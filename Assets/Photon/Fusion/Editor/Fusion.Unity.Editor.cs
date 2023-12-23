@@ -1966,11 +1966,13 @@ namespace Fusion.Editor {
 
 #region AssetDatabaseUtils.Addressables.cs
 
-#if FUSION_ENABLE_ADDRESSABLES && !FUSION_DISABLE_ADDRESSABLES
+#if (FUSION_ADDRESSABLES || FUSION_ENABLE_ADDRESSABLES) && !FUSION_DISABLE_ADDRESSABLES
 namespace Fusion.Editor {
   using System;
   using System.Collections.Generic;
   using System.Linq;
+  using UnityEditor;
+  using UnityEditor.AddressableAssets;
   using UnityEditor.AddressableAssets.Settings;
   using UnityEngine;
 
@@ -2010,6 +2012,70 @@ namespace Fusion.Editor {
         }
       };
     }
+    
+        
+    public static AddressableAssetEntry GetAddressableAssetEntry(UnityEngine.Object source) {
+      if (source == null || !AssetDatabase.Contains(source)) {
+        return null;
+      }
+
+      return GetAddressableAssetEntry(GetAssetGuidOrThrow(source));
+    }
+    
+    public static AddressableAssetEntry GetAddressableAssetEntry(string guid) {
+      if (string.IsNullOrEmpty(guid)) {
+        return null;
+      }
+
+      var addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
+      return addressableSettings.FindAssetEntry(guid);
+    }
+
+    public static AddressableAssetEntry CreateOrMoveAddressableAssetEntry(UnityEngine.Object source, string groupName = null) {
+      if (source == null || !AssetDatabase.Contains(source))
+        return null;
+
+      return CreateOrMoveAddressableAssetEntry(GetAssetGuidOrThrow(source), groupName);
+    }
+    
+    public static AddressableAssetEntry CreateOrMoveAddressableAssetEntry(string guid, string groupName = null) {
+      if (string.IsNullOrEmpty(guid)) {
+        return null;
+      }
+
+      var addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
+
+      AddressableAssetGroup group;
+      if (string.IsNullOrEmpty(groupName)) {
+        group = addressableSettings.DefaultGroup; 
+      } else {
+        group = addressableSettings.FindGroup(groupName);
+      }
+      
+      if (group == null) {
+        throw new ArgumentOutOfRangeException($"Group {groupName} not found");
+      }
+      
+      var entry = addressableSettings.CreateOrMoveEntry(guid, group);
+      return entry;
+    }
+    
+    public static bool RemoveMoveAddressableAssetEntry(UnityEngine.Object source) {
+      if (source == null || !AssetDatabase.Contains(source)) {
+        return false;
+      }
+
+      return RemoveMoveAddressableAssetEntry(GetAssetGuidOrThrow(source));
+    }
+    
+    public static bool RemoveMoveAddressableAssetEntry(string guid) {
+      if (string.IsNullOrEmpty(guid)) {
+        return false;
+      }
+
+      var addressableSettings = AddressableAssetSettingsDefaultObject.Settings;
+      return addressableSettings.RemoveAssetEntry(guid);
+    }
   }
 }
 #endif
@@ -2027,6 +2093,7 @@ namespace Fusion.Editor {
   using UnityEditor;
   using UnityEditor.PackageManager;
   using UnityEngine;
+  using Object = UnityEngine.Object;
 
   public static partial class AssetDatabaseUtils {
     
@@ -2052,6 +2119,14 @@ namespace Fusion.Editor {
       return result;
     }
     
+    public static string GetAssetPathOrThrow(UnityEngine.Object obj) {
+      var result = AssetDatabase.GetAssetPath(obj);
+      if (string.IsNullOrEmpty(result)) {
+        throw new ArgumentException($"Asset {obj} not found");
+      }
+      return result;
+    }
+    
     public static string GetAssetPathOrThrow(string assetGuid) {
       var result = AssetDatabase.GUIDToAssetPath(assetGuid);
       if (string.IsNullOrEmpty(result)) {
@@ -2070,7 +2145,16 @@ namespace Fusion.Editor {
       return result;
     }
     
+    public static string GetAssetGuidOrThrow(int instanceId) {
+      var assetPath = GetAssetPathOrThrow(instanceId);
+      return GetAssetGuidOrThrow(assetPath);
+    }
     
+    public static string GetAssetGuidOrThrow(UnityEngine.Object obj) {
+      var assetPath = GetAssetPathOrThrow(obj);
+      return GetAssetGuidOrThrow(assetPath);
+    }
+
     public static (string, long) GetGUIDAndLocalFileIdentifierOrThrow<T>(LazyLoadReference<T> reference) where T : UnityEngine.Object {
       if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(reference, out var guid, out long localId)) {
         throw new ArgumentException($"Asset with instanceId {reference} not found");
@@ -2079,12 +2163,27 @@ namespace Fusion.Editor {
       return (guid, localId);
     }
 
+    public static (string, long) GetGUIDAndLocalFileIdentifierOrThrow(UnityEngine.Object obj) {
+      if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out var guid, out long localId)) {
+        throw new ArgumentException(nameof(obj));
+      }
+
+      return (guid, localId);
+    }
+    
     public static (string, long) GetGUIDAndLocalFileIdentifierOrThrow(int instanceId) {
       if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(instanceId, out var guid, out long localId)) {
         throw new ArgumentException($"Asset with instanceId {instanceId} not found");
       }
 
       return (guid, localId);
+    }
+    
+    public static void MoveAssetOrThrow(string source, string destination) {
+      var error = AssetDatabase.MoveAsset(source, destination);
+      if (!string.IsNullOrEmpty(error)) {
+        throw new ArgumentException($"Failed to move {source} to {destination}: {error}");
+      }
     }
 
     public static bool HasLabel(string assetPath, string label) {
@@ -2187,6 +2286,44 @@ namespace Fusion.Editor {
     public static bool HasScriptingDefineSymbol(BuildTargetGroup group, string value) {
       var defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group).Split(';');
       return System.Array.IndexOf(defines, value) >= 0;
+    }
+    
+    public static T SetScriptableObjectType<T>(ScriptableObject obj) where T : ScriptableObject {
+      return (T)SetScriptableObjectType(obj, typeof(T));
+    }
+    
+    public static ScriptableObject SetScriptableObjectType(ScriptableObject obj, Type type) {
+      const string ScriptPropertyName = "m_Script";
+
+      if (!obj) {
+        throw new ArgumentNullException(nameof(obj));
+      }
+      if (type == null) {
+        throw new ArgumentNullException(nameof(type));
+      }
+      if (!type.IsSubclassOf(typeof(ScriptableObject))) {
+        throw new ArgumentException($"Type {type} is not a subclass of {nameof(ScriptableObject)}");
+      }
+      
+      if (obj.GetType() == type) {
+        return obj;
+      }
+
+      var tmp = ScriptableObject.CreateInstance(type);
+      try {
+        using (var dst = new SerializedObject(obj)) {
+          using (var src = new SerializedObject(tmp)) {
+            var scriptDst = dst.FindPropertyOrThrow(ScriptPropertyName);
+            var scriptSrc = src.FindPropertyOrThrow(ScriptPropertyName);
+            Debug.Assert(scriptDst.objectReferenceValue != scriptSrc.objectReferenceValue);
+            dst.CopyFromSerializedProperty(scriptSrc);
+            dst.ApplyModifiedPropertiesWithoutUndo();
+            return (ScriptableObject)dst.targetObject;
+          }
+        }
+      } finally {
+        UnityEngine.Object.DestroyImmediate(tmp);
+      }
     }
     
     private static bool IsEnumValueObsolete<T>(string valueName) where T : System.Enum {
@@ -2439,9 +2576,7 @@ namespace Fusion.Editor {
           bool checkResult;
           
           if (getter == null) {
-            // use the property
-            var rootProperty = editor.serializedObject.GetIterator();
-            checkResult = DoIfAttributeDrawer.CheckDraw(doIf, rootProperty);
+            checkResult = DoIfAttributeDrawer.CheckDraw(doIf, editor.serializedObject);
           } else {
             var value = getter(targets[0]);
             checkResult = DoIfAttributeDrawer.CheckCondition(doIf, value);
@@ -4322,14 +4457,20 @@ namespace Fusion.Editor {
       return drawerType;
     }
     
-    public static void DisplayTypePickerMenu(Rect position, Type baseType, Action<Type> callback, string noneOptionLabel = "[None]", bool groupByNamespace = true, Type selectedType = null, bool enableAbstract = false, bool enableGenericTypeDefinitions = false) {
-      var types = TypeCache.GetTypesDerivedFrom(baseType)
-       .Where(x =>
-          (enableAbstract || !x.IsAbstract) && 
-          (enableGenericTypeDefinitions || !x.IsGenericTypeDefinition)
-        )
-       .OrderBy(x => x.FullName)
-       .ToList();
+    public static void DisplayTypePickerMenu(Rect position, Type[] baseTypes, Action<Type> callback, Func<Type, bool> filter, string noneOptionLabel = "[None]", bool groupByNamespace = true, Type selectedType = null) {
+
+      var types = new List<Type>();
+
+      foreach (var baseType in baseTypes) {
+        types.AddRange(TypeCache.GetTypesDerivedFrom(baseType).Where(filter));
+      }
+
+      if (baseTypes.Length > 1) {
+        types = types.Distinct().ToList();
+      }
+
+      types.Sort((a, b) => string.CompareOrdinal(a.FullName, b.FullName));
+
 
       List<GUIContent> menuOptions = new List<GUIContent>();
       var actualTypes = new Dictionary<string, System.Type>();
@@ -4375,6 +4516,37 @@ namespace Fusion.Editor {
         var newType = ((Dictionary<string, System.Type>)userData)[path];
         callback(newType);
       }, actualTypes);
+    }
+    
+        
+    public static void DisplayTypePickerMenu(Rect position, Type[] baseTypes, Action<Type> callback, string noneOptionLabel = "[None]", bool groupByNamespace = true, Type selectedType = null, bool enableAbstract = false, bool enableGenericTypeDefinitions = false) {
+      DisplayTypePickerMenu(position, baseTypes, callback, x => 
+        (enableAbstract || !x.IsAbstract) && 
+        (enableGenericTypeDefinitions || !x.IsGenericTypeDefinition));
+    }
+    
+    public static void DisplayTypePickerMenu(Rect position, Type baseType, Action<Type> callback, string noneOptionLabel = "[None]", bool groupByNamespace = true, Type selectedType = null, bool enableAbstract = false, bool enableGenericTypeDefinitions = false) {
+      DisplayTypePickerMenu(position, new [] { baseType }, callback, x => 
+        (enableAbstract || !x.IsAbstract) && 
+        (enableGenericTypeDefinitions || !x.IsGenericTypeDefinition));
+    }
+  }
+}
+
+#endregion
+
+
+#region FusionEditorUtility.cs
+
+namespace Fusion.Editor {
+  using System;
+  using UnityEditor;
+
+  partial class FusionEditorUtility {
+    public static void DelayCall(EditorApplication.CallbackFunction callback) {
+      FusionEditorLog.Assert(callback.Target == null, "DelayCall callback needs to stateless");
+      EditorApplication.delayCall -= callback;
+      EditorApplication.delayCall += callback;
     }
   }
 }
@@ -4754,7 +4926,7 @@ namespace Fusion.Editor {
       return null;
     }
 
-    protected static Column MakeSimpleColumn<T>(Expression<Func<TItem, T>> propertyExpression, Column column) where T : IComparable {
+    protected static Column MakeSimpleColumn<T>(Expression<Func<TItem, T>> propertyExpression, Column column) {
 
       string propertyName;
       if (propertyExpression.Body is MemberExpression memberExpression) {
@@ -4769,7 +4941,9 @@ namespace Fusion.Editor {
       column.getSearchText ??= toString;
       column.getComparer ??= order => (a, b) => EditorUtility.NaturalCompare(toString(a), toString(b)) * order;
       column.cellGUI ??= (item, rect, selected, focused) => TreeView.DefaultGUI.Label(rect, toString(item), selected, focused);
-      column.headerContent = new GUIContent(propertyName);
+      if (string.IsNullOrEmpty(column.headerContent.text) && string.IsNullOrEmpty(column.headerContent.tooltip)) {
+        column.headerContent = new GUIContent(propertyName);
+      }
         
       return column;
     }
@@ -5048,6 +5222,7 @@ namespace Fusion.Editor {
           _builder.AppendLine("...");
         }
 
+        _lastHash = arrayHash;
         _lastValue = new GUIContent(_builder.ToString());
       } else {
         Debug.Assert(_lastValue != null);
@@ -5106,6 +5281,7 @@ namespace Fusion.Editor {
           _builder.AppendLine("...");
         }
 
+        _lastHash = arrayHash;
         _lastValue = new GUIContent(_builder.ToString());
       } else {
         Debug.Assert(_lastValue != null);
@@ -5142,6 +5318,25 @@ namespace Fusion.Editor {
   static partial class ReflectionUtils {
     public const BindingFlags DefaultBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 
+    public static string GetShortAssemblyQualifiedName(this Type type) {
+      
+      var result = type.AssemblyQualifiedName;
+      if (result == null) {
+        throw new InvalidOperationException();
+      }
+
+      string RemoveSuffixStartingWith(string str, string part) {
+        var i = str.IndexOf(part, StringComparison.Ordinal);
+        return i >= 0 ? str.Substring(0, i) : str;
+      }
+
+      result = RemoveSuffixStartingWith(result, ", Version=");
+      result = RemoveSuffixStartingWith(result, ", Culture=");
+      result = RemoveSuffixStartingWith(result, ", PublicKeyToken=");
+
+      return result;
+    }
+    
     public static Type GetUnityLeafType(this Type type) {
       if (type.HasElementType) {
         type = type.GetElementType();
@@ -5806,7 +6001,7 @@ namespace Fusion.Editor {
     public static SerializedProperty FindPropertyRelativeOrThrow(this SerializedProperty sp, string relativePropertyPath) {
       var result = sp.FindPropertyRelative(relativePropertyPath);
       if (result == null) {
-        throw new ArgumentOutOfRangeException(nameof(relativePropertyPath), $"Property not found: {relativePropertyPath} (relative to {sp.propertyPath} of {sp.serializedObject.targetObject}");
+        throw new ArgumentOutOfRangeException(nameof(relativePropertyPath), $"Property not found: {relativePropertyPath} (relative to \"{sp.propertyPath}\" of {sp.serializedObject.targetObject}");
       }
 
       return result;
@@ -6789,7 +6984,6 @@ namespace Fusion.Editor {
   
   internal partial class BinaryDataAttributeDrawer : PropertyDrawerWithErrorHandling, INonApplicableOnArrayElements {
     
-    private int           MaxLength = 2048;
     private int           MaxLines  = 16;
     private RawDataDrawer _drawer   = new RawDataDrawer();
 
@@ -7309,13 +7503,15 @@ namespace Fusion.Editor {
         // maybe this is a top-level property then and we can use reflection?
         if (depth != 0) {
           if (doIf.ErrorOnConditionMemberNotFound) {
-            FusionEditorLog.ErrorInspector($"Can't check condition for {referencePath}: non-SerializedProperty checks only work for top-level properties");
+            FusionEditorLog.ErrorInspector($"Can't check condition for {referencePath}: non-SerializedProperty checks only work for top-level properties (depth:{depth}, conditionMember:{doIf.ConditionMember})");
           }
         } else {
           try {
             getter = objType.CreateGetter(doIf.ConditionMember, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
           } catch (Exception e) {
-            FusionEditorLog.ErrorInspector($"Can't check condition for {referencePath}: unable to create getter for {doIf.ConditionMember} with exception {e}");
+            if (doIf.ErrorOnConditionMemberNotFound) {
+              FusionEditorLog.ErrorInspector($"Can't check condition for {referencePath}: unable to create getter for {doIf.ConditionMember} with exception {e}");
+            }
           }
         }
 
@@ -8035,6 +8231,7 @@ namespace Fusion.Editor {
 
       int value;
 
+      using (new FusionEditorGUI.PropertyScope(p, label, prop))
       using (new FusionEditorGUI.ShowMixedValueScope(prop.hasMultipleDifferentValues)) {
         value = EditorGUI.LayerField(p, label, prop.intValue);
       }
@@ -8884,13 +9081,7 @@ namespace Fusion.Editor {
         FusionEditorGUI.DisplayTypePickerMenu(position, baseType, t => {
           string typeName = string.Empty;
           if (t != null) {
-            typeName = t.AssemblyQualifiedName;
-            if (attr?.UseFullAssemblyQualifiedName == false) {
-              var versionIndex = typeName.IndexOf(", Version=", StringComparison.Ordinal);
-              if (versionIndex > 0) {
-                typeName = typeName.Substring(0, versionIndex);
-              }
-            }
+            typeName = attr?.UseFullAssemblyQualifiedName == false ? t.GetShortAssemblyQualifiedName() : t.AssemblyQualifiedName;
           }
           
           valueProperty.stringValue = typeName;
@@ -8923,6 +9114,7 @@ namespace Fusion.Editor {
       Rect pickerRect;
       if (label == GUIContent.none) {
         pickerRect = position;
+        pickerRect.height = EditorGUIUtility.singleLineHeight;
       } else {
         pickerRect = EditorGUI.PrefixLabel(new Rect(position) { height = EditorGUIUtility.singleLineHeight }, FusionEditorGUI.WhitespaceContent);
       }
@@ -8931,7 +9123,13 @@ namespace Fusion.Editor {
       var instanceType = instance?.GetType();
       
       if (EditorGUI.DropdownButton(pickerRect, new GUIContent(instanceType?.FullName ?? NullContent), FocusType.Keyboard)) {
-        FusionEditorGUI.DisplayTypePickerMenu(pickerRect, fieldInfo.FieldType.GetUnityLeafType(), t => {
+
+        var types = attribute.Types;
+        if (!types.Any()) {
+          types = new[] { fieldInfo.FieldType.GetUnityLeafType() };
+        }
+        
+        FusionEditorGUI.DisplayTypePickerMenu(pickerRect, types, t => {
           if (t == null) {
             instance = null;
           } else if (t.IsInstanceOfType(instance)) {
@@ -9151,7 +9349,7 @@ namespace Fusion.Editor {
         assetPath = AssetDatabase.GUIDToAssetPath(guid);
       }
 
-      using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(assetPath))) {
+      using (new FusionEditorGUI.EnabledScope(!string.IsNullOrEmpty(assetPath))) {
         position.x     += position.width;
         position.width =  40;
 
@@ -9446,7 +9644,7 @@ namespace Fusion.Editor {
           var objType = Property.ParentType;
           if (!_cachedGetters.TryGetValue((objType, doIf.ConditionMember), out var getter)) {
             // maybe this is a top-level property then and we can use reflection?
-            if (Property.GetDepth() != 0) {
+            if (Property.GetValueDepth() != 0) {
               if (doIf.ErrorOnConditionMemberNotFound) {
                 FusionEditorLog.ErrorInspector($"Can't check condition for {Property.Path}: non-SerializedProperty checks only work for top-level properties");
               }
@@ -9454,13 +9652,15 @@ namespace Fusion.Editor {
               try {
                 _cachedGetters.Add((objType, doIf.ConditionMember), Property.ParentType.CreateGetter(doIf.ConditionMember, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
               } catch (Exception e) {
-                FusionEditorLog.ErrorInspector($"Can't check condition for {Property.Path}: unable to create getter for {doIf.ConditionMember} with exception {e}");
+                if (doIf.ErrorOnConditionMemberNotFound) {
+                  FusionEditorLog.ErrorInspector($"Can't check condition for {Property.Path}: unable to create getter for {doIf.ConditionMember} with exception {e}");
+                }
               }
             }
           }
 
           if (getter != null) {
-            foreach (var obj in Property.Parent.ValueEntry.WeakValues) {
+            foreach (var obj in Property.GetValueParent().ValueEntry.WeakValues) {
               var value = getter(obj);
               if (DoIfAttributeDrawer.CheckCondition(doIf, value)) {
                 anyPassed = true;
@@ -9913,18 +10113,27 @@ namespace Fusion.Editor {
       return true;
     }
 
-    public static int GetDepth(this InspectorProperty inspectorProperty) {
-      int               depth           = 0;
-      InspectorProperty currentProperty = inspectorProperty;
-
-      while (currentProperty.Parent != null && !currentProperty.Parent.IsTreeRoot) {
-        depth++;
-        currentProperty = currentProperty.Parent;
+    public static int GetValueDepth(this InspectorProperty property) {
+      int depth = 0;
+      
+      var parent = property.GetValueParent();
+      while (parent?.IsTreeRoot == false) {
+        ++depth;
+        parent = parent.GetValueParent();
       }
-
+      
       return depth;
     }
 
+    public static InspectorProperty GetValueParent(this InspectorProperty property) {
+      
+      var parent = property.Parent;
+      while (parent?.Info.PropertyType == PropertyType.Group) {
+        parent = parent.Parent;
+      }
+      return parent;
+    }
+    
     public static SerializedPropertyType GetUnityPropertyType(this InspectorProperty inspectorProperty) {
       if (inspectorProperty == null) {
         throw new ArgumentNullException(nameof(inspectorProperty));
@@ -9985,11 +10194,11 @@ namespace Fusion.Editor {
 
       int parentIndex = 0;
       do {
-        if (referenceProperty.Parent == null) {
+        if (referenceProperty.GetValueParent() == null) {
           return null;
         }
         
-        referenceProperty = referenceProperty.Parent;
+        referenceProperty = referenceProperty.GetValueParent();
       } while (path[parentIndex++] == '^');
 
       if (parentIndex > 1) {
@@ -10257,7 +10466,7 @@ namespace Fusion.Editor {
 
 #region NetworkAssetSourceFactoryAddressable.cs
 
-#if FUSION_ENABLE_ADDRESSABLES && !FUSION_DISABLE_ADDRESSABLES
+#if (FUSION_ADDRESSABLES || FUSION_ENABLE_ADDRESSABLES) && !FUSION_DISABLE_ADDRESSABLES
 namespace Fusion.Editor {
   using System;
   using System.Collections.Generic;
@@ -10290,21 +10499,24 @@ namespace Fusion.Editor {
     readonly Lazy<ILookup<string, AddressableAssetEntry>> _guidToParentAddressable = new(() => CreateAddressablesLookup());
     
     static ILookup<string, AddressableAssetEntry> CreateAddressablesLookup() {
-      var assetList      = new List<AddressableAssetEntry>();
+      var assetList      = new List<AddressableAssetEntry>(128);
       var assetsSettings = AddressableAssetSettingsDefaultObject.Settings;
 
       if (assetsSettings == null) {
         throw new System.InvalidOperationException("Unable to load Addressables settings. This may be due to an outdated Addressables version.");
       }
-
-      foreach (var settingsGroup in assetsSettings.groups) {
-        if (settingsGroup.ReadOnly)
-          continue;
-        settingsGroup.GatherAllAssets(assetList, true, true, true);
-      }
-
+      
+      Func<AddressableAssetGroup, bool> groupFilter = null;
+      CreateAddressablesGroupFilter(ref groupFilter);
+      Func<AddressableAssetEntry, bool> entryFilter = null;
+      CreateAddressablesEntryFilter(ref entryFilter);
+      assetsSettings.GetAllAssets(assetList, true, groupFilter: groupFilter, entryFilter: entryFilter);
+      
       return assetList.Where(x => !string.IsNullOrEmpty(x.guid)).ToLookup(x => x.guid);
     }
+
+    static partial void CreateAddressablesEntryFilter(ref Func<AddressableAssetEntry, bool> filter);
+    static partial void CreateAddressablesGroupFilter(ref Func<AddressableAssetGroup, bool> filter);
   }
 }
 #endif
@@ -11392,12 +11604,6 @@ namespace Fusion.Editor {
     private static PropertyInfo _HasInputAuthority = typeof(NetworkObject).GetPropertyOrThrow(nameof(NetworkObject.HasInputAuthority));
     private static PropertyInfo _HasStateAuthority = typeof(NetworkObject).GetPropertyOrThrow(nameof(NetworkObject.HasStateAuthority));
 
-
-    [Obsolete("Use " + nameof(NetworkObjectBaker) + " instead", true)]
-    public static bool BakeHierarchy(GameObject root, NetworkObjectGuid? prefabGuid, Action<object> setDirty = null, Func<NetworkObject, NetworkObjectGuid> guidProvider = null) {
-      throw new NotImplementedException();
-    }
-
     static string GetLoadInfoString(NetworkObjectGuid guid) {
       if (NetworkProjectConfigUtilities.TryGetGlobalPrefabSource(guid, out INetworkPrefabSource prefabSource)) {
         return prefabSource.Description;
@@ -11405,8 +11611,6 @@ namespace Fusion.Editor {
 
       return "Null";
     }
-    
-
 
     public override void OnInspectorGUI() {
       FusionEditorGUI.InjectScriptHeaderDrawer(serializedObject);
@@ -11734,8 +11938,6 @@ namespace Fusion.Editor {
 
     public static event Action<NetworkObjectBakePrefabArgs> OnBakePrefab;
     public static event Action<NetworkObjectBakeSceneArgs> OnBakeScene;
-    
-    private static HashSet<string> s_knownSpawnablePrefabs = new HashSet<string>();
 
     static NetworkObjectPostprocessor() {
       EditorSceneManager.sceneSaving += OnSceneSaving;
@@ -11745,59 +11947,97 @@ namespace Fusion.Editor {
     static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths) {
       FusionEditorLog.TraceImport($"Postprocessing imported assets [{importedAssets.Length}]:\n{string.Join("\n", importedAssets)}");
 
-      bool configPossiblyDirty = false;
+      bool rebuildPrefabHash = false;
+
 
       foreach (var path in importedAssets) {
-        if (!path.EndsWith(".prefab")) {
+        if (!IsPrefabPath(path)) {
           continue;
         }
-
-#if UNITY_2023_1_OR_NEWER
-        if (Array.IndexOf(movedAssets, path) >= 0) {
-          // attempting to bake a prefab that has been moved would hang the editor
-          // TODO: add the bug tracker link once Unity has assigned one
-          continue;
-        }
-#endif
         
         var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
         if (!go) {
           continue;
         }
-
+        
+        var isSpawnable = false;
+        var needsBaking = false;
+        
         var no = go.GetComponent<NetworkObject>();
         if (no) {
-          FusionEditorLog.TraceImport(path, "Was marked as dirty in OnPostprocessPrefab, need to rebake");
-          if (BakePrefab(path, out var newRoot)) {
-#if FUSION_DEV
-              Debug.Assert(newRoot != null && newRoot == AssetDatabase.LoadMainAssetAtPath(path));
-#endif
-            go = newRoot;
-            no = go.GetComponent<NetworkObject>();
-          }
+          // NO prefab, needs labels adjusted and hash needs to be rebuilt
+          rebuildPrefabHash = true;
+          needsBaking = true;
+          isSpawnable = !no.Flags.IsIgnored();
         }
-
-        var isSpawnable = no && no.Flags.IsIgnored() == false;
-        var isKnownSpawnablePrefab = isSpawnable && !s_knownSpawnablePrefabs.Add(path);
         
         if (AssetDatabaseUtils.SetLabel(go, NetworkProjectConfigImporter.FusionPrefabTag, isSpawnable)) {
-          configPossiblyDirty = true;
+          rebuildPrefabHash = true;
           AssetDatabase.ImportAsset(path);
-          FusionEditorLog.TraceImport(path, "Labels dirty, going to reimport the config, too");
+          FusionEditorLog.TraceImport(path, "Labels were dirty");
         } else if (no) {
-          if (!isKnownSpawnablePrefab) {
-            // there's still a possible case of prefab being duplicated with the label already in place;
-            configPossiblyDirty = true;
-          }
           FusionEditorLog.TraceImport(path, "Labels up to date");
+        }
+        
+        if (needsBaking) {
+#if UNITY_2023_1_OR_NEWER || UNITY_2022_3_OR_NEWER
+          if (Array.IndexOf(movedAssets, path) >= 0) {
+            // attempting to bake a prefab that has been moved would hang the editor
+            // https://issuetracker.unity3d.com/issues/editor-freezes-when-prefabutility-dot-loadprefabcontents-is-called-in-assetpostprocessor-dot-onpostprocessallassets-for-a-moved-prefab
+            continue;
+          }
+#endif
+          FusionEditorLog.TraceImport(path, "Baking");
+          BakePrefab(path, out _);
         }
       }
 
-      if (configPossiblyDirty) {
-        NetworkProjectConfigUtilities.ImportGlobalConfig();
+      foreach (var path in movedAssets) {
+        if (!IsPrefabPath(path)) {
+          continue;
+        }
+        if (!AssetDatabaseUtils.HasLabel(path, NetworkProjectConfigImporter.FusionPrefabTag)) {
+          continue;
+        }
+        rebuildPrefabHash = true;
+        break;
+      }
+      
+      foreach (var path in deletedAssets) {
+        if (!IsPrefabPath(path)) {
+          continue;
+        }
+        rebuildPrefabHash = true;
+        break;
+      }
+
+      if (rebuildPrefabHash) {
+        EditorApplication.delayCall -= NetworkProjectConfigImporter.RefreshNetworkObjectPrefabHash;
+        EditorApplication.delayCall += NetworkProjectConfigImporter.RefreshNetworkObjectPrefabHash;
       }
     }
 
+    static bool IsPrefabPath(string path) {
+      return path.EndsWith(".prefab");
+    }
+    
+    static bool IsNetworkObjectPrefab(string path, out NetworkObject no) {
+      if (!path.EndsWith(".prefab")) {
+        // not a prefab
+        no = null;
+        return false;
+      }
+        
+      var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+      if (!go) {
+        no = null;
+        return false;
+      }
+        
+      no = go.GetComponent<NetworkObject>();
+      return no;
+    }
+    
     void OnPostprocessPrefab(GameObject prefab) {
       var no = prefab.GetComponent<NetworkObject>();
 
@@ -11880,13 +12120,6 @@ namespace Fusion.Editor {
     private static void OnSceneSaving(Scene scene, string path) {
       BakeScene(scene);
     }
-
-
-    [Obsolete("Use " + nameof(BakeScene) + " instead")]
-    public static void BakeSceneObjects(Scene scene) => BakeScene(scene);
-
-    [Obsolete("Use " + nameof(BakeAllOpenScenes) + " instead")]
-    public static void BakeSceneObjects() => BakeAllOpenScenes();
 
     [MenuItem("Tools/Fusion/Scene/Bake Scene Objects", false, FusionAssistants.PRIORITY_LOW - 1)]
     [MenuItem("GameObject/Fusion/Scene/Bake Scene Objects", false, FusionAssistants.PRIORITY - 1)]
@@ -12925,28 +13158,6 @@ namespace Fusion.Editor {
     public static bool IsSceneObject(GameObject go) {
       return ReferenceEquals(PrefabStageUtility.GetPrefabStage(go), null) && (PrefabUtility.IsPartOfPrefabAsset(go) == false || PrefabUtility.GetPrefabAssetType(go) == PrefabAssetType.NotAPrefab);
     }
-
-    public static T SetScriptableObjectType<T>(ScriptableObject obj) where T : ScriptableObject {
-      if (obj.GetType() == typeof(T)) {
-        return (T)obj;
-      }
-
-      var tmp = ScriptableObject.CreateInstance(typeof(T));
-      try {
-        using (var dst = new SerializedObject(obj)) {
-          using (var src = new SerializedObject(tmp)) {
-            var scriptDst = dst.FindPropertyOrThrow(FusionEditorGUI.ScriptPropertyName);
-            var scriptSrc = src.FindPropertyOrThrow(FusionEditorGUI.ScriptPropertyName);
-            Debug.Assert(scriptDst.objectReferenceValue != scriptSrc.objectReferenceValue);
-            dst.CopyFromSerializedProperty(scriptSrc);
-            dst.ApplyModifiedPropertiesWithoutUndo();
-            return (T)dst.targetObject;
-          }
-        }
-      } finally {
-        UnityEngine.Object.DestroyImmediate(tmp);
-      }
-    }
   }
 }
 
@@ -13177,9 +13388,6 @@ namespace Fusion.Editor {
       NetworkProjectConfigUtilities.PingGlobalConfigAsset(true);
     }
 
-    [Obsolete("Use " + nameof(RebuildPrefabTable) + " instead")]
-    public static void RebuildObjectTable() => RebuildPrefabTable();
-
     [MenuItem("Tools/Fusion/Rebuild Prefab Table", priority = 100)]
     public static void RebuildPrefabTable() {
       foreach (var prefab in AssetDatabase.FindAssets($"t:prefab")
@@ -13194,6 +13402,8 @@ namespace Fusion.Editor {
 
       AssetDatabase.Refresh();
       ImportGlobalConfig();
+
+      Debug.Log("Rebuild Prefab Table done.");
     }
 
     public static void PingGlobalConfigAsset(bool select = false) {

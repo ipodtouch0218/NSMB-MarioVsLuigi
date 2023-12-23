@@ -40,7 +40,7 @@
             <summary>
             Set the Async Operation as faulted using the Exception
             </summary>
-            <param name="e"></param>
+            <param name="e">Exception to be set on the Operation</param>
         </member>
         <member name="M:Fusion.Async.AsyncOperationHandler`1.Expire">
             <summary>
@@ -159,8 +159,8 @@
             <summary>
             Register a callback for a specific Message Type
             </summary>
-            <typeparam name="K"></typeparam>
-            <param name="callback"></param>
+            <typeparam name="T">Message Type</typeparam>
+            <param name="callback">Callback to be invoked when a Message of type T is received</param>
         </member>
         <member name="M:Fusion.Protocol.ICommunicator.SendMessage(System.Int32,Fusion.Protocol.IMessage)">
             <summary>

@@ -109,6 +109,43 @@ For a more in-depth overview over what changed check: [Coming from Fusion 1.0](h
 
 ## RC
 
+### Build 801 (Dec 12, 2023)
+
+**Changes**
+
+- `NetworkRigidbody` XML Docs
+- `NetworkProjectConfigImporter` refreshes now whenever a new `NetworkObject` prefab is created, a prefab is moved or deleted
+- NetworkRigidbody EnsurerHasRunnerSimulatePhysics() changed from private to protected
+- _deferredTeleport field in NetworkRigidbody changed from private to protected
+
+**Removed**
+
+- Obsolete API
+
+**Bug Fixes**
+
+- Fixed: NetworkCharacterController Spawn at 0,0,0
+- Fixed: Issue with full consistency not acting properly when ReplicateTo was being used
+- Fixed: NetworkObjects not being replicated on clients correctly when scheduling only enabled
+- Fixed: Revert & Apply buttons always disabled in `NetworkProjectConfig` inspector
+- Fixed: Odin: inspector errors for `[Networked]` properties when using `[FoldoutGroups]`  
+Dev: Imported PhotonUnityEditorCommon@f81d7ff1bfa4ef962bd64e664a3c50a44e922404
+- Fixed: FusionStats NetworkObject stats would always fail to find stat data, now will correctly retry until found
+- Fixed: NetworkRigidbody fixed so State Authority changes in Shared Mode retain Rigidbody velocity on the new State Authority
+- Fixed: Timming issue with master client objects state authority changed detection
+- Fixed: NetworkRigidbody now un-dirties the interpolation target when SetInterpolationTarget(null) is called. This prevents null errors due to setting the target to null at runtime
+- Fixed: Test Suit Platforms
+- Fixed: `NullReferenceException` thrown by `NetworkProjectConfigImporterEditor` if initial prefab table import fails
+- Fixed: NetworkRigidbody3D ResetRigidbody() now checks for isKinematic before reseting velocity
+- Fixed: Change detector having incorrect ticks set
+- Fixed: "InvalidOperationException" during connection establishing on server
+- Fixed: Allocations in Timelines.Update
+- Fixed: Allocations in Client.GetInput
+- Fixed: Invalid properties when NetworkRunner is Uninitialized
+- Fixed: NRB handling of unparented Kinematic RBs now always applies pos/rot to Transform rather than Rigidbody
+- Fixed: Fusion.Addon.Physics assembly correctly renamed in NetworkProjectConfig.AssembliesToWeave defaults
+- Fixed: Editor freezing on prefab rename workaround applied to Unity 2022.3 as well
+
 ### Build 797 (Nov 07, 2023)
 
 **What's New**

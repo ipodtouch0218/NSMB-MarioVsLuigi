@@ -17,38 +17,6 @@ namespace Fusion {
   [AddComponentMenu("Fusion/Enable On Single Runner")]
   public class EnableOnSingleRunner : Fusion.Behaviour {
 
-    
-    
-    // -------------------------------  Delete this in the future ----------------------
-    // TODO: Only here for transition from RunnerVisibilityNodes:
-#pragma warning disable CS0618
-    private static bool Upgrade(RunnerVisibilityNodes old, GameObject go) {
-      Debug.LogWarning($"Upgrading {go.name} {old._guid}");
-#if UNITY_EDITOR
-      var existingNew = go.GetComponents<EnableOnSingleRunner>();
-      foreach (var c in existingNew) {
-        if (c._guid == old._guid) {
-          // already upgraded
-          return false;
-        }
-      }
-      var upgraded = Undo.AddComponent<EnableOnSingleRunner>(go);
-      upgraded._guid           = old._guid;
-      upgraded.Components      = old.Components;
-      upgraded.PreferredRunner = (RunnerVisibilityLink.PreferredRunners)old.PreferredRunner;
-
-      EditorUtility.SetDirty(upgraded);
-
-      return true;
-#else
-      return false;
-#endif
-    }
-#pragma warning restore CS0618
-    // -------------------------------  Delete this in the future ----------------------
-    
-    
-    
     /// <summary>
     /// If more than one runner instance is visible, this indicates which peer's clone of this entity should be visible.
     /// </summary>

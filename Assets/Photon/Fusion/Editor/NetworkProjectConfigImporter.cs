@@ -19,6 +19,7 @@ namespace Fusion.Editor {
     public const string FusionPrefabTagSearchTerm  = "l:FusionPrefab";
     public const string ScriptOrderDependencyName  = "Fusion.ScriptOrderDependency";
     public const string AddressablesDependencyName = "Fusion.AddressablesDependency";
+    public const string PrefabsDependencyName      = "Fusion.PrefabsDependency";
 
     [Header("Prefabs")]
     [DrawInline]
@@ -49,6 +50,7 @@ namespace Fusion.Editor {
       
       ctx.DependsOnCustomDependency(AddressablesDependencyName);
       ctx.DependsOnCustomDependency(ScriptOrderDependencyName);
+      ctx.DependsOnCustomDependency(PrefabsDependencyName);
     }
 
 
@@ -89,9 +91,7 @@ namespace Fusion.Editor {
 #if FUSION_EDITOR_TRACE
         detailsLog.AppendLine($"{assetPath} -> {((INetworkPrefabSource)prefabSource).EditorSummary}");
 #endif
-
-        ctx.DependsOnSourceAsset(prefabPath);
-
+        
         var index = paths.BinarySearch(prefabPath, StringComparer.Ordinal);
         if (index < 0) {
           index = ~index;
@@ -213,6 +213,18 @@ namespace Fusion.Editor {
 
         return hash;
       }
+    }
+
+    public static void RefreshNetworkObjectPrefabHash() {
+      var hash = new Hash128();
+      
+      foreach (var it in AssetDatabaseUtils.IterateAssets<GameObject>(label: FusionPrefabTag)) {
+        hash.Append(it.guid);
+      }
+      
+      FusionEditorLog.TraceImport($"Refreshing {PrefabsDependencyName} dependency hash: {hash}");
+      AssetDatabase.RegisterCustomDependency(PrefabsDependencyName, hash);
+      AssetDatabase.Refresh();
     }
   }
 }

@@ -110,6 +110,7 @@ namespace Fusion {
     public override void Spawned() {
       _initial = default;
       TryGetComponent(out _controller);
+      CopyToBuffer();
     }
 
     public override void Render() {

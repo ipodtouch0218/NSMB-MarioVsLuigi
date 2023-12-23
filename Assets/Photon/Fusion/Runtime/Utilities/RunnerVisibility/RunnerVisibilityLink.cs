@@ -22,26 +22,6 @@ namespace Fusion {
   [AddComponentMenu("")]
   public sealed class RunnerVisibilityLink : MonoBehaviour {
 
-    [StaticField(StaticFieldResetMode.None)]
-    [Obsolete]
-    private static readonly System.Type[] _recognizedBehaviourTypes = {
-      typeof(IRunnerVisibilityRecognizedType),
-      typeof(Renderer),
-      typeof(AudioListener),
-      typeof(Camera),
-      typeof(Canvas),
-      typeof(Light)
-    };
-
-    /// <summary>
-    /// Types that fusion.runtime isn't aware of, which need to be found using names instead.
-    /// </summary>
-    [StaticField(StaticFieldResetMode.None)]
-    [Obsolete]
-    private static readonly string[] _recognizedBehaviourNames = {
-      "EventSystem"
-    };
-
     /// <summary>
     /// The peer runner that will be used if more than one runner is visible, and this node was manually added by developer (indicating only one instance should be visible at a time).
     /// </summary>

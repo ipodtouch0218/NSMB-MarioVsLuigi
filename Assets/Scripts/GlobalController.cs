@@ -73,7 +73,6 @@ public class GlobalController : Singleton<GlobalController> {
         ControlSystem.controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
 
         NetworkHandler.OnShutdown += OnShutdown;
-        NetworkHandler.OnPlayerJoined += OnPlayerJoined;
         NetworkHandler.OnHostMigration += OnHostMigration;
 
         CreateFusionStatsInstance();
@@ -84,7 +83,6 @@ public class GlobalController : Singleton<GlobalController> {
         ControlSystem.controls.Disable();
 
         NetworkHandler.OnShutdown -= OnShutdown;
-        NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
         NetworkHandler.OnHostMigration -= OnHostMigration;
     }
 
@@ -122,16 +120,36 @@ public class GlobalController : Singleton<GlobalController> {
 #endif
     }
 
+#if UNITY_WEBGL
+    int previousVsyncCount;
+    int previousFrameRate;
+#endif
+
     public void OnApplicationFocus(bool focus) {
         if (focus) {
             Settings.Instance.ApplyVolumeSettings();
             StopCoroutineNullable(ref fadeMusicRoutine);
             StopCoroutineNullable(ref fadeSfxRoutine);
+
+#if UNITY_WEBGL
+            // Lock framerate when losing focus to (hopefully) disable browsers slowing the game
+            previousVsyncCount = QualitySettings.vSyncCount;
+            previousFrameRate = Application.targetFrameRate;
+
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 30;
+#endif
+
         } else {
             if (Settings.Instance.audioMuteMusicOnUnfocus)
                 fadeMusicRoutine ??= StartCoroutine(FadeVolume("MusicVolume"));
             if (Settings.Instance.audioMuteSFXOnUnfocus)
                 fadeSfxRoutine ??= StartCoroutine(FadeVolume("SoundVolume"));
+
+#if UNITY_WEBGL
+            QualitySettings.vSyncCount = previousVsyncCount;
+            Application.targetFrameRate = previousFrameRate;
+#endif
         }
     }
 
@@ -183,16 +201,6 @@ public class GlobalController : Singleton<GlobalController> {
     private void OnHostMigration(NetworkRunner runner, HostMigrationToken token) {
         CreateFusionStatsInstance();
     }
-
-    private void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-        if (runner.LocalPlayer != player)
-            return;
-
-        // Fixed bugged layout if the graph was already open.
-        Debug.Log(fusionStats);
-        fusionStats.GetComponent<FusionStats>().PlayerRef = player;
-    }
-
 
     private void ToggleFpsMonitor(InputAction.CallbackContext obj) {
         graphy.SetActive(!graphy.activeSelf);

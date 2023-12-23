@@ -813,7 +813,7 @@ PlayerSettings:
     QNX: 
     Stadia: 
     Standalone: FUSION_WEAVER;FUSION2
-    WebGL: FUSION_WEAVER
+    WebGL: FUSION_WEAVER;FUSION2
     Windows Store Apps: FUSION_WEAVER
     XboxOne: 
     iPhone: 

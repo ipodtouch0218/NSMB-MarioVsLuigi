@@ -6,7 +6,7 @@
 
 #region NetworkAssetSourceAddressable.cs
 
-#if FUSION_ENABLE_ADDRESSABLES && !FUSION_DISABLE_ADDRESSABLES
+#if (FUSION_ADDRESSABLES || FUSION_ENABLE_ADDRESSABLES) && !FUSION_DISABLE_ADDRESSABLES
 namespace Fusion {
   using System;
 #if UNITY_EDITOR
@@ -80,8 +80,9 @@ namespace Fusion {
     }
 
     private void UnloadInternal() {
-      Debug.Assert(Address.IsValid());
-      Address.ReleaseAsset();
+      if (Address.IsValid()) {
+        Address.ReleaseAsset();  
+      }
     }
 
     private T ValidateResult(object result) {
@@ -1408,7 +1409,7 @@ namespace Fusion.StatsInternal
 
       private static Dictionary<StatSourceTypes, FieldMaskData> s_lookup = new ();
 
-      public static FieldMaskData Lookup(this Type type) {
+      private static FieldMaskData Lookup(this Type type) {
         if (type == typeof(SimulationStats)) return Lookup(StatSourceTypes.Simulation);
         if (type == typeof(BehaviourStats)) return Lookup(StatSourceTypes.Behaviour);
         if (type == typeof(SimulationConnectionStats)) return Lookup(StatSourceTypes.NetConnection);
@@ -1634,7 +1635,7 @@ namespace Fusion {
     private object        _statsObject;
     private NetworkObject _previousNetworkObject;
 
-    public object StatsObject {
+    protected object StatsObject {
       get {
          
         if (_statsObject != null && _previousNetworkObject == _fusionStats.Object) {
@@ -1652,14 +1653,14 @@ namespace Fusion {
               var no = _fusionStats.Object; // GetComponentInParent<NetworkObject>();
               if (no != _previousNetworkObject) {
                 if (no) {
-                  _previousNetworkObject = no;
-                  runner.TryGetObjectStats(no.Id, out var stats);
+                  if (runner.TryGetObjectStats(no.Id, out var stats)) {
+                    _previousNetworkObject = no;
+                  } 
                   return _statsObject = stats;
                 }
                 _previousNetworkObject = null;
                 return _statsObject = default;
               }
-
               return _statsObject;
             }
             case StatSourceTypes.NetConnection: {
@@ -1703,7 +1704,7 @@ namespace Fusion {
 
     }
 
-    public virtual void CyclePer() {
+    protected virtual void CyclePer() {
 
       switch (CurrentAveraging) {
         case StatAveraging.PerSample:

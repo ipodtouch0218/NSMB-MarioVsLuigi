@@ -35,6 +35,7 @@ namespace Fusion.Editor {
           using (new EditorGUI.DisabledScope(HasModified())) {
             if (GUILayout.Button("Rebuild Prefab Table")) {
               NetworkProjectConfigUtilities.RebuildPrefabTable();
+              GUIUtility.ExitGUI();
             }
           }
 
@@ -52,11 +53,14 @@ namespace Fusion.Editor {
           if (GUILayout.Button("Show Network Prefabs Inspector")) {
             NetworkPrefabsInspector.ShowWindow();
           }
-
+          
           // WORKAROUND: during initial failed imports, this may be an instance of UnityEngine.DefaultAsset instead of the actual asset
-          if (assetSerializedObject.targetObject.GetType() == typeof(NetworkProjectConfigAsset)) {
-            EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.Prefabs)));
-            EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.BehaviourMeta)));  
+          if (assetSerializedObject?.targetObject.GetType() == typeof(NetworkProjectConfigAsset)) {
+            // this has the tendency to overwrite the global enabled flag, so let's make sure it's reset once the scope exists
+            using (new FusionEditorGUI.EnabledScope(GUI.enabled)) {
+              EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.Prefabs)));
+              EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.BehaviourMeta)));
+            }
           } else {
             EditorGUILayout.HelpBox("Asset failed to deserialize correctly. Please reimport.", MessageType.Warning);
           }

@@ -197,7 +197,7 @@ namespace Fusion {
       }
     }
 
-    public override void CyclePer() {
+    protected override void CyclePer() {
       base.CyclePer();
       SetAveragingText();
     }
@@ -248,7 +248,7 @@ namespace Fusion {
       }
       
 
-      // Boxing.. yay fun. Would be nice to be able to get values from OverTimeStatsBuffer by index
+      // Boxing here... Would be nice to be able to get values from OverTimeStatsBuffer by index
       var statsBuffer = (OverTimeStatBuffer)FieldInfo.GetValue(StatsObject);
       var values      = _values;
 

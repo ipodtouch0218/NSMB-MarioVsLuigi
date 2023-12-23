@@ -114,7 +114,7 @@
             <summary>
             Change the Custom Properties of the current Room
             </summary>
-            <param name="properties">New set of Custom Properties</param>
+            <param name="customProperties">New set of Custom Properties</param>
             <returns>True if the change was made, false otherwise</returns>
         </member>
         <member name="M:Fusion.Photon.Realtime.FusionRelayClient.UpdateRoomIsVisible(System.Boolean)">
@@ -160,7 +160,7 @@
         </member>
         <member name="M:Fusion.Photon.Realtime.FusionRelayClient.BuildSessionCustomPropertyHolders(System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty},ExitGames.Client.Photon.Hashtable@,System.String[]@)">
             <summary>
-            Convert a <see cref="!:Dictionary&lt;string, SessionProperty&gt;"/> into a pair of <see cref="T:ExitGames.Client.Photon.Hashtable"/> and <see cref="!:string[]"/> respectively 
+            Convert a <see cref="T:System.Collections.Generic.Dictionary`2"/> into a pair of <see cref="T:ExitGames.Client.Photon.Hashtable"/> and <see cref="T:System.String"/> respectively 
             representing the custom properties of a session and the property names that will be published on the Lobby
             </summary>
             <param name="customProperties">Dictionary to be converted</param>
@@ -184,15 +184,17 @@
         </member>
         <member name="M:Fusion.Photon.Realtime.Async.LoadBalancingClientAsyncExtensions.ReconnectAndRejoinAsync(Fusion.Photon.Realtime.LoadBalancingClient,System.Boolean,System.Boolean,System.Threading.CancellationToken)">
             <summary>
-            Runs reconnect and rejoin.
+            Asynchronously reconnects and rejoins a room.
             </summary>
-            <param name="client">Client object</param>
-            <param name="createServiceTask">Runs client.Service() during the operation</param>
-            <returns>Returns when inside the room</returns>
-            <exception cref="T:Fusion.Photon.Realtime.Async.DisconnectException">Is thrown when the connection terminated</exception>
-            <exception cref="T:Fusion.Photon.Realtime.Async.OperationStartException">Is thrown when the operation could not be started</exception>
-            <exception cref="T:Fusion.Photon.Realtime.Async.OperationException">Is thrown when the operation completed unsuccessfully</exception>
-            <exception cref="T:Fusion.Photon.Realtime.Async.OperationTimeoutException">Is thrown when the operation timed out</exception>
+            <param name="client">The client that is reconnecting and rejoining.</param>
+            <param name="throwOnError">Indicates whether to throw an exception on error. Defaults to true.</param>
+            <param name="createServiceTask">Indicates whether to run the client's service during the operation. Defaults to true.</param>
+            <param name="externalCancellationToken">An optional cancellation token that can be used to cancel the operation. Defaults to an empty cancellation token.</param>
+            <returns>A task that represents the asynchronous operation. The task result is a boolean indicating whether the operation was successful.</returns>
+            <exception cref="T:Fusion.Photon.Realtime.Async.OperationStartException">Thrown when the client is still connected or when the reconnecting operation fails to start.</exception>
+            <exception cref="T:Fusion.Photon.Realtime.Async.DisconnectException">Thrown when the connection is terminated during the operation.</exception>
+            <exception cref="T:Fusion.Photon.Realtime.Async.OperationException">Thrown when the operation completes unsuccessfully.</exception>
+            <exception cref="T:Fusion.Photon.Realtime.Async.OperationTimeoutException">Thrown when the operation times out.</exception>
         </member>
         <member name="M:Fusion.Photon.Realtime.Async.LoadBalancingClientAsyncExtensions.DisconnectAsync(Fusion.Photon.Realtime.LoadBalancingClient,System.Boolean,System.Threading.CancellationToken)">
             <summary>
@@ -200,6 +202,7 @@
             </summary>
             <param name="client">Client.</param>
             <param name="createServiceTask">Runs client.Service() during the operation</param>
+            <param name="externalCancellationToken">Optional external cancellation token</param>
             <returns>Returns when the client has successfully disconnected</returns>
             <exception cref="T:Fusion.Photon.Realtime.Async.DisconnectException">Is thrown when the connection terminated</exception>
             <exception cref="T:Fusion.Photon.Realtime.Async.OperationStartException">Is thrown when the operation could not be started</exception>
@@ -214,6 +217,7 @@
             <param name="enterRoomParams">Enter room params</param>
             <param name="throwOnError">Set ErrorCode as result on RoomCreateFailed or RoomJoinFailed</param>
             <param name="createServiceTask">Runs client.Service() during the operation</param>
+            <param name="externalCancellationToken">Optional external cancellation token</param>
             <returns>When the room has been entered</returns>
             <exception cref="T:Fusion.Photon.Realtime.Async.DisconnectException">Is thrown when the connection terminated</exception>
             <exception cref="T:Fusion.Photon.Realtime.Async.OperationStartException">Is thrown when the operation could not be started</exception>
@@ -316,12 +320,12 @@
         </member>
         <member name="M:Fusion.Photon.Realtime.Extension.RealtimeExtensions_Hashtable.ConvertToDictionaryProperty(ExitGames.Client.Photon.Hashtable)">
             <summary>
-            Convert a <see cref="T:ExitGames.Client.Photon.Hashtable"/> into a <see cref="!:Dictionary&lt;string, SessionProperty&gt;"/>
+            Convert a <see cref="T:ExitGames.Client.Photon.Hashtable"/> into a <see cref="T:System.Collections.Generic.Dictionary`2"/>
             </summary>
         </member>
         <member name="M:Fusion.Photon.Realtime.Extension.RealtimeExtensions_Hashtable.ConvertToHashtable(System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">
             <summary>
-            Convert a <see cref="!:Dictionary&lt;string, SessionProperty&gt;"/> into a <see cref="T:ExitGames.Client.Photon.Hashtable"/>
+            Convert a <see cref="T:System.Collections.Generic.Dictionary`2"/> into a <see cref="T:ExitGames.Client.Photon.Hashtable"/>
             </summary>
         </member>
         <member name="M:Fusion.Photon.Realtime.Extension.RealtimeExtensions_Hashtable.CalculateTotalSize(ExitGames.Client.Photon.Hashtable)">
@@ -333,14 +337,14 @@
         </member>
         <member name="M:Fusion.Photon.Realtime.Extension.RealtimeExtensions_RoomInfo.GetCustomProperties(Fusion.Photon.Realtime.RoomInfo)">
             <summary>
-            Convert the Room Custom Properties into a <see cref="!:Dictionary&lt;string, SessionProperty&gt;"/>
+            Convert the Room Custom Properties into a <see cref="T:System.Collections.Generic.Dictionary`2"/>
             </summary>
             <param name="roomInfo">RoomInfo to extract the custom properties</param>
-            <returns><see cref="!:Dictionary&lt;string, SessionProperty&gt;"/> with the data</returns>
+            <returns><see cref="T:System.Collections.Generic.Dictionary`2"/> with the data</returns>
         </member>
         <member name="M:Fusion.Photon.Realtime.Extension.RealtimeExtensions_DictionaryProperties.CalculateTotalSize(System.Collections.Generic.Dictionary{System.String,Fusion.SessionProperty})">
             <summary>
-            Calculate the total size a <see cref="!:Dictionary&lt;string, SessionProperty&gt;"/> would take when serialized
+            Calculate the total size a <see cref="T:System.Collections.Generic.Dictionary`2"/> would take when serialized
             </summary>
             <param name="dictionary">Dictionary to check the size</param>
             <returns>Total size of the Dictionary in serialized format</returns>
@@ -4498,7 +4502,7 @@
             <summary>
             Accompanies Equals, using the name's HashCode as return.
             </summary>
-            <returns></returns>
+            <returns>HashCode of the name.</returns>
         </member>
         <member name="M:Fusion.Photon.Realtime.RoomInfo.ToString">
             <summary>Returns most interesting room values as string.</summary>
@@ -4679,7 +4683,7 @@
             The photon settings class, which is wrapped by this <see cref="T:Fusion.Photon.Realtime.PhotonAppSettings"/> ScriptableObject.
             </summary>
         </member>
-        <member name="P:Fusion.Photon.Realtime.PhotonAppSettings.Instance">
+        <member name="P:Fusion.Photon.Realtime.PhotonAppSettings.Global">
             <summary>Serialized server settings, written by the Setup Wizard for use in ConnectUsingSettings.</summary>
         </member>
         <member name="T:Fusion.SessionProperty">
