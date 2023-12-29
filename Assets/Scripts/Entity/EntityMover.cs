@@ -4,7 +4,6 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
-using NSMB.Entities.Player;
 
 [SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Resimulate | SimulationStages.Forward)]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
@@ -34,6 +33,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             transform.position = value;
         }
     }
+    public bool ForceSnapshotInterpolation { get; set; } = false;
     private Vector2 ColliderOffset => transform.lossyScale * activeCollider.offset;
     private Vector2 ColliderSize => transform.lossyScale * activeCollider.size;
 
@@ -48,14 +48,16 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     private PropertyReader<Vector2> internalPositionPropertyReader;
 
     public override void Spawned() {
-        if (HasStateAuthority)
+        if (HasStateAuthority) {
             Position = transform.position;
+        }
 
         internalPositionPropertyReader = GetPropertyReader<Vector2>(nameof(InternalPosition));
     }
 
     public void BeforeTick() {
         transform.position = Position;
+        Physics2D.SyncTransforms();
     }
 
     public void AfterTick() {
@@ -110,13 +112,19 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     }
 
     public override void FixedUpdateNetwork() {
+        if (ForceSnapshotInterpolation) {
+            return;
+        }
+
         ResetPhysicsData();
 
         if (!Freeze) {
             Vector2 movement;
             movement = CollideAndSlide(Position + ColliderOffset, Velocity * Runner.DeltaTime, false);
-            if (!IsKinematic)
+            if (!IsKinematic) {
                 movement += CollideAndSlide(Position + ColliderOffset + movement, Gravity * (Runner.DeltaTime * Runner.DeltaTime), true);
+            }
+
             movement *= Runner.TickRate;
 
             Velocity = movement;
@@ -139,16 +147,21 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     }
 
     private Vector2 CollideAndSlide(Vector2 raycastPos, Vector2 raycastVel, bool gravityPass, int depth = 0) {
-        if (depth >= MaxIterations)
+        if (depth >= MaxIterations) {
             return Vector2.zero;
+        }
 
-        if (IsKinematic)
+        if (IsKinematic) {
             return raycastVel;
+        }
 
-        if (LockX)
+        if (LockX) {
             raycastVel.x = 0;
-        if (LockY)
+        }
+
+        if (LockY) {
             raycastVel.y = 0;
+        }
 
         float distance = raycastVel.magnitude + Skin;
         Vector2 direction = raycastVel.normalized;
@@ -245,10 +258,13 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 if (stuckHit) {
                     Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);
 
-                    if (LockX)
+                    if (LockX) {
                         offset.x = 0;
-                    if (LockY)
+                    }
+
+                    if (LockY) {
                         offset.y = 0;
+                    }
 
                     Position += offset;
                     raycastPos += offset;
@@ -262,10 +278,13 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 // Hit normal pushing us away from the wall
                 Vector2 offset = (Vector2) Vector3.Project(positionToSurfacePoint, hit.normal);
 
-                if (LockX)
+                if (LockX) {
                     offset.x = 0;
-                if (LockY)
+                }
+
+                if (LockY) {
                     offset.y = 0;
+                }
 
                 Position += offset;
                 raycastPos += offset;
@@ -273,8 +292,9 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 positionToSurfacePoint = direction * hit.distance;
             }
 
-            if (Data.OnGround && gravityPass)
+            if (Data.OnGround && gravityPass) {
                 return Vector2.zero;
+            }
 
             Vector2 leftover = raycastVel - positionToSurfacePoint;
             leftover = bounceOnImpacts ? Vector2.Reflect(leftover, hit.normal) : Vector3.ProjectOnPlane(leftover, hit.normal);

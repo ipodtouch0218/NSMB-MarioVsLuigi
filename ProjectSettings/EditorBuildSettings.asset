@@ -42,5 +42,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Levels/CustomGhost.unity
     guid: 39b9f67bcc00dd640a5971ac500078e9
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: b02bce592fba21b4982d8cf5e36a1459,
+      type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 49335f30d253220488d2d332ade6e901,
       type: 2}

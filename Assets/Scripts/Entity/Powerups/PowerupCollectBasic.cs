@@ -14,12 +14,14 @@ namespace NSMB.Entities.Collectable.Powerups {
             NetworkRunner runner = player.Runner;
 
             //reserve if it's the same item
-            if (player.State == newState)
+            if (player.State == newState) {
                 return PowerupReserveResult.ReserveNewPowerup;
+            }
 
             //reserve if we cant fit with our new hitbox
-            if (player.State == Enums.PowerupState.MiniMushroom && player.IsOnGround && runner.GetPhysicsScene2D().Raycast(player.body.Position, Vector2.up, 0.3f, Layers.MaskSolidGround))
+            if (player.State == Enums.PowerupState.MiniMushroom && player.IsOnGround && runner.GetPhysicsScene2D().Raycast(player.body.Position, Vector2.up, 0.3f, Layers.MaskSolidGround)) {
                 return PowerupReserveResult.ReserveNewPowerup;
+            }
 
             PowerupScriptable currentPowerup = player.State.GetPowerupScriptable();
             PowerupScriptable newPowerup = powerup;
@@ -27,9 +29,10 @@ namespace NSMB.Entities.Collectable.Powerups {
             sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.statePriority : (sbyte) -1;
             sbyte newPowerupItemPriority = newPowerup ? newPowerup.itemPriority : (sbyte) -1;
 
-            //reserve if we have a higher priority item
-            if (currentPowerupStatePriority > newPowerupItemPriority)
+            // Reserve if we have a higher priority item
+            if (currentPowerupStatePriority > newPowerupItemPriority) {
                 return PowerupReserveResult.ReserveNewPowerup;
+            }
 
             player.PreviousState = player.State;
             player.State = newState;
@@ -41,9 +44,10 @@ namespace NSMB.Entities.Collectable.Powerups {
             player.PropellerLaunchTimer = TickTimer.None;
             player.IsInShell = false;
 
-            // dont give us an extra mushroom
-            if (player.PreviousState == Enums.PowerupState.NoPowerup || (player.PreviousState == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom))
+            // Don't give us an extra mushroom
+            if (player.PreviousState == Enums.PowerupState.NoPowerup || (player.PreviousState == Enums.PowerupState.Mushroom && newState != Enums.PowerupState.Mushroom)) {
                 return PowerupReserveResult.NoneButPlaySound;
+            }
 
             return PowerupReserveResult.ReserveOldPowerup;
         }

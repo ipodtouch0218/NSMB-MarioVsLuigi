@@ -22,6 +22,9 @@ namespace NSMB.Utils {
             [NetConnectFailedReason.Timeout] = "ui.error.jointimeout",
             [NetConnectFailedReason.ServerFull] = "ui.error.joinfull",
             [NetConnectFailedReason.ServerRefused] = "ui.error.joinrefused",
+
+            [NetDisconnectReason.Timeout] = "ui.error.hosttimeout",
+            [NetDisconnectReason.Unknown] = "ui.error.unknown"
         };
 
         public static Dictionary<string, SessionProperty> DefaultRoomProperties = new() {

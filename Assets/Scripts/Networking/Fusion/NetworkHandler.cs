@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
 
 using static ConnectionToken;
@@ -23,12 +24,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us", "usw" };
     public static readonly Dictionary<string, string> RegionIPs = new() {
         ["asia"] = "15.235.132.46",
-        ["eu"  ] = "192.36.27.39",
-        ["jp"  ] = "139.162.127.196",
-        ["kr"  ] = "158.247.198.230",
-        ["sa"  ] = "200.25.36.72",
-        ["us"  ] = "45.86.230.227",
-        ["usw" ] = "45.145.148.21",
+        ["eu"] = "192.36.27.39",
+        ["jp"] = "139.162.127.196",
+        ["kr"] = "158.247.198.230",
+        ["sa"] = "200.25.36.72",
+        ["us"] = "45.86.230.227",
+        ["usw"] = "45.145.148.21",
     };
     public static readonly Dictionary<string, int> RegionPings = new();
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
@@ -61,7 +62,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public delegate bool OnConnectRequestDelegate(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token);
     public static event OnConnectRequestDelegate OnConnectRequest;
 
-    public delegate void OnDisconnectedFromServerDelegate(NetworkRunner runner);
+    public delegate void OnDisconnectedFromServerDelegate(NetworkRunner runner, NetDisconnectReason disconnectReason);
     public static event OnDisconnectedFromServerDelegate OnDisconnectedFromServer;
 
     public delegate void OnCustomAuthenticationResponseDelegate(NetworkRunner runner, Dictionary<string, object> data);
@@ -124,13 +125,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     void INetworkRunnerCallbacks.OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) {
-        Debug.LogError($"[Network] Failed to connect to the server ({remoteAddress}): {reason}");
+        Debug.LogError($"[Network] Failed to connect to the server: {reason}");
 
         OnConnectFailed?.Invoke(runner, remoteAddress, reason);
     }
 
     void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
-        Debug.Log($"[Network] Incoming connection request from {request.RemoteAddress}");
+        ConnectionToken connectionToken = Deserialize(token);
+        Debug.Log($"[Network] Incoming connection request from {connectionToken.signedData.UserId}");
 
         if (runner.SessionInfo.PlayerCount > SessionData.Instance.MaxPlayers) {
             request.Refuse();
@@ -138,17 +140,34 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         }
 
         bool accept = OnConnectRequest?.Invoke(runner, request, token) ?? true;
-        if (accept)
+        if (accept) {
             request.Accept();
-        else
+        } else {
             request.Refuse();
+        }
+    }
+
+    void ReturnToMainMenu(Action callback) {
+        if (SceneManager.GetActiveScene().buildIndex == 0) {
+            callback();
+        } else {
+            AsyncOperation op = SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
+            // Weird null check for exiting play mode in the editor
+            if (op != null) {
+                op.completed += delegate (AsyncOperation operation) {
+                    callback();
+                };
+            }
+        }
     }
 
     void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) {
         Debug.Log($"[Network] Disconnected from Server (Reason: {reason})");
 
-        OnDisconnectedFromServer?.Invoke(runner);
-        RecreateInstance();
+        ReturnToMainMenu(() => {
+            OnDisconnectedFromServer?.Invoke(runner, reason);
+            RecreateInstance();
+        });
     }
 
     void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {
@@ -183,8 +202,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         MainMenuManager.WasHostMigration = true;
         GlobalController.Instance.connecting.SetActive(true);
 
-        if (GameManager.Instance)
+        if (GameManager.Instance) {
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.hostdc");
+        }
 
         await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
         RecreateInstance();
@@ -236,21 +256,24 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 playerDatas.Add(obj.GetComponent<PlayerData>());
             }
 
-            if (runner.Tick != 0)
+            if (runner.Tick != 0) {
                 runner.PushHostMigrationSnapshot();
+            }
         }
 
         // Please spare a join message, sir?
         if (!hadExistingData) {
             SessionData.PlayersNeedingJoinMessage.Add(player);
             PlayerData data = player.GetPlayerData(runner);
-            if (data)
+            if (data) {
                 data.SendJoinMessageIfNeeded();
+            }
         }
 
         // Update Discord integration
-        if (player != runner.LocalPlayer)
+        if (player != runner.LocalPlayer) {
             GlobalController.Instance.discordController.UpdateActivity();
+        }
 
         OnPlayerJoined?.Invoke(runner, player);
     }
@@ -302,8 +325,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
         Debug.Log($"[Network] Network Shutdown: {shutdownReason}");
 
-        if (shutdownReason == ShutdownReason.HostMigration)
+        if (shutdownReason == ShutdownReason.HostMigration) {
             return;
+        }
 
         if (shutdownReason == ShutdownReason.ServerInRoom && reattemptCreate) {
             reattemptCreate = false;
@@ -312,8 +336,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             reattemptCreate = false;
         }
 
-        OnShutdown?.Invoke(runner, shutdownReason);
-        RecreateInstance();
+        ReturnToMainMenu(() => {
+            OnShutdown?.Invoke(runner, shutdownReason);
+            RecreateInstance();
+        });
     }
 
     void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) {
@@ -332,12 +358,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #region Unity Callbacks
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static async void RecreateInstance() {
-        if (!prefab)
+        if (!prefab) {
             prefab = (GameObject) Resources.Load("Prefabs/Static/NetworkingHandler");
+        }
 
         if (Instance) {
-            if (!Instance.runner.IsShutdown)
+            if (!Instance.runner.IsShutdown) {
                 await Instance.runner.Shutdown(shutdownReason: ShutdownReason.Ok);
+            }
             DestroyImmediate(Instance.gameObject);
         }
 
@@ -353,8 +381,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     public void OnApplicationQuit() {
-        if (Runner && !Runner.IsShutdown)
+        if (Runner && !Runner.IsShutdown) {
             Runner.Shutdown();
+        }
     }
     #endregion
 
@@ -436,8 +465,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         int attempts = 3;
 
         while (attempts-- > 0) {
-            if (attempts != 0)
+            if (attempts != 0) {
                 reattemptCreate = true;
+            }
 
             // Create a random room id.
             StringBuilder idBuilder = new();
@@ -448,8 +478,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             // Fill rest of the string with random chars
             UnityEngine.Random.InitState(unchecked((int) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds));
-            for (int i = 1; i < RoomIdLength; i++)
+            for (int i = 1; i < RoomIdLength; i++) {
                 idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
+            }
 
             AuthenticationValues authValues = await Authenticate();
             if (authValues == null) {
@@ -510,8 +541,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             await ConnectToRegion(targetRegion);
         }
 
-        if (MainMenuManager.Instance)
+        if (MainMenuManager.Instance) {
             MainMenuManager.Instance.nonNetworkShutdown = true;
+        }
 
         Debug.Log($"[Network] Attempting to join game with ID: {roomId}");
         // Attempt to join the room
@@ -530,8 +562,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             await ConnectToRegion(originalRegion);
         }
 
-        if (MainMenuManager.Instance)
+        if (MainMenuManager.Instance) {
             MainMenuManager.Instance.nonNetworkShutdown = false;
+        }
 
         connecting--;
         return result;
@@ -556,8 +589,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             anyRemaining = false;
 
             foreach ((string region, Ping pinger) in pingers) {
-                if (pinger == null)
+                if (pinger == null) {
                     continue;
+                }
 
                 if (!pinger.isDone) {
                     anyRemaining = true;
@@ -587,8 +621,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     private static void HostMigrationResume(NetworkRunner runner) {
 
-        if (!runner.IsServer)
+        if (!runner.IsServer) {
             return;
+        }
 
         // Update the room's name to be our own.
         runner.SessionInfo.UpdateCustomProperties(new() {
@@ -603,14 +638,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             } else if (resumeNO.TryGetComponent(out PlayerData pd)) {
 
                 // Don't respawn the PlayerData for the host that just left. Stupid.
-                if (pd.Object.InputAuthority.AsIndex == runner.SessionInfo.MaxPlayers - 1)
+                if (pd.Object.InputAuthority.AsIndex == runner.SessionInfo.MaxPlayers - 1) {
                     continue;
+                }
 
                 // Oh, and immediately assign our own. We're greedy :)
                 // (not doing it breaks stuff cuz EnterRoom is called first...)
                 PlayerRef? player = null;
-                if (pd.GetUserIdString() == runner.GetPlayerUserId())
+                if (pd.GetUserIdString() == runner.GetPlayerUserId()) {
                     player = runner.LocalPlayer;
+                }
 
                 runner.Spawn(resumeNO, inputAuthority: player, onBeforeSpawned: (runner, newNO) => {
                     newNO.CopyStateFrom(resumeNO);

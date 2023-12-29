@@ -40,9 +40,17 @@ namespace NSMB.Entities.Collectable {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (!worldCollider) worldCollider = GetComponent<BoxCollider2D>();
-            if (!animator) animator = GetComponent<Animator>();
+            if (!sRenderer) {
+                sRenderer = GetComponentInChildren<SpriteRenderer>();
+            }
+
+            if (!worldCollider) {
+                worldCollider = GetComponent<BoxCollider2D>();
+            }
+
+            if (!animator) {
+                animator = GetComponent<Animator>();
+            }
         }
 
         public void OnBeforeSpawned(byte direction, bool stationary, bool pit) {
@@ -52,12 +60,14 @@ namespace NSMB.Entities.Collectable {
             Collectable = stationary;
             DroppedByPit = pit;
 
-            if (!stationary)
+            if (!stationary) {
                 DespawnTimer = TickTimer.CreateFromSeconds(Runner, lifespan);
+            }
         }
 
         public override void Spawned() {
             base.Spawned();
+            Runner.SetIsSimulated(Object, true);
             icon = UIUpdater.Instance.CreateTrackIcon(this);
 
             if (IsStationary) {
@@ -75,16 +85,18 @@ namespace NSMB.Entities.Collectable {
                 body.Velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), deathBoostAmount);
 
                 // Death via pit boost, we need some extra velocity
-                if (DroppedByPit)
+                if (DroppedByPit) {
                     body.Velocity += Vector2.up * 3;
+                }
 
                 body.Freeze = false;
                 worldCollider.enabled = true;
             }
 
             // Only make a sound if we're already playing
-            if (GameManager.Instance.GameState == Enums.GameState.Playing)
+            if (GameManager.Instance.GameState == Enums.GameState.Playing) {
                 GameManager.Instance.sfx.PlayOneShot(Enums.Sounds.World_Star_Spawn);
+            }
 
             if (!GroundFilter.useTriggers) {
                 GroundFilter.SetLayerMask((1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough));
@@ -94,8 +106,9 @@ namespace NSMB.Entities.Collectable {
 
         public override void Render() {
             base.Render();
-            if (IsStationary || (GameManager.Instance?.GameEnded ?? false))
+            if (IsStationary || (GameManager.Instance?.GameEnded ?? false)) {
                 return;
+            }
 
             graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
 
@@ -111,14 +124,16 @@ namespace NSMB.Entities.Collectable {
                 return;
             }
 
-            if (!Object || IsStationary)
+            if (!Object || IsStationary) {
                 return;
+            }
 
             body.Velocity = new(moveSpeed * (FacingRight ? 1 : -1) * (Fast ? 2f : 1f), body.Velocity.y);
             Collectable |= body.Velocity.y < 0;
 
-            if (HandleCollision())
+            if (HandleCollision()) {
                 return;
+            }
 
             if (Passthrough && Collectable && body.Velocity.y <= 0 && !Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.Position + worldCollider.offset, worldCollider.size * transform.lossyScale) && !Runner.GetPhysicsScene2D().OverlapBox(body.Position, Vector3.one * 0.33f, 0, GroundFilter)) {
                 Passthrough = false;
@@ -148,19 +163,22 @@ namespace NSMB.Entities.Collectable {
                 Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
             }
 
-            if (Collector.cameraController.IsControllingCamera)
+            if (Collector.cameraController.IsControllingCamera) {
                 GlobalController.Instance.rumbleManager.RumbleForSeconds(0f, 0.8f, 0.1f, RumbleManager.RumbleSetting.High);
+            }
 
             Instantiate(PrefabList.Instance.Particle_StarCollect, transform.position, Quaternion.identity);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
 
-            if (GameManager.Instance && GameManager.Instance.GameState == Enums.GameState.Playing && !Collector)
+            if (GameManager.Instance && GameManager.Instance.GameState == Enums.GameState.Playing && !Collector) {
                 GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
+            }
 
-            if (icon)
+            if (icon) {
                 Destroy(icon.gameObject);
+            }
         }
 
         private IEnumerator PulseEffect() {
@@ -199,11 +217,13 @@ namespace NSMB.Entities.Collectable {
 
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-            if (player.IsDead)
+            if (player.IsDead) {
                 return;
+            }
 
-            if (!Collectable || Collector)
+            if (!Collectable || Collector) {
                 return;
+            }
 
             Collector = player;
 
@@ -215,8 +235,9 @@ namespace NSMB.Entities.Collectable {
             player.Stars = (byte) Mathf.Min(player.Stars + 1, SessionData.Instance.StarRequirement);
 
             // Game mechanics
-            if (IsStationary && Runner.IsServer)
+            if (IsStationary && Runner.IsServer) {
                 GameManager.Instance.tileManager.ResetMap();
+            }
 
             GameManager.Instance.CheckForWinner();
 
@@ -232,16 +253,17 @@ namespace NSMB.Entities.Collectable {
                 particles.Stop();
                 sfx.Stop();
 
-                if (icon)
+                if (icon) {
                     icon.gameObject.SetActive(false);
-
+                }
             } else {
                 // oops...
                 graphicTransform.gameObject.SetActive(true);
                 particles.Play();
                 sfx.Play();
-                if (icon)
+                if (icon) {
                     icon.gameObject.SetActive(true);
+                }
             }
         }
 

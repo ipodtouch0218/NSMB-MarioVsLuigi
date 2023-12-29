@@ -1,12 +1,11 @@
-﻿using UnityEngine;
-
-using Fusion;
+﻿using Fusion;
 using NSMB.Entities.Enemies;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
+using UnityEngine;
 
 namespace NSMB.Entities {
     public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {
@@ -42,15 +41,17 @@ namespace NSMB.Entities {
                 Bounds bounds = default;
                 Renderer[] renderers = GetComponentsInChildren<Renderer>();
                 foreach (Renderer renderer in renderers) {
-                    if (!renderer.enabled || renderer is ParticleSystemRenderer)
+                    if (!renderer.enabled || renderer is ParticleSystemRenderer) {
                         continue;
+                    }
 
                     renderer.ResetBounds();
 
-                    if (bounds == default)
+                    if (bounds == default) {
                         bounds = new(renderer.bounds.center, renderer.bounds.size);
-                    else
+                    } else {
                         bounds.Encapsulate(renderer.bounds);
+                    }
                 }
 
                 Vector2 size = bounds.size;
@@ -63,15 +64,17 @@ namespace NSMB.Entities {
                 Bounds bounds = default;
                 Renderer[] renderers = GetComponentsInChildren<Renderer>();
                 foreach (Renderer renderer in renderers) {
-                    if (!renderer.enabled || renderer is ParticleSystemRenderer)
+                    if (!renderer.enabled || renderer is ParticleSystemRenderer) {
                         continue;
+                    }
 
                     renderer.ResetBounds();
 
-                    if (bounds == default)
+                    if (bounds == default) {
                         bounds = new(renderer.bounds.center, renderer.bounds.size);
-                    else
+                    } else {
                         bounds.Encapsulate(renderer.bounds);
+                    }
                 }
 
                 Vector2 position = new(bounds.center.x, bounds.min.y);
@@ -96,15 +99,16 @@ namespace NSMB.Entities {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
-            if (!animator) animator = GetComponentInChildren<Animator>();
-            if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (!legacyAnimation) legacyAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
+            SetIfNull(ref hitbox);
+            SetIfNull(ref animator, true);
+            SetIfNull(ref sRenderer, true);
+            SetIfNull(ref legacyAnimation, true);
         }
 
         public virtual void Start() {
-            if (!EntityFilter.useLayerMask)
+            if (!EntityFilter.useLayerMask) {
                 EntityFilter.SetLayerMask(Layers.MaskEntities);
+            }
         }
 
         public override void Spawned() {
@@ -116,21 +120,27 @@ namespace NSMB.Entities {
 
         public override void Render() {
             base.Render();
-            if (!IsActive)
+            if (!IsActive) {
                 return;
+            }
 
-            if (IsDead)
+            if (IsDead) {
                 transform.rotation *= Quaternion.Euler(0, 0, AngularVelocity * Time.deltaTime);
+            } else {
+                transform.rotation = Quaternion.identity;
+            }
         }
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (!GameManager.Instance || !Object || !body)
+            if (!GameManager.Instance || !Object || !body) {
                 return;
+            }
 
             if (!IsActive) {
                 gameObject.layer = Layers.LayerHitsNothing;
                 AngularVelocity = 0;
+                transform.rotation = Quaternion.identity;
                 body.Velocity = Vector2.zero;
                 body.Freeze = true;
                 return;
@@ -168,12 +178,14 @@ namespace NSMB.Entities {
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
 
-                if (obj.transform.IsChildOf(transform))
+                if (obj.transform.IsChildOf(transform)) {
                     continue;
+                }
 
                 if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
-                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant)
+                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant) {
                         continue;
+                    }
 
                     Utils.Utils.UnwrapLocations(body.Position, killable.body.Position, out Vector2 ourPos, out Vector2 theirPos);
                     bool goRight = ourPos.x > theirPos.x;
@@ -192,15 +204,17 @@ namespace NSMB.Entities {
         }
 
         public virtual void Kill() {
-            if (IsDead)
+            if (IsDead) {
                 return;
+            }
 
             SpecialKill(false, false, 0);
         }
 
         public virtual void SpecialKill(bool right, bool groundpound, int combo) {
-            if (IsDead)
+            if (IsDead) {
                 return;
+            }
 
             IsDead = true;
             WasSpecialKilled = true;
@@ -213,13 +227,15 @@ namespace NSMB.Entities {
             AngularVelocity = 400f * (FacingRight ? 1 : -1);
             body.Gravity = Vector2.down * 14.75f;
 
-            if (HasStateAuthority)
+            if (HasStateAuthority) {
                 Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.Position + hitbox.offset);
+            }
         }
 
         public virtual void Crushed() {
-            if (WasCrushed)
+            if (WasCrushed) {
                 return;
+            }
 
             IsDead = true;
             WasSpecialKilled = false;
@@ -233,20 +249,24 @@ namespace NSMB.Entities {
         public virtual void OnIsDeadChanged() {
             if (IsDead) {
                 // Death effects
-                if (animator)
+                if (animator) {
                     animator.enabled = false;
+                }
+
                 sfx.enabled = true;
 
-                if (WasSpecialKilled || WasCrushed)
+                if (WasSpecialKilled || WasCrushed) {
                     PlaySound(!IsFrozen ? ComboSounds[Mathf.Min(ComboSounds.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
+                }
 
-                if (WasGroundpounded)
+                if (WasGroundpounded) {
                     Instantiate(PrefabList.Instance.Particle_EnemySpecialKill, body.Position + hitbox.offset, Quaternion.identity);
-
+                }
             } else {
                 // Undo death effects
-                if (animator)
+                if (animator) {
                     animator.enabled = true;
+                }
             }
         }
 
@@ -257,14 +277,17 @@ namespace NSMB.Entities {
         //---BasicEntity overrides
         public override void OnIsActiveChanged() {
             if (IsActive) {
-                if (sRenderer)
+                if (sRenderer) {
                     sRenderer.enabled = true;
+                }
 
-                if (body)
+                if (body) {
                     transform.rotation = Quaternion.identity;
+                }
             } else {
-                if (sRenderer)
+                if (sRenderer) {
                     sRenderer.enabled = false;
+                }
             }
         }
 
@@ -273,8 +296,9 @@ namespace NSMB.Entities {
         }
 
         public override void RespawnEntity() {
-            if (IsActive)
+            if (IsActive) {
                 return;
+            }
 
             base.RespawnEntity();
             IsDead = false;
@@ -292,8 +316,9 @@ namespace NSMB.Entities {
 
         public override void DespawnEntity(object data = null) {
             base.DespawnEntity(data);
-            if (!Object)
+            if (!Object) {
                 return;
+            }
 
             IsDead = true;
         }
@@ -342,16 +367,18 @@ namespace NSMB.Entities {
 
         //---IFireballInteractable overrides
         public virtual bool InteractWithFireball(Fireball fireball) {
-            if (IsDead)
+            if (IsDead) {
                 return false;
+            }
 
             SpecialKill(fireball.FacingRight, false, 0);
             return true;
         }
 
         public virtual bool InteractWithIceball(Fireball iceball) {
-            if (IsDead)
+            if (IsDead) {
                 return false;
+            }
 
             if (!IsFrozen) {
                 FrozenCube.FreezeEntity(Runner, this);
@@ -382,13 +409,17 @@ namespace NSMB.Entities {
         }
 
         public override void OnIsFrozenChanged() {
-            if (IsFrozen)
+            if (IsFrozen) {
                 sfx.Stop();
+            }
 
-            if (animator)
+            if (animator) {
                 animator.enabled = !IsFrozen;
-            if (legacyAnimation)
+            }
+
+            if (legacyAnimation) {
                 legacyAnimation.enabled = !IsFrozen;
+            }
         }
 
         //---OnChangeds
@@ -404,8 +435,9 @@ namespace NSMB.Entities {
         }
 
         public void OnWasCrushedChanged() {
-            if (!WasCrushed)
+            if (!WasCrushed) {
                 return;
+            }
 
             PlaySound(Enums.Sounds.Enemy_Shell_Kick, null, 0, 0.5f);
             SpawnParticle(body.Position, Enums.PrefabParticle.Enemy_Puff);

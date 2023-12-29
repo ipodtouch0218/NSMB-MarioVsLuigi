@@ -64,24 +64,28 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            if (!Object || IsFrozen || IsDead)
+            if (!Object || IsFrozen || IsDead) {
                 return;
+            }
 
-            if (HandleCollision())
+            if (HandleCollision()) {
                 return;
+            }
 
             if (DetonationTimer.Expired(Runner)) {
                 Detonate();
                 return;
             }
 
-            if (!Lit)
+            if (!Lit) {
                 body.Velocity = new(walkSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
+            }
         }
 
         private bool HandleCollision() {
-            if (Holder)
+            if (Holder) {
                 return false;
+            }
 
             PhysicsDataStruct data = body.Data;
 
@@ -108,8 +112,9 @@ namespace NSMB.Entities.Enemies {
         }
 
         public void Light() {
-            if (Lit)
+            if (Lit) {
                 return;
+            }
 
             DetonationTimer = TickTimer.CreateFromSeconds(Runner, detonationTime);
             body.Velocity = Vector2.zero;
@@ -126,8 +131,9 @@ namespace NSMB.Entities.Enemies {
             // Use distinct to only damage enemies once
             foreach (GameObject hitObj in DetonationHits.Select(c => c.gameObject).Distinct()) {
                 // Don't interact with ourselves
-                if (hitObj == gameObject)
+                if (hitObj == gameObject) {
                     continue;
+                }
 
                 // Interact with players by powerdown-ing them
                 if (hitObj.GetComponentInParent<PlayerController>() is PlayerController player) {
@@ -148,14 +154,16 @@ namespace NSMB.Entities.Enemies {
             for (int x = -explosionTileSize; x <= explosionTileSize; x++) {
                 for (int y = -explosionTileSize; y <= explosionTileSize; y++) {
                     // Use taxi-cab distance to make a somewhat circular explosion
-                    if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize)
+                    if (Mathf.Abs(x) + Mathf.Abs(y) > explosionTileSize) {
                         continue;
+                    }
 
                     Vector2Int ourLocation = tileLocation + new Vector2Int(x, y);
                     Utils.Utils.WrapTileLocation(ref ourLocation);
 
-                    if (tm.GetTile(ourLocation, out InteractableTile tile))
+                    if (tm.GetTile(ourLocation, out InteractableTile tile)) {
                         tile.Interact(this, InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(ourLocation), out bool _);
+                    }
                 }
             }
 
@@ -167,16 +175,18 @@ namespace NSMB.Entities.Enemies {
             FacingRight = hitWallOnLeft;
             body.Velocity = new((Lit ? Mathf.Abs(body.Velocity.x) : walkSpeed) * (FacingRight ? 1 : -1), body.Velocity.y);
 
-            if (Runner.IsForward)
+            if (Runner.IsForward) {
                 animator.SetTrigger("turnaround");
+            }
         }
 
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Temporary invincibility, we dont want to spam the kick sound
-            if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
+            if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner)) {
                 return;
+            }
 
             // Special insta-kill cases
             if (player.InstakillsEnemies) {
@@ -203,8 +213,9 @@ namespace NSMB.Entities.Enemies {
                 if (attackedFromAbove) {
                     // Light
                     bool mini = player.State == Enums.PowerupState.MiniMushroom;
-                    if (!mini || player.IsGroundpounding)
+                    if (!mini || player.IsGroundpounding) {
                         Light();
+                    }
 
                     if (!mini && player.IsGroundpounding) {
                         Kick(player, !fromRight, Mathf.Abs(player.body.Velocity.x) / player.RunningMaxSpeed, player.IsGroundpounding);
@@ -251,8 +262,9 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void RespawnEntity() {
-            if (IsActive)
+            if (IsActive) {
                 return;
+            }
 
             base.RespawnEntity();
             IsDetonated = false;
@@ -269,28 +281,32 @@ namespace NSMB.Entities.Enemies {
 
         protected override void CheckForEntityCollisions() {
             base.CheckForEntityCollisions();
-            if (IsDead || !Lit || Mathf.Abs(body.Velocity.x) < 1f)
+            if (IsDead || !Lit || Mathf.Abs(body.Velocity.x) < 1f) {
                 return;
+            }
 
             int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
 
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
 
-                if (obj.transform.IsChildOf(transform))
+                if (obj.transform.IsChildOf(transform)) {
                     continue;
+                }
 
                 // Killable entities
                 if (obj.TryGetComponent(out KillableEntity killable)) {
-                    if (killable.IsDead)
+                    if (killable.IsDead) {
                         continue;
+                    }
 
                     // Kill entity we ran into
                     killable.SpecialKill(killable.body.Position.x > body.Position.x, false, ComboCounter++);
 
                     // Kill ourselves if we're being held too
-                    if (Holder)
+                    if (Holder) {
                         SpecialKill(killable.body.Position.x < body.Position.x, false, 0);
+                    }
 
                     continue;
                 }
@@ -320,8 +336,9 @@ namespace NSMB.Entities.Enemies {
 
             if (IsDetonated) {
                 // Spawn explosion
-                if (!explosion)
+                if (!explosion) {
                     explosion = Instantiate(explosionPrefab, sRenderer.bounds.center, Quaternion.identity);
+                }
 
                 sRenderer.enabled = false;
                 sfx.Pause();
@@ -334,8 +351,9 @@ namespace NSMB.Entities.Enemies {
         public void OnDetonationTimerChanged() {
             animator.SetBool("lit", Lit);
 
-            if (!Lit)
+            if (!Lit) {
                 return;
+            }
 
             PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
         }

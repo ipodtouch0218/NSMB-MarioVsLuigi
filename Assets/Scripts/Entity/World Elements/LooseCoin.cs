@@ -17,19 +17,18 @@ namespace NSMB.Entities.Collectable {
         [SerializeField] private float despawn = 8;
 
         //---Components
-        [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private LegacyAnimateSpriteRenderer spriteAnimation;
         [SerializeField] private BoxCollider2D hitbox;
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!spriteRenderer) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (!spriteAnimation) spriteAnimation = GetComponentInChildren<LegacyAnimateSpriteRenderer>();
-            if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
+            SetIfNull(ref spriteAnimation, true);
+            SetIfNull(ref hitbox);
         }
 
         public override void Spawned() {
             base.Spawned();
+            Runner.SetIsSimulated(Object, true);
             CollectableTick = (int) (Runner.Tick + (0.2f * Runner.TickRate));
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
@@ -40,7 +39,7 @@ namespace NSMB.Entities.Collectable {
         public override void Render() {
             base.Render();
             float despawnTimeRemaining = DespawnTimer.RemainingRenderTime(Runner) ?? 0f;
-            spriteRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
+            sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
         }
 
         public override void FixedUpdateNetwork() {
@@ -52,8 +51,9 @@ namespace NSMB.Entities.Collectable {
                 return;
             }
 
-            if (!Object)
+            if (!Object) {
                 return;
+            }
 
             bool inWall = Utils.Utils.IsAnyTileSolidBetweenWorldBox(body.Position + hitbox.offset, hitbox.size * transform.lossyScale * 0.75f);
             gameObject.layer = inWall ? Layers.LayerHitsNothing : Layers.LayerEntityNoGroundEntity;
@@ -68,19 +68,22 @@ namespace NSMB.Entities.Collectable {
 
                 // Bounce
                 body.Velocity = -body.PreviousTickVelocity * 0.5f;
-                if (body.Velocity.y < 0.2f)
+                if (body.Velocity.y < 0.2f) {
                     body.Velocity = new(body.Velocity.x, 0);
+                }
 
                 // TODO: doesn't always trigger, even for host. Strange.
-                if (body.PreviousTickVelocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f))
+                if (body.PreviousTickVelocity.y < -0.5f * (Mathf.Sin(data.FloorAngle) + 1f)) {
                     CoinBounceAnimCounter++;
+                }
             }
         }
 
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-            if (Runner.Tick < CollectableTick)
+            if (Runner.Tick < CollectableTick) {
                 return;
+            }
 
             base.InteractWithPlayer(player, contact);
             Runner.Despawn(Object);

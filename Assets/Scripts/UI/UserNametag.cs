@@ -42,14 +42,15 @@ public class UserNametag : MonoBehaviour {
         }
 
         // If the parent disconnects, don't immediately die, but don't keep trying to update our info either.
-        if (parent.Disconnected || !data || !data.Object) {
+        if (!parent.Object || parent.Disconnected || !data || !data.Object) {
             return;
         }
 
         nametag.SetActive(!(parent.IsDead && parent.IsRespawning) && GameManager.Instance.GameState >= Enums.GameState.Playing);
 
-        if (!nametag.activeSelf)
+        if (!nametag.activeSelf) {
             return;
+        }
 
         Vector2 worldPos = parent.animationController.models.transform.position;
         worldPos.y += parent.WorldHitboxSize.y * 1.2f + 0.5f;
@@ -75,15 +76,17 @@ public class UserNametag : MonoBehaviour {
         }
         newText += cachedNickname + "\n";
 
-        if (parent.Lives >= 0)
+        if (parent.Lives >= 0) {
             newText += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
+        }
 
         newText += Utils.GetSymbolString("Sx" + parent.Stars);
 
         text.text = newText;
 
         nicknameColor ??= data.NicknameColor;
-        if (nicknameColor != null && nicknameColor.isRainbow)
+        if (nicknameColor != null && nicknameColor.isRainbow) {
             text.color = Utils.GetRainbowColor(parent.Runner);
+        }
     }
 }

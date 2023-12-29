@@ -134,7 +134,6 @@ namespace NSMB.Game {
             ControlSystem.controls.UI.Pause.performed += OnPause;
             ControlSystem.controls.Debug.ToggleHUD.performed += OnToggleHud;
 
-            NetworkHandler.OnShutdown += OnShutdown;
             NetworkHandler.OnPlayerLeft += OnPlayerLeft;
             OnAllPlayersLoaded += OurOnAllPlayersLoaded;
         }
@@ -143,7 +142,6 @@ namespace NSMB.Game {
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             ControlSystem.controls.Debug.ToggleHUD.performed -= OnToggleHud;
 
-            NetworkHandler.OnShutdown -= OnShutdown;
             NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
             OnAllPlayersLoaded -= OurOnAllPlayersLoaded;
         }
@@ -165,8 +163,7 @@ namespace NSMB.Game {
 
         public async void Start() {
             // Handles spawning in editor
-            if (!NetworkHandler.Runner.SessionInfo) {
-                Debug.Log($"no sessioinfo {NetworkHandler.Runner.SessionInfo}");
+            if (string.IsNullOrEmpty(NetworkHandler.Runner.SessionInfo.Name)) {
                 // Join a singleplayer room if we're not in one
                 await NetworkHandler.CreateRoom(new() {
                     Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
@@ -574,11 +571,6 @@ namespace NSMB.Game {
 
             CheckIfAllPlayersLoaded();
             CheckForWinner();
-        }
-
-        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
-            GlobalController.Instance.disconnectCause = shutdownReason;
-            SceneManager.LoadScene(0);
         }
 
         //---RPCs

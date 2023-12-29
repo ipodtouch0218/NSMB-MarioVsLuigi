@@ -18,7 +18,6 @@ namespace NSMB.Loading {
         //---Private Variables
         private TMP_Text text;
         private GameObject playerListParent;
-        private string ourNickname;
 
         public void Awake() {
             text = GetComponent<TMP_Text>();
@@ -28,7 +27,6 @@ namespace NSMB.Loading {
 
         public void OnEnable() {
             playerListParent.SetActive(false);
-            ourNickname = NetworkHandler.Runner.GetLocalPlayerData()?.GetNickname();
         }
 
         public void Update() {
@@ -51,7 +49,7 @@ namespace NSMB.Loading {
             }
 
             // Game starting
-            if (GameManager.Instance.GameStartTimer.IsRunning) {
+            if (GameManager.Instance.gameObject.activeSelf && GameManager.Instance.GameStartTimer.IsRunning) {
                 text.text = tm.GetTranslation("ui.loading.starting");
                 playerListParent.SetActive(false);
                 return;
@@ -61,25 +59,19 @@ namespace NSMB.Loading {
             NetworkRunner runner = GameManager.Instance.Runner;
             foreach (PlayerRef player in runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(runner);
-                if (!data || data.IsCurrentlySpectating)
+                if (!data || data.IsCurrentlySpectating || data.HasInputAuthority) {
                     continue;
+                }
 
-                if (!data.IsLoaded)
+                if (!data.IsLoaded) {
                     waitingFor.Add(data.GetNickname());
+                }
             }
 
-            if (waitingFor.Contains(ourNickname)) {
-                // Loading
-                text.text = tm.GetTranslation("ui.loading.loading");
-                playerListParent.SetActive(false);
-
-            } else {
-                // Waiting for others
-                text.text = tm.GetTranslation("ui.loading.waiting");
-
-                playerListParent.SetActive(true);
-                playerList.text = waitingFor.Count == 0 ? "" : "\n- " + string.Join("\n- ", waitingFor);
-            }
+            // Waiting for others
+            text.text = tm.GetTranslation("ui.loading.waiting");
+            playerListParent.SetActive(true);
+            playerList.text = waitingFor.Count == 0 ? "" : "\n- " + string.Join("\n- ", waitingFor);
         }
     }
 }

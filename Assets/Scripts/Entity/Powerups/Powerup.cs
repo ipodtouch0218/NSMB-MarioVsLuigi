@@ -49,15 +49,15 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
-            if (!childAnimator) childAnimator = GetComponentInChildren<Animator>();
+            SetIfNull(ref sRenderer, true);
+            SetIfNull(ref hitbox);
+            SetIfNull(ref childAnimator, true);
         }
 
         public void Awake() {
             collectScript = GetComponent<IPowerupCollect>();
 
-            if (GroundMask == 0) {
+            if (GroundMask == default) {
                 GroundMask = (1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough);
             }
         }
@@ -91,14 +91,16 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void Spawned() {
             base.Spawned();
+            Runner.SetIsSimulated(Object, true);
 
             if (FollowPlayer) {
                 // Spawned following a player.
                 body.Freeze = true;
                 gameObject.layer = Layers.LayerHitsNothing;
                 sRenderer.sortingOrder = 15;
-                if (childAnimator)
+                if (childAnimator) {
                     childAnimator.enabled = false;
+                }
 
                 sRenderer.GetPropertyBlock(mpb = new());
 
@@ -111,9 +113,9 @@ namespace NSMB.Entities.Collectable.Powerups {
                     gameObject.layer = Layers.LayerHitsNothing;
                     sRenderer.sortingOrder = -1000;
 
-                    if (childAnimation)
+                    if (childAnimation) {
                         childAnimation.Play();
-
+                    }
                 } else {
                     // Spawned by any other means (blue koopa, usually.)
                     body.Freeze = false;
@@ -129,11 +131,13 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void Render() {
             base.Render();
-            if (Collector)
+            if (Collector) {
                 return;
+            }
 
-            if (childAnimator)
+            if (childAnimator) {
                 childAnimator.SetBool("onGround", body.Data.OnGround);
+            }
 
             HandleSpawningAnimation();
             HandleDespawningBlinking();
@@ -142,8 +146,9 @@ namespace NSMB.Entities.Collectable.Powerups {
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
 
-            if (!Object || Collector)
+            if (!Object || Collector) {
                 return;
+            }
 
             if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
@@ -161,9 +166,9 @@ namespace NSMB.Entities.Collectable.Powerups {
                     body.Freeze = false;
                     sRenderer.sortingOrder = OriginalSortingOrder;
                     sRenderer.gameObject.transform.localScale = Vector3.one;
-                    if (childAnimator)
+                    if (childAnimator) {
                         childAnimator.enabled = true;
-
+                    }
                 } else {
                     return;
                 }
@@ -195,7 +200,7 @@ namespace NSMB.Entities.Collectable.Powerups {
             Vector2 size = hitbox.size * transform.lossyScale * 0.7f;
             Vector2 origin = body.Position + hitbox.offset * transform.lossyScale;
 
-            // TODO: bug here somewhere. Client powerups jitter
+            //// TODO: bug here somewhere. Client powerups jitter
             if (Utils.Utils.IsAnyTileSolidBetweenWorldBox(origin, size) || Runner.GetPhysicsScene2D().OverlapBox(origin, size, 0, GroundMask)) {
                 gameObject.layer = Layers.LayerHitsNothing;
                 return;
@@ -205,7 +210,11 @@ namespace NSMB.Entities.Collectable.Powerups {
             }
 
             if (avoidPlayers && body.Data.OnGround) {
-                PlayerController closest = GameManager.Instance.AlivePlayers.OrderBy(player => Utils.Utils.WrappedDistance(body.Position, player.body.Position)).FirstOrDefault();
+                PlayerController closest =
+                    GameManager.Instance.AlivePlayers
+                    .OrderBy(player => Utils.Utils.WrappedDistance(body.Position, player.body.Position))
+                    .FirstOrDefault();
+
                 if (closest) {
                     FacingRight = Utils.Utils.WrappedDirectionSign(closest.body.Position, body.Position) == -1;
                 }
@@ -243,7 +252,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         private void HandleDespawningBlinking() {
             float despawnTimeRemaining = DespawnTimer.RemainingTime(Runner) ?? 0f;
             if (despawnTimeRemaining < 1) {
-                sRenderer.enabled = despawnTimeRemaining * blinkingRate % 1 > 0.5f;
+                sRenderer.enabled = (despawnTimeRemaining * blinkingRate % 1) > 0.5f;
             }
         }
 
@@ -267,14 +276,16 @@ namespace NSMB.Entities.Collectable.Powerups {
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            if (!Collector)
+            if (!Collector) {
                 GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, body.Position + hitbox.offset);
+            }
         }
 
         //---IBlockBumpable overrides
         public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
-            if (direction == InteractionDirection.Down || FollowPlayer)
+            if (direction == InteractionDirection.Down || FollowPlayer) {
                 return;
+            }
 
             body.Velocity = new(body.Velocity.x, 5f);
         }
@@ -283,24 +294,29 @@ namespace NSMB.Entities.Collectable.Powerups {
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Fixes players hitting multiple colliders at once (propeller)
-            if (!Object || !Object.IsValid)
+            if (!Object || !Object.IsValid) {
                 return;
+            }
 
             // Don't be collectable if someone already collected us
-            if (Collector)
+            if (Collector) {
                 return;
+            }
 
             // Don't be collectable if we're following a player / spawning
-            if (BlockSpawn && (SpawnAnimationTimer.RemainingTime(Runner) ?? 0f) > 0.1f)
+            if (BlockSpawn && (SpawnAnimationTimer.RemainingTime(Runner) ?? 0f) > 0.1f) {
                 return;
+            }
 
-            if (!BlockSpawn && SpawnAnimationTimer.IsActive(Runner))
+            if (!BlockSpawn && SpawnAnimationTimer.IsActive(Runner)) {
                 return;
+            }
 
             // Don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
             // so we dont collect it instantly)
-            if (IgnorePlayerTimer.IsActive(Runner))
+            if (IgnorePlayerTimer.IsActive(Runner)) {
                 return;
+            }
 
             Collector = player;
 
@@ -313,8 +329,10 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             switch (result) {
             case PowerupReserveResult.ReserveOldPowerup: {
-                if (oldState != Enums.PowerupState.NoPowerup)
+                if (oldState != Enums.PowerupState.NoPowerup) {
                     player.SetReserveItem(oldState);
+                }
+
                 break;
             }
             case PowerupReserveResult.ReserveNewPowerup: {
@@ -326,8 +344,9 @@ namespace NSMB.Entities.Collectable.Powerups {
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
             IsActive = false;
 
-            if (HasStateAuthority)
+            if (HasStateAuthority) {
                 Rpc_CollectedPowerup(player, result);
+            }
         }
 
         //---CollectableEntity overrides

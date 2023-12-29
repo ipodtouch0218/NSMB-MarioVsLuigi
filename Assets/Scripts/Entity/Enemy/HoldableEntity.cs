@@ -7,7 +7,7 @@ using NSMB.Game;
 
 namespace NSMB.Entities {
     //[OrderAfter(typeof(PlayerController))]
-    public abstract class HoldableEntity : KillableEntity, IBeforeTick {
+    public abstract class HoldableEntity : KillableEntity {
 
         //---Networked Variables
         [Networked] public PlayerController Holder { get; set; }
@@ -22,16 +22,12 @@ namespace NSMB.Entities {
         //--Misc Variables
         public Vector3 holderOffset;
         public bool canPlace = true, canKick = true;
-        private bool wasHeldLastTick;
-
-        public void BeforeTick() {
-            wasHeldLastTick = Holder;
-        }
 
         public override void Render() {
             base.Render();
-            if (IsDead)
+            if (IsDead) {
                 return;
+            }
 
             if (Holder) {
                 Vector3 newPos = Holder.transform.position + holderOffset;
@@ -56,8 +52,9 @@ namespace NSMB.Entities {
         }
 
         public virtual void Kick(PlayerController kicker, bool toRight, float kickFactor, bool groundpound) {
-            if (Holder)
+            if (Holder) {
                 return;
+            }
 
             if (kicker) {
                 ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, 0.2f);
@@ -70,11 +67,13 @@ namespace NSMB.Entities {
         }
 
         public virtual void Throw(bool toRight, bool crouching) {
-            if (!Holder)
+            if (!Holder) {
                 return;
+            }
 
-            if (Utils.Utils.IsTileSolidAtWorldLocation(body.Position))
+            if (Utils.Utils.IsTileSolidAtWorldLocation(body.Position)) {
                 transform.position = body.Position = new(Holder.transform.position.x, body.Position.y);
+            }
 
             ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.6f : 0.35f);
             PreviousHolder = Holder;
@@ -85,8 +84,9 @@ namespace NSMB.Entities {
         }
 
         public virtual void Pickup(PlayerController player) {
-            if (Holder)
+            if (Holder) {
                 return;
+            }
 
             player.SetHeldEntity(this);
         }
@@ -94,33 +94,39 @@ namespace NSMB.Entities {
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             // Don't interact with our lovely holder
-            if (Holder == player)
+            if (Holder == player) {
                 return;
+            }
 
             // Temporary invincibility
-            if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+            if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner)) {
                 return;
+            }
 
             base.InteractWithPlayer(player, contact);
         }
 
         //---KillableEntity overrides
         public override void Kill() {
-            if (IsDead)
+            if (IsDead) {
                 return;
+            }
 
-            if (Holder)
+            if (Holder) {
                 Holder.SetHeldEntity(null);
+            }
 
             base.Kill();
         }
 
         public override void SpecialKill(bool right, bool groundpound, int combo) {
-            if (IsDead)
+            if (IsDead) {
                 return;
+            }
 
-            if (Holder)
+            if (Holder) {
                 Holder.SetHeldEntity(null);
+            }
 
             base.SpecialKill(right, groundpound, combo);
         }
@@ -132,15 +138,18 @@ namespace NSMB.Entities {
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
 
-                if (obj.transform.IsChildOf(transform))
+                if (obj.transform.IsChildOf(transform)) {
                     continue;
+                }
 
-                if (Holder && obj.transform.IsChildOf(Holder.transform))
+                if (Holder && obj.transform.IsChildOf(Holder.transform)) {
                     continue;
+                }
 
                 if (obj.GetComponent<KillableEntity>() is KillableEntity killable) {
-                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant)
+                    if (killable.IsDead || !killable.collideWithOtherEnemies || killable is PiranhaPlant) {
                         continue;
+                    }
 
                     Utils.Utils.UnwrapLocations(body.Position, killable.body.Position, out Vector2 ourPos, out Vector2 theirPos);
                     bool goRight = ourPos.x > theirPos.x;
@@ -170,10 +179,13 @@ namespace NSMB.Entities {
         }
 
         public void OnKickedAnimCounterChanged() {
-            if (GameManager.Instance.GameState != Enums.GameState.Playing)
+            if (GameManager.Instance.GameState != Enums.GameState.Playing) {
                 return;
+            }
 
-            if (!IsActive) return;
+            if (!IsActive) {
+                return;
+            }
 
             PlaySound(Enums.Sounds.Enemy_Shell_Kick);
         }

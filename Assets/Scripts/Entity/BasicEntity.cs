@@ -36,18 +36,19 @@ namespace NSMB.Entities {
         protected ChangeDetector changeDetector;
 
         public virtual void OnValidate() {
-            if (!body) body = GetComponent<EntityMover>();
-            if (!sfx) sfx = GetComponent<AudioSource>();
+            SetIfNull(ref body);
+            SetIfNull(ref sfx);
         }
 
         public override void Spawned() {
             if (FirstSpawn) {
                 SpawnLocation = transform.position;
 
-                if (IsRespawningEntity)
+                if (IsRespawningEntity) {
                     DespawnEntity();
-                else
+                } else {
                     RespawnEntity();
+                }
             }
             GameManager.Instance.networkObjects.Add(Object);
             OnFacingRightChanged();
@@ -76,8 +77,9 @@ namespace NSMB.Entities {
 
         public void PlaySound(Enums.Sounds sound, CharacterData character = null, byte variant = 0, float volume = 1f) {
             if (sound == Enums.Sounds.World_Block_Break) {
-                if (brickBreakSound)
+                if (brickBreakSound) {
                     return;
+                }
 
                 brickBreakSound = true;
             }
@@ -86,8 +88,9 @@ namespace NSMB.Entities {
         }
 
         public virtual void RespawnEntity() {
-            if (IsActive)
+            if (IsActive) {
                 return;
+            }
 
             if (body) {
                 body.Position = SpawnLocation;
@@ -102,8 +105,9 @@ namespace NSMB.Entities {
                 return;
             }
 
-            if (!IsActive)
+            if (!IsActive) {
                 return;
+            }
 
             if (body) {
                 body.Position = SpawnLocation;
@@ -122,12 +126,15 @@ namespace NSMB.Entities {
 
         //---RPCs
         public void SpawnResizableParticle(Vector2 pos, bool right, bool flip, Vector2 size, Enums.PrefabParticle prefab) {
-            if (!Runner.IsForward || IsProxy) return;
+            if (!Runner.IsForward || IsProxy) {
+                return;
+            }
 
-            if (HasStateAuthority)
+            if (HasStateAuthority) {
                 Rpc_SpawnResizableParticle(pos, right, flip, size, prefab);
-            else
+            } else {
                 SpawnResizableParticleInternal(pos, right, flip, size, prefab);
+            }
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
@@ -149,14 +156,17 @@ namespace NSMB.Entities {
         }
 
         public void SpawnParticle(Vector2 pos, Enums.PrefabParticle prefab, Quaternion? rot = null) {
-            if (!Runner.IsForward || IsProxy) return;
+            if (!Runner.IsForward || IsProxy) {
+                return;
+            }
 
             rot ??= Quaternion.identity;
 
-            if (HasStateAuthority)
+            if (HasStateAuthority) {
                 Rpc_SpawnParticle(pos, prefab, rot.Value);
-            else
+            } else {
                 SpawnParticleInternal(pos, prefab, rot.Value);
+            }
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
@@ -169,12 +179,15 @@ namespace NSMB.Entities {
         }
 
         public void SpawnTileBreakParticle(Vector2 pos, Color color, float rot = 0) {
-            if (!Runner.IsForward || IsProxy) return;
+            if (!Runner.IsForward || IsProxy) {
+                return;
+            }
 
-            if (HasStateAuthority)
+            if (HasStateAuthority) {
                 Rpc_SpawnTileBreakParticle(pos, color, rot);
-            else
+            } else {
                 SpawnTileBreakParticleInternal(pos, color, rot);
+            }
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
@@ -190,15 +203,21 @@ namespace NSMB.Entities {
         private Tick lastPlayedSoundTick;
 
         public void PlayNetworkedSound(Enums.Sounds sound) {
-            if (!Runner.IsForward || IsProxy) return;
-            if (lastPlayedSoundTick >= Runner.Tick) return;
+            if (!Runner.IsForward || IsProxy) {
+                return;
+            }
+
+            if (lastPlayedSoundTick >= Runner.Tick) {
+                return;
+            }
 
             lastPlayedSoundTick = Runner.Tick;
 
-            if (HasStateAuthority)
+            if (HasStateAuthority) {
                 Rpc_PlayNetworkedSound(sound);
-            else
+            } else {
                 PlayNetworkedSoundInternal(sound);
+            }
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.Proxies | RpcTargets.StateAuthority)]
@@ -223,6 +242,17 @@ namespace NSMB.Entities {
                 switch (change) {
                 case nameof(FacingRight): OnFacingRightChanged(); break;
                 case nameof(IsActive): OnIsActiveChanged(); break;
+                }
+            }
+        }
+
+        //---Utils
+        protected void SetIfNull<T>(ref T var, bool children = false) where T : Component {
+            if (!var) {
+                if (children) {
+                    var = GetComponentInChildren<T>();
+                } else {
+                    var = GetComponent<T>();
                 }
             }
         }

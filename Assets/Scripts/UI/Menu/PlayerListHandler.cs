@@ -37,9 +37,13 @@ namespace NSMB.UI.MainMenu {
 
         public void PopulatePlayerEntries(bool addSelf) {
             RemoveAllPlayerEntries();
-            foreach (PlayerRef player in Runner.ActivePlayers) {
-                if (addSelf || Runner.LocalPlayer != player)
-                    AddPlayerEntry(player);
+            try {
+                foreach (PlayerRef player in Runner.ActivePlayers) {
+                    if (addSelf || Runner.LocalPlayer != player)
+                        AddPlayerEntry(player);
+                }
+            } catch {
+
             }
         }
 

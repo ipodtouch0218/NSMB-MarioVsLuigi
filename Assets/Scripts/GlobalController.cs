@@ -33,8 +33,7 @@ public class GlobalController : Singleton<GlobalController> {
 
     public RenderTexture ndsTexture;
 
-    public bool checkedForVersion, firstConnection;
-    public ShutdownReason? disconnectCause = null;
+    public bool checkedForVersion = false, firstConnection = true;
     public int windowWidth = 1280, windowHeight = 720;
 
     public ConnectionToken connectionToken;
@@ -59,6 +58,9 @@ public class GlobalController : Singleton<GlobalController> {
 
     public void Awake() {
         Set(this);
+
+        firstConnection = true;
+        checkedForVersion = false;
     }
 
     public void Start() {

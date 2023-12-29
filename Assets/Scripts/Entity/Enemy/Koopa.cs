@@ -42,8 +42,9 @@ namespace NSMB.Entities.Enemies {
 
         public override void Render() {
             base.Render();
-            if (IsFrozen || IsDead)
+            if (IsFrozen || IsDead) {
                 return;
+            }
 
             // Animation
             animator.SetBool("shell", IsInShell || Holder != null);
@@ -69,8 +70,9 @@ namespace NSMB.Entities.Enemies {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (!Object)
+            if (!Object) {
                 return;
+            }
 
             if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
@@ -86,17 +88,19 @@ namespace NSMB.Entities.Enemies {
                 hitbox.enabled = true;
             }
 
-            if (Holder)
+            if (Holder) {
                 FacingRight = Holder.FacingRight;
+            }
 
             PhysicsDataStruct data = body.Data;
             if (IsInShell) {
                 hitbox.size = inShellHitboxSize;
-                 hitbox.offset = inShellHitboxOffset;
+                hitbox.offset = inShellHitboxOffset;
 
                 if (IsStationary) {
-                    if (data.OnGround && body.Velocity.y < 1)
+                    if (data.OnGround && body.Velocity.y < 1) {
                         body.Velocity = new(0, body.Velocity.y);
+                    }
 
                     if (WakeupTimer.Expired(Runner)) {
                         WakeUp();
@@ -118,12 +122,14 @@ namespace NSMB.Entities.Enemies {
 
             if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.Position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
                 Vector3 redCheckPos = body.Position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
-                if (GameManager.Instance)
+                if (GameManager.Instance) {
                     Utils.Utils.WrapWorldLocation(ref redCheckPos);
+                }
 
                 // Turn around if no ground
-                if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround))
+                if (!Runner.GetPhysicsScene2D().Raycast(redCheckPos, Vector2.down, 0.5f, Layers.MaskAnyGround)) {
                     Turnaround(!FacingRight, body.Velocity.x);
+                }
             }
 
             if (!IsStationary) {
@@ -135,8 +141,9 @@ namespace NSMB.Entities.Enemies {
         }
 
         private void HandleTile() {
-            if (Holder)
+            if (Holder) {
                 return;
+            }
 
             PhysicsDataStruct data = body.Data;
 
@@ -148,8 +155,9 @@ namespace NSMB.Entities.Enemies {
 
             } else if (IsInShell && !IsStationary && (data.HitLeft || data.HitRight)) {
                 foreach (PhysicsDataStruct.TileContact tile in data.TilesHitSide) {
-                    if (GameManager.Instance.tileManager.GetTile(tile.location, out InteractableTile it))
+                    if (GameManager.Instance.tileManager.GetTile(tile.location, out InteractableTile it)) {
                         it.Interact(this, InteractionDirection.Up, Utils.Utils.TilemapToWorldPosition(tile.location), out bool _);
+                    }
                 }
             }
         }
@@ -161,16 +169,18 @@ namespace NSMB.Entities.Enemies {
             IsUpsideDown = false;
             IsStationary = false;
 
-            if (Holder)
+            if (Holder) {
                 Holder.SetHeldEntity(null);
+            }
 
             Holder = null;
             PreviousHolder = null;
         }
 
         public void EnterShell(bool becomeItem, PlayerController player) {
-            if (IsDead)
+            if (IsDead) {
                 return;
+            }
 
             if (blue && !IsInShell && becomeItem) {
                 BlueBecomeItem(player);
@@ -202,11 +212,13 @@ namespace NSMB.Entities.Enemies {
         }
 
         protected void Turnaround(bool hitWallOnLeft, float x) {
-            if (IsActuallyStationary)
+            if (IsActuallyStationary) {
                 return;
+            }
 
-            if (Runner.IsForward && IsInShell && hitWallOnLeft != FacingRight)
+            if (Runner.IsForward && IsInShell && hitWallOnLeft != FacingRight) {
                 PlaySound(Enums.Sounds.World_Block_Bump);
+            }
 
             FacingRight = hitWallOnLeft;
             body.Velocity = new((x > 0.5f ? Mathf.Abs(x) : CurrentKickSpeed) * (FacingRight ? 1 : -1), body.Velocity.y);
@@ -214,8 +226,9 @@ namespace NSMB.Entities.Enemies {
 
         //---BasicEntity overrides
         public override void RespawnEntity() {
-            if (IsActive)
+            if (IsActive) {
                 return;
+            }
 
             base.RespawnEntity();
             IsInShell = false;
@@ -230,12 +243,14 @@ namespace NSMB.Entities.Enemies {
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Don't interact with anyone if we're being held.
-            if (Holder)
+            if (Holder) {
                 return;
+            }
 
             // Temporary invincibility
-            if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
+            if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner)) {
                 return;
+            }
 
             Utils.Utils.UnwrapLocations(body.Position, player.body.Position, out Vector2 ourPos, out Vector2 theirPos);
             bool fromRight = ourPos.x < theirPos.x;
@@ -319,27 +334,29 @@ namespace NSMB.Entities.Enemies {
                 // Finally attempt to damage player
                 bool damageable = player.IsDamageable;
                 player.Powerdown(false);
-                if (damageable && !IsInShell)
+                if (damageable && !IsInShell) {
                     FacingRight = fromRight;
+                }
             }
         }
 
         //---IBlockBumpable overrides
         public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
-            if (IsDead)
+            if (IsDead) {
                 return;
+            }
 
-            if (!IsInShell) {
+            if (!IsInShell || IsStationary) {
                 EnterShell(false, bumper as PlayerController);
-                IsStationary = true;
                 Putdown = true;
             }
             IsUpsideDown = canBeFlipped;
 
             body.Velocity = new(body.Velocity.x, 5.5f);
 
-            if (Holder)
+            if (Holder) {
                 Holder.SetHeldEntity(null);
+            }
 
             if (IsStationary) {
                 body.Velocity = new(bumper.body.Position.x < body.Position.x ? 1f : -1f, body.Velocity.y);
@@ -365,16 +382,19 @@ namespace NSMB.Entities.Enemies {
                 for (int i = 0; i < count; i++) {
                     GameObject obj = CollisionBuffer[i].gameObject;
 
-                    if (obj.transform.IsChildOf(transform))
+                    if (obj.transform.IsChildOf(transform)) {
                         continue;
+                    }
 
-                    if (Holder && obj.transform.IsChildOf(Holder.transform))
+                    if (Holder && obj.transform.IsChildOf(Holder.transform)) {
                         continue;
+                    }
 
                     // Killable entities
                     if (obj.GetComponentInParent<KillableEntity>() is KillableEntity killable) {
-                        if (killable.IsDead)
+                        if (killable.IsDead) {
                             continue;
+                        }
 
                         Utils.Utils.UnwrapLocations(body.Position, killable.body ? killable.body.Position : killable.transform.position, out Vector2 ourPos, out Vector2 theirPos);
                         bool fromRight = ourPos.x < theirPos.x;
@@ -409,8 +429,9 @@ namespace NSMB.Entities.Enemies {
         public override void OnIsDeadChanged() {
             base.OnIsDeadChanged();
 
-            if (IsDead)
+            if (IsDead) {
                 sRenderer.sprite = deadSprite;
+            }
         }
 
         //---ThrowableEntity overrides
@@ -427,8 +448,10 @@ namespace NSMB.Entities.Enemies {
 
             IsStationary = crouch;
             IsInShell = true;
-            if (!crouch)
+            if (!crouch) {
                 WakeupTimer = TickTimer.None;
+            }
+
             Putdown = crouch;
         }
 
@@ -446,8 +469,9 @@ namespace NSMB.Entities.Enemies {
         }
 
         private void OnBlueShellCollectorChanged() {
-            if (BlueShellCollector)
+            if (BlueShellCollector) {
                 BlueShellCollector.PlaySound(Enums.Sounds.Player_Sound_PowerupCollect);
+            }
         }
     }
 }

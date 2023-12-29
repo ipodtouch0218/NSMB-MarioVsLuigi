@@ -15,7 +15,6 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
-using UnityEngine.Rendering.UI;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuManager : Singleton<MainMenuManager> {
@@ -112,25 +111,22 @@ namespace NSMB.UI.MainMenu {
             HorizontalCamera.SizeIncreaseTarget = 0;
             HorizontalCamera.SizeIncreaseCurrent = 0;
 
-            if (GlobalController.Instance.disconnectCause != null) {
-                if (GlobalController.Instance.disconnectCause != ShutdownReason.Ok)
-                    OpenErrorBox(GlobalController.Instance.disconnectCause.Value);
-
-                GlobalController.Instance.disconnectCause = null;
-            }
-
             PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
             UpdateRegionDropdown();
             StartCoroutine(NetworkHandler.PingRegions());
 
             // Photon stuff.
-            if (!Runner.IsCloudReady) {
+            if (GlobalController.Instance.firstConnection) {
                 // Initial connection to the game
                 OpenTitleScreen();
 
             } else if ((Runner.IsServer || Runner.IsConnectedToServer) && SessionData.Instance && SessionData.Instance.Object) {
                 // Call enterroom callback
                 EnterRoom(true);
+
+            } else {
+                // Quit out of a room unexpectedly
+                OpenRoomListMenu();
             }
 
             // Controls & Settings
@@ -141,10 +137,10 @@ namespace NSMB.UI.MainMenu {
             // Discord RPC
             GlobalController.Instance.discordController.UpdateActivity();
 
-            // Version Checking
 #if PLATFORM_WEBGL
             copyRoomIdCanvasGroup.interactable = false;
 #else
+            // Version Checking
             if (!GlobalController.Instance.checkedForVersion) {
                 UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
                     if (upToDate)
@@ -158,7 +154,7 @@ namespace NSMB.UI.MainMenu {
             }
 #endif
 
-            EventSystem.current.SetSelectedGameObject(title);
+            GlobalController.Instance.firstConnection = false;
         }
 
         public void Update() {
@@ -328,11 +324,11 @@ namespace NSMB.UI.MainMenu {
             bg.SetActive(true);
             lobbyMenu.SetActive(true);
 
-            if (NetworkHandler.Disconnected) {
+            if (!errorPrompt.gameObject.activeSelf && !networkErrorPrompt.gameObject.activeSelf && NetworkHandler.Disconnected) {
                 Reconnect();
             }
 
-            roomManager.RefreshRooms();
+            //roomManager.RefreshRooms();
 
             EventSystem.current.SetSelectedGameObject(lobbySelected);
         }
@@ -393,7 +389,7 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
-        public void OpenNetworkErrorBox(ShutdownReason reason) {
+        public void OpenNetworkErrorBox(Enum reason) {
             if (nonNetworkShutdown) {
                 OpenErrorBox(reason);
                 return;
@@ -675,8 +671,9 @@ namespace NSMB.UI.MainMenu {
 
         // CONNECTION CALLBACKS
         public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
-            if (cause != ShutdownReason.Ok)
+            if (cause != ShutdownReason.Ok) {
                 OpenNetworkErrorBox(cause);
+            }
 
             if (inLobbyMenu.activeSelf) {
                 OpenRoomListMenu();
@@ -685,13 +682,9 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
-        public void OnDisconnect(NetworkRunner runner) {
-            OpenNetworkErrorBox(ShutdownReason.ConnectionRefused);
-
-            if (inLobbyMenu.activeSelf) {
-                OpenRoomListMenu();
-            }
-
+        public void OnDisconnect(NetworkRunner runner, NetDisconnectReason disconnectReason) {
+            OpenNetworkErrorBox(disconnectReason);
+            OpenRoomListMenu();
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
@@ -775,8 +768,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnSceneLoadStart() {
-            if (!Runner.TryGetSceneInfo(out var sceneInfo) || sceneInfo.Scenes[0].AsIndex != 0)
+            if (!Runner.TryGetSceneInfo(out var sceneInfo) || sceneInfo.Scenes[0].AsIndex != 0) {
                 GlobalController.Instance.loadingCanvas.Initialize();
+            }
         }
 
         //---Debug
@@ -786,8 +780,9 @@ namespace NSMB.UI.MainMenu {
         public void OnDrawGizmos() {
             Gizmos.color = Color.red;
             foreach (MapData map in maps) {
-                if (map.levelPreviewPosition)
+                if (map.levelPreviewPosition) {
                     Gizmos.DrawWireCube(map.levelPreviewPosition.transform.position, MaxCameraSize);
+                }
             }
         }
 #endif
