@@ -71,14 +71,16 @@ public class UIUpdater : MonoBehaviour {
     public void Update() {
 
         if (!player) {
-            if (!uiHidden)
+            if (!uiHidden) {
                 ToggleUI(true);
+            }
 
             return;
         }
 
-        if (uiHidden)
+        if (uiHidden) {
             ToggleUI(false);
+        }
 
         UpdateStoredItemUI();
         UpdateTextUI();
@@ -95,8 +97,9 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void UpdateStoredItemUI() {
-        if (!player || !player.Object)
+        if (!player || !player.Object) {
             return;
+        }
 
         PowerupScriptable powerup = player.StoredPowerup.GetPowerupScriptable();
         if (!powerup) {
@@ -108,8 +111,9 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void UpdateTextUI() {
-        if (!player || !player.Object)
+        if (!player || !player.Object) {
             return;
+        }
 
         if (teams) {
             int teamIndex = player.Data.Team;
@@ -120,8 +124,9 @@ public class UIUpdater : MonoBehaviour {
         if (player.Stars != stars) {
             stars = player.Stars;
             string starString = "Sx" + stars;
-            if (!teams)
+            if (!teams) {
                 starString += "/" + SessionData.Instance.StarRequirement;
+            }
 
             uiStars.text = Utils.GetSymbolString(starString);
         }
@@ -140,29 +145,30 @@ public class UIUpdater : MonoBehaviour {
         }
 
         if (SessionData.Instance.Timer > 0) {
-            if (!GameManager.Instance.GameEnded) {
-                float? timeRemaining = GameManager.Instance.GameEndTimer.RemainingRenderTime(Runner);
+            float timeRemaining = GameManager.Instance.GameEndTimer.RemainingRenderTime(Runner) ?? 0;
 
-                if ((GameManager.Instance.IsMusicEnabled || GameManager.Instance.GameEnded) && timeRemaining == null)
-                    timeRemaining = 0;
+            if (GameManager.Instance.GameEnded) {
+                if (GameManager.Instance.GameEndTimer.IsRunning) {
+                    return;
+                }
 
-                if (timeRemaining != null) {
-                    int seconds = Mathf.CeilToInt(timeRemaining.Value - 1);
-                    seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer * 60);
+                if (!timerMaterial) {
+                    CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
+                    cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
+                    timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
+                }
+            }
 
-                    if (seconds != timer) {
-                        timer = seconds;
-                        uiCountdown.text = Utils.GetSymbolString("Tx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
-                        timerParent.SetActive(true);
-                    }
+            if (GameManager.Instance.GameState < Enums.GameState.Playing) {
+                uiCountdown.text = Utils.GetSymbolString("Tx" + SessionData.Instance.Timer + ":00");
+            } else {
+                int seconds = Mathf.CeilToInt(timeRemaining);
+                seconds = Mathf.Clamp(seconds, 0, SessionData.Instance.Timer * 60);
 
-                    if (timeRemaining <= 0 && !timerMaterial) {
-                        CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
-                        cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
-                        timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
-                    }
-                } else {
-                    uiCountdown.text = Utils.GetSymbolString("Tx" + SessionData.Instance.Timer + ":00");
+                if (seconds != timer) {
+                    timer = seconds;
+                    uiCountdown.text = Utils.GetSymbolString("Tx" + (timer / 60) + ":" + (seconds % 60).ToString("00"));
+                    timerParent.SetActive(true);
                 }
             }
         } else {
@@ -172,12 +178,13 @@ public class UIUpdater : MonoBehaviour {
 
     public TrackIcon CreateTrackIcon(Component comp) {
         TrackIcon icon;
-        if (comp is PlayerController)
+        if (comp is PlayerController) {
             icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
-        else if (comp is BigStar)
+        } else if (comp is BigStar) {
             icon = Instantiate(starTrackTemplate, starTrackTemplate.transform.parent);
-        else
+        } else {
             return null;
+        }
 
         icon.target = comp.gameObject;
         icon.gameObject.SetActive(true);
@@ -201,8 +208,9 @@ public class UIUpdater : MonoBehaviour {
     }
 
     private void UpdatePingText() {
-        if (!Runner)
+        if (!Runner) {
             return;
+        }
 
         if (Runner.IsServer) {
             uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\"> <sprite name=connection_host>" + GlobalController.Instance.translationManager.GetTranslation("ui.game.ping.hosting");
@@ -218,8 +226,10 @@ public class UIUpdater : MonoBehaviour {
             ? Utils.GetTeamColor(player.Data.Team, 0.8f, 1f)
             : GameManager.Instance.levelUIColor;
 
-        foreach (Image bg in backgrounds)
+        foreach (Image bg in backgrounds) {
             bg.color = color;
+        }
+
         itemColor.color = color;
     }
 
@@ -238,8 +248,10 @@ public class UIUpdater : MonoBehaviour {
         teamsParent.SetActive(teams);
         GameManager.Instance.teamScoreboardElement.gameObject.SetActive(teams);
 
-        if (!Runner.IsServer)
+        if (!Runner.IsServer) {
             StartCoroutine(UpdatePingTextCoroutine());
+        }
+
         UpdatePingText();
 
         stars = -1;
@@ -250,11 +262,13 @@ public class UIUpdater : MonoBehaviour {
     }
 
     public void OnReserveItemIconClicked() {
-        if (!GameManager.Instance)
+        if (!GameManager.Instance) {
             return;
+        }
 
-        if (!GameManager.Instance.localPlayer)
+        if (!GameManager.Instance.localPlayer) {
             return;
+        }
 
         GameManager.Instance.localPlayer.OnReserveItem(default);
     }

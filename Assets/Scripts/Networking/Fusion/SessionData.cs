@@ -2,12 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using Fusion;
 using NSMB.Extensions;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
-using UnityEngine.SceneManagement;
 
 public class SessionData : NetworkBehaviour {
 
@@ -36,15 +36,17 @@ public class SessionData : NetworkBehaviour {
     [Networked(Default = nameof(defaultLives))] public sbyte Lives { get; set; }
     [Networked(Default = nameof(defaultTimer))] public sbyte Timer { get; set; }
     [Networked] public NetworkBool DrawOnTimeUp { get; set; }
-    [Networked(Default = nameof(defaultCustomPowerups))]  public NetworkBool CustomPowerups { get; set; }
+    [Networked(Default = nameof(defaultCustomPowerups))] public NetworkBool CustomPowerups { get; set; }
     [Networked] public NetworkBool Teams { get; set; }
     [Networked] public byte AlternatingMusicIndex { get; set; }
 
     //---Properties
     private MainMenuChat Chat {
         get {
-            if (MainMenuManager.Instance)
+            if (MainMenuManager.Instance) {
                 return MainMenuManager.Instance.chat;
+            }
+
             return null;
         }
     }
@@ -69,12 +71,12 @@ public class SessionData : NetworkBehaviour {
         Instance = this;
 
         if (!Runner.IsResume) {
-            if (MainMenuManager.Instance)
+            if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.EnterRoom(false);
+            }
         }
 
         if (Runner.IsServer) {
-
             PrivateRoom = !Runner.SessionInfo.IsVisible;
             if (MaxPlayers == 0) {
                 NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
@@ -97,8 +99,9 @@ public class SessionData : NetworkBehaviour {
         levelPropertyReader = GetPropertyReader<byte>(nameof(Level));
         gameObject.name = "SessionData (" + Runner.SessionInfo.Name + ")";
 
-        if (MainMenuManager.Instance)
+        if (MainMenuManager.Instance) {
             MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(Instance, false);
+        }
     }
 
     public override void Render() {
@@ -153,8 +156,10 @@ public class SessionData : NetworkBehaviour {
         while (true) {
             yield return WaitTwoSeconds;
             foreach (PlayerRef player in Runner.ActivePlayers) {
-                if (player.GetPlayerData(Runner) is not PlayerData pd || !pd)
+                if (player.GetPlayerData(Runner) is not PlayerData pd || !pd) {
                     continue;
+                }
+
                 pd.Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
             }
         }
@@ -163,8 +168,9 @@ public class SessionData : NetworkBehaviour {
     public override void Despawned(NetworkRunner runner, bool hasState) {
         NetworkHandler.OnConnectRequest -= OnConnectRequest;
 
-        if (pingUpdaterCorotuine != null)
+        if (pingUpdaterCorotuine != null) {
             StopCoroutine(pingUpdaterCorotuine);
+        }
     }
 
     private bool OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {
@@ -195,8 +201,9 @@ public class SessionData : NetworkBehaviour {
     }
 
     public void LoadWins(PlayerData data) {
-        if (wins.ContainsKey(data.UserId))
+        if (wins.ContainsKey(data.UserId)) {
             data.Wins = wins[data.UserId];
+        }
     }
 
     public void AddBan(PlayerData data) {
@@ -239,7 +246,7 @@ public class SessionData : NetworkBehaviour {
 
     public void SetDrawOnTimeUp(bool value) {
         DrawOnTimeUp = value;
-        //no session property here.
+        // No session property here.
     }
 
     public void SetCustomPowerups(bool value) {
@@ -255,10 +262,10 @@ public class SessionData : NetworkBehaviour {
     public void SetPrivateRoom(bool value) {
         PrivateRoom = value;
         Runner.SessionInfo.IsVisible = !value;
-        //no session property here.
+        // No session property here.
     }
 
-    private void UpdateProperty(string property, SessionProperty value) {
+    public void UpdateProperty(string property, SessionProperty value) {
         Runner.SessionInfo.UpdateCustomProperties(new() {
             [property] = value
         });
@@ -266,15 +273,20 @@ public class SessionData : NetworkBehaviour {
 
     //---RPCs
     [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
-    public void Rpc_ChatIncomingMessage(string message, RpcInfo info = default) => ChatManager.Instance.IncomingPlayerMessage(message, info);
+    public void Rpc_ChatIncomingMessage(string message, RpcInfo info = default) {
+        ChatManager.Instance.IncomingPlayerMessage(message, info);
+    }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void Rpc_ChatDisplayMessage(string message, PlayerRef player) => ChatManager.Instance.DisplayPlayerMessage(message, player);
+    public void Rpc_ChatDisplayMessage(string message, PlayerRef player) {
+        ChatManager.Instance.DisplayPlayerMessage(message, player);
+    }
 
     [Rpc(RpcSources.All, RpcTargets.All, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_UpdateTypingCounter(RpcInfo info = default) {
-        if (Chat)
+        if (Chat) {
             Chat.SetTypingIndicator(info.Source);
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, TickAligned = false)]
@@ -284,8 +296,9 @@ public class SessionData : NetworkBehaviour {
         sbyte count = 0;
         foreach (PlayerRef player in Runner.ActivePlayers) {
             PlayerData data = player.GetPlayerData(Runner);
-            if (!data)
+            if (!data) {
                 continue;
+            }
 
             data.IsCurrentlySpectating = data.IsManualSpectator;
             data.IsLoaded = false;
@@ -319,21 +332,24 @@ public class SessionData : NetworkBehaviour {
     //---OnChangeds
     public void OnSettingChanged(NetworkBehaviourBuffer previous) {
         Tick currentTick = Object.Runner.Tick;
-        if (currentTick <= lastUpdatedTick)
+        if (currentTick <= lastUpdatedTick) {
             return;
+        }
 
         //no "started" setting to update
         int oldLevel = previous.Read(levelPropertyReader);
 
-        if (MainMenuManager.Instance && MainMenuManager.Instance.roomSettingsCallbacks)
+        if (MainMenuManager.Instance && MainMenuManager.Instance.roomSettingsCallbacks) {
             MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(this, oldLevel != Level);
+        }
 
         lastUpdatedTick = currentTick;
     }
 
     public void OnGameStartTimerChanged() {
-        if (!MainMenuManager.Instance)
+        if (!MainMenuManager.Instance) {
             return;
+        }
 
         float time = Runner.SimulationTime;
 

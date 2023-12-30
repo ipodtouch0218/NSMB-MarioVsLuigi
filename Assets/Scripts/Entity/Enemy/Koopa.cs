@@ -26,7 +26,7 @@ namespace NSMB.Entities.Enemies {
         [SerializeField] private Transform graphicsTransform;
         [SerializeField] private Vector2 outShellHitboxSize, inShellHitboxSize;
         [SerializeField] private Vector2 outShellHitboxOffset, inShellHitboxOffset;
-        [SerializeField] protected float walkSpeed, kickSpeed, wakeup = 15;
+        [SerializeField] protected float walkSpeed, wakeup = 15;
         [SerializeField] public bool dontFallOffEdges, blue, canBeFlipped = true, flipXFlip;
 
         //---Properties
@@ -443,7 +443,7 @@ namespace NSMB.Entities.Enemies {
         }
 
         public override void Throw(bool toRight, bool crouch) {
-            throwSpeed = CurrentKickSpeed = kickSpeed + 1.5f * (Mathf.Abs(Holder.body.Velocity.x) / Holder.RunningMaxSpeed);
+            CurrentKickSpeed = throwSpeed + 1.5f * (Mathf.Abs(Holder.body.Velocity.x) / Holder.RunningMaxSpeed);
             base.Throw(toRight, crouch);
 
             IsStationary = crouch;

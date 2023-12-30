@@ -205,14 +205,13 @@ MonoBehaviour:
   collideWithOtherEnemies: 1
   dieWhenInsideBlock: 1
   flipSpriteRenderer: 0
-  fusionHitbox: {fileID: 0}
   hitbox: {fileID: 8836298984178612584}
   animator: {fileID: 3696720750550087088}
   legacyAnimation: {fileID: 0}
   sRenderer: {fileID: 8133877121043965814}
   _Holder: {fileID: 0}
   _PreviousHolder: {fileID: 0}
-  throwSpeed: 4.5
+  throwSpeed: 5
   holderOffset: {x: 0, y: 0, z: 0}
   canPlace: 1
   canKick: 1
@@ -433,8 +432,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 2957605562
   ObjectInterest: 0
-  _DestroyWhenStateAuthorityLeaves: 0
-  _AllowStateAuthorityOverride: 0
   Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:

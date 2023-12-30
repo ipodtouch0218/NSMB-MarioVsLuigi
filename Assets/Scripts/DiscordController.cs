@@ -60,8 +60,9 @@ public class DiscordController : MonoBehaviour {
 
     public void TryJoinGame(string secret) {
         //TODO: MainMenu jank...
-        if (GameManager.Instance)
+        if (GameManager.Instance) {
             return;
+        }
 
         Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
 
@@ -87,12 +88,14 @@ public class DiscordController : MonoBehaviour {
 #if UNITY_WEBGL || UNITY_WSA
         return;
 #endif
-        if (discord == null || activityManager == null || !Application.isPlaying)
+        if (discord == null || activityManager == null || !Application.isPlaying) {
             return;
+        }
 
         Activity activity = new();
-        if (!session && NetworkHandler.Runner)
+        if (!session && NetworkHandler.Runner) {
             session = NetworkHandler.Runner.SessionInfo;
+        }
 
         TranslationManager tm = GlobalController.Instance.translationManager;
 
@@ -111,10 +114,12 @@ public class DiscordController : MonoBehaviour {
                 GameManager gm = GameManager.Instance;
 
                 ActivityAssets assets = new();
-                if (gm.richPresenceId != "")
+                if (gm.richPresenceId != "") {
                     assets.LargeImage = "level-" + gm.richPresenceId;
-                else
+                } else {
                     assets.LargeImage = "mainmenu";
+                }
+
                 assets.LargeText = tm.GetTranslation(gm.levelTranslationKey).Replace("<sprite name=room_customlevel>", "");
 
                 activity.Assets = assets;

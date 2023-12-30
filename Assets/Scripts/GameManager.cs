@@ -28,11 +28,13 @@ namespace NSMB.Game {
         private static GameManager _instance;
         public static GameManager Instance {
             get {
-                if (_instance)
+                if (_instance) {
                     return _instance;
+                }
 
-                if (SceneManager.GetActiveScene().buildIndex != 0)
+                if (SceneManager.GetActiveScene().buildIndex != 0) {
                     _instance = FindFirstObjectByType<GameManager>();
+                }
 
                 return _instance;
             }
@@ -121,6 +123,7 @@ namespace NSMB.Game {
         private bool pauseStateLastFrame, optionsWereOpenLastFrame;
         private bool hurryUpSoundPlayed, endSoundPlayed;
         private bool calledAllPlayersLoaded;
+        private float previousTimerRenderTime;
 
         //---Components
         [Header("Misc Components")]
@@ -151,7 +154,9 @@ namespace NSMB.Game {
             // We shouldn't have to worry about values changing mid-game ever.
             levelWidth = levelHeight = middleX = minX = minY = maxX = maxY = null;
 
-            if (!tileManager) tileManager = GetComponentInChildren<TileManager>();
+            if (!tileManager) {
+                tileManager = GetComponentInChildren<TileManager>();
+            }
         }
 
         public void Awake() {
@@ -212,38 +217,44 @@ namespace NSMB.Game {
         public override void Render() {
             base.Render();
 
-            if (GameState == Enums.GameState.Playing)
+            if (GameState == Enums.GameState.Playing) {
                 HandleMusic();
+            }
 
             // Handle sound effects for the timer, if it's enabled
-            if (GameEndTimer.IsRunning) {
-                if (GameEndTimer.Expired(Runner)) {
-                    if (!endSoundPlayed)
+            if (SessionData.Instance.Timer > 0 && GameState >= Enums.GameState.Playing) {
+                if (GameEndTimer.ExpiredOrNotRunning(Runner)) {
+                    if (!endSoundPlayed) {
                         sfx.PlayOneShot(Enums.Sounds.UI_Countdown_1);
-                    endSoundPlayed = true;
-                } else {
-                    int tickrate = Runner.TickRate;
-                    int remainingTicks = GameEndTimer.RemainingTicks(Runner) ?? 0;
-
-                    if (!hurryUpSoundPlayed && remainingTicks < 61 * tickrate) {
-                        // 60 second warning
-                        hurryUpSoundPlayed = true;
-                        sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
-                    } else if (remainingTicks <= (10 * tickrate)) {
-                        // 10 second "dings"
-                        if (remainingTicks % tickrate == 0)
-                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
-                        // At 3 seconds, double speed
-                        else if (remainingTicks < (3 * tickrate) && remainingTicks % (tickrate / 2) == 0)
-                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
                     }
+                    endSoundPlayed = true;
+                } else if (PlaySounds) {
+                    float timer = GameEndTimer.RemainingRenderTime(Runner) ?? 0f;
+
+                    if ((int) (previousTimerRenderTime * 2) != (int) (timer * 2)) {
+                        int second = (int) timer;
+
+                        if (!hurryUpSoundPlayed && second < 60) {
+                            // 60 second warning
+                            hurryUpSoundPlayed = true;
+                            sfx.PlayOneShot(Enums.Sounds.UI_HurryUp);
+                        } else if (second < 3) {
+                            // At 3 seconds, double speed
+                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+                        } else if (second < 10 && second != (int) previousTimerRenderTime) {
+                            // 10 second "dings"
+                            sfx.PlayOneShot(Enums.Sounds.UI_Countdown_0);
+                        }
+                    }
+                    previousTimerRenderTime = timer;
                 }
             }
         }
 
         public override void FixedUpdateNetwork() {
-            if (!HasStateAuthority || GameEnded)
+            if (!HasStateAuthority || GameEnded) {
                 return;
+            }
 
             switch (GameState) {
             case Enums.GameState.Loading: {
@@ -262,15 +273,17 @@ namespace NSMB.Game {
             }
 
             if (BigStarRespawnTimer.Expired(Runner)) {
-                if (AttemptSpawnBigStar())
+                if (AttemptSpawnBigStar()) {
                     BigStarRespawnTimer = TickTimer.None;
-                else
+                } else {
                     BigStarRespawnTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+                }
             }
 
-            if (GameEndTimer.Expired(Runner)) {
+            if (previousTimerRenderTime > 0 && GameEndTimer.Expired(Runner)) {
                 CheckForWinner();
                 GameEndTimer = TickTimer.None;
+                endSoundPlayed = false;
             }
         }
 
@@ -286,12 +299,14 @@ namespace NSMB.Game {
         }
 
         public ushort GetTileIdFromTileInstance(TileBase tile) {
-            if (!tile)
+            if (!tile) {
                 return 0;
+            }
 
             int index = Array.IndexOf(sceneTiles, tile);
-            if (index == -1)
+            if (index == -1) {
                 return 0;
+            }
 
             return (ushort) index;
         }
@@ -305,15 +320,17 @@ namespace NSMB.Game {
         }
 
         public void OnPause(InputAction.CallbackContext context) {
-            if (optionsWereOpenLastFrame)
+            if (optionsWereOpenLastFrame) {
                 return;
+            }
 
             Pause(!pauseStateLastFrame);
         }
 
         public void Pause(bool newState) {
-            if (paused == newState || GameState != Enums.GameState.Playing)
+            if (paused == newState || GameState != Enums.GameState.Playing) {
                 return;
+            }
 
             paused = newState;
             pauseUI.SetActive(paused);
@@ -327,8 +344,9 @@ namespace NSMB.Game {
 
         //---UI Callbacks
         public void PauseEndMatch() {
-            if (!NetworkHandler.Runner.IsServer)
+            if (!NetworkHandler.Runner.IsServer) {
                 return;
+            }
 
             pauseUI.SetActive(false);
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
@@ -346,10 +364,13 @@ namespace NSMB.Game {
         }
 
         public Vector3 GetSpawnpoint(int playerIndex, int players = -1) {
-            if (players <= -1)
+            if (players <= -1) {
                 players = RealPlayerCount;
-            if (players == 0)
+            }
+
+            if (players == 0) {
                 players = 1;
+            }
 
             float comp = (float) playerIndex / players * 2 * Mathf.PI + (Mathf.PI / 2f) + (Mathf.PI / (2 * players));
             float scale = (2 - (players + 1f) / players) * spawnCircleWidth;
@@ -364,8 +385,9 @@ namespace NSMB.Game {
         [SerializeField] private int DebugSpawns = 10;
         private static readonly Color StarSpawnTint = new(1f, 1f, 1f, 0.5f), StarSpawnBox = new(1f, 0.9f, 0.2f, 0.2f);
         public void OnDrawGizmos() {
-            if (!tilemap)
+            if (!tilemap) {
                 return;
+            }
 
             for (int i = 0; i < DebugSpawns; i++) {
                 Gizmos.color = new Color((float) i / DebugSpawns, 0, 0, 0.75f);
@@ -387,10 +409,11 @@ namespace NSMB.Game {
                     Vector2Int loc = new(x + levelMinTileX, y + levelMinTileY);
                     TileBase tile = tilemap.GetTile((Vector3Int) loc);
 
-                    if (tile is CoinTile)
+                    if (tile is CoinTile) {
                         Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "coin");
-                    else if (tile is PowerupTile)
+                    } else if (tile is PowerupTile) {
                         Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "powerup");
+                    }
                 }
             }
 
@@ -410,8 +433,9 @@ namespace NSMB.Game {
 #endif
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            if (!runner.IsServer || !hasState)
+            if (!runner.IsServer || !hasState) {
                 return;
+            }
 
             DestroyNetworkObjects(runner);
         }
@@ -427,8 +451,9 @@ namespace NSMB.Game {
         /// Checks if a team has won, and calls Rpc_EndGame if one has.
         /// </summary>
         public bool CheckForWinner() {
-            if (GameState != Enums.GameState.Playing || !Runner.IsServer)
+            if (GameState != Enums.GameState.Playing || !Runner.IsServer) {
                 return false;
+            }
 
             int requiredStars = SessionData.Instance.StarRequirement;
             bool starGame = requiredStars != -1;
@@ -485,19 +510,22 @@ namespace NSMB.Game {
         /// </summary>
         public void CheckIfAllPlayersLoaded() {
             // If we aren't the server, don't bother checking. We can't start the game regardless.
-            if (!Runner || !Runner.IsServer || GameState != Enums.GameState.Loading)
+            if (!Runner || !Runner.IsServer || GameState != Enums.GameState.Loading) {
                 return;
+            }
 
             if (!Runner.IsSinglePlayer) {
                 foreach (PlayerRef player in Runner.ActivePlayers) {
                     PlayerData data = player.GetPlayerData(Runner);
 
-                    if (!data || data.IsCurrentlySpectating)
+                    if (!data || data.IsCurrentlySpectating) {
                         continue;
+                    }
 
                     // I'm still loading!
-                    if (!data.IsLoaded)
+                    if (!data.IsLoaded) {
                         return;
+                    }
                 }
             }
 
@@ -509,8 +537,9 @@ namespace NSMB.Game {
             // Find out how many players we have
             foreach (PlayerRef client in Runner.ActivePlayers) {
                 PlayerData data = client.GetPlayerData(Runner);
-                if (!data || data.IsCurrentlySpectating)
+                if (!data || data.IsCurrentlySpectating) {
                     continue;
+                }
 
                 RealPlayerCount++;
             }
@@ -520,12 +549,14 @@ namespace NSMB.Game {
             // Create player instances
             foreach (PlayerRef player in Runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(Runner);
-                if (!data)
+                if (!data) {
                     continue;
+                }
 
                 data.IsLoaded = false;
-                if (data.IsCurrentlySpectating)
+                if (data.IsCurrentlySpectating) {
                     continue;
+                }
 
                 Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player, onBeforeSpawned: (runner, obj) => {
                     // Set the spawnpoint that they should spawn at
@@ -538,8 +569,9 @@ namespace NSMB.Game {
             }
 
             // Create pooled Fireball instances (max of 6 per player)
-            for (int i = 0; i < RealPlayerCount * 6; i++)
+            for (int i = 0; i < RealPlayerCount * 6; i++) {
                 Runner.Spawn(PrefabList.Instance.Obj_Fireball);
+            }
 
             // Tell everyone else to start the game
             StartCoroutine(CallLoadingComplete(2));
@@ -564,8 +596,9 @@ namespace NSMB.Game {
             // Kill player if they are still alive
             if (Object.HasStateAuthority) {
                 foreach (PlayerController pl in AlivePlayers) {
-                    if (pl.Object.InputAuthority == player)
+                    if (pl.Object.InputAuthority == player) {
                         pl.Rpc_DisconnectDeath();
+                    }
                 }
             }
 
@@ -583,24 +616,29 @@ namespace NSMB.Game {
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_LoadingComplete() {
-            if (!calledAllPlayersLoaded)
+            if (!calledAllPlayersLoaded) {
                 OnAllPlayersLoaded?.Invoke();
+            }
+
             calledAllPlayersLoaded = true;
         }
 
         //---Helpers
         private void Host_StartGame() {
             // Respawn players
-            foreach (PlayerController player in AlivePlayers)
+            foreach (PlayerController player in AlivePlayers) {
                 player.PreRespawn();
+            }
 
             // Respawn enemies
-            foreach (KillableEntity enemy in enemies)
+            foreach (KillableEntity enemy in enemies) {
                 enemy.RespawnEntity();
+            }
 
             // Start "WaitForGameStart" objects
-            foreach (var wfgs in FindObjectsByType<WaitForGameStart>(FindObjectsSortMode.None))
-                wfgs.AttemptExecute();
+            foreach (var wfgs in FindObjectsByType<NetworkBehaviour>(FindObjectsSortMode.None).Where(nb => nb is IWaitForGameStart)) {
+                ((IWaitForGameStart) wfgs).AttemptExecute(wfgs.Object);
+            }
 
             // Spawn the initial Big Star
             AttemptSpawnBigStar();
@@ -627,8 +665,9 @@ namespace NSMB.Game {
 
             // Start timer
             int timer = SessionData.Instance.Timer;
-            if (timer > 0)
-                GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer * 60 + 1);
+            if (timer > 0) {
+                GameEndTimer = TickTimer.CreateFromSeconds(Runner, timer * 60);
+            }
 
             // Update Discord RPC status
             SetGameTimestamps();
@@ -641,6 +680,7 @@ namespace NSMB.Game {
             GameState = Enums.GameState.Ended;
             IsMusicEnabled = false;
             PlaySounds = false;
+            endSoundPlayed = true;
 
             ForceUnpause();
             musicManager.Stop();
@@ -718,8 +758,9 @@ namespace NSMB.Game {
                     data.IsCurrentlySpectating = false;
 
                     // Move people without teams into a valid teams range
-                    if (SessionData.Instance.Teams)
+                    if (SessionData.Instance.Teams) {
                         data.Team = (sbyte) Mathf.Clamp(data.Team, 0, ScriptableManager.Instance.teams.Length);
+                    }
                 }
 
                 SessionData.Instance.AlternatingMusicIndex++;
@@ -741,11 +782,13 @@ namespace NSMB.Game {
             bool speedup = false;
 
             foreach (var player in AlivePlayers) {
-                if (!player)
+                if (!player) {
                     continue;
+                }
 
-                if (Settings.Instance.audioSpecialPowerupMusicLocalOnly && !player.cameraController.IsControllingCamera)
+                if (Settings.Instance.audioSpecialPowerupMusicLocalOnly && !player.cameraController.IsControllingCamera) {
                     return;
+                }
 
                 mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && player.State == Enums.PowerupState.MegaMushroom && player.MegaStartTimer.ExpiredOrNotRunning(Runner);
                 invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && player.IsStarmanInvincible;
@@ -758,8 +801,13 @@ namespace NSMB.Game {
                 int playersWithOneLife = 0;
                 int playerCount = 0;
                 foreach (var player in AlivePlayers) {
-                    if (!player || player.Lives == 0) continue;
-                    if (player.Lives == 1) playersWithOneLife++;
+                    if (!player || player.Lives == 0) {
+                        continue;
+                    }
+
+                    if (player.Lives == 1) {
+                        playersWithOneLife++;
+                    }
 
                     playerCount++;
                 }
@@ -787,8 +835,9 @@ namespace NSMB.Game {
         /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
 
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return true;
+            }
 
             for (int attempt = 0; attempt < starSpawns.Length; attempt++) {
                 int validSpawns = starSpawns.Length - AvailableStarSpawns.UnsetBitCount();
@@ -835,8 +884,9 @@ namespace NSMB.Game {
             gameStartTimestamp = now - secondsSinceStart;
 
             int timer = SessionData.Instance.Timer;
-            if (timer > 0)
+            if (timer > 0) {
                 gameEndTimestamp = gameStartTimestamp + (timer * 60);
+            }
         }
 
         private IEnumerator CallLoadingComplete(float seconds) {
@@ -846,22 +896,26 @@ namespace NSMB.Game {
 
         private IEnumerator CallAllPlayersLoaded() {
             yield return new WaitForSeconds(1f);
-            if (!calledAllPlayersLoaded)
+            if (!calledAllPlayersLoaded) {
                 OnAllPlayersLoaded?.Invoke();
+            }
+
             calledAllPlayersLoaded = true;
         }
 
         private void DestroyNetworkObjects(NetworkRunner runner) {
             // Remove all networked objects. Fusion doesn't do this for us, unlike PUN.
             foreach (var obj in networkObjects) {
-                if (obj)
+                if (obj) {
                     runner.Despawn(obj);
+                }
             }
         }
 
         private void OurOnAllPlayersLoaded() {
-            foreach (var player in AlivePlayers)
+            foreach (var player in AlivePlayers) {
                 teamManager.AddPlayer(player);
+            }
 
             teamScoreboardElement.OnAllPlayersLoaded();
         }

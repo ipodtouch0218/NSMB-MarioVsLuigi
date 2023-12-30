@@ -11793,7 +11793,7 @@ TilemapCollider2D:
     m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_UsedByComposite: 1
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0.00001
@@ -11836,15 +11836,6 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
-      inSlope: 0.0024703913
-      outSlope: 0.0024703913
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.9962175
-    - serializedVersion: 3
-      time: 1
       value: -0.000014567999
       inSlope: -0.0034566224
       outSlope: -0.0034566224
@@ -11853,7 +11844,7 @@ MonoBehaviour:
       inWeight: 0.2980277
       outWeight: 1
     - serializedVersion: 3
-      time: 8
+      time: 7
       value: 3.0000024
       inSlope: 0
       outSlope: 0
@@ -11862,7 +11853,7 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 10
+      time: 9
       value: 3.000002
       inSlope: -0.00000032782555
       outSlope: -0.00000032782555
@@ -11871,8 +11862,17 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 17
+      time: 16
       value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 17
+      value: -0.00001513958
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -11899,9 +11899,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 3220799618
   ObjectInterest: 1
-  _DestroyWhenStateAuthorityLeaves: 0
-  _AllowStateAuthorityOverride: 1
-  Flags: 2561
+  Flags: 264705
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 361225208}

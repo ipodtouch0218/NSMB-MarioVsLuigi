@@ -12,7 +12,7 @@ namespace NSMB.UI.Prompts {
 
         protected override void SetDefaults() {
             maxPlayersSlider.value = 10;
-            privateRoomToggle.isOn = false;
+            privateRoomToggle.SetIsOnWithoutNotify(false);
         }
 
         public void OnPlayerSliderValueChanged() {

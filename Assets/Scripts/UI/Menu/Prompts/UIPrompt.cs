@@ -12,9 +12,9 @@ namespace NSMB.UI.Prompts {
             EventSystem.current.SetSelectedGameObject(defaultSelectedObject);
         }
 
-        public void OnDisable() {
-            SetDefaults();
-        }
+        //public void OnDisable() {
+        //    SetDefaults();
+        //}
 
         protected virtual void SetDefaults() { }
     }

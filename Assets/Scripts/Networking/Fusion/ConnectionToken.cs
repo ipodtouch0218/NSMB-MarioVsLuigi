@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using Newtonsoft.Json;
 
 using Fusion;
-using Newtonsoft.Json;
 using NSMB.Utils;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
@@ -55,8 +55,9 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbVXeDZyyeb+ptn7HEjg0vtIL+jUV
 
         // Remove signature padding (isn't always 72 bytes for whatever reason).
         int signatureLength = 115 - 43;
-        while (input[43 + signatureLength - 1] == 0)
+        while (input[43 + signatureLength - 1] == 0) {
             signatureLength--;
+        }
 
         ConnectionToken newToken = new() {
             nickname = Encoding.ASCII.GetString(input[0..20]).TrimEnd('\0'),

@@ -4,10 +4,11 @@ using Fusion;
 using NSMB.Game;
 
 //[OrderBefore(typeof(EntityMover))]
-public class GenericMover : NetworkBehaviour, IBeforeTick {
+public class GenericMover : NetworkBehaviour, IBeforeTick, IWaitForGameStart {
 
     //---Networked Variables
     [Networked] private Vector3 Origin { get; set; }
+    [Networked] private NetworkBool Enabled { get; set; }
 
     //---Serialized Variables
     [SerializeField] private AnimationCurve x, y;
@@ -20,8 +21,9 @@ public class GenericMover : NetworkBehaviour, IBeforeTick {
     private float? xCurveLength, yCurveLength;
 
     public void Start() {
-        if (notNetworked)
+        if (notNetworked) {
             origin = transform.position;
+        }
     }
 
     public override void Spawned() {
@@ -29,34 +31,43 @@ public class GenericMover : NetworkBehaviour, IBeforeTick {
     }
 
     public void BeforeTick() {
-        if (GameManager.Instance.GameEnded)
+        if (!Enabled) {
             return;
+        }
 
         SetPosition(transform, Origin, Runner.SimulationTime - Runner.DeltaTime - GameManager.Instance.GameStartTime);
     }
 
     public void Update() {
-        if (notNetworked)
+        if (notNetworked) {
             SetPosition(interpolationTarget, origin, Time.time);
+        }
     }
 
     public override void Render() {
-        if (!GameManager.Instance || GameManager.Instance.GameEnded)
+        if (!Enabled) {
             return;
+        }
 
         SetPosition(interpolationTarget, Origin, Runner.LocalRenderTime - GameManager.Instance.GameStartTime);
     }
 
     public override void FixedUpdateNetwork() {
-        if (GameManager.Instance.GameEnded)
+        if (!Enabled) {
             return;
+        }
 
         SetPosition(transform, Origin, Runner.SimulationTime - GameManager.Instance.GameStartTime);
     }
 
+    public void Execute() {
+        Enabled = true;
+    }
+
     private void SetPosition(Transform target, Vector3 origin, float secondsElapsed) {
-        if (!target)
+        if (!target) {
             target = transform;
+        }
 
         float xOffset = EvaluateCurve(x, ref xCurveLength, animationOffset, secondsElapsed);
         float yOffset = EvaluateCurve(y, ref yCurveLength, animationOffset, secondsElapsed);
@@ -65,8 +76,9 @@ public class GenericMover : NetworkBehaviour, IBeforeTick {
     }
 
     private static float EvaluateCurve(AnimationCurve curve, ref float? length, double offset, double time) {
-        if (curve.length <= 0)
+        if (curve.length <= 0) {
             return 0;
+        }
 
         length ??= curve.keys[^1].time;
 

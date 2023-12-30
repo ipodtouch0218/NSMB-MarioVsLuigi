@@ -72,7 +72,7 @@ namespace NSMB.Entities.Player {
         [Networked] private byte KnockbackAnimCounter { get; set; }
         [Networked] public NetworkBool IsWeakKnockback { get; set; }
         [Networked] public NetworkBool IsForwardsKnockback { get; set; }
-        [Networked] private NetworkBool KnockbackWasOriginallyFacingRight { get; set; }
+        [Networked] public NetworkBool KnockbackWasOriginallyFacingRight { get; set; }
         [Networked] public int KnockbackTick { get; set; }
         [Networked] public NetworkObject KnockbackAttacker { get; set; }
         //Groundpound
@@ -154,7 +154,7 @@ namespace NSMB.Entities.Player {
         public bool HitLeft => body.Data.HitLeft;
         public bool HitRight => body.Data.HitRight;
         public bool WallSliding => WallSlideLeft || WallSlideRight;
-        public bool InstakillsEnemies => IsStarmanInvincible || IsInShell || (IsSliding && Mathf.Abs(body.Velocity.x) > 0.1f) || State == Enums.PowerupState.MegaMushroom;
+        public bool InstakillsEnemies => State == Enums.PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (IsSliding && Mathf.Abs(body.Velocity.x) > 0.1f);
         public bool IsCrouchedInShell => State == Enums.PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsStarmanInvincible => StarmanTimer.IsActive(Runner);
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityTimer.ExpiredOrNotRunning(Runner);
@@ -465,10 +465,6 @@ namespace NSMB.Entities.Player {
             }
 
             if (!IsProxy) {
-
-                if (IsDead) {
-                    HandleDeathTimers();
-                } else if (!IsFrozen) {
 #if INPUT_BUFFERING_TEST
                     int inputIndex = Runner.Tick % InputBufferCapacity;
                     PlayerNetworkInput input = InputBuffer[inputIndex];
@@ -481,20 +477,24 @@ namespace NSMB.Entities.Player {
                         InputBuffer.Set(inputIndex, HandleMissingInputs());
                     }
 #else
-                    PlayerNetworkInput input;
-                    if (GetInput(out PlayerNetworkInput currentInputs)) {
-                        // Got the inputs from the player!
-                        input = currentInputs;
-                        HandleButtonHolding(input);
-                        LastInputTick = Runner.Tick;
-                    } else if (!IsProxy) {
-                        // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
-                        input = HandleMissingInputs();
-                    } else {
-                        // Just trust the server
-                        input = PreviousInputs;
-                    }
+                PlayerNetworkInput input;
+                if (GetInput(out PlayerNetworkInput currentInputs)) {
+                    // Got the inputs from the player!
+                    input = currentInputs;
+                    HandleButtonHolding(input);
+                    LastInputTick = Runner.Tick;
+                } else if (!IsProxy) {
+                    // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
+                    input = HandleMissingInputs();
+                } else {
+                    // Just trust the server
+                    input = PreviousInputs;
+                }
 #endif
+
+                if (IsDead) {
+                    HandleDeathTimers();
+                } else if (!IsFrozen) {
 
                     NetworkButtons heldButtons = input.buttons;
                     NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
@@ -525,11 +525,11 @@ namespace NSMB.Entities.Player {
                     //HandleBlockSnapping();
                     CheckForEntityCollision();
 
-                    PreviousInputs = input;
                     PreviousTickIsOnGround = IsOnGround;
                 }
 
                 animationController.HandlePipeAnimation();
+                PreviousInputs = input;
             }
 
             UpdateTileProperties();
@@ -643,9 +643,12 @@ namespace NSMB.Entities.Player {
 
             LagCompensatedBuffer.Clear();
             foreach (BoxCollider2D hitbox in hitboxes) {
+                Vector2 extents = ((Vector3) (hitbox.size * 0.5f) + Vector3.forward).Multiply(2 * transform.localScale);
+                Vector2 origin = body.Position + (hitbox.offset * transform.localScale) + (body.Velocity * Runner.DeltaTime);
+
                 Runner.LagCompensation.OverlapBox(
-                    body.Position + (hitbox.offset * transform.localScale),
-                    ((Vector3) (hitbox.size * 0.5f) + Vector3.forward).Multiply(transform.localScale),
+                    origin,
+                    extents,
                     Quaternion.identity,
                     Object.InputAuthority,
                     LagCompensatedBuffer,
@@ -986,6 +989,7 @@ namespace NSMB.Entities.Player {
             if (pressed.IsSet(PlayerControls.PowerupAction)
                 || (pressed.IsSet(PlayerControls.Sprint) && Settings.Instance.controlsFireballSprint && (State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower))
                 || (pressed.IsSet(PlayerControls.Jump) && !IsOnGround && Settings.Instance.controlsPropellerJump && State == Enums.PowerupState.PropellerMushroom)) {
+
                 newInput.powerupActionCounter++;
             }
 
@@ -1041,9 +1045,9 @@ namespace NSMB.Entities.Player {
                 Vector2 spawnPos = body.Position + new Vector2(right ? 0.4f : -0.4f, 0.35f);
 
                 Fireball inactiveFireball = null;
-                for (int i = PlayerId * 6; i < (PlayerId + 1) * 6; i++) {
+                for (int i = 0; i < GameManager.Instance.PooledFireballs.Count; i++) {
                     Fireball fireball = GameManager.Instance.PooledFireballs[i];
-                    if (fireball.IsActive) {
+                    if (fireball.IsHitboxActive) {
                         continue;
                     }
 
@@ -1338,6 +1342,8 @@ namespace NSMB.Entities.Player {
             if (IsDead) {
                 return;
             }
+
+            animator.Update(Time.deltaTime);
 
             if (IsProxy) {
                 return;
@@ -2257,14 +2263,15 @@ namespace NSMB.Entities.Player {
             } else if ((left ^ right) && (!IsCrouching || (IsCrouching && !IsOnGround && State != Enums.PowerupState.BlueShell)) && !IsInKnockback && !IsSliding) {
                 // We can walk here
 
-                float speed = Mathf.Abs(body.Velocity.x) - 0.01f;
+                float speed = Mathf.Abs(body.Velocity.x);
                 bool reverse = body.Velocity.x != 0 && ((left ? 1 : -1) == sign);
 
                 // Check that we're not going above our limit
                 float max = maxArray[maxStage] + CalculateSlopeMaxSpeedOffset(Mathf.Abs(FloorAngle) * (uphill ? 1 : -1));
+                float maxAcceleration = Mathf.Abs(max - speed) * Runner.TickRate;
+                acc = Mathf.Clamp(acc, -maxAcceleration, maxAcceleration);
                 if (speed > max) {
-                    float maxDeceleration = (speed - max) * Runner.TickRate;
-                    acc = Mathf.Clamp(-acc, -maxDeceleration, maxDeceleration);
+                    acc = -acc;
                 }
 
                 if (reverse) {
@@ -3624,29 +3631,6 @@ namespace NSMB.Entities.Player {
             }
             animator.ResetTrigger("throw");
         }
-
-        //---Debug
-#if UNITY_EDITOR
-        private readonly List<Renderer> renderers = new();
-        public void OnDrawGizmos() {
-            if (!body || !Object) {
-                return;
-            }
-
-            Gizmos.color = Color.white;
-            Gizmos.DrawRay(body.Position, body.Velocity);
-            Gizmos.DrawCube(body.Position + new Vector2(0, WorldHitboxSize.y * 0.5f) + (body.Velocity * Runner.DeltaTime), WorldHitboxSize);
-
-            if (renderers.Count == 0) {
-                GetComponentsInChildren(true, renderers);
-                renderers.RemoveAll(r => r is ParticleSystemRenderer);
-            }
-
-            foreach (Renderer r in renderers) {
-                Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
-            }
-        }
-#endif
 
         public enum PlayerJumpState : byte {
             None,

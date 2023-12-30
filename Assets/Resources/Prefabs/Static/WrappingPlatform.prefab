@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 549419135642806226}
   - component: {fileID: 9096082496902365425}
   - component: {fileID: 549419135642806221}
-  - component: {fileID: 8658303608481168900}
   - component: {fileID: 4423665312669468572}
   m_Layer: 12
   m_Name: WrappingPlatform
@@ -221,21 +220,6 @@ PlatformEffector2D:
   m_UseSideFriction: 0
   m_UseSideBounce: 0
   m_SideArc: 1
---- !u!114 &8658303608481168900
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 549419135642806219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fedcefda7c82c5f4483ddc0098f43865, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: 0
-  behaviours:
-  - {fileID: 4512469588533065805}
 --- !u!114 &4423665312669468572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,13 +234,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 880041526
   ObjectInterest: 0
-  _DestroyWhenStateAuthorityLeaves: 0
-  _AllowStateAuthorityOverride: 0
-  Flags: 67841
+  Flags: 329985
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4512469588533065805}
-  - {fileID: 8658303608481168900}
 --- !u!1 &5006307683767262364
 GameObject:
   m_ObjectHideFlags: 0

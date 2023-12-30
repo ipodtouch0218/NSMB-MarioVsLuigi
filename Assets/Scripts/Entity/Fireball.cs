@@ -23,6 +23,10 @@ namespace NSMB.Entities {
         [Networked] public NetworkBool IsIceball { get; set; }
         [Networked] public int InactiveTick { get; set; }
         [Networked] private Vector2 BreakEffectLocation { get; set; }
+        [Networked] private byte BreakEffectAnimCounter { get; set; }
+
+        //---Properties
+        public bool IsHitboxActive => IsActive || ((Runner.Tick - InactiveTick) <= Runner.TickRate * 0.5f);
 
         //---Serialized Variables
         [SerializeField] private ParticleSystem iceBreak, fireBreak, iceTrail, fireTrail;
@@ -37,8 +41,13 @@ namespace NSMB.Entities {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
-            if ((renderers?.Length ?? 0) == 0) renderers = GetComponentsInChildren<SpriteRenderer>();
+            if (!hitbox) {
+                hitbox = GetComponent<BoxCollider2D>();
+            }
+
+            if ((renderers?.Length ?? 0) == 0) {
+                renderers = GetComponentsInChildren<SpriteRenderer>();
+            }
         }
 
         public void Initialize(PlayerController owner, Vector2 spawnpoint, bool ice, bool right) {
@@ -73,16 +82,18 @@ namespace NSMB.Entities {
 
             transform.SetParent(GameManager.Instance.objectPoolParent.transform);
 
-            if (!GameManager.Instance.PooledFireballs.Contains(this))
+            if (!GameManager.Instance.PooledFireballs.Contains(this)) {
                 GameManager.Instance.PooledFireballs.Add(this);
+            }
         }
 
         public override void Render() {
             base.Render();
 
             if (GameManager.Instance.GameEnded) {
-                foreach (var anim in GetComponentsInChildren<LegacyAnimateSpriteRenderer>())
+                foreach (var anim in GetComponentsInChildren<LegacyAnimateSpriteRenderer>()) {
                     anim.enabled = false;
+                }
             }
         }
 
@@ -92,7 +103,9 @@ namespace NSMB.Entities {
 
             if (!IsActive) {
                 body.Velocity = Vector2.zero;
-                return;
+                if (!IsHitboxActive) {
+                    return;
+                }
             }
 
             if (GameManager.Instance && GameManager.Instance.GameEnded) {
@@ -105,26 +118,30 @@ namespace NSMB.Entities {
                 return;
             }
 
-            if (!HandleCollision())
+            if (!HandleCollision()) {
                 return;
+            }
 
-            if (!CheckForEntityCollision())
+            if (!CheckForEntityCollision()) {
                 return;
+            }
 
             body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), Mathf.Max(-terminalVelocity, body.Velocity.y));
         }
 
         //---Helper Methods
         private bool HandleCollision() {
-            if (!IsActive)
-                return false;
+            if (!IsActive) {
+                return IsHitboxActive;
+            }
 
             PhysicsDataStruct data = body.Data;
 
             if (data.OnGround && !AlreadyBounced) {
                 float boost = bounceHeight * Mathf.Abs(Mathf.Sin(data.FloorAngle * Mathf.Deg2Rad)) * 1.25f;
-                if ((data.FloorAngle > 0) == FacingRight)
+                if ((data.FloorAngle > 0) == FacingRight) {
                     boost = 0;
+                }
 
                 body.Velocity = new(body.Velocity.x, bounceHeight + boost);
             } else if (IsIceball && body.Velocity.y > 0.1f) {
@@ -145,8 +162,9 @@ namespace NSMB.Entities {
         }
 
         private bool CheckForEntityCollision() {
-            if (!IsActive)
+            if (!IsHitboxActive) {
                 return false;
+            }
 
             int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, default, CollisionBuffer);
 
@@ -154,13 +172,15 @@ namespace NSMB.Entities {
                 GameObject collidedObject = CollisionBuffer[i].gameObject;
 
                 // Don't interact with ourselves.
-                if (CollisionBuffer[i].attachedRigidbody == body)
+                if (CollisionBuffer[i].attachedRigidbody == body) {
                     continue;
+                }
 
                 if (collidedObject.GetComponentInParent<IFireballInteractable>() is IFireballInteractable interactable) {
                     // Don't interact with players in this way
-                    if (interactable is PlayerController)
+                    if (interactable is PlayerController) {
                         continue;
+                    }
 
                     bool result = IsIceball ? interactable.InteractWithIceball(this) : interactable.InteractWithFireball(this);
                     if (result) {
@@ -176,6 +196,10 @@ namespace NSMB.Entities {
 
         //---BasicEntity overrides
         public override void DespawnEntity(object data = null) {
+            if (!IsActive) {
+                return;
+            }
+
             if (data is not bool playEffect || playEffect) {
                 if (body.Position.y > GameManager.Instance.LevelMinY && GameManager.Instance.GameState != Enums.GameState.Ended) {
                     if (body.Position == BreakEffectLocation) {
@@ -183,6 +207,7 @@ namespace NSMB.Entities {
                     } else {
                         BreakEffectLocation = body.Position;
                     }
+                    BreakEffectAnimCounter++;
                 }
             }
 
@@ -225,20 +250,19 @@ namespace NSMB.Entities {
         //---IPlayerInteractable overrides
         public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
             // If we're not active, don't collide.
-            //if (!IsActive)
-            //    return;
-
-            // Don't interact with proxies
-            //if (IsProxy)
-            //    return;
+            if (!IsHitboxActive) {
+                return;
+            }
 
             // Check if they own us. If so, don't collide.
-            if (Owner == player)
+            if (Owner == player) {
                 return;
+            }
 
             // If they have knockback invincibility, don't collide.
-            if (player.DamageInvincibilityTimer.IsActive(Runner))
+            if (player.DamageInvincibilityTimer.IsActive(Runner)) {
                 return;
+            }
 
             // Iceball combo exception
             if (IsIceball && player.IsInKnockback) {
@@ -257,18 +281,21 @@ namespace NSMB.Entities {
                     return;
                 }
                 case Enums.PowerupState.MiniMushroom: {
-                    if (dropStars)
+                    if (dropStars) {
                         player.Death(false, false);
-                    else
+                    } else {
                         player.DoKnockback(!FacingRight, 0, true, Object);
+                    }
 
                     DespawnEntity();
                     return;
                 }
                 case Enums.PowerupState.BlueShell: {
                     if (player.IsInShell || player.IsCrouching || player.IsGroundpounding) {
-                        if (IsIceball)
+                        if (IsIceball) {
                             player.ShellSlowdownTimer = TickTimer.CreateFromSeconds(Runner, 0.65f);
+                        }
+
                         DespawnEntity();
                         return;
                     }
@@ -295,8 +322,9 @@ namespace NSMB.Entities {
 
         //---IFireballInteractable overrides
         public bool InteractWithFireball(Fireball fireball) {
-            if (!IsActive || !fireball.IsActive)
+            if (!IsActive || !fireball.IsActive) {
                 return false;
+            }
 
             // Fire + ice = both destroy
             if (IsIceball) {
@@ -308,8 +336,9 @@ namespace NSMB.Entities {
         }
 
         public bool InteractWithIceball(Fireball iceball) {
-            if (!IsActive || !iceball.IsActive)
+            if (!IsActive || !iceball.IsActive) {
                 return false;
+            }
 
             // Fire + ice = both destroy
             if (!IsIceball) {
@@ -331,16 +360,17 @@ namespace NSMB.Entities {
 
             foreach (var change in ChangesBuffer) {
                 switch (change) {
-                case nameof(BreakEffectLocation):
-                    OnBreakEffectLocationChanged();
+                case nameof(BreakEffectAnimCounter):
+                    OnBreakEffectAnimCounterChanged();
                     break;
                 }
             }
         }
 
-        public void OnBreakEffectLocationChanged() {
-            if (GameManager.Instance.GameState != Enums.GameState.Playing)
+        public void OnBreakEffectAnimCounterChanged() {
+            if (GameManager.Instance.GameState != Enums.GameState.Playing) {
                 return;
+            }
 
             sfx.transform.position = BreakEffectLocation;
             if (IsIceball) {

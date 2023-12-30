@@ -79,8 +79,9 @@ namespace NSMB.Entities {
             PreviousHolder = Holder;
             Holder = null;
             FacingRight = toRight;
+            CurrentKickSpeed = throwSpeed;
 
-            body.Velocity = new((crouching && canPlace ? 2f : throwSpeed) * (FacingRight ? 1 : -1), 0);
+            body.Velocity = new((crouching && canPlace ? 2f : CurrentKickSpeed) * (FacingRight ? 1 : -1), 0);
         }
 
         public virtual void Pickup(PlayerController player) {

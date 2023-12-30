@@ -75,13 +75,15 @@ namespace NSMB.Entities.Player {
 
             modelRotationTarget = models.transform.rotation.eulerAngles;
 
-            if (blinkRoutine == null)
+            if (blinkRoutine == null) {
                 blinkRoutine = StartCoroutine(BlinkRoutine());
+            }
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            if (icon)
+            if (icon) {
                 Destroy(icon.gameObject);
+            }
         }
 
         public override void Render() {
@@ -98,8 +100,9 @@ namespace NSMB.Entities.Player {
         }
 
         public override void FixedUpdateNetwork() {
-            if (IsSpinningOnSpinner)
+            if (IsSpinningOnSpinner) {
                 controller.FacingRight = models.transform.eulerAngles.y < 180;
+            }
         }
 
         public void HandleAnimations() {
@@ -137,8 +140,9 @@ namespace NSMB.Entities.Player {
 
             bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, controller.WorldHitboxSize.y);
 
-            if (controller.cameraController.IsControllingCamera)
+            if (controller.cameraController.IsControllingCamera) {
                 HorizontalCamera.SizeIncreaseTarget = (controller.IsSpinnerFlying || controller.IsPropellerFlying) ? 0.5f : 0f;
+            }
         }
 
         private IEnumerator BlinkRoutine() {
@@ -170,7 +174,11 @@ namespace NSMB.Entities.Player {
             modelRotateInstantly = false;
 
             if (controller.IsInKnockback || controller.IsFrozen) {
-                modelRotationTarget.Set(0, controller.FacingRight ? 110 : 250, 0);
+                bool right = controller.FacingRight;
+                if (controller.IsInKnockback && controller.IsWeakKnockback) {
+                    right = controller.KnockbackWasOriginallyFacingRight;
+                }
+                modelRotationTarget.Set(0, right ? 110 : 250, 0);
                 modelRotateInstantly = true;
 
             } else if (controller.IsDead) {
@@ -222,8 +230,9 @@ namespace NSMB.Entities.Player {
                 models.transform.rotation = Quaternion.Euler(x, y, z);
             }
 
-            if (GameManager.Instance.GameEnded)
+            if (GameManager.Instance.GameEnded) {
                 return;
+            }
 
             if (controller.State == Enums.PowerupState.PropellerMushroom && !controller.IsFrozen) {
                 propeller.transform.Rotate(Vector3.forward, propellerVelocity * Time.deltaTime);
@@ -232,11 +241,13 @@ namespace NSMB.Entities.Player {
 
         private void SetParticleEmission(ParticleSystem particle, bool value) {
             if (value) {
-                if (particle.isStopped)
+                if (particle.isStopped) {
                     particle.Play();
+                }
             } else {
-                if (particle.isPlaying)
+                if (particle.isPlaying) {
                     particle.Stop();
+                }
             }
         }
 
@@ -288,8 +299,9 @@ namespace NSMB.Entities.Player {
             } else if (controller.OnIce) {
                 animatedVelocity = 0;
             }
-            if (animatedVelocity < 0.01f)
+            if (animatedVelocity < 0.01f) {
                 animatedVelocity = 0;
+            }
 
             animator.SetFloat("velocityX", animatedVelocity);
             animator.SetFloat("velocityY", body.Velocity.y);
@@ -297,8 +309,9 @@ namespace NSMB.Entities.Player {
 
         private void HandleMiscStates() {
             if (controller.MegaStartTimer.IsActive(Runner)) {
-                if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale")
+                if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale") {
                     animator.Play("mega-scale");
+                }
             }
 
             // Scale
@@ -325,8 +338,9 @@ namespace NSMB.Entities.Player {
             }
             materialBlock.SetVector("MultiplyColor", giantMultiply);
 
-            foreach (Renderer r in renderers)
+            foreach (Renderer r in renderers) {
                 r.SetPropertyBlock(materialBlock);
+            }
 
             // Hit flash
             float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingRenderTime(Runner) ?? 0f;
@@ -346,17 +360,19 @@ namespace NSMB.Entities.Player {
 
 
             float newZ = -4;
-            if (controller.IsDead)
+            if (controller.IsDead) {
                 newZ = -6;
-            else if (controller.CurrentPipe || controller.IsFrozen)
+            } else if (controller.CurrentPipe || controller.IsFrozen) {
                 newZ = 1;
+            }
 
             transform.position = new(transform.position.x, transform.position.y, newZ);
         }
 
         public void HandlePipeAnimation() {
-            if (!controller.CurrentPipe)
+            if (!controller.CurrentPipe) {
                 return;
+            }
 
             controller.UpdateHitbox();
 
@@ -369,8 +385,9 @@ namespace NSMB.Entities.Player {
                 if (controller.PipeEntering) {
                     // Teleport to other pipe
 
-                    if (pe.otherPipe.bottom == pe.bottom)
+                    if (pe.otherPipe.bottom == pe.bottom) {
                         controller.PipeDirection *= -1;
+                    }
 
                     Vector2 offset = controller.PipeDirection * (pipeDuration * 0.45f);
                     if (pe.otherPipe.bottom) {
@@ -405,8 +422,9 @@ namespace NSMB.Entities.Player {
         }
 
         private void TryCreateMaterialBlock() {
-            if (materialBlock != null)
+            if (materialBlock != null) {
                 return;
+            }
 
             materialBlock = new();
 
@@ -416,16 +434,18 @@ namespace NSMB.Entities.Player {
             materialBlock.SetFloat("HatUsesOverallsColor", (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
 
             // Glow Color
-            if (enableGlow)
+            if (enableGlow) {
                 materialBlock.SetColor("GlowColor", GlowColor);
+            }
         }
 
         private void OnAllPlayersLoaded() {
             enableGlow = SessionData.Instance.Teams || !Object.HasInputAuthority;
             GlowColor = Utils.Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
 
-            if (!controller.Object.HasInputAuthority)
+            if (!controller.Object.HasInputAuthority) {
                 GameManager.Instance.CreateNametag(controller);
+            }
 
             icon = UIUpdater.Instance.CreateTrackIcon(controller);
             TryCreateMaterialBlock();

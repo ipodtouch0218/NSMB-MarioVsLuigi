@@ -44,6 +44,10 @@ namespace NSMB.Entities.Collectable {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
+            if (!Object) {
+                return;
+            }
+
             if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Velocity = Vector2.zero;
                 spriteAnimation.enabled = false;

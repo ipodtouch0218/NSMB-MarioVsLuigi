@@ -143,8 +143,9 @@ namespace NSMB.UI.MainMenu {
             // Version Checking
             if (!GlobalController.Instance.checkedForVersion) {
                 UpdateChecker.IsUpToDate((upToDate, latestVersion) => {
-                    if (upToDate)
+                    if (upToDate) {
                         return;
+                    }
 
                     updateText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.update.prompt", "newversion", latestVersion, "currentversion", Application.version);
                     updateBox.SetActive(true);
@@ -175,8 +176,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDestroy() {
-            if (GlobalController.Instance)
+            if (GlobalController.Instance) {
                 GlobalController.Instance.connecting.SetActive(false);
+            }
         }
 
         public void UpdateRegionDropdown() {
@@ -196,8 +198,9 @@ namespace NSMB.UI.MainMenu {
 
                 if (NetworkHandler.RegionPings != null) {
                     foreach (var option in regionDropdown.options) {
-                        if (option is RegionOption ro)
+                        if (option is RegionOption ro) {
                             ro.Ping = NetworkHandler.RegionPings[ro.Region];
+                        }
                     }
                 }
 
@@ -209,22 +212,22 @@ namespace NSMB.UI.MainMenu {
         public void EnterRoom(bool inSameRoom) {
 
             // Chat
-            if (inSameRoom) {
-                chat.ReplayChatMessages();
-
-            } else if (WasHostMigration) {
-
+            if (WasHostMigration) {
                 // Host chat notification
-                if (Runner.IsServer)
+                if (Runner.IsServer) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+                }
+            } else if (inSameRoom) {
+                chat.ReplayChatMessages();
 
             } else {
                 chat.ClearChat();
                 chatTextField.SetTextWithoutNotify("");
 
                 // Host chat notification
-                if (Runner.IsServer)
+                if (Runner.IsServer) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+                }
             }
 
             // Open the in-room menu
@@ -244,7 +247,7 @@ namespace NSMB.UI.MainMenu {
             spectateToggle.isOn = data ? data.IsManualSpectator : false;
 
             // Set the room settings
-            hostControlsGroup.interactable = data ? data.IsRoomOwner : true;
+            hostControlsGroup.interactable = Runner.IsServer || (bool) (data ? data.IsRoomOwner : true);
             roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
 
             // Preview the current level
@@ -287,8 +290,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void PreviewLevel(int levelIndex) {
-            if (levelIndex < 0 || levelIndex >= maps.Count)
+            if (levelIndex < 0 || levelIndex >= maps.Count) {
                 levelIndex = 0;
+            }
 
             Camera.main.transform.position = maps[levelIndex].levelPreviewPosition.transform.position;
         }
@@ -352,8 +356,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenOptions() {
-            if (wasSettingsOpen)
+            if (wasSettingsOpen) {
                 return;
+            }
 
             GlobalController.Instance.optionsManager.OpenMenu();
         }
@@ -417,8 +422,9 @@ namespace NSMB.UI.MainMenu {
         public void ConnectToDropdownRegion() {
             RegionOption selectedRegion = (RegionOption) regionDropdown.options[regionDropdown.value];
             string targetRegion = selectedRegion.Region;
-            if (NetworkHandler.CurrentRegion == targetRegion)
+            if (NetworkHandler.CurrentRegion == targetRegion) {
                 return;
+            }
 
             roomManager.ClearRooms();
             NetworkHandler.CurrentRegion = targetRegion;
@@ -459,8 +465,9 @@ namespace NSMB.UI.MainMenu {
                 sfx.PlayOneShot(Enums.Sounds.UI_Back);
             } else {
                 // Make sure we can actually start the game
-                if (!IsRoomConfigurationValid())
+                if (!IsRoomConfigurationValid()) {
                     return;
+                }
 
                 // Actually start the game.
                 SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
@@ -507,16 +514,18 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Kick(PlayerData target) {
-            if (target.HasInputAuthority)
+            if (target.HasInputAuthority) {
                 return;
+            }
 
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetNickname());
             Runner.Disconnect(target.Object.InputAuthority);
         }
 
         public void Promote(PlayerData target) {
-            if (target.HasInputAuthority)
+            if (target.HasInputAuthority) {
                 return;
+            }
 
             //PhotonNetwork.SetMasterClient(target);
             //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
@@ -525,8 +534,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Mute(PlayerData target) {
-            if (target.HasInputAuthority)
+            if (target.HasInputAuthority) {
                 return;
+            }
 
             bool newMuteState = !target.IsMuted;
             target.IsMuted = newMuteState;
@@ -534,8 +544,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Ban(PlayerData target) {
-            if (target.HasInputAuthority)
+            if (target.HasInputAuthority) {
                 return;
+            }
 
             SessionData.Instance.AddBan(target);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetNickname());
@@ -620,8 +631,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Quit() {
-            if (quitCoroutine == null)
+            if (quitCoroutine == null) {
                 quitCoroutine = StartCoroutine(FinishQuitting());
+            }
         }
 
         private IEnumerator FinishQuitting() {
@@ -648,8 +660,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public SceneRef GetCurrentSceneRef() {
-            if (!SessionData.Instance)
+            if (!SessionData.Instance) {
                 return SceneRef.None;
+            }
 
             byte index = SessionData.Instance.Level;
             return SceneRef.FromIndex(maps[index].buildIndex);
@@ -734,8 +747,9 @@ namespace NSMB.UI.MainMenu {
                 startGameBtn.interactable = data && data.IsRoomOwner;
                 startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
                 hostControlsGroup.interactable = false;
-                if (time == 1 && fadeMusicCoroutine == null)
+                if (time == 1 && fadeMusicCoroutine == null) {
                     fadeMusicCoroutine = StartCoroutine(FadeMusic());
+                }
             } else {
                 UpdateStartGameButton();
                 hostControlsGroup.interactable = data && data.IsRoomOwner;
@@ -801,8 +815,9 @@ namespace NSMB.UI.MainMenu {
             public int Ping {
                 get => _ping;
                 set {
-                    if (value <= 0)
+                    if (value <= 0) {
                         value = -1;
+                    }
 
                     _ping = value;
                     text = "<align=left>" + Region + "<line-height=0>\n<align=right>" + Utils.Utils.GetPingSymbol(_ping);
@@ -815,13 +830,17 @@ namespace NSMB.UI.MainMenu {
             }
 
             public int CompareTo(object other) {
-                if (other is not RegionOption ro)
+                if (other is not RegionOption ro) {
                     return -1;
+                }
 
-                if (Ping <= 0)
+                if (Ping <= 0) {
                     return 1;
-                if (ro.Ping <= 0)
+                }
+
+                if (ro.Ping <= 0) {
                     return -1;
+                }
 
                 return Ping.CompareTo(ro.Ping);
             }

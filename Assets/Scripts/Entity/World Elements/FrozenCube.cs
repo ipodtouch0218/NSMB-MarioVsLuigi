@@ -66,8 +66,9 @@ namespace NSMB.Entities {
 
         public override void Render() {
 
-            if (!Object || IsDead)
+            if (!Object || IsDead) {
                 return;
+            }
 
             // Shaking animation. Don't play if we're being held or moving fast, unless we're a player
             if ((!Holder && !FastSlide) || FrozenEntity is PlayerController) {
@@ -89,13 +90,15 @@ namespace NSMB.Entities {
 
         public override void FixedUpdateNetwork() {
 
-            if (!Object || IsDead)
+            if (!Object || IsDead) {
                 return;
+            }
 
             base.FixedUpdateNetwork();
 
-            if (!Object || IsDead)
+            if (!Object || IsDead) {
                 return;
+            }
 
             gameObject.layer = (Holder || FastSlide) ? Layers.LayerEntity : Layers.LayerGroundEntity;
 
@@ -111,8 +114,9 @@ namespace NSMB.Entities {
 
             // Handle interactions with tiles
             if (FrozenEntity.IsCarryable) {
-                if (!HandleTile())
+                if (!HandleTile()) {
                     return;
+                }
 
                 FrozenEntity.body.Position = body.Position + EntityPositionOffset;
                 FrozenEntity.body.Velocity = Vector2.zero;
@@ -122,8 +126,9 @@ namespace NSMB.Entities {
             if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
 
                 if (AutoBreakTimer.Expired(Runner)) {
-                    if (!FastSlide)
+                    if (!FastSlide) {
                         KillReason = UnfreezeReason.Timer;
+                    }
 
                     if (flying) {
                         Fallen = true;
@@ -135,8 +140,9 @@ namespace NSMB.Entities {
                 }
             }
 
-            if (Holder)
+            if (Holder) {
                 return;
+            }
 
             // Our entity despawned. remove.
             if (!FrozenEntity) {
@@ -146,8 +152,9 @@ namespace NSMB.Entities {
 
             // Handle interactions with tiles
             if (FrozenEntity.IsCarryable) {
-                if (!HandleTile())
+                if (!HandleTile()) {
                     return;
+                }
             }
 
             if (FastSlide) {
@@ -159,7 +166,7 @@ namespace NSMB.Entities {
                 //            body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
                 //    }
                 //}
-                body.Velocity = new(throwSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
+                body.Velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
             }
 
             ApplyConstraints();
@@ -204,16 +211,19 @@ namespace NSMB.Entities {
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
             // Don't interact with our lovely holder
-            if (Holder == player)
+            if (Holder == player) {
                 return;
+            }
 
             // Don't interact with other frozen players
-            if (player.IsFrozen)
+            if (player.IsFrozen) {
                 return;
+            }
 
             // Temporary invincibility
-            if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner))
+            if (PreviousHolder == player && ThrowInvincibility.IsActive(Runner)) {
                 return;
+            }
 
             Utils.Utils.UnwrapLocations(body.Position, player.body.Position, out Vector2 ourPos, out Vector2 playerPos);
 
@@ -257,8 +267,9 @@ namespace NSMB.Entities {
 
         //---IFireballInteractable overrides
         public override bool InteractWithFireball(Fireball fireball) {
-            if (!fireball.IsIceball)
+            if (!fireball.IsIceball) {
                 Kill();
+            }
 
             return true;
         }
@@ -296,8 +307,9 @@ namespace NSMB.Entities {
 
         //---IKillableEntity overrides
         protected override void CheckForEntityCollisions() {
-            if (Holder || !FastSlide)
+            if (Holder || !FastSlide) {
                 return;
+            }
 
             // Only run when fastsliding...
             int count = Runner.GetPhysicsScene2D().OverlapBox(body.Position + hitbox.offset, hitbox.size, 0, CollisionBuffer, Layers.MaskEntities);
@@ -305,8 +317,9 @@ namespace NSMB.Entities {
             for (int i = 0; i < count; i++) {
                 GameObject obj = CollisionBuffer[i].gameObject;
 
-                if (obj.transform.IsChildOf(transform))
+                if (obj.transform.IsChildOf(transform)) {
                     continue;
+                }
 
                 if (PreviousHolder && obj.TryGetComponent(out Coin coin)) {
                     coin.InteractWithPlayer(PreviousHolder);
@@ -314,18 +327,21 @@ namespace NSMB.Entities {
                 }
 
                 if (obj.TryGetComponent(out KillableEntity killable)) {
-                    if (killable.IsDead || killable == FrozenEntity)
+                    if (killable.IsDead || killable == FrozenEntity) {
                         continue;
+                    }
 
-                    if (Holder == killable || PreviousHolder == killable || FrozenEntity == killable)
+                    if (Holder == killable || PreviousHolder == killable || FrozenEntity == killable) {
                         continue;
+                    }
 
                     // Kill entity we ran into
                     killable.SpecialKill(killable.body.Position.x > body.Position.x, false, Combo++);
 
                     // Kill ourselves if we're being held too
-                    if (Holder)
+                    if (Holder) {
                         SpecialKill(killable.body.Position.x < body.Position.x, false, 0);
+                    }
 
                     continue;
                 }

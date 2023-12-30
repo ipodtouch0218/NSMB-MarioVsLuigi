@@ -32,8 +32,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateAllSettings(SessionData roomData, bool level) {
-            if (!roomData.Object)
+            if (!roomData.Object) {
                 return;
+            }
 
             ChangePrivate(roomData.PrivateRoom);
             ChangeMaxPlayers(roomData.MaxPlayers);
@@ -52,14 +53,16 @@ namespace NSMB.UI.MainMenu {
                 MainMenuManager.Instance.UpdateStartGameButton();
             }
 
-            if (Runner.IsServer && Runner.Tick != 0)
+            if (Runner.IsServer && Runner.Tick != 0) {
                 Runner.PushHostMigrationSnapshot();
+            }
         }
 
         #region Level Index
         public void SetLevelIndex() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             int oldValue = Room.Level;
             int newValue = levelDropdown.value;
@@ -81,12 +84,14 @@ namespace NSMB.UI.MainMenu {
 
         #region Stars
         public void SetStarRequirement() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             int oldValue = Room.StarRequirement;
-            if (!int.TryParse(starsInputField.text, out int newValue))
+            if (!int.TryParse(starsInputField.text, out int newValue)) {
                 return;
+            }
 
             newValue = Mathf.Clamp(newValue, 1, 25);
 
@@ -104,12 +109,14 @@ namespace NSMB.UI.MainMenu {
 
         #region Coins
         public void SetCoinRequirement() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             int oldValue = Room.CoinRequirement;
-            if (!int.TryParse(coinsInputField.text, out int newValue))
+            if (!int.TryParse(coinsInputField.text, out int newValue)) {
                 return;
+            }
 
             newValue = Mathf.Clamp(newValue, 2, 25);
 
@@ -127,12 +134,14 @@ namespace NSMB.UI.MainMenu {
 
         #region Lives
         public void SetLives() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             int oldValue = Room.Lives;
-            if (!int.TryParse(livesInputField.text, out int newValue))
+            if (!int.TryParse(livesInputField.text, out int newValue)) {
                 return;
+            }
 
             newValue = Mathf.Clamp(newValue, 1, 25);
 
@@ -145,8 +154,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void EnableLives() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : -1;
 
@@ -158,19 +168,22 @@ namespace NSMB.UI.MainMenu {
             livesEnabledToggle.SetIsOnWithoutNotify(enabled);
             livesInputField.interactable = enabled;
 
-            if (enabled)
+            if (enabled) {
                 livesInputField.SetTextWithoutNotify(lives.ToString());
+            }
         }
         #endregion
 
         #region Timer
         public void SetTime() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             int oldValue = Room.Timer;
-            if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue))
+            if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue)) {
                 return;
+            }
 
             newValue = Mathf.Clamp(newValue, 1, 99);
 
@@ -183,11 +196,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void EnableTime() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
-            if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue))
+            if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue)) {
                 return;
+            }
 
             newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : -1;
 
@@ -199,8 +214,9 @@ namespace NSMB.UI.MainMenu {
             timerInputField.interactable = time != -1;
             drawEnabledToggle.interactable = time != -1;
 
-            if (time == -1)
+            if (time == -1) {
                 return;
+            }
 
             timerInputField.SetTextWithoutNotify($"{time}:00");
         }
@@ -208,8 +224,9 @@ namespace NSMB.UI.MainMenu {
 
         #region DrawOnTimeUp
         public void SetDrawOnTimeUp() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             bool newValue = drawEnabledToggle.isOn;
 
@@ -222,29 +239,33 @@ namespace NSMB.UI.MainMenu {
 
         #region Teams
         public void SetTeams() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             bool newValue = teamsEnabledToggle.isOn;
 
             Room.SetTeams(newValue);
 
-            if (MainMenuManager.Instance)
+            if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+            }
         }
         private void ChangeTeams(bool value) {
             teamsEnabledToggle.SetIsOnWithoutNotify(value);
             teamSelectorButton.SetEnabled(value);
 
-            if (!teamsEnabledToggle.isOn && value)
+            if (!teamsEnabledToggle.isOn && value) {
                 MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+            }
         }
         #endregion
 
         #region Custom Powerups
         public void SetCustomPowerups() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             bool newValue = customPowerupsEnabledToggle.isOn;
 
@@ -257,8 +278,9 @@ namespace NSMB.UI.MainMenu {
 
         #region Players
         public void SetMaxPlayers() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             int oldValue = Room.MaxPlayers;
             int newValue = (int) playersSlider.value;
@@ -271,6 +293,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             Room.SetMaxPlayers((byte) newValue);
+            ChangeMaxPlayers(newValue);
         }
         private void ChangeMaxPlayers(int value) {
             playersSlider.SetValueWithoutNotify(value);
@@ -280,8 +303,9 @@ namespace NSMB.UI.MainMenu {
 
         #region Private
         public void SetPrivate() {
-            if (!Runner.IsServer)
+            if (!Runner.IsServer) {
                 return;
+            }
 
             bool newValue = privateEnabledToggle.isOn;
 

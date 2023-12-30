@@ -68,8 +68,9 @@ public class PlayerData : NetworkBehaviour {
             // Successful :D
             SetNickname(ConnectionToken.nickname.Value);
         } catch {
-            if (!Runner.IsSinglePlayer)
+            if (!Runner.IsSinglePlayer) {
                 Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Object.InputAuthority)}'.");
+            }
 
             SetNickname(ConnectionToken.nickname.Value);
             ConnectionToken = new();
@@ -112,8 +113,9 @@ public class PlayerData : NetworkBehaviour {
             IsRoomOwner = true;
         }
 
-        if (SessionData.Instance)
+        if (SessionData.Instance) {
             SessionData.Instance.LoadWins(this);
+        }
 
         if (HasInputAuthority) {
             // We're the client. update with our data.
@@ -123,10 +125,14 @@ public class PlayerData : NetworkBehaviour {
             PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenToggled;
         }
 
+
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
 
         // Check if we need to play sfx / send a chat message
         SendJoinMessageIfNeeded();
+
+        UpdateObjectName();
+        NetworkHandler.Instance.playerDatas.Add(this);
     }
 
     public override void Render() {
@@ -138,7 +144,6 @@ public class PlayerData : NetworkBehaviour {
             case nameof(IsManualSpectator):
                 OnStartSettingChanged();
                 break;
-            case nameof(DisplayNickname): OnNameChanged(); break;
             case nameof(Ping): OnSettingChanged(); break;
             case nameof(IsLoaded): OnLoadStateChanged(); break;
             case nameof(IsInOptions): OnInOptionsChanged(); break;
@@ -150,8 +155,9 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (hasState)
+        if (hasState) {
             SessionData.Instance.SaveWins(this);
+        }
 
         if (HasInputAuthority) {
             PauseOptionMenuManager.OnOptionsOpenedToggled -= OnOptionsOpenToggled;
@@ -161,13 +167,15 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public void SendJoinMessageIfNeeded() {
-        if (!SessionData.PlayersNeedingJoinMessage.Remove(Object.InputAuthority))
+        if (!SessionData.PlayersNeedingJoinMessage.Remove(Object.InputAuthority)) {
             return;
+        }
 
         ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
 
-        if (MainMenuManager.Instance)
+        if (MainMenuManager.Instance) {
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
+        }
     }
 
     public string GetNickname(bool filter = true) {
@@ -186,8 +194,9 @@ public class PlayerData : NetworkBehaviour {
         name = name[..Mathf.Min(name.Length, MainMenuManager.NicknameMax)];
 
         // If this new nickname is invalid, default back to "noname"
-        if (name.Length < MainMenuManager.NicknameMin)
+        if (name.Length < MainMenuManager.NicknameMin) {
             name = "noname";
+        }
 
         RawNickname = name;
 
@@ -200,12 +209,13 @@ public class PlayerData : NetworkBehaviour {
                 .Where(pd => pd.RawNickname.ToString().Filter() == name)
                 .Count();
 
-            if (count > 0)
+            if (count > 0) {
                 name += " (" + count + ")";
+            }
         }
 
         DisplayNickname = name;
-        OnNameChanged();
+        UpdateObjectName();
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -216,8 +226,9 @@ public class PlayerData : NetworkBehaviour {
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetPermanentSpectator(bool value) {
         //not accepting changes at this time
-        if (Locked)
+        if (Locked) {
             return;
+        }
 
         IsManualSpectator = value;
     }
@@ -225,12 +236,14 @@ public class PlayerData : NetworkBehaviour {
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetCharacterIndex(byte index) {
         //not accepting changes at this time
-        if (Locked)
+        if (Locked) {
             return;
+        }
 
         //invalid character...
-        if (index >= ScriptableManager.Instance.characters.Length)
+        if (index >= ScriptableManager.Instance.characters.Length) {
             return;
+        }
 
         CharacterIndex = index;
     }
@@ -238,12 +251,14 @@ public class PlayerData : NetworkBehaviour {
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetSkinIndex(byte index) {
         // Not accepting changes at this time
-        if (Locked)
+        if (Locked) {
             return;
+        }
 
         // Invalid skin...
-        if (index >= ScriptableManager.Instance.skins.Length)
+        if (index >= ScriptableManager.Instance.skins.Length) {
             return;
+        }
 
         SkinIndex = index;
     }
@@ -251,12 +266,14 @@ public class PlayerData : NetworkBehaviour {
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetTeamNumber(sbyte team) {
         // Not accepting changes at this time
-        if (Locked)
+        if (Locked) {
             return;
+        }
 
         // Invalid team...
-        if (team < 0 || team > 4)
+        if (team < 0 || team > 4) {
             return;
+        }
 
         Team = team;
     }
@@ -271,46 +288,51 @@ public class PlayerData : NetworkBehaviour {
         IsReady = ready;
     }
 
+    public void UpdateObjectName() {
+        gameObject.name = "PlayerData (" + DisplayNickname + ", " + UserId.ToString() + ")";
+    }
+
     private void OnOptionsOpenToggled(bool isOpen) {
         Rpc_SetOptionsOpen(isOpen);
     }
 
     public void OnLoadStateChanged() {
-        if (IsLoaded && GameManager.Instance)
+        if (IsLoaded && GameManager.Instance) {
             GameManager.Instance.CheckIfAllPlayersLoaded();
+        }
     }
 
     public void OnSettingChanged() {
-        if (!MainMenuManager.Instance || lastUpdatedTick >= Runner.Tick)
+        if (!MainMenuManager.Instance || lastUpdatedTick >= Runner.Tick) {
             return;
+        }
 
         lastUpdatedTick = Runner.Tick;
         MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
     }
 
     public void OnStartSettingChanged() {
-        if (!MainMenuManager.Instance)
+        if (!MainMenuManager.Instance) {
             return;
+        }
 
         MainMenuManager.Instance.UpdateStartGameButton();
         OnSettingChanged();
     }
 
-    public void OnNameChanged() {
-        gameObject.name = "PlayerData (" + DisplayNickname + ", " + UserId.ToString() + ")";
-    }
-
     public void OnCharacterChanged() {
-        if (!MainMenuManager.Instance || !HasInputAuthority)
+        if (!MainMenuManager.Instance || !HasInputAuthority) {
             return;
+        }
 
         MainMenuManager.Instance.SwapCharacter(CharacterIndex, false);
         OnSettingChanged();
     }
 
     public void OnSkinChanged() {
-        if (!MainMenuManager.Instance || !HasInputAuthority)
+        if (!MainMenuManager.Instance || !HasInputAuthority) {
             return;
+        }
 
         MainMenuManager.Instance.SwapPlayerSkin(SkinIndex, false);
     }
@@ -322,7 +344,8 @@ public class PlayerData : NetworkBehaviour {
     public void OnIsReadyChanged() {
         OnIsReadyChangedEvent?.Invoke(IsReady);
 
-        if (MainMenuManager.Instance && HasInputAuthority)
+        if (MainMenuManager.Instance && HasInputAuthority) {
             MainMenuManager.Instance.UpdateStartGameButton();
+        }
     }
 }
