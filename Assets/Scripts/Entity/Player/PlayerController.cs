@@ -332,8 +332,6 @@ namespace NSMB.Entities.Player {
 
             Data = Object.InputAuthority.GetPlayerData(Runner);
             if (HasInputAuthority) {
-                //body.InterpolationDataSource = InterpolationDataSources.Predicted;
-
                 GameManager.Instance.localPlayer = this;
                 GameManager.Instance.spectationManager.Spectating = false;
                 ControlSystem.controls.Player.ReserveItem.performed += OnReserveItem;
@@ -466,16 +464,16 @@ namespace NSMB.Entities.Player {
 
             if (!IsProxy) {
 #if INPUT_BUFFERING_TEST
-                    int inputIndex = Runner.Tick % InputBufferCapacity;
-                    PlayerNetworkInput input = InputBuffer[inputIndex];
+                int inputIndex = Runner.Tick % InputBufferCapacity;
+                PlayerNetworkInput input = InputBuffer[inputIndex];
 
-                    if (GetInput(out PlayerNetworkInput inputsThisTick)) {
-                        // Add later inputs to the buffer.
-                        InputBuffer.Set(inputIndex, inputsThisTick);
-                    } else if (!IsProxy) {
-                        // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
-                        InputBuffer.Set(inputIndex, HandleMissingInputs());
-                    }
+                if (GetInput(out PlayerNetworkInput inputsThisTick)) {
+                    // Add later inputs to the buffer.
+                    InputBuffer.Set(inputIndex, inputsThisTick);
+                } else if (!IsProxy) {
+                    // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
+                    InputBuffer.Set(inputIndex, HandleMissingInputs());
+                }
 #else
                 PlayerNetworkInput input;
                 if (GetInput(out PlayerNetworkInput currentInputs)) {
@@ -495,7 +493,6 @@ namespace NSMB.Entities.Player {
                 if (IsDead) {
                     HandleDeathTimers();
                 } else if (!IsFrozen) {
-
                     NetworkButtons heldButtons = input.buttons;
                     NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
 

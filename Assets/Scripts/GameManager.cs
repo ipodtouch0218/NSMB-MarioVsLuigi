@@ -655,6 +655,8 @@ namespace NSMB.Game {
         }
 
         private IEnumerator WaitToStartGame() {
+            GameStartTime = Runner.SimulationTime + 1.3f;
+
             yield return new WaitForSecondsRealtime(1.3f);
 
             // Keep track of game timestamps

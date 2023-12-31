@@ -22,15 +22,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     //---Static Variables
     public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us", "usw" };
-    public static readonly Dictionary<string, string> RegionIPs = new() {
-        ["asia"] = "15.235.132.46",
-        ["eu"] = "192.36.27.39",
-        ["jp"] = "139.162.127.196",
-        ["kr"] = "158.247.198.230",
-        ["sa"] = "200.25.36.72",
-        ["us"] = "45.86.230.227",
-        ["usw"] = "45.145.148.21",
-    };
     public static readonly Dictionary<string, int> RegionPings = new();
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
@@ -456,6 +447,27 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         // And join lobby
         StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues, customAppSettings: appSettings);
         if (result.Ok) {
+            try {
+                // Wacky reflection to get the region pings.
+                object cloudServices = Runner.GetType().GetField("_cloudServices", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(Runner);
+                object communicator = cloudServices.GetType().GetProperty("Communicator", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(cloudServices);
+                object client = communicator.GetType().GetProperty("Client", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(communicator);
+                object regionHandler = client.GetType().GetField("RegionHandler", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(client);
+                IList regions = (IList) regionHandler.GetType().GetProperty("EnabledRegions", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(regionHandler);
+
+                var codeField = regions[0].GetType().GetProperty("Code", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                var pingField = regions[0].GetType().GetProperty("Ping", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                foreach (object item in regions) {
+                    string code = (string) codeField.GetValue(item);
+                    int ping = (int) pingField.GetValue(item);
+                    RegionPings[code] = ping;
+                }
+
+                OnRegionPingsUpdated?.Invoke();
+            } catch (Exception e) {
+                Debug.LogError(e);
+            }
+
             CurrentRegion = Runner.LobbyInfo.Region;
 
             Debug.Log($"[Network] Connected to a Lobby ({Runner.LobbyInfo.Name}, {CurrentRegion})");
@@ -594,43 +606,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return result;
     }
     #endregion
-
-    private static float pingStartTime;
-    public static IEnumerator PingRegions() {
-        foreach ((string region, _) in RegionIPs) {
-            RegionPings[region] = 0;
-        }
-
-        pingStartTime = Time.time;
-        Dictionary<string, Ping> pingers = new();
-
-        foreach ((string region, string ip) in RegionIPs) {
-            pingers[region] = new(ip);
-        }
-
-        bool anyRemaining = true;
-        while (anyRemaining && Time.time - pingStartTime < 4) {
-            anyRemaining = false;
-
-            foreach ((string region, Ping pinger) in pingers) {
-                if (pinger == null) {
-                    continue;
-                }
-
-                if (!pinger.isDone) {
-                    anyRemaining = true;
-                    continue;
-                }
-
-                // Ping done.
-                RegionPings[region] = pinger.time;
-                pinger.DestroyPing();
-            }
-            yield return null;
-        }
-
-        OnRegionPingsUpdated?.Invoke();
-    }
 
     private static void RoomInitialized(NetworkRunner runner) {
 

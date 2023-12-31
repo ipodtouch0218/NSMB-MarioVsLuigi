@@ -4231,7 +4231,6 @@ GameObject:
   - component: {fileID: 361225204}
   - component: {fileID: 361225200}
   - component: {fileID: 361225208}
-  - component: {fileID: 361225205}
   - component: {fileID: 361225209}
   m_Layer: 8
   m_Name: Tilemap_Squishy
@@ -11798,21 +11797,6 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0.00001
   m_UseDelaunayMesh: 0
---- !u!114 &361225205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 361225195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fedcefda7c82c5f4483ddc0098f43865, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: 0
-  behaviours:
-  - {fileID: 361225208}
 --- !u!114 &361225208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11903,7 +11887,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 361225208}
-  - {fileID: 361225205}
 --- !u!1001 &379146488
 PrefabInstance:
   m_ObjectHideFlags: 0

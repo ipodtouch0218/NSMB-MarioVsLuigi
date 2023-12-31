@@ -176,7 +176,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
 
-            if (GameManager.Instance && GameManager.Instance.GameState == Enums.GameState.Playing && !Collector) {
+            if (GameManager.Instance && GameManager.Instance.Object && GameManager.Instance.GameState == Enums.GameState.Playing && !Collector) {
                 GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
             }
 

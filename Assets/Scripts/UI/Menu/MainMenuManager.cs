@@ -113,7 +113,7 @@ namespace NSMB.UI.MainMenu {
 
             PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
             UpdateRegionDropdown();
-            StartCoroutine(NetworkHandler.PingRegions());
+            //StartCoroutine(NetworkHandler.PingRegions());
 
             // Photon stuff.
             if (GlobalController.Instance.firstConnection) {

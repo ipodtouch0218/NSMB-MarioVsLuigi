@@ -28,6 +28,7 @@ public class GenericMover : NetworkBehaviour, IBeforeTick, IWaitForGameStart {
 
     public override void Spawned() {
         Origin = transform.position;
+        Runner.SetIsSimulated(Object, true);
     }
 
     public void BeforeTick() {
