@@ -208,7 +208,7 @@ namespace NSMB.Game {
 
             // Set up alternating music for the default stages
             if (!mainMusic) {
-                byte musicIndex = SessionData.Instance.AlternatingMusicIndex;
+                byte musicIndex = (SessionData.Instance && SessionData.Instance.Object) ? SessionData.Instance.AlternatingMusicIndex : (byte) 0;
                 int songs = ScriptableManager.Instance.alternatingStageMusic.Length;
                 mainMusic = ScriptableManager.Instance.alternatingStageMusic[musicIndex % songs];
             }

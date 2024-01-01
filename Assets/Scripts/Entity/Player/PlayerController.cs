@@ -1560,13 +1560,13 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            bool hitGroundTiles = body.Velocity.y < -8f && (IsOnGround || IsGroundpounding);
+            bool hitGroundTiles = body.PreviousTickVelocity.y < -8f && (IsOnGround || IsGroundpounding);
             Vector2 offset = Vector2.zero;
             if (hitGroundTiles) {
                 offset = Vector2.down * 0.25f;
             }
 
-            Vector2 checkSizeHalf = WorldHitboxSize * 0.5f;
+            Vector2 checkSizeHalf = WorldHitboxSize * 0.525f;
             Vector2 checkPosition = body.Position + (Vector2.up * checkSizeHalf) + (Runner.DeltaTime * body.Velocity) + offset;
 
             Vector2Int minPos = Utils.Utils.WorldToTilemapPosition(checkPosition - (checkSizeHalf), wrap: false);
@@ -2561,9 +2561,8 @@ namespace NSMB.Entities.Player {
                 if (MegaStartTimer.Expired(Runner)) {
                     FinishMegaMario(true);
                     MegaStartTimer = TickTimer.None;
-                } else {
-                    body.Freeze = true;
 
+                } else {
                     Vector2 checkExtents = WorldHitboxSize * new Vector2(0.375f, 0.55f);
                     Vector2 checkPosition = body.Position + Vector2.up * checkExtents;
 
@@ -2587,8 +2586,8 @@ namespace NSMB.Entities.Player {
                             return;
                         }
                     }
+                    return;
                 }
-                return;
             }
 
             if (MegaEndTimer.IsRunning && IsStationaryMegaShrink) {
@@ -2606,21 +2605,6 @@ namespace NSMB.Entities.Player {
                 return;
             }
             #endregion
-
-            if (State == Enums.PowerupState.MegaMushroom) {
-                HandleMegaTiles(true);
-                if (Runner.IsForward && IsOnGround && JumpState == PlayerJumpState.SingleJump) {
-                    DustParticleAnimCounter++;
-                    CameraController.ScreenShake = 0.15f;
-                    JumpState = PlayerJumpState.None;
-                }
-                StarmanTimer = TickTimer.None;
-
-                if (MegaTimer.ExpiredOrNotRunning(Runner)) {
-                    EndMega();
-                    MegaTimer = TickTimer.None;
-                }
-            }
 
             // Pipes > stuck in block, else the animation gets janked.
             if (CurrentPipe || MegaStartTimer.IsActive(Runner) || (MegaEndTimer.IsActive(Runner) && IsStationaryMegaShrink) || animator.GetBool("pipe")) {
@@ -2868,6 +2852,22 @@ namespace NSMB.Entities.Player {
             }
 
             HandleFacingDirection(left, right);
+
+
+            if (State == Enums.PowerupState.MegaMushroom) {
+                HandleMegaTiles(true);
+                if (Runner.IsForward && IsOnGround && JumpState == PlayerJumpState.SingleJump) {
+                    DustParticleAnimCounter++;
+                    CameraController.ScreenShake = 0.15f;
+                    JumpState = PlayerJumpState.None;
+                }
+                StarmanTimer = TickTimer.None;
+
+                if (MegaTimer.ExpiredOrNotRunning(Runner)) {
+                    EndMega();
+                    MegaTimer = TickTimer.None;
+                }
+            }
 
             HandleGravity(jumpHeld);
 
