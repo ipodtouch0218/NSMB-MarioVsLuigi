@@ -4,7 +4,7 @@ using Fusion;
 using NSMB.Game;
 
 //[OrderBefore(typeof(EntityMover))]
-public class GenericMover : NetworkBehaviour, IBeforeTick, IWaitForGameStart {
+public class GenericMover : NetworkBehaviour, IBeforeTick, IWaitForGameStart, IWaitForGameEnd {
 
     //---Networked Variables
     [Networked] private Vector3 Origin { get; set; }
@@ -61,8 +61,12 @@ public class GenericMover : NetworkBehaviour, IBeforeTick, IWaitForGameStart {
         SetPosition(transform, Origin, Runner.SimulationTime - GameManager.Instance.GameStartTime);
     }
 
-    public void Execute() {
+    void IWaitForGameStart.Execute() {
         Enabled = true;
+    }
+
+    void IWaitForGameEnd.Execute() {
+        Enabled = false;
     }
 
     private void SetPosition(Transform target, Vector3 origin, float secondsElapsed) {

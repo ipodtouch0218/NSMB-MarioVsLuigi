@@ -498,19 +498,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public bool IsRoomConfigurationValid() {
-            List<PlayerData> nonSpectators = Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner)).Where(pd => !pd.IsManualSpectator).ToList();
-            bool validRoomConfig = true;
-
-            int realPlayers = nonSpectators.Count();
-            validRoomConfig &= realPlayers >= 1;
-
-            // Only do team checks if there's more than one player
-            if (SessionData.Instance && SessionData.Instance.Teams && realPlayers > 1) {
-                int teams = nonSpectators.Select(pd => pd.Team).Distinct().Count();
-                validRoomConfig &= teams > 1;
-            }
-
-            return validRoomConfig;
+            return Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner)).Where(pd => !pd.IsManualSpectator).Count() >= 1;
         }
 
         public void Kick(PlayerData target) {

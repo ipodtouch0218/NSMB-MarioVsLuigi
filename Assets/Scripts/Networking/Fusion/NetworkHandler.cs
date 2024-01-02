@@ -453,17 +453,19 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 object communicator = cloudServices.GetType().GetProperty("Communicator", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(cloudServices);
                 object client = communicator.GetType().GetProperty("Client", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(communicator);
                 object regionHandler = client.GetType().GetField("RegionHandler", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(client);
-                IList regions = (IList) regionHandler.GetType().GetProperty("EnabledRegions", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(regionHandler);
+                if (regionHandler != null) {
+                    IList regions = (IList) regionHandler.GetType().GetProperty("EnabledRegions", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).GetValue(regionHandler);
 
-                var codeField = regions[0].GetType().GetProperty("Code", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                var pingField = regions[0].GetType().GetProperty("Ping", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                foreach (object item in regions) {
-                    string code = (string) codeField.GetValue(item);
-                    int ping = (int) pingField.GetValue(item);
-                    RegionPings[code] = ping;
+                    var codeField = regions[0].GetType().GetProperty("Code", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    var pingField = regions[0].GetType().GetProperty("Ping", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    foreach (object item in regions) {
+                        string code = (string) codeField.GetValue(item);
+                        int ping = (int) pingField.GetValue(item);
+                        RegionPings[code] = ping;
+                    }
+
+                    OnRegionPingsUpdated?.Invoke();
                 }
-
-                OnRegionPingsUpdated?.Invoke();
             } catch (Exception e) {
                 Debug.LogError(e);
             }

@@ -684,6 +684,11 @@ namespace NSMB.Game {
             PlaySounds = false;
             endSoundPlayed = true;
 
+            // End "WaitForGameEnd" objects
+            foreach (var wfge in FindObjectsByType<NetworkBehaviour>(FindObjectsSortMode.None).Where(nb => nb is IWaitForGameEnd)) {
+                ((IWaitForGameEnd) wfge).AttemptExecute(wfge.Object);
+            }
+
             ForceUnpause();
             musicManager.Stop();
 

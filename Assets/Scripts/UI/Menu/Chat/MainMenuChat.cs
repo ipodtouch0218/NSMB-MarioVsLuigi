@@ -40,16 +40,19 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void SetTypingIndicator(PlayerRef player) {
-            if (!MainMenuManager.Instance)
+            if (!MainMenuManager.Instance) {
                 return;
+            }
 
             PlayerData data;
-            if ((data = player.GetPlayerData(NetworkHandler.Runner)) && data.IsMuted)
+            if ((data = player.GetPlayerData(NetworkHandler.Runner)) && data.IsMuted) {
                 return;
+            }
 
             PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player);
-            if (ple)
+            if (ple) {
                 ple.typingCounter = 4;
+            }
         }
 
         public void SendChat() {
@@ -61,8 +64,9 @@ namespace NSMB.UI.MainMenu {
             }
 
             string text = chatbox.text.Replace("\n", " ").Trim();
-            if (string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrWhiteSpace(text)) {
                 return;
+            }
 
             if (text.StartsWith('/')) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.command");
@@ -73,8 +77,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void ClearChat() {
-            foreach (ChatMessage message in chatMessages)
+            foreach (ChatMessage message in chatMessages) {
                 Destroy(message.gameObject);
+            }
 
             chatMessages.Clear();
         }
@@ -94,18 +99,21 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnTextboxChanged() {
-            if (!MainMenuManager.Instance)
+            if (!MainMenuManager.Instance) {
                 return;
+            }
 
             int size = chatbox.text.Length;
-            if (size == previousTextLength)
+            if (size == previousTextLength) {
                 return;
+            }
 
             previousTextLength = size;
 
             PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(NetworkHandler.Runner.LocalPlayer);
-            if (!ple || ple.typingCounter > 2)
+            if (!ple || ple.typingCounter > 2) {
                 return;
+            }
 
             SessionData.Instance.Rpc_UpdateTypingCounter();
         }

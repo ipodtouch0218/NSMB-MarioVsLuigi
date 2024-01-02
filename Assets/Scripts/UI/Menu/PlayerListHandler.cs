@@ -18,11 +18,13 @@ namespace NSMB.UI.MainMenu {
         private NetworkRunner Runner => NetworkHandler.Instance.runner;
 
         public void OnEnable() {
-            if (!NetworkHandler.Instance.runner)
+            if (!NetworkHandler.Instance || !Runner) {
                 return;
+            }
 
-            if (NetworkHandler.Instance.runner.SessionInfo.IsValid)
+            if (NetworkHandler.Instance.runner.SessionInfo.IsValid) {
                 PopulatePlayerEntries(true);
+            }
 
             NetworkHandler.OnPlayerJoined += OnPlayerJoined;
             NetworkHandler.OnPlayerLeft += OnPlayerLeft;
@@ -39,8 +41,9 @@ namespace NSMB.UI.MainMenu {
             RemoveAllPlayerEntries();
             try {
                 foreach (PlayerRef player in Runner.ActivePlayers) {
-                    if (addSelf || Runner.LocalPlayer != player)
+                    if (addSelf || Runner.LocalPlayer != player) {
                         AddPlayerEntry(player);
+                    }
                 }
             } catch {
 
@@ -49,8 +52,9 @@ namespace NSMB.UI.MainMenu {
 
         public void AddPlayerEntry(PlayerRef player) {
             PlayerData data = player.GetPlayerData(Runner);
-            if (!data || !template)
+            if (!data || !template) {
                 return;
+            }
 
             if (!playerListEntries.ContainsKey(player)) {
                 GameObject go = Instantiate(template, contentPane.transform);
@@ -71,8 +75,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void RemovePlayerEntry(PlayerRef player) {
-            if (!playerListEntries.ContainsKey(player))
+            if (!playerListEntries.ContainsKey(player)) {
                 return;
+            }
 
             Destroy(playerListEntries[player].gameObject);
             playerListEntries.Remove(player);
@@ -80,11 +85,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateAllPlayerEntries() {
-            foreach (PlayerRef player in Runner.ActivePlayers)
+            foreach (PlayerRef player in Runner.ActivePlayers) {
                 UpdatePlayerEntry(player, false);
+            }
 
-            if (MainMenuManager.Instance)
+            if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.chat.UpdatePlayerColors();
+            }
         }
 
         public void UpdatePlayerEntry(PlayerRef player, bool updateChat = true) {
@@ -96,23 +103,26 @@ namespace NSMB.UI.MainMenu {
             playerListEntries[player].UpdateText();
             ReorderEntries();
 
-            if (updateChat && MainMenuManager.Instance)
+            if (updateChat && MainMenuManager.Instance) {
                 MainMenuManager.Instance.chat.UpdatePlayerColors();
+            }
         }
 
         public void ReorderEntries() {
             foreach (PlayerRef player in Runner.ActivePlayers.OrderByDescending(pr => pr.GetPlayerData(NetworkHandler.Runner).JoinTick)) {
 
-                if (!playerListEntries.ContainsKey(player))
+                if (!playerListEntries.ContainsKey(player)) {
                     continue;
+                }
 
                 playerListEntries[player].transform.SetAsFirstSibling();
             }
         }
 
         public PlayerListEntry GetPlayerListEntry(PlayerRef player) {
-            if (playerListEntries.ContainsKey(player))
+            if (playerListEntries.ContainsKey(player)) {
                 return playerListEntries[player];
+            }
 
             return null;
         }

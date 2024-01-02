@@ -44,6 +44,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     [SerializeField] private bool bounceOnImpacts;
 
     //---Private Variables
+    private Vector2 previousInternalPosition;
     private Vector2 previousRenderPosition;
     private PropertyReader<Vector2> internalPositionPropertyReader;
 
@@ -79,9 +80,18 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         if (Freeze) {
             newPosition = Position;
         } else if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
-            // Snapshot interpolation with no smoothing:
 
-            (Vector2 fromVector, Vector2 toVector) = internalPositionPropertyReader.Read(from, to);
+            // Snapshot interpolation with no smoothing:
+            Vector2 fromVector;
+            Vector2 toVector;
+
+            if (ForceSnapshotInterpolation) {
+                fromVector = previousInternalPosition;
+                toVector = Position;
+                previousInternalPosition = Position;
+            } else {
+                (fromVector, toVector) = internalPositionPropertyReader.Read(from, to);
+            }
 
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(fromVector, toVector) > interpolationTeleportDistance) {
                 // Teleport over large distances
@@ -94,7 +104,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             }
         } else {
             // Fallback interpolation with some smoothing:
-
             if (interpolationTeleportDistance > 0 && Utils.WrappedDistance(previousRenderPosition, Position) > interpolationTeleportDistance) {
                 // Teleport over large distances
                 newPosition = Utils.WrapWorldLocation(Position);
