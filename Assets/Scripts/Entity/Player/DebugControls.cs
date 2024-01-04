@@ -8,11 +8,10 @@ using NSMB.Entities.Collectable.Powerups;
 using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
-using static Unity.Collections.Unicode;
 
 public class DebugControls : MonoBehaviour {
 
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
 
     public void Start() {
         enabled = false;
@@ -68,8 +67,9 @@ public class DebugControls : MonoBehaviour {
     }
 
     private void FreezePlayer(Key key) {
-        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
+        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame) {
             return;
+        }
 
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
         if (!p.IsFrozen && !p.FrozenCube && p.State != Enums.PowerupState.MegaMushroom && !p.CurrentPipe && !p.IsInKnockback && p.IsDamageable) {
@@ -78,21 +78,24 @@ public class DebugControls : MonoBehaviour {
     }
 
     private void KnockbackPlayer(Key key, bool weak) {
-        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
+        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame) {
             return;
+        }
 
         PlayerController p = GameManager.Instance.localPlayer.GetComponent<PlayerController>();
         p.DoKnockback(p.FacingRight, 0, weak, null);
     }
 
 
-        private void DebugItem(Key key, NetworkPrefabRef item) {
-        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
+    private void DebugItem(Key key, NetworkPrefabRef item) {
+        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame) {
             return;
+        }
 
         // get random item if none is specified
-        if (item == NetworkPrefabRef.Empty)
+        if (item == NetworkPrefabRef.Empty) {
             item = Utils.GetRandomItem(GameManager.Instance.localPlayer).prefab;
+        }
 
         NetworkHandler.Runner.Spawn(item, onBeforeSpawned: (runner, obj) => {
             obj.GetComponent<Powerup>().OnBeforeSpawned(GameManager.Instance.localPlayer);
@@ -100,8 +103,9 @@ public class DebugControls : MonoBehaviour {
     }
 
     private void DebugEntity(Key key, NetworkPrefabRef enemy, NetworkRunner.OnBeforeSpawned spawned = null) {
-        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame)
+        if (!GameManager.Instance.localPlayer || !Keyboard.current[key].wasPressedThisFrame) {
             return;
+        }
 
         Vector3 pos = GameManager.Instance.localPlayer.transform.position + (GameManager.Instance.localPlayer.GetComponent<PlayerController>().FacingRight ? Vector3.right : Vector3.left) + new Vector3(0, 0.2f, 0);
         NetworkHandler.Runner.Spawn(enemy, pos, onBeforeSpawned: spawned);

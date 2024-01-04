@@ -31,8 +31,9 @@ namespace NSMB.Entities.Enemies {
 
         public override void Render() {
             base.Render();
-            if (IsFrozen)
+            if (IsFrozen) {
                 return;
+            }
 
             float popupRenderTime;
             if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
@@ -57,8 +58,9 @@ namespace NSMB.Entities.Enemies {
                     return;
                 }
 
-                if (gm.GameState != Enums.GameState.Playing)
+                if (gm.GameState != Enums.GameState.Playing) {
                     return;
+                }
             }
 
             if (IsDead) {
@@ -74,8 +76,9 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            if (IsFrozen)
+            if (IsFrozen) {
                 return;
+            }
 
             bool chomping = ChompTimer.IsRunning;
             if (chomping) {
@@ -119,8 +122,9 @@ namespace NSMB.Entities.Enemies {
 
         //---KillableEntity overrides
         public override void RespawnEntity() {
-            if (!IsDead)
+            if (!IsDead) {
                 return;
+            }
 
             IsActive = true;
             IsDead = false;
@@ -138,13 +142,14 @@ namespace NSMB.Entities.Enemies {
             Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up);
         }
 
-        public override void SpecialKill(bool right, bool groundpound, int combo) {
+        public override void SpecialKill(bool right, bool groundpound, bool mega, int combo) {
             Kill();
         }
 
         public override bool InteractWithIceball(Fireball iceball) {
-            if (IsDead)
+            if (IsDead) {
                 return false;
+            }
 
             if (!IsFrozen) {
                 FrozenCube.FreezeEntity(Runner, this);

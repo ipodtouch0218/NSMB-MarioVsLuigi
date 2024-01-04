@@ -14,22 +14,32 @@ public class VolumeWithDistance : MonoBehaviour {
 
     //---Private Variables
     private float soundRangeInverse;
+    private float[] originalVolumes;
 
     public void OnValidate() {
-        if (audioSources?.Length <= 0)
+        if (audioSources?.Length <= 0) {
             audioSources = GetComponentsInChildren<AudioSource>();
+        }
 
-        if (!soundOrigin) soundOrigin = transform;
+        if (!soundOrigin) {
+            soundOrigin = transform;
+        }
     }
 
     public void Awake() {
         soundRangeInverse = 1f / soundRange;
+        originalVolumes = new float[audioSources.Length];
+
+        for (int i = 0; i < audioSources.Length; i++) {
+            originalVolumes[i] = audioSources[i].volume;
+        }
     }
 
     public void LateUpdate() {
         GameManager inst = GameManager.Instance;
-        if (!inst)
+        if (!inst) {
             return;
+        }
 
         Vector3 listener = (!useDistanceToCamera && inst && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
 
@@ -46,8 +56,9 @@ public class VolumeWithDistance : MonoBehaviour {
         float volume = Utils.QuadraticEaseOut(percentage);
         float panning = Settings.Instance.audioPanning ? Utils.QuadraticEaseOut(-xDifference * soundRangeInverse) * maxPanning : 0f;
 
-        foreach (AudioSource source in audioSources) {
-            source.volume = volume;
+        for (int i = 0; i < audioSources.Length; i++) {
+            AudioSource source = audioSources[i];
+            source.volume = volume * originalVolumes[i];
             source.panStereo = panning;
         }
     }

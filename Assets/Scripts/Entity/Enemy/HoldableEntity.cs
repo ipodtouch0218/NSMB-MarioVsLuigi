@@ -120,7 +120,7 @@ namespace NSMB.Entities {
             base.Kill();
         }
 
-        public override void SpecialKill(bool right, bool groundpound, int combo) {
+        public override void SpecialKill(bool right, bool groundpound, bool mega, int combo) {
             if (IsDead) {
                 return;
             }
@@ -129,7 +129,7 @@ namespace NSMB.Entities {
                 Holder.SetHeldEntity(null);
             }
 
-            base.SpecialKill(right, groundpound, combo);
+            base.SpecialKill(right, groundpound, mega, combo);
         }
 
         protected override void CheckForEntityCollisions() {

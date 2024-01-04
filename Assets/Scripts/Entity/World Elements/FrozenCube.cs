@@ -65,6 +65,7 @@ namespace NSMB.Entities {
         }
 
         public override void Render() {
+            base.Render();
 
             if (!Object || IsDead) {
                 return;
@@ -90,7 +91,7 @@ namespace NSMB.Entities {
 
         public override void FixedUpdateNetwork() {
 
-            if (!Object || IsDead) {
+            if (!Object) {
                 return;
             }
 
@@ -336,11 +337,11 @@ namespace NSMB.Entities {
                     }
 
                     // Kill entity we ran into
-                    killable.SpecialKill(killable.body.Position.x > body.Position.x, false, Combo++);
+                    killable.SpecialKill(killable.body.Position.x > body.Position.x, false, false, Combo++);
 
                     // Kill ourselves if we're being held too
                     if (Holder) {
-                        SpecialKill(killable.body.Position.x < body.Position.x, false, 0);
+                        SpecialKill(killable.body.Position.x < body.Position.x, false, false, 0);
                     }
 
                     continue;
@@ -362,11 +363,12 @@ namespace NSMB.Entities {
             }
 
             IsDead = true;
+            IsActive = false;
             body.Freeze = true;
             Runner.Despawn(Object);
         }
 
-        public override void SpecialKill(bool right, bool groundpound, int combo) {
+        public override void SpecialKill(bool right, bool groundpound, bool mega, int combo) {
             Kill();
         }
 
@@ -383,6 +385,10 @@ namespace NSMB.Entities {
 
         //---Static
         public static void FreezeEntity(NetworkRunner runner, FreezableEntity entity) {
+            if (!runner.IsServer) {
+                return;
+            }
+
             Vector2 entityPosition = entity.body ? entity.body.Position : entity.transform.position;
             Vector2 spawnPosition = entityPosition - entity.FrozenOffset + (Vector2.up * 0.05f);
 

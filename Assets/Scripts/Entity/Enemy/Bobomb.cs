@@ -143,7 +143,7 @@ namespace NSMB.Entities.Enemies {
 
                 // Interact with other entities by special killing htem
                 if (hitObj.GetComponentInParent<KillableEntity>() is KillableEntity en) {
-                    en.SpecialKill(transform.position.x < hitObj.transform.position.x, false, 0);
+                    en.SpecialKill(transform.position.x < hitObj.transform.position.x, false, false, 0);
                     continue;
                 }
             }
@@ -190,7 +190,7 @@ namespace NSMB.Entities.Enemies {
 
             // Special insta-kill cases
             if (player.InstakillsEnemies) {
-                SpecialKill(player.body.Velocity.x > 0, false, player.StarCombo++);
+                SpecialKill(player.body.Velocity.x > 0, false, player.State == Enums.PowerupState.MegaMushroom, player.StarCombo++);
                 return;
             }
 
@@ -301,11 +301,11 @@ namespace NSMB.Entities.Enemies {
                     }
 
                     // Kill entity we ran into
-                    killable.SpecialKill(killable.body.Position.x > body.Position.x, false, ComboCounter++);
+                    killable.SpecialKill(killable.body.Position.x > body.Position.x, false, false, ComboCounter++);
 
                     // Kill ourselves if we're being held too
                     if (Holder) {
-                        SpecialKill(killable.body.Position.x < body.Position.x, false, 0);
+                        SpecialKill(killable.body.Position.x < body.Position.x, false, false, 0);
                     }
 
                     continue;

@@ -1,11 +1,12 @@
-﻿using Fusion;
+﻿using UnityEngine;
+
+using Fusion;
 using NSMB.Entities.Enemies;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
 using NSMB.Utils;
-using UnityEngine;
 
 namespace NSMB.Entities {
     public abstract class KillableEntity : FreezableEntity, IPlayerInteractable, IFireballInteractable {
@@ -29,6 +30,7 @@ namespace NSMB.Entities {
         [Networked] public NetworkBool IsDead { get; set; }
         [Networked] protected NetworkBool WasSpecialKilled { get; set; }
         [Networked] protected NetworkBool WasCrushed { get; set; }
+        [Networked] protected NetworkBool WasKilledByMega { get; set; }
         [Networked] protected NetworkBool WasGroundpounded { get; set; }
         [Networked] protected float AngularVelocity { get; set; }
         [Networked] protected byte ComboCounter { get; set; }
@@ -208,10 +210,10 @@ namespace NSMB.Entities {
                 return;
             }
 
-            SpecialKill(false, false, 0);
+            SpecialKill(false, false, false, 0);
         }
 
-        public virtual void SpecialKill(bool right, bool groundpound, int combo) {
+        public virtual void SpecialKill(bool right, bool groundpound, bool mega, int combo) {
             if (IsDead) {
                 return;
             }
@@ -219,6 +221,7 @@ namespace NSMB.Entities {
             IsDead = true;
             WasSpecialKilled = true;
             WasGroundpounded = groundpound;
+            WasKilledByMega = mega;
             WasCrushed = false;
             ComboCounter = (byte) combo;
             FacingRight = right;
@@ -255,7 +258,9 @@ namespace NSMB.Entities {
 
                 sfx.enabled = true;
 
-                if (WasSpecialKilled || WasCrushed) {
+                if (WasKilledByMega) {
+                    PlaySound(Enums.Sounds.Powerup_MegaMushroom_Break_Block);
+                } else if (WasSpecialKilled || WasCrushed) {
                     PlaySound(!IsFrozen ? ComboSounds[Mathf.Min(ComboSounds.Length - 1, ComboCounter)] : Enums.Sounds.Enemy_Generic_FreezeShatter);
                 }
 
@@ -336,7 +341,7 @@ namespace NSMB.Entities {
                     Kill();
                     player.DoEntityBounce = true;
                 } else {
-                    SpecialKill(player.body.Velocity.x > 0, player.IsGroundpounding, player.StarCombo++);
+                    SpecialKill(player.body.Velocity.x > 0, player.IsGroundpounding, player.State == Enums.PowerupState.MegaMushroom, player.StarCombo++);
                 }
                 return;
             }
@@ -371,7 +376,7 @@ namespace NSMB.Entities {
                 return false;
             }
 
-            SpecialKill(fireball.FacingRight, false, 0);
+            SpecialKill(fireball.FacingRight, false, false, 0);
             return true;
         }
 
@@ -388,7 +393,7 @@ namespace NSMB.Entities {
 
         //---IBlockBumpable overrides
         public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
-            SpecialKill(false, false, 0);
+            SpecialKill(false, false, false, 0);
         }
 
         //---FreezableEntity overrides
@@ -405,7 +410,7 @@ namespace NSMB.Entities {
             IsFrozen = false;
             hitbox.enabled = true;
 
-            SpecialKill(false, false, 0);
+            SpecialKill(false, false, false, 0);
         }
 
         public override void OnIsFrozenChanged() {

@@ -15,8 +15,8 @@ using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Game;
-using NSMB.Utils;
 using NSMB.UI.MainMenu;
+using NSMB.Utils;
 
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
@@ -251,9 +251,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         // Handle PlayerDatas
         bool hadExistingData = false;
         if (runner.IsServer && !runner.IsSinglePlayer) {
-            PlayerData existingData = FindObjectsByType<PlayerData>(FindObjectsSortMode.None)
-                .Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player))
-                .FirstOrDefault();
+            PlayerData existingData =
+                FindObjectsByType<PlayerData>(FindObjectsSortMode.None)
+                    .Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player))
+                    .FirstOrDefault();
             hadExistingData = existingData;
 
             if (hadExistingData) {
@@ -290,6 +291,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         PlayerData data = null;
         foreach (PlayerData d in playerDatas) {
+            if (!d || !d.Object) {
+                continue;
+            }
+
             if (d.Object.InputAuthority == player) {
                 data = d;
                 break;
@@ -637,10 +642,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             } else {
                 if (resumeNO.TryGetComponent(out PlayerData pd)) {
 
-                    Debug.Log(pd.UserId);
-
                     // Don't respawn the PlayerData for the host that just left. Stupid.
-                    if (pd.Object.InputAuthority.AsIndex == runner.SessionInfo.MaxPlayers - 1) {
+                    if (pd.IsRoomOwner) {
                         continue;
                     }
 

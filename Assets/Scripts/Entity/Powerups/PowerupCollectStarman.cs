@@ -10,14 +10,15 @@ namespace NSMB.Entities.Collectable.Powerups {
 
             NetworkRunner runner = player.Runner;
 
-            if (!player.IsStarmanInvincible)
+            if (!player.IsStarmanInvincible) {
                 player.StarCombo = 0;
+            }
 
             player.StarmanTimer = TickTimer.CreateFromSeconds(runner, 10f);
             //player.PlaySound(powerup.powerupScriptable.soundEffect);
 
             if (player.HeldEntity) {
-                player.HeldEntity.SpecialKill(player.FacingRight, false, 0);
+                player.HeldEntity.SpecialKill(player.FacingRight, false, false, 0);
                 player.SetHeldEntity(null);
             }
 

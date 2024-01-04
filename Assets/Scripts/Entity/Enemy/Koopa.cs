@@ -260,13 +260,13 @@ namespace NSMB.Entities.Enemies {
             // Do knockback to players in shells
             if (player.IsInShell && !player.IsStarmanInvincible && IsInShell && !IsStationary) {
                 player.DoKnockback(!fromRight, 0, true, Object);
-                SpecialKill(!fromRight, false, player.StarCombo++);
+                SpecialKill(!fromRight, false, false, player.StarCombo++);
                 return;
             }
 
             // Always damage exceptions
             if (player.InstakillsEnemies) {
-                SpecialKill(!player.FacingRight, false, player.StarCombo++);
+                SpecialKill(!fromRight, false, player.State == Enums.PowerupState.MegaMushroom, player.StarCombo++);
                 return;
             }
 
@@ -392,7 +392,7 @@ namespace NSMB.Entities.Enemies {
 
                     // Killable entities
                     if (obj.GetComponentInParent<KillableEntity>() is KillableEntity killable) {
-                        if (killable.IsDead) {
+                        if (!killable.collideWithOtherEnemies || killable.IsDead) {
                             continue;
                         }
 
@@ -400,11 +400,11 @@ namespace NSMB.Entities.Enemies {
                         bool fromRight = ourPos.x < theirPos.x;
 
                         // Kill entity we ran into
-                        killable.SpecialKill(fromRight, false, ComboCounter++);
+                        killable.SpecialKill(fromRight, false, false, ComboCounter++);
 
                         // If we hit another moving shell (or we're being held), we both die.
                         if (Holder || (killable is Koopa kw && kw.IsInShell && !kw.IsActuallyStationary)) {
-                            SpecialKill(!fromRight, false, 0);
+                            SpecialKill(!fromRight, false, false, 0);
                             return;
                         }
 

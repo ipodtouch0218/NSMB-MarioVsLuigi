@@ -21,7 +21,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     [Networked] public NetworkBool LockX { get; set; }
     [Networked] public NetworkBool LockY { get; set; }
     [Networked] public Vector2 Gravity { get; set; }
-    [Networked] public ref PhysicsDataStruct Data => ref MakeRef<PhysicsDataStruct>();
+    [Networked, HideInInspector] public ref PhysicsDataStruct Data => ref MakeRef<PhysicsDataStruct>();
     [Networked] public Vector2 PreviousTickPosition { get; private set; }
     [Networked] public Vector2 PreviousTickVelocity { get; private set; }
 

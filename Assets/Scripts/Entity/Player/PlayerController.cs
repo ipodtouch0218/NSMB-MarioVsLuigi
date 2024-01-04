@@ -681,6 +681,10 @@ namespace NSMB.Entities.Player {
             // Interact with touched objects
             foreach (PhysicsDataStruct.ObjectContact contact in body.Data.ObjectContacts) {
                 NetworkObject obj = contact.GetNetworkObject(Runner);
+                if (!obj) {
+                    continue;
+                }
+
                 AttemptToInteractWithObject(obj.gameObject, contact);
             }
         }
@@ -756,6 +760,11 @@ namespace NSMB.Entities.Player {
 
             // Or players in the Mega Mushroom grow animation
             if (MegaStartTimer.IsActive(Runner) || other.MegaStartTimer.IsActive(Runner)) {
+                return;
+            }
+
+            // Or if a player just got damaged
+            if ((Runner.Tick - KnockbackTick) < Runner.TickRate * 0.2f || (Runner.Tick - other.KnockbackTick) < Runner.TickRate * 0.2f) {
                 return;
             }
 

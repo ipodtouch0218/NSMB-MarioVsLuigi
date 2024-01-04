@@ -17,12 +17,14 @@ public static class Enums {
     }
 
     public static PowerupScriptable GetPowerupScriptable(this PowerupState state) {
-        if (state == PowerupState.NoPowerup)
+        if (state == PowerupState.NoPowerup) {
             return null;
+        }
 
         foreach (var powerup in ScriptableManager.Instance.powerups) {
-            if (powerup.state == state)
+            if (powerup.state == state) {
                 return powerup;
+            }
         }
         return null;
     }
@@ -42,11 +44,12 @@ public static class Enums {
 
     //---Sound effects
     public enum Sounds : byte {
-        //CURRENT HIGHEST NUMBER: 100
+        //CURRENT HIGHEST NUMBER: 101
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
         [SoundData("enemy/stomp")]                              Enemy_Generic_Stomp = 2,
+        [SoundData("enemy/boo_laugh")]                          Enemy_Boo_Laugh = 101,
         [SoundData("enemy/bobomb_explode")]                     Enemy_Bobomb_Explode = 3,
         [SoundData("enemy/bobomb_fuse")]                        Enemy_Bobomb_Fuse = 4,
         [SoundData("enemy/bulletbill_shoot")]                   Enemy_BulletBill_Shoot = 5,
@@ -231,11 +234,13 @@ public static class AttributeExtensions {
     public static AudioClip GetClip(this Enums.Sounds sound, CharacterData player = null, int variant = 0) {
         string name = "Sound/" + GetClipString(sound) + (variant > 0 ? "_" + variant : "");
 
-        if (player != null)
+        if (player != null) {
             name = name.Replace("{char}", player.soundFolder);
+        }
 
-        if (cachedClips.ContainsKey(name))
+        if (cachedClips.ContainsKey(name)) {
             return cachedClips[name];
+        }
 
         AudioClip clip = Resources.Load(name) as AudioClip;
         cachedClips[name] = clip;
@@ -243,15 +248,17 @@ public static class AttributeExtensions {
     }
 
     private static string GetClipString(Enums.Sounds sound) {
-        if (cachedStrings.ContainsKey(sound))
+        if (cachedStrings.ContainsKey(sound)) {
             return cachedStrings[sound];
+        }
 
         return cachedStrings[sound] = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound; ;
     }
 
     public static GameObject GetGameObject(this Enums.PrefabParticle particle) {
-        if (cachedParticles.ContainsKey(particle))
+        if (cachedParticles.ContainsKey(particle)) {
             return cachedParticles[particle];
+        }
 
         return cachedParticles[particle] = Resources.Load(particle.GetType().GetMember(particle.ToString())[0].GetCustomAttribute<PrefabParticleData>().Path) as GameObject;
     }

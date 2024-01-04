@@ -76,23 +76,36 @@ public class PlayerData : NetworkBehaviour {
             ConnectionToken = new();
         }
 
-        JoinTick = Runner.Tick;
+        // Find the least populated team and automatically join that one.
+        var playerDatas =
+            Runner.ActivePlayers
+                .Select(pr => pr.GetPlayerData(Runner))
+                .Where(pd => pd != null);
 
-        if (Object.InputAuthority.AsIndex == Runner.SessionInfo.MaxPlayers - 1) {
-            Team = 0;
-            IsRoomOwner = true;
-        } else {
-            Team = (sbyte) ((Object.InputAuthority.AsIndex + 1) % 5);
+        int[] teamCounts = new int[5];
+        foreach (PlayerData data in playerDatas) {
+            teamCounts[data.Team]++;
         }
+
+        int minIndex = 0;
+        for (int i = 1; i < teamCounts.Length; i++) {
+            if (teamCounts[i] < teamCounts[minIndex]) {
+                minIndex = i;
+            }
+        }
+
+        Team = (sbyte) minIndex;
+        IsRoomOwner = (Object.InputAuthority == Runner.LocalPlayer);
+        JoinTick = IsRoomOwner ? -1 : Runner.Tick;
     }
 
     public void ReassignPlayerData(PlayerRef player) {
         Object.AssignInputAuthority(player);
         Runner.SetPlayerObject(player, Object);
 
-        if (player == Runner.LocalPlayer) {
+        IsRoomOwner = (Object.InputAuthority == Runner.LocalPlayer);
+        if (IsRoomOwner) {
             JoinTick = -1;
-            IsRoomOwner = true;
         }
     }
 
@@ -107,11 +120,6 @@ public class PlayerData : NetworkBehaviour {
 
         IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
         nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
-
-        if (Runner.IsServer && HasInputAuthority) {
-            JoinTick = -1;
-            IsRoomOwner = true;
-        }
 
         if (SessionData.Instance) {
             SessionData.Instance.LoadWins(this);
@@ -278,14 +286,26 @@ public class PlayerData : NetworkBehaviour {
         Team = team;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.InputAuthority, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
     public void Rpc_SetOptionsOpen(bool open) {
-        IsInOptions = open;
+        if (HasStateAuthority) {
+            IsInOptions = open;
+        } else if (HasInputAuthority) {
+            // Bodge for the lack of "InvokeResim" in Fusion 2
+            // Makes it so the icon appears.. "predictively"? Is that a word?
+            OnInOptionsChanged();
+        }
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.InputAuthority, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
     public void Rpc_SetIsReady(bool ready) {
-        IsReady = ready;
+        if (HasStateAuthority) {
+            IsReady = ready;
+        } else if (HasInputAuthority) {
+            // Bodge for the lack of "InvokeResim" in Fusion 2
+            // Makes it so the icon appears.. "predictively"? Is that a word?
+            OnIsReadyChanged();
+        }
     }
 
     public void UpdateObjectName() {

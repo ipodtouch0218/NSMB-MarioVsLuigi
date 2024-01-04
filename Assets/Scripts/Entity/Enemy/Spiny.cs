@@ -9,12 +9,14 @@ namespace NSMB.Entities.Enemies {
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
 
-            if (Holder)
+            if (Holder) {
                 return;
+            }
 
             // Temporary invincibility, we dont want to spam the kick sound
-            if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner))
+            if (PreviousHolder == player && !ThrowInvincibility.ExpiredOrNotRunning(Runner)) {
                 return;
+            }
 
             Utils.Utils.UnwrapLocations(body.Position, player.body.Position, out Vector2 ourPos, out Vector2 theirPos);
             bool fromRight = ourPos.x < theirPos.x;
@@ -24,19 +26,20 @@ namespace NSMB.Entities.Enemies {
             // Do knockback to players in shells
             if (player.IsInShell && !player.IsStarmanInvincible && IsInShell && !IsStationary) {
                 player.DoKnockback(!fromRight, 0, true, Object);
-                SpecialKill(!fromRight, false, player.StarCombo++);
+                SpecialKill(!fromRight, false, false, player.StarCombo++);
                 return;
             }
 
             // Always damage exceptions
             if (player.InstakillsEnemies) {
-                SpecialKill(!player.FacingRight, false, player.StarCombo++);
+                SpecialKill(!player.FacingRight, false, player.State == Enums.PowerupState.MegaMushroom, player.StarCombo++);
                 return;
             }
 
             // Don't interact with players if we're being held.
-            if (Holder)
+            if (Holder) {
                 return;
+            }
 
             // Don't interact with crouched blue shell players
             if (!attackedFromAbove && player.IsCrouchedInShell) {
@@ -103,8 +106,9 @@ namespace NSMB.Entities.Enemies {
         public override void OnIsActiveChanged() {
             base.OnIsActiveChanged();
 
-            if (IsActive)
+            if (IsActive) {
                 animator.Play("walk");
+            }
         }
 
         public override void OnIsDeadChanged() {
