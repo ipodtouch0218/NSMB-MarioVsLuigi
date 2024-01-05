@@ -4,6 +4,9 @@ using UnityEngine;
 using Fusion;
 using NSMB.Entities.Collectable;
 using NSMB.Entities.Player;
+using NSMB.Entities.Collectable.Powerups;
+using NSMB.Extensions;
+using NSMB.Game;
 
 namespace NSMB.Entities.World {
 
@@ -43,12 +46,15 @@ namespace NSMB.Entities.World {
 
         private void OnValidate() {
             ValidationUtility.SafeOnValidate(Initialize);
-            if (!splashExitPrefab) splashExitPrefab = splashPrefab;
+            if (!splashExitPrefab) {
+                splashExitPrefab = splashPrefab;
+            }
         }
 
         private void Initialize() {
-            if (this == null)
+            if (this == null) {
                 return;
+            }
 
             hitbox = GetComponent<BoxCollider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -64,8 +70,9 @@ namespace NSMB.Entities.World {
 
             Color32 gray = new Color(0.5f, 0.5f, 0.5f, 1);
             colors = new Color32[totalPoints];
-            for (int i = 0; i < totalPoints; i++)
+            for (int i = 0; i < totalPoints; i++) {
                 colors[i] = gray;
+            }
 
             heightTex.SetPixels32(colors);
             heightTex.Apply();
@@ -73,8 +80,9 @@ namespace NSMB.Entities.World {
             hitbox.offset = new(0, heightTiles * 0.25f - 0.1f);
             hitbox.size = new(widthTiles * 0.5f, heightTiles * 0.5f);
             spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
-            if (mask)
+            if (mask) {
                 mask.transform.localScale = new(widthTiles * mask.sprite.pixelsPerUnit / 32f, (heightTiles - 1f) * mask.sprite.pixelsPerUnit / 32f + 2f, 1f);
+            }
 
             properties = new();
             properties.SetTexture("Heightmap", heightTex);
@@ -136,12 +144,14 @@ namespace NSMB.Entities.World {
 
             foreach (var obj in splashedEntities) {
 
-                if (!obj || Utils.Utils.BufferContains(CollisionBuffer, collisionCount, obj))
+                if (!obj || Utils.Utils.BufferContains(CollisionBuffer, collisionCount, obj)) {
                     continue;
+                }
 
                 BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
-                if (!entity || !entity.Object || !entity.IsActive)
+                if (!entity || !entity.Object || !entity.IsActive) {
                     continue;
+                }
 
                 if (entity is PlayerController player) {
                     float height = player.body.Position.y + player.WorldHitboxSize.y;
@@ -156,8 +166,9 @@ namespace NSMB.Entities.World {
                             player.IsSwimming = false;
                             player.SwimJump = true;
                             player.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
-                            if (Runner.IsServer)
+                            if (Runner.IsServer) {
                                 Rpc_Splash(new(player.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player.body.Velocity.y)), ParticleType.Exit);
+                            }
                         }
                     }
                     continue;
@@ -175,16 +186,24 @@ namespace NSMB.Entities.World {
         }
 
         private void HandleEntityCollision(Collider2D obj) {
-            if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity)
+            if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity) {
                 return;
+            }
 
             // Don't splash stationary stars
-            if (entity is BigStar sb && sb.IsStationary)
+            if (entity is BigStar sb && sb.IsStationary) {
                 return;
+            }
 
             // Don't splash stationary coins
-            if (entity is FloatingCoin)
+            if (entity is FloatingCoin) {
                 return;
+            }
+
+            // Dont splash newly created powerups (bug fix)
+            if (entity is Powerup powerup && powerup.SpawnAnimationTimer.IsActive(Runner)) {
+                return;
+            }
 
             if (liquidType == LiquidType.Water && entity is PlayerController player && player.State == Enums.PowerupState.MiniMushroom) {
                 if (!player.IsSwimming && Mathf.Abs(player.body.Velocity.x) > 0.3f && player.body.Velocity.y < 0) {
@@ -205,12 +224,14 @@ namespace NSMB.Entities.World {
                     splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.Velocity.y < -2f;
                 }
 
-                if (splash && entity.IsActive)
+                if (splash && entity.IsActive) {
                     Rpc_Splash(new(entity.body.Position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.Velocity.y)), ParticleType.Enter);
+                }
             }
 
-            if (!contains)
+            if (!contains) {
                 splashedEntities.Add(obj);
+            }
 
             // Kill entity if they're below the surface of the posion/lava
             if (liquidType != LiquidType.Water && entity is not PlayerController) {
@@ -225,8 +246,9 @@ namespace NSMB.Entities.World {
                         if (entity is KillableEntity ke) {
                             ke.Crushed();
                         } else {
-                            if (!entity.DespawnTimer.IsRunning)
+                            if (!entity.DespawnTimer.IsRunning) {
                                 entity.DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+                            }
                             //entity.DespawnEntity();
                         }
                     }
@@ -235,8 +257,9 @@ namespace NSMB.Entities.World {
 
             // Player collisions are special
             if (entity is PlayerController player2) {
-                if (player2.IsDead || player2.CurrentPipe)
+                if (player2.IsDead || player2.CurrentPipe) {
                     return;
+                }
 
                 float height = player2.body.Position.y + (player2.WorldHitboxSize.y * 0.5f);
                 bool underwater = height <= SurfaceHeight;
@@ -248,8 +271,9 @@ namespace NSMB.Entities.World {
                         player2.IsSwimming = false;
                         player2.SwimJump = true;
                         player2.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
-                        if (Runner.IsServer)
+                        if (Runner.IsServer) {
                             Rpc_Splash(new(player2.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.Velocity.y)), ParticleType.Exit);
+                        }
                     } else {
                         player2.IsSwimming = underwater;
                         player2.IsWaterWalking = false;
@@ -258,8 +282,10 @@ namespace NSMB.Entities.World {
                     //if (!underwater)
                     //    return;
 
-                    if (Runner.IsServer)
+                    if (Runner.IsServer) {
                         Rpc_Splash(new(player2.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.Velocity.y)), ParticleType.Enter);
+                    }
+
                     player2.Death(false, liquidType == LiquidType.Lava);
                     return;
                 }
@@ -268,6 +294,10 @@ namespace NSMB.Entities.World {
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void Rpc_Splash(Vector2 position, float power, ParticleType particle) {
+            if (!GameManager.Instance || !GameManager.Instance.Object || GameManager.Instance.GameState != Enums.GameState.Playing) {
+                return;
+            }
+
             switch (particle) {
             case ParticleType.Enter:
                 Instantiate(splashPrefab, position, Quaternion.identity);

@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
+using NSMB.Entities.Enemies;
 
 [SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Resimulate | SimulationStages.Forward)]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
@@ -186,6 +187,11 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             if (hit.collider.transform == transform || hit.collider.transform.IsChildOf(transform)) {
                 continue;
             }
+
+            if (TryGetComponent(out Koopa _)) {
+                Debug.DrawRay(hit.point, hit.normal, Color.white);
+            }
+
 
             // Exception: dont hit objects if we're moving away from them
             if (Vector2.Dot(direction, hit.normal) > 0.1f) {

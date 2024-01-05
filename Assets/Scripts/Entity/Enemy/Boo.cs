@@ -53,8 +53,8 @@ public class Boo : KillableEntity {
             body.Gravity = Vector2.zero;
         }
 
-        // Change targets infrequently to avoid jittery movement
-        if (Runner.Tick % (Runner.TickRate / 2) == 0) {
+        // Change targets infrequently to avoid jittery movement from changing targets too fast
+        if ((CurrentTarget && CurrentTarget.IsDead) || (Runner.Tick % (Runner.TickRate / 2) == 0)) {
             CurrentTarget = GetNearestPlayer(maxTargetRange);
         }
 

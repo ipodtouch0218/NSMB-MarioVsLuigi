@@ -26,7 +26,7 @@ namespace NSMB.Entities.Collectable.Powerups {
         [Networked] private NetworkBool BlockSpawn { get; set; }
         [Networked] private float BlockSpawnAnimationLength { get; set; }
 
-        [Networked] private TickTimer SpawnAnimationTimer { get; set; }
+        [Networked] public TickTimer SpawnAnimationTimer { get; set; }
 
         //---Public Variables
         public PowerupScriptable powerupScriptable;

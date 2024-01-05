@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,42 +26,51 @@ namespace NSMB.Utils {
         }
 
         public static void BitSet(ref byte v, int index, bool value) {
-            if (value)
+            if (value) {
                 v |= (byte) (1 << index);
-            else
+            } else {
                 v &= (byte) ~(1 << index);
+            }
         }
 
         public static void BitSet(ref long v, int index, bool value) {
-            if (value)
+            if (value) {
                 v |= (1L << index);
-            else
+            } else {
                 v &= ~(1L << index);
+            }
         }
 
         public static void BitSet(ref ulong v, int index, bool value) {
-            if (value)
+            if (value) {
                 v |= ((ulong) 1 << index);
-            else
+            } else {
                 v &= ~((ulong) 1 << index);
+            }
         }
 
 
         public static Vector2Int WorldToTilemapPosition(Vector2 worldVec, GameManager gm = null, bool wrap = true) {
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
 
             Vector2Int tileLocation = (Vector2Int) gm.tilemap.WorldToCell(worldVec);
-            if (wrap)
+            if (wrap) {
                 WrapTileLocation(ref tileLocation, gm);
+            }
 
             return tileLocation;
         }
 
         public static Vector2 WrapWorldLocation(Vector2 location, GameManager gm = null) {
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
 
-            if (!gm.loopingLevel)
+            if (!gm.loopingLevel) {
                 return location;
+            }
 
             if (location.x < gm.LevelMinX) {
                 location.x += gm.LevelWidth;
@@ -75,10 +83,13 @@ namespace NSMB.Utils {
         }
 
         public static bool WrapWorldLocation(ref Vector2 location, GameManager gm = null) {
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
 
-            if (!gm.loopingLevel)
+            if (!gm.loopingLevel) {
                 return false;
+            }
 
             if (location.x < gm.LevelMinX) {
                 location.x += gm.LevelWidth;
@@ -91,10 +102,13 @@ namespace NSMB.Utils {
         }
 
         public static bool WrapWorldLocation(ref Vector3 location, GameManager gm = null) {
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
 
-            if (!gm || !gm.loopingLevel)
+            if (!gm || !gm.loopingLevel) {
                 return false;
+            }
 
             if (location.x < gm.LevelMinX) {
                 location.x += gm.LevelWidth;
@@ -107,10 +121,13 @@ namespace NSMB.Utils {
         }
 
         public static int WrappedDirectionSign(Vector2 a, Vector2 b, GameManager gm = null) {
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
 
-            if (!gm.loopingLevel)
+            if (!gm.loopingLevel) {
                 return a.x > b.x ? 1 : -1;
+            }
 
             if (Mathf.Abs(a.x - b.x) > GameManager.Instance.LevelWidth * 0.5f) {
                 return (a.x < b.x) ? 1 : -1;
@@ -120,10 +137,13 @@ namespace NSMB.Utils {
         }
 
         public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager gm = null) {
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
 
-            if (!gm.loopingLevel)
+            if (!gm.loopingLevel) {
                 return;
+            }
 
             if (tileLocation.x < gm.levelMinTileX) {
                 tileLocation.x += gm.levelWidthTile;
@@ -133,24 +153,30 @@ namespace NSMB.Utils {
         }
 
         public static void UnwrapLocations(Vector2 a, Vector2 b, out Vector2 newA, out Vector2 newB, GameManager gm = null) {
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
 
             newA = a;
             newB = b;
 
-            if (!gm.loopingLevel)
+            if (!gm.loopingLevel) {
                 return;
+            }
 
-            if (Mathf.Abs(newA.x - newB.x) > gm.LevelWidth * 0.5f)
+            if (Mathf.Abs(newA.x - newB.x) > gm.LevelWidth * 0.5f) {
                 newB.x += gm.LevelWidth * (newB.x > gm.LevelMiddleX ? -1 : 1);
+            }
         }
 
         public static void WrapTileLocation(ref Vector2Int tileLocation, GameManager manager = null) {
-            if (!manager)
+            if (!manager) {
                 manager = GameManager.Instance;
+            }
 
-            if (!manager.loopingLevel)
+            if (!manager.loopingLevel) {
                 return;
+            }
 
             if (tileLocation.x < manager.levelMinTileX) {
                 tileLocation.x += manager.levelWidthTile;
@@ -160,8 +186,9 @@ namespace NSMB.Utils {
         }
 
         public static Vector3 TilemapToWorldPosition(Vector2Int tileVec, GameManager manager = null) {
-            if (!manager)
+            if (!manager) {
                 manager = GameManager.Instance;
+            }
 
             return manager.tilemap.CellToWorld((Vector3Int) tileVec);
         }
@@ -183,14 +210,17 @@ namespace NSMB.Utils {
 
             TileBase tileBase = GetTileAtTileLocation(tileLocation);
 
-            if (tileBase is AnimatedTile aTile)
+            if (tileBase is AnimatedTile aTile) {
                 return aTile.m_TileColliderType;
+            }
 
-            if (tileBase is RuleTile rTile)
+            if (tileBase is RuleTile rTile) {
                 return rTile.m_DefaultColliderType;
+            }
 
-            if (tileBase is Tile tTile)
+            if (tileBase is Tile tTile) {
                 return tTile.colliderType;
+            }
 
             return Tile.ColliderType.None;
         }
@@ -202,11 +232,15 @@ namespace NSMB.Utils {
                 Collider2D collision = Physics2D.OverlapPoint(worldLocation, Layers.MaskSolidGround);
                 Physics2D.queriesHitTriggers = hitTriggers;
 
-                if (collision)
+                if (collision) {
                     return true;
+                }
             }
 
-            if (!gm) gm = GameManager.Instance;
+            if (!gm) {
+                gm = GameManager.Instance;
+            }
+
             Vector2 ogWorldLocation = worldLocation;
             while (GetTileAtTileLocation(tileLocation) is TileInteractionRelocator it) {
                 worldLocation += (Vector2) it.offset * 0.5f;
@@ -293,11 +327,13 @@ namespace NSMB.Utils {
 
         public static bool IsTileSolidAtWorldLocation(Vector2 worldLocation) {
             Collider2D collision = NetworkHandler.Runner.GetPhysicsScene2D().OverlapPoint(worldLocation, Layers.MaskSolidGround);
-            if (collision && !collision.isTrigger && !collision.CompareTag("Player"))
+            if (collision && !collision.isTrigger && !collision.CompareTag("Player")) {
                 return true;
+            }
 
-            while (GetTileAtWorldLocation(worldLocation) is TileInteractionRelocator it)
+            while (GetTileAtWorldLocation(worldLocation) is TileInteractionRelocator it) {
                 worldLocation += (Vector2) it.offset * 0.5f;
+            }
 
             Vector2Int tileLocation = WorldToTilemapPosition(worldLocation);
             Matrix4x4 tileTransform = GameManager.Instance.tilemap.GetTransformMatrix((Vector3Int) tileLocation);
@@ -322,8 +358,9 @@ namespace NSMB.Utils {
                         PhysicsShapeBuffer[j] = point;
                     }
 
-                    if (IsPointInPolygon(PhysicsShapeBuffer, worldLocation))
+                    if (IsPointInPolygon(PhysicsShapeBuffer, worldLocation)) {
                         return true;
+                    }
                 }
                 return false;
             }
@@ -341,8 +378,9 @@ namespace NSMB.Utils {
                     Vector2Int tileLocation = new(minPos.x + x, minPos.y + y);
                     WrapTileLocation(ref tileLocation);
 
-                    if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize, boxcast))
+                    if (IsTileSolidBetweenWorldBox(tileLocation, checkPosition, checkSize, boxcast)) {
                         return true;
+                    }
                 }
             }
             return false;
@@ -350,16 +388,18 @@ namespace NSMB.Utils {
 
         public static float WrappedDistance(Vector2 a, Vector2 b) {
             GameManager gm = GameManager.Instance;
-            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f)
+            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f) {
                 a.x -= gm.LevelWidth * Mathf.Sign(a.x - b.x);
+            }
 
             return Vector2.Distance(a, b);
         }
 
         public static float WrappedDistance(Vector2 a, Vector2 b, out float xDifference) {
             GameManager gm = GameManager.Instance;
-            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f)
+            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f) {
                 a.x -= gm.LevelWidth * Mathf.Sign(a.x - b.x);
+            }
 
             xDifference = a.x - b.x;
             return Vector2.Distance(a, b);
@@ -386,25 +426,33 @@ namespace NSMB.Utils {
 
             float totalChance = 0;
             foreach (PowerupScriptable powerup in powerups) {
-                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
+                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega) {
                     continue;
-                if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
+                }
+
+                if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives)) {
                     continue;
+                }
 
                 totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
             }
 
             float rand = GameManager.Instance.random.NextSingleExclusive() * totalChance;
             foreach (PowerupScriptable powerup in powerups) {
-                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega)
+                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega) {
                     continue;
-                if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives))
+                }
+
+                if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives)) {
                     continue;
+                }
 
                 float chance = powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
 
-                if (rand < chance)
+                if (rand < chance) {
                     return powerup;
+                }
+
                 rand -= chance;
             }
 
@@ -473,8 +521,9 @@ namespace NSMB.Utils {
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
-            if (!player.IsRealPlayer)
+            if (!player.IsRealPlayer) {
                 return spectatorColor;
+            }
 
             return GetPlayerColor(runner, player.GetPlayerData(runner), s, v);
         }
@@ -482,12 +531,14 @@ namespace NSMB.Utils {
         public static Color GetPlayerColor(NetworkRunner runner, PlayerData player, float s = 1, float v = 1) {
 
             // Prioritize spectator status
-            if (!player || player.IsManualSpectator || player.IsCurrentlySpectating)
+            if (!player || player.IsManualSpectator || player.IsCurrentlySpectating) {
                 return spectatorColor;
+            }
 
             // Then teams
-            if (SessionData.Instance && SessionData.Instance.Teams && player.Team >= 0 && player.Team < ScriptableManager.Instance.teams.Length)
+            if (SessionData.Instance && SessionData.Instance.Teams && player.Team >= 0 && player.Team < ScriptableManager.Instance.teams.Length) {
                 return GetTeamColor(player.Team, s, v);
+            }
 
             // Then id based color
             int result = -1;
@@ -495,24 +546,28 @@ namespace NSMB.Utils {
             foreach (PlayerRef pl in runner.ActivePlayers.OrderBy(pr => pr.GetPlayerData(runner).JoinTick)) {
                 // Skip spectators in color calculations
                 PlayerData playerData = pl.GetPlayerData(runner);
-                if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating)
+                if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating) {
                     continue;
+                }
 
-                if (playerData == player)
+                if (playerData == player) {
                     result = count;
+                }
 
                 count++;
             }
 
-            if (result == -1)
+            if (result == -1) {
                 return spectatorColor;
+            }
 
             return Color.HSVToRGB(result / ((float) count + 1), s, v);
         }
 
         public static Color GetTeamColor(int team, float s = 1, float v = 1) {
-            if (team < 0 || team >= ScriptableManager.Instance.teams.Length)
+            if (team < 0 || team >= ScriptableManager.Instance.teams.Length) {
                 return spectatorColor;
+            }
 
             Color color = ScriptableManager.Instance.teams[team].color;
             Color.RGBToHSV(color, out float hue, out float saturation, out float value);
@@ -539,7 +594,10 @@ namespace NSMB.Utils {
 
         public static Color GetRainbowColor(NetworkRunner runner) {
             // Four seconds per revolution
-            if (!runner) return Color.white;
+            if (!runner) {
+                return Color.white;
+            }
+
             double time = runner.SimulationTime * 0.25d;
             time %= 1;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
@@ -570,8 +628,9 @@ namespace NSMB.Utils {
 
         public static bool BufferContains<T>(T[] buffer, int bufferLength, T element) {
             for (int i = 0; i < bufferLength; i++) {
-                if (element.Equals(buffer[i]))
+                if (element.Equals(buffer[i])) {
                     return true;
+                }
             }
             return false;
         }

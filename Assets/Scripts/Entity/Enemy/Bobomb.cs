@@ -300,12 +300,14 @@ namespace NSMB.Entities.Enemies {
                         continue;
                     }
 
+                    bool enemyOnRight = Utils.Utils.WrappedDirectionSign(body.Position, killable.body.Position) == 1;
+
                     // Kill entity we ran into
-                    killable.SpecialKill(killable.body.Position.x > body.Position.x, false, false, ComboCounter++);
+                    killable.SpecialKill(!enemyOnRight, false, false, ComboCounter++);
 
                     // Kill ourselves if we're being held too
                     if (Holder) {
-                        SpecialKill(killable.body.Position.x < body.Position.x, false, false, 0);
+                        SpecialKill(enemyOnRight, false, false, 0);
                     }
 
                     continue;

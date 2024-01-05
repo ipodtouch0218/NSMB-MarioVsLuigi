@@ -183,7 +183,7 @@ MonoBehaviour:
   maxTargetRange: 12
   targetingOffset: {x: 0, y: 0.5}
   sinSpeed: 1
-  sinAmplitude: 0.075
+  sinAmplitude: 0.0875
 --- !u!114 &3271411975674711402
 MonoBehaviour:
   m_ObjectHideFlags: 0
