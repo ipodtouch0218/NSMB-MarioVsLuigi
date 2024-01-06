@@ -44,20 +44,23 @@ public class Settings : Singleton<Settings> {
     private string _graphicsFullscreenResolution;
     public string GraphicsFullscreenResolution {
         get {
-            if (Screen.fullScreenMode == FullScreenMode.Windowed)
+            if (Screen.fullScreenMode == FullScreenMode.Windowed) {
                 return _graphicsFullscreenResolution;
+            }
 
             Resolution currentRes = Screen.fullScreenMode == FullScreenMode.Windowed ? Screen.resolutions[^1] : Screen.currentResolution;
             return currentRes.width + "," + currentRes.height;
         }
         set {
             _graphicsFullscreenResolution = value;
-            if (Screen.fullScreenMode == FullScreenMode.Windowed)
+            if (Screen.fullScreenMode == FullScreenMode.Windowed) {
                 return;
+            }
 
             string[] split = value.Split(',');
-            if (split.Length != 2)
+            if (split.Length != 2) {
                 return;
+            }
 
             int width = int.Parse(split[0]);
             int height = int.Parse(split[1]);
@@ -71,15 +74,17 @@ public class Settings : Singleton<Settings> {
             FullScreenMode mode = (FullScreenMode) value;
 
             if (mode == FullScreenMode.Windowed) {
-                if (Screen.fullScreenMode == FullScreenMode.Windowed)
+                if (Screen.fullScreenMode == FullScreenMode.Windowed) {
                     return;
+                }
 
                 Screen.SetResolution(GlobalController.Instance.windowWidth, GlobalController.Instance.windowHeight, mode);
                 return;
             } else {
                 string[] split = GraphicsFullscreenResolution.Split(',');
-                if (split.Length != 2)
+                if (split.Length != 2) {
                     return;
+                }
 
                 int width = int.Parse(split[0]);
                 int height = int.Parse(split[1]);
@@ -121,8 +126,9 @@ public class Settings : Singleton<Settings> {
         get => _graphicsPlayerNametags;
         set {
             _graphicsPlayerNametags = value;
-            if (GameManager.Instance)
+            if (GameManager.Instance) {
                 GameManager.Instance.nametagCanvas.gameObject.SetActive(value);
+            }
         }
     }
 
@@ -133,8 +139,9 @@ public class Settings : Singleton<Settings> {
             bool oldValue = _graphicsColorblind;
             _graphicsColorblind = value;
 
-            if (oldValue != value)
+            if (oldValue != value) {
                 OnColorblindModeChanged?.Invoke();
+            }
         }
     }
 
@@ -148,7 +155,7 @@ public class Settings : Singleton<Settings> {
     //---Public Variables
     public string generalNickname;
     public int generalCharacter, generalSkin;
-    public bool generalScoreboardAlways, generalChatFiltering, generalDisableNATPunchthrough;
+    public bool generalScoreboardAlways, generalChatFiltering, generalDisableNATPunchthrough, generalUseNicknameColor;
 
     public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
 
@@ -161,7 +168,9 @@ public class Settings : Singleton<Settings> {
     //---Private Variables
     [SerializeField] private AudioMixer mixer;
 
-    public void Awake() => Set(this);
+    public void Awake() {
+        Set(this);
+    }
 
     public void Start() {
         VersionUpdaters = new Action[] { LoadFromVersion0, LoadFromVersion1 };
@@ -249,6 +258,7 @@ public class Settings : Singleton<Settings> {
         generalCharacter = PlayerPrefs.GetInt("Character", 0);
         generalSkin = PlayerPrefs.GetInt("Skin", 0);
         GeneralLocale = "en-US";
+        generalDisableNATPunchthrough = false;
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
         GraphicsFullscreenMode = (int) Screen.fullScreenMode;
@@ -286,47 +296,88 @@ public class Settings : Singleton<Settings> {
     }
 
     private void LoadFromVersion1() {
-        //Generic
-        TryGetSetting("General_Nickname", out generalNickname);
-        TryGetSetting("General_ScoreboardAlwaysVisible", out generalScoreboardAlways);
-        TryGetSetting("General_ChatFilter", out generalChatFiltering);
-        TryGetSetting("General_Character", out generalCharacter);
-        TryGetSetting("General_Skin", out generalSkin);
-        if (TryGetSetting("General_Locale", out string tempLocale)) GeneralLocale = tempLocale;
-        TryGetSetting("General_DisableNATPunchthrough", out generalDisableNATPunchthrough);
+        // Generic
+        TryGetSetting("General_Nickname", ref generalNickname);
+        TryGetSetting("General_ScoreboardAlwaysVisible", ref generalScoreboardAlways);
+        TryGetSetting("General_ChatFilter", ref generalChatFiltering);
+        TryGetSetting("General_Character", ref generalCharacter);
+        TryGetSetting("General_Skin", ref generalSkin);
+        TryGetSetting<string>("General_Locale", nameof(GeneralLocale));
 
-        //Graphics
-        if (TryGetSetting("Graphics_FullscreenMode", out int tempFullscreenMode)) GraphicsFullscreenMode = tempFullscreenMode;
-        if (TryGetSetting("Graphics_FullscreenResolution", out string tempFullscreenResolution)) GraphicsFullscreenResolution = tempFullscreenResolution;
-        TryGetSetting("Graphics_NDS_Enabled", out graphicsNdsEnabled);
-        TryGetSetting("Graphics_NDS_ForceAspect", out graphicsNdsForceAspect);
-        TryGetSetting("Graphics_NDS_PixelPerfect", out graphicsNdsPixelPerfect);
-        if (TryGetSetting("Graphics_NDS_Border", out int tempNdsBorder)) GraphicsNdsBorder = tempNdsBorder;
-        if (TryGetSetting("Graphics_MaxFPS", out int tempMaxFps)) GraphicsMaxFps = tempMaxFps;
-        if (TryGetSetting("Graphics_VSync", out bool tempVsync)) GraphicsVsync = tempVsync;
-        if (TryGetSetting("Graphics_PlayerOutlines", out bool tempOutlines)) GraphicsPlayerOutlines = tempOutlines;
-        if (TryGetSetting("Graphics_PlayerNametags", out bool tempNametags)) GraphicsPlayerNametags = tempNametags;
-        if (TryGetSetting("Graphics_Colorblind", out bool tempColorblind)) GraphicsColorblind = tempColorblind;
+        TryGetSetting("General_DisableNATPunchthrough", ref generalDisableNATPunchthrough);
+        TryGetSetting("General_UseNicknameColor", ref generalUseNicknameColor);
 
-        //Audio
-        if (TryGetSetting("Audio_MasterVolume", out float tempMasterVolume)) AudioMasterVolume = tempMasterVolume;
-        if (TryGetSetting("Audio_MusicVolume", out float tempMusicVolume)) AudioMusicVolume = tempMusicVolume;
-        if (TryGetSetting("Audio_SFXVolume", out float tempSFXVolume)) AudioSFXVolume = tempSFXVolume;
-        TryGetSetting("Audio_MuteMusicOnUnfocus", out audioMuteMusicOnUnfocus);
-        TryGetSetting("Audio_MuteSFXOnUnfocus", out audioMuteSFXOnUnfocus);
-        TryGetSetting("Audio_Panning", out audioPanning);
-        if (TryGetSetting("Audio_SpecialPowerupMusic", out int tempAudioSpecialPowerupMusic)) audioSpecialPowerupMusic = (Enums.SpecialPowerupMusic) tempAudioSpecialPowerupMusic;
-        TryGetSetting("Audio_SpecialPowerupMusicLocalOnly", out audioSpecialPowerupMusicLocalOnly);
+        // Graphics
+        TryGetSetting<int>("Graphics_FullscreenMode", nameof(GraphicsFullscreenMode));
+        TryGetSetting<string>("Graphics_FullscreenResolution", nameof(GraphicsFullscreenResolution));
+        TryGetSetting("Graphics_NDS_Enabled", ref graphicsNdsEnabled);
+        TryGetSetting("Graphics_NDS_ForceAspect", ref graphicsNdsForceAspect);
+        TryGetSetting("Graphics_NDS_PixelPerfect", ref graphicsNdsPixelPerfect);
+        TryGetSetting<int>("Graphics_NDS_Border", nameof(GraphicsNdsBorder));
+        TryGetSetting<int>("Graphics_MaxFPS", nameof(GraphicsMaxFps));
+        TryGetSetting<bool>("Graphics_VSync", nameof(GraphicsVsync));
+        TryGetSetting<bool>("Graphics_PlayerOutlines", nameof(GraphicsPlayerOutlines));
+        TryGetSetting<bool>("Graphics_PlayerNametags", nameof(GraphicsPlayerNametags));
+        TryGetSetting<bool>("Graphics_Colorblind", nameof(GraphicsColorblind));
 
-        //Controls
-        TryGetSetting("Controls_FireballFromSprint", out controlsFireballSprint);
-        TryGetSetting("Controls_AutoSprint", out controlsAutoSprint);
-        TryGetSetting("Controls_PropellerJump", out controlsPropellerJump);
-        if (TryGetSetting("Controls_Rumble", out int tempRumble)) controlsRumble = (RumbleManager.RumbleSetting) tempRumble;
-        if (TryGetSetting("Controls_Bindings", out string tempBindings)) ControlsBindings = tempBindings;
+        // Audio
+        TryGetSetting<float>("Audio_MasterVolume", nameof(AudioMasterVolume));
+        TryGetSetting<float>("Audio_MusicVolume", nameof(AudioMusicVolume));
+        TryGetSetting<float>("Audio_SFXVolume", nameof(AudioSFXVolume));
+        TryGetSetting("Audio_MuteMusicOnUnfocus", ref audioMuteMusicOnUnfocus);
+        TryGetSetting("Audio_MuteSFXOnUnfocus", ref audioMuteSFXOnUnfocus);
+        TryGetSetting("Audio_Panning", ref audioPanning);
+        TryGetSetting("Audio_SpecialPowerupMusic", ref audioSpecialPowerupMusic);
+        TryGetSetting("Audio_SpecialPowerupMusicLocalOnly", ref audioSpecialPowerupMusicLocalOnly);
+
+        // Controls
+        TryGetSetting("Controls_FireballFromSprint", ref controlsFireballSprint);
+        TryGetSetting("Controls_AutoSprint", ref controlsAutoSprint);
+        TryGetSetting("Controls_PropellerJump", ref controlsPropellerJump);
+        TryGetSetting("Controls_Rumble", ref controlsRumble);
+        TryGetSetting<string>("Controls_Bindings", nameof(ControlsBindings));
     }
 
-    private bool TryGetSetting(string key, out string value) {
+    private bool TryGetSetting<T>(string key, string propertyName) {
+        if (!PlayerPrefs.HasKey(key)) {
+            return false;
+        }
+
+        object value;
+
+        // Gross... but there's no way to do it through a switch statement (afaik)
+        if (typeof(T) == typeof(int)) {
+            value = PlayerPrefs.GetInt(key);
+
+        } else if (typeof(T) == typeof(float)) {
+            value = PlayerPrefs.GetFloat(key);
+
+        } else if (typeof(T) == typeof(string)) {
+            value = PlayerPrefs.GetString(key);
+
+        } else if (typeof(T) == typeof(bool)) {
+            value = PlayerPrefs.GetInt(key) != 0;
+
+        } else {
+            throw new ArgumentException($"Type {typeof(T).Name} is not supported!");
+        }
+
+        var property = typeof(Settings).GetProperty(propertyName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        property.SetValue(this, value);
+
+        return true;
+    }
+
+    private bool TryGetSetting<T>(string key, ref T value) where T : Enum {
+        int temp = 0;
+        if (!TryGetSetting(key, ref temp)) {
+            return false;
+        }
+        value = (T) (object) temp;
+        return true;
+    }
+
+    private bool TryGetSetting(string key, ref string value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;
@@ -336,7 +387,7 @@ public class Settings : Singleton<Settings> {
         return true;
     }
 
-    private bool TryGetSetting(string key, out int value) {
+    private bool TryGetSetting(string key, ref int value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;
@@ -346,7 +397,7 @@ public class Settings : Singleton<Settings> {
         return true;
     }
 
-    private bool TryGetSetting(string key, out float value) {
+    private bool TryGetSetting(string key, ref float value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;
@@ -356,7 +407,7 @@ public class Settings : Singleton<Settings> {
         return true;
     }
 
-    private bool TryGetSetting(string key, out bool value) {
+    private bool TryGetSetting(string key, ref bool value) {
         if (!PlayerPrefs.HasKey(key)) {
             value = default;
             return false;
@@ -367,8 +418,10 @@ public class Settings : Singleton<Settings> {
     }
 
     private void MassDeleteKeys(params string[] keys) {
-        foreach (string key in keys)
+        foreach (string key in keys) {
             PlayerPrefs.DeleteKey(key);
+        }
+
         PlayerPrefs.Save();
     }
 }
