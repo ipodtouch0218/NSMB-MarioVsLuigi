@@ -188,6 +188,8 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("General_Character", generalCharacter);
         PlayerPrefs.SetInt("General_Skin", generalSkin);
         PlayerPrefs.SetString("General_Locale", GeneralLocale);
+        PlayerPrefs.SetInt("General_DisableNATPunchthrough", generalDisableNATPunchthrough ? 1 : 0);
+        PlayerPrefs.SetInt("General_UseNicknameColor", generalUseNicknameColor ? 1 : 0);
 
         // Graphics
         PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
@@ -253,20 +255,21 @@ public class Settings : Singleton<Settings> {
          */
 
         generalNickname = PlayerPrefs.GetString("Nickname");
-        generalScoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) == 1;
-        generalChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
+        generalScoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) != 0;
+        generalChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) != 0;
         generalCharacter = PlayerPrefs.GetInt("Character", 0);
         generalSkin = PlayerPrefs.GetInt("Skin", 0);
         GeneralLocale = "en-US";
         generalDisableNATPunchthrough = false;
+        generalUseNicknameColor = true;
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
         GraphicsFullscreenMode = (int) Screen.fullScreenMode;
-        graphicsNdsEnabled = PlayerPrefs.GetInt("NDSResolution", 0) == 1;
-        graphicsNdsForceAspect = PlayerPrefs.GetInt("NDS4by3", 0) == 1;
+        graphicsNdsEnabled = PlayerPrefs.GetInt("NDSResolution", 0) != 0;
+        graphicsNdsForceAspect = PlayerPrefs.GetInt("NDS4by3", 0) != 0;
         graphicsNdsPixelPerfect = false;
         GraphicsNdsBorder = 1;
-        GraphicsVsync = PlayerPrefs.GetInt("VSync", 0) == 1;
+        GraphicsVsync = PlayerPrefs.GetInt("VSync", 0) != 0;
         GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
         GraphicsPlayerNametags = true;
@@ -303,7 +306,6 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("General_Character", ref generalCharacter);
         TryGetSetting("General_Skin", ref generalSkin);
         TryGetSetting<string>("General_Locale", nameof(GeneralLocale));
-
         TryGetSetting("General_DisableNATPunchthrough", ref generalDisableNATPunchthrough);
         TryGetSetting("General_UseNicknameColor", ref generalUseNicknameColor);
 

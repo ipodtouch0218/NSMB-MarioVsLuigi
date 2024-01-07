@@ -353,11 +353,9 @@ namespace NSMB.Entities.Enemies {
         public void OnDetonationTimerChanged() {
             animator.SetBool("lit", Lit);
 
-            if (!Lit) {
-                return;
+            if (Lit) {
+                PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
             }
-
-            PlaySound(Enums.Sounds.Enemy_Bobomb_Fuse);
         }
     }
 }

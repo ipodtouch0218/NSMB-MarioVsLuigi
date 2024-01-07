@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 using Fusion.Photon.Realtime;
+using NSMB.Utils;
 
 public class AuthenticationHandler {
 
@@ -18,10 +19,15 @@ public class AuthenticationHandler {
         IsAuthenticating = true;
 
         string request = URL + "?";
-        if (userid != null)
+        if (userid != null) {
             request += "&userid=" + userid;
-        if (token != null)
+        }
+        if (token != null) {
             request += "&token=" + token;
+        }
+        byte args = 0;
+        Utils.BitSet(ref args, 0, !Settings.Instance.generalUseNicknameColor);
+        request += "&args=" + args;
 
         UnityWebRequest client = UnityWebRequest.Get(request);
 
