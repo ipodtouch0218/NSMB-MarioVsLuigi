@@ -418,10 +418,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         connecting++;
 
         // Exit if we're already in a room
-        if ((Runner.SessionInfo.IsValid || Runner.LobbyInfo.IsValid) && !Runner.IsShutdown) {
+        if (Runner && (Runner.SessionInfo.IsValid || Runner.LobbyInfo.IsValid) && !Runner.IsShutdown) {
             await Runner.Shutdown();
         } else {
-            DestroyImmediate(Runner);
+            if (Runner) {
+                DestroyImmediate(Runner);
+            }
             Instance.runner = Instance.gameObject.AddComponent<NetworkRunner>();
         }
 
@@ -601,6 +603,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         });
         if (!result.Ok) {
             Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
+            connecting = 0;
             // Automatically go back to the lobby.
             await ConnectToRegion(originalRegion);
         }

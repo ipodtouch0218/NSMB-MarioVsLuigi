@@ -373,6 +373,7 @@ MonoBehaviour:
   loader: {fileID: 4106952048028765773}
   translationKey: ui.options.controls.player.sprintfireball
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 4415235828989290865}
 --- !u!114 &4106952048028765773
 MonoBehaviour:
@@ -2594,6 +2595,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &450293994584279393
 GameObject:
   m_ObjectHideFlags: 0
@@ -3208,6 +3210,7 @@ MonoBehaviour:
   loader: {fileID: 1572332216229407554}
   translationKey: ui.options.general.usenicknamecolor
   hideOnWebGL: 1
+  requireReconnect: 1
   toggle: {fileID: 5498601322469563358}
 --- !u!114 &1572332216229407554
 MonoBehaviour:
@@ -4569,6 +4572,7 @@ MonoBehaviour:
   loader: {fileID: 3946802595166957417}
   translationKey: ui.options.general.language
   hideOnWebGL: 0
+  requireReconnect: 0
   value: 0
   options: []
   leftButton: {fileID: 7410339893995999180}
@@ -7139,6 +7143,7 @@ MonoBehaviour:
   loader: {fileID: 8085566484365423440}
   translationKey: ui.options.audio.sfxvolume
   hideOnWebGL: 0
+  requireReconnect: 0
   slider: {fileID: 6987087655746581023}
 --- !u!114 &8085566484365423440
 MonoBehaviour:
@@ -7793,6 +7798,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
   slider: {fileID: 3860544532418367598}
 --- !u!1 &1612769417556316985
 GameObject:
@@ -8126,6 +8132,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &1706591211145739144
 GameObject:
   m_ObjectHideFlags: 0
@@ -8621,6 +8628,7 @@ MonoBehaviour:
   loader: {fileID: 4100463863979494654}
   translationKey: ui.options.general.filter
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 1249766320593447571}
 --- !u!114 &4100463863979494654
 MonoBehaviour:
@@ -12214,6 +12222,7 @@ MonoBehaviour:
   loader: {fileID: 8578619449753810612}
   translationKey: ui.options.graphics.colorblind
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 7055432996009240227}
 --- !u!114 &8578619449753810612
 MonoBehaviour:
@@ -12578,6 +12587,7 @@ MonoBehaviour:
   loader: {fileID: 3080994205510645947}
   translationKey: ui.options.graphic.ndsborder
   hideOnWebGL: 0
+  requireReconnect: 0
   value: 0
   options:
   - ui.generic.none
@@ -15503,6 +15513,7 @@ MonoBehaviour:
   loader: {fileID: 4874636553619239975}
   translationKey: ui.options.audio.specialpowerupmusic
   hideOnWebGL: 0
+  requireReconnect: 0
   value: 0
   options:
   - None
@@ -15785,6 +15796,7 @@ MonoBehaviour:
   loader: {fileID: 3258124353341044133}
   translationKey: ui.options.general.disablenatpunchthrough
   hideOnWebGL: 1
+  requireReconnect: 0
   toggle: {fileID: 2877012976476073891}
 --- !u!114 &3258124353341044133
 MonoBehaviour:
@@ -16990,6 +17002,7 @@ MonoBehaviour:
   loader: {fileID: 3109658290078881478}
   translationKey: ui.options.graphics.nametags
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 6333737616381551296}
 --- !u!114 &3109658290078881478
 MonoBehaviour:
@@ -18612,6 +18625,7 @@ MonoBehaviour:
   loader: {fileID: 6228130765146996256}
   translationKey: ui.options.graphics.outlines
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 5634080094010737286}
 --- !u!114 &6228130765146996256
 MonoBehaviour:
@@ -19100,6 +19114,7 @@ MonoBehaviour:
   loader: {fileID: 5299115518252778836}
   translationKey: ui.options.graphics.ndsaspect
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 2109658561299059253}
 --- !u!114 &5299115518252778836
 MonoBehaviour:
@@ -20307,6 +20322,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &4030309687177511095
 GameObject:
   m_ObjectHideFlags: 0
@@ -21232,6 +21248,7 @@ MonoBehaviour:
   loader: {fileID: 7484567522761811551}
   translationKey: ui.options.audio.musicvolume
   hideOnWebGL: 0
+  requireReconnect: 0
   slider: {fileID: 1000726170360123287}
 --- !u!114 &7484567522761811551
 MonoBehaviour:
@@ -23254,6 +23271,7 @@ MonoBehaviour:
   loader: {fileID: 7376213027954581934}
   translationKey: ui.options.graphics.ndspixelperfect
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 3135476301697766250}
 --- !u!114 &7376213027954581934
 MonoBehaviour:
@@ -25649,6 +25667,7 @@ MonoBehaviour:
   loader: {fileID: 6602884925576800488}
   translationKey: ui.options.controls.player.rumble
   hideOnWebGL: 0
+  requireReconnect: 0
   value: 0
   options:
   - ui.generic.none
@@ -26070,6 +26089,7 @@ MonoBehaviour:
   loader: {fileID: 8134013611042343623}
   translationKey: ui.options.general.scoreboard
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 6144179526056008828}
 --- !u!114 &8134013611042343623
 MonoBehaviour:
@@ -26217,6 +26237,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
   value: 0
   options:
   - Example Option #1
@@ -26362,6 +26383,7 @@ MonoBehaviour:
   loader: {fileID: 4325302529494723555}
   translationKey: ui.options.audio.mutemusic
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 7189109949806830117}
 --- !u!114 &4325302529494723555
 MonoBehaviour:
@@ -26846,6 +26868,7 @@ MonoBehaviour:
   loader: {fileID: 932358162206055826}
   translationKey: ui.options.audio.directionalaudio
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 1146890752544744863}
 --- !u!114 &932358162206055826
 MonoBehaviour:
@@ -27935,6 +27958,7 @@ MonoBehaviour:
   loader: {fileID: 1818113054297424985}
   translationKey: ui.options.audio.mastervolume
   hideOnWebGL: 0
+  requireReconnect: 0
   slider: {fileID: 5728337758400529624}
 --- !u!114 &1818113054297424985
 MonoBehaviour:
@@ -30702,6 +30726,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 564158829353813385}
 --- !u!1 &6200578200987653295
 GameObject:
@@ -31427,6 +31452,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &6364731373147859471
 GameObject:
   m_ObjectHideFlags: 0
@@ -31900,6 +31926,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
   action:
     m_Name: Action
     m_Type: 0
@@ -32337,6 +32364,7 @@ MonoBehaviour:
   loader: {fileID: 1145943068350904329}
   translationKey: ui.options.controls.player.autosprint
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 2073441564213733866}
 --- !u!114 &1145943068350904329
 MonoBehaviour:
@@ -32409,6 +32437,7 @@ MonoBehaviour:
   loader: {fileID: 2237231657595372107}
   translationKey: ui.options.graphics.ndsresolution
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 3083316540106571746}
 --- !u!114 &2237231657595372107
 MonoBehaviour:
@@ -32518,7 +32547,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.75
+  m_fontSize: 0
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -33664,6 +33693,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &6858180508840204657
 GameObject:
   m_ObjectHideFlags: 0
@@ -33884,6 +33914,7 @@ MonoBehaviour:
   loader: {fileID: 3540664288043984378}
   translationKey: ui.options.audio.specialpowerupmusic.localonly
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 6536488187605093126}
 --- !u!114 &3540664288043984378
 MonoBehaviour:
@@ -34030,6 +34061,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &6931819943234914722
 GameObject:
   m_ObjectHideFlags: 0
@@ -34875,6 +34907,7 @@ MonoBehaviour:
   loader: {fileID: 7098611919111807654}
   translationKey: ui.options.graphics.windowmode
   hideOnWebGL: 0
+  requireReconnect: 0
   value: 0
   options:
   - Windowed
@@ -35744,6 +35777,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &7276809741208318974
 GameObject:
   m_ObjectHideFlags: 0
@@ -37423,6 +37457,7 @@ MonoBehaviour:
   loader: {fileID: 57704536503830520}
   translationKey: ui.options.audio.mutesfx
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 7084307702370645175}
 --- !u!114 &57704536503830520
 MonoBehaviour:
@@ -41940,6 +41975,7 @@ MonoBehaviour:
   loader: {fileID: 2390399773882146463}
   translationKey: ui.options.controls.player.propellerjump
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 1032388464164283321}
 --- !u!114 &2390399773882146463
 MonoBehaviour:
@@ -42969,6 +43005,7 @@ MonoBehaviour:
   loader: {fileID: 2989453527913275262}
   translationKey: ui.options.graphics.vsync
   hideOnWebGL: 0
+  requireReconnect: 0
   toggle: {fileID: 1360917658475361938}
 --- !u!114 &2989453527913275262
 MonoBehaviour:
@@ -44054,6 +44091,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
   slider: {fileID: 4900420335262708530}
   valueLabel: {fileID: 7275605491149319844}
   numberMultiplier: 0
@@ -44199,6 +44237,7 @@ MonoBehaviour:
   loader: {fileID: 2731578900809585502}
   translationKey: ui.options.graphics.maxframerate
   hideOnWebGL: 0
+  requireReconnect: 0
   slider: {fileID: 4562510881309958844}
   valueLabel: {fileID: 593734359055409212}
   numberMultiplier: 5
@@ -45053,6 +45092,7 @@ MonoBehaviour:
   loader: {fileID: 0}
   translationKey: 
   hideOnWebGL: 0
+  requireReconnect: 0
 --- !u!1 &9120245329450423663
 GameObject:
   m_ObjectHideFlags: 0
@@ -45576,6 +45616,7 @@ MonoBehaviour:
   loader: {fileID: 5592080312414666002}
   translationKey: ui.options.graphics.fullscreenresolution
   hideOnWebGL: 0
+  requireReconnect: 0
   value: 0
   options: []
   leftButton: {fileID: 6803919461541835449}

@@ -52,11 +52,13 @@ public class ScoreboardUpdater : MonoBehaviour {
         int count = 0;
         foreach (var player in NetworkHandler.Runner.ActivePlayers) {
             PlayerData data = player.GetPlayerData(NetworkHandler.Runner);
-            if (!data)
+            if (!data) {
                 continue;
+            }
 
-            if (data.IsCurrentlySpectating)
+            if (data.IsCurrentlySpectating) {
                 count++;
+            }
         }
         spectatorText.text = (count == 0) ? "" : "<sprite name=room_spectator><sprite name=hudnumber_x><sprite name=hudnumber_" + count + ">";
     }
@@ -84,16 +86,18 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     public void OnDeathToggle() {
-        if (manuallyToggled)
+        if (manuallyToggled) {
             return;
+        }
 
         PlayAnimation(true);
         autoToggled = true;
     }
 
     public void OnRespawnToggle() {
-        if (manuallyToggled)
+        if (manuallyToggled) {
             return;
+        }
 
         PlayAnimation(false);
         autoToggled = false;
@@ -109,7 +113,10 @@ public class ScoreboardUpdater : MonoBehaviour {
     public void CreateEntries() {
 
         NetworkRunner runner = NetworkHandler.Runner;
-        List<PlayerData> actualPlayers = runner.ActivePlayers.Select(pr => pr.GetPlayerData(runner)).Where(pd => !pd.IsCurrentlySpectating).ToList();
+        List<PlayerData> actualPlayers = runner.ActivePlayers
+            .Select(pr => pr.GetPlayerData(runner))
+            .Where(pd => pd && !pd.IsCurrentlySpectating)
+            .ToList();
 
         foreach (PlayerData player in actualPlayers) {
 
@@ -139,8 +146,9 @@ public class ScoreboardUpdater : MonoBehaviour {
         CreateEntries();
         UpdateSpectatorCount();
 
-        if (Settings.Instance.generalScoreboardAlways)
+        if (Settings.Instance.generalScoreboardAlways) {
             SetEnabled();
+        }
     }
 
     private void OnPlayerListChanged(NetworkRunner runner, PlayerRef player) {

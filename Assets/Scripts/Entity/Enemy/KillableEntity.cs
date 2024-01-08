@@ -101,10 +101,10 @@ namespace NSMB.Entities {
 
         public override void OnValidate() {
             base.OnValidate();
-            SetIfNull(ref hitbox);
-            SetIfNull(ref animator, true);
-            SetIfNull(ref sRenderer, true);
-            SetIfNull(ref legacyAnimation, true);
+            this.SetIfNull(ref hitbox);
+            this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref legacyAnimation, UnityExtensions.GetComponentType.Children);
         }
 
         public virtual void Start() {

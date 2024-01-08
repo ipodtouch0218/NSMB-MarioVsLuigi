@@ -8,9 +8,6 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities {
-
-    //[OrderBefore(typeof(FrozenCube))]
-    //[OrderAfter(typeof(PlayerController), typeof(NetworkPhysicsSimulation2D))]
     public class Fireball : BasicEntity, IPlayerInteractable, IFireballInteractable {
 
         //---Static Variables

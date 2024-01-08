@@ -44,8 +44,8 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            PlayerData data;
-            if ((data = player.GetPlayerData(NetworkHandler.Runner)) && data.IsMuted) {
+            PlayerData data = player.GetPlayerData(NetworkHandler.Runner);
+            if (data && data.IsMuted) {
                 return;
             }
 

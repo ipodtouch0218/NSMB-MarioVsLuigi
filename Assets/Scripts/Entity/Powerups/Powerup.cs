@@ -49,9 +49,9 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void OnValidate() {
             base.OnValidate();
-            SetIfNull(ref sRenderer, true);
-            SetIfNull(ref hitbox);
-            SetIfNull(ref childAnimator, true);
+            this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref hitbox);
+            this.SetIfNull(ref childAnimator, UnityExtensions.GetComponentType.Children);
         }
 
         public void Awake() {

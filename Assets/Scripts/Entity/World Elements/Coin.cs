@@ -3,6 +3,7 @@ using UnityEngine;
 using Fusion;
 using NSMB.Entities.Enemies;
 using NSMB.Entities.Player;
+using NSMB.Extensions;
 using NSMB.Tiles;
 
 namespace NSMB.Entities.Collectable {
@@ -12,15 +13,16 @@ namespace NSMB.Entities.Collectable {
         [SerializeField] protected SpriteRenderer sRenderer;
 
         public override void OnValidate() {
-            if (!sRenderer) sRenderer = GetComponentInChildren<SpriteRenderer>();
+            this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         }
 
         public static void GivePlayerCoin(PlayerController player, Vector3 position) {
             byte newCoins = (byte) (player.Coins + 1);
             bool item = newCoins >= SessionData.Instance.CoinRequirement;
 
-            if (player.Object.HasStateAuthority)
+            if (player.Object.HasStateAuthority) {
                 player.Rpc_SpawnCoinEffects(position, newCoins, item);
+            }
 
             if (item) {
                 player.SpawnItem(NetworkPrefabRef.Empty);
@@ -32,8 +34,9 @@ namespace NSMB.Entities.Collectable {
 
         //---IPlayerInteractable overrides
         public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-            if (Collector)
+            if (Collector) {
                 return;
+            }
 
             Collector = player;
             GivePlayerCoin(player, transform.position);
@@ -41,17 +44,20 @@ namespace NSMB.Entities.Collectable {
 
         //---IBlockBumpable overrides
         public override void BlockBump(BasicEntity bumper, Vector2Int tile, InteractionDirection direction) {
-            if (direction == InteractionDirection.Down)
+            if (direction == InteractionDirection.Down) {
                 return;
+            }
 
             PlayerController target = null;
-            if (bumper is PlayerController player)
+            if (bumper is PlayerController player) {
                 target = player;
-            else if (bumper is Koopa koopa)
+            } else if (bumper is Koopa koopa) {
                 target = koopa.PreviousHolder;
+            }
 
-            if (!target)
+            if (!target) {
                 return;
+            }
 
             InteractWithPlayer(target);
         }

@@ -76,10 +76,10 @@ namespace NSMB.Entities {
             }
 
             ThrowInvincibility = TickTimer.CreateFromSeconds(Runner, crouching ? 0.6f : 0.35f);
+            CurrentKickSpeed = throwSpeed + 1.5f * (Mathf.Abs(Holder.body.Velocity.x) / Holder.RunningMaxSpeed);
             PreviousHolder = Holder;
             Holder = null;
             FacingRight = toRight;
-            CurrentKickSpeed = throwSpeed;
 
             body.Velocity = new((crouching && canPlace ? 2f : CurrentKickSpeed) * (FacingRight ? 1 : -1), 0);
         }

@@ -109,7 +109,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void ReorderEntries() {
-            foreach (PlayerRef player in Runner.ActivePlayers.OrderByDescending(pr => pr.GetPlayerData(NetworkHandler.Runner).JoinTick)) {
+            var playerList = Runner.ActivePlayers
+                .Where(pr => pr.GetPlayerData(NetworkHandler.Runner))
+                .OrderByDescending(pr => pr.GetPlayerData(NetworkHandler.Runner).JoinTick);
+
+            foreach (PlayerRef player in playerList) {
 
                 if (!playerListEntries.ContainsKey(player)) {
                     continue;

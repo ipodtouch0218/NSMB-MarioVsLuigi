@@ -4,7 +4,6 @@ using UnityEngine;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
-using Fusion;
 
 public class BackgroundLoop : MonoBehaviour {
 
@@ -36,8 +35,9 @@ public class BackgroundLoop : MonoBehaviour {
             truePositions[i] = children[i].transform.position;
         }
 
-        foreach (GameObject obj in children)
+        foreach (GameObject obj in children) {
             LoadChildObjects(obj);
+        }
 
         lastPosition = transform.position;
     }
@@ -82,15 +82,19 @@ public class BackgroundLoop : MonoBehaviour {
             c.name = obj.name + i;
         }
         Destroy(clone);
-        if (obj.GetComponent<LegacyAnimateSpriteRenderer>() is LegacyAnimateSpriteRenderer anim)
+        if (obj.GetComponent<LegacyAnimateSpriteRenderer>() is LegacyAnimateSpriteRenderer anim) {
             Destroy(anim);
-        if (obj.GetComponent<SpriteRenderer>() is SpriteRenderer sRenderer)
+        }
+
+        if (obj.GetComponent<SpriteRenderer>() is SpriteRenderer sRenderer) {
             Destroy(sRenderer);
+        }
     }
 
     private void RepositionChildObjects(GameObject obj) {
-        if (!obj)
+        if (!obj) {
             return;
+        }
 
         Transform parent = obj.transform;
         if (parent.childCount > 1) {

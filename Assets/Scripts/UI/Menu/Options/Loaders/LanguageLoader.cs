@@ -12,8 +12,9 @@ namespace NSMB.UI.Pause.Loaders {
         private LocaleData[] locales;
 
         public override void LoadOptions(PauseOption option) {
-            if (option is not ScrollablePauseOption spo)
+            if (option is not ScrollablePauseOption spo) {
                 return;
+            }
 
             spo.options.Clear();
             locales = GlobalController.Instance.translationManager.GetLocaleData();
@@ -27,10 +28,12 @@ namespace NSMB.UI.Pause.Loaders {
         }
 
         public override void OnValueChanged(PauseOption option, object newValue) {
-            if (option is not ScrollablePauseOption spo)
+            if (option is not ScrollablePauseOption spo) {
                 return;
+            }
 
             GlobalController.Instance.translationManager.ChangeLanguage(locales[spo.value].Locale);
+            option.manager.RequireReconnect |= option.requireReconnect;
         }
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 
+using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Pause.Loaders;
 
@@ -18,18 +19,18 @@ namespace NSMB.UI.Pause.Options {
 #endif
 
         //---Serialized Variables
-        [SerializeField] private PauseOptionMenuManager manager;
+        [SerializeField] internal PauseOptionMenuManager manager;
         [SerializeField] internal TMP_Text label;
         [SerializeField] protected PauseOptionLoader loader;
         [SerializeField] public string translationKey;
-        [SerializeField] internal bool hideOnWebGL;
+        [SerializeField] internal bool hideOnWebGL, requireReconnect;
 
         //---Properties
         public bool IsSelected { get; private set; }
 
         public virtual void OnValidate() {
-            if (!manager) manager = GetComponentInParent<PauseOptionMenuManager>();
-            if (!loader) loader = GetComponent<PauseOptionLoader>();
+            this.SetIfNull(ref manager, UnityExtensions.GetComponentType.Parent);
+            this.SetIfNull(ref loader);
         }
 
         public virtual void Awake() {
@@ -37,8 +38,9 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public virtual void OnEnable() {
-            if (loader)
+            if (loader) {
                 loader.LoadOptions(this);
+            }
 
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -49,21 +51,20 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            if (IsSelected)
+            if (IsSelected) {
                 Selected();
-            else
+            } else {
                 Deselected();
+            }
         }
 
         public virtual void Selected() {
             label.text = "» " + GetTranslatedString();
-            //label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             IsSelected = true;
         }
 
         public virtual void Deselected() {
             label.text = GetTranslatedString();
-            //label.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             IsSelected = false;
         }
 

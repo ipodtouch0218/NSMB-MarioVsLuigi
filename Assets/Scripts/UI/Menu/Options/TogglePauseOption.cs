@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using NSMB.Extensions;
+
 namespace NSMB.UI.Pause.Options {
     public class TogglePauseOption : PauseOption {
 
@@ -9,7 +11,7 @@ namespace NSMB.UI.Pause.Options {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!toggle) toggle = GetComponentInChildren<Toggle>();
+            this.SetIfNull(ref toggle, UnityExtensions.GetComponentType.Children);
         }
 
         public override void Awake() {
@@ -23,8 +25,9 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void OnToggleValueChanged(bool value) {
-            if (loader)
+            if (loader) {
                 loader.OnValueChanged(this, value);
+            }
 
             Settings.Instance.SaveSettings();
         }

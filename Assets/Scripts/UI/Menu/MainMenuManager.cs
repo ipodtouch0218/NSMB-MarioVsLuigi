@@ -632,7 +632,7 @@ namespace NSMB.UI.MainMenu {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
-        Application.Quit();
+            Application.Quit();
 #endif
         }
 
@@ -720,8 +720,6 @@ namespace NSMB.UI.MainMenu {
             characterDropdown.SetValueWithoutNotify(selectedCharacter);
             characterDropdown.RefreshShownValue();
 
-            //TODO: RTL FONT
-
             if (SessionData.Instance && SessionData.Instance.Object) {
                 UpdateRoomHeader();
                 OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
@@ -740,7 +738,7 @@ namespace NSMB.UI.MainMenu {
                 }
             } else {
                 UpdateStartGameButton();
-                hostControlsGroup.interactable = data && data.IsRoomOwner;
+                hostControlsGroup.interactable = Runner.IsServer || (data && data.IsRoomOwner);
                 if (fadeMusicCoroutine != null) {
                     StopCoroutine(fadeMusicCoroutine);
                     fadeMusicCoroutine = null;

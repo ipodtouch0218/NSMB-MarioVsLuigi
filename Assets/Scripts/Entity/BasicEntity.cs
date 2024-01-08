@@ -36,8 +36,8 @@ namespace NSMB.Entities {
         protected ChangeDetector changeDetector;
 
         public virtual void OnValidate() {
-            SetIfNull(ref body);
-            SetIfNull(ref sfx);
+            this.SetIfNull(ref body);
+            this.SetIfNull(ref sfx);
         }
 
         public override void Spawned() {
@@ -58,6 +58,11 @@ namespace NSMB.Entities {
         }
 
         public override void Render() {
+            changeDetector ??= GetChangeDetector(ChangeDetector.Source.SimulationState);
+            if (changeDetector == null) {
+                return;
+            }
+
             NetworkBehaviourBuffer oldBuffer = default;
             NetworkBehaviourBuffer newBuffer = default;
             HandleRenderChanges(true, ref oldBuffer, ref newBuffer);
@@ -242,17 +247,6 @@ namespace NSMB.Entities {
                 switch (change) {
                 case nameof(FacingRight): OnFacingRightChanged(); break;
                 case nameof(IsActive): OnIsActiveChanged(); break;
-                }
-            }
-        }
-
-        //---Utils
-        protected void SetIfNull<T>(ref T var, bool children = false) where T : Component {
-            if (!var) {
-                if (children) {
-                    var = GetComponentInChildren<T>();
-                } else {
-                    var = GetComponent<T>();
                 }
             }
         }

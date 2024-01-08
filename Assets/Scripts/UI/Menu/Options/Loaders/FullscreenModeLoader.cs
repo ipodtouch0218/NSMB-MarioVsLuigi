@@ -12,7 +12,8 @@ namespace NSMB.UI.Pause.Loaders {
             "ui.options.graphics.windowmode.fullscreen",
             "ui.options.graphics.windowmode.borderless",
             "ui.options.graphics.windowmode.maximized",
-            "ui.options.graphics.windowmode.windowed" };
+            "ui.options.graphics.windowmode.windowed"
+        };
 
         //---Private Variables
         private FullScreenMode[] validModes;
@@ -27,18 +28,19 @@ namespace NSMB.UI.Pause.Loaders {
         }
 
         public override void LoadOptions(PauseOption option) {
-            if (option is not ScrollablePauseOption spo)
+            if (option is not ScrollablePauseOption spo) {
                 return;
+            }
 
             this.option = option;
             spo.options.Clear();
 
             validModes ??= Application.platform switch {
-                    RuntimePlatform.WindowsPlayer or RuntimePlatform.WindowsEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.ExclusiveFullScreen },
-                    RuntimePlatform.OSXPlayer or RuntimePlatform.OSXEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.MaximizedWindow },
-                    RuntimePlatform.LinuxPlayer or RuntimePlatform.LinuxEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow },
-                    _ => new[] { FullScreenMode.FullScreenWindow },
-                };
+                RuntimePlatform.WindowsPlayer or RuntimePlatform.WindowsEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.ExclusiveFullScreen },
+                RuntimePlatform.OSXPlayer or RuntimePlatform.OSXEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow, FullScreenMode.MaximizedWindow },
+                RuntimePlatform.LinuxPlayer or RuntimePlatform.LinuxEditor => new[] { FullScreenMode.Windowed, FullScreenMode.FullScreenWindow },
+                _ => new[] { FullScreenMode.FullScreenWindow },
+            };
 
             spo.options.AddRange(validModes.Select(fsm => FullscreenDisplayKeys[(int) fsm]).Select(GlobalController.Instance.translationManager.GetTranslation));
 
@@ -47,8 +49,9 @@ namespace NSMB.UI.Pause.Loaders {
         }
 
         public override void OnValueChanged(PauseOption option, object newValue) {
-            if (option is not ScrollablePauseOption spo)
+            if (option is not ScrollablePauseOption spo) {
                 return;
+            }
 
             int value = spo.value;
             FullScreenMode newMode = validModes[value];
@@ -58,11 +61,14 @@ namespace NSMB.UI.Pause.Loaders {
             } else {
                 Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, newMode);
             }
+
+            option.manager.RequireReconnect |= option.requireReconnect;
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            if (option)
+            if (option) {
                 LoadOptions(option);
+            }
         }
     }
 }

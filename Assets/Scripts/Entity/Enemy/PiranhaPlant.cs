@@ -139,7 +139,10 @@ namespace NSMB.Entities.Enemies {
 
         public override void Kill() {
             IsDead = true;
-            Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up);
+
+            if (Runner.IsServer) {
+                Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up);
+            }
         }
 
         public override void SpecialKill(bool right, bool groundpound, bool mega, int combo) {

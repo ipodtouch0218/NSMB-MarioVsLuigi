@@ -82,7 +82,7 @@ namespace NSMB.Entities {
             }
 
             if (FrozenEntity && FrozenEntity.IsCarryable) {
-                Transform target = FrozenEntity.transform.transform;
+                Transform target = FrozenEntity.transform;
                 Vector2 newPos = (Vector2) transform.position + EntityPositionOffset;
                 Utils.Utils.WrapWorldLocation(ref newPos);
                 target.position = new(newPos.x, newPos.y, target.position.z);
@@ -98,6 +98,7 @@ namespace NSMB.Entities {
             base.FixedUpdateNetwork();
 
             if (!Object || IsDead) {
+                gameObject.layer = Layers.LayerHitsNothing;
                 return;
             }
 
@@ -174,7 +175,6 @@ namespace NSMB.Entities {
         }
 
         private bool HandleTile() {
-
             if ((FastSlide && (body.Data.HitLeft || body.Data.HitRight))
                 || (flying && Fallen && body.Data.OnGround && !Holder)
                 || ((Holder || body.Data.OnGround) && body.Data.HitRoof)) {

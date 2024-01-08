@@ -519,9 +519,7 @@ namespace NSMB.Entities.Player {
                         HandleMovement(heldButtons, pressedButtons);
                     }
 
-                    //HandleBlockSnapping();
                     CheckForEntityCollision();
-
                     PreviousTickIsOnGround = IsOnGround;
                 }
 
@@ -1183,7 +1181,6 @@ namespace NSMB.Entities.Player {
             IsFrozen = true;
             FrozenCube = cube;
             FrozenCube.AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, 1.75f);
-            animator.enabled = false;
             body.Freeze = true;
             IsInKnockback = false;
             IsSkidding = false;
@@ -1209,12 +1206,11 @@ namespace NSMB.Entities.Player {
             }
 
             IsFrozen = false;
-            animator.enabled = true;
             body.Freeze = false;
 
             int knockbackStars = reason switch {
                 UnfreezeReason.Timer => 0,
-                UnfreezeReason.Groundpounded => 2,
+                UnfreezeReason.Groundpounded => 3,
                 _ => 1
             };
 
@@ -1225,7 +1221,7 @@ namespace NSMB.Entities.Player {
             }
 
             if (knockbackStars > 0) {
-                DoKnockback(FacingRight, knockbackStars, true, null);
+                DoKnockback(FacingRight, knockbackStars, knockbackStars <= 1, null);
             } else {
                 DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1f);
             }
@@ -1287,7 +1283,6 @@ namespace NSMB.Entities.Player {
         }
 
         private void SpawnStars(int amount, bool deathplane) {
-
             if (!Runner.IsServer) {
                 return;
             }
@@ -1656,7 +1651,7 @@ namespace NSMB.Entities.Player {
 
         #region -- KNOCKBACK --
         public void DoKnockback(bool fromRight, int starsToDrop, bool weak, NetworkObject attacker) {
-            if ((weak && IsWeakKnockback && IsInKnockback) || (IsInKnockback && !IsWeakKnockback)) {
+            if (IsInKnockback && ((IsWeakKnockback && weak) || !IsWeakKnockback)) {
                 return;
             }
 
@@ -1682,10 +1677,12 @@ namespace NSMB.Entities.Player {
             KnockbackWasOriginallyFacingRight = FacingRight;
             KnockbackTick = Runner.Tick;
 
-            //Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
-            //TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
-            //if (!weak && tile)
-            //    fromRight = !fromRight;
+            // Don't go into walls
+            Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
+            TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
+            if (!weak && tile) {
+                fromRight = !fromRight;
+            }
 
             body.Velocity = new Vector2(
                 (fromRight ? -1 : 1) *
@@ -1695,7 +1692,7 @@ namespace NSMB.Entities.Player {
                 (State == Enums.PowerupState.MiniMushroom ? 2.5f : 1f) *
                 (weak ? 0.5f : 1f),
 
-                // don't go upwards if we got hit by a fireball
+                // Don't go upwards if we got hit by a fireball
                 (attacker && attacker.TryGetComponent(out Fireball _)) ? 0 : 4.5f
             );
 
@@ -1727,6 +1724,8 @@ namespace NSMB.Entities.Player {
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 1f);
             //DoEntityBounce = false;
             IsInKnockback = false;
+            IsWeakKnockback = false;
+            IsForwardsKnockback = false;
             body.Velocity = new(0, body.Velocity.y);
             FacingRight = KnockbackWasOriginallyFacingRight;
         }
@@ -2620,6 +2619,10 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
+            if (State == Enums.PowerupState.MegaMushroom) {
+                HandleMegaTiles(true);
+            }
+
             // Don't do anything if we're stuck in a block
             if (HandleStuckInBlock()) {
                 return;
@@ -2861,7 +2864,6 @@ namespace NSMB.Entities.Player {
             }
 
             HandleFacingDirection(left, right);
-
 
             if (State == Enums.PowerupState.MegaMushroom) {
                 HandleMegaTiles(true);

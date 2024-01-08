@@ -10,11 +10,11 @@ namespace NSMB.UI.Pause.Loaders {
         private readonly List<string> options = new();
 
         public override void LoadOptions(PauseOption option) {
-
             ScrollablePauseOption spo = (ScrollablePauseOption) option;
 
-            if (options.Count == 0)
+            if (options.Count == 0) {
                 options.AddRange(spo.options);
+            }
 
             spo.options.Clear();
             spo.options.AddRange(options.Select(GlobalController.Instance.translationManager.GetTranslation));

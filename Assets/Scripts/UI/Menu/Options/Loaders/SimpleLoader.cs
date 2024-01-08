@@ -14,11 +14,13 @@ namespace NSMB.UI.Pause.Loaders {
         private PropertyInfo property;
 
         public override void LoadOptions(PauseOption option) {
-            if (option is not O optionType)
+            if (option is not O optionType) {
                 return;
+            }
 
-            if (string.IsNullOrEmpty(fieldName))
+            if (string.IsNullOrEmpty(fieldName)) {
                 return;
+            }
 
             V value;
             field = Settings.Instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public);
@@ -40,13 +42,16 @@ namespace NSMB.UI.Pause.Loaders {
         public abstract V GetValue(O pauseOption);
 
         public override void OnValueChanged(PauseOption option, object newValue) {
-            if (option is not O optionType)
+            if (option is not O optionType) {
                 return;
+            }
 
             V value = GetValue(optionType);
 
             field?.SetValue(Settings.Instance, value);
             property?.SetValue(Settings.Instance, value);
+
+            option.manager.RequireReconnect |= option.requireReconnect;
         }
     }
 }

@@ -41,6 +41,7 @@ namespace NSMB.UI.Pause.Options {
                 backButton.sprite = _back ? backSelectedSprite : backDeselectedSprite;
             }
         }
+        public bool RequireReconnect { get; set; }
 
         protected override void Awake() {
             base.Awake();
@@ -76,14 +77,21 @@ namespace NSMB.UI.Pause.Options {
                 EventSystem.current.SetSelectedGameObject(previouslySelected);
             }
             OnOptionsOpenedToggled?.Invoke(false);
+
+            if (RequireReconnect && NetworkHandler.Runner.LobbyInfo.IsValid) {
+                _ = NetworkHandler.ConnectToSameRegion();
+            }
+            RequireReconnect = false;
         }
 
         public void Update() {
-            if (!Application.isPlaying)
+            if (!Application.isPlaying) {
                 return;
+            }
 
-            if (!EnableInput)
+            if (!EnableInput) {
                 return;
+            }
 
             Vector2 direction = ControlSystem.controls.UI.Navigate.ReadValue<Vector2>();
             direction = direction.normalized;
@@ -109,25 +117,30 @@ namespace NSMB.UI.Pause.Options {
                     func = SelectedTab.OnRightPress;
                 }
 
-                if (func(true))
+                if (func(true)) {
                     return;
+                }
             }
 
-            if (!SelectedOption)
+            if (!SelectedOption) {
                 return;
+            }
 
-            if (left)
+            if (left) {
                 SelectedOption.OnLeftHeld();
-            else if (right)
+            } else if (right) {
                 SelectedOption.OnRightHeld();
+            }
         }
 
         private void OnCancel(InputAction.CallbackContext context) {
-            if (!EnableInput)
+            if (!EnableInput) {
                 return;
+            }
 
-            if (SelectedTab && SelectedTab.OnCancel())
+            if (SelectedTab && SelectedTab.OnCancel()) {
                 return;
+            }
 
             if (Back) {
                 CloseMenu();
@@ -141,19 +154,22 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void OnSubmit(InputAction.CallbackContext context) {
-            if (!EnableInput)
+            if (!EnableInput) {
                 return;
+            }
 
-            if (SelectedTab && SelectedTab.OnSubmit())
+            if (SelectedTab && SelectedTab.OnSubmit()) {
                 return;
+            }
 
             if (Back) {
                 CloseMenu();
                 return;
             }
 
-            if (!SelectedOption)
+            if (!SelectedOption) {
                 return;
+            }
 
             SelectedOption.OnClick();
         }
@@ -165,11 +181,13 @@ namespace NSMB.UI.Pause.Options {
                 return;
             }
 
-            if (!EnableInput)
+            if (!EnableInput) {
                 return;
+            }
 
-            if (inputted)
+            if (inputted) {
                 return;
+            }
 
             Vector2 direction = context.ReadValue<Vector2>();
             direction = direction.normalized;
@@ -194,22 +212,25 @@ namespace NSMB.UI.Pause.Options {
                     func = SelectedTab.OnRightPress;
                 }
 
-                if (func(false))
+                if (func(false)) {
                     return;
+                }
             }
 
             if (Back && (down || right)) {
                 Back = false;
                 if (right) {
-                    if (currentTabIndex != 0)
+                    if (currentTabIndex != 0) {
                         SetTab(0, false);
-                    else
+                    } else {
                         SelectedTab.Highlighted();
+                    }
                 }
                 if (down) {
                     SetCurrentOption(0);
-                    if (currentOptionIndex == -1)
+                    if (currentOptionIndex == -1) {
                         SelectedTab.Highlighted();
+                    }
                 }
                 GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
                 return;
@@ -223,11 +244,11 @@ namespace NSMB.UI.Pause.Options {
 
             } else if (currentOption) {
                 // Give this input to the option
-                if (left)
+                if (left) {
                     currentOption.OnLeftPress();
-                else
+                } else {
                     currentOption.OnRightPress();
-
+                }
             } else {
                 // Move between tabs
                 if (left && currentTabIndex == 0) {
@@ -246,8 +267,9 @@ namespace NSMB.UI.Pause.Options {
         public void OpenMenu() {
             gameObject.SetActive(true);
 
-            foreach (PauseOptionTab tab in tabs)
+            foreach (PauseOptionTab tab in tabs) {
                 tab.Deselected();
+            }
 
             currentTabIndex = -1;
             currentOptionIndex = -1;
@@ -258,11 +280,13 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void CloseMenu() {
-            if (SelectedTab)
+            if (SelectedTab) {
                 SelectedTab.Deselected();
+            }
 
-            if (SelectedOption)
+            if (SelectedOption) {
                 SelectedOption.Deselected();
+            }
 
             EnableInput = false;
             gameObject.SetActive(false);
@@ -270,11 +294,13 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void SetCurrentOption(int index, bool center = false) {
-            if (currentOptionIndex == index || index >= SelectedTab.options.Count || index < -1)
+            if (currentOptionIndex == index || index >= SelectedTab.options.Count || index < -1) {
                 return;
+            }
 
-            if (SelectedOption)
+            if (SelectedOption) {
                 SelectedOption.Deselected();
+            }
 
             int direction = index - currentOptionIndex;
             int original = currentOptionIndex;
@@ -284,11 +310,13 @@ namespace NSMB.UI.Pause.Options {
                 currentOptionIndex += direction;
             }
 
-            if (currentOptionIndex >= SelectedTab.options.Count)
+            if (currentOptionIndex >= SelectedTab.options.Count) {
                 currentOptionIndex = original;
+            }
 
-            if (currentOptionIndex < -1)
+            if (currentOptionIndex < -1) {
                 currentOptionIndex = -1;
+            }
 
             if (SelectedTab) {
                 if (currentOptionIndex == -1) {
@@ -327,19 +355,23 @@ namespace NSMB.UI.Pause.Options {
         public void SetTab(int index, bool sound = true) {
             SetCurrentOption(-1);
 
-            if (currentTabIndex == index)
+            if (currentTabIndex == index) {
                 return;
+            }
 
-            if (SelectedTab)
+            if (SelectedTab) {
                 SelectedTab.Deselected();
+            }
 
             currentTabIndex = index;
 
-            if (SelectedTab)
+            if (SelectedTab) {
                 SelectedTab.Selected();
+            }
 
-            if (sound)
+            if (sound) {
                 GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+            }
 
             Canvas.ForceUpdateCanvases();
             scroll.verticalNormalizedPosition = 1;

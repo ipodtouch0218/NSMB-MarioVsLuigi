@@ -543,9 +543,13 @@ namespace NSMB.Utils {
             // Then id based color
             int result = -1;
             int count = 0;
-            foreach (PlayerRef pl in runner.ActivePlayers.OrderBy(pr => pr.GetPlayerData(runner).JoinTick)) {
+            var players = runner.ActivePlayers
+                .Select(pr => pr.GetPlayerData(runner))
+                .Where(pd => pd)
+                .OrderBy(pd => pd.JoinTick);
+
+            foreach (PlayerData playerData in players) {
                 // Skip spectators in color calculations
-                PlayerData playerData = pl.GetPlayerData(runner);
                 if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating) {
                     continue;
                 }

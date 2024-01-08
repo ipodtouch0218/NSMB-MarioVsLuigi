@@ -24,8 +24,9 @@ namespace NSMB.UI.Pause.Loaders {
         }
 
         public override void LoadOptions(PauseOption option) {
-            if (option is not ScrollablePauseOption spo)
+            if (option is not ScrollablePauseOption spo) {
                 return;
+            }
 
             this.option = option;
             spo.options.Clear();
@@ -37,11 +38,13 @@ namespace NSMB.UI.Pause.Loaders {
 
         public override void OnValueChanged(PauseOption option, object newValue) {
             Settings.Instance.audioSpecialPowerupMusic = (Enums.SpecialPowerupMusic) newValue;
+            option.manager.RequireReconnect |= option.requireReconnect;
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            if (option)
+            if (option) {
                 LoadOptions(option);
+            }
         }
     }
 }

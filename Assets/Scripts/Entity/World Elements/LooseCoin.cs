@@ -22,8 +22,8 @@ namespace NSMB.Entities.Collectable {
 
         public override void OnValidate() {
             base.OnValidate();
-            SetIfNull(ref spriteAnimation, true);
-            SetIfNull(ref hitbox);
+            this.SetIfNull(ref spriteAnimation, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref hitbox);
         }
 
         public override void Spawned() {
