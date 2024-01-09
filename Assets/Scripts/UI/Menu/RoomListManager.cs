@@ -14,13 +14,15 @@ namespace NSMB.UI.MainMenu {
         public RoomIcon SelectedRoom {
             get => _selectedRoom;
             private set {
-                if (_selectedRoom != null)
+                if (_selectedRoom != null) {
                     _selectedRoom.Unselect();
+                }
 
                 _selectedRoom = value;
 
-                if (_selectedRoom != null)
+                if (_selectedRoom != null) {
                     _selectedRoom.Select();
+                }
             }
         }
 
@@ -56,8 +58,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public async void JoinSelectedRoom() {
-            if (!SelectedRoom)
+            if (!SelectedRoom) {
                 return;
+            }
 
             await NetworkHandler.JoinRoom(SelectedRoom.session.Name);
         }
@@ -67,21 +70,24 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void RefreshRooms() {
-            foreach (RoomIcon room in rooms.Values)
+            foreach (RoomIcon room in rooms.Values) {
                 room.UpdateUI(room.session);
+            }
         }
 
         public void RemoveRoom(RoomIcon icon) {
             Destroy(icon.gameObject);
             rooms.Remove(icon.session.Name);
 
-            if (SelectedRoom == icon)
+            if (SelectedRoom == icon) {
                 SelectedRoom = null;
+            }
         }
 
         public void ClearRooms() {
-            foreach (RoomIcon room in rooms.Values)
+            foreach (RoomIcon room in rooms.Values) {
                 Destroy(room.gameObject);
+            }
 
             rooms.Clear();
             SelectedRoom = null;
@@ -136,8 +142,9 @@ namespace NSMB.UI.MainMenu {
             }
 
             foreach (string key in invalidRooms) {
-                if (!rooms.ContainsKey(key))
+                if (!rooms.ContainsKey(key)) {
                     continue;
+                }
 
                 Destroy(rooms[key].gameObject);
                 rooms.Remove(key);

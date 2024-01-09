@@ -8,6 +8,7 @@ using Fusion;
 using NSMB.Extensions;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
+using NSMB.Game;
 
 public class SessionData : NetworkBehaviour {
 
@@ -101,6 +102,10 @@ public class SessionData : NetworkBehaviour {
 
         if (MainMenuManager.Instance) {
             MainMenuManager.Instance.roomSettingsCallbacks.UpdateAllSettings(Instance, false);
+        }
+
+        if (GameManager.Instance) {
+            GameManager.Instance.SetGameTimestamps();
         }
     }
 

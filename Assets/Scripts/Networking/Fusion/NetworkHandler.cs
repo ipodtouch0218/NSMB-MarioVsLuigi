@@ -156,7 +156,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         ReturnToMainMenu(() => {
             OnDisconnectedFromServer?.Invoke(runner, reason);
-            RecreateInstance();
+            //RecreateInstance();
         });
     }
 
@@ -304,8 +304,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (data) {
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.quit", "playername", data.GetNickname());
-            if (Runner.IsServer) {
+            if (runner.IsServer) {
                 runner.Despawn(data.Object);
+                runner.PushHostMigrationSnapshot();
             }
             playerDatas.Remove(data);
         }
@@ -420,11 +421,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         // Exit if we're already in a room
         if (Runner && (Runner.SessionInfo.IsValid || Runner.LobbyInfo.IsValid) && !Runner.IsShutdown) {
             await Runner.Shutdown();
-        } else {
-            if (Runner) {
-                DestroyImmediate(Runner);
-            }
-            Instance.runner = Instance.gameObject.AddComponent<NetworkRunner>();
         }
 
         if (string.IsNullOrEmpty(region)) {
@@ -647,6 +643,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
                     // Don't respawn the PlayerData for the host that just left. Stupid.
                     if (pd.IsRoomOwner) {
+                        continue;
+                    }
+
+                    // Don't respawn invalid PlayerDatas
+                    if (pd.UserId == default) {
+                        continue;
+                    }
+
+                    // Don't respawn duplicate PlayerDatas (idk why they even exist???)
+                    // Like we despawn them on player leave and they just pop back up...
+                    if (Instance.playerDatas.Any(other => other.UserId == pd.UserId)) {
                         continue;
                     }
 

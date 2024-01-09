@@ -217,6 +217,10 @@ namespace NSMB.Game {
         public override void Render() {
             base.Render();
 
+            if (!SessionData.Instance) {
+                return;
+            }
+
             if (GameState == Enums.GameState.Playing) {
                 HandleMusic();
             }
@@ -355,7 +359,7 @@ namespace NSMB.Game {
 
         public void PauseQuitGame() {
             sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-            _ = NetworkHandler.ConnectToRegion();
+            NetworkHandler.Instance.runner.Shutdown(false, ShutdownReason.Ok);
         }
 
         public void PauseOpenOptions() {
@@ -681,7 +685,6 @@ namespace NSMB.Game {
 
             GameState = Enums.GameState.Ended;
             IsMusicEnabled = false;
-            PlaySounds = false;
             endSoundPlayed = true;
 
             // End "WaitForGameEnd" objects
@@ -693,6 +696,8 @@ namespace NSMB.Game {
             musicManager.Stop();
 
             yield return new WaitForSecondsRealtime(1);
+
+            PlaySounds = false;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
             bool draw = winningTeam == -1;
@@ -784,6 +789,10 @@ namespace NSMB.Game {
         }
 
         private void HandleMusic() {
+            if (!SessionData.Instance) {
+                return;
+            }
+
             bool invincible = false;
             bool mega = false;
             bool speedup = false;
@@ -879,13 +888,17 @@ namespace NSMB.Game {
         }
 
         private void ResetAvailableStarSpawns() {
-            AvailableStarSpawns.RawSet(unchecked((ulong) ~0L));
+            AvailableStarSpawns.RawSet(unchecked(~0UL));
         }
 
         /// <summary>
         /// Sets the game timestamps for Discord RPC
         /// </summary>
-        private void SetGameTimestamps() {
+        public void SetGameTimestamps() {
+            if (!SessionData.Instance) {
+                return;
+            }
+
             double now = DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
             float secondsSinceStart = Runner.SimulationTime - GameStartTime;
             gameStartTimestamp = now - secondsSinceStart;

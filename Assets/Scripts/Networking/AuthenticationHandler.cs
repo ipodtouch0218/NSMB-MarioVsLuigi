@@ -18,27 +18,27 @@ public class AuthenticationHandler {
 
         IsAuthenticating = true;
 
-        string request = URL + "?";
+        string requestUrl = URL + "?";
         if (userid != null) {
-            request += "&userid=" + userid;
+            requestUrl += "&userid=" + userid;
         }
         if (token != null) {
-            request += "&token=" + token;
+            requestUrl += "&token=" + token;
         }
         byte args = 0;
         Utils.BitSet(ref args, 0, !Settings.Instance.generalUseNicknameColor);
-        request += "&args=" + args;
+        requestUrl += "&args=" + args;
 
-        UnityWebRequest client = UnityWebRequest.Get(request);
+        UnityWebRequest webRequest = UnityWebRequest.Get(requestUrl);
+        webRequest.certificateHandler = new MvLCertificateHandler();
+        webRequest.disposeCertificateHandlerOnDispose = true;
+        webRequest.disposeDownloadHandlerOnDispose = true;
+        webRequest.disposeUploadHandlerOnDispose = true;
+        webRequest.timeout = 10;
 
-        client.certificateHandler = new MvLCertificateHandler();
-        client.disposeCertificateHandlerOnDispose = true;
-        client.disposeDownloadHandlerOnDispose = true;
-        client.disposeUploadHandlerOnDispose = true;
+        await webRequest.SendWebRequest();
 
-        await client.SendWebRequest();
-
-        if (client.result != UnityWebRequest.Result.Success) {
+        if (webRequest.result != UnityWebRequest.Result.Success) {
             IsAuthenticating = false;
             return null;
         }
@@ -47,9 +47,9 @@ public class AuthenticationHandler {
             AuthType = CustomAuthenticationType.Custom,
             UserId = userid,
         };
-        values.AddAuthParameter("data", client.downloadHandler.text.Trim().Replace("\"", ""));
+        values.AddAuthParameter("data", webRequest.downloadHandler.text.Trim().Replace("\"", ""));
 
-        client.Dispose();
+        webRequest.Dispose();
 
         IsAuthenticating = false;
         return values;

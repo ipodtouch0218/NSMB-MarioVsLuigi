@@ -5,6 +5,7 @@ using Fusion;
 using NSMB.Entities.Player;
 using NSMB.Game;
 using NSMB.Utils;
+using NSMB.Extensions;
 
 //[OrderBefore(typeof(Powerup))]
 public class CameraController : NetworkBehaviour {
@@ -17,8 +18,9 @@ public class CameraController : NetworkBehaviour {
     public static float ScreenShake {
         get => _screenShake;
         set {
-            if (CurrentController && !CurrentController.controller.IsOnGround)
+            if (CurrentController && !CurrentController.controller.IsOnGround) {
                 return;
+            }
 
             _screenShake = value;
         }
@@ -51,11 +53,10 @@ public class CameraController : NetworkBehaviour {
     //---Private Variables
     private readonly List<SecondaryCameraPositioner> secondaryPositioners = new();
     private PropertyReader<Vector3> currentPositionReader;
+    private Vector2 previousCurrentPosition;
 
     public void OnValidate() {
-        if (!controller) controller = GetComponentInParent<PlayerController>();
-
-        currentPositionReader = GetPropertyReader<Vector3>(nameof(CurrentPosition));
+        this.SetIfNull(ref controller, UnityExtensions.GetComponentType.Parent);
     }
 
     public void Awake() {
@@ -63,14 +64,29 @@ public class CameraController : NetworkBehaviour {
         TargetCamera.GetComponentsInChildren(secondaryPositioners);
     }
 
+    public override void Spawned() {
+        currentPositionReader = GetPropertyReader<Vector3>(nameof(CurrentPosition));
+        Object.RenderTimeframe = !controller.IsProxy ? RenderTimeframe.Auto : RenderTimeframe.Remote;
+    }
+
     public override void Render() {
-        if (!IsControllingCamera)
+        if (!IsControllingCamera) {
             return;
+        }
 
         Vector3 newPosition;
 
         if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
-            (var fromVector, var toVector) = currentPositionReader.Read(from, to);
+            Vector2 fromVector, toVector;
+
+            if (Object.RenderTimeframe == RenderTimeframe.Remote) {
+                // Weird interpolation stuff taken from EntityMover
+                fromVector = previousCurrentPosition;
+                toVector = CurrentPosition;
+                previousCurrentPosition = CurrentPosition;
+            } else {
+                (fromVector, toVector) = currentPositionReader.Read(from, to);
+            }
 
             Utils.UnwrapLocations(fromVector, toVector, out var fromVectorRelative, out var toVectorRelative);
             Vector2 lerped = Vector2.Lerp(fromVectorRelative, toVectorRelative, alpha);
@@ -83,8 +99,9 @@ public class CameraController : NetworkBehaviour {
         }
 
         Vector3 shakeOffset = Vector3.zero;
-        if ((_screenShake -= Time.deltaTime) > 0)
+        if ((_screenShake -= Time.deltaTime) > 0) {
             shakeOffset = new Vector3((Random.value - 0.5f) * _screenShake, (Random.value - 0.5f) * _screenShake);
+        }
 
         SetPosition(newPosition + shakeOffset);
     }
@@ -100,12 +117,14 @@ public class CameraController : NetworkBehaviour {
     }
 
     private void SetPosition(Vector3 position) {
-        if (!IsControllingCamera)
+        if (!IsControllingCamera) {
             return;
+        }
 
         TargetCamera.transform.position = position;
-        if (BackgroundLoop.Instance)
+        if (BackgroundLoop.Instance) {
             BackgroundLoop.Instance.Reposition();
+        }
 
         secondaryPositioners.RemoveAll(scp => !scp);
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());
@@ -115,21 +134,25 @@ public class CameraController : NetworkBehaviour {
         float minY = GameManager.Instance.cameraMinY, heightY = GameManager.Instance.cameraHeightY;
         float minX = GameManager.Instance.cameraMinX, maxX = GameManager.Instance.cameraMaxX;
 
-        if (!controller.IsDead && !controller.IsRespawning)
+        if (!controller.IsDead && !controller.IsRespawning) {
             PlayerPos = AntiJitter(controller.transform.position);
+        }
 
         float vOrtho = TargetCamera.orthographicSize;
         float xOrtho = vOrtho * TargetCamera.aspect;
         Vector3 newCameraPosition = CurrentPosition;
 
         // Lagging camera movements
-        if (controller.IsOnGround)
+        if (controller.IsOnGround) {
             LastFloorHeight = PlayerPos.y;
+        }
+
         bool validFloor = controller.IsOnGround || LastFloorHeight < PlayerPos.y;
 
         // Floor height
-        if (validFloor)
+        if (validFloor) {
             newCameraPosition.y = Mathf.Max(newCameraPosition.y, LastFloorHeight + floorOffset);
+        }
 
         // Smoothing
         Vector3 smoothDamp = SmoothDampVel;
@@ -170,13 +193,15 @@ public class CameraController : NetworkBehaviour {
             right = newCameraPosition.x > PlayerPos.x;
         }
 
-        if (xDifference > 0.25f)
+        if (xDifference > 0.25f) {
             newCameraPosition.x += (0.25f - xDifference - 0.01f) * (right ? 1 : -1);
+        }
 
         // Clamping to within level bounds
         float maxY = heightY == 0 ? (minY + vOrtho) : (minY + heightY - vOrtho);
-        if (newCameraPosition.y > maxY)
+        if (newCameraPosition.y > maxY) {
             SmoothDampVel = Vector3.zero;
+        }
 
         newCameraPosition.x = Mathf.Clamp(newCameraPosition.x, minX + xOrtho, maxX - xOrtho);
         newCameraPosition.y = Mathf.Clamp(newCameraPosition.y, minY + vOrtho, maxY);
@@ -197,8 +222,9 @@ public class CameraController : NetworkBehaviour {
 #if UNITY_EDITOR
     private static Vector3 HalfRight = Vector3.right * 0.5f;
     public void OnDrawGizmos() {
-        if (!controller || !controller.Object)
+        if (!controller || !controller.Object) {
             return;
+        }
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(new(PlayerPos.x, LastFloorHeight), HalfRight);

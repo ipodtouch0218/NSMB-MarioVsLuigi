@@ -332,8 +332,7 @@ namespace NSMB.UI.MainMenu {
                 Reconnect();
             }
 
-            //roomManager.RefreshRooms();
-
+            roomManager.RefreshRooms();
             EventSystem.current.SetSelectedGameObject(lobbySelected);
         }
 
@@ -432,12 +431,12 @@ namespace NSMB.UI.MainMenu {
             _ = NetworkHandler.ConnectToRegion(targetRegion);
         }
 
-        public async void Reconnect() {
+        public void Reconnect() {
             Debug.Log("[Network] (Re)connecting to the master server");
-            await NetworkHandler.ConnectToSameRegion();
+            _ = NetworkHandler.ConnectToSameRegion();
         }
 
-        public async void QuitRoom() {
+        public void QuitRoom() {
             OpenRoomListMenu();
 
             if (playerPingUpdateCoroutine != null) {
@@ -445,7 +444,7 @@ namespace NSMB.UI.MainMenu {
                 playerPingUpdateCoroutine = null;
             }
 
-            await NetworkHandler.ConnectToRegion();
+            _ = NetworkHandler.ConnectToRegion();
             GlobalController.Instance.discordController.UpdateActivity();
         }
 
