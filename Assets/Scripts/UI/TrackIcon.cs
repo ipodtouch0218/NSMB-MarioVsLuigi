@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 
 using NSMB.Game;
+using NSMB.Extensions;
 
 public abstract class TrackIcon : MonoBehaviour {
 
@@ -10,18 +11,18 @@ public abstract class TrackIcon : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private float trackMinX, trackMaxX;
-
-    //---Components
-    protected Image image;
+    [SerializeField] protected Image image;
 
     //---Private Variables
     private float levelWidthReciprocal;
     private float levelMinX;
     private float trackWidth;
 
-    public void Awake() {
-        image = GetComponent<Image>();
+    public void OnValidate() {
+        this.SetIfNull(ref image);
+    }
 
+    public void Awake() {
         GameManager gm = GameManager.Instance;
         levelMinX = gm.LevelMinX;
         trackWidth = trackMaxX - trackMinX;

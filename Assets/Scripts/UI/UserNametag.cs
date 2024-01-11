@@ -68,8 +68,8 @@ public class UserNametag : MonoBehaviour {
         cachedNickname ??= data.GetNickname();
 
         // TODO: this allocates every frame.
+        string newText = "";
 
-        string newText = (data.IsRoomOwner ? "<sprite name=room_host>" : "");
         if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
             Team team = ScriptableManager.Instance.teams[data.Team];
             newText += team.textSpriteColorblindBig;

@@ -362,7 +362,9 @@ namespace NSMB.Entities.Player {
             float newZ = -4;
             if (controller.IsDead) {
                 newZ = -6;
-            } else if (controller.CurrentPipe || controller.IsFrozen) {
+            } else if (controller.IsFrozen) {
+                newZ = -2;
+            } else if (controller.CurrentPipe) {
                 newZ = 1;
             }
 

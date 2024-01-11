@@ -33,8 +33,9 @@ public class SpectationManager : MonoBehaviour {
     public PlayerController TargetPlayer {
         get => _targetPlayer;
         set {
-            if (_targetPlayer)
+            if (_targetPlayer) {
                 _targetPlayer.cameraController.IsControllingCamera = false;
+            }
 
             _targetPlayer = value;
             if (value != null) {
@@ -59,39 +60,44 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void Update() {
-        if (!Spectating)
+        if (!Spectating) {
             return;
+        }
 
-        if (!TargetPlayer)
+        if (!TargetPlayer) {
             SpectateNextPlayer();
-        else
+        } else {
             TargetPlayer.cameraController.IsControllingCamera = true;
+        }
     }
 
     public void UpdateSpectateUI() {
         spectationUI.SetActive(Spectating);
-        if (!Spectating || !UIUpdater.Instance)
+        if (!Spectating || !UIUpdater.Instance) {
             return;
+        }
 
         UIUpdater.Instance.player = TargetPlayer;
-        if (!TargetPlayer)
+        if (!TargetPlayer) {
             return;
+        }
 
         string username = TargetPlayer.Object.InputAuthority.GetPlayerData(TargetPlayer.Runner).GetNickname();
 
         TranslationManager tm = GlobalController.Instance.translationManager;
         spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
-        //spectatingText.isRightToLeftText = tm.RightToLeft;
     }
 
     public void SpectateNextPlayer() {
-        if (!GameManager.Instance)
+        if (!GameManager.Instance) {
             return;
+        }
 
         NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
-        if (count <= 0)
+        if (count <= 0) {
             return;
+        }
 
         TargetPlayer = null;
 
@@ -99,19 +105,22 @@ public class SpectationManager : MonoBehaviour {
         while (!TargetPlayer) {
             targetIndex = (targetIndex + 1) % count;
             TargetPlayer = players[targetIndex];
-            if (nulls++ > count)
+            if (nulls++ > count) {
                 break;
+            }
         }
     }
 
     public void SpectatePreviousPlayer() {
-        if (!GameManager.Instance)
+        if (!GameManager.Instance) {
             return;
+        }
 
         NetworkLinkedList<PlayerController> players = GameManager.Instance.AlivePlayers;
         int count = players.Count;
-        if (count <= 0)
+        if (count <= 0) {
             return;
+        }
 
         TargetPlayer = null;
 
@@ -119,14 +128,16 @@ public class SpectationManager : MonoBehaviour {
         while (!TargetPlayer) {
             targetIndex = (targetIndex + count - 1) % count;
             TargetPlayer = players[targetIndex];
-            if (nulls++ > count)
+            if (nulls++ > count) {
                 break;
+            }
         }
     }
 
     private void SpectatePlayerIndex(InputAction.CallbackContext context) {
-        if (!Spectating)
+        if (!Spectating) {
             return;
+        }
 
         if (int.TryParse(context.control.name, out int index)) {
             index += 9;
@@ -135,13 +146,15 @@ public class SpectationManager : MonoBehaviour {
             List<PlayerController> sortedPlayers = new(GameManager.Instance.AlivePlayers);
             sortedPlayers.Sort(new PlayerComparer());
 
-            if (index >= sortedPlayers.Count)
+            if (index >= sortedPlayers.Count) {
                 return;
+            }
 
             PlayerController newTarget = sortedPlayers[index];
 
-            if (!newTarget)
+            if (!newTarget) {
                 return;
+            }
 
             TargetPlayer = newTarget;
         }
@@ -153,12 +166,14 @@ public class SpectationManager : MonoBehaviour {
 
     public class PlayerComparer : IComparer<PlayerController> {
         public int Compare(PlayerController x, PlayerController y) {
-            if (!x ^ !y)
+            if (!x ^ !y) {
                 return !x ? 1 : -1;
+            }
 
             if (x.Stars == y.Stars || x.Lives == 0 || y.Lives == 0) {
-                if (Mathf.Max(0, x.Lives) == Mathf.Max(0, y.Lives))
+                if (Mathf.Max(0, x.Lives) == Mathf.Max(0, y.Lives)) {
                     return x.PlayerId - y.PlayerId;
+                }
 
                 return y.Lives - x.Lives;
             }

@@ -135,9 +135,9 @@ public class Boo : KillableEntity {
     }
 
     public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-        bool fromRight = Utils.WrappedDirectionSign(body.Position, CurrentTarget.body.Position + targetingOffset) == -1;
 
         if (player.State == Enums.PowerupState.MegaMushroom || player.IsStarmanInvincible || player.IsInShell) {
+            bool fromRight = Utils.WrappedDirectionSign(body.Position, CurrentTarget.body.Position + targetingOffset) == -1;
             SpecialKill(!fromRight, false, !player.IsStarmanInvincible, player.StarCombo++);
             return;
         }
@@ -168,17 +168,13 @@ public class Boo : KillableEntity {
         WasSpecialKilled = true;
         WasKilledByMega = mega;
         ComboCounter = (byte) combo;
+        Scared = true;
 
-        if (WasKilledByMega) {
-            FacingRight = right;
-            body.IsKinematic = false;
-            body.Velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
-            AngularVelocity = 400f * (FacingRight ? 1 : -1);
-            body.Gravity = Vector2.down * 14.75f;
-        } else {
-            body.Velocity = Vector2.zero;
-            IsActive = false;
-        }
+        FacingRight = right;
+        body.IsKinematic = false;
+        body.Velocity = new(2f * (FacingRight ? 1 : -1), 2.5f);
+        AngularVelocity = 400f * (FacingRight ? 1 : -1);
+        body.Gravity = Vector2.down * 14.75f;
 
         if (HasStateAuthority) {
             Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, body.Position + hitbox.offset);
@@ -191,11 +187,8 @@ public class Boo : KillableEntity {
         if (IsDead) {
             if (WasKilledByMega) {
                 sfx.PlayOneShot(Enums.Sounds.Powerup_MegaMushroom_Break_Block);
-                Scared = true;
-
             } else {
                 Instantiate(Enums.PrefabParticle.Enemy_Puff.GetGameObject(), body.Position, Quaternion.identity);
-                sRenderer.enabled = false;
             }
         } else {
             sRenderer.enabled = true;

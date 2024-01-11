@@ -4,16 +4,22 @@ using UnityEngine.SceneManagement;
 public class HorizontalCamera : MonoBehaviour {
 
     //---Static Variables
-    private static readonly float BaseSize = 3.5f;
 
     public static float SizeIncreaseTarget = 0f, SizeIncreaseCurrent = 0f;
     private static float SizeIncreaseVelocity;
 
     //---Serialized Variables
     [SerializeField] private bool renderToTextureIfAvailable = true;
+    [SerializeField] private float verticalSizeInTiles = 14f;
 
     //---Private Variables
     private Camera ourCamera;
+
+    public void OnValidate() {
+        if (GetComponentInParent<HorizontalCamera>() is HorizontalCamera parent && parent) {
+            verticalSizeInTiles = parent.verticalSizeInTiles;
+        }
+    }
 
     public void Start() {
         ourCamera = GetComponent<Camera>();
@@ -35,7 +41,7 @@ public class HorizontalCamera : MonoBehaviour {
     private void AdjustCamera() {
 
         float aspect = ourCamera.aspect;
-        double size = BaseSize + SizeIncreaseCurrent;
+        double size = (verticalSizeInTiles / 4f) + SizeIncreaseCurrent;
 
         // https://forum.unity.com/threads/how-to-calculate-horizontal-field-of-view.16114/#post-2961964
         double aspectReciprocals = 1d / aspect;

@@ -283,7 +283,7 @@ namespace NSMB.Entities.World {
                     //    return;
 
                     if (Runner.IsServer) {
-                        Rpc_Splash(new(player2.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, player2.body.Velocity.y)), ParticleType.Enter);
+                        Rpc_Splash(new(player2.body.Position.x, SurfaceHeight), -Mathf.Abs(-Mathf.Max(5, player2.body.Velocity.y)), ParticleType.Enter);
                     }
 
                     player2.Death(false, liquidType == LiquidType.Lava);

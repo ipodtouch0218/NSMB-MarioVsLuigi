@@ -24,6 +24,7 @@ public class UIUpdater : MonoBehaviour {
     [SerializeField] private Sprite storedItemNull;
     [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
     [SerializeField] private Image itemReserve, itemColor;
+    [SerializeField] private GameObject boos;
 
     //---Properties
     private NetworkRunner Runner => NetworkHandler.Runner;
@@ -69,6 +70,8 @@ public class UIUpdater : MonoBehaviour {
     }
 
     public void Update() {
+        PlayerTrackIcon.HideAllPlayerIcons = !GameManager.Instance.spectationManager.Spectating && GameManager.Instance.hidePlayersOnMinimap;
+        boos.SetActive(PlayerTrackIcon.HideAllPlayerIcons);
 
         if (!player) {
             if (!uiHidden) {

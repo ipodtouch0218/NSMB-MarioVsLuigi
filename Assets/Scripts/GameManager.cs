@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,9 +16,8 @@ using NSMB.Entities.Collectable;
 using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Tiles;
-using System.Collections;
-using NSMB.Utils;
 using NSMB.Translation;
+using NSMB.Utils;
 
 namespace NSMB.Game {
     public class GameManager : NetworkBehaviour {
@@ -68,9 +68,9 @@ namespace NSMB.Game {
 
         //---Serialized Variables
         [Header("Music")]
-        [SerializeField] public LoopingMusicData mainMusic;
-        [SerializeField] public LoopingMusicData invincibleMusic;
-        [SerializeField] public LoopingMusicData megaMushroomMusic;
+        public LoopingMusicData mainMusic;
+        public LoopingMusicData invincibleMusic;
+        public LoopingMusicData megaMushroomMusic;
 
         [Header("Level Configuration")]
         public int levelMinTileX;
@@ -83,6 +83,7 @@ namespace NSMB.Game {
         [FormerlySerializedAs("size")] public float spawnCircleWidth = 1.39f;
         [FormerlySerializedAs("ySize")] public float spawnCircleHeight = 0.8f;
         [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
+        public bool hidePlayersOnMinimap = false;
 
         [Header("Camera")]
         public float cameraMinY;
@@ -895,7 +896,7 @@ namespace NSMB.Game {
         /// Sets the game timestamps for Discord RPC
         /// </summary>
         public void SetGameTimestamps() {
-            if (!SessionData.Instance) {
+            if (!SessionData.Instance || !Object) {
                 return;
             }
 

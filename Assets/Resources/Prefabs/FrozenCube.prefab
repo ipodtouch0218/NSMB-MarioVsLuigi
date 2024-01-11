@@ -15,8 +15,7 @@ GameObject:
   - component: {fileID: -4211955845073762521}
   - component: {fileID: 3997958104174501866}
   - component: {fileID: 3575323815080525926}
-  - component: {fileID: 4917212830917736075}
-  - component: {fileID: 3006671777509063445}
+  - component: {fileID: 886428514376071190}
   m_Layer: 14
   m_Name: FrozenCube
   m_TagString: frozencube
@@ -155,7 +154,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4465303805189439310}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
@@ -268,14 +267,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 160341060
   ObjectInterest: 0
-  _DestroyWhenStateAuthorityLeaves: 0
-  _AllowStateAuthorityOverride: 0
-  Flags: 2305
+  Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5742616016131993260}
   - {fileID: 3575323815080525926}
-  - {fileID: 4917212830917736075}
 --- !u!114 &3575323815080525926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,7 +307,7 @@ MonoBehaviour:
   maxFloorAngle: 70
   interpolationTeleportDistance: 1
   bounceOnImpacts: 0
---- !u!114 &4917212830917736075
+--- !u!114 &886428514376071190
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -320,35 +316,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 4465303805189439310}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1039544458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Config: 3
-  BroadRadius: 1.5
-  Offset: {x: 0, y: 1, z: 0}
-  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  Hitboxes:
-  - {fileID: 3006671777509063445}
---- !u!114 &3006671777509063445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4465303805189439310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Type: 1
-  SphereRadius: 0
-  CapsuleRadius: 0
-  BoxExtents: {x: 0.25, y: 0.25, z: 0}
-  CapsuleHeight: 0
-  Offset: {x: 0, y: 0.25, z: 0}
-  Root: {fileID: 4917212830917736075}
-  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  audioSources:
+  - {fileID: -4211955845073762521}
+  soundOrigin: {fileID: 6697499874741732443}
+  soundRange: 12
+  maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!1 &5906585881545024381
 GameObject:
   m_ObjectHideFlags: 0

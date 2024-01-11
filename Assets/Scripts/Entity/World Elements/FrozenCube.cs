@@ -48,7 +48,7 @@ namespace NSMB.Entities {
             ApplyConstraints();
 
             FrozenEntity.Freeze(this);
-            FrozenEntity.PlaySound(Enums.Sounds.Enemy_Generic_Freeze);
+            sfx.PlayOneShot(Enums.Sounds.Enemy_Generic_Freeze);
 
             // Move entity inside us
             if (!FrozenEntity.IsCarryable) {
@@ -71,14 +71,16 @@ namespace NSMB.Entities {
                 return;
             }
 
-            // Shaking animation. Don't play if we're being held or moving fast, unless we're a player
-            if ((!Holder && !FastSlide) || FrozenEntity is PlayerController) {
+            if (!Holder) {
+                Vector3 newPosition = transform.position;
                 float remainingTime = AutoBreakTimer.RemainingRenderTime(Runner) ?? 0f;
-                if (remainingTime < 1) {
-                    Vector3 newPosition = body.Position + Vector2.right * (Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount);
-                    newPosition.z = transform.position.z;
-                    transform.position = newPosition;
+
+                if (remainingTime < 1 && ((!Holder && !FastSlide) || FrozenEntity is PlayerController)) {
+                    // Shaking animation. Don't play if we're being held or moving fast, unless we're a player
+                    newPosition = body.Position + Vector2.right * (Mathf.Sin(remainingTime * shakeSpeed) * shakeAmount);
                 }
+                newPosition.z = FrozenEntity.transform.position.z - 1;
+                transform.position = newPosition;
             }
 
             if (FrozenEntity && FrozenEntity.IsCarryable) {
@@ -105,7 +107,7 @@ namespace NSMB.Entities {
             gameObject.layer = (Holder || FastSlide) ? Layers.LayerEntity : Layers.LayerGroundEntity;
 
             if (body.Position.y + hitbox.size.y < GameManager.Instance.LevelMinY) {
-                Kill();
+                KillWithReason(UnfreezeReason.Other);
                 return;
             }
 
@@ -243,6 +245,7 @@ namespace NSMB.Entities {
                 // Groundpounded by player
                 player.body.Velocity = new(0, 38.671875f * Runner.DeltaTime);
                 player.GroundpoundAnimCounter++;
+                FrozenEntity.FacingRight = ourPos.x < playerPos.x;
                 KillWithReason(UnfreezeReason.Groundpounded);
                 return;
 
@@ -307,6 +310,10 @@ namespace NSMB.Entities {
         }
 
         //---IKillableEntity overrides
+        public override void Crushed() {
+            KillWithReason(UnfreezeReason.Other);
+        }
+
         protected override void CheckForEntityCollisions() {
             if (Holder || !FastSlide) {
                 return;
