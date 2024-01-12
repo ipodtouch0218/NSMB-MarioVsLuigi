@@ -13,7 +13,7 @@ namespace NSMB.Entities.World {
         //---Serialized Variables
         [SerializeField] private Transform topArmBone;
         [SerializeField] private BoxCollider2D hitbox;
-        [SerializeField] private float idleSpinSpeed = -100, fastSpinSpeed = -1800, pressSpeed = 0.5f;
+        [SerializeField] private float idleSpinSpeed = -100, fastSpinSpeed = -1800, pressSpeed = 0.5f, acceleration = 1350f;
 
         //---Public Variables
         public float spinSpeed;
@@ -29,6 +29,7 @@ namespace NSMB.Entities.World {
         public void BeforeTick() {
             HasPlayer = false;
             hitbox.transform.localPosition = new(0, ArmPosition * -0.084f, 0);
+            Physics2D.SyncTransforms();
         }
 
         public override void Render() {
@@ -40,7 +41,7 @@ namespace NSMB.Entities.World {
                 armRenderPosition = ArmPosition;
             }
 
-            spinSpeed = Mathf.MoveTowards(spinSpeed, HasPlayer ? fastSpinSpeed : idleSpinSpeed, Time.deltaTime * 1350f);
+            spinSpeed = Mathf.MoveTowards(spinSpeed, HasPlayer ? fastSpinSpeed : idleSpinSpeed, Time.deltaTime * acceleration);
             topArmBone.eulerAngles += spinSpeed * Time.deltaTime * Vector3.up;
             topArmBone.localPosition = new(0, armRenderPosition * -0.084f, 0);
         }

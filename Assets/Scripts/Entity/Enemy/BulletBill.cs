@@ -125,7 +125,7 @@ namespace NSMB.Entities.Enemies {
             IsDead = true;
             WasSpecialKilled = true;
             WasGroundpounded = true;
-            WasKilledByMega = true;
+            WasKilledByMega = mega;
 
             if (WasKilledByMega) {
                 FacingRight = right;

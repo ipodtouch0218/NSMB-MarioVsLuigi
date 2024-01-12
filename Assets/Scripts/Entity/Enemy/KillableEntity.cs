@@ -311,6 +311,7 @@ namespace NSMB.Entities {
             FacingRight = false;
             WasSpecialKilled = false;
             WasGroundpounded = false;
+            WasKilledByMega = false;
             WasCrushed = false;
             ComboCounter = 0;
 
@@ -326,6 +327,10 @@ namespace NSMB.Entities {
             }
 
             IsDead = true;
+            WasSpecialKilled = false;
+            WasGroundpounded = false;
+            WasKilledByMega = false;
+            WasCrushed = false;
         }
 
         //---IPlayerInteractable overrides

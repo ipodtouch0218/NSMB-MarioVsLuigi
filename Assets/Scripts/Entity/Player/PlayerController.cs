@@ -500,6 +500,8 @@ namespace NSMB.Entities.Player {
                         HandleGroundCollision();
                         IsOnGround |= GroundSnapCheck();
 
+                        CheckForEntityCollision();
+
                         if (IsOnGround) {
                             IgnoreCoyoteTime = false;
                         }
@@ -519,7 +521,6 @@ namespace NSMB.Entities.Player {
                         HandleMovement(heldButtons, pressedButtons);
                     }
 
-                    CheckForEntityCollision();
                     PreviousTickIsOnGround = IsOnGround;
                 }
 
@@ -594,11 +595,11 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        #region -- COLLISIONS --
+        #region -- COLLISIONS --.// hand
         private void HandleGroundCollision() {
             IsOnGround = body.Data.OnGround && PropellerLaunchTimer.ExpiredOrNotRunning(Runner);
-
             OnSpinner = null;
+
             foreach (PhysicsDataStruct.ObjectContact objectContact in body.Data.ObjectsStandingOn) {
                 NetworkObject obj = objectContact.GetNetworkObject(Runner);
 
@@ -609,7 +610,7 @@ namespace NSMB.Entities.Player {
 
                 if (obj.CompareTag("spinner") && obj.gameObject.TryGetComponent(out SpinnerAnimator spinner)) {
                     OnSpinner = spinner;
-                    OnSpinner.HasPlayer = true;
+                    spinner.HasPlayer = true;
                     break;
                 }
             }
@@ -2062,6 +2063,8 @@ namespace NSMB.Entities.Player {
 
             if (!DoEntityBounce && OnSpinner && !HeldEntity) {
                 // Jump of spinner
+                Debug.Log($"{Runner.Tick}{(Runner.IsResimulation ? " (R)" : "")}");
+
                 body.Velocity = new(body.Velocity.x, launchVelocity);
                 IsSpinnerFlying = true;
                 SpinnerLaunchAnimCounter++;
