@@ -16,9 +16,22 @@ public struct PhysicsDataStruct : INetworkStruct {
 
     public IEnumerable<T> GetContactsFromDirection<T>(IEnumerable<T> list, InteractionDirection direction) where T : IContactStruct {
         foreach (T contact in list) {
-            if ((contact.direction & direction) != 0)
+            if ((contact.direction & direction) != 0) {
                 yield return contact;
+            }
         }
+    }
+
+    public void Reset() {
+        FloorAngle = 0;
+        OnGround = false;
+        CrushableGround = false;
+        HitRoof = false;
+        HitRight = false;
+        HitLeft = false;
+
+        TileContacts.Clear();
+        ObjectContacts.Clear();
     }
 
     public IEnumerable<TileContact> TilesStandingOn => GetContactsFromDirection(TileContacts, InteractionDirection.Down);

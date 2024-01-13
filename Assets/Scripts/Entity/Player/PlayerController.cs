@@ -320,7 +320,7 @@ namespace NSMB.Entities.Player {
 
         public void BeforeTick() {
             HandleLayerState();
-            IsOnGround = GroundSnapCheck();
+            //IsOnGround |= GroundSnapCheck();groudn
         }
 
         public override void Spawned() {
@@ -2063,8 +2063,6 @@ namespace NSMB.Entities.Player {
 
             if (!DoEntityBounce && OnSpinner && !HeldEntity) {
                 // Jump of spinner
-                Debug.Log($"{Runner.Tick}{(Runner.IsResimulation ? " (R)" : "")}");
-
                 body.Velocity = new(body.Velocity.x, launchVelocity);
                 IsSpinnerFlying = true;
                 SpinnerLaunchAnimCounter++;

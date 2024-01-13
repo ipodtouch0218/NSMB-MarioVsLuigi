@@ -99,7 +99,7 @@ namespace NSMB.Entities.Enemies {
 
                 if (IsStationary) {
                     if (data.OnGround && body.Velocity.y < 1) {
-                        body.Velocity = new(0, body.Velocity.y);
+                        body.Velocity = Vector2.zero;
                     }
 
                     if (WakeupTimer.Expired(Runner)) {
@@ -120,7 +120,7 @@ namespace NSMB.Entities.Enemies {
                 }
             }
 
-            if (data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.Position, Vector2.down, 0.5f, Layers.MaskAnyGround) && dontFallOffEdges && !IsInShell) {
+            if (dontFallOffEdges && !IsInShell && data.OnGround && Runner.GetPhysicsScene2D().Raycast(body.Position, Vector2.down, 0.5f, Layers.MaskAnyGround)) {
                 Vector3 redCheckPos = body.Position + new Vector2(0.1f * (FacingRight ? 1 : -1), 0);
                 if (GameManager.Instance) {
                     Utils.Utils.WrapWorldLocation(ref redCheckPos);
@@ -149,7 +149,7 @@ namespace NSMB.Entities.Enemies {
 
             if (Putdown) {
                 if (data.OnGround) {
-                    body.Velocity = new(0, body.Velocity.y);
+                    body.Velocity = Vector2.zero;
                     Putdown = false;
                 }
 

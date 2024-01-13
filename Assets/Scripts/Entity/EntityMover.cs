@@ -4,9 +4,8 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
-using NSMB.Entities.Enemies;
 
-[SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Resimulate | SimulationStages.Forward)]
+[SimulationBehaviour]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
 
     //---Static Variables
@@ -45,6 +44,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     [SerializeField] private bool bounceOnImpacts;
 
     //---Private Variables
+    private float previousFloorAngle;
     private Vector2 previousInternalPosition;
     private Vector2 previousRenderPosition;
     private PropertyReader<Vector2> internalPositionPropertyReader;
@@ -126,7 +126,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             return;
         }
 
-        ResetPhysicsData();
+        previousFloorAngle = Data.OnGround ? Data.FloorAngle : 0;
+        Data.Reset();
 
         if (!Freeze) {
             Vector2 movement;
@@ -142,18 +143,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         }
 
         transform.position = Position;
-    }
-
-    private void ResetPhysicsData() {
-        Data.FloorAngle = 0;
-        Data.OnGround = false;
-        Data.CrushableGround = false;
-        Data.HitRoof = false;
-        Data.HitRight = false;
-        Data.HitLeft = false;
-
-        Data.TileContacts.Clear();
-        Data.ObjectContacts.Clear();
     }
 
     private Vector2 CollideAndSlide(Vector2 raycastPos, Vector2 raycastVel, bool gravityPass, int depth = 0) {
@@ -188,25 +177,43 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 continue;
             }
 
-            if (TryGetComponent(out Koopa _)) {
-                Debug.DrawRay(hit.point, hit.normal, Color.white);
+            // Exception: dont hit objects if we're moving away from them
+            if (gravityPass) {
+                Vector2 combinedDirection = raycastVel + (Velocity * Runner.DeltaTime);
+
+                if (Vector2.Dot(combinedDirection, hit.normal) > 0) {
+                    continue;
+                }
             }
 
-
-            // Exception: dont hit objects if we're moving away from them
-            if (Vector2.Dot(direction, hit.normal) > 0.1f) {
+            if (Vector2.Dot(direction, hit.normal) > 0) {
                 continue;
             }
 
             float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
 
-            // Semisolid check.
+
+            // Semisolid check(s)
             if (hit.collider.gameObject.layer == Layers.LayerSemisolid) {
+
+                if (angle > maxFloorAngle) {
+                    continue;
+                }
+
+                // Semisolid stairs check
+                //if (TryGetBehaviour(out PlayerController _)) {
+                //    Debug.Log($"{angle} {previousFloorAngle}");
+                //}
+
+                //if (Mathf.Abs(angle - previousFloorAngle) > 30) {
+                //    continue;
+                //}
+
                 if (
-                    (direction.y > 0 || Velocity.y > 0) || // We are moving upwards, impossible to collide.
                     (raycastPos.y - (ColliderSize.y * 0.5f) < hit.point.y - 0.03f) || // Lower bound of hitbox is BELOW the semisolid hit
                     (Mathf.Abs(angle) > maxFloorAngle) // Didn't hit upwards...
                    ) {
+
                     continue;
                 }
             }
@@ -301,10 +308,12 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                     offset.y = 0;
                 }
 
-                Position += offset;
-                raycastPos += offset;
-                direction = ((Vector2) Vector3.ProjectOnPlane(direction, hit.normal)).normalized;
-                positionToSurfacePoint = direction * hit.distance;
+                if (offset.sqrMagnitude >= Skin) {
+                    Position += offset;
+                    raycastPos += offset;
+                    direction = ((Vector2) Vector3.ProjectOnPlane(direction, hit.normal)).normalized;
+                    positionToSurfacePoint = direction * hit.distance;
+                }
             }
 
             if (Data.OnGround && gravityPass) {
