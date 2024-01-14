@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using TMPro;
 
-using NSMB.Utils;
 using NSMB.Game;
+using NSMB.Utils;
 
 public class TeamScoreboard : MonoBehaviour {
 
@@ -16,8 +17,9 @@ public class TeamScoreboard : MonoBehaviour {
     private TeamManager teamManager;
 
     public void Update() {
-        if (CheckForStarCountUpdates())
+        if (CheckForStarCountUpdates()) {
             UpdateText();
+        }
     }
 
     private bool CheckForStarCountUpdates() {
@@ -25,9 +27,10 @@ public class TeamScoreboard : MonoBehaviour {
         // Ew... Linq, but needed to avoid concurrent modification
         foreach (int index in teamStars.Keys.ToArray()) {
             int stars = teamStars[index];
-            int newStars = teamManager.GetTeamStars(index);
-            if (stars == newStars)
+            teamManager.GetTeamStars(index, out int newStars);
+            if (stars == newStars) {
                 continue;
+            }
 
             teamStars[index] = newStars;
             updated = true;
@@ -36,19 +39,24 @@ public class TeamScoreboard : MonoBehaviour {
     }
 
     private void UpdateText() {
-        string newString = "";
+        StringBuilder newString = new();
         foreach ((int index, int stars) in teamStars) {
+            if (newString.Length != 0) {
+                newString.Append(" ");
+            }
             Team team = ScriptableManager.Instance.teams[index];
-            newString += (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString(stars.ToString()) + " ";
+            newString.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
+            newString.Append(Utils.GetSymbolString(stars.ToString()));
         }
 
-        text.text = newString.Trim();
+        text.text = newString.ToString();
     }
 
     public void OnAllPlayersLoaded() {
         teamManager = GameManager.Instance.teamManager;
-        foreach (int teamIndex in teamManager.GetValidTeams())
+        foreach (int teamIndex in teamManager.GetValidTeams()) {
             teamStars[teamIndex] = 0;
+        }
 
         UpdateText();
     }

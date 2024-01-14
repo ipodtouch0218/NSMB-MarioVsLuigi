@@ -233,7 +233,7 @@ public class PlayerData : NetworkBehaviour {
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetPermanentSpectator(bool value) {
-        //not accepting changes at this time
+        // Not accepting changes at this time
         if (Locked) {
             return;
         }
@@ -243,12 +243,12 @@ public class PlayerData : NetworkBehaviour {
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void Rpc_SetCharacterIndex(byte index) {
-        //not accepting changes at this time
+        // Not accepting changes at this time
         if (Locked) {
             return;
         }
 
-        //invalid character...
+        // Invalid character...
         if (index >= ScriptableManager.Instance.characters.Length) {
             return;
         }

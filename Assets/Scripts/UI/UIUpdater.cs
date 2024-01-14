@@ -120,7 +120,7 @@ public class UIUpdater : MonoBehaviour {
 
         if (teams) {
             int teamIndex = player.Data.Team;
-            teamStars = teamManager?.GetTeamStars(teamIndex) ?? 0;
+            teamManager?.GetTeamStars(teamIndex, out teamStars);
             Team team = ScriptableManager.Instance.teams[teamIndex];
             uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + SessionData.Instance.StarRequirement);
         }
@@ -138,7 +138,7 @@ public class UIUpdater : MonoBehaviour {
             uiCoins.text = Utils.GetSymbolString("Cx" + coins + "/" + SessionData.Instance.CoinRequirement);
         }
 
-        if (player.Lives >= 0) {
+        if (player.LivesEnabled) {
             if (player.Lives != lives) {
                 lives = player.Lives;
                 uiLives.text = player.Data.GetCharacterData().uistring + Utils.GetSymbolString("x" + lives);

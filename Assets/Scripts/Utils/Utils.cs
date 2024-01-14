@@ -22,7 +22,7 @@ namespace NSMB.Utils {
         }
 
         public static bool BitTest(ulong v, int index) {
-            return (v & ((ulong) 1 << index)) != 0;
+            return (v & (1UL << index)) != 0;
         }
 
         public static void BitSet(ref byte v, int index, bool value) {
@@ -33,19 +33,27 @@ namespace NSMB.Utils {
             }
         }
 
-        public static void BitSet(ref long v, int index, bool value) {
+        public static void BitSet(ref int v, int index, bool value) {
             if (value) {
-                v |= (1L << index);
+                v |= (1 << index);
             } else {
-                v &= ~(1L << index);
+                v &= ~(1 << index);
+            }
+        }
+
+        public static void BitSet(ref uint v, int index, bool value) {
+            if (value) {
+                v |= (1U << index);
+            } else {
+                v &= ~(1U << index);
             }
         }
 
         public static void BitSet(ref ulong v, int index, bool value) {
             if (value) {
-                v |= ((ulong) 1 << index);
+                v |= (1UL << index);
             } else {
-                v &= ~((ulong) 1 << index);
+                v &= ~(1UL << index);
             }
         }
 
@@ -411,7 +419,7 @@ namespace NSMB.Utils {
             GameManager gm = GameManager.Instance;
 
             // "Losing" variable based on ln(x+1), x being the # of stars we're behind
-            int ourStars = gm.teamManager.GetTeamStars(player.Data.Team);
+            gm.teamManager.GetTeamStars(player.Data.Team, out int ourStars);
             int leaderStars = gm.teamManager.GetFirstPlaceStars();
 
             int starsToWin = SessionData.Instance.StarRequirement;

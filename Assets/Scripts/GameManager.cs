@@ -814,11 +814,11 @@ namespace NSMB.Game {
             speedup |= SessionData.Instance.Timer > 0 && ((GameEndTimer.RemainingTime(Runner) ?? 0f) < 60f);
             speedup |= teamManager.GetFirstPlaceStars() + 1 >= SessionData.Instance.StarRequirement;
 
-            if (!speedup) {
+            if (!speedup && SessionData.Instance.Lives > 0) {
                 int playersWithOneLife = 0;
                 int playerCount = 0;
                 foreach (var player in AlivePlayers) {
-                    if (!player || player.Lives == 0) {
+                    if (!player || player.OutOfLives) {
                         continue;
                     }
 

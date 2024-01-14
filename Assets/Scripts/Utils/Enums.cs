@@ -197,15 +197,8 @@ public static class Enums {
     #region NETWORKING
     // Networking Enums
     public static class NetRoomProperties {
-        public const string MaxPlayers = "P";
-        public const string Level = "L";
-        public const string StarRequirement = "S";
-        public const string CoinRequirement = "Co";
-        public const string Lives = "Li";
-        public const string Time = "T";
-        public const string Teams = "Ts";
-        public const string CustomPowerups = "C";
-        public const string GameStarted = "G";
+        public const string IntProperties = "I";
+        public const string BoolProperties = "B";
         public const string HostName = "H";
     }
     #endregion

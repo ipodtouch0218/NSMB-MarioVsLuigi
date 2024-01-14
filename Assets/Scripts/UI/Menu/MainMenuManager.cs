@@ -481,6 +481,10 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateStartGameButton() {
+            if (SessionData.Instance && SessionData.Instance.GameStartTimer.IsRunning) {
+                return;
+            }
+
             PlayerData data = Runner.GetLocalPlayerData();
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (data && data.IsRoomOwner) {

@@ -170,8 +170,8 @@ public class SpectationManager : MonoBehaviour {
                 return !x ? 1 : -1;
             }
 
-            if (x.Stars == y.Stars || x.Lives == 0 || y.Lives == 0) {
-                if (Mathf.Max(0, x.Lives) == Mathf.Max(0, y.Lives)) {
+            if (x.Stars == y.Stars || x.OutOfLives || y.OutOfLives) {
+                if (x.Lives == y.Lives) {
                     return x.PlayerId - y.PlayerId;
                 }
 

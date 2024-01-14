@@ -41,6 +41,16 @@ public class Settings : Singleton<Settings> {
         set => GlobalController.Instance.translationManager.ChangeLanguage(value);
     }
 
+    private bool _generalDiscordIntegration;
+    public bool GeneralDiscordIntegration {
+        get => _generalDiscordIntegration;
+        set {
+            _generalDiscordIntegration = value;
+            GlobalController.Instance.discordController.UpdateActivity();
+        }
+    }
+
+
     private string _graphicsFullscreenResolution;
     public string GraphicsFullscreenResolution {
         get {
@@ -190,6 +200,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetString("General_Locale", GeneralLocale);
         PlayerPrefs.SetInt("General_DisableNATPunchthrough", generalDisableNATPunchthrough ? 1 : 0);
         PlayerPrefs.SetInt("General_UseNicknameColor", generalUseNicknameColor ? 1 : 0);
+        PlayerPrefs.SetInt("General_DiscordIntegration", GeneralDiscordIntegration ? 1 : 0);
 
         // Graphics
         PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
@@ -262,6 +273,7 @@ public class Settings : Singleton<Settings> {
         GeneralLocale = "en-US";
         generalDisableNATPunchthrough = false;
         generalUseNicknameColor = true;
+        _generalDiscordIntegration = true;
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
         GraphicsFullscreenMode = (int) Screen.fullScreenMode;
@@ -308,6 +320,7 @@ public class Settings : Singleton<Settings> {
         TryGetSetting<string>("General_Locale", nameof(GeneralLocale));
         TryGetSetting("General_DisableNATPunchthrough", ref generalDisableNATPunchthrough);
         TryGetSetting("General_UseNicknameColor", ref generalUseNicknameColor);
+        TryGetSetting<bool>("General_DiscordIntegration", nameof(GeneralDiscordIntegration));
 
         // Graphics
         TryGetSetting<int>("Graphics_FullscreenMode", nameof(GraphicsFullscreenMode));

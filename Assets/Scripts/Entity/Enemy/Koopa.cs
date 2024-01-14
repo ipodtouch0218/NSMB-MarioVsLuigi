@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
 using Fusion;
-using NSMB.Entities.Player;
 using NSMB.Entities.Collectable;
 using NSMB.Entities.Collectable.Powerups;
+using NSMB.Entities.Player;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;

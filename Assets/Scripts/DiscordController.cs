@@ -6,9 +6,9 @@ using Discord;
 using Fusion;
 using NSMB.Game;
 using NSMB.Translation;
-using NSMB.Utils;
 
 public class DiscordController : MonoBehaviour {
+#pragma warning disable CS0162
 
     //---Static Variables
     private static readonly long DiscordAppId = 962073502469459999;
@@ -26,16 +26,16 @@ public class DiscordController : MonoBehaviour {
         discord?.Dispose();
     }
 
-    private void OnLanguageChanged(TranslationManager tm) {
-        if (NetworkHandler.Runner) {
-            UpdateActivity(NetworkHandler.Runner.SessionInfo);
-        } else {
-            UpdateActivity(null);
-        }
+    public void Start() {
+#if UNITY_WEBGL || UNITY_WSA
+        enabled = false;
+#endif
+
+        Initialize();
     }
 
-#pragma warning disable CS0162
-    public void Start() {
+
+    private bool Initialize() {
 #if UNITY_WEBGL || UNITY_WSA
         enabled = false;
         return;
@@ -43,7 +43,7 @@ public class DiscordController : MonoBehaviour {
 
         discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
         activityManager = discord.GetActivityManager();
-        activityManager.OnActivityJoinRequest += AskToJoin;
+        //activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
 
         try {
@@ -53,42 +53,32 @@ public class DiscordController : MonoBehaviour {
             activityManager.RegisterCommand(dir);
             Debug.Log($"[Discord] Set launch path to \"{dir}\"");
         } catch {
-            Debug.Log($"[Discord] Failed to set launch path (on {Application.platform})");
-        }
-    }
-#pragma warning restore CS0162
-
-    public void TryJoinGame(string secret) {
-        //TODO: MainMenu jank...
-        if (GameManager.Instance) {
-            return;
+            Debug.LogError($"[Discord] Failed to set launch path (on {Application.platform})");
         }
 
-        Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
-
-        //TODO: add "disconnect" prompt
-        _ = NetworkHandler.JoinRoom(secret);
-    }
-
-    //TODO this doesn't work???
-    public void AskToJoin(ref User user) {
-        //activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
-        //    Debug.Log($"[Discord] Ask to Join response: {res}");
-        //});
+        return true;
     }
 
     public void Update() {
+        if (discord == null) {
+            return;
+        }
+
         try {
             discord.RunCallbacks();
         } catch { }
     }
 
-#pragma warning disable CS0162
     public void UpdateActivity(SessionInfo session = null) {
 #if UNITY_WEBGL || UNITY_WSA
         return;
 #endif
-        if (discord == null || activityManager == null || !Application.isPlaying) {
+        if (!Application.isPlaying || discord == null) {
+            return;
+        }
+
+        if (!Settings.Instance.GeneralDiscordIntegration) {
+            activityManager.ClearActivity(res => { Debug.Log(res); });
             return;
         }
 
@@ -103,14 +93,19 @@ public class DiscordController : MonoBehaviour {
 
             activity.Details = NetworkHandler.Runner.IsSinglePlayer ? tm.GetTranslation("discord.offline") : tm.GetTranslation("discord.online");
             if (!NetworkHandler.Runner.IsSinglePlayer) {
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int maxSize);
-                activity.Party = new() { Size = new() { CurrentSize = session.PlayerCount, MaxSize = maxSize }, Id = session.Name + "1" };
+                activity.Party = new() {
+                    Size = new() {
+                        CurrentSize = session.PlayerCount,
+                        MaxSize = SessionData.Instance.MaxPlayers,
+                    },
+                    Id = session.Name + "1",
+                };
             }
             activity.State = session.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
             activity.Secrets = new() { Join = session.Name };
 
             if (GameManager.Instance) {
-                //in a level
+                // In a level
                 GameManager gm = GameManager.Instance;
 
                 ActivityAssets assets = new();
@@ -130,16 +125,43 @@ public class DiscordController : MonoBehaviour {
                     activity.Timestamps = new() { End = (long) gm.gameEndTimestamp };
                 }
             } else {
-                //in a room, but on the main menu.
+                // In a room, but on the main menu.
                 activity.Assets = new() { LargeImage = "mainmenu" };
             }
         } else {
-            //in the main menu, not in a room
+            // In the main menu, not in a room
             activity.Details = tm.GetTranslation("discord.mainmenu");
             activity.Assets = new() { LargeImage = "mainmenu" };
         }
 
         activityManager.UpdateActivity(activity, (res) => { });
+    }
+
+    private void OnLanguageChanged(TranslationManager tm) {
+        if (NetworkHandler.Runner) {
+            UpdateActivity(NetworkHandler.Runner.SessionInfo);
+        } else {
+            UpdateActivity(null);
+        }
+    }
+
+    public void TryJoinGame(string secret) {
+        // TODO: MainMenu jank...
+        if (GameManager.Instance) {
+            return;
+        }
+
+        Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
+
+        // TODO: add "disconnect" prompt if we're already in a game.
+        _ = NetworkHandler.JoinRoom(secret);
+    }
+
+    //TODO this doesn't work???
+    public void AskToJoin(ref User user) {
+        //activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
+        //    Debug.Log($"[Discord] Ask to Join response: {res}");
+        //});
     }
 #pragma warning restore CS0162
 }

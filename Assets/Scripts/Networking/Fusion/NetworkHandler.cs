@@ -540,7 +540,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.Scene = scene;
 
             args.SessionProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname;
-            args.SessionProperties[Enums.NetRoomProperties.MaxPlayers] = players;
+            NetworkUtils.IntegerProperties intProperties = new() {
+                maxPlayers = players,
+            };
+            args.SessionProperties[Enums.NetRoomProperties.IntProperties] = (int) intProperties;
 
             // Attempt to create the room
             StartGameResult results = await Runner.StartGame(args);

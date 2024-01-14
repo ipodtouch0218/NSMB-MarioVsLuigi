@@ -118,7 +118,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            newValue = Mathf.Clamp(newValue, 2, 25);
+            newValue = Mathf.Clamp(newValue, 3, 25);
 
             if (newValue == oldValue) {
                 ChangeCoinRequirement(oldValue);
@@ -150,7 +150,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            Room.SetLives((sbyte) newValue);
+            Room.SetLives((byte) newValue);
         }
 
         public void EnableLives() {
@@ -158,13 +158,13 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : -1;
+            int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : 0;
 
-            Room.SetLives((sbyte) newValue);
+            Room.SetLives((byte) newValue);
         }
 
         private void ChangeLives(int lives) {
-            bool enabled = lives != -1;
+            bool enabled = lives > 0;
             livesEnabledToggle.SetIsOnWithoutNotify(enabled);
             livesInputField.interactable = enabled;
 
@@ -181,7 +181,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             int oldValue = Room.Timer;
-            if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue)) {
+            if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
                 return;
             }
 
@@ -192,7 +192,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            Room.SetTimer((sbyte) newValue);
+            Room.SetTimer((byte) newValue);
         }
 
         public void EnableTime() {
@@ -200,21 +200,21 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            if (!int.TryParse(timerInputField.text.Split(":")[0], out int newValue)) {
+            if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
                 return;
             }
 
-            newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : -1;
+            newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : 0;
 
-            Room.SetTimer((sbyte) newValue);
+            Room.SetTimer((byte) newValue);
         }
 
         private void ChangeTime(int time) {
-            timerEnabledToggle.SetIsOnWithoutNotify(time != -1);
-            timerInputField.interactable = time != -1;
-            drawEnabledToggle.interactable = time != -1;
+            timerEnabledToggle.SetIsOnWithoutNotify(time > 0);
+            timerInputField.interactable = time > 0;
+            drawEnabledToggle.interactable = time > 0;
 
-            if (time == -1) {
+            if (time <= 0) {
                 return;
             }
 

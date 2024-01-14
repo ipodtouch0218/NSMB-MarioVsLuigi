@@ -10,15 +10,17 @@ public class TeamManager {
     public void AddPlayer(PlayerController player) {
         sbyte teamid = player.Data.Team;
 
-        if (!teams.TryGetValue(teamid, out HashSet<PlayerController> team))
+        if (!teams.TryGetValue(teamid, out HashSet<PlayerController> team)) {
             teams[teamid] = team = new();
+        }
 
         team.Add(player);
     }
 
     public HashSet<PlayerController> GetTeamMembers(int team) {
-        if (teams.TryGetValue(team, out HashSet<PlayerController> teamMembers))
+        if (teams.TryGetValue(team, out HashSet<PlayerController> teamMembers)) {
             return teamMembers;
+        }
 
         return null;
     }
@@ -27,48 +29,52 @@ public class TeamManager {
         return teams.Keys;
     }
 
-    public int GetTeamStars(int teamIndex) {
-        if (!teams.TryGetValue(teamIndex, out HashSet<PlayerController> team))
-            return 0;
+    public bool GetTeamStars(int teamIndex, out int stars) {
+        stars = 0;
+        if (!teams.TryGetValue(teamIndex, out HashSet<PlayerController> team)) {
+            return false;
+        }
 
-        int stars = 0;
         bool hasAtLeastOnePlayer = false;
         foreach (PlayerController player in team) {
-            if (!player || !player.Object || player.Lives == 0)
+            if (!player || !player.Object || player.OutOfLives) {
                 continue;
+            }
 
             stars += player.Stars;
             hasAtLeastOnePlayer = true;
         }
 
-        if (!hasAtLeastOnePlayer)
-            return 0;
+        if (!hasAtLeastOnePlayer) {
+            return false;
+        }
 
-        return stars;
+        return true;
     }
 
     public int GetFirstPlaceStars() {
         int max = 0;
         foreach ((int index, var team) in teams) {
-            int count = GetTeamStars(index);
-
-            if (count > max)
-                max = count;
+            if (GetTeamStars(index, out int stars)) {
+                if (stars > max) {
+                    max = stars;
+                }
+            }
         }
         return max;
     }
 
-    public bool HasFirstPlaceTeam(out int teamIndex, out int stars) {
-        stars = 0;
+    public bool HasFirstPlaceTeam(out int teamIndex, out int maxStars) {
+        maxStars = -1;
         teamIndex = -1;
         foreach ((int index, var team) in teams) {
-            int count = GetTeamStars(index);
-
-            if (count > stars) {
-                stars = count;
-                teamIndex = index;
-            } else if (count == stars) {
-                teamIndex = -1;
+            if (GetTeamStars(index, out int stars)) {
+                if (stars > maxStars) {
+                    maxStars = stars;
+                    teamIndex = index;
+                } else if (stars == maxStars) {
+                    teamIndex = -1;
+                }
             }
         }
         return teamIndex != -1;
@@ -78,8 +84,9 @@ public class TeamManager {
         int count = 0;
         foreach ((int index, var team) in teams) {
             foreach (PlayerController player in team) {
-                if (!player || player.Lives == 0)
+                if (!player || player.OutOfLives) {
                     continue;
+                }
 
                 count++;
                 break;

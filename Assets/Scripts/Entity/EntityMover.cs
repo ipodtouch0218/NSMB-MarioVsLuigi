@@ -44,7 +44,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     [SerializeField] private bool bounceOnImpacts;
 
     //---Private Variables
-    private float previousFloorAngle;
     private Vector2 previousInternalPosition;
     private Vector2 previousRenderPosition;
     private PropertyReader<Vector2> internalPositionPropertyReader;
@@ -126,7 +125,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             return;
         }
 
-        previousFloorAngle = Data.OnGround ? Data.FloorAngle : 0;
         Data.Reset();
 
         if (!Freeze) {
@@ -191,7 +189,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             }
 
             float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
-
 
             // Semisolid check(s)
             if (hit.collider.gameObject.layer == Layers.LayerSemisolid) {

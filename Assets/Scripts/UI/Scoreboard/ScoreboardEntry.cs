@@ -22,7 +22,7 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
     private PlayerData data;
     private NicknameColor nicknameColor;
     private int playerId, currentLives, currentStars, currentPing;
-    private bool disconnected;
+    private bool disconnected, initialized = false;
     private int deathTick;
 
     public void Start() {
@@ -53,13 +53,15 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
     public void Update() {
         CheckForTextUpdate();
 
-        if (nicknameColor.isRainbow)
+        if (nicknameColor.isRainbow) {
             nameText.color = Utils.GetRainbowColor(NetworkHandler.Runner);
+        }
     }
 
     private void CheckForTextUpdate() {
-        if (disconnected)
+        if (disconnected) {
             return;
+        }
 
         if (!data || !data.Object || !data.Object.IsValid) {
             disconnected = true;
@@ -78,9 +80,10 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
             return;
         }
 
-        if (target.Lives != currentLives || target.Stars != currentStars) {
+        if (!initialized || target.Lives != currentLives || target.Stars != currentStars) {
             currentLives = target.Lives;
             currentStars = target.Stars;
+            initialized = true;
             UpdateScoreText();
             ScoreboardUpdater.Instance.RepositionEntries();
         }
@@ -88,26 +91,32 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
 
     private void UpdateScoreText() {
         string txt = "";
-        if (currentLives >= 0)
+        if (target.LivesEnabled) {
             txt += target.Data.GetCharacterData().uistring + Utils.GetSymbolString(currentLives.ToString());
+        }
+
         txt += Utils.GetSymbolString("S" + currentStars);
 
         valuesText.text = txt;
     }
 
     public int CompareTo(object obj) {
-        if (obj is not ScoreboardEntry other)
+        if (obj is not ScoreboardEntry other) {
             return -1;
+        }
 
-        if (!target && !other.target)
+        if (!target && !other.target) {
             return other.deathTick - deathTick;
+        }
 
-        if (!target ^ !other.target)
+        if (!target ^ !other.target) {
             return !target ? 1 : -1;
+        }
 
         if (currentStars == other.currentStars || currentLives == 0 || other.currentLives == 0) {
-            if (Mathf.Max(0, currentLives) == Mathf.Max(0, other.currentLives))
+            if (Mathf.Max(0, currentLives) == Mathf.Max(0, other.currentLives)) {
                 return playerId - other.playerId;
+            }
 
             return other.currentLives - currentLives;
         }
@@ -117,7 +126,8 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
 
     //---Callbacks
     private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        if (target.Object.InputAuthority == player)
+        if (target.Object.InputAuthority == player) {
             ScoreboardUpdater.Instance.DestroyEntry(this);
+        }
     }
 }

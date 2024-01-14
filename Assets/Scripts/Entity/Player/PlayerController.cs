@@ -35,7 +35,7 @@ namespace NSMB.Entities.Player {
         [Networked] public Enums.PowerupState StoredPowerup { get; set; }
         [Networked] public byte Stars { get; set; }
         [Networked] public byte Coins { get; set; }
-        [Networked] public sbyte Lives { get; set; }
+        [Networked] public byte Lives { get; set; }
         [Networked] private sbyte SpawnpointIndex { get; set; }
         //-Player Movement
         //Generic
@@ -212,6 +212,9 @@ namespace NSMB.Entities.Player {
         }
         public PlayerData Data { get; private set; }
 
+        public bool LivesEnabled => SessionData.Instance.Lives > 0;
+        public bool OutOfLives => Disconnected || (LivesEnabled && Lives == 0);
+
         //---Components
         [SerializeField] public CameraController cameraController;
         [SerializeField] public PlayerAnimationController animationController;
@@ -340,7 +343,9 @@ namespace NSMB.Entities.Player {
             }
 
             if (FirstSpawn) {
-                Lives = SessionData.Instance.Lives;
+                if (SessionData.Instance.Lives > 0) {
+                    Lives = SessionData.Instance.Lives;
+                }
                 Vector3 spawn = GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
                 body.Position = spawn;
                 cameraController.Recenter(spawn);
@@ -564,7 +569,7 @@ namespace NSMB.Entities.Player {
         private void HandleDeathTimers() {
 
             if (DeathAnimationTimer.Expired(Runner)) {
-                if ((Lives == 0 || Disconnected) && Stars > 0) {
+                if (OutOfLives && Stars > 0) {
                     // Try to drop more stars.
                     SpawnStars(1, DeathplaneDeath);
                     DeathAnimationTimer = TickTimer.CreateFromSeconds(Runner, 0.5f);
@@ -576,7 +581,7 @@ namespace NSMB.Entities.Player {
                         body.Freeze = false;
                     }
                     DeathAnimationTimer = TickTimer.None;
-                    if (Lives == 0) {
+                    if (OutOfLives) {
                         PreRespawnTimer = TickTimer.CreateFromSeconds(Runner, 2.4f);
                     }
                 }
@@ -1301,7 +1306,7 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            if (Lives == 0) {
+            if (OutOfLives) {
                 fastStars = true;
                 starDirection = noLivesStarSpawnDirection++ % 4;
 
@@ -1358,7 +1363,7 @@ namespace NSMB.Entities.Player {
             PreRespawnTimer = TickTimer.CreateFromSeconds(Runner, 3f);
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 4.3f);
 
-            if ((Lives > 0 && --Lives == 0) || Disconnected) {
+            if ((LivesEnabled && --Lives == 0) || Disconnected) {
                 // Last death - drop all stars at 0.5s each
                 if (!GameManager.Instance.CheckForWinner()) {
                     SpawnStars(1, DeathplaneDeath);
@@ -1419,7 +1424,7 @@ namespace NSMB.Entities.Player {
 
             RespawnTimer = TickTimer.CreateFromSeconds(Runner, 1.3f);
 
-            if (Lives == 0) {
+            if (OutOfLives) {
                 GameManager.Instance.CheckForWinner();
 
                 if (HasInputAuthority) {
@@ -2666,7 +2671,7 @@ namespace NSMB.Entities.Player {
             bool jumpPressed = pressedButtons.IsSet(PlayerControls.Jump);
             bool canJump = jumpPressed || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
             bool doJump = (canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime)) || (!IsSwimming && SwimJump);
-            bool doWalljump = canJump && !IsOnGround && WallSliding;
+            bool doWalljump = canJump /* && !IsOnGround */ && WallSliding;
             bool doGroundpound = pressedButtons.IsSet(PlayerControls.Down) || (IsPropellerFlying && heldButtons.IsSet(PlayerControls.Down));
 
             /*

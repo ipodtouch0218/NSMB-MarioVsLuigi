@@ -76,7 +76,7 @@ public class UserNametag : MonoBehaviour {
         }
         newText += cachedNickname + "\n";
 
-        if (parent.Lives >= 0) {
+        if (parent.LivesEnabled) {
             newText += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
         }
 

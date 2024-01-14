@@ -104,19 +104,19 @@ namespace NSMB.UI.MainMenu {
 
             foreach (SessionInfo session in sessionList) {
 
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.Lives, out int lives);
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.StarRequirement, out int stars);
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.CoinRequirement, out int coins);
+                // Is this check really necessary anymore?
+
                 NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string host);
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.MaxPlayers, out int players);
+                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.IntProperties, out int packedIntProperties);
+                NetworkUtils.IntegerProperties intProperties = (NetworkUtils.IntegerProperties) packedIntProperties;
 
                 bool valid = true;
                 valid &= session.IsVisible && session.IsOpen;
                 valid &= session.MaxPlayers > 0 && session.MaxPlayers <= 10;
-                valid &= players > 0 && players <= 10;
-                valid &= lives <= 99;
-                valid &= stars >= 1 && stars <= 99;
-                valid &= coins >= 1 && coins <= 99;
+                valid &= intProperties.maxPlayers > 0 && intProperties.maxPlayers <= 10;
+                valid &= intProperties.lives <= 25;
+                valid &= intProperties.starRequirement >= 1 && intProperties.starRequirement <= 25;
+                valid &= intProperties.coinRequirement >= 3 && intProperties.coinRequirement <= 25;
                 valid &= host.IsValidUsername();
 
                 if (valid) {

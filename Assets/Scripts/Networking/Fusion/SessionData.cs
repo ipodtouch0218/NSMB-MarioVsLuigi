@@ -21,8 +21,6 @@ public class SessionData : NetworkBehaviour {
     //---Default values
     private readonly sbyte defaultStarRequirement = 10;
     private readonly byte defaultCoinRequirement = 8;
-    private readonly sbyte defaultLives = -1;
-    private readonly sbyte defaultTimer = -1;
     private readonly NetworkBool defaultCustomPowerups = true;
 #pragma warning restore CS0414
 
@@ -34,8 +32,8 @@ public class SessionData : NetworkBehaviour {
     [Networked] public byte Level { get; set; }
     [Networked(Default = nameof(defaultStarRequirement))] public sbyte StarRequirement { get; set; }
     [Networked(Default = nameof(defaultCoinRequirement))] public byte CoinRequirement { get; set; }
-    [Networked(Default = nameof(defaultLives))] public sbyte Lives { get; set; }
-    [Networked(Default = nameof(defaultTimer))] public sbyte Timer { get; set; }
+    [Networked] public byte Lives { get; set; }
+    [Networked] public byte Timer { get; set; }
     [Networked] public NetworkBool DrawOnTimeUp { get; set; }
     [Networked(Default = nameof(defaultCustomPowerups))] public NetworkBool CustomPowerups { get; set; }
     [Networked] public NetworkBool Teams { get; set; }
@@ -80,8 +78,9 @@ public class SessionData : NetworkBehaviour {
         if (Runner.IsServer) {
             PrivateRoom = !Runner.SessionInfo.IsVisible;
             if (MaxPlayers == 0) {
-                NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.MaxPlayers, out int players);
-                MaxPlayers = (byte) players;
+                NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
+                NetworkUtils.IntegerProperties intProperties = (NetworkUtils.IntegerProperties) packedBoolProperties;
+                MaxPlayers = (byte) intProperties.maxPlayers;
             }
 
             bannedIds = new();
@@ -215,38 +214,39 @@ public class SessionData : NetworkBehaviour {
         bannedIds.Add(data.UserId);
     }
 
-    public void SetMaxPlayers(byte value) {
-        MaxPlayers = value;
-        UpdateProperty(Enums.NetRoomProperties.MaxPlayers, value);
-    }
-
     public void SetGameStarted(bool value) {
         GameStarted = value;
-        UpdateProperty(Enums.NetRoomProperties.GameStarted, value ? 1 : 0);
+        UpdateBooleanProperties();
+    }
+
+    public void SetMaxPlayers(byte value) {
+        MaxPlayers = value;
+        UpdateIntProperties();
     }
 
     public void SetLevel(byte value) {
         Level = value;
-        UpdateProperty(Enums.NetRoomProperties.Level, value);
+        UpdateIntProperties();
     }
 
     public void SetStarRequirement(sbyte value) {
         StarRequirement = value;
-        UpdateProperty(Enums.NetRoomProperties.StarRequirement, value);
+        UpdateIntProperties();
     }
 
     public void SetCoinRequirement(byte value) {
         CoinRequirement = value;
-        UpdateProperty(Enums.NetRoomProperties.CoinRequirement, value);
-    }
-    public void SetLives(sbyte value) {
-        Lives = value;
-        UpdateProperty(Enums.NetRoomProperties.Lives, value);
+        UpdateIntProperties();
     }
 
-    public void SetTimer(sbyte value) {
+    public void SetLives(byte value) {
+        Lives = value;
+        UpdateIntProperties();
+    }
+
+    public void SetTimer(byte value) {
         Timer = value;
-        UpdateProperty(Enums.NetRoomProperties.Time, value);
+        UpdateIntProperties();
     }
 
     public void SetDrawOnTimeUp(bool value) {
@@ -256,18 +256,39 @@ public class SessionData : NetworkBehaviour {
 
     public void SetCustomPowerups(bool value) {
         CustomPowerups = value;
-        UpdateProperty(Enums.NetRoomProperties.CustomPowerups, value ? 1 : 0);
+        UpdateBooleanProperties();
     }
 
     public void SetTeams(bool value) {
         Teams = value;
-        UpdateProperty(Enums.NetRoomProperties.Teams, value ? 1 : 0);
+        UpdateBooleanProperties();
     }
 
     public void SetPrivateRoom(bool value) {
         PrivateRoom = value;
         Runner.SessionInfo.IsVisible = !value;
         // No session property here.
+    }
+
+    private void UpdateIntProperties() {
+        NetworkUtils.IntegerProperties properties = new() {
+            level = Level,
+            timer = Timer,
+            lives = Lives,
+            coinRequirement = CoinRequirement,
+            starRequirement = StarRequirement,
+            maxPlayers = MaxPlayers
+        };
+        UpdateProperty(Enums.NetRoomProperties.IntProperties, (int) properties);
+    }
+
+    private void UpdateBooleanProperties() {
+        NetworkUtils.BooleanProperties properties = new() {
+            gameStarted = GameStarted,
+            customPowerups = CustomPowerups,
+            teams = Teams,
+        };
+        UpdateProperty(Enums.NetRoomProperties.BoolProperties, (int) properties);
     }
 
     public void UpdateProperty(string property, SessionProperty value) {
