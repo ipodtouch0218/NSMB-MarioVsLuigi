@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
+using NSMB.Entities.Player;
 
 [SimulationBehaviour]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
@@ -215,6 +216,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 }
             }
 
+            Vector2 alignedDirection;
+
             bool isTilemap = hit.collider is CompositeCollider2D;
             if (Mathf.Abs(angle) < maxFloorAngle) {
                 // Floor
@@ -232,6 +235,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                     AddTileContacts(lowerBound, upperBound, y, InteractionDirection.Down);
                 }
 
+                alignedDirection = Vector2.up;
+
             } else if (Mathf.Abs(angle) > 180 - maxFloorAngle) {
                 // Roof
                 Data.HitRoof = true;
@@ -246,16 +251,20 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                     AddTileContacts(lowerBound, upperBound, y, InteractionDirection.Up);
                 }
 
+                alignedDirection = Vector2.down;
+
             } else {
                 InteractionDirection interactionDirection;
                 if (angle > 0) {
                     // Left
                     Data.HitLeft = true;
                     interactionDirection = InteractionDirection.Left;
+                    alignedDirection = Vector2.left;
                 } else {
                     // Right
                     Data.HitRight = true;
                     interactionDirection = InteractionDirection.Right;
+                    alignedDirection = Vector2.right;
                 }
 
                 if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
@@ -269,7 +278,11 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 }
             }
 
-            Vector2 positionToSurfacePoint = (direction * hit.distance) + (hit.normal * Skin);
+            Vector2 positionToSurfacePoint = (direction * hit.distance) + (alignedDirection * Skin);
+
+            if (TryGetComponent(out PlayerController _)) {
+                Debug.DrawRay(positionToSurfacePoint, hit.normal, Color.red);
+            }
 
             // Started inside an object
             if (hit.distance <= 0) {
@@ -305,12 +318,10 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                     offset.y = 0;
                 }
 
-                if (offset.sqrMagnitude >= Skin) {
-                    Position += offset;
-                    raycastPos += offset;
-                    direction = ((Vector2) Vector3.ProjectOnPlane(direction, hit.normal)).normalized;
-                    positionToSurfacePoint = direction * hit.distance;
-                }
+                Position += offset;
+                raycastPos += offset;
+                direction = ((Vector2) Vector3.ProjectOnPlane(direction, hit.normal)).normalized;
+                positionToSurfacePoint = direction * hit.distance;
             }
 
             if (Data.OnGround && gravityPass) {

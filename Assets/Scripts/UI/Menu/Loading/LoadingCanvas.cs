@@ -29,8 +29,9 @@ namespace NSMB.Loading {
         }
 
         public void Initialize() {
-            if (initialized)
+            if (initialized) {
                 return;
+            }
 
             initialized = true;
 
@@ -46,8 +47,10 @@ namespace NSMB.Loading {
             audioSource.volume = 0;
             audioSource.Play();
 
-            if (fadeCoroutine != null)
+            if (fadeCoroutine != null) {
                 StopCoroutine(fadeCoroutine);
+            }
+
             fadeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
 
             //audioListener.enabled = true;
@@ -60,8 +63,9 @@ namespace NSMB.Loading {
 
             initialized = false;
 
-            if (fadeCoroutine != null)
+            if (fadeCoroutine != null) {
                 StopCoroutine(fadeCoroutine);
+            }
 
             fadeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             //audioListener.enabled = false;
@@ -88,8 +92,9 @@ namespace NSMB.Loading {
                 yield return null;
             }
 
-            if (!fadeIn)
+            if (!fadeIn) {
                 audioSource.Stop();
+            }
         }
     }
 }

@@ -204,9 +204,11 @@ namespace NSMB.Entities.Enemies {
                 BlueShellCollector = player;
                 powerupCollect.OnPowerupCollect(player, Enums.GetPowerupScriptable(Enums.PowerupState.BlueShell));
             } else {
-                Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position + Vector3.down * 0.15f, onBeforeSpawned: (runner, obj) => {
-                    obj.GetComponent<Powerup>().OnBeforeSpawned(0.1f);
-                });
+                if (Runner.IsServer) {
+                    Runner.Spawn(PrefabList.Instance.Powerup_BlueShell, transform.position + Vector3.down * 0.15f, onBeforeSpawned: (runner, obj) => {
+                        obj.GetComponent<Powerup>().OnBeforeSpawned(0.1f);
+                    });
+                }
             }
             DespawnEntity();
         }

@@ -916,7 +916,7 @@ namespace NSMB.Game {
         }
 
         private IEnumerator CallAllPlayersLoaded() {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(2f);
             if (!calledAllPlayersLoaded) {
                 OnAllPlayersLoaded?.Invoke();
             }

@@ -687,7 +687,7 @@ MonoBehaviour:
   m_fontSizeMin: 0
   m_fontSizeMax: 28
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -44733,6 +44733,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerList: {fileID: 1394624252273630683}
+  statusText: {fileID: 3626728888328854889}
 --- !u!1 &8962770090848600293
 GameObject:
   m_ObjectHideFlags: 0

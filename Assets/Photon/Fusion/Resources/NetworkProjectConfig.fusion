@@ -4,8 +4,8 @@
     "PeerMode": 0,
     "LagCompensation": {
         "Enabled": true,
-        "HitboxBufferLengthInMs": 200,
-        "HitboxDefaultCapacity": 512,
+        "HitboxBufferLengthInMs": 400,
+        "HitboxDefaultCapacity": 256,
         "CachedStaticCollidersSize": 64
     },
     "EnqueueIncompleteSynchronousSpawns": true,
@@ -50,7 +50,7 @@
     },
     "Heap": {
         "PageShift": 14,
-        "PageCount": 128,
+        "PageCount": 256,
         "GlobalsSize": 0
     },
     "AssembliesToWeave": [

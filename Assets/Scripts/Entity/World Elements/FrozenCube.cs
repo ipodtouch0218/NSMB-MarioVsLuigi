@@ -97,6 +97,11 @@ namespace NSMB.Entities {
                 return;
             }
 
+            if (GameManager.Instance.GameEnded) {
+                body.Velocity = Vector2.zero;
+                return;
+            }
+
             base.FixedUpdateNetwork();
 
             if (!Object || IsDead) {

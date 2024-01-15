@@ -88,11 +88,16 @@ public class CameraController : NetworkBehaviour {
                 (fromVector, toVector) = currentPositionReader.Read(from, to);
             }
 
+            Vector2 dest;
             Utils.UnwrapLocations(fromVector, toVector, out var fromVectorRelative, out var toVectorRelative);
-            Vector2 lerped = Vector2.Lerp(fromVectorRelative, toVectorRelative, alpha);
-            Utils.WrapWorldLocation(ref lerped);
+            if (Vector2.Distance(fromVectorRelative, toVectorRelative) > 1f) {
+                dest = toVectorRelative;
+            } else {
+                dest = Vector2.Lerp(fromVectorRelative, toVectorRelative, alpha);
+            }
+            Utils.WrapWorldLocation(ref dest);
 
-            newPosition = lerped;
+            newPosition = dest;
             newPosition.z = CurrentPosition.z;
         } else {
             newPosition = CurrentPosition;

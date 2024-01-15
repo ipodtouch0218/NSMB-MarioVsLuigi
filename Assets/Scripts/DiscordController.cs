@@ -8,6 +8,7 @@ using NSMB.Game;
 using NSMB.Translation;
 
 public class DiscordController : MonoBehaviour {
+#pragma warning disable IDE0079
 #pragma warning disable CS0162
 
     //---Static Variables
@@ -164,4 +165,5 @@ public class DiscordController : MonoBehaviour {
         //});
     }
 #pragma warning restore CS0162
+#pragma warning restore IDE0079
 }

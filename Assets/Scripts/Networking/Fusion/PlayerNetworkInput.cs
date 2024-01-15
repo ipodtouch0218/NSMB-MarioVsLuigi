@@ -3,6 +3,7 @@ using Fusion;
 public struct PlayerNetworkInput : INetworkInput {
 
     public NetworkButtons buttons;
+    public int lastJumpPressTick;
     public byte powerupActionCounter;
 
 }

@@ -523,7 +523,7 @@ namespace NSMB.Entities.Player {
                         }
 
                         CheckForPowerupActions(input, PreviousInputs);
-                        HandleMovement(heldButtons, pressedButtons);
+                        HandleMovement(heldButtons, pressedButtons, input);
                     }
 
                     PreviousTickIsOnGround = IsOnGround;
@@ -653,7 +653,7 @@ namespace NSMB.Entities.Player {
                     Quaternion.identity,
                     Object.InputAuthority,
                     LagCompensatedBuffer,
-                    options: HitOptions.IgnoreInputAuthority | HitOptions.IncludeBox2D,
+                    options: HitOptions.IgnoreInputAuthority | HitOptions.IncludeBox2D | HitOptions.SubtickAccuracy,
                     clearHits: false);
             }
 
@@ -974,6 +974,7 @@ namespace NSMB.Entities.Player {
             }
 
 
+
             Vector2 joystick = ControlSystem.controls.Player.Movement.ReadValue<Vector2>();
             bool jump = ControlSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
             bool powerup = ControlSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
@@ -994,13 +995,18 @@ namespace NSMB.Entities.Player {
             newInput.buttons.Set(PlayerControls.Sprint, sprint ^ Settings.Instance.controlsAutoSprint);
             newInput.buttons.Set(PlayerControls.PowerupAction, powerup);
 
-            // Powerup action counter avoids dropped inputs
+            // Powerup action counter to avoid dropped inputs
             NetworkButtons pressed = newInput.buttons.GetPressed(onInputPreviousInputs.buttons);
             if (pressed.IsSet(PlayerControls.PowerupAction)
                 || (pressed.IsSet(PlayerControls.Sprint) && Settings.Instance.controlsFireballSprint && (State == Enums.PowerupState.FireFlower || State == Enums.PowerupState.IceFlower))
                 || (pressed.IsSet(PlayerControls.Jump) && !IsOnGround && Settings.Instance.controlsPropellerJump && State == Enums.PowerupState.PropellerMushroom)) {
 
                 newInput.powerupActionCounter++;
+            }
+
+            // Jump tick to avoid dropped inputs
+            if (pressed.IsSet(PlayerControls.Jump)) {
+                newInput.lastJumpPressTick = Runner.Tick;
             }
 
             input.Set(newInput);
@@ -2552,7 +2558,7 @@ namespace NSMB.Entities.Player {
             body.Position = newPosition;
         }
 
-        private void HandleMovement(NetworkButtons heldButtons, NetworkButtons pressedButtons) {
+        private void HandleMovement(NetworkButtons heldButtons, NetworkButtons pressedButtons, PlayerNetworkInput input) {
             float delta = Runner.DeltaTime;
             IsFunctionallyRunning = heldButtons.IsSet(PlayerControls.Sprint) || State == Enums.PowerupState.MegaMushroom || IsPropellerFlying;
 
@@ -2645,7 +2651,7 @@ namespace NSMB.Entities.Player {
                 IsInShell = false;
                 body.Velocity -= body.Velocity * (delta * 2f);
 
-                float timeStunned = (Runner.Tick - KnockbackTick) * Runner.DeltaTime;
+                float timeStunned = (Runner.Tick - KnockbackTick) * delta;
 
                 if ((IsSwimming && timeStunned > 1.5f) || (!IsSwimming && IsOnGround && Mathf.Abs(body.Velocity.x) < 0.35f && timeStunned > 0.5f)) {
                     ResetKnockback();
@@ -2663,10 +2669,7 @@ namespace NSMB.Entities.Player {
             bool powerupAction = heldButtons.IsSet(PlayerControls.PowerupAction);
 
             // Jump Buffering
-            if (pressedButtons.IsSet(PlayerControls.Jump) && !IsOnGround) {
-                // 0.15s buffer time
-                JumpBufferTime = Runner.SimulationTime + 0.15f;
-            }
+            JumpBufferTime = (input.lastJumpPressTick * delta) + 0.15f;
 
             bool jumpPressed = pressedButtons.IsSet(PlayerControls.Jump);
             bool canJump = jumpPressed || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
