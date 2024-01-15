@@ -4,7 +4,6 @@ using UnityEngine.Serialization;
 using Fusion;
 using NSMB.Tiles;
 using NSMB.Utils;
-using NSMB.Entities.Player;
 
 [SimulationBehaviour]
 public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllTicks, IRemotePrefabCreated {
@@ -280,10 +279,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
             Vector2 positionToSurfacePoint = (direction * hit.distance) + (alignedDirection * Skin);
 
-            if (TryGetComponent(out PlayerController _)) {
-                Debug.DrawRay(positionToSurfacePoint, hit.normal, Color.red);
-            }
-
             // Started inside an object
             if (hit.distance <= 0) {
                 RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(raycastPos, (hit.point - raycastPos), Mathf.Max(size.x, size.y), filter);
@@ -309,6 +304,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             if (Vector2.Dot(positionToSurfacePoint, hit.normal) > 0) {
                 // Hit normal pushing us away from the wall
                 Vector2 offset = (Vector2) Vector3.Project(positionToSurfacePoint, hit.normal);
+                // Maybe the offset shouldnt be based on the normal???
 
                 if (LockX) {
                     offset.x = 0;
