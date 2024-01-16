@@ -50,7 +50,8 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool IsTurnaround { get; set; }
         [Networked] private byte WalkingTurnaroundFrames { get; set; } //TODO: change somehow
         [Networked] private float TurnaroundBoostTime { get; set; } //TODO: change somehow
-        [Networked] private float JumpBufferTime { get; set; }
+        [Networked] private int JumpBufferTick { get; set; }
+        [Networked] private int LastConsumedJumpTick { get; set; }
         [Networked] public float CoyoteTime { get; set; }
         [Networked] private float TimeGrounded { get; set; }
         [Networked] public NetworkBool IgnoreCoyoteTime { get; set; }
@@ -2141,7 +2142,7 @@ namespace NSMB.Entities.Player {
             ProperJump = true;
             IsJumping = true;
             JumpAnimCounter++;
-            JumpBufferTime = -1;
+            JumpBufferTick = -1;
             IsInKnockback = false;
 
             BounceJump = DoEntityBounce;
@@ -2669,10 +2670,17 @@ namespace NSMB.Entities.Player {
             bool powerupAction = heldButtons.IsSet(PlayerControls.PowerupAction);
 
             // Jump Buffering
-            JumpBufferTime = (input.lastJumpPressTick * delta) + 0.15f;
+            int bufferTicks = (int) (Runner.TickRate * 0.2f);
+            int jumpTick = input.lastJumpPressTick;
 
-            bool jumpPressed = pressedButtons.IsSet(PlayerControls.Jump);
-            bool canJump = jumpPressed || (Runner.SimulationTime <= JumpBufferTime && (IsOnGround || WallSliding));
+            if (LastConsumedJumpTick < jumpTick) {
+                // Doing it like this *should* help with dropped inputs... untested though.
+                JumpBufferTick = jumpTick + bufferTicks;
+                LastConsumedJumpTick = Runner.Tick;
+            }
+
+            // Actions
+            bool canJump = pressedButtons.IsSet(PlayerControls.Jump) || (Runner.Tick <= JumpBufferTick && (IsOnGround || WallSliding));
             bool doJump = (canJump && (IsOnGround || Runner.SimulationTime <= CoyoteTime)) || (!IsSwimming && SwimJump);
             bool doWalljump = canJump /* && !IsOnGround */ && WallSliding;
             bool doGroundpound = pressedButtons.IsSet(PlayerControls.Down) || (IsPropellerFlying && heldButtons.IsSet(PlayerControls.Down));
@@ -3034,7 +3042,7 @@ namespace NSMB.Entities.Player {
                     }
 
                     JumpAnimCounter++;
-                    JumpBufferTime = -1;
+                    JumpBufferTick = -1;
 
                     IsOnGround = false;
                     IsCrouching = false;

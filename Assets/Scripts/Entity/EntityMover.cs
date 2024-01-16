@@ -258,12 +258,12 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                     // Left
                     Data.HitLeft = true;
                     interactionDirection = InteractionDirection.Left;
-                    alignedDirection = Vector2.left;
+                    alignedDirection = Vector2.right;
                 } else {
                     // Right
                     Data.HitRight = true;
                     interactionDirection = InteractionDirection.Right;
-                    alignedDirection = Vector2.right;
+                    alignedDirection = Vector2.left;
                 }
 
                 if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
@@ -279,26 +279,26 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
             Vector2 positionToSurfacePoint = (direction * hit.distance) + (alignedDirection * Skin);
 
-            // Started inside an object
-            if (hit.distance <= 0) {
-                RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(raycastPos, (hit.point - raycastPos), Mathf.Max(size.x, size.y), filter);
-                if (stuckHit) {
-                    Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);
-
-                    if (LockX) {
-                        offset.x = 0;
-                    }
-
-                    if (LockY) {
-                        offset.y = 0;
-                    }
-
-                    Position += offset;
-                    raycastPos += offset;
-
-                    return CollideAndSlide(raycastPos, raycastVel, gravityPass, depth + 1);
-                }
-            }
+        //    // Started inside an object
+        //    if (hit.distance <= 0) {
+        //        RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(raycastPos, (hit.point - raycastPos), Mathf.Max(size.x, size.y), filter);
+        //        if (stuckHit) {
+        //            Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);
+        //
+        //            if (LockX) {
+        //                offset.x = 0;
+        //            }
+        //
+        //            if (LockY) {
+        //                offset.y = 0;
+        //            }
+        //
+        //            Position += offset;
+        //            raycastPos += offset;
+        //
+        //            return CollideAndSlide(raycastPos, raycastVel, gravityPass, depth + 1);
+        //        }
+        //    }
 
             // Eject from walls
             if (Vector2.Dot(positionToSurfacePoint, hit.normal) > 0) {
