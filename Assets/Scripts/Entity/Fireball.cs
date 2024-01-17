@@ -73,6 +73,7 @@ namespace NSMB.Entities {
             base.Spawned();
 
             body.Freeze = true;
+            IsActive = false;
             iceGraphics.SetActive(false);
             fireGraphics.SetActive(false);
 

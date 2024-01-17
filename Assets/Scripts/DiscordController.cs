@@ -39,7 +39,7 @@ public class DiscordController : MonoBehaviour {
     private bool Initialize() {
 #if UNITY_WEBGL || UNITY_WSA
         enabled = false;
-        return;
+        return false;
 #endif
 
         discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
