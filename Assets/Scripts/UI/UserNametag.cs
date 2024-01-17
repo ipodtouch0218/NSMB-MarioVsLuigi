@@ -42,7 +42,7 @@ public class UserNametag : MonoBehaviour {
         }
 
         // If the parent disconnects, don't immediately die, but don't keep trying to update our info either.
-        if (!parent.Object || parent.Disconnected || !data || !data.Object) {
+        if (!parent.Object) {
             return;
         }
 
@@ -65,26 +65,29 @@ public class UserNametag : MonoBehaviour {
         transform.position = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentTransform.rect.size;
         transform.position += parentTransform.position - (Vector3) (parentTransform.pivot * parentTransform.rect.size);
 
-        cachedNickname ??= data.GetNickname();
+        if (data && data.Object) {
+            cachedNickname ??= data.GetNickname();
 
-        // TODO: this allocates every frame.
-        string newText = "";
+            // TODO: this allocates every frame.
+            string newText = "";
 
-        if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
-            Team team = ScriptableManager.Instance.teams[data.Team];
-            newText += team.textSpriteColorblindBig;
+            if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
+                Team team = ScriptableManager.Instance.teams[data.Team];
+                newText += team.textSpriteColorblindBig;
+            }
+            newText += cachedNickname + "\n";
+
+            if (parent.LivesEnabled) {
+                newText += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
+            }
+
+            newText += Utils.GetSymbolString("Sx" + parent.Stars);
+
+            text.text = newText;
+
+            nicknameColor ??= data.NicknameColor;
         }
-        newText += cachedNickname + "\n";
 
-        if (parent.LivesEnabled) {
-            newText += character.uistring + Utils.GetSymbolString("x" + parent.Lives + " ");
-        }
-
-        newText += Utils.GetSymbolString("Sx" + parent.Stars);
-
-        text.text = newText;
-
-        nicknameColor ??= data.NicknameColor;
         if (nicknameColor != null && nicknameColor.isRainbow) {
             text.color = Utils.GetRainbowColor(parent.Runner);
         }

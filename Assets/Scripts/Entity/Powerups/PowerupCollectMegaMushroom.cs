@@ -6,11 +6,10 @@ using NSMB.Entities.Player;
 namespace NSMB.Entities.Collectable.Powerups {
     public class PowerupCollectMegaMushroom : MonoBehaviour, IPowerupCollect {
 
-        private GameObject particle;
-
         public PowerupReserveResult OnPowerupCollect(PlayerController player, PowerupScriptable powerup) {
-            if (player.State == Enums.PowerupState.MegaMushroom)
+            if (player.State == Enums.PowerupState.MegaMushroom) {
                 return PowerupReserveResult.ReserveNewPowerup;
+            }
 
             NetworkRunner runner = player.Runner;
 
@@ -34,12 +33,6 @@ namespace NSMB.Entities.Collectable.Powerups {
             player.IsInShell = false;
 
             player.AttemptThrowHeldItem();
-
-            if (!particle) {
-                Vector3 position = player.transform.position;
-                position.z = -4;
-                particle = Instantiate(PrefabList.Instance.Particle_Giant, position, Quaternion.identity);
-            }
 
             return PowerupReserveResult.ReserveOldPowerup;
         }

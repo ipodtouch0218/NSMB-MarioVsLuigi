@@ -67,7 +67,6 @@ namespace NSMB.Entities {
             body.Position = spawnpoint;
             body.Freeze = false;
             body.Velocity = new(CurrentSpeed * (FacingRight ? 1 : -1), -CurrentSpeed);
-            Runner.SetIsSimulated(Object, !owner.IsProxy);
         }
 
         public override void Spawned() {
@@ -82,6 +81,7 @@ namespace NSMB.Entities {
             if (!GameManager.Instance.PooledFireballs.Contains(this)) {
                 GameManager.Instance.PooledFireballs.Add(this);
             }
+            Runner.SetIsSimulated(Object, true);
         }
 
         public override void Render() {
@@ -98,15 +98,21 @@ namespace NSMB.Entities {
             body.Freeze = !IsActive;
             gameObject.layer = IsActive ? Layers.LayerEntity : Layers.LayerEntityNoGroundEntity;
 
-            if (!IsActive) {
+            if (!IsActive || !Owner) {
                 body.Velocity = Vector2.zero;
-                if (!IsHitboxActive) {
+                if (!IsHitboxActive || !Owner) {
                     return;
                 }
             }
 
             if (GameManager.Instance && GameManager.Instance.GameEnded) {
                 body.Freeze = true;
+                return;
+            }
+
+            Object.RenderTimeframe = Owner.IsProxy ? RenderTimeframe.Remote : RenderTimeframe.Local;
+
+            if (Owner.IsProxy) {
                 return;
             }
 

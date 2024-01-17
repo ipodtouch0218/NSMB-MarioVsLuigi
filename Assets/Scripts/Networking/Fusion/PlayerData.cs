@@ -155,7 +155,7 @@ public class PlayerData : NetworkBehaviour {
             case nameof(Ping): OnSettingChanged(); break;
             case nameof(IsLoaded): OnLoadStateChanged(); break;
             case nameof(IsInOptions): OnInOptionsChanged(); break;
-            case nameof(IsReady): OnIsReadyChanged(); break;
+            case nameof(IsReady): OnIsReadyChanged(IsReady); break;
             case nameof(CharacterIndex): OnCharacterChanged(); break;
             case nameof(SkinIndex): OnSkinChanged(); break;
             }
@@ -304,7 +304,7 @@ public class PlayerData : NetworkBehaviour {
         } else if (HasInputAuthority) {
             // Bodge for the lack of "InvokeResim" in Fusion 2
             // Makes it so the icon appears.. "predictively"? Is that a word?
-            OnIsReadyChanged();
+            OnIsReadyChanged(ready);
         }
     }
 
@@ -361,11 +361,11 @@ public class PlayerData : NetworkBehaviour {
         OnInOptionsChangedEvent?.Invoke(IsInOptions);
     }
 
-    public void OnIsReadyChanged() {
-        OnIsReadyChangedEvent?.Invoke(IsReady);
+    public void OnIsReadyChanged(bool state) {
+        OnIsReadyChangedEvent?.Invoke(state);
 
         if (MainMenuManager.Instance && HasInputAuthority) {
-            MainMenuManager.Instance.UpdateStartGameButton();
+            MainMenuManager.Instance.UpdateReadyButton(state);
         }
     }
 }

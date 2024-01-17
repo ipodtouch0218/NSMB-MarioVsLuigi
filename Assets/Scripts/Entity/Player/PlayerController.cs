@@ -230,8 +230,10 @@ namespace NSMB.Entities.Player {
         [SerializeField] public float flyingGravity = 0.8f, flyingTerminalVelocity = 1.25f, drillVelocity = 7f, groundpoundTime = 0.25f, groundpoundVelocity = 10, blinkingSpeed = 0.25f, terminalVelocity = -7f, launchVelocity = 12f, wallslideSpeed = -4.25f, soundRange = 10f, slopeSlidingAngle = 12.5f, pickupTime = 0.5f;
         [SerializeField, FormerlySerializedAs("giantStartTime")] public float megaStartTime = 1.5f;
         [SerializeField] public float propellerLaunchVelocity = 6, propellerFallSpeed = 2, propellerSpinFallSpeed = 1.5f, propellerSpinTime = 0.75f, heightSmallModel = 0.42f, heightLargeModel = 0.82f;
+        [SerializeField] private float jumpBufferDuration = 0.2f;
         [SerializeField] public GameObject models;
         [SerializeField] public CharacterData character;
+
 
         //---Private Variables
         private Enums.Sounds footstepSound = Enums.Sounds.Player_Walk_Grass;
@@ -2670,7 +2672,7 @@ namespace NSMB.Entities.Player {
             bool powerupAction = heldButtons.IsSet(PlayerControls.PowerupAction);
 
             // Jump Buffering
-            int bufferTicks = (int) (Runner.TickRate * 0.2f);
+            int bufferTicks = (int) (Runner.TickRate * jumpBufferDuration);
             int jumpTick = input.lastJumpPressTick;
 
             if (LastConsumedJumpTick < jumpTick) {
@@ -3604,6 +3606,7 @@ namespace NSMB.Entities.Player {
             PlaySoundEverywhere(MegaTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
         }
 
+        GameObject megaParticle;
         public void OnMegaStartTimerChanged() {
             if (GameManager.Instance.GameState != Enums.GameState.Playing) {
                 return;
@@ -3614,6 +3617,11 @@ namespace NSMB.Entities.Player {
             }
 
             animator.Play("mega-scale");
+            if (!megaParticle) {
+                Vector3 position = body.Position;
+                position.z = -4;
+                megaParticle = Instantiate(PrefabList.Instance.Particle_Giant, position, Quaternion.identity);
+            }
         }
 
         public void OnIsStationaryMegaShrinkChanged() {

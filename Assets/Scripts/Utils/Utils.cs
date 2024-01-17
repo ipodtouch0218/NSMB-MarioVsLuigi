@@ -610,8 +610,7 @@ namespace NSMB.Utils {
                 return Color.white;
             }
 
-            double time = runner.SimulationTime * 0.25d;
-            time %= 1;
+            double time = (runner.LocalRenderTime * 0.25d) % 1d;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }
 

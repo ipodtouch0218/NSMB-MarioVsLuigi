@@ -38,8 +38,9 @@ namespace NSMB.UI.MainMenu {
 
                 Button b = newButton.GetComponent<Button>();
                 newButton.name = color?.name ?? "Reset";
-                if (color == null)
+                if (color == null) {
                     b.image.sprite = clearSprite;
+                }
 
                 newButton.SetActive(true);
                 buttons.Add(b);
@@ -71,8 +72,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void ChangeCharacter(CharacterData data) {
-            foreach (ColorButton b in colorButtons)
+            foreach (ColorButton b in colorButtons) {
                 b.Instantiate(data);
+            }
         }
 
         public void SelectColor(Button button) {
@@ -80,8 +82,9 @@ namespace NSMB.UI.MainMenu {
             MainMenuManager.Instance.SwapPlayerSkin((byte) buttons.IndexOf(button), true);
             Close(false);
 
-            if (MainMenuManager.Instance)
+            if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
+            }
         }
 
         public void Open() {
@@ -91,8 +94,9 @@ namespace NSMB.UI.MainMenu {
 
             EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
 
-            if (MainMenuManager.Instance)
+            if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
+            }
         }
 
         public void Close(bool playSound) {
@@ -100,8 +104,9 @@ namespace NSMB.UI.MainMenu {
             EventSystem.current.SetSelectedGameObject(gameObject);
             content.SetActive(false);
 
-            if (playSound && MainMenuManager.Instance)
+            if (playSound && MainMenuManager.Instance) {
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Back);
+            }
         }
     }
 }

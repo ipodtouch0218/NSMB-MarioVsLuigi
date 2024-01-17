@@ -23,12 +23,8 @@ public struct PhysicsDataStruct : INetworkStruct {
     }
 
     public void Reset() {
+        Flags = 0;
         FloorAngle = 0;
-        OnGround = false;
-        CrushableGround = false;
-        HitRoof = false;
-        HitRight = false;
-        HitLeft = false;
 
         TileContacts.Clear();
         ObjectContacts.Clear();
@@ -59,9 +55,13 @@ public struct PhysicsDataStruct : INetworkStruct {
         get => Utils.BitTest(Flags, 4);
         set => Utils.BitSet(ref Flags, 4, value);
     }
+    public bool OnMovingPlatform {
+        get => Utils.BitTest(Flags, 5);
+        set => Utils.BitSet(ref Flags, 5, value);
+    }
 
     public override string ToString() {
-        return $"FloorAngle: {FloorAngle} OnGround: {OnGround}, CrushableGround: {CrushableGround}, HitRoof: {HitRoof}, HitLeft: {HitLeft}, HitRight: {HitRight}";
+        return $"FloorAngle: {FloorAngle} OnGround: {OnGround}, CrushableGround: {CrushableGround}, HitRoof: {HitRoof}, HitLeft: {HitLeft}, HitRight: {HitRight}, OnMovingPlatform: {OnMovingPlatform}";
     }
 
     public interface IContactStruct : INetworkStruct {

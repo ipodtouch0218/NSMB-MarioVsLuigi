@@ -480,6 +480,15 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
+        public void UpdateReadyButton(bool ready) {
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            if (ready) {
+                startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.unready");
+            } else {
+                startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.readyup");
+            }
+        }
+
         public void UpdateStartGameButton() {
             if (SessionData.Instance && SessionData.Instance.GameStartTimer.IsRunning) {
                 return;
@@ -491,11 +500,7 @@ namespace NSMB.UI.MainMenu {
                 startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
                 startGameBtn.interactable = IsRoomConfigurationValid();
             } else {
-                if (data && data.IsReady) {
-                    startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.unready");
-                } else {
-                    startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.readyup");
-                }
+                UpdateReadyButton(data && data.IsReady);
                 startGameBtn.interactable = true;
             }
         }
@@ -564,10 +569,10 @@ namespace NSMB.UI.MainMenu {
 
             CharacterData data = ScriptableManager.Instance.characters[character];
             colorManager.ChangeCharacter(data);
-            SwapPlayerSkin(currentSkin, false);
+            SwapPlayerSkin(currentSkin, false, data);
         }
 
-        public void SwapPlayerSkin(byte index, bool callback) {
+        public void SwapPlayerSkin(byte index, bool callback, CharacterData character = null) {
 
             bool disabled = index == 0;
 
@@ -575,7 +580,7 @@ namespace NSMB.UI.MainMenu {
                 playerColorDisabledIcon.SetActive(false);
                 playerColorPaletteIcon.SetActive(true);
 
-                CharacterData character = Runner.GetLocalPlayerData().GetCharacterData();
+                character ??= Runner.GetLocalPlayerData().GetCharacterData();
                 PlayerColorSet set = ScriptableManager.Instance.skins[index];
                 PlayerColors colors = set.GetPlayerColors(character);
                 overallsColorImage.color = colors.overallsColor;

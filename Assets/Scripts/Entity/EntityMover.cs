@@ -121,15 +121,20 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
     }
 
     public override void FixedUpdateNetwork() {
-        if (ForceSnapshotInterpolation) {
+        bool local = !IsProxy || !ForceSnapshotInterpolation || Data.OnMovingPlatform;
+        if (!local) {
             return;
         }
+
+        bool noVelocity = IsProxy && ForceSnapshotInterpolation;
 
         Data.Reset();
 
         if (!Freeze) {
-            Vector2 movement;
-            movement = CollideAndSlide(Position + ColliderOffset, Velocity * Runner.DeltaTime, false);
+            Vector2 movement = Vector2.zero;
+            if (!noVelocity) {
+                movement = CollideAndSlide(Position + ColliderOffset, Velocity * Runner.DeltaTime, false);
+            }
             if (!IsKinematic) {
                 movement += CollideAndSlide(Position + ColliderOffset + movement, Gravity * (Runner.DeltaTime * Runner.DeltaTime), true);
             }
@@ -176,6 +181,10 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             }
 
             // Exception: dont hit objects if we're moving away from them
+            if (Vector2.Dot(direction, hit.normal) > 0) {
+                continue;
+            }
+
             if (gravityPass) {
                 Vector2 combinedDirection = raycastVel + (Velocity * Runner.DeltaTime);
 
@@ -183,11 +192,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                     continue;
                 }
             }
-
-            if (Vector2.Dot(direction, hit.normal) > 0) {
-                continue;
-            }
-
             float angle = Vector2.SignedAngle(hit.normal, Vector2.up);
 
             // Semisolid check(s)
@@ -222,6 +226,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                 // Floor
                 Data.OnGround = true;
                 Data.CrushableGround |= !hit.collider.CompareTag("platform");
+                Data.OnMovingPlatform |= hit.collider.GetComponentInParent<GenericMover>();
                 Data.FloorAngle = angle;
 
                 if (hit.collider.GetComponentInParent<NetworkObject>() is NetworkObject no) {
@@ -279,26 +284,26 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
             Vector2 positionToSurfacePoint = (direction * hit.distance) + (alignedDirection * Skin);
 
-        //    // Started inside an object
-        //    if (hit.distance <= 0) {
-        //        RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(raycastPos, (hit.point - raycastPos), Mathf.Max(size.x, size.y), filter);
-        //        if (stuckHit) {
-        //            Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);
-        //
-        //            if (LockX) {
-        //                offset.x = 0;
-        //            }
-        //
-        //            if (LockY) {
-        //                offset.y = 0;
-        //            }
-        //
-        //            Position += offset;
-        //            raycastPos += offset;
-        //
-        //            return CollideAndSlide(raycastPos, raycastVel, gravityPass, depth + 1);
-        //        }
-        //    }
+            // Started inside an object
+            if (hit.distance <= 0) {
+                RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(raycastPos, (hit.point - raycastPos), Mathf.Max(size.x, size.y), filter);
+                if (stuckHit) {
+                    Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);
+
+                    if (LockX) {
+                        offset.x = 0;
+                    }
+
+                    if (LockY) {
+                        offset.y = 0;
+                    }
+
+                    Position += offset;
+                    raycastPos += offset;
+
+                    return CollideAndSlide(raycastPos, raycastVel, gravityPass, depth + 1);
+                }
+            }
 
             // Eject from walls
             if (Vector2.Dot(positionToSurfacePoint, hit.normal) > 0) {
