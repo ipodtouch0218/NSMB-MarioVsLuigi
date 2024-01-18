@@ -1,19 +1,23 @@
 using UnityEngine;
 
 using Fusion;
+using NSMB.Extensions;
 using NSMB.Game;
 
-[SimulationBehaviour(Modes = SimulationModes.Server | SimulationModes.Host | SimulationModes.Client, Stages = SimulationStages.Forward | SimulationStages.Resimulate)]
 public class WrappingHitbox : NetworkBehaviour {
 
-    private EntityMover body;
+    //---Components
+    [SerializeField] private EntityMover body;
+
+    //---Private Variables
     private BoxCollider2D[] ourColliders, childColliders;
     private Vector2 offset;
 
+    public void OnValidate() {
+        this.SetIfNull(ref body, UnityExtensions.GetComponentType.Parent);
+    }
+
     public void Awake() {
-        body = GetComponent<EntityMover>();
-        if (!body)
-            body = GetComponentInParent<EntityMover>();
         ourColliders = GetComponents<BoxCollider2D>();
 
         // Null propagation is ok w/ GameManager.Instance
@@ -23,14 +27,17 @@ public class WrappingHitbox : NetworkBehaviour {
         }
 
         childColliders = new BoxCollider2D[ourColliders.Length];
-        for (int i = 0; i < ourColliders.Length; i++)
+        for (int i = 0; i < ourColliders.Length; i++) {
             childColliders[i] = gameObject.AddComponent<BoxCollider2D>();
+        }
+
         offset = new(GameManager.Instance.LevelWidth, 0);
     }
 
     public override void FixedUpdateNetwork() {
-        for (int i = 0; i < ourColliders.Length; i++)
+        for (int i = 0; i < ourColliders.Length; i++) {
             UpdateChildColliders(i);
+        }
     }
 
     private void UpdateChildColliders(int index) {

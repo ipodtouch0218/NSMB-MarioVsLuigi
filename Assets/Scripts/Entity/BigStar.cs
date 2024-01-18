@@ -40,17 +40,9 @@ namespace NSMB.Entities.Collectable {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!sRenderer) {
-                sRenderer = GetComponentInChildren<SpriteRenderer>();
-            }
-
-            if (!worldCollider) {
-                worldCollider = GetComponent<BoxCollider2D>();
-            }
-
-            if (!animator) {
-                animator = GetComponent<Animator>();
-            }
+            this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref worldCollider);
+            this.SetIfNull(ref animator);
         }
 
         public void OnBeforeSpawned(byte direction, bool stationary, bool pit) {
@@ -67,7 +59,6 @@ namespace NSMB.Entities.Collectable {
 
         public override void Spawned() {
             base.Spawned();
-            Runner.SetIsSimulated(Object, true);
             icon = UIUpdater.Instance.CreateTrackIcon(this);
 
             if (IsStationary) {
@@ -102,6 +93,8 @@ namespace NSMB.Entities.Collectable {
                 GroundFilter.SetLayerMask((1 << Layers.LayerGround) | (1 << Layers.LayerPassthrough));
                 GroundFilter.useTriggers = true;
             }
+
+            Runner.SetIsSimulated(Object, true);
         }
 
         public override void Render() {
@@ -206,10 +199,12 @@ namespace NSMB.Entities.Collectable {
 
             if (data.OnGround && Collectable) {
                 body.Velocity = new(body.Velocity.x, bounceAmount);
+                /*
                 if (data.HitRoof) {
                     DespawnEntity();
                     return true;
                 }
+                */
             }
 
             return false;

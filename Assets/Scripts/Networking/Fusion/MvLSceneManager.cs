@@ -3,7 +3,7 @@ using System.Collections;
 
 using Fusion;
 
-public class MvLSceneManager : Fusion.NetworkSceneManagerDefault {
+public class MvLSceneManager : NetworkSceneManagerDefault {
 
     public static event Action OnSceneLoadStart;
 
@@ -11,4 +11,5 @@ public class MvLSceneManager : Fusion.NetworkSceneManagerDefault {
         OnSceneLoadStart?.Invoke();
         return base.LoadSceneCoroutine(sceneRef, sceneParams);
     }
+
 }

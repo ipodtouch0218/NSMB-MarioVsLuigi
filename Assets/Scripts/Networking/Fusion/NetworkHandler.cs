@@ -156,7 +156,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         ReturnToMainMenu(() => {
             OnDisconnectedFromServer?.Invoke(runner, reason);
-            //RecreateInstance();
+            RecreateInstance();
         });
     }
 

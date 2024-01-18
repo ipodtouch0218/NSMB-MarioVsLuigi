@@ -20,17 +20,18 @@ public class BlockBump : NetworkBehaviour {
     [Networked] private Vector2Int TileLocation { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private Transform hitbox;
     [SerializeField] private Transform graphics;
     [SerializeField] private float bumpSize = 0.35f;
     [SerializeField] private float bumpScale = 0.25f;
     [SerializeField] private float bumpDuration = 0.15f;
 
     //---Components
+    [SerializeField] private BoxCollider2D hitbox;
     [SerializeField] private SpriteRenderer sRenderer;
 
     public void OnValidate() {
-        if (!sRenderer) sRenderer = GetComponent<SpriteRenderer>();
+        this.SetIfNull(ref sRenderer);
+        this.SetIfNull(ref hitbox, UnityExtensions.GetComponentType.Children);
     }
 
     public void OnBeforeSpawned(Vector2Int tileLocation, ushort bumpTile, ushort resultTile, NetworkPrefabRef? spawnPrefab, bool downwards, bool spawnCoin, Tick tick, Vector2 spawnOffset = default) {
@@ -74,13 +75,11 @@ public class BlockBump : NetworkBehaviour {
         }
         sRenderer.sprite = sprite;
 
-        BoxCollider2D hitbox = GetComponentInChildren<BoxCollider2D>();
         hitbox.size = sRenderer.sprite.bounds.size;
         hitbox.offset = (hitbox.size - Vector2.one) * new Vector2(0.5f, -0.5f);
     }
 
     public override void Render() {
-
         float elapsedTime = DespawnTimer.RemainingRenderTime(Runner) ?? 0f;
         float sin = Mathf.Sin((elapsedTime / bumpDuration) * Mathf.PI);
 
@@ -89,12 +88,11 @@ public class BlockBump : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-
         float elapsedTime = DespawnTimer.RemainingTime(Runner) ?? 0f;
         float sin = Mathf.Sin((elapsedTime / bumpDuration) * Mathf.PI);
 
-        hitbox.localPosition = new(0, (bumpSize * sin) * (IsDownwards ? -1 : 1), 0);
-        hitbox.localScale = new(1 + (bumpScale * sin), 1 + (bumpScale * sin), 1);
+        hitbox.transform.localPosition = new(0, (bumpSize * sin) * (IsDownwards ? -1 : 1), 0);
+        hitbox.transform.localScale = new(1 + (bumpScale * sin), 1 + (bumpScale * sin), 1);
 
         if (DespawnTimer.Expired(Runner)) {
             DespawnTimer = TickTimer.None;

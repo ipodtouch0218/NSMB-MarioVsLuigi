@@ -274,6 +274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe023cea6fd5f842af136c8824b0710, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  body: {fileID: 7021228977528019271}
 --- !u!1 &1136710984746719041
 GameObject:
   m_ObjectHideFlags: 0
@@ -10650,6 +10651,7 @@ MonoBehaviour:
   propellerSpinTime: 0.5
   heightSmallModel: 0.42
   heightLargeModel: 0.82
+  jumpBufferDuration: 0.2
   models: {fileID: 8422425992379838812}
   character: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
 --- !u!114 &79918617084146557

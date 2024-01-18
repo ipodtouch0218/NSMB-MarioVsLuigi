@@ -5430,6 +5430,7 @@ MonoBehaviour:
   propellerSpinTime: 0.5
   heightSmallModel: 0.42
   heightLargeModel: 0.82
+  jumpBufferDuration: 0.2
   models: {fileID: 5265735797725400742}
   character: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
 --- !u!114 &2180046975010359444
@@ -21953,6 +21954,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe023cea6fd5f842af136c8824b0710, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  body: {fileID: 3351902527667160351}
 --- !u!1 &8100970774645509540
 GameObject:
   m_ObjectHideFlags: 0

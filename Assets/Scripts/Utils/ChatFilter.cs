@@ -45,15 +45,17 @@ namespace NSMB.Utils {
         }
 
         private static string ApplySubsitutions(string input) {
-            foreach ((char replace, char replacement) in Replacements)
+            foreach ((char replace, char replacement) in Replacements) {
                 input = input.Replace(replace, replacement);
+            }
 
             return input;
         }
 
         private static void DecodeFilter() {
-            if (filteredWords != null)
+            if (filteredWords != null) {
                 return;
+            }
 
             filteredWords = Encoding.UTF8.GetString(Convert.FromBase64String(FilterBase64)).Split(",");
             Array.Sort(filteredWords, StringLengthComparer);
@@ -64,8 +66,9 @@ namespace NSMB.Utils {
                 int j;
                 for (j = 0; j < word.Length; j++) {
                     char c = word[j];
-                    if (!char.IsLetter(c))
+                    if (!char.IsLetter(c)) {
                         break;
+                    }
 
                     newWord += c + "\\W*";
                 }

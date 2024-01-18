@@ -309,10 +309,9 @@ namespace NSMB.Entities.Player {
 
         public override void OnValidate() {
             base.OnValidate();
-
-            cameraController = GetComponentInChildren<CameraController>();
-            animator = GetComponentInChildren<Animator>();
-            animationController = GetComponent<PlayerAnimationController>();
+            this.SetIfNull(ref cameraController, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref animationController);
         }
 
         public void OnDisable() {
@@ -326,7 +325,7 @@ namespace NSMB.Entities.Player {
 
         public void BeforeTick() {
             HandleLayerState();
-            //IsOnGround |= GroundSnapCheck();groudn
+            //IsOnGround |= GroundSnapCheck();
         }
 
         public override void Spawned() {
@@ -334,7 +333,7 @@ namespace NSMB.Entities.Player {
             hitboxes = GetComponentsInChildren<BoxCollider2D>();
 
             body.Freeze = true;
-            body.ForceSnapshotInterpolation = IsProxy;
+            //body.ForceSnapshotInterpolation = IsProxy;
 
             Data = Object.InputAuthority.GetPlayerData(Runner);
             if (HasInputAuthority) {
@@ -459,7 +458,7 @@ namespace NSMB.Entities.Player {
         }
 
         public override void FixedUpdateNetwork() {
-            if (GameManager.Instance.GameState < Enums.GameState.Playing) {
+            if (GameManager.Instance.GameState < Enums.GameState.Starting) {
                 return;
             }
 
@@ -666,7 +665,7 @@ namespace NSMB.Entities.Player {
 
                 GameObject hitObject = hit.GameObject;
 
-                if (!hit.Hitbox && hitObject.TryGetComponent<Hitbox>(out _)) {
+                if (!hit.Hitbox && hitObject.TryGetComponent(out Hitbox _)) {
                     continue;
                 }
 
@@ -1448,6 +1447,7 @@ namespace NSMB.Entities.Player {
             body.Position = spawnpoint;
             cameraController.Recenter(spawnpoint);
 
+            IsDead = true;
             IsFrozen = false;
             IsRespawning = true;
             FacingRight = true;
