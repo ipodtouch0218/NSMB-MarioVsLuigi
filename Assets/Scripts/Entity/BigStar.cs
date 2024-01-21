@@ -155,7 +155,7 @@ namespace NSMB.Entities.Collectable {
         public void Rpc_StarCollected(PlayerController collector) {
             Collector = collector;
 
-            if (GameManager.Instance && GameManager.Instance.GameState == Enums.GameState.Playing) {
+            if (GameManager.Instance && GameManager.Instance.PlaySounds) {
                 bool sameTeam = Collector.Data.Team == Runner.GetLocalPlayerData().Team || Collector.cameraController.IsControllingCamera;
                 Collector.PlaySoundEverywhere(sameTeam ? Enums.Sounds.World_Star_Collect : Enums.Sounds.World_Star_CollectOthers);
             }
