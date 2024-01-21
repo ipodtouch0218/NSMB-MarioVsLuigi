@@ -285,7 +285,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
             Vector2 positionToSurfacePoint = (direction * hit.distance) + (alignedDirection * Skin);
 
             // Started inside an object
-            if (hit.distance <= 0) {
+            if (!gravityPass && hit.distance <= 0) {
                 RaycastHit2D stuckHit = Runner.GetPhysicsScene2D().Raycast(raycastPos, (hit.point - raycastPos), Mathf.Max(size.x, size.y), filter);
                 if (stuckHit) {
                     Vector2 offset = stuckHit.normal * (Vector2.Distance(hit.point, stuckHit.point) + Skin + Skin + Skin);

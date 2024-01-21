@@ -8,6 +8,9 @@ using NSMB.Utils;
 namespace NSMB.Entities.Enemies {
     public class PiranhaPlant : KillableEntity {
 
+        public override Vector2 FrozenOffset => Vector2.zero;
+        public override Vector2 FrozenSize => iceBlockSize;
+
         //---Networked Variables
         [Networked] public TickTimer PopupCountdownTimer { get; set; }
         [Networked] public TickTimer ChompTimer { get; set; }
@@ -18,6 +21,8 @@ namespace NSMB.Entities.Enemies {
         [SerializeField] private float playerDetectSize = 1;
         [SerializeField] private float popupTimerRequirement = 6f, popupDistance = 0.5f;
         [SerializeField] private float popupTime = 0.5f, chompTime = 2f;
+        [SerializeField] private Vector2 iceBlockSize = new(0.5f, 0.8f);
+        [SerializeField] private Sprite frozenSprite;
 
         //---Private Variables
         private PropertyReader<float> popupAnimationTimePropertyReader;
@@ -31,12 +36,13 @@ namespace NSMB.Entities.Enemies {
 
         public override void Render() {
             base.Render();
-            if (IsFrozen) {
-                return;
-            }
 
             float popupRenderTime;
-            if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
+            if (IsDead) {
+                popupRenderTime = 0;
+            } else if (IsFrozen) {
+                popupRenderTime = 1;
+            } else if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
                 (float fromPosition, float toPosition) = popupAnimationTimePropertyReader.Read(from, to);
                 popupRenderTime = Mathf.Lerp(fromPosition, toPosition, alpha);
             } else {
@@ -46,7 +52,7 @@ namespace NSMB.Entities.Enemies {
             interpolationTarget.localPosition = new(0, (popupRenderTime - 1) * popupDistance, 0);
             animator.SetBool("active", ChompTimer.IsRunning);
             animator.SetBool("chomping", popupRenderTime > 0.99f);
-            sRenderer.enabled = !IsDead;
+            sRenderer.enabled = popupRenderTime > 0;
         }
 
         public override void FixedUpdateNetwork() {
@@ -139,6 +145,7 @@ namespace NSMB.Entities.Enemies {
 
         public override void Kill() {
             IsDead = true;
+            PopupAnimationTime = 0;
 
             if (Runner.IsServer) {
                 Runner.Spawn(PrefabList.Instance.Obj_LooseCoin, transform.position + Vector3.up);
@@ -168,6 +175,14 @@ namespace NSMB.Entities.Enemies {
             }
 
             sRenderer.enabled = !IsDead;
+        }
+
+        public override void OnIsFrozenChanged() {
+            base.OnIsFrozenChanged();
+
+            if (IsFrozen) {
+                sRenderer.sprite = frozenSprite;
+            }
         }
 
 #if UNITY_EDITOR

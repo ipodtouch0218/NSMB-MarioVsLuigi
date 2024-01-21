@@ -333,7 +333,7 @@ namespace NSMB.Entities.Player {
             hitboxes = GetComponentsInChildren<BoxCollider2D>();
 
             body.Freeze = true;
-            //body.ForceSnapshotInterpolation = IsProxy;
+            body.ForceSnapshotInterpolation = IsProxy;
 
             Data = Object.InputAuthority.GetPlayerData(Runner);
             if (HasInputAuthority) {

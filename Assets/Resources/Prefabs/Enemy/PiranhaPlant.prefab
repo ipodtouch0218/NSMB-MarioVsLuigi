@@ -28,13 +28,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5221492842734043434}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 526604015599624815}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5652721323520962159
 SpriteRenderer:
@@ -261,13 +261,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6138843839452149636}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 526604015599624815}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1094213376118772922
 BoxCollider2D:
@@ -339,6 +339,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6254190274066690703}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -347,7 +348,6 @@ Transform:
   - {fileID: 4904021044407665645}
   - {fileID: 435428292489101360}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3689884099564413062
 MonoBehaviour:
@@ -377,7 +377,6 @@ MonoBehaviour:
   collideWithOtherEnemies: 1
   dieWhenInsideBlock: 0
   flipSpriteRenderer: 0
-  fusionHitbox: {fileID: 0}
   hitbox: {fileID: 1094213376118772922}
   animator: {fileID: 863355600414429673}
   legacyAnimation: {fileID: 0}
@@ -389,6 +388,9 @@ MonoBehaviour:
   popupDistance: 0.55
   popupTime: 0.5
   chompTime: 1.45
+  iceBlockSize: {x: 0.75, y: 1}
+  frozenSprite: {fileID: 2413434192097388818, guid: b106f26e91cafe14c85de41684327185,
+    type: 3}
 --- !u!114 &597171190669668077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,8 +405,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 367916708
   ObjectInterest: 1
-  _DestroyWhenStateAuthorityLeaves: 0
-  _AllowStateAuthorityOverride: 0
   Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:

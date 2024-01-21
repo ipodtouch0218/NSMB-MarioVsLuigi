@@ -169,7 +169,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
 
-            if (GameManager.Instance && GameManager.Instance.Object && GameManager.Instance.GameState == Enums.GameState.Playing && !Collector) {
+            if (GameManager.Instance && GameManager.Instance.Object && GameManager.Instance.PlaySounds && !Collector) {
                 GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, transform.position);
             }
 
@@ -199,12 +199,10 @@ namespace NSMB.Entities.Collectable {
 
             if (data.OnGround && Collectable) {
                 body.Velocity = new(body.Velocity.x, bounceAmount);
-                /*
                 if (data.HitRoof) {
                     DespawnEntity();
                     return true;
                 }
-                */
             }
 
             return false;

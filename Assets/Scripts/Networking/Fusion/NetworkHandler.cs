@@ -388,7 +388,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     public void Initialize() {
         DontDestroyOnLoad(this);
         runner = GetComponent<NetworkRunner>();
-        runner.ProvideInput = true;
         runner.AddCallbacks(this);
     }
 

@@ -28,6 +28,10 @@ namespace NSMB.Entities {
             FrozenEntity = entityToFreeze;
             CubeSize = size;
             EntityPositionOffset = offset;
+
+            if (!FrozenEntity.IsCarryable) {
+                body.IsKinematic = true;
+            }
         }
 
         public override void Spawned() {
@@ -53,6 +57,7 @@ namespace NSMB.Entities {
             // Move entity inside us
             if (!FrozenEntity.IsCarryable) {
                 dieWhenInsideBlock = false;
+                body.LockY = true;
             }
 
             body.LockX = true;

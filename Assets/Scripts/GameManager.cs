@@ -113,7 +113,6 @@ namespace NSMB.Game {
 
         public NetworkRNG random;
         public float gameEndTime;
-        public bool dontPlaySounds;
 
         [NonSerialized] public KillableEntity[] enemies;
         [NonSerialized] public FloatingCoin[] coins;

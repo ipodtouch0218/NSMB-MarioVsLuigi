@@ -3,9 +3,9 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Entities.Player;
+using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
-using NSMB.Extensions;
 
 //[OrderBefore(typeof(Powerup))]
 public class CameraController : NetworkBehaviour {
