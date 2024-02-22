@@ -225,7 +225,7 @@ namespace NSMB.UI.MainMenu {
                 chatTextField.SetTextWithoutNotify("");
 
                 // Host chat notification
-                if (Runner.IsServer) {
+                if (Runner.IsServer || Runner.IsSharedModeMasterClient) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
                 }
             }
@@ -525,8 +525,9 @@ namespace NSMB.UI.MainMenu {
 
             //PhotonNetwork.SetMasterClient(target);
             //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-            ChatManager.Instance.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
-            //runner.set
+            //ChatManager.Instance.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", "playername", target.GetNickname());
+            Runner.SetMasterClient(target.Object.InputAuthority);
         }
 
         public void Mute(PlayerData target) {
@@ -746,7 +747,7 @@ namespace NSMB.UI.MainMenu {
                 }
             } else {
                 UpdateStartGameButton();
-                hostControlsGroup.interactable = Runner.IsServer || (data && data.IsRoomOwner);
+                hostControlsGroup.interactable = Runner.IsServer || Runner.IsSharedModeMasterClient || (data && data.IsRoomOwner);
                 if (fadeMusicCoroutine != null) {
                     StopCoroutine(fadeMusicCoroutine);
                     fadeMusicCoroutine = null;

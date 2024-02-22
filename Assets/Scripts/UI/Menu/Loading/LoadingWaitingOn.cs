@@ -60,7 +60,7 @@ namespace NSMB.Loading {
 
             // Waiting for others
             StringBuilder waitingOnPlayers = new();
-
+            int waitingCount = 0;
             NetworkRunner runner = GameManager.Instance.Runner;
             foreach (PlayerRef player in runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData(runner);
@@ -70,12 +70,17 @@ namespace NSMB.Loading {
 
                 if (!data.IsLoaded) {
                     waitingOnPlayers.AppendLine(data.GetNickname());
+                    waitingCount++;
                 }
             }
 
-            statusText.text = tm.GetTranslation("ui.loading.waiting");
-            playerListParent.SetActive(true);
-            playerList.text = waitingOnPlayers.ToString();
+            if (waitingCount <= 0) {
+                playerListParent.SetActive(false);
+            } else {
+                statusText.text = tm.GetTranslation("ui.loading.waiting");
+                playerListParent.SetActive(true);
+                playerList.text = waitingOnPlayers.ToString();
+            }
         }
     }
 }

@@ -75,7 +75,7 @@ public class SessionData : NetworkBehaviour {
             }
         }
 
-        if (Runner.IsServer) {
+        if (HasStateAuthority) {
             PrivateRoom = !Runner.SessionInfo.IsVisible;
             if (MaxPlayers == 0) {
                 NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
@@ -112,6 +112,7 @@ public class SessionData : NetworkBehaviour {
 
         if (!GameStarted && GameStartTimer.IsActive(Runner) && MainMenuManager.Instance) {
             int ticksLeft = (GameStartTimer.RemainingTicks(Runner) ?? 0) + 1;
+            Debug.Log(ticksLeft);
             if (ticksLeft % Runner.TickRate == 0) {
                 // Send countdown
                 int seconds = ticksLeft / Runner.TickRate;
@@ -149,8 +150,10 @@ public class SessionData : NetworkBehaviour {
                 return;
             }
 
+            Debug.Log("start game?");
             if (GameStartTimer.Expired(Runner)) {
                 // Start game
+                Debug.Log("start game!");
                 Rpc_StartGame();
             }
         }
@@ -350,7 +353,7 @@ public class SessionData : NetworkBehaviour {
         SetGameStarted(true);
 
         // Load the correct scene
-        if (Runner.IsServer) {
+        if (Runner.IsSceneAuthority) {
             Runner.LoadScene(MainMenuManager.Instance.GetCurrentSceneRef(), LoadSceneMode.Single);
         }
     }

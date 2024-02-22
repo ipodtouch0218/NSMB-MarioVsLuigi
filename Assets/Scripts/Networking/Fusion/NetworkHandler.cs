@@ -243,25 +243,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
 
-        // Fusion 2.0.0 rc7 bug.
-        if (!runner.IsPlayerValid(player)) {
-            return;
-        }
-
         // Handle PlayerDatas
         bool hadExistingData = false;
-        if (runner.IsServer && !runner.IsSinglePlayer) {
-            PlayerData existingData =
-                FindObjectsByType<PlayerData>(FindObjectsSortMode.None)
-                    .Where(pd => pd.UserId.ToString() == runner.GetPlayerUserId(player))
-                    .FirstOrDefault();
-            hadExistingData = existingData;
+        if ((runner.IsServer || runner.IsSharedModeMasterClient) && !runner.IsSinglePlayer) {
 
-            if (hadExistingData) {
-                existingData.ReassignPlayerData(player);
-            } else {
-                runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
-            }
+            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned(), flags: NetworkSpawnFlags.SharedModeStateAuthMasterClient);
 
             if (runner.Tick != 0) {
                 runner.PushHostMigrationSnapshot();
@@ -447,7 +433,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         }
 
         // And join lobby
-        StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues, customAppSettings: appSettings);
+        StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.Shared, authentication: authValues, customAppSettings: appSettings);
         if (result.Ok) {
             try {
                 // Wacky reflection to get the region pings.
@@ -489,7 +475,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return result;
     }
 
-    public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
+    public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Shared, int players = 10) {
         GlobalController.Instance.connectionToken.nickname = Settings.Instance.generalNickname;
 
         connecting++;
@@ -591,7 +577,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         // Attempt to join the room
         StartGameResult result = await Runner.StartGame(new() {
             AuthValues = authValues,
-            GameMode = GameMode.Client,
+            GameMode = GameMode.Shared,
             SessionName = roomId,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
@@ -620,10 +606,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         Instance.playerDatas.Clear();
         SessionData.PlayersNeedingJoinMessage.Clear();
 
-        if (runner.IsServer) {
-            NetworkObject session = runner.Spawn(PrefabList.Instance.SessionDataHolder, onBeforeSpawned: (runner, obj) => {
+        if (runner.IsServer || runner.IsSharedModeMasterClient) {
+            runner.Spawn(PrefabList.Instance.SessionDataHolder, onBeforeSpawned: (runner, obj) => {
                 SessionData.Instance = obj.GetComponent<SessionData>();
-            });
+            }, flags: NetworkSpawnFlags.SharedModeStateAuthMasterClient);
         } else {
             SessionData.PlayersNeedingJoinMessage.Add(runner.LocalPlayer);
         }
