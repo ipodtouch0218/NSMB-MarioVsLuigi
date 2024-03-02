@@ -28,7 +28,7 @@ namespace NSMB.Tiles {
             WorldOriginX = GameManager.levelMinTileX;
             WorldOriginY = GameManager.levelMinTileY;
 
-            if (Runner.IsServer) {
+            if (HasStateAuthority) {
                 for (int y = 0; y < ChunksY; y++) {
                     for (int x = 0; x < ChunksX; x++) {
                         Runner.Spawn(PrefabList.Instance.TilemapChunk, onBeforeSpawned: (runner, obj) => {

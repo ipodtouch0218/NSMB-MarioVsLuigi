@@ -27,11 +27,9 @@ namespace NSMB.Tiles {
         public void BeforeTick() {
             updatedDirtyCounterThisTick = false;
 
-            if (!Runner.IsResimulation)
+            if (!Runner.IsResimulation || latestDirtyCounter == DirtyCounter) {
                 return;
-
-            if (latestDirtyCounter == DirtyCounter)
-                return;
+            }
 
             // The the tilemap is different from it's current state.
             UpdateTilemapState();
@@ -56,14 +54,16 @@ namespace NSMB.Tiles {
         public override void Spawned() {
             Runner.SetIsSimulated(Object, true);
 
-            if (initialized)
+            if (initialized) {
                 return;
+            }
 
             transform.SetParent(GameManager.Instance.tileManager.transform, true);
             tilemapCollider = GameManager.Instance.tilemap.GetComponent<TilemapCollider2D>();
             LoadState();
-            if (Runner.IsServer)
+            if (HasStateAuthority) {
                 Tiles.CopyFrom(originalTiles, 0, originalTiles.Length);
+            }
 
             UpdateTilemapState();
             GameManager.Instance.tileManager.AddChunk(this);
@@ -125,8 +125,9 @@ namespace NSMB.Tiles {
         }
 
         public void SetTile(int index, ushort value) {
-            if (Tiles[index] == value)
+            if (Tiles[index] == value) {
                 return;
+            }
 
             Tiles.Set(index, value);
             if (!updatedDirtyCounterThisTick) {

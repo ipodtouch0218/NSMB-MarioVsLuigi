@@ -23,7 +23,8 @@ namespace NSMB.Entities.Player {
 
         //---Static Variables
         private static readonly List<GameObject> CollidedObjects = new(16);
-        private static readonly List<LagCompensatedHit> LagCompensatedBuffer = new(16);
+        private static readonly Collider2D[] TempCollisionBuffer = new Collider2D[16];
+        private static readonly Collider2D[] CollisionBuffer = new Collider2D[48];
         private static readonly Vector3 ZeroPointFive = Vector3.one * 0.5f;
 
         private static readonly Vector2 GroundpoundStartUpwardsVelocity = Vector2.up * 1.5f;
@@ -644,36 +645,36 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            LagCompensatedBuffer.Clear();
+            int totalHits = 0;
             foreach (BoxCollider2D hitbox in hitboxes) {
-                Vector2 extents = ((Vector3) (hitbox.size * 0.5f) + Vector3.forward).Multiply(2 * transform.localScale);
-                Vector2 origin = body.Position + (hitbox.offset * transform.localScale) + (body.Velocity * Runner.DeltaTime);
+                Vector2 origin = body.Position + (hitbox.offset * transform.localScale)/* + (body.Velocity * Runner.DeltaTime)*/;
 
-                Runner.LagCompensation.OverlapBox(
-                    origin,
-                    extents,
-                    Quaternion.identity,
-                    Object.InputAuthority,
-                    LagCompensatedBuffer,
-                    options: HitOptions.IgnoreInputAuthority | HitOptions.IncludeBox2D | HitOptions.SubtickAccuracy,
-                    clearHits: false);
+                int hits = Runner.GetPhysicsScene2D().OverlapBox(origin, hitbox.size, 0, TempCollisionBuffer);
+                Array.Copy(TempCollisionBuffer, 0, CollisionBuffer, totalHits, hits);
+                totalHits += hits;
+
+                //Runner.LagCompensation.OverlapBox(
+                //    origin,
+                //    extents,
+                //    Quaternion.identity,
+                //    Object.InputAuthority,
+                //    LagCompensatedBuffer,
+                //    options: HitOptions.IgnoreInputAuthority | HitOptions.IncludeBox2D | HitOptions.SubtickAccuracy,
+                //    clearHits: false);
             }
 
             // Interact with overlapped entities
             CollidedObjects.Clear();
-            foreach (LagCompensatedHit hit in LagCompensatedBuffer) {
+            for (int i = 0; i < totalHits; i++) {
+                Collider2D hit = CollisionBuffer[i];
+                GameObject hitObject = hit.gameObject;
 
-                GameObject hitObject = hit.GameObject;
-
-                if (!hit.Hitbox && hitObject.TryGetComponent(out Hitbox _)) {
-                    continue;
-                }
+                Utils.Utils.UnwrapLocations(body.Position + MainHitbox.offset, (Vector2) hit.gameObject.transform.position + hit.offset, out Vector2 us, out Vector2 them);
 
                 PhysicsDataStruct.ObjectContact contact = new();
-                float angle = Vector2.SignedAngle(hit.Normal, Vector2.up);
+                float angle = Vector2.SignedAngle(them, us);
                 angle += 360 + 45;
                 angle %= 360;
-
                 contact.direction = angle switch {
                     < 90 => InteractionDirection.Up,
                     < 180 => InteractionDirection.Right,
@@ -1281,7 +1282,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void SpawnItem(NetworkPrefabRef prefab) {
-            if (!Runner.IsServer) {
+            if (!(Runner.IsServer || Runner.IsSharedModeMasterClient)) {
                 return;
             }
 
@@ -1297,7 +1298,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void SpawnStars(int amount, bool deathplane) {
-            if (!Runner.IsServer) {
+            if (!(Runner.IsServer || Runner.IsSharedModeMasterClient)) {
                 return;
             }
 

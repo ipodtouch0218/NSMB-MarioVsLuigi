@@ -243,6 +243,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
 
+        Debug.Log($"player joined! {player}");
+
         // Handle PlayerDatas
         bool hadExistingData = false;
         if ((runner.IsServer || runner.IsSharedModeMasterClient) && !runner.IsSinglePlayer) {

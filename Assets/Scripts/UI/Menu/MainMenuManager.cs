@@ -506,7 +506,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         public bool IsRoomConfigurationValid() {
-            return Runner.ActivePlayers.Select(p => p.GetPlayerData(Runner)).Where(pd => !pd.IsManualSpectator).Count() >= 1;
+            return
+                Runner.ActivePlayers
+                    .Select(p => p.GetPlayerData(Runner))
+                    .Where(pd => pd && !pd.IsManualSpectator)
+                    .Count() >= 1;
         }
 
         public void Kick(PlayerData target) {

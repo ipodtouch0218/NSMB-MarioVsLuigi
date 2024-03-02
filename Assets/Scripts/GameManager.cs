@@ -189,7 +189,7 @@ namespace NSMB.Game {
             // By default, spectate. when we get assigned a player object, we disable it there.
             spectationManager.Spectating = true;
 
-            if (Runner.IsServer && Runner.IsSinglePlayer) {
+            if (HasStateAuthority && Runner.IsSinglePlayer) {
                 // Handle spawning in editor by spawning the room + player data objects
                 NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
                 Runner.SetPlayerObject(Runner.LocalPlayer, localData);
@@ -348,7 +348,7 @@ namespace NSMB.Game {
 
         //---UI Callbacks
         public void PauseEndMatch() {
-            if (!NetworkHandler.Runner.IsServer) {
+            if (!HasStateAuthority) {
                 return;
             }
 
@@ -437,7 +437,7 @@ namespace NSMB.Game {
 #endif
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            if (!runner.IsServer || !hasState) {
+            if (!HasStateAuthority || !hasState) {
                 return;
             }
 
@@ -455,7 +455,7 @@ namespace NSMB.Game {
         /// Checks if a team has won, and calls Rpc_EndGame if one has.
         /// </summary>
         public bool CheckForWinner() {
-            if (GameState != Enums.GameState.Playing || !Runner.IsServer) {
+            if (!HasStateAuthority || GameState != Enums.GameState.Playing) {
                 return false;
             }
 
@@ -514,7 +514,7 @@ namespace NSMB.Game {
         /// </summary>
         public void CheckIfAllPlayersLoaded() {
             // If we aren't the server, don't bother checking. We can't start the game regardless.
-            if (!Runner || !Runner.IsServer || GameState != Enums.GameState.Loading) {
+            if (!Runner || !HasStateAuthority || GameState != Enums.GameState.Loading) {
                 return;
             }
 
@@ -586,7 +586,7 @@ namespace NSMB.Game {
             Vector3 spawnLocation = Utils.Utils.TilemapToWorldPosition(loc) + OneFourth;
 
             // TODO: find a way to predict these.
-            if (Runner.IsServer) {
+            if (HasStateAuthority || Runner.IsServer) {
                 Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
                     obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, tick ?? Runner.Tick, offset);
                 });
@@ -716,7 +716,7 @@ namespace NSMB.Game {
                     resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);
                 }
 
-                if (Runner.IsServer) {
+                if (HasStateAuthority) {
                     foreach (PlayerController player in teamManager.GetTeamMembers(winningTeam)) {
                         player.Data.Wins++;
                     }
@@ -758,7 +758,7 @@ namespace NSMB.Game {
 
             DestroyNetworkObjects(Runner);
 
-            if (Runner.IsServer) {
+            if (HasStateAuthority) {
                 // Handle resetting player states for the next game
                 foreach (PlayerRef player in Runner.ActivePlayers) {
                     PlayerData data = player.GetPlayerData(Runner);
@@ -783,7 +783,7 @@ namespace NSMB.Game {
 
             yield return new WaitForSecondsRealtime(0.25f);
 
-            if (Runner.IsServer) {
+            if (HasStateAuthority) {
                 Runner.LoadScene(SceneRef.FromIndex(0), LoadSceneMode.Single);
             }
         }
@@ -851,7 +851,7 @@ namespace NSMB.Game {
         /// <returns>If the star successfully spawned</returns>
         private bool AttemptSpawnBigStar() {
 
-            if (!Runner.IsServer) {
+            if (!HasStateAuthority) {
                 return true;
             }
 
