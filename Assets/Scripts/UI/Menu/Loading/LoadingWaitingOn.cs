@@ -35,7 +35,7 @@ namespace NSMB.Loading {
         public void Update() {
 
             TranslationManager tm = GlobalController.Instance.translationManager;
-            PlayerData ourData = NetworkHandler.Runner.LocalPlayer.GetPlayerData(NetworkHandler.Runner);
+            PlayerData ourData = NetworkHandler.Runner.GetLocalPlayerData();
 
             // Loading (as spectator)
             if (!ourData || ourData.IsCurrentlySpectating) {
@@ -63,7 +63,7 @@ namespace NSMB.Loading {
             int waitingCount = 0;
             NetworkRunner runner = GameManager.Instance.Runner;
             foreach (PlayerRef player in runner.ActivePlayers) {
-                PlayerData data = player.GetPlayerData(runner);
+                PlayerData data = player.GetPlayerData();
                 if (!data || data.IsCurrentlySpectating || data.HasInputAuthority) {
                     continue;
                 }

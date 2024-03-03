@@ -32,8 +32,9 @@ public class ChatManager : MonoBehaviour {
 
     public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
 
-        if (filter)
+        if (filter) {
             message = message.Filter();
+        }
 
         ChatMessage.ChatMessageData data = new() {
             isSystemMessage = false,
@@ -64,16 +65,17 @@ public class ChatManager : MonoBehaviour {
 
     public void DisplayPlayerMessage(string message, PlayerRef source) {
         // What
-        if (!source.IsRealPlayer)
+        if (!source.IsRealPlayer) {
             return;
+        }
 
-        PlayerData data = source.GetPlayerData(NetworkHandler.Runner);
-
-        if (!data || !data.Object.IsValid)
+        if (!source.TryGetPlayerData(out PlayerData data)) {
             return;
+        }
 
-        if (data.IsMuted)
+        if (data.IsMuted) {
             return;
+        }
 
         // Format message, in case we can't trust the host to do it for us.
         message = message[..Mathf.Min(128, message.Length)];
@@ -96,24 +98,27 @@ public class ChatManager : MonoBehaviour {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerRef player = info.Source;
 
-        if (!player.IsRealPlayer)
+        if (!player.IsRealPlayer) {
             return;
+        }
 
-        PlayerData data = player.GetPlayerData(runner);
-        if (!data || !data.Object.IsValid)
+        if (!player.TryGetPlayerData(out PlayerData data)) {
             return;
+        }
 
         // Spam prevention & Muted
-        if (data.IsMuted || data.MessageCooldownTimer.IsActive(runner))
+        if (data.IsMuted || data.MessageCooldownTimer.IsActive(runner)) {
             return;
+        }
 
         // Validate message format
         message = message[..Mathf.Min(128, message.Length)];
         message = message.Replace("\n", " ").Trim();
 
         // Empty message
-        if (string.IsNullOrWhiteSpace(message))
+        if (string.IsNullOrWhiteSpace(message)) {
             return;
+        }
 
         data.MessageCooldownTimer = TickTimer.CreateFromSeconds(runner, 0.5f);
 
@@ -123,15 +128,17 @@ public class ChatManager : MonoBehaviour {
 
     public void ClearChat() {
         chatHistory.Clear();
-        if (MainMenuManager.Instance)
+        if (MainMenuManager.Instance) {
             MainMenuManager.Instance.chat.ClearChat();
+        }
     }
 
     //---Callbacks
     private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         foreach (ChatMessage.ChatMessageData data in chatHistory) {
-            if (data.player == player)
+            if (data.player == player) {
                 data.player = PlayerRef.None;
+            }
         }
     }
 
@@ -139,7 +146,7 @@ public class ChatManager : MonoBehaviour {
         if (data.isSystemMessage) {
             Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
         } else {
-            PlayerData pd = data.player.GetPlayerData(NetworkHandler.Runner);
+            PlayerData pd = data.player.GetPlayerData();
             Debug.Log($"[Chat] ({pd.GetUserIdString()}) {data.message}");
         }
     }

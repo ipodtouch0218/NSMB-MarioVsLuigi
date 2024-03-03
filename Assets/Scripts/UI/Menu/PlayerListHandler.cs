@@ -22,12 +22,9 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            if (NetworkHandler.Instance.runner.SessionInfo.IsValid) {
-                PopulatePlayerEntries(true);
-            }
-
             NetworkHandler.OnPlayerJoined += OnPlayerJoined;
             NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+            PlayerData.OnPlayerDataReady += OnPlayerDataReady;
         }
 
         public void OnDisable() {
@@ -35,26 +32,30 @@ namespace NSMB.UI.MainMenu {
 
             NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
             NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+            PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
         }
 
-        public void PopulatePlayerEntries(bool addSelf) {
+        public void PopulatePlayerEntries() {
             RemoveAllPlayerEntries();
-            try {
-                foreach (PlayerRef player in Runner.ActivePlayers) {
-                    if (addSelf || Runner.LocalPlayer != player) {
-                        AddPlayerEntry(player);
-                    }
-                }
-            } catch {
 
+            if (!SessionData.Instance) {
+                return;
+            }
+
+            foreach ((_, PlayerData data) in SessionData.Instance.PlayerDatas) {
+                AddPlayerEntry(data);
             }
         }
 
         public void AddPlayerEntry(PlayerRef player) {
-            PlayerData data = player.GetPlayerData(Runner);
+            AddPlayerEntry(player.GetPlayerData());
+        }
+
+        public void AddPlayerEntry(PlayerData data) {
             if (!data || !template) {
                 return;
             }
+            PlayerRef player = data.Owner;
 
             if (!playerListEntries.ContainsKey(player)) {
                 GameObject go = Instantiate(template, contentPane.transform);
@@ -85,8 +86,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateAllPlayerEntries() {
-            foreach (PlayerRef player in Runner.ActivePlayers) {
-                UpdatePlayerEntry(player, false);
+            foreach ((_, PlayerData data) in SessionData.Instance.PlayerDatas) {
+                UpdatePlayerEntry(data, false);
             }
 
             if (MainMenuManager.Instance) {
@@ -94,13 +95,13 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public void UpdatePlayerEntry(PlayerRef player, bool updateChat = true) {
-            if (!playerListEntries.ContainsKey(player)) {
-                AddPlayerEntry(player);
+        public void UpdatePlayerEntry(PlayerData data, bool updateChat = true) {
+            if (!playerListEntries.ContainsKey(data.Owner)) {
+                //AddPlayerEntry(data);
                 return;
             }
 
-            playerListEntries[player].UpdateText();
+            playerListEntries[data.Owner].UpdateText();
             ReorderEntries();
 
             if (updateChat && MainMenuManager.Instance) {
@@ -109,12 +110,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void ReorderEntries() {
-            var playerList = Runner.ActivePlayers
-                .Where(pr => pr.GetPlayerData(NetworkHandler.Runner))
-                .OrderByDescending(pr => pr.GetPlayerData(NetworkHandler.Runner).JoinTick);
+            var playerList = SessionData.Instance.PlayerDatas.OrderByDescending(pd => pd.Value.JoinTick);
 
-            foreach (PlayerRef player in playerList) {
-
+            foreach ((PlayerRef player, _) in playerList) {
                 if (!playerListEntries.ContainsKey(player)) {
                     continue;
                 }
@@ -132,6 +130,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         //---Callbacks
+        public void OnPlayerDataReady(PlayerData data) {
+            Debug.Log(data);
+            AddPlayerEntry(data);
+        }
+
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
             AddPlayerEntry(player);
         }

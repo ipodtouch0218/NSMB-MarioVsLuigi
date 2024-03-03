@@ -64,8 +64,7 @@ namespace NSMB.Entities.Player {
 
             DisableAllModels();
 
-            PlayerData data = Object.InputAuthority.GetPlayerData(Runner);
-
+            PlayerData data = controller.Data;
             if (ScriptableManager.Instance.skins[data ? data.SkinIndex : 0] is PlayerColorSet colorSet) {
                 skin = colorSet.GetPlayerColors(controller.character);
             }

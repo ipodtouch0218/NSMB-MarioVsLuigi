@@ -5,7 +5,6 @@ using TMPro;
 
 using Fusion;
 using NSMB.Entities.Player;
-using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Translation;
 
@@ -82,7 +81,7 @@ public class SpectationManager : MonoBehaviour {
             return;
         }
 
-        string username = TargetPlayer.Object.InputAuthority.GetPlayerData(TargetPlayer.Runner).GetNickname();
+        string username = TargetPlayer.Data.GetNickname();
 
         TranslationManager tm = GlobalController.Instance.translationManager;
         spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);

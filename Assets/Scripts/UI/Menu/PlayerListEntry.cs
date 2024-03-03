@@ -24,7 +24,7 @@ namespace NSMB.UI.MainMenu {
 
         //---Private Variables
         private GameObject blockerInstance;
-        private NicknameColor nicknameColor;
+        private NicknameColor NicknameColor => player.NicknameColor;
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
@@ -41,17 +41,18 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDestroy() {
-            if (blockerInstance)
+            if (blockerInstance) {
                 Destroy(blockerInstance);
+            }
         }
 
         public void Start() {
-            nicknameColor = player.NicknameColor;
-            nameText.color = nicknameColor.color;
+            nameText.color = NicknameColor.color;
         }
 
         public void Update() {
-            if (nicknameColor.isRainbow) {
+            nameText.color = NicknameColor.color;
+            if (NicknameColor.isRainbow) {
                 nameText.color = Utils.Utils.GetRainbowColor(NetworkHandler.Runner);
             }
 
@@ -75,16 +76,16 @@ namespace NSMB.UI.MainMenu {
                 winsText.text = "<sprite name=room_wins>" + player.Wins;
             }
 
+            int ping = player.Ping;
+            if (ping == 0) {
+                pingText.text = "";
+            } else {
+                pingText.text = ping + " " + Utils.Utils.GetPingSymbol(ping);
+            }
+
             string permissionSymbol = "";
             if (player.IsRoomOwner) {
                 permissionSymbol += "<sprite name=room_host>";
-                pingText.text = "";
-            } else {
-                int ping = player.Ping;
-                if (ping == 0)
-                    pingText.text = "";
-                else
-                    pingText.text = ping + " " + Utils.Utils.GetPingSymbol(ping);
             }
 
             string characterSymbol = player.GetCharacterData().uistring;
@@ -101,8 +102,9 @@ namespace NSMB.UI.MainMenu {
             Transform parent = transform.parent;
             int childIndex = 0;
             for (int i = 0; i < parent.childCount; i++) {
-                if (parent.GetChild(i) != gameObject)
+                if (parent.GetChild(i) != gameObject) {
                     continue;
+                }
 
                 childIndex = i;
                 break;
@@ -113,8 +115,9 @@ namespace NSMB.UI.MainMenu {
 
         public void ShowDropdown() {
             NetworkRunner runner = NetworkHandler.Instance.runner;
-            if (blockerInstance)
+            if (blockerInstance) {
                 Destroy(blockerInstance);
+            }
 
             bool admin = runner.IsServer && runner.LocalPlayer != player.Object.InputAuthority;
             foreach (GameObject option in adminOnlyOptions) {

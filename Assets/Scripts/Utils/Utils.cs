@@ -533,7 +533,7 @@ namespace NSMB.Utils {
                 return spectatorColor;
             }
 
-            return GetPlayerColor(runner, player.GetPlayerData(runner), s, v);
+            return GetPlayerColor(runner, player.GetPlayerData(), s, v);
         }
 
         public static Color GetPlayerColor(NetworkRunner runner, PlayerData player, float s = 1, float v = 1) {
@@ -551,12 +551,9 @@ namespace NSMB.Utils {
             // Then id based color
             int result = -1;
             int count = 0;
-            var players = runner.ActivePlayers
-                .Select(pr => pr.GetPlayerData(runner))
-                .Where(pd => pd)
-                .OrderBy(pd => pd.JoinTick);
+            var players = SessionData.Instance.PlayerDatas.OrderBy(pd => pd.Value.JoinTick);
 
-            foreach (PlayerData playerData in players) {
+            foreach ((_, PlayerData playerData) in players) {
                 // Skip spectators in color calculations
                 if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating) {
                     continue;

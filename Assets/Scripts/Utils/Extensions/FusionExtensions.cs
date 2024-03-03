@@ -11,29 +11,32 @@ namespace NSMB.Extensions {
 
         public static float? RemainingRenderTime(this TickTimer timer, NetworkRunner runner) {
             float? timeRemaining = timer.RemainingTime(runner);
-            if (!timeRemaining.HasValue)
+            if (!timeRemaining.HasValue) {
                 return null;
+            }
 
             return Mathf.Max(0, (float) timeRemaining - (runner.LocalAlpha * runner.DeltaTime));
         }
 
-        public static PlayerData GetPlayerData(this PlayerRef player, NetworkRunner runner) {
-            NetworkObject obj = runner.GetPlayerObject(player);
-            if (!obj)
-                return null;
+        public static PlayerData GetPlayerData(this PlayerRef player) {
+            SessionData.Instance.PlayerDatas.TryGet(player, out PlayerData value);
+            return value;
+        }
 
-            return obj.GetComponent<PlayerData>();
+        public static bool TryGetPlayerData(this PlayerRef player, out PlayerData data) {
+            return SessionData.Instance.PlayerDatas.TryGet(player, out data);
         }
 
         public static PlayerData GetLocalPlayerData(this NetworkRunner runner) {
-            try {
-                return runner.LocalPlayer.GetPlayerData(runner);
-            } catch {}
-            return null;
+            return GetPlayerData(runner.LocalPlayer);
         }
 
-        public static CharacterData GetCharacterData(this PlayerRef player, NetworkRunner runner) {
-            return player.GetPlayerData(runner).GetCharacterData();
+        public static bool TryGetPlayerData(this NetworkRunner runner, out PlayerData data) {
+            return TryGetPlayerData(runner.LocalPlayer, out data);
+        }
+
+        public static CharacterData GetCharacterData(this PlayerRef player) {
+            return player.GetPlayerData().GetCharacterData();
         }
 
         public static CharacterData GetCharacterData(this PlayerData data) {

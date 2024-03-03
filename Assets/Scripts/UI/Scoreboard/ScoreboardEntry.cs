@@ -18,8 +18,10 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
     //---Public Variables
     public PlayerController target;
 
+    //---Properties
+    private PlayerData Data => target.Data;
+
     //---Private Variables
-    private PlayerData data;
     private NicknameColor nicknameColor;
     private int playerId, currentLives, currentStars, currentPing;
     private bool disconnected, initialized = false;
@@ -32,15 +34,13 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
             return;
         }
 
-        data = target.Object.InputAuthority.GetPlayerData(target.Runner);
-
         playerId = target.PlayerId;
-        nameText.text = (data.IsRoomOwner ? "<sprite name=connection_host>" : "<sprite name=connection_great>") + data.GetNickname();
+        nameText.text = (Data.IsRoomOwner ? "<sprite name=connection_host>" : "<sprite name=connection_great>") + Data.GetNickname();
 
         Color c = target.animationController.GlowColor;
         background.color = new(c.r, c.g, c.b, 0.5f);
 
-        nicknameColor = data.NicknameColor;
+        nicknameColor = Data.NicknameColor;
         nameText.color = nicknameColor.color;
 
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
@@ -63,13 +63,13 @@ public class ScoreboardEntry : MonoBehaviour, IComparable {
             return;
         }
 
-        if (!data || !data.Object || !data.Object.IsValid) {
+        if (!Data || !Data.Object || !Data.Object.IsValid) {
             disconnected = true;
             nameText.text = Regex.Replace(nameText.text, "<sprite name=.*>", "<sprite name=connection_disconnected>");
 
-        } else if (!data.IsRoomOwner && currentPing != data.Ping) {
-            currentPing = data.Ping;
-            nameText.text = Utils.GetPingSymbol(currentPing) + data.GetNickname();
+        } else if (!Data.IsRoomOwner && currentPing != Data.Ping) {
+            currentPing = Data.Ping;
+            nameText.text = Utils.GetPingSymbol(currentPing) + Data.GetNickname();
         }
 
         if (!target || !target.Object || disconnected) {

@@ -16,10 +16,12 @@ public class PlayerData : NetworkBehaviour {
     public bool Locked => SessionData.Instance && SessionData.Instance.GameStarted && !IsCurrentlySpectating;
 
     //---Events
+    public static event Action<PlayerData> OnPlayerDataReady;
     public event Action<bool> OnInOptionsChangedEvent;
     public event Action<bool> OnIsReadyChangedEvent;
 
     //---Networked Variables
+    [Networked] public PlayerRef Owner { get; set; }
     [Networked, Capacity(20)] public string RawNickname { get; set; } = "noname";
     [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked] public ConnectionToken ConnectionToken { get; set; }
@@ -41,77 +43,71 @@ public class PlayerData : NetworkBehaviour {
 
     public Guid UserId => ConnectionToken.signedData.UserId;
     public NicknameColor NicknameColor => nicknameColor;
+    private bool IsLocal => Owner == Runner.LocalPlayer;
 
     //---Private Variables
-    private NicknameColor nicknameColor;
+    private NicknameColor nicknameColor = NicknameColor.White;
     private Tick lastUpdatedTick;
     private string filteredNickname;
     private ChangeDetector changeDetector;
+    private bool sentJoinMessage;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
     }
 
-    public void OnBeforeSpawned() {
+    public void OnBeforeSpawned(PlayerRef owner) {
+        Owner = owner;
+
+        /*
         // Expose their connection token :flushed:
-        byte[] token = Runner.GetPlayerConnectionToken(Object.InputAuthority);
+        byte[] token = Runner.GetPlayerConnectionToken(owner);
         try {
             ConnectionToken = ConnectionToken.Deserialize(token);
             if (!ConnectionToken.HasValidSignature()) {
                 // Invalid signature, nice try guy
                 throw new Exception();
             }
-            if (ConnectionToken.signedData.UserId != Guid.Parse(Runner.GetPlayerUserId(Object.InputAuthority))) {
+            if (ConnectionToken.signedData.UserId != Guid.Parse(Runner.GetPlayerUserId(Owner))) {
                 // Attempted to steal from another user???
                 throw new Exception();
             }
             // Successful :D
-            SetNickname(ConnectionToken.nickname.Value);
         } catch {
             if (!Runner.IsSinglePlayer) {
-                Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Object.InputAuthority)}'.");
+                Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Owner)}'.");
             }
 
             SetNickname(ConnectionToken.nickname.Value);
             ConnectionToken = new();
         }
+        */
 
         // Find the least populated team and automatically join that one.
-        var playerDatas =
-            Runner.ActivePlayers
-                .Select(pr => pr.GetPlayerData(Runner))
-                .Where(pd => pd != null);
-
-        int[] teamCounts = new int[5];
-        foreach (PlayerData data in playerDatas) {
-            teamCounts[data.Team]++;
-        }
-
-        int minIndex = 0;
-        for (int i = 1; i < teamCounts.Length; i++) {
-            if (teamCounts[i] < teamCounts[minIndex]) {
-                minIndex = i;
+        if (SessionData.Instance) {
+            int[] teamCounts = new int[5];
+            foreach ((_, PlayerData data) in SessionData.Instance.PlayerDatas) {
+                teamCounts[data.Team]++;
             }
+
+            int minIndex = 0;
+            for (int i = 1; i < teamCounts.Length; i++) {
+                if (teamCounts[i] < teamCounts[minIndex]) {
+                    minIndex = i;
+                }
+            }
+
+            Team = (sbyte) minIndex;
         }
 
-        Team = (sbyte) minIndex;
-        IsRoomOwner = (Object.InputAuthority == Runner.LocalPlayer);
+        IsRoomOwner = (Owner == Runner.LocalPlayer);
         JoinTick = IsRoomOwner ? -1 : Runner.Tick;
     }
 
-    public void ReassignPlayerData(PlayerRef player) {
-        Object.AssignInputAuthority(player);
-        Runner.SetPlayerObject(player, Object);
-
-        IsRoomOwner = (Object.InputAuthority == Runner.LocalPlayer);
-        if (IsRoomOwner) {
-            JoinTick = -1;
-        }
-    }
-
     public override void Spawned() {
-        // Keep track of our data, pls kthx
-        Runner.SetPlayerObject(Object.InputAuthority, Object);
+        if (SessionData.Instance) {
+            SessionData.Instance.PlayerDatas.Add(Owner, this);
+        }
 
         if (Runner.IsResume) {
             SetNickname(ConnectionToken.nickname.Value);
@@ -119,14 +115,14 @@ public class PlayerData : NetworkBehaviour {
         }
 
         IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
-        nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
 
         if (SessionData.Instance) {
             SessionData.Instance.LoadWins(this);
         }
 
-        if (HasInputAuthority) {
+        if (IsLocal) {
             // We're the client. update with our data.
+            Rpc_SetConnectionToken(GlobalController.Instance.connectionToken);
             Rpc_SetCharacterIndex((byte) Settings.Instance.generalCharacter);
             Rpc_SetSkinIndex((byte) Settings.Instance.generalSkin);
 
@@ -135,12 +131,7 @@ public class PlayerData : NetworkBehaviour {
 
 
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-
-        // Check if we need to play sfx / send a chat message
-        SendJoinMessageIfNeeded();
-
         UpdateObjectName();
-        NetworkHandler.Instance.playerDatas.Add(this);
     }
 
     public override void Render() {
@@ -158,7 +149,19 @@ public class PlayerData : NetworkBehaviour {
             case nameof(IsReady): OnIsReadyChanged(IsReady); break;
             case nameof(CharacterIndex): OnCharacterChanged(); break;
             case nameof(SkinIndex): OnSkinChanged(); break;
+            case nameof(DisplayNickname): OnDisplayNicknameChanged(); break;
             }
+        }
+    }
+
+    public override void FixedUpdateNetwork() {
+        if (!HasStateAuthority) {
+            return;
+        }
+
+        if (!ConnectionToken.HasValidSignature() && (Runner.Tick - JoinTick) > Runner.TickRate) {
+            // Kick player for not sending the token in time...
+
         }
     }
 
@@ -167,23 +170,26 @@ public class PlayerData : NetworkBehaviour {
             SessionData.Instance.SaveWins(this);
         }
 
-        if (HasInputAuthority) {
+        if (IsLocal) {
             PauseOptionMenuManager.OnOptionsOpenedToggled -= OnOptionsOpenToggled;
         }
-
-        runner.SetPlayerObject(Object.InputAuthority, null);
     }
 
     public void SendJoinMessageIfNeeded() {
-        if (!SessionData.PlayersNeedingJoinMessage.Remove(Object.InputAuthority)) {
+        if (sentJoinMessage) {
             return;
         }
 
+        if (IsRoomOwner && Owner == Runner.LocalPlayer) {
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+        }
         ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
 
         if (MainMenuManager.Instance) {
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
         }
+
+        sentJoinMessage = true;
     }
 
     public string GetNickname(bool filter = true) {
@@ -208,11 +214,10 @@ public class PlayerData : NetworkBehaviour {
 
         RawNickname = name;
 
-        if (Object.InputAuthority.AsIndex != Runner.SessionInfo.MaxPlayers - 1) {
+        if (Runner.LocalPlayer != Owner) {
             // Check for players with duplicate names, and add (1), (2), etc
-            int count = Runner.ActivePlayers
-                .Select(pr => pr.GetPlayerData(Runner))
-                .Where(pd => pd && pd.Object)
+            int count = SessionData.Instance.PlayerDatas
+                .Select(kvp => kvp.Value)
                 .Where(pd => pd.JoinTick < JoinTick)
                 .Where(pd => pd.RawNickname.ToString().Filter() == name)
                 .Count();
@@ -223,16 +228,35 @@ public class PlayerData : NetworkBehaviour {
         }
 
         DisplayNickname = name;
-        UpdateObjectName();
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void Rpc_FinishedLoading() {
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void Rpc_SetConnectionToken(ConnectionToken token, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
+
+        ConnectionToken = token;
+        SetNickname(ConnectionToken.nickname.Value);
+        if (token.signedData.UserId.ToString() == Runner.GetPlayerUserId(Owner)) {
+            nicknameColor = NicknameColor.FromConnectionToken(token);
+        }
+        OnPlayerDataReady?.Invoke(this);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void Rpc_FinishedLoading(RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
         IsLoaded = true;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void Rpc_SetPermanentSpectator(bool value) {
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void Rpc_SetPermanentSpectator(bool value, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
         // Not accepting changes at this time
         if (Locked) {
             return;
@@ -241,8 +265,12 @@ public class PlayerData : NetworkBehaviour {
         IsManualSpectator = value;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void Rpc_SetCharacterIndex(byte index) {
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void Rpc_SetCharacterIndex(byte index, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
+
         // Not accepting changes at this time
         if (Locked) {
             return;
@@ -256,8 +284,12 @@ public class PlayerData : NetworkBehaviour {
         CharacterIndex = index;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void Rpc_SetSkinIndex(byte index) {
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void Rpc_SetSkinIndex(byte index, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
+
         // Not accepting changes at this time
         if (Locked) {
             return;
@@ -286,22 +318,26 @@ public class PlayerData : NetworkBehaviour {
         Team = team;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
     public void Rpc_SetOptionsOpen(bool open) {
         if (HasStateAuthority) {
             IsInOptions = open;
-        } else if (HasInputAuthority) {
+        } else if (IsLocal) {
             // Bodge for the lack of "InvokeResim" in Fusion 2
             // Makes it so the icon appears.. "predictively"? Is that a word?
             OnInOptionsChanged();
         }
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
-    public void Rpc_SetIsReady(bool ready) {
+    [Rpc(RpcSources.All, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
+    public void Rpc_SetIsReady(bool ready, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
+
         if (HasStateAuthority) {
             IsReady = ready;
-        } else if (HasInputAuthority) {
+        } else if (IsLocal) {
             // Bodge for the lack of "InvokeResim" in Fusion 2
             // Makes it so the icon appears.. "predictively"? Is that a word?
             OnIsReadyChanged(ready);
@@ -341,7 +377,7 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public void OnCharacterChanged() {
-        if (!MainMenuManager.Instance || !HasInputAuthority) {
+        if (!MainMenuManager.Instance || !IsLocal) {
             return;
         }
 
@@ -350,11 +386,16 @@ public class PlayerData : NetworkBehaviour {
     }
 
     public void OnSkinChanged() {
-        if (!MainMenuManager.Instance || !HasInputAuthority) {
+        if (!MainMenuManager.Instance || !IsLocal) {
             return;
         }
 
         MainMenuManager.Instance.SwapPlayerSkin(SkinIndex, false);
+    }
+
+    public void OnDisplayNicknameChanged() {
+        UpdateObjectName();
+        SendJoinMessageIfNeeded();
     }
 
     public void OnInOptionsChanged() {
@@ -364,7 +405,7 @@ public class PlayerData : NetworkBehaviour {
     public void OnIsReadyChanged(bool state) {
         OnIsReadyChangedEvent?.Invoke(state);
 
-        if (MainMenuManager.Instance && HasInputAuthority) {
+        if (MainMenuManager.Instance && IsLocal) {
             MainMenuManager.Instance.UpdateReadyButton(state);
         }
     }

@@ -10,7 +10,6 @@ using NSMB.Utils;
 public class UserNametag : MonoBehaviour {
 
     public PlayerController parent;
-    private PlayerData data;
     private CharacterData character;
 
     //---Serailzied Variables
@@ -20,16 +19,18 @@ public class UserNametag : MonoBehaviour {
     [SerializeField] private Image arrow;
     [SerializeField] private RectTransform parentTransform;
 
+    //---Properties
+    private PlayerData Data => parent.Data;
+
     //---Private Variables
     private string cachedNickname;
     private NicknameColor nicknameColor;
 
     public void Start() {
-        data = parent.Object.InputAuthority.GetPlayerData(parent.Runner);
-        character = data.GetCharacterData();
+        character = Data.GetCharacterData();
         arrow.color = parent.animationController.GlowColor;
 
-        nicknameColor = data.NicknameColor;
+        nicknameColor = Data.NicknameColor;
         text.color = nicknameColor.color;
     }
 
@@ -65,14 +66,14 @@ public class UserNametag : MonoBehaviour {
         transform.position = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentTransform.rect.size;
         transform.position += parentTransform.position - (Vector3) (parentTransform.pivot * parentTransform.rect.size);
 
-        if (data && data.Object) {
-            cachedNickname ??= data.GetNickname();
+        if (Data && Data.Object) {
+            cachedNickname ??= Data.GetNickname();
 
             // TODO: this allocates every frame.
             string newText = "";
 
             if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
-                Team team = ScriptableManager.Instance.teams[data.Team];
+                Team team = ScriptableManager.Instance.teams[Data.Team];
                 newText += team.textSpriteColorblindBig;
             }
             newText += cachedNickname + "\n";
@@ -85,10 +86,10 @@ public class UserNametag : MonoBehaviour {
 
             text.text = newText;
 
-            nicknameColor ??= data.NicknameColor;
+            nicknameColor = Data.NicknameColor;
         }
 
-        if (nicknameColor != null && nicknameColor.isRainbow) {
+        if (nicknameColor.isRainbow) {
             text.color = Utils.GetRainbowColor(parent.Runner);
         }
     }

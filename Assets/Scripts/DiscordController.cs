@@ -90,7 +90,7 @@ public class DiscordController : MonoBehaviour {
 
         TranslationManager tm = GlobalController.Instance.translationManager;
 
-        if (SessionData.Instance) {
+        if (SessionData.Instance && SessionData.Instance.Object) {
 
             activity.Details = NetworkHandler.Runner.IsSinglePlayer ? tm.GetTranslation("discord.offline") : tm.GetTranslation("discord.online");
             if (!NetworkHandler.Runner.IsSinglePlayer) {

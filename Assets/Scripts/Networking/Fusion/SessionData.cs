@@ -14,7 +14,6 @@ public class SessionData : NetworkBehaviour {
 
     //---Static Variables
     public static SessionData Instance;
-    public static HashSet<PlayerRef> PlayersNeedingJoinMessage = new();
     private static readonly WaitForSeconds WaitTwoSeconds = new(2);
 
 #pragma warning disable CS0414
@@ -38,6 +37,7 @@ public class SessionData : NetworkBehaviour {
     [Networked(Default = nameof(defaultCustomPowerups))] public NetworkBool CustomPowerups { get; set; }
     [Networked] public NetworkBool Teams { get; set; }
     [Networked] public byte AlternatingMusicIndex { get; set; }
+    [Networked, Capacity(10)] public NetworkDictionary<PlayerRef, PlayerData> PlayerDatas => default;
 
     //---Properties
     private MainMenuChat Chat {
@@ -68,6 +68,10 @@ public class SessionData : NetworkBehaviour {
 
     public override void Spawned() {
         Instance = this;
+
+        foreach (var data in FindObjectsOfType<PlayerData>()) {
+            PlayerDatas.Add(data.Owner, data);
+        }
 
         if (!Runner.IsResume) {
             if (MainMenuManager.Instance) {
@@ -160,7 +164,8 @@ public class SessionData : NetworkBehaviour {
         while (true) {
             yield return WaitTwoSeconds;
             foreach (PlayerRef player in Runner.ActivePlayers) {
-                if (player.GetPlayerData(Runner) is not PlayerData pd || !pd) {
+                PlayerData pd = player.GetPlayerData();
+                if (!pd) {
                     continue;
                 }
 
@@ -321,7 +326,7 @@ public class SessionData : NetworkBehaviour {
         // Set PlayerIDs and spectator values for players
         sbyte count = 0;
         foreach (PlayerRef player in Runner.ActivePlayers) {
-            PlayerData data = player.GetPlayerData(Runner);
+            PlayerData data = player.GetPlayerData();
             if (!data) {
                 continue;
             }

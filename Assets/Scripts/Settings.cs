@@ -165,12 +165,12 @@ public class Settings : Singleton<Settings> {
     //---Public Variables
     public string generalNickname;
     public int generalCharacter, generalSkin;
-    public bool generalScoreboardAlways, generalChatFiltering, generalDisableNATPunchthrough, generalUseNicknameColor;
+    public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
 
     public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
 
     public Enums.SpecialPowerupMusic audioSpecialPowerupMusic;
-    public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning, audioSpecialPowerupMusicLocalOnly;
+    public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
 
     public RumbleManager.RumbleSetting controlsRumble;
     public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
@@ -198,7 +198,6 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("General_Character", generalCharacter);
         PlayerPrefs.SetInt("General_Skin", generalSkin);
         PlayerPrefs.SetString("General_Locale", GeneralLocale);
-        PlayerPrefs.SetInt("General_DisableNATPunchthrough", generalDisableNATPunchthrough ? 1 : 0);
         PlayerPrefs.SetInt("General_UseNicknameColor", generalUseNicknameColor ? 1 : 0);
         PlayerPrefs.SetInt("General_DiscordIntegration", GeneralDiscordIntegration ? 1 : 0);
 
@@ -223,7 +222,6 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Audio_MuteSFXOnUnfocus", audioMuteSFXOnUnfocus ? 1 : 0);
         PlayerPrefs.SetInt("Audio_Panning", audioPanning ? 1 : 0);
         PlayerPrefs.SetInt("Audio_SpecialPowerupMusic", (int) audioSpecialPowerupMusic);
-        PlayerPrefs.SetInt("Audio_SpecialPowerupMusicLocal", audioSpecialPowerupMusicLocalOnly ? 1 : 0);
 
         // Controls
         PlayerPrefs.SetInt("Controls_FireballFromSprint", controlsFireballSprint ? 1 : 0);
@@ -271,7 +269,6 @@ public class Settings : Singleton<Settings> {
         generalCharacter = PlayerPrefs.GetInt("Character", 0);
         generalSkin = PlayerPrefs.GetInt("Skin", 0);
         GeneralLocale = "en-US";
-        generalDisableNATPunchthrough = false;
         generalUseNicknameColor = true;
         _generalDiscordIntegration = true;
 
@@ -294,7 +291,6 @@ public class Settings : Singleton<Settings> {
         audioMuteSFXOnUnfocus = false;
         audioPanning = true;
         audioSpecialPowerupMusic = Enums.SpecialPowerupMusic.Starman | Enums.SpecialPowerupMusic.MegaMushroom;
-        audioSpecialPowerupMusicLocalOnly = false;
 
         FileInfo bindingsFile = new(Application.persistentDataPath + "/controls.json");
         if (bindingsFile.Exists) {
@@ -318,7 +314,6 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("General_Character", ref generalCharacter);
         TryGetSetting("General_Skin", ref generalSkin);
         TryGetSetting<string>("General_Locale", nameof(GeneralLocale));
-        TryGetSetting("General_DisableNATPunchthrough", ref generalDisableNATPunchthrough);
         TryGetSetting("General_UseNicknameColor", ref generalUseNicknameColor);
         TryGetSetting<bool>("General_DiscordIntegration", nameof(GeneralDiscordIntegration));
 
@@ -343,7 +338,6 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("Audio_MuteSFXOnUnfocus", ref audioMuteSFXOnUnfocus);
         TryGetSetting("Audio_Panning", ref audioPanning);
         TryGetSetting("Audio_SpecialPowerupMusic", ref audioSpecialPowerupMusic);
-        TryGetSetting("Audio_SpecialPowerupMusicLocalOnly", ref audioSpecialPowerupMusicLocalOnly);
 
         // Controls
         TryGetSetting("Controls_FireballFromSprint", ref controlsFireballSprint);

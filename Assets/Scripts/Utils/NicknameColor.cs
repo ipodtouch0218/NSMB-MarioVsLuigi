@@ -3,7 +3,7 @@ using UnityEngine;
 
 using Fusion;
 
-public class NicknameColor {
+public readonly struct NicknameColor {
     public readonly Color color;
     public readonly bool isRainbow;
 
@@ -12,15 +12,17 @@ public class NicknameColor {
         this.isRainbow = isRainbow;
     }
 
-    private static readonly NicknameColor White = new();
+    public static readonly NicknameColor White = new();
     public static NicknameColor FromConnectionToken(ConnectionToken data) {
 
-        if (!data.HasValidSignature())
+        if (!data.HasValidSignature()) {
             return White;
+        }
 
         NetworkString<_8> colorString = data.signedData.NicknameColor;
-        if (colorString == "")
+        if (colorString == "") {
             return White;
+        }
 
         NicknameColor ret;
         if (colorString.StartsWith("#")) {

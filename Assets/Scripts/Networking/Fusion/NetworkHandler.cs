@@ -13,7 +13,6 @@ using static ConnectionToken;
 using Fusion;
 using Fusion.Photon.Realtime;
 using Fusion.Sockets;
-using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
@@ -39,7 +38,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     //---Public
     public NetworkRunner runner;
-    public readonly HashSet<PlayerData> playerDatas = new();
 
     #region Events
     //---Exposed callbacks for Events
@@ -220,7 +218,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             HostMigrationResume = HostMigrationResume,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             SessionProperties = properties,
-            DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
             EnableClientSessionCreation = true,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
             Scene = SceneRef.FromIndex(0)
@@ -243,19 +240,20 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
 
-        Debug.Log($"player joined! {player}");
-
         // Handle PlayerDatas
-        bool hadExistingData = false;
         if ((runner.IsServer || runner.IsSharedModeMasterClient) && !runner.IsSinglePlayer) {
-
-            runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: player, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned(), flags: NetworkSpawnFlags.SharedModeStateAuthMasterClient);
-
+            runner.Spawn(
+                PrefabList.Instance.PlayerDataHolder,
+                inputAuthority: player,
+                onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned(player),
+                flags: NetworkSpawnFlags.SharedModeStateAuthMasterClient
+            );
             if (runner.Tick != 0) {
                 runner.PushHostMigrationSnapshot();
             }
         }
 
+        /*
         // Please spare a join message, sir?
         if (!hadExistingData) {
             SessionData.PlayersNeedingJoinMessage.Add(player);
@@ -264,6 +262,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 data.SendJoinMessageIfNeeded();
             }
         }
+        */
 
         // Update Discord integration
         if (player != runner.LocalPlayer) {
@@ -278,12 +277,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         OnPlayerLeft?.Invoke(runner, player);
 
         PlayerData data = null;
-        foreach (PlayerData d in playerDatas) {
+        foreach ((_, PlayerData d) in SessionData.Instance.PlayerDatas) {
             if (!d || !d.Object) {
                 continue;
             }
 
-            if (d.Object.InputAuthority == player) {
+            if (d.Owner == player) {
                 data = d;
                 break;
             }
@@ -292,11 +291,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (data) {
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.quit", "playername", data.GetNickname());
-            if (runner.IsServer) {
+            SessionData.Instance.PlayerDatas.Remove(data.Owner);
+            if (data.HasStateAuthority) {
                 runner.Despawn(data.Object);
                 runner.PushHostMigrationSnapshot();
             }
-            playerDatas.Remove(data);
         }
 
         GlobalController.Instance.discordController.UpdateActivity();
@@ -520,7 +519,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             args.GameMode = gamemode;
             args.SessionName = idBuilder.ToString();
             args.ConnectionToken = GlobalController.Instance.connectionToken.Serialize();
-            args.DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough;
             args.SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>();
             args.SessionProperties = NetworkUtils.DefaultRoomProperties;
             args.OnGameStarted = RoomInitialized;
@@ -582,11 +580,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             GameMode = GameMode.Shared,
             SessionName = roomId,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
-            DisableNATPunchthrough = Settings.Instance.generalDisableNATPunchthrough,
             EnableClientSessionCreation = false,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
             OnGameStarted = RoomInitialized,
         });
+
         if (!result.Ok) {
             Debug.Log($"[Network] Failed to join game: {result.ShutdownReason}");
             connecting = 0;
@@ -604,16 +602,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #endregion
 
     private static void RoomInitialized(NetworkRunner runner) {
-
-        Instance.playerDatas.Clear();
-        SessionData.PlayersNeedingJoinMessage.Clear();
-
         if (runner.IsServer || runner.IsSharedModeMasterClient) {
             runner.Spawn(PrefabList.Instance.SessionDataHolder, onBeforeSpawned: (runner, obj) => {
                 SessionData.Instance = obj.GetComponent<SessionData>();
             }, flags: NetworkSpawnFlags.SharedModeStateAuthMasterClient);
-        } else {
-            SessionData.PlayersNeedingJoinMessage.Add(runner.LocalPlayer);
         }
     }
 
@@ -643,7 +635,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
                     // Don't respawn duplicate PlayerDatas (idk why they even exist???)
                     // Like we despawn them on player leave and they just pop back up...
-                    if (Instance.playerDatas.Any(other => other.UserId == pd.UserId)) {
+                    if (SessionData.Instance.PlayerDatas.Any(other => other.Value.UserId == pd.UserId)) {
                         continue;
                     }
 

@@ -336,7 +336,7 @@ namespace NSMB.Entities.Player {
             body.Freeze = true;
             body.ForceSnapshotInterpolation = IsProxy;
 
-            Data = Object.InputAuthority.GetPlayerData(Runner);
+            Data = Object.InputAuthority.GetPlayerData();
             if (HasInputAuthority) {
                 GameManager.Instance.localPlayer = this;
                 GameManager.Instance.spectationManager.Spectating = false;

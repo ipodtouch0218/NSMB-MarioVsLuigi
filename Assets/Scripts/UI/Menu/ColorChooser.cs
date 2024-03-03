@@ -67,7 +67,7 @@ namespace NSMB.UI.MainMenu {
                 buttons[i].navigation = navigations[i];
             }
 
-            CharacterData character = NetworkHandler.Runner.LocalPlayer.GetCharacterData(NetworkHandler.Runner);
+            CharacterData character = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
             ChangeCharacter(character);
         }
 

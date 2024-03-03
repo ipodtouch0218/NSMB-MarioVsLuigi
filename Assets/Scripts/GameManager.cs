@@ -191,15 +191,17 @@ namespace NSMB.Game {
 
             if (HasStateAuthority && Runner.IsSinglePlayer) {
                 // Handle spawning in editor by spawning the room + player data objects
-                NetworkObject localData = Runner.Spawn(PrefabList.Instance.PlayerDataHolder, inputAuthority: Runner.LocalPlayer, onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned());
-                Runner.SetPlayerObject(Runner.LocalPlayer, localData);
+                Runner.Spawn(
+                    PrefabList.Instance.PlayerDataHolder,
+                    inputAuthority: Runner.LocalPlayer,
+                    onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned(Runner.LocalPlayer)
+                );
             }
 
             if (GameStartTime <= 0 && !GameStartTimer.IsRunning) {
                 // The game hasn't started.
                 // Tell our host that we're done loading
-                PlayerData localData = Runner.GetLocalPlayerData();
-                localData.Rpc_FinishedLoading();
+                Runner.GetLocalPlayerData().Rpc_FinishedLoading();
             } else {
                 // The game HAS already started.
                 SetGameTimestamps();
@@ -520,7 +522,7 @@ namespace NSMB.Game {
 
             if (!Runner.IsSinglePlayer) {
                 foreach (PlayerRef player in Runner.ActivePlayers) {
-                    PlayerData data = player.GetPlayerData(Runner);
+                    PlayerData data = player.GetPlayerData();
 
                     if (!data || data.IsCurrentlySpectating) {
                         continue;
@@ -540,7 +542,7 @@ namespace NSMB.Game {
 
             // Find out how many players we have
             foreach (PlayerRef client in Runner.ActivePlayers) {
-                PlayerData data = client.GetPlayerData(Runner);
+                PlayerData data = client.GetPlayerData();
                 if (!data || data.IsCurrentlySpectating) {
                     continue;
                 }
@@ -552,7 +554,7 @@ namespace NSMB.Game {
 
             // Create player instances
             foreach (PlayerRef player in Runner.ActivePlayers) {
-                PlayerData data = player.GetPlayerData(Runner);
+                PlayerData data = player.GetPlayerData();
                 if (!data) {
                     continue;
                 }
@@ -761,7 +763,7 @@ namespace NSMB.Game {
             if (HasStateAuthority) {
                 // Handle resetting player states for the next game
                 foreach (PlayerRef player in Runner.ActivePlayers) {
-                    PlayerData data = player.GetPlayerData(Runner);
+                    PlayerData data = player.GetPlayerData();
 
                     // Set IsLoaded to false
                     data.IsLoaded = false;
@@ -798,12 +800,8 @@ namespace NSMB.Game {
             bool speedup = false;
 
             foreach (var player in AlivePlayers) {
-                if (!player) {
+                if (!player || !player.cameraController.IsControllingCamera) {
                     continue;
-                }
-
-                if (Settings.Instance.audioSpecialPowerupMusicLocalOnly && !player.cameraController.IsControllingCamera) {
-                    return;
                 }
 
                 mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && player.State == Enums.PowerupState.MegaMushroom && player.MegaStartTimer.ExpiredOrNotRunning(Runner);

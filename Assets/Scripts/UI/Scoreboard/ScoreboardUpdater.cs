@@ -51,7 +51,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     public void UpdateSpectatorCount() {
         int count = 0;
         foreach (var player in NetworkHandler.Runner.ActivePlayers) {
-            PlayerData data = player.GetPlayerData(NetworkHandler.Runner);
+            PlayerData data = player.GetPlayerData();
             if (!data) {
                 continue;
             }
@@ -114,12 +114,11 @@ public class ScoreboardUpdater : MonoBehaviour {
 
         NetworkRunner runner = NetworkHandler.Runner;
         List<PlayerData> actualPlayers = runner.ActivePlayers
-            .Select(pr => pr.GetPlayerData(runner))
+            .Select(pr => pr.GetPlayerData())
             .Where(pd => pd && !pd.IsCurrentlySpectating)
             .ToList();
 
         foreach (PlayerData player in actualPlayers) {
-
             GameObject entryObj = Instantiate(entryTemplate, entryTemplate.transform.parent);
             entryObj.SetActive(true);
             entryObj.name = player.GetNickname();

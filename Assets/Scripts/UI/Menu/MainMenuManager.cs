@@ -219,15 +219,8 @@ namespace NSMB.UI.MainMenu {
                 }
             } else if (inSameRoom) {
                 chat.ReplayChatMessages();
-
             } else {
-                chat.ClearChat();
                 chatTextField.SetTextWithoutNotify("");
-
-                // Host chat notification
-                if (Runner.IsServer || Runner.IsSharedModeMasterClient) {
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
-                }
             }
 
             // Open the in-room menu
@@ -237,8 +230,6 @@ namespace NSMB.UI.MainMenu {
                 // Fix the damned setting scroll menu
                 StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
             }
-
-            playerList.RemoveAllPlayerEntries();
 
             // Set the player settings
             PlayerData data = Runner.GetLocalPlayerData();
@@ -261,6 +252,9 @@ namespace NSMB.UI.MainMenu {
 
             // Discord RPC
             GlobalController.Instance.discordController.UpdateActivity();
+
+            // Create player icons
+            playerList.PopulatePlayerEntries();
 
             WasHostMigration = false;
         }
@@ -327,6 +321,7 @@ namespace NSMB.UI.MainMenu {
             DisableAllMenus();
             bg.SetActive(true);
             lobbyMenu.SetActive(true);
+            chat.ClearChat();
 
             if (!errorPrompt.gameObject.activeSelf && !networkErrorPrompt.gameObject.activeSelf && NetworkHandler.Disconnected) {
                 Reconnect();
@@ -490,7 +485,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateStartGameButton() {
-            if (SessionData.Instance && SessionData.Instance.GameStartTimer.IsRunning) {
+            if (!SessionData.Instance || SessionData.Instance.GameStartTimer.IsRunning) {
                 return;
             }
 
@@ -507,35 +502,31 @@ namespace NSMB.UI.MainMenu {
 
         public bool IsRoomConfigurationValid() {
             return
-                Runner.ActivePlayers
-                    .Select(p => p.GetPlayerData(Runner))
-                    .Where(pd => pd && !pd.IsManualSpectator)
+                SessionData.Instance.PlayerDatas
+                    .Where(kvp => !kvp.Value.IsManualSpectator)
                     .Count() >= 1;
         }
 
         public void Kick(PlayerData target) {
-            if (target.HasInputAuthority) {
+            if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
 
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetNickname());
-            Runner.Disconnect(target.Object.InputAuthority);
+            Runner.Disconnect(target.Owner);
         }
 
         public void Promote(PlayerData target) {
-            if (target.HasInputAuthority) {
+            if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
 
-            //PhotonNetwork.SetMasterClient(target);
-            //LocalChatMessage($"Promoted {target.GetUniqueNickname()} to be the host", Color.red);
-            //ChatManager.Instance.AddChatMessage("Changing hosts is not implemented yet!", PlayerRef.None, Color.red);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", "playername", target.GetNickname());
-            Runner.SetMasterClient(target.Object.InputAuthority);
+            Runner.SetMasterClient(target.Owner);
         }
 
         public void Mute(PlayerData target) {
-            if (target.HasInputAuthority) {
+            if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
 
@@ -545,13 +536,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Ban(PlayerData target) {
-            if (target.HasInputAuthority) {
+            if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
 
             SessionData.Instance.AddBan(target);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetNickname());
-            Runner.Disconnect(target.Object.InputAuthority);
+            Runner.Disconnect(target.Owner);
         }
 
         public void UI_CharacterDropdownChanged() {

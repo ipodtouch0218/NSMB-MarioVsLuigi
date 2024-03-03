@@ -60,7 +60,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Level Index
         public void SetLevelIndex() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -84,7 +84,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Stars
         public void SetStarRequirement() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Coins
         public void SetCoinRequirement() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -134,7 +134,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Lives
         public void SetLives() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -154,7 +154,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void EnableLives() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -176,7 +176,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Timer
         public void SetTime() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -196,7 +196,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void EnableTime() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -224,7 +224,7 @@ namespace NSMB.UI.MainMenu {
 
         #region DrawOnTimeUp
         public void SetDrawOnTimeUp() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -239,7 +239,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Teams
         public void SetTeams() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -263,7 +263,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Custom Powerups
         public void SetCustomPowerups() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -278,7 +278,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Players
         public void SetMaxPlayers() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
@@ -303,7 +303,7 @@ namespace NSMB.UI.MainMenu {
 
         #region Private
         public void SetPrivate() {
-            if (!Runner.IsServer) {
+            if (!Room.HasStateAuthority) {
                 return;
             }
 
