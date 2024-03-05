@@ -3,7 +3,7 @@ using UnityEngine;
 
 using Fusion;
 
-public readonly struct NicknameColor {
+public class NicknameColor {
     public readonly Color color;
     public readonly bool isRainbow;
 

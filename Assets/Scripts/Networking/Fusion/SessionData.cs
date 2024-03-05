@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,7 +13,6 @@ public class SessionData : NetworkBehaviour {
 
     //---Static Variables
     public static SessionData Instance;
-    private static readonly WaitForSeconds WaitTwoSeconds = new(2);
 
 #pragma warning disable CS0414
     //---Default values
@@ -57,7 +55,6 @@ public class SessionData : NetworkBehaviour {
     private Tick lastUpdatedTick;
     private float lastStartCancelTime = -10f;
     private bool playedStartSound;
-    private Coroutine pingUpdaterCorotuine;
     private ChangeDetector changeDetector;
     private PropertyReader<byte> levelPropertyReader;
 
@@ -90,8 +87,6 @@ public class SessionData : NetworkBehaviour {
             bannedIds = new();
             bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;
-
-            pingUpdaterCorotuine = StartCoroutine(UpdatePings());
 
             if (Runner.IsResume) {
                 GameStartTimer = TickTimer.None;
@@ -160,26 +155,8 @@ public class SessionData : NetworkBehaviour {
         }
     }
 
-    private IEnumerator UpdatePings() {
-        while (true) {
-            yield return WaitTwoSeconds;
-            foreach (PlayerRef player in Runner.ActivePlayers) {
-                PlayerData pd = player.GetPlayerData();
-                if (!pd) {
-                    continue;
-                }
-
-                pd.Ping = (int) (Runner.GetPlayerRtt(player) * 1000);
-            }
-        }
-    }
-
     public override void Despawned(NetworkRunner runner, bool hasState) {
         NetworkHandler.OnConnectRequest -= OnConnectRequest;
-
-        if (pingUpdaterCorotuine != null) {
-            StopCoroutine(pingUpdaterCorotuine);
-        }
     }
 
     private bool OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {

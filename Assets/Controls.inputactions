@@ -412,6 +412,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Next",
+                    "type": "Button",
+                    "id": "0c263a71-9606-485f-8149-4ea77c761c1a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Previous",
+                    "type": "Button",
+                    "id": "cde457c7-34f7-4b4b-86e6-7a8ab6c5fe1c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "!SpectatePlayerByIndex",
                     "type": "Button",
                     "id": "39bd28f4-bd03-4374-9e6f-ba1c13f41a2c",
@@ -992,6 +1010,94 @@
                     "processors": "",
                     "groups": "Keyboard",
                     "action": "!SpectatePlayerByIndex",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1156f33-622b-40cc-bf4c-c287df68228a",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Previous",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "10f200ed-8990-4d9b-a549-56369e8c431d",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Previous",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5ca0d410-6a5f-44d2-ad75-165c16268e61",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Previous",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4c0d9b4d-ef23-41ad-a9c8-99dfcd80f778",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Previous",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c48bf4cd-e13a-4ff0-9990-1463cd971e99",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "af069ccb-d780-466e-bf54-2bc817d6034b",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d2016ea5-be20-4f31-b903-678b07b88719",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ae3c1b99-ff96-4c8c-a807-dd1d71e83bc3",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Next",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

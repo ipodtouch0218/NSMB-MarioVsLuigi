@@ -9,6 +9,7 @@ using NSMB.Game;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
 using NSMB.UI.Pause.Options;
+using System.Collections;
 
 public class PlayerData : NetworkBehaviour {
 
@@ -51,6 +52,7 @@ public class PlayerData : NetworkBehaviour {
     private string filteredNickname;
     private ChangeDetector changeDetector;
     private bool sentJoinMessage;
+    private Coroutine pingRoutine;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -114,10 +116,15 @@ public class PlayerData : NetworkBehaviour {
             Ping = 0;
         }
 
-        IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
 
-        if (SessionData.Instance) {
-            SessionData.Instance.LoadWins(this);
+        if (HasStateAuthority) {
+            IsCurrentlySpectating = SessionData.Instance ? SessionData.Instance.GameStarted : false;
+            Ping = (int) (Runner.GetPlayerRtt(Owner) * 1000);
+
+            if (SessionData.Instance) {
+                SessionData.Instance.LoadWins(this);
+            }
         }
 
         if (IsLocal) {
@@ -125,32 +132,37 @@ public class PlayerData : NetworkBehaviour {
             Rpc_SetConnectionToken(GlobalController.Instance.connectionToken);
             Rpc_SetCharacterIndex((byte) Settings.Instance.generalCharacter);
             Rpc_SetSkinIndex((byte) Settings.Instance.generalSkin);
+            StartCoroutine(UpdatePingRoutine());
 
             PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenToggled;
         }
 
-
-        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         UpdateObjectName();
     }
 
     public override void Render() {
         base.Render();
 
+        bool ready = false;
         foreach (var change in changeDetector.DetectChanges(this)) {
             switch (change) {
             case nameof(Team):
             case nameof(IsManualSpectator):
                 OnStartSettingChanged();
                 break;
-            case nameof(Ping): OnSettingChanged(); break;
+            case nameof(Ping): OnPingChanged(); break;
             case nameof(IsLoaded): OnLoadStateChanged(); break;
             case nameof(IsInOptions): OnInOptionsChanged(); break;
             case nameof(IsReady): OnIsReadyChanged(IsReady); break;
             case nameof(CharacterIndex): OnCharacterChanged(); break;
             case nameof(SkinIndex): OnSkinChanged(); break;
-            case nameof(DisplayNickname): OnDisplayNicknameChanged(); break;
+            case nameof(DisplayNickname): OnDisplayNicknameChanged(); ready = true; break;
+            case nameof(ConnectionToken): OnConnectionTokenChanged(); ready = true; break;
             }
+        }
+
+        if (ready) {
+            OnPlayerDataReady?.Invoke(this);
         }
     }
 
@@ -159,15 +171,19 @@ public class PlayerData : NetworkBehaviour {
             return;
         }
 
-        if (!ConnectionToken.HasValidSignature() && (Runner.Tick - JoinTick) > Runner.TickRate) {
+        if (!ConnectionToken.HasValidSignature() && (Runner.Tick - JoinTick) > (int) (Runner.TickRate * 10f)) {
             // Kick player for not sending the token in time...
-
+            Runner.Disconnect(Owner);
         }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
         if (hasState) {
             SessionData.Instance.SaveWins(this);
+        }
+
+        if (pingRoutine != null) {
+            StopCoroutine(pingRoutine);
         }
 
         if (IsLocal) {
@@ -180,9 +196,10 @@ public class PlayerData : NetworkBehaviour {
             return;
         }
 
-        if (IsRoomOwner && Owner == Runner.LocalPlayer) {
+        if (Owner == Runner.LocalPlayer && IsRoomOwner) {
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
         }
+
         ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
 
         if (MainMenuManager.Instance) {
@@ -230,6 +247,31 @@ public class PlayerData : NetworkBehaviour {
         DisplayNickname = name;
     }
 
+    private IEnumerator UpdatePingRoutine() {
+        int avgRate = 10;
+        WaitForSeconds waitTime = new(1f / avgRate);
+
+        while (true) {
+            double total = 0;
+            for (int i = 0; i < avgRate; i++) {
+                total += Runner.GetPlayerRtt(Owner);
+                yield return waitTime;
+            }
+
+            Rpc_SetPing((int) (total / avgRate * 1000));
+            yield return waitTime;
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void Rpc_SetPing(int ping, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
+
+        Ping = ping;
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void Rpc_SetConnectionToken(ConnectionToken token, RpcInfo info = default) {
         if (info.Source != Owner) {
@@ -238,10 +280,7 @@ public class PlayerData : NetworkBehaviour {
 
         ConnectionToken = token;
         SetNickname(ConnectionToken.nickname.Value);
-        if (token.signedData.UserId.ToString() == Runner.GetPlayerUserId(Owner)) {
-            nicknameColor = NicknameColor.FromConnectionToken(token);
-        }
-        OnPlayerDataReady?.Invoke(this);
+        //OnConnectionTokenChanged(); // Needed, for some reason...
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -249,6 +288,7 @@ public class PlayerData : NetworkBehaviour {
         if (info.Source != Owner) {
             return;
         }
+
         IsLoaded = true;
     }
 
@@ -257,6 +297,7 @@ public class PlayerData : NetworkBehaviour {
         if (info.Source != Owner) {
             return;
         }
+
         // Not accepting changes at this time
         if (Locked) {
             return;
@@ -303,8 +344,12 @@ public class PlayerData : NetworkBehaviour {
         SkinIndex = index;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void Rpc_SetTeamNumber(sbyte team) {
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void Rpc_SetTeamNumber(sbyte team, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
+
         // Not accepting changes at this time
         if (Locked) {
             return;
@@ -319,7 +364,11 @@ public class PlayerData : NetworkBehaviour {
     }
 
     [Rpc(RpcSources.All, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
-    public void Rpc_SetOptionsOpen(bool open) {
+    public void Rpc_SetOptionsOpen(bool open, RpcInfo info = default) {
+        if (info.Source != Owner) {
+            return;
+        }
+
         if (HasStateAuthority) {
             IsInOptions = open;
         } else if (IsLocal) {
@@ -355,6 +404,12 @@ public class PlayerData : NetworkBehaviour {
     public void OnLoadStateChanged() {
         if (IsLoaded && GameManager.Instance) {
             GameManager.Instance.CheckIfAllPlayersLoaded();
+        }
+    }
+
+    public void OnPingChanged() {
+        if (Owner == Runner.LocalPlayer && MainMenuManager.Instance) {
+            MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
         }
     }
 
@@ -396,6 +451,14 @@ public class PlayerData : NetworkBehaviour {
     public void OnDisplayNicknameChanged() {
         UpdateObjectName();
         SendJoinMessageIfNeeded();
+    }
+
+    public void OnConnectionTokenChanged() {
+        if (ConnectionToken.signedData.UserId.ToString() == Runner.GetPlayerUserId(Owner)) {
+            nicknameColor = NicknameColor.FromConnectionToken(ConnectionToken);
+        } else {
+            nicknameColor = NicknameColor.White;
+        }
     }
 
     public void OnInOptionsChanged() {

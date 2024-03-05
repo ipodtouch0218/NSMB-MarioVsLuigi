@@ -22,17 +22,18 @@ namespace NSMB.UI.Pause.Loaders {
                 return;
             }
 
+            field ??= Settings.Instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public);
+            property ??= Settings.Instance.GetType().GetProperty(fieldName, BindingFlags.Instance | BindingFlags.Public);
+            if (field == null && property == null) {
+                Debug.LogWarning($"Could not load setting: Property/field '{fieldName}' not found in Settings class");
+                return;
+            }
+
             V value;
-            field = Settings.Instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public);
-            if (field == null) {
-                property = Settings.Instance.GetType().GetProperty(fieldName, BindingFlags.Instance | BindingFlags.Public);
-                if (property == null) {
-                    Debug.LogWarning("Could not load setting: Property/field \"" + fieldName + "\" not found in Settings class");
-                    return;
-                }
-                value = (V) property.GetValue(Settings.Instance);
-            } else {
+            if (field != null) {
                 value = (V) field.GetValue(Settings.Instance);
+            } else {
+                value = (V) property.GetValue(Settings.Instance);
             }
 
             SetValue(optionType, value);

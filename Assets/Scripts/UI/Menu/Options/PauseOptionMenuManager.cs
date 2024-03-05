@@ -53,6 +53,8 @@ namespace NSMB.UI.Pause.Options {
 
             ControlSystem.controls.UI.Navigate.performed += OnNavigate;
             ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
+            ControlSystem.controls.UI.Next.performed += OnNext;
+            ControlSystem.controls.UI.Previous.performed += OnPrevious;
             ControlSystem.controls.UI.Cancel.performed += OnCancel;
             ControlSystem.controls.UI.Submit.performed += OnSubmit;
 
@@ -70,6 +72,8 @@ namespace NSMB.UI.Pause.Options {
 
             ControlSystem.controls.UI.Navigate.performed -= OnNavigate;
             ControlSystem.controls.UI.Navigate.canceled -= OnNavigate;
+            ControlSystem.controls.UI.Next.performed -= OnNext;
+            ControlSystem.controls.UI.Previous.performed -= OnPrevious;
             ControlSystem.controls.UI.Cancel.performed -= OnCancel;
             ControlSystem.controls.UI.Submit.performed -= OnSubmit;
 
@@ -133,6 +137,32 @@ namespace NSMB.UI.Pause.Options {
             }
         }
 
+        public void ChangeTab(int diff) {
+            if (diff == 0) {
+                return;
+            }
+
+            if (Back && diff > 0) {
+                Back = false;
+                if (currentTabIndex != 0) {
+                    SetTab(0, false);
+                } else {
+                    SelectedTab.Highlighted();
+                }
+                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+                return;
+
+            } else if (!Back && diff < 0 && currentTabIndex == 0) {
+                // Enable the back button
+                Back = true;
+                SetCurrentOption(-1);
+                SelectedTab.Unhighlighted();
+                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+            }
+            int newTabIndex = Mathf.Clamp(currentTabIndex + diff, 0, tabs.Count - 1);
+            SetTab(newTabIndex);
+        }
+
         private void OnCancel(InputAction.CallbackContext context) {
             if (!EnableInput) {
                 return;
@@ -172,6 +202,14 @@ namespace NSMB.UI.Pause.Options {
             }
 
             SelectedOption.OnClick();
+        }
+
+        private void OnNext(InputAction.CallbackContext context) {
+            ChangeTab(1);
+        }
+
+        private void OnPrevious(InputAction.CallbackContext context) {
+            ChangeTab(-1);
         }
 
         private void OnNavigate(InputAction.CallbackContext context) {
@@ -217,22 +255,12 @@ namespace NSMB.UI.Pause.Options {
                 }
             }
 
-            if (Back && (down || right)) {
+            if (Back && down) {
                 Back = false;
-                if (right) {
-                    if (currentTabIndex != 0) {
-                        SetTab(0, false);
-                    } else {
-                        SelectedTab.Highlighted();
-                    }
+                SetCurrentOption(0);
+                if (currentOptionIndex == -1) {
+                    SelectedTab.Highlighted();
                 }
-                if (down) {
-                    SetCurrentOption(0);
-                    if (currentOptionIndex == -1) {
-                        SelectedTab.Highlighted();
-                    }
-                }
-                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
                 return;
             }
 
@@ -251,15 +279,7 @@ namespace NSMB.UI.Pause.Options {
                 }
             } else {
                 // Move between tabs
-                if (left && currentTabIndex == 0) {
-                    // Enable the back button
-                    Back = true;
-                    SetCurrentOption(-1);
-                    SelectedTab.Unhighlighted();
-                    GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
-                }
-                int newTabIndex = Mathf.Clamp(currentTabIndex + (left ? -1 : 1), 0, tabs.Count - 1);
-                SetTab(newTabIndex);
+                ChangeTab(left ? -1 : 1);
             }
             inputted = true;
         }

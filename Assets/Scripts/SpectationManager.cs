@@ -49,12 +49,17 @@ public class SpectationManager : MonoBehaviour {
 
     public void OnEnable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
+        ControlSystem.controls.UI.Next.performed += SpectateNextPlayer;
+        ControlSystem.controls.UI.Previous.performed += SpectatePreviousPlayer;
+
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     public void OnDisable() {
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
+        ControlSystem.controls.UI.Next.performed -= SpectateNextPlayer;
+        ControlSystem.controls.UI.Previous.performed -= SpectatePreviousPlayer;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
@@ -87,6 +92,10 @@ public class SpectationManager : MonoBehaviour {
         spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
     }
 
+    public void SpectateNextPlayer(InputAction.CallbackContext context) {
+        SpectateNextPlayer();
+    }
+
     public void SpectateNextPlayer() {
         if (!GameManager.Instance) {
             return;
@@ -108,6 +117,10 @@ public class SpectationManager : MonoBehaviour {
                 break;
             }
         }
+    }
+
+    public void SpectatePreviousPlayer(InputAction.CallbackContext context) {
+        SpectateNextPlayer();
     }
 
     public void SpectatePreviousPlayer() {

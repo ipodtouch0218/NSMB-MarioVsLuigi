@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 
 using Fusion;
-using NSMB.Extensions;
 
 namespace NSMB.UI.MainMenu {
     public class PlayerListHandler : MonoBehaviour {
@@ -22,7 +21,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            NetworkHandler.OnPlayerJoined += OnPlayerJoined;
+            //NetworkHandler.OnPlayerJoined += OnPlayerJoined;
             NetworkHandler.OnPlayerLeft += OnPlayerLeft;
             PlayerData.OnPlayerDataReady += OnPlayerDataReady;
         }
@@ -30,7 +29,7 @@ namespace NSMB.UI.MainMenu {
         public void OnDisable() {
             RemoveAllPlayerEntries();
 
-            NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
+            //NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
             NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
             PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
         }
@@ -45,10 +44,6 @@ namespace NSMB.UI.MainMenu {
             foreach ((_, PlayerData data) in SessionData.Instance.PlayerDatas) {
                 AddPlayerEntry(data);
             }
-        }
-
-        public void AddPlayerEntry(PlayerRef player) {
-            AddPlayerEntry(player.GetPlayerData());
         }
 
         public void AddPlayerEntry(PlayerData data) {
@@ -131,12 +126,7 @@ namespace NSMB.UI.MainMenu {
 
         //---Callbacks
         public void OnPlayerDataReady(PlayerData data) {
-            Debug.Log(data);
             AddPlayerEntry(data);
-        }
-
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
-            AddPlayerEntry(player);
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
