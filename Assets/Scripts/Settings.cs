@@ -12,6 +12,7 @@ public class Settings : Singleton<Settings> {
     //---Static Variables
     private Action[] VersionUpdaters;
     public static event Action OnColorblindModeChanged;
+    public static event Action OnDisableChatChanged;
     public static event Action OnNdsBorderChanged;
 
     //---Properties
@@ -39,6 +40,15 @@ public class Settings : Singleton<Settings> {
     public string GeneralLocale {
         get => GlobalController.Instance.translationManager.CurrentLocale;
         set => GlobalController.Instance.translationManager.ChangeLanguage(value);
+    }
+
+    private bool _generalDisableChat;
+    public bool GeneralDisableChat {
+        get => _generalDisableChat;
+        set {
+            _generalDisableChat = value;
+            OnDisableChatChanged?.Invoke();
+        }
     }
 
     private bool _generalDiscordIntegration;
@@ -170,7 +180,7 @@ public class Settings : Singleton<Settings> {
     public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
 
     public Enums.SpecialPowerupMusic audioSpecialPowerupMusic;
-    public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning;
+    public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning, audioRestartMusicOnDeath;
 
     public RumbleManager.RumbleSetting controlsRumble;
     public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
@@ -194,6 +204,7 @@ public class Settings : Singleton<Settings> {
         // Generic
         PlayerPrefs.SetString("General_Nickname", generalNickname);
         PlayerPrefs.SetInt("General_ScoreboardAlwaysVisible", generalScoreboardAlways ? 1 : 0);
+        PlayerPrefs.SetInt("General_DisableChat", GeneralDisableChat ? 1 : 0);
         PlayerPrefs.SetInt("General_ChatFilter", generalChatFiltering ? 1 : 0);
         PlayerPrefs.SetInt("General_Character", generalCharacter);
         PlayerPrefs.SetInt("General_Skin", generalSkin);
@@ -221,6 +232,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Audio_MuteMusicOnUnfocus", audioMuteMusicOnUnfocus ? 1 : 0);
         PlayerPrefs.SetInt("Audio_MuteSFXOnUnfocus", audioMuteSFXOnUnfocus ? 1 : 0);
         PlayerPrefs.SetInt("Audio_Panning", audioPanning ? 1 : 0);
+        PlayerPrefs.SetInt("Audio_RestartMusicOnDeath", audioRestartMusicOnDeath ? 1 : 0);
         PlayerPrefs.SetInt("Audio_SpecialPowerupMusic", (int) audioSpecialPowerupMusic);
 
         // Controls
@@ -265,6 +277,7 @@ public class Settings : Singleton<Settings> {
 
         generalNickname = PlayerPrefs.GetString("Nickname");
         generalScoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) != 0;
+        GeneralDisableChat = false;
         generalChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) != 0;
         generalCharacter = PlayerPrefs.GetInt("Character", 0);
         generalSkin = PlayerPrefs.GetInt("Skin", 0);
@@ -290,6 +303,7 @@ public class Settings : Singleton<Settings> {
         audioMuteMusicOnUnfocus = false;
         audioMuteSFXOnUnfocus = false;
         audioPanning = true;
+        audioRestartMusicOnDeath = false;
         audioSpecialPowerupMusic = Enums.SpecialPowerupMusic.Starman | Enums.SpecialPowerupMusic.MegaMushroom;
 
         FileInfo bindingsFile = new(Application.persistentDataPath + "/controls.json");
@@ -310,6 +324,7 @@ public class Settings : Singleton<Settings> {
         // Generic
         TryGetSetting("General_Nickname", ref generalNickname);
         TryGetSetting("General_ScoreboardAlwaysVisible", ref generalScoreboardAlways);
+        TryGetSetting<bool>("General_DisableChat", nameof(GeneralDisableChat));
         TryGetSetting("General_ChatFilter", ref generalChatFiltering);
         TryGetSetting("General_Character", ref generalCharacter);
         TryGetSetting("General_Skin", ref generalSkin);
@@ -337,6 +352,7 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("Audio_MuteMusicOnUnfocus", ref audioMuteMusicOnUnfocus);
         TryGetSetting("Audio_MuteSFXOnUnfocus", ref audioMuteSFXOnUnfocus);
         TryGetSetting("Audio_Panning", ref audioPanning);
+        TryGetSetting("Audio_RestartMusicOnDeath", ref audioRestartMusicOnDeath);
         TryGetSetting("Audio_SpecialPowerupMusic", ref audioSpecialPowerupMusic);
 
         // Controls

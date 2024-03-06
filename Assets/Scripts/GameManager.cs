@@ -451,8 +451,6 @@ namespace NSMB.Game {
             random = new(Runner.Tick);
         }
 
-
-
         /// <summary>
         /// Checks if a team has won, and calls Rpc_EndGame if one has.
         /// </summary>
@@ -669,6 +667,7 @@ namespace NSMB.Game {
             GameState = Enums.GameState.Playing;
             GameStartTime = Runner.SimulationTime;
             IsMusicEnabled = true;
+            musicManager.Play(mainMusic);
             PlaySounds = true;
 
             // Start timer
@@ -792,6 +791,10 @@ namespace NSMB.Game {
 
         private void HandleMusic() {
             if (!SessionData.Instance) {
+                return;
+            }
+
+            if (!musicManager.IsPlaying) {
                 return;
             }
 

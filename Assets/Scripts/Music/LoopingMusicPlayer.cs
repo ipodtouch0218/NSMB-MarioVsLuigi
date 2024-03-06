@@ -4,17 +4,20 @@ public class LoopingMusicPlayer : LoopingSoundPlayer {
     private bool _fastMusic;
     public bool FastMusic {
         set {
-            if (_fastMusic == value)
+            if (_fastMusic == value) {
                 return;
+            }
 
             _fastMusic = value;
 
-            if (!CurrentMusicSong)
+            if (!CurrentMusicSong) {
                 return;
+            }
 
             float scaleFactor = CurrentMusicSong.speedupFactor;
-            if (_fastMusic)
+            if (_fastMusic) {
                 scaleFactor = 1f / scaleFactor;
+            }
 
             float time = audioSource.time;
             audioSource.clip = (_fastMusic && CurrentMusicSong.fastClip) ? CurrentMusicSong.fastClip : CurrentMusicSong.clip;
@@ -41,8 +44,9 @@ public class LoopingMusicPlayer : LoopingSoundPlayer {
     }
 
     public override void Play(LoopingSoundData song, bool restartIfAlreadyPlaying = false) {
-        if (currentAudio == song && !restartIfAlreadyPlaying)
+        if (currentAudio == song && !restartIfAlreadyPlaying) {
             return;
+        }
 
         currentAudio = song;
         audioSource.loop = true;

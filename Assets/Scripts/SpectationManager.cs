@@ -77,7 +77,15 @@ public class SpectationManager : MonoBehaviour {
 
     public void UpdateSpectateUI() {
         spectationUI.SetActive(Spectating);
-        if (!Spectating || !UIUpdater.Instance) {
+        if (!Spectating) {
+            return;
+        }
+
+        if (GameManager.Instance.IsMusicEnabled && !GameManager.Instance.musicManager.IsPlaying) {
+            GameManager.Instance.musicManager.Play(GameManager.Instance.mainMusic);
+        }
+
+        if (!UIUpdater.Instance) {
             return;
         }
 

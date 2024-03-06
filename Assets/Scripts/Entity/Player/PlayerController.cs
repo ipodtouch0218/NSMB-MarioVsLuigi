@@ -976,8 +976,6 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-
-
             Vector2 joystick = ControlSystem.controls.Player.Movement.ReadValue<Vector2>();
             bool jump = ControlSystem.controls.Player.Jump.ReadValue<float>() >= 0.5f;
             bool powerup = ControlSystem.controls.Player.PowerupAction.ReadValue<float>() >= 0.5f;
@@ -3350,15 +3348,15 @@ namespace NSMB.Entities.Player {
             animator.SetBool("dead", IsDead);
 
             if (IsDead) {
-                if (GameManager.Instance.GameState < Enums.GameState.Playing) {
-                    return;
-                }
-
                 animator.Play("deadstart");
                 animator.SetBool("knockback", false);
                 animator.SetBool("flying", false);
                 animator.SetBool("firedeath", FireDeath);
                 //PlaySound(cameraController.IsControllingCamera ? Enums.Sounds.Player_Sound_Death : Enums.Sounds.Player_Sound_DeathOthers);
+
+                if (Settings.Instance.audioRestartMusicOnDeath && cameraController.IsControllingCamera) {
+                    GameManager.Instance.musicManager.Stop();
+                }
 
                 if (HasInputAuthority) {
                     ScoreboardUpdater.Instance.OnDeathToggle();
@@ -3368,6 +3366,10 @@ namespace NSMB.Entities.Player {
                 if (Mathf.Abs(lastRespawnParticle - Runner.SimulationTime) > 2) {
                     GameManager.Instance.particleManager.Play(Enums.Particle.Generic_Puff, Spawnpoint);
                     lastRespawnParticle = Runner.SimulationTime;
+                }
+
+                if (Settings.Instance.audioRestartMusicOnDeath && cameraController.IsControllingCamera) {
+                    GameManager.Instance.musicManager.Play(GameManager.Instance.mainMusic, true);
                 }
             }
         }
@@ -3400,6 +3402,10 @@ namespace NSMB.Entities.Player {
 
             respawnParticle = Instantiate(PrefabList.Instance.Particle_Respawn, Spawnpoint, Quaternion.identity);
             respawnParticle.player = this;
+
+            if (cameraController.IsControllingCamera && !GameManager.Instance.musicManager.IsPlaying && GameManager.Instance.IsMusicEnabled) {
+                PlaySound(Enums.Sounds.UI_StartGame);
+            }
         }
 
         public void OnFireballAnimCounterChanged() {
@@ -3604,7 +3610,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            PlaySoundEverywhere(MegaTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
+            PlaySound(MegaTimer.IsRunning ? Enums.Sounds.Player_Voice_MegaMushroom : Enums.Sounds.Powerup_MegaMushroom_End);
         }
 
         GameObject megaParticle;

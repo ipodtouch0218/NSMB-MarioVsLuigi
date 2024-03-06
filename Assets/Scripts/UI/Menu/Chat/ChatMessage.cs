@@ -4,8 +4,9 @@ using UnityEngine.UI;
 using TMPro;
 
 using Fusion;
-using NSMB.Utils;
+using NSMB.Extensions;
 using NSMB.Translation;
+using NSMB.Utils;
 
 public class ChatMessage : MonoBehaviour {
 
@@ -17,8 +18,8 @@ public class ChatMessage : MonoBehaviour {
     [SerializeField] private Image image;
 
     public void OnValidate() {
-        if (!chatText) chatText = GetComponent<TMP_Text>();
-        if (!image) image = GetComponent<Image>();
+        this.SetIfNull(ref chatText);
+        this.SetIfNull(ref image);
     }
 
     public void OnDestroy() {
@@ -44,12 +45,18 @@ public class ChatMessage : MonoBehaviour {
             chatText.text = data.message;
         }
 
+        UpdateVisibleState(!Settings.Instance.GeneralDisableChat);
         UpdatePlayerColor();
     }
 
+    public void UpdateVisibleState(bool enable) {
+        gameObject.SetActive(data.isSystemMessage || enable);
+    }
+
     public void UpdatePlayerColor() {
-        if (data.isSystemMessage)
+        if (data.isSystemMessage) {
             return;
+        }
 
         image.color = Utils.GetPlayerColor(NetworkHandler.Runner, data.player, 0.15f);
     }

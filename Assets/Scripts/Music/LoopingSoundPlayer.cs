@@ -14,19 +14,22 @@ public class LoopingSoundPlayer : MonoBehaviour {
     [SerializeField] private bool playOnAwake = true;
 
     public void Start() {
-        if (playOnAwake && currentAudio)
+        if (playOnAwake && currentAudio) {
             Play(currentAudio, true);
+        }
     }
 
     public void Update() {
-        if (!audioSource.isPlaying || !currentAudio)
+        if (!audioSource.isPlaying || !currentAudio) {
             return;
+        }
 
         if (currentAudio.loopEndSeconds != -1) {
             float time = audioSource.time;
 
-            if (time >= AudioEnd)
+            if (time >= AudioEnd) {
                 audioSource.time = AudioStart + (time - AudioEnd);
+            }
         }
     }
 
@@ -36,15 +39,17 @@ public class LoopingSoundPlayer : MonoBehaviour {
     }
 
     public virtual void Play(bool restartIfAlreadyPlaying = true) {
-        if (!currentAudio)
+        if (!currentAudio) {
             return;
+        }
 
         Play(currentAudio, restartIfAlreadyPlaying);
     }
 
     public virtual void Play(LoopingSoundData song, bool restartIfAlreadyPlaying = false) {
-        if (currentAudio == song && !audioSource.isPlaying && !restartIfAlreadyPlaying)
+        if (currentAudio == song && !audioSource.isPlaying && !restartIfAlreadyPlaying) {
             return;
+        }
 
         currentAudio = song;
         audioSource.loop = true;
@@ -54,8 +59,9 @@ public class LoopingSoundPlayer : MonoBehaviour {
     }
 
     public void Restart() {
-        if (currentAudio)
+        if (currentAudio) {
             Play(currentAudio, true);
+        }
     }
 
     public void Unpause() {
