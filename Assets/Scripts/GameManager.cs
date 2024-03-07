@@ -586,7 +586,7 @@ namespace NSMB.Game {
             Vector3 spawnLocation = Utils.Utils.TilemapToWorldPosition(loc) + OneFourth;
 
             // TODO: find a way to predict these.
-            if (HasStateAuthority || Runner.IsServer) {
+            if (HasStateAuthority) {
                 Runner.Spawn(PrefabList.Instance.Obj_BlockBump, spawnLocation, onBeforeSpawned: (runner, obj) => {
                     obj.GetComponentInChildren<BlockBump>().OnBeforeSpawned(loc, oldTile, newTile, spawnPrefab, downwards, spawnCoin, tick ?? Runner.Tick, offset);
                 });

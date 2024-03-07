@@ -4,6 +4,228 @@
         <name>Fusion.Sockets</name>
     </assembly>
     <members>
+        <member name="T:Fusion.Encryption.DataEncryptor">
+            <summary>
+            Responsible for encrypting and decrypting data buffers
+            </summary>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.Setup(System.Byte[])">
+            <inheritdoc cref="M:Fusion.Encryption.IDataEncryption.Setup(System.Byte[])"/>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.GenerateKey">
+            <inheritdoc cref="M:Fusion.Encryption.IDataEncryption.GenerateKey"/>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.EncryptData(System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Encrypts the data in the provided buffer.
+            </summary>
+            <param name="buffer">The buffer containing the data to be encrypted.</param>
+            <param name="bufferLength">The length of the data in the buffer.</param>
+            <param name="capacity">The total capacity of the buffer.</param>
+            <returns>Returns true if the encryption was successful, false otherwise.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when the encryption provider is not initialized.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the original buffer cannot hold the encrypted data.</exception>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.DecryptData(System.Byte*,System.Int32@,System.Int32)">
+            <inheritdoc cref="M:Fusion.Encryption.IDataEncryption.DecryptData(System.Byte*,System.Int32@,System.Int32)"/>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.ComputeHash(System.Byte*,System.Int32@,System.Int32)">
+            <inheritdoc cref="M:Fusion.Encryption.IDataEncryption.ComputeHash(System.Byte*,System.Int32@,System.Int32)"/>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.VerifyHash(System.Byte*,System.Int32@,System.Int32)">
+            <inheritdoc cref="M:Fusion.Encryption.IDataEncryption.VerifyHash(System.Byte*,System.Int32@,System.Int32)"/>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.BuildAesProvider(System.Byte[])">
+            <summary>
+            Build a new AES Implementation
+            </summary>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.BuildHMACSHA256(System.Byte[])">
+            <summary>
+            Build a new HMACSHA256 Implementation
+            </summary>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.GetBufferEncrypt">
+            <summary>
+            Clear and return the IN Encrypt Buffer 
+            </summary>
+        </member>
+        <member name="M:Fusion.Encryption.DataEncryptor.GetBufferDecrypt">
+            <summary>
+            Clear and return the OUT Encrypt Buffer 
+            </summary>
+        </member>
+        <member name="T:Fusion.Encryption.IDataEncryption">
+            <summary>
+            Interface for classes that manage the encryption/decryption of byte arrays
+            </summary>
+        </member>
+        <member name="M:Fusion.Encryption.IDataEncryption.Setup(System.Byte[])">
+            <summary>
+            Setup the encryption implementation with the right key
+            </summary>
+        </member>
+        <member name="M:Fusion.Encryption.IDataEncryption.GenerateKey">
+            <summary>
+            Generate the key used used by the encryption implementation
+            </summary>
+            <returns>Key used to setup the encryption implementation</returns>
+        </member>
+        <member name="M:Fusion.Encryption.IDataEncryption.EncryptData(System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Encrypt data in place and update it's length.
+            </summary>
+            <param name="buffer">Data to encrypt</param>
+            <param name="bufferLength">Length of the data to encrypt</param>
+            <param name="capacity">Buffer total capacity</param>
+            <returns>True if the encryption was completed, false otherwise</returns>
+        </member>
+        <member name="M:Fusion.Encryption.IDataEncryption.DecryptData(System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Decrypt data in place and update it's length.
+            </summary>
+            <param name="buffer">Data to decrypt</param>
+            <param name="bufferLength">Length of the data to decrypt</param>
+            <param name="capacity">Buffer total capacity</param>
+            <returns>True if the decryption was completed, false otherwise</returns>
+        </member>
+        <member name="M:Fusion.Encryption.IDataEncryption.ComputeHash(System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Compute the Buffer hash and append it to the buffer itself
+            </summary>
+            <param name="buffer">Data to compute the hash</param>
+            <param name="bufferLength">Length of the data to hash</param>
+            <param name="capacity">Buffer total capacity</param>
+            <returns>True if the hash was properly computed, false otherwise</returns>
+        </member>
+        <member name="M:Fusion.Encryption.IDataEncryption.VerifyHash(System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Verify the buffer hash that was appended to the buffer
+            </summary>
+            <param name="buffer">Buffer to check the hash</param>
+            <param name="bufferLength">Length of the data to hash</param>
+            <param name="capacity">Buffer total capacity</param>
+            <returns>True if the hash was properly verified, false otherwise</returns>
+        </member>
+        <member name="T:Fusion.Encryption.EncryptionManager`2">
+            <summary>
+            The EncryptionManager class manages encryption keys for different handles.
+            </summary>
+            <typeparam name="TEncryption">A type that implements the IDataEncryption interface.</typeparam>
+            <typeparam name="THandler">A type that implements the IEquatable interface.</typeparam>
+            <remarks>
+            This class is unsafe because it uses pointers in its methods.
+            </remarks>
+        </member>
+        <member name="F:Fusion.Encryption.EncryptionManager`2._cyphers">
+            <summary>
+            A dictionary that maps handle IDs to their corresponding encryption objects.
+            </summary>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.Dispose">
+            <summary>
+            Disposes all encryption objects in the _cyphers dictionary.
+            </summary>
+            <remarks>
+            This method is called when the EncryptionManager object is being disposed.
+            </remarks>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.RegisterEncryptionKey(`0,System.Byte[])">
+            <summary>
+            Registers a new encryption key for a specific handle.
+            </summary>
+            <param name="handle">The handle ID for which the encryption key is to be registered.</param>
+            <param name="key">The encryption key to be registered.</param>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.DeleteEncryptionKey(`0)">
+            <summary>
+            Deletes the encryption key for a specific handle.
+            </summary>
+            <param name="handle">The handle ID for which the encryption key is to be deleted.</param>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.HasEncryptionForHandle(`0)">
+            <summary>
+            Check if a handle has encryption setup
+            </summary>
+            <param name="handle">Handle ID</param>
+            <returns>True if the handle has encryption setup, false otherwise</returns>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.Wrap(`0,System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Wraps the provided buffer with encryption and computes a hash for it.
+            </summary>
+            <param name="handle">The handle ID for which the packet is to be encrypted and hashed.</param>
+            <param name="buffer">The data buffer array containing the packet to be encrypted and hashed.</param>
+            <param name="length">The length of the buffer array.</param>
+            <param name="capacity">The total capacity of the buffer array.</param>
+            <returns>Returns true if both the encryption and hash computation were successful, false otherwise.</returns>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.Unwrap(`0,System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Unwraps the provided buffer by verifying its hash and decrypting it.
+            </summary>
+            <param name="handle">The handle ID for which the packet is to be verified and decrypted.</param>
+            <param name="buffer">The data buffer array containing the packet to be verified and decrypted.</param>
+            <param name="length">The length of the buffer array.</param>
+            <param name="capacity">The total capacity of the buffer array.</param>
+            <returns>Returns true if both the hash verification and decryption were successful, false otherwise.</returns>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.GenerateKey">
+            <summary>
+            Generates a new encryption key.
+            </summary>
+            <returns>A byte array representing the generated encryption key.</returns>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.ComputeHash(`0,System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Computes the hash for the data in the buffer for a specific handle.
+            </summary>
+            <param name="handle">The handle for which to compute the hash.</param>
+            <param name="buffer">The buffer containing the data to hash.</param>
+            <param name="length">The length of the data in the buffer.</param>
+            <param name="capacity">The total capacity of the buffer.</param>
+            <returns>True if the hash was computed successfully, false otherwise.</returns>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.VerifyHash(`0,System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Verifies the hash for the data in the buffer for a specific handle.
+            </summary>
+            <param name="handle">The handle for which to verify the hash.</param>
+            <param name="buffer">The buffer containing the data to verify the hash.</param>
+            <param name="length">The length of the data in the buffer.</param>
+            <param name="capacity">The total capacity of the buffer.</param>
+            <returns>True if the hash was verified successfully, false otherwise.</returns>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.Encrypt(`0,System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Encrypts a packet for a specific handle.
+            </summary>
+            <param name="handle">The handle ID for which the packet is to be encrypted.</param>
+            <param name="buffer">The data buffer array containing the packet to be encrypted.</param>
+            <param name="length">The length of the buffer array.</param>
+            <param name="capacity">The total capacity of the buffer array.</param>
+            <returns>Returns true if the encryption was successful, false otherwise.</returns>
+        </member>
+        <member name="M:Fusion.Encryption.EncryptionManager`2.Decrypt(`0,System.Byte*,System.Int32@,System.Int32)">
+            <summary>
+            Decrypts a packet from a specific handle.
+            </summary>
+            <param name="handle">The handle ID from which the packet is to be decrypted.</param>
+            <param name="buffer">The data buffer array containing the packet to be decrypted.</param>
+            <param name="length">The length of the buffer array.</param>
+            <param name="capacity">The total capacity of the buffer array.</param>
+            <returns>Returns true if the decryption was successful, false otherwise.</returns>
+        </member>
+        <member name="T:Fusion.Encryption.EncryptionToken">
+            <summary>
+            Represents an encryption token.
+            </summary>
+        </member>
+        <member name="F:Fusion.EncryptionConfig.EnableEncryption">
+            <summary>
+            Enabled the Encryption Feature
+            </summary>
+        </member>
         <member name="T:Fusion.Sockets.NetAddress">
             <summary>
             Represents a Network Address, which includes a IP and Port
@@ -380,6 +602,49 @@
             If they are the same, the result is zero.
             </returns>
             <exception cref="T:System.ArgumentException">Thrown when the calculated distance is outside the range of an integer.</exception>
+        </member>
+        <member name="M:Fusion.Sockets.NetSocketNative.SetupEncryption(System.Byte[],System.Byte[])">
+            Encryption System
+            <summary>
+            Sets up the encryption system by initializing the encryption manager,
+            registering the encryption key, and creating the encryption token and buffer.
+            </summary>
+            <param name="key">The encryption key.</param>
+            <param name="encryptedKey">The encrypted key.</param>
+            <remarks>
+            If <paramref name="encryptedKey"/> is null, it indicates that the peer is a server.
+            If <paramref name="encryptedKey"/> is not null, the peer is a client.
+            </remarks>
+        </member>
+        <member name="M:Fusion.Sockets.NetSocketNative.HandleEncryptionOutgoing(Fusion.Sockets.NetAddress*,System.Byte*@,System.Int32@)">
+            <summary>
+            Handles the outgoing encryption process for the given address and buffer.
+            </summary>
+            <param name="address">The address to which the data is being sent.</param>
+            <param name="buffer">The buffer containing the data to be sent.</param>
+            <param name="bufferLength">The length of the data to be sent.</param>
+            <returns>Returns true if the encryption process is successful, false otherwise.</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetSocketNative.HandleEncryptionIngoing(Fusion.Sockets.NetAddress*,System.Byte*@,System.Int32,System.Int32@)">
+            <summary>
+            Handles the incoming encryption process for the given address and buffer.
+            </summary>
+            <param name="address">The address from which the data is received.</param>
+            <param name="buffer">The buffer containing the received data.</param>
+            <param name="bufferLength">The length of the received data.</param>
+            <param name="received">The number of bytes received.</param>
+            <returns>Returns true if the decryption process is successful, false otherwise.</returns>
+        </member>
+        <member name="M:Fusion.Sockets.NetSocketNative.ResetEncryption">
+            <summary>
+            Resets the encryption system by disposing the encryption manager and resetting the session key.
+            </summary>
+        </member>
+        <member name="M:Fusion.Sockets.NetSocketNative.DeleteEncryptionKey(Fusion.Sockets.NetAddress)">
+            <summary>
+            Deletes the encryption key associated with the given address.
+            </summary>
+            <param name="address">The address whose associated encryption key is to be deleted.</param>
         </member>
         <member name="F:Fusion.Sockets.NetSocketRelay._handle">
             <summary>
@@ -950,6 +1215,16 @@
             Player Unique Ref
             </summary>
         </member>
+        <member name="F:Fusion.Protocol.Join.EncryptionKey">
+            <summary>
+            Peer Encryption Key
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.Join.EncryptionKeySecret">
+            <summary>
+            Peer Encryption Key
+            </summary>
+        </member>
         <member name="T:Fusion.Protocol.SyncType">
             <summary>
             Network Config Msg Type
@@ -1251,6 +1526,11 @@
         <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_4_0">
             <summary>
             Rework Host Migration
+            </summary>
+        </member>
+        <member name="F:Fusion.Protocol.ProtocolMessageVersion.V1_5_0">
+            <summary>
+            Added Encryption Support
             </summary>
         </member>
         <member name="F:Fusion.Protocol.ProtocolMessageVersion.LATEST">

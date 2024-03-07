@@ -19,11 +19,20 @@ namespace NSMB.Extensions {
         }
 
         public static PlayerData GetPlayerData(this PlayerRef player) {
+            if (!SessionData.Instance) {
+                return null;
+            }
+
             SessionData.Instance.PlayerDatas.TryGet(player, out PlayerData value);
             return value;
         }
 
         public static bool TryGetPlayerData(this PlayerRef player, out PlayerData data) {
+            if (!SessionData.Instance) {
+                data = null;
+                return false;
+            }
+
             return SessionData.Instance.PlayerDatas.TryGet(player, out data);
         }
 
@@ -31,7 +40,12 @@ namespace NSMB.Extensions {
             return GetPlayerData(runner.LocalPlayer);
         }
 
-        public static bool TryGetPlayerData(this NetworkRunner runner, out PlayerData data) {
+        public static bool TryGetLocalPlayerData(this NetworkRunner runner, out PlayerData data) {
+            if (!runner) {
+                data = null;
+                return false;
+            }
+
             return TryGetPlayerData(runner.LocalPlayer, out data);
         }
 

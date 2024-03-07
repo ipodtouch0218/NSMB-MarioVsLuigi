@@ -107,6 +107,40 @@ For a more in-depth overview over what changed check: [Coming from Fusion 1.0](h
 - Fixed: All folders ending with `Resources` incorrectly recognized as `Resources` folders, making some of the contained prefabs unspawnable
 - Fixed: "unresolved external symbol" runtime errors if an abstract class deriving from `NetworkBehaviour` has no `[Networked]` properties
 
+## RC3
+
+### Build 805 (Jan 17, 2024)
+
+**What's New**
+
+- Encryption Support
+- Mobile support for the introduction sample
+- `int IElementReaderWriter.GetElementHashCode(T element);`
+- Added OnChangedRender attribute to receive a callback before Render when a networked property changes
+
+**Changes**
+
+- Made `Runner.RemoveSimulationBehaviour` internal. Use `Runner.RemoveGlobal` instead
+- Added shared mode support to intro sample
+- `[NetworkSerialize]` methods no longer need to have a `NetworkRunner` parameter if a `[NetworkDeserialize]` method has one
+- Lag compensation capsule settings now matches unity capsule
+- Scheduling is now the default replication feature
+
+**Bug Fixes**
+
+- Fixed: NetAddress.CreateFromIpPort should ignore IPv6 Scope ID
+- Fixed: MC change not replicating MasterClient objects correctly
+- Fixed: MasterClient objects not being active on priority list on the new mc
+- Fixed: Avoid attach already valid Scene Network Objects
+- Fixed: Free object from priority list in shared mode clients
+- Fixed: Handle Disconnect while waiting for Join confirmation
+- Fixed: `FusionGlobalScriptableObject.GetMethodsWithAttribute` not handling `ReflectionTypeLoadException` errors
+- Fixed: Confirm Join Timeout
+- Fixed: Newly simulated objects blinking positions when reparenting
+- Fixed: Invalid `GetElementHashCode` generation for NBs
+- Fixed: `NetworkDictionary` key lookup not being deterministic for `System.String`, `NetworkObject` and `NetworkBehaviour` keys
+- Fixed: "SerializedObject target has been destroyed" error when clicking "Rebuild Prefab Table" in the config editor (Unity 2022.3.11+)
+
 ## RC
 
 ### Build 801 (Dec 12, 2023)

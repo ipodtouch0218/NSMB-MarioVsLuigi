@@ -4,7 +4,7 @@
     "PeerMode": 0,
     "LagCompensation": {
         "Enabled": true,
-        "HitboxBufferLengthInMs": 400,
+        "HitboxBufferLengthInMs": 200,
         "HitboxDefaultCapacity": 256,
         "CachedStaticCollidersSize": 64
     },
@@ -32,6 +32,9 @@
     "HostMigration": {
         "EnableAutoUpdate": true,
         "UpdateDelay": 10
+    },
+    "EncryptionConfig": {
+        "EnableEncryption": false
     },
     "NetworkConditions": {
         "Enabled": false,

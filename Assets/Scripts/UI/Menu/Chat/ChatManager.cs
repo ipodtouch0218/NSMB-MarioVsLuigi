@@ -50,12 +50,12 @@ public class ChatManager : MonoBehaviour {
         AddSystemMessage(key, null, replacements);
     }
 
-    private static readonly Color DarkerRed = new(0.8f, 0, 0, 1);
+    private static readonly Color SystemMessageColor = new(0x55/255f, 0x55/255f, 0x55/255f, 1);
     public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
 
         ChatMessage.ChatMessageData data = new() {
             isSystemMessage = true,
-            color = color ?? DarkerRed,
+            color = color ?? SystemMessageColor,
             message = key,
             replacements = replacements,
         };

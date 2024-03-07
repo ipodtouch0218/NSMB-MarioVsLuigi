@@ -442,7 +442,7 @@ namespace NSMB.Entities.Player {
 
         private void OnAllPlayersLoaded() {
             enableGlow = SessionData.Instance.Teams || !Object.HasInputAuthority;
-            GlowColor = Utils.Utils.GetPlayerColor(Runner, controller.Object.InputAuthority);
+            GlowColor = Utils.Utils.GetPlayerColor(controller.Object.InputAuthority);
 
             if (!controller.Object.HasInputAuthority) {
                 GameManager.Instance.CreateNametag(controller);

@@ -562,12 +562,18 @@ namespace Fusion {
     }
 
     void Reset() {
-      ResetInternal();
+      ResetLayout();
     }
 
 #endif
 
-    void ResetInternal(bool? enableObjectStats = null, DefaultLayouts? objectLayout = null, DefaultLayouts? screenLayout = null) {
+    /// <summary>
+    /// Resets the layout of the stats panel to the default layout for the current <see cref="CanvasType"/>.
+    /// </summary>
+    /// <param name="enableObjectStats">Optional parameter to enable or disable object stats. If null, the current setting is used.</param>
+    /// <param name="objectLayout">Optional parameter to set the layout for the object stats. If null, the current setting is used.</param>
+    /// <param name="screenLayout">Optional parameter to set the layout for the screen stats. If null, the current setting is used.</param>
+    public void ResetLayout(bool? enableObjectStats = null, DefaultLayouts? objectLayout = null, DefaultLayouts? screenLayout = null) {
       // Destroy existing built graphs
       var canv = GetComponentInChildren<Canvas>();
       if (canv) {
@@ -713,7 +719,7 @@ namespace Fusion {
         if (NewInputSystemFound) {
           // New Input System
         } else {
-          if (FindObjectOfType<EventSystem>() == null) {
+          if (FindFirstObjectByType<EventSystem>() == null) {
             var eventSystemGO = new GameObject("Event System");
             eventSystemGO.AddComponent<EventSystem>();
             eventSystemGO.AddComponent<StandaloneInputModule>();

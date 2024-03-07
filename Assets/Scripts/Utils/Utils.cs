@@ -528,15 +528,15 @@ namespace NSMB.Utils {
         }
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
-        public static Color GetPlayerColor(NetworkRunner runner, PlayerRef player, float s = 1, float v = 1) {
+        public static Color GetPlayerColor(PlayerRef player, float s = 1, float v = 1) {
             if (!player.IsRealPlayer) {
                 return spectatorColor;
             }
 
-            return GetPlayerColor(runner, player.GetPlayerData(), s, v);
+            return GetPlayerColor(player.GetPlayerData(), s, v);
         }
 
-        public static Color GetPlayerColor(NetworkRunner runner, PlayerData player, float s = 1, float v = 1) {
+        public static Color GetPlayerColor(PlayerData player, float s = 1, float v = 1) {
 
             // Prioritize spectator status
             if (!player || player.IsManualSpectator || player.IsCurrentlySpectating) {

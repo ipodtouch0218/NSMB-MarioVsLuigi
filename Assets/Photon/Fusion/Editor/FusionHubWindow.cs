@@ -158,7 +158,7 @@ namespace Fusion.Editor {
 
       GUILayout.Space(15);
 
-      DrawButtonAction(Icon.Community, Constants.DiscordHeader, Constants.DiscordText, callback: OpenURL(Constants.UrlDiscordGeneral));
+      DrawButtonAction(Icon.Community, Constants.DiscordHeader, Constants.DiscordText, callback: OpenURL(Constants.UrlDashboardProfile));
       DrawButtonAction(Icon.Documentation, Constants.DocumentationHeader, Constants.DocumentationText, callback: OpenURL(Constants.UrlFusionDocsOnline));
     }
 
@@ -181,11 +181,6 @@ namespace Fusion.Editor {
           
           // Check for changes and validate the AppId
           if (EditorGUI.EndChangeCheck() && Guid.TryParse(editedAppId, out _)) {
-            // Send attribution event if the AppId has changed
-            if (string.IsNullOrEmpty(realtimeAppId) || realtimeAppId.Equals(editedAppId) == false) {
-              VSAttribution.SendAttributionEvent(editedAppId);
-            }
-            
             // Update the AppId
             realtimeSettings.AppSettings.AppIdFusion = editedAppId;
             EditorUtility.SetDirty(realtimeSettings);

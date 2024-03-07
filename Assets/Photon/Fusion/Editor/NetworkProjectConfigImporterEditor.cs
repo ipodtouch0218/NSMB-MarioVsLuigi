@@ -22,6 +22,8 @@ namespace Fusion.Editor {
 
     public override void OnInspectorGUI() {
 
+      bool rebuildPrefabTable = false;
+      
       try {
         if (_initializeException != null) {
           EditorGUILayout.HelpBox(_initializeException.ToString(), MessageType.Error, true);
@@ -33,10 +35,7 @@ namespace Fusion.Editor {
           VersionInfoGUI();
 
           using (new EditorGUI.DisabledScope(HasModified())) {
-            if (GUILayout.Button("Rebuild Prefab Table")) {
-              NetworkProjectConfigUtilities.RebuildPrefabTable();
-              GUIUtility.ExitGUI();
-            }
+            rebuildPrefabTable = GUILayout.Button("Rebuild Prefab Table");
           }
 
           extraDataSerializedObject.Update();
@@ -67,6 +66,10 @@ namespace Fusion.Editor {
         }
       } finally {
         ApplyRevertGUI();
+      }
+      
+      if (rebuildPrefabTable) {
+        NetworkProjectConfigUtilities.RebuildPrefabTable();
       }
     }
 

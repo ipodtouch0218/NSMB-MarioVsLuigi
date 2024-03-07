@@ -20,7 +20,7 @@ using NSMB.Utils;
 public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks {
 
     //---Static Variables
-    public static readonly string[] Regions = { "asia", "eu", "jp", "kr", "sa", "us", "usw" };
+    public static readonly string[] Regions = { "asia", "eu", "hk", "jp", "kr", "sa", "us", "usw" };
     public static readonly Dictionary<string, int> RegionPings = new();
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
@@ -28,6 +28,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     private static GameObject prefab;
     private static bool reattemptCreate;
     public static int connecting;
+    public static float connectionTimeout = -1;
 
     //---Properties
     public static string CurrentRegion { get; set; }
@@ -242,15 +243,21 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         // Handle PlayerDatas
         if ((runner.IsServer || runner.IsSharedModeMasterClient) && !runner.IsSinglePlayer) {
+
+            if (SessionData.Instance) {
+                if (!Guid.TryParse(runner.GetPlayerUserId(player), out Guid guid) || SessionData.Instance.bannedIds.Contains(guid)) {
+                    // Banned, or failed to parse.
+                    SessionData.Instance.Rpc_Disconnect(player);
+                    return;
+                }
+            }
+
             runner.Spawn(
                 PrefabList.Instance.PlayerDataHolder,
                 inputAuthority: player,
                 onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned(player),
-                flags: NetworkSpawnFlags.SharedModeStateAuthMasterClient
+                flags: NetworkSpawnFlags.DontDestroyOnLoad
             );
-            if (runner.Tick != 0) {
-                runner.PushHostMigrationSnapshot();
-            }
         }
 
         /*
@@ -292,6 +299,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.quit", "playername", data.GetNickname());
             SessionData.Instance.PlayerDatas.Remove(data.Owner);
+
             if (data.HasStateAuthority) {
                 runner.Despawn(data.Object);
                 runner.PushHostMigrationSnapshot();
@@ -376,6 +384,24 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         DontDestroyOnLoad(this);
         runner = GetComponent<NetworkRunner>();
         runner.AddCallbacks(this);
+
+        PlayerData.OnPlayerDataReady += OnPlayerDataReady;
+    }
+
+    public void Update() {
+        if (connectionTimeout > 0) {
+            if ((connectionTimeout -= Time.deltaTime) <= 0) {
+                // Timed out...
+                Runner.Shutdown(shutdownReason: ShutdownReason.ConnectionTimeout);
+                connectionTimeout = -1;
+            }
+        }
+    }
+
+    private void OnPlayerDataReady(PlayerData data) {
+        if (runner.LocalPlayer == data.Owner) {
+            connectionTimeout = -1;
+        }
     }
 
     public void OnApplicationQuit() {
@@ -602,6 +628,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #endregion
 
     private static void RoomInitialized(NetworkRunner runner) {
+
+        connectionTimeout = 10;
+
         if (runner.IsServer || runner.IsSharedModeMasterClient) {
             runner.Spawn(PrefabList.Instance.SessionDataHolder, onBeforeSpawned: (runner, obj) => {
                 SessionData.Instance = obj.GetComponent<SessionData>();

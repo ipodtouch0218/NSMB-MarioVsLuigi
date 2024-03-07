@@ -48,10 +48,11 @@ public class SessionData : NetworkBehaviour {
         }
     }
 
+    //---Public Variables
+    public readonly HashSet<Guid> bannedIds = new();
+
     //---Private Variables
     private readonly Dictionary<Guid, uint> wins = new();
-    private HashSet<Guid> bannedIds;
-    private HashSet<string> bannedIps;
     private Tick lastUpdatedTick;
     private float lastStartCancelTime = -10f;
     private bool playedStartSound;
@@ -70,12 +71,6 @@ public class SessionData : NetworkBehaviour {
             PlayerDatas.Add(data.Owner, data);
         }
 
-        if (!Runner.IsResume) {
-            if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.EnterRoom(false);
-            }
-        }
-
         if (HasStateAuthority) {
             PrivateRoom = !Runner.SessionInfo.IsVisible;
             if (MaxPlayers == 0) {
@@ -84,8 +79,6 @@ public class SessionData : NetworkBehaviour {
                 MaxPlayers = (byte) intProperties.maxPlayers;
             }
 
-            bannedIds = new();
-            bannedIps = new();
             NetworkHandler.OnConnectRequest += OnConnectRequest;
 
             if (Runner.IsResume) {
@@ -280,6 +273,11 @@ public class SessionData : NetworkBehaviour {
     }
 
     //---RPCs
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+    public void Rpc_Disconnect([RpcTarget] PlayerRef target) {
+        Runner.Shutdown(shutdownReason: ShutdownReason.ConnectionRefused);
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_ChatIncomingMessage(string message, RpcInfo info = default) {
         ChatManager.Instance.IncomingPlayerMessage(message, info);

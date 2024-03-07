@@ -192,7 +192,7 @@ namespace Fusion {
       var config = NetworkProjectConfig.Global;
       var isMultiPeer = config.PeerMode == NetworkProjectConfig.PeerModes.Multiple;
 
-      var existingRunner = FindObjectOfType<NetworkRunner>();
+      var existingRunner = FindFirstObjectByType<NetworkRunner>();
 
       if (existingRunner && existingRunner != RunnerPrefab) {
         if (existingRunner.State != NetworkRunner.States.Shutdown) {

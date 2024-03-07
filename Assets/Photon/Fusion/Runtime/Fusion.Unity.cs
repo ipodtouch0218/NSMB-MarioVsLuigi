@@ -858,7 +858,7 @@ namespace Fusion
 
       stats = go.AddComponent<FusionStats>();
 
-      stats.ResetInternal(null, null, screenLayout);
+      stats.ResetLayout(null, null, screenLayout);
 
       stats.SetRunner(runner);
 

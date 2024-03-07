@@ -58,7 +58,7 @@ public class ChatMessage : MonoBehaviour {
             return;
         }
 
-        image.color = Utils.GetPlayerColor(NetworkHandler.Runner, data.player, 0.15f);
+        image.color = Utils.GetPlayerColor(data.player, 0.2f);
     }
 
     public class ChatMessageData {

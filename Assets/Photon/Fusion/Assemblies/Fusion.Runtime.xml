@@ -373,20 +373,6 @@
             <para>
             Flags a property of <see cref="T:Fusion.NetworkBehaviour"/> for network state synchronization. 
             The property should have empty get and set defines, which will automatically be replaced with networking code via IL Weaving.
-            OnChanged can be assigned with the name of a method in the same NetworkBehaviour. 
-            The named method will get called whenever this property value has been changed by the State Authority.
-            <code>
-            | [Networked(OnDataReceived = nameof(MyCallbackMethod)]<br></br>
-            | public int MyProperty { get; set; }
-            |
-            | protected static void MyCallbackMethod(Changed&lt;ChangedCallbackParent&gt; changed) {
-            |   changed.LoadNew();
-            |   var newval = changed.Behaviour.MyProperty;
-            |   changed.LoadOld();
-            |   var oldval = changed.Behaviour.MyProperty;
-            |   Debug.Log($"Changed from {oldval} to {newval}");
-            | }
-            </code>
             </para>
             <para>
             Inside of INetworkStruct, do not use AutoProperties (get; set;), as these will introduce managed types into the struct, which are not allowed. Instead use '=> default'.
@@ -406,6 +392,26 @@
             <summary>
             Default constructor for NetworkedAttribute
             </summary>
+        </member>
+        <member name="T:Fusion.OnChangedRenderAttribute">
+            <summary>
+            OnChangedRender Attribute
+            </summary>
+            <remarks>
+            This attribute is used to specify a method that should be called when the property changes.
+            </remarks>
+        </member>
+        <member name="P:Fusion.OnChangedRenderAttribute.MethodName">
+            <summary>
+            Gets the name of the method to be called when the property changes.
+            </summary>
+        </member>
+        <member name="M:Fusion.OnChangedRenderAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Fusion.OnChangedRenderAttribute"/> class.
+            </summary>
+            <param name="methodName">The name of the method to be called when the property changes.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="methodName"/> is null or empty.</exception>
         </member>
         <member name="T:Fusion.NetworkedWeavedAttribute">
              <summary>
@@ -870,6 +876,11 @@
             Signal if the local peer will try or accept connections using NAT Punch
             </summary>
         </member>
+        <member name="P:Fusion.CloudServices.IsEncryptionEnabled">
+            <summary>
+            Flag to signal if the Photon Cloud connection is encrypted by default
+            </summary>
+        </member>
         <member name="P:Fusion.CloudServices.CustomSTUNServer">
             <summary>
             Custom STUN Server
@@ -1174,6 +1185,11 @@
         <member name="P:Fusion.CloudServicesMetadata.PlayerRef">
             <summary>
             Stores the local peer Unique Id
+            </summary>
+        </member>
+        <member name="P:Fusion.CloudServicesMetadata.EncryptionToken">
+            <summary>
+            Stores the local Encryption Token
             </summary>
         </member>
         <member name="F:Fusion.CloudServicesMetadata.ScheduledRequests">
@@ -1781,6 +1797,11 @@
             Gets the state buffer associated with the network behaviour.
             </summary>
         </member>
+        <member name="F:Fusion.NetworkBehaviour._onRenderCallbacksDetector">
+            <summary>
+            On Render Default Change Detector instance
+            </summary>
+        </member>
         <member name="P:Fusion.NetworkBehaviour.WordInfo">
             <summary>
             Gives access to the offset (in 32 bit words) and count (in 32 bit words) of this behaviour backing data
@@ -2146,7 +2167,15 @@
             <summary>
             Serializes a NetworkBehaviour into a byte array.
             </summary>
-            <param name="runner">The NetworkRunner associated with the NetworkBehaviour.</param>
+            <param name="runner"></param>
+            <param name="obj">The NetworkBehaviour to be serialized.</param>
+            <param name="data">The byte pointer to write the serialized data to.</param>
+            <returns>The size of the serialized data in bytes.</returns>
+        </member>
+        <member name="M:Fusion.NetworkBehaviour.NetworkSerialize(Fusion.NetworkBehaviour,System.Byte*)">
+            <summary>
+            Serializes a NetworkBehaviour into a byte array.
+            </summary>
             <param name="obj">The NetworkBehaviour to be serialized.</param>
             <param name="data">The byte pointer to write the serialized data to.</param>
             <returns>The size of the serialized data in bytes.</returns>
@@ -3113,6 +3142,7 @@
             <summary>
             Post simulation frame rendering callback. Runs after all simulations have finished. Use in place of Unity's Update when Fusion is handling Physics.
             </summary>
+            
         </member>
         <member name="M:Fusion.SimulationBehaviour.OnDestroy">
             <summary>
@@ -3709,7 +3739,7 @@
             Used on <see cref="T:Fusion.HitboxTypes"/> of types: Sphere and Capsule.
             </summary>
         </member>
-        <member name="P:Fusion.LagCompensation.ColliderDrawInfo.CapsuleHeight">
+        <member name="P:Fusion.LagCompensation.ColliderDrawInfo.CapsuleExtents">
             <summary>
             The height for capsule colliders.
             <seealso cref="T:Fusion.HitboxTypes"/>
@@ -4308,7 +4338,7 @@
             When <see cref="F:Fusion.Hitbox.Type"/> is set to <see cref="F:Fusion.HitboxTypes.Box"/>, this defines the local-space geometry for narrow-phase checks.
             </summary>
         </member>
-        <member name="F:Fusion.Hitbox.CapsuleHeight">
+        <member name="F:Fusion.Hitbox.CapsuleExtents">
             <summary>
             When <see cref="F:Fusion.Hitbox.Type"/> is set to <see cref="F:Fusion.HitboxTypes.Capsule"/>, this defines the local-space geometry for narrow-phase checks.
             </summary>
@@ -4354,6 +4384,12 @@
             <summary>
             Color used when drawing gizmos for this hitbox.
             </summary>
+        </member>
+        <member name="M:Fusion.Hitbox.SetLayer(System.Int32)">
+            <summary>
+            Set a layer mask for this <see cref="T:Fusion.Hitbox"/> gameobject. This method caches the layer mask.
+            </summary>
+            <param name="layer"></param>
         </member>
         <member name="M:Fusion.Hitbox.OnDrawGizmos">
             <summary>
@@ -5988,6 +6024,13 @@
             <param name="data">The byte array.</param>
             <param name="index">The index of the element.</param>
             <returns>A reference to the element at the specified index.</returns>
+        </member>
+        <member name="M:Fusion.IElementReaderWriter`1.GetElementHashCode(`0)">
+            <summary>
+            Calculate the hash code of an element.
+            </summary>
+            <param name="element"></param>
+            <returns></returns>
         </member>
         <member name="T:Fusion.INetworkInput">
             <summary>
@@ -7858,6 +7901,14 @@
             <param name="data">The memory location to write to.</param>
             <param name="value">The boolean value to write.</param>
         </member>
+        <member name="M:Fusion.ReadWriteUtilsForWeaver.GetByteArrayHashCode(System.Byte*,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="ptr"></param>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
         <member name="M:Fusion.ReadWriteUtilsForWeaver.WriteStringUtf8NoHash(System.Void*,System.String)">
             <summary>
             Writes a string to the provided memory location in UTF8 format without a hash.
@@ -7880,6 +7931,14 @@
             </summary>
             <param name="value">The string to get the byte count of.</param>
             <returns>The byte count of the string in UTF8 format.</returns>
+        </member>
+        <member name="M:Fusion.ReadWriteUtilsForWeaver.GetStringHashCode(System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="value"></param>
+            <param name="maxLength"></param>
+            <returns></returns>
         </member>
         <member name="M:Fusion.ReadWriteUtilsForWeaver.WriteStringUtf32NoHash(System.Int32*,System.Int32,System.String)">
             <summary>
@@ -8982,10 +9041,10 @@
             <summary>
             A surrogate for serializing a dictionary.
             </summary>
-            <typeparam name="KeyType">The type of the key.</typeparam>
-            <typeparam name="KeyReaderWriter">The type of the key reader writer.</typeparam>
-            <typeparam name="ValueType">The type of the value.</typeparam>
-            <typeparam name="ValueReaderWriter">The type of the value reader writer.</typeparam>
+            <typeparam name="TKeyType">The type of the key.</typeparam>
+            <typeparam name="TKeyReaderWriter">The type of the key reader writer.</typeparam>
+            <typeparam name="TValueType">The type of the value.</typeparam>
+            <typeparam name="TValueReaderWriter">The type of the value reader writer.</typeparam>
             <seealso cref="T:Fusion.Internal.UnitySurrogateBase" />
         </member>
         <member name="P:Fusion.Internal.UnityDictionarySurrogate`4.DataProperty">
@@ -9536,6 +9595,13 @@
             Return the <paramref name="obj"/> <see cref="T:Fusion.NetworkId"/>.
             </summary>
             <param name="runner">The <see cref="T:Fusion.NetworkRunner"/> that <paramref name="obj"/> is assigned to</param>
+            <param name="obj">The <see cref="T:Fusion.NetworkObject"/> to get the ID from</param>
+            <returns>The <see cref="T:Fusion.NetworkId"/> of the object. Default if the object is not alive (null or destroyed)</returns>
+        </member>
+        <member name="M:Fusion.NetworkObject.NetworkWrap(Fusion.NetworkObject)">
+            <summary>
+            Return the <paramref name="obj"/> <see cref="T:Fusion.NetworkId"/>.
+            </summary>
             <param name="obj">The <see cref="T:Fusion.NetworkObject"/> to get the ID from</param>
             <returns>The <see cref="T:Fusion.NetworkId"/> of the object. Default if the object is not alive (null or destroyed)</returns>
         </member>
@@ -13515,6 +13581,11 @@
             Reference to <see cref="F:Fusion.NetworkProjectConfig.HostMigration"/> settings for this <see cref="T:Fusion.NetworkProjectConfig"/>
             </summary>
         </member>
+        <member name="F:Fusion.NetworkProjectConfig.EncryptionConfig">
+            <summary>
+            Reference to <see cref="F:Fusion.NetworkProjectConfig.EncryptionConfig"/> settings for this <see cref="T:Fusion.NetworkProjectConfig"/>
+            </summary>
+        </member>
         <member name="F:Fusion.NetworkProjectConfig.NetworkConditions">
             <summary>
             Settings for simulating network conditions of latency and loss.
@@ -15926,6 +15997,12 @@
         <member name="T:Fusion.TimeSyncConfiguration">
             <summary>
             Time Synchronization Configuration
+            </summary>
+        </member>
+        <member name="F:Fusion.TimeSyncConfiguration.SampleWindowSeconds">
+            <summary>
+            <para>To stay in sync, the client will analyze the network conditions of the last <see cref="F:Fusion.TimeSyncConfiguration.SampleWindowSeconds"/>.</para>
+            <para>Setting this too high will make the client slow to adapt to sudden changes.</para>
             </summary>
         </member>
         <member name="F:Fusion.TimeSyncConfiguration.MaxLateInputs">

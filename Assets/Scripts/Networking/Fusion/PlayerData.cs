@@ -11,13 +11,14 @@ using NSMB.UI.MainMenu;
 using NSMB.UI.Pause.Options;
 using System.Collections;
 
-public class PlayerData : NetworkBehaviour {
+public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
 
     //---Static stuffs
     public bool Locked => SessionData.Instance && SessionData.Instance.GameStarted && !IsCurrentlySpectating;
 
     //---Events
     public static event Action<PlayerData> OnPlayerDataReady;
+    public static event Action<PlayerData> OnPlayerDataDespawned;
     public event Action<bool> OnInOptionsChangedEvent;
     public event Action<bool> OnIsReadyChangedEvent;
 
@@ -111,11 +112,6 @@ public class PlayerData : NetworkBehaviour {
             SessionData.Instance.PlayerDatas.Add(Owner, this);
         }
 
-        if (Runner.IsResume) {
-            SetNickname(ConnectionToken.nickname.Value);
-            Ping = 0;
-        }
-
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
 
         if (HasStateAuthority) {
@@ -125,6 +121,8 @@ public class PlayerData : NetworkBehaviour {
             if (SessionData.Instance) {
                 SessionData.Instance.LoadWins(this);
             }
+        } else {
+            OnConnectionTokenChanged();
         }
 
         if (IsLocal) {
@@ -140,6 +138,22 @@ public class PlayerData : NetworkBehaviour {
         UpdateObjectName();
     }
 
+    public void StateAuthorityChanged() {
+        if (!HasStateAuthority) {
+            return;
+        }
+
+        if (Owner == Runner.LocalPlayer) {
+            // We are the new master client...
+            IsMuted = false;
+            IsRoomOwner = true;
+            IsReady = false;
+        } else {
+            // Other, non-master client player
+            IsRoomOwner = false;
+        }
+    }
+
     public override void Render() {
         base.Render();
 
@@ -150,6 +164,9 @@ public class PlayerData : NetworkBehaviour {
             case nameof(IsManualSpectator):
                 OnStartSettingChanged();
                 break;
+            case nameof(IsRoomOwner): OnRoomOwnerChanged(); break;
+            case nameof(Wins): OnSettingChanged(); break;
+            case nameof(IsMuted): OnIsMutedChanged(); break;
             case nameof(Ping): OnPingChanged(); break;
             case nameof(IsLoaded): OnLoadStateChanged(); break;
             case nameof(IsInOptions): OnInOptionsChanged(); break;
@@ -173,17 +190,20 @@ public class PlayerData : NetworkBehaviour {
 
         if (!ConnectionToken.HasValidSignature() && (Runner.Tick - JoinTick) > (int) (Runner.TickRate * 10f)) {
             // Kick player for not sending the token in time...
-            Runner.Disconnect(Owner);
+            //Runner.Disconnect(Owner);
+            SessionData.Instance.Rpc_Disconnect(Owner);
         }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (hasState) {
-            SessionData.Instance.SaveWins(this);
-        }
-
         if (pingRoutine != null) {
             StopCoroutine(pingRoutine);
+        }
+
+        OnPlayerDataDespawned?.Invoke(this);
+
+        if (hasState) {
+            SessionData.Instance.SaveWins(this);
         }
 
         if (IsLocal) {
@@ -407,10 +427,28 @@ public class PlayerData : NetworkBehaviour {
         }
     }
 
+    public void OnIsMutedChanged() {
+        if (MainMenuManager.Instance) {
+            MainMenuManager.Instance.chat.OnDisableChatChanged();
+        }
+    }
+
     public void OnPingChanged() {
         if (Owner == Runner.LocalPlayer && MainMenuManager.Instance) {
             MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
         }
+    }
+
+    public void OnRoomOwnerChanged() {
+        if (IsRoomOwner) {
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promote", "playername", GetNickname());
+
+            if (Runner.LocalPlayer == Owner) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+            }
+        }
+
+        OnSettingChanged();
     }
 
     public void OnSettingChanged() {
@@ -419,7 +457,7 @@ public class PlayerData : NetworkBehaviour {
         }
 
         lastUpdatedTick = Runner.Tick;
-        MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+        MainMenuManager.Instance.playerList.UpdatePlayerEntry(this);
     }
 
     public void OnStartSettingChanged() {
@@ -428,7 +466,7 @@ public class PlayerData : NetworkBehaviour {
         }
 
         MainMenuManager.Instance.UpdateStartGameButton();
-        OnSettingChanged();
+        MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
     }
 
     public void OnCharacterChanged() {

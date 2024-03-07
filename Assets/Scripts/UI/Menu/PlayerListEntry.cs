@@ -66,9 +66,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateText() {
-            NetworkRunner runner = NetworkHandler.Instance.runner;
 
-            colorStrip.color = Utils.Utils.GetPlayerColor(runner, player);
+            colorStrip.color = Utils.Utils.GetPlayerColor(player);
 
             if (player.Wins == 0) {
                 winsText.text = "";
@@ -119,9 +118,9 @@ namespace NSMB.UI.MainMenu {
                 Destroy(blockerInstance);
             }
 
-            bool admin = runner.IsServer && runner.LocalPlayer != player.Object.InputAuthority;
+            bool adminOptions = runner.GetLocalPlayerData().IsRoomOwner && runner.LocalPlayer != player.Owner;
             foreach (GameObject option in adminOnlyOptions) {
-                option.SetActive(admin);
+                option.SetActive(adminOptions);
             }
 
             Canvas.ForceUpdateCanvases();

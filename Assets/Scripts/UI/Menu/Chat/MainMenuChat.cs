@@ -111,7 +111,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisableChatChanged() {
-            PlayerData data = NetworkHandler.Runner.GetLocalPlayerData();
+            if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData data)) {
+                return;
+            }
 
             foreach (ChatMessage msg in chatMessages) {
                 msg.UpdateVisibleState(!Settings.Instance.GeneralDisableChat);
@@ -127,7 +129,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnLanguageChanged(TranslationManager tm) {
-            PlayerData data = NetworkHandler.Runner.GetLocalPlayerData();
+            if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData data)) {
+                return;
+            }
             string key;
 
             if (Settings.Instance.GeneralDisableChat) {

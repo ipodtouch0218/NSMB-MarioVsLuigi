@@ -74,8 +74,8 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             // Register callbacks
-            NetworkHandler.OnPlayerJoined += OnPlayerJoined;
-            NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+            PlayerData.OnPlayerDataReady += OnPlayerDataReady;
+            PlayerData.OnPlayerDataDespawned += OnPlayerDataDespawned;
             NetworkHandler.OnLobbyConnect += OnLobbyConnect;
             NetworkHandler.OnShutdown += OnShutdown;
             NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
@@ -91,8 +91,8 @@ namespace NSMB.UI.MainMenu {
 
         public void OnDisable() {
             // Unregister callbacks
-            NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
-            NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+            PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
+            PlayerData.OnPlayerDataDespawned -= OnPlayerDataDespawned;
             NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
             NetworkHandler.OnShutdown -= OnShutdown;
             NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
@@ -512,8 +512,9 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
+            SessionData.Instance.Rpc_Disconnect(target.Owner);
+            //Runner.Disconnect(target.Owner);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetNickname());
-            Runner.Disconnect(target.Owner);
         }
 
         public void Promote(PlayerData target) {
@@ -521,7 +522,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", "playername", target.GetNickname());
+            // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", "playername", target.GetNickname());
             Runner.SetMasterClient(target.Owner);
         }
 
@@ -540,9 +541,10 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
+            SessionData.Instance.Rpc_Disconnect(target.Owner);
+            //Runner.Disconnect(target.Owner);
             SessionData.Instance.AddBan(target);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetNickname());
-            Runner.Disconnect(target.Owner);
         }
 
         public void UI_CharacterDropdownChanged() {
@@ -753,13 +755,20 @@ namespace NSMB.UI.MainMenu {
             startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
-        private void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
+        private void OnPlayerDataReady(PlayerData data) {
+            if (data.Owner == Runner.LocalPlayer) {
+                EnterRoom(false);
+            }
+
             UpdateStartGameButton();
         }
 
-        private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-            sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
-            UpdateStartGameButton();
+        private void OnPlayerDataDespawned(PlayerData data) {
+            if (!Runner.IsShutdown && data.Owner != Runner.LocalPlayer) {
+                sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
+                UpdateStartGameButton();
+            }
+
             GlobalController.Instance.discordController.UpdateActivity();
         }
 

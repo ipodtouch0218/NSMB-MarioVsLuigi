@@ -301,6 +301,19 @@ namespace NSMB.UI.MainMenu {
         }
         #endregion
 
+        #region Win Counter
+        public void ClearWinCounters() {
+            if (!Room.HasStateAuthority) {
+                return;
+            }
+
+            foreach ((_, PlayerData data) in Room.PlayerDatas) {
+                data.Wins = 0;
+            }
+        }
+
+        #endregion
+
         #region Private
         public void SetPrivate() {
             if (!Room.HasStateAuthority) {

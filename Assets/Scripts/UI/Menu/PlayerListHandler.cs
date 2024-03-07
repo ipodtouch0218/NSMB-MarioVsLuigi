@@ -21,17 +21,15 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            //NetworkHandler.OnPlayerJoined += OnPlayerJoined;
-            NetworkHandler.OnPlayerLeft += OnPlayerLeft;
             PlayerData.OnPlayerDataReady += OnPlayerDataReady;
+            PlayerData.OnPlayerDataDespawned += OnPlayerDataDespawned;
         }
 
         public void OnDisable() {
             RemoveAllPlayerEntries();
 
-            //NetworkHandler.OnPlayerJoined -= OnPlayerJoined;
-            NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
             PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
+            PlayerData.OnPlayerDataDespawned -= OnPlayerDataDespawned;
         }
 
         public void PopulatePlayerEntries() {
@@ -70,13 +68,13 @@ namespace NSMB.UI.MainMenu {
             playerListEntries.Clear();
         }
 
-        public void RemovePlayerEntry(PlayerRef player) {
-            if (!playerListEntries.ContainsKey(player)) {
+        public void RemovePlayerEntry(PlayerData data) {
+            if (!playerListEntries.ContainsKey(data.Owner)) {
                 return;
             }
 
-            Destroy(playerListEntries[player].gameObject);
-            playerListEntries.Remove(player);
+            Destroy(playerListEntries[data.Owner].gameObject);
+            playerListEntries.Remove(data.Owner);
             UpdateAllPlayerEntries();
         }
 
@@ -129,8 +127,8 @@ namespace NSMB.UI.MainMenu {
             AddPlayerEntry(data);
         }
 
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-            RemovePlayerEntry(player);
+        public void OnPlayerDataDespawned(PlayerData data) {
+            RemovePlayerEntry(data);
         }
     }
 }

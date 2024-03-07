@@ -232,7 +232,7 @@ namespace NSMB.Entities.Collectable {
             player.Stars = (byte) Mathf.Min(player.Stars + 1, SessionData.Instance.StarRequirement);
 
             // Game mechanics
-            if (IsStationary && Runner.IsServer) {
+            if (IsStationary && HasStateAuthority) {
                 GameManager.Instance.tileManager.ResetMap();
             }
 

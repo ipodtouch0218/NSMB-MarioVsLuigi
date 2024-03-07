@@ -17,7 +17,7 @@ using NSMB.Tiles;
 using NSMB.Utils;
 
 namespace NSMB.Entities.Player {
-    public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick {
+    public class PlayerController : FreezableEntity, IPlayerInteractable, IBeforeTick, IStateAuthorityChanged {
 
         #region Variables
 
@@ -374,6 +374,10 @@ namespace NSMB.Entities.Player {
             if (GameManager.Instance && hasState) {
                 GameManager.Instance.AlivePlayers.Remove(this);
             }
+        }
+
+        public void StateAuthorityChanged() {
+
         }
 
         public override void Render() {
