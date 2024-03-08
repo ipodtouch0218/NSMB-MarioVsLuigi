@@ -23,7 +23,9 @@ namespace NSMB.Entities.World {
 
         public override void Spawned() {
             armPositionPropertyReader = GetPropertyReader<float>(nameof(ArmPosition));
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
         }
 
         public void BeforeTick() {

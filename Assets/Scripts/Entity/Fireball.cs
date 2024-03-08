@@ -82,7 +82,9 @@ namespace NSMB.Entities {
             if (!GameManager.Instance.PooledFireballs.Contains(this)) {
                 GameManager.Instance.PooledFireballs.Add(this);
             }
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
         }
 
         public override void Render() {

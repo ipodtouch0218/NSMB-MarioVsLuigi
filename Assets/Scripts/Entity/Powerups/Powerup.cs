@@ -91,7 +91,9 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void Spawned() {
             base.Spawned();
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
 
             if (FollowPlayer) {
                 // Spawned following a player.

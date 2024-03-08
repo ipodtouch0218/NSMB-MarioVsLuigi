@@ -28,6 +28,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
     [Networked, Capacity(28)] private string DisplayNickname { get; set; } = "noname";
     [Networked] public ConnectionToken ConnectionToken { get; set; }
     [Networked] public sbyte PlayerId { get; set; }
+    [Networked] public sbyte SpawnpointId { get; set; }
     [Networked] public uint Wins { get; set; }
     [Networked] public sbyte Team { get; set; }
     [Networked] public NetworkBool IsManualSpectator { get; set; }
@@ -440,11 +441,25 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
     }
 
     public void OnRoomOwnerChanged() {
+        // Send the chat message(s)
         if (IsRoomOwner) {
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promote", "playername", GetNickname());
 
             if (Runner.LocalPlayer == Owner) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+            }
+        }
+
+        // Ensures that the host controls / start button updates correctly
+        if (Owner == Runner.LocalPlayer) {
+            if (MainMenuManager.Instance) {
+                int? ticksLeft = SessionData.Instance.GameStartTimer.RemainingTicks(Runner);
+                if (ticksLeft == null) {
+                    MainMenuManager.Instance.OnCountdownTick(-1);
+                } else {
+                    int seconds = (ticksLeft.Value / Runner.TickRate) + 1;
+                    MainMenuManager.Instance.OnCountdownTick(seconds);
+                }
             }
         }
 

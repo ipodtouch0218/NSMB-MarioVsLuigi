@@ -366,7 +366,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static async void RecreateInstance() {
         if (!prefab) {
-            prefab = (GameObject) Resources.Load("Prefabs/Static/NetworkingHandler");
+            prefab = (GameObject) Resources.Load("Prefabs/Network/NetworkingHandler");
         }
 
         if (Instance) {

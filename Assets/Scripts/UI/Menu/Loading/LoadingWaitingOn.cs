@@ -64,7 +64,7 @@ namespace NSMB.Loading {
             NetworkRunner runner = GameManager.Instance.Runner;
             foreach (PlayerRef player in runner.ActivePlayers) {
                 PlayerData data = player.GetPlayerData();
-                if (!data || data.IsCurrentlySpectating || data.HasInputAuthority) {
+                if (!data || data.IsCurrentlySpectating || data.Object.HasControlAuthority()) {
                     continue;
                 }
 

@@ -52,7 +52,9 @@ namespace NSMB.Tiles {
         }
 
         public override void Spawned() {
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
 
             if (initialized) {
                 return;

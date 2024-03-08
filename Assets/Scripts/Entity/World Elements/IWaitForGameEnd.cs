@@ -1,4 +1,5 @@
 using Fusion;
+using NSMB.Extensions;
 
 public interface IWaitForGameEnd {
 
@@ -11,14 +12,14 @@ public interface IWaitForGameEnd {
             break;
         }
         case FunctionTarget.ServerHostOnly: {
-            if (obj.Runner.IsServer) {
+            if (obj.Runner.IsServer || obj.Runner.IsSharedModeMasterClient) {
                 Execute();
             }
 
             break;
         }
         case FunctionTarget.ObjectOwnerOnly: {
-            if (obj.HasInputAuthority) {
+            if (obj.HasControlAuthority()) {
                 Execute();
             }
 

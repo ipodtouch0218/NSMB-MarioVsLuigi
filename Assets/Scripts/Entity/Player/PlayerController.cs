@@ -1,4 +1,3 @@
-//#define INPUT_BUFFERING_TEST
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,7 +36,6 @@ namespace NSMB.Entities.Player {
         [Networked] public byte Stars { get; set; }
         [Networked] public byte Coins { get; set; }
         [Networked] public byte Lives { get; set; }
-        [Networked] private sbyte SpawnpointIndex { get; set; }
         //-Player Movement
         //Generic
         [Networked] public PlayerNetworkInput PreviousInputs { get; set; }
@@ -143,11 +141,6 @@ namespace NSMB.Entities.Player {
         [Networked] public NetworkBool IsInShell { get; set; }
         [Networked] public FrozenCube FrozenCube { get; set; }
 
-#if INPUT_BUFFERING_TEST
-        private const int InputBufferCapacity = 3;
-        [Networked, Capacity(InputBufferCapacity)] public NetworkArray<PlayerNetworkInput> InputBuffer => default;
-#endif
-
         //---Properties
         public override bool IsFlying => IsSpinnerFlying || IsPropellerFlying; //doesn't work consistently?
         public override bool IsCarryable => true;
@@ -167,7 +160,7 @@ namespace NSMB.Entities.Player {
         public float WalkingMaxSpeed => SPEED_STAGE_MAX[WALK_STAGE];
         public BoxCollider2D MainHitbox => hitboxes[0];
         public Vector2 WorldHitboxSize => MainHitbox.size * transform.lossyScale;
-        public Vector3 Spawnpoint => GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
+        public Vector3 Spawnpoint => GameManager.Instance.GetSpawnpoint(Data.SpawnpointId);
         private int MovementStage {
             get {
                 float xVel = Mathf.Abs(body.Velocity.x) - 0.01f;
@@ -320,24 +313,24 @@ namespace NSMB.Entities.Player {
             NetworkHandler.OnInput -= OnInput;
         }
 
-        public void OnBeforeSpawned(int spawnpoint) {
-            SpawnpointIndex = (sbyte) spawnpoint;
-        }
-
         public void BeforeTick() {
             HandleLayerState();
             //IsOnGround |= GroundSnapCheck();
         }
 
         public override void Spawned() {
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
+
             hitboxes = GetComponentsInChildren<BoxCollider2D>();
 
             body.Freeze = true;
             body.ForceSnapshotInterpolation = IsProxy;
+            Object.AssignInputAuthority(Object.StateAuthority);
 
-            Data = Object.InputAuthority.GetPlayerData();
-            if (HasInputAuthority) {
+            Data = Object.ControlAuthority().GetPlayerData();
+            if (Object.HasControlAuthority()) {
                 GameManager.Instance.localPlayer = this;
                 GameManager.Instance.spectationManager.Spectating = false;
                 ControlSystem.controls.Player.ReserveItem.performed += OnReserveItem;
@@ -349,12 +342,12 @@ namespace NSMB.Entities.Player {
                 if (SessionData.Instance.Lives > 0) {
                     Lives = SessionData.Instance.Lives;
                 }
-                Vector3 spawn = GameManager.Instance.GetSpawnpoint(SpawnpointIndex);
+                Vector3 spawn = GameManager.Instance.GetSpawnpoint(Data.PlayerId);
                 body.Position = spawn;
                 cameraController.Recenter(spawn);
             }
 
-            cameraController.IsControllingCamera = HasInputAuthority;
+            cameraController.IsControllingCamera = Object.HasControlAuthority();
 
             if (!GameManager.Instance.AlivePlayers.Contains(this)) {
                 GameManager.Instance.AlivePlayers.Add(this);
@@ -366,7 +359,7 @@ namespace NSMB.Entities.Player {
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {
-            if (HasInputAuthority) {
+            if (Object.HasControlAuthority()) {
                 NetworkHandler.OnInput -= OnInput;
                 NetworkHandler.Runner.ProvideInput = false;
             }
@@ -377,7 +370,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void StateAuthorityChanged() {
-
+            Debug.Log($"new state authroity: {Object.StateAuthority}");
         }
 
         public override void Render() {
@@ -463,6 +456,7 @@ namespace NSMB.Entities.Player {
         }
 
         public override void FixedUpdateNetwork() {
+
             if (GameManager.Instance.GameState < Enums.GameState.Starting) {
                 return;
             }
@@ -475,18 +469,6 @@ namespace NSMB.Entities.Player {
             }
 
             if (!IsProxy) {
-#if INPUT_BUFFERING_TEST
-                int inputIndex = Runner.Tick % InputBufferCapacity;
-                PlayerNetworkInput input = InputBuffer[inputIndex];
-
-                if (GetInput(out PlayerNetworkInput inputsThisTick)) {
-                    // Add later inputs to the buffer.
-                    InputBuffer.Set(inputIndex, inputsThisTick);
-                } else if (!IsProxy) {
-                    // Didn't get the inputs, but we *need* them. Interpolate based on what it *could* be?
-                    InputBuffer.Set(inputIndex, HandleMissingInputs());
-                }
-#else
                 PlayerNetworkInput input;
                 if (GetInput(out PlayerNetworkInput currentInputs)) {
                     // Got the inputs from the player!
@@ -500,11 +482,12 @@ namespace NSMB.Entities.Player {
                     // Just trust the server
                     input = PreviousInputs;
                 }
-#endif
 
                 if (IsDead) {
                     HandleDeathTimers();
+
                 } else if (!IsFrozen) {
+
                     NetworkButtons heldButtons = input.buttons;
                     NetworkButtons pressedButtons = input.buttons.GetPressed(PreviousInputs.buttons);
 
@@ -1438,7 +1421,7 @@ namespace NSMB.Entities.Player {
             if (OutOfLives) {
                 GameManager.Instance.CheckForWinner();
 
-                if (HasInputAuthority) {
+                if (Object.HasControlAuthority()) {
                     GameManager.Instance.spectationManager.Spectating = true;
                 }
 
@@ -1510,7 +1493,7 @@ namespace NSMB.Entities.Player {
 
             DamageInvincibilityTimer = TickTimer.CreateFromSeconds(Runner, 2f);
 
-            if (HasInputAuthority) {
+            if (Object.HasControlAuthority()) {
                 ScoreboardUpdater.Instance.OnRespawnToggle();
             }
         }
@@ -3362,7 +3345,7 @@ namespace NSMB.Entities.Player {
                     GameManager.Instance.musicManager.Stop();
                 }
 
-                if (HasInputAuthority) {
+                if (Object.HasControlAuthority()) {
                     ScoreboardUpdater.Instance.OnDeathToggle();
                 }
             } else {
@@ -3372,7 +3355,7 @@ namespace NSMB.Entities.Player {
                     lastRespawnParticle = Runner.SimulationTime;
                 }
 
-                if (Settings.Instance.audioRestartMusicOnDeath && cameraController.IsControllingCamera) {
+                if (!GameManager.Instance.musicManager.IsPlaying && cameraController.IsControllingCamera) {
                     GameManager.Instance.musicManager.Play(GameManager.Instance.mainMusic, true);
                 }
             }

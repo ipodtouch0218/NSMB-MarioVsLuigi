@@ -56,5 +56,13 @@ namespace NSMB.Extensions {
         public static CharacterData GetCharacterData(this PlayerData data) {
             return ScriptableManager.Instance.characters[data ? data.CharacterIndex : Settings.Instance.generalCharacter];
         }
+
+        public static PlayerRef ControlAuthority(this NetworkObject obj) {
+            return obj.Runner.Topology == Topologies.Shared ? obj.StateAuthority : obj.InputAuthority;
+        }
+
+        public static bool HasControlAuthority(this NetworkObject obj) {
+            return obj.ControlAuthority() == obj.Runner.LocalPlayer;
+        }
     }
 }

@@ -28,12 +28,13 @@ namespace NSMB.Entities.Collectable {
 
         public override void Spawned() {
             base.Spawned();
-            Runner.SetIsSimulated(Object, true);
             CollectableTick = (int) (Runner.Tick + (0.2f * Runner.TickRate));
             DespawnTimer = TickTimer.CreateFromSeconds(Runner, despawn);
 
             body.Velocity = Vector2.up * GameManager.Instance.random.RangeInclusive(5.5f, 6f);
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
         }
 
         public override void Render() {

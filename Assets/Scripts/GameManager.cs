@@ -202,6 +202,11 @@ namespace NSMB.Game {
                 // The game hasn't started.
                 // Tell our host that we're done loading
                 Runner.GetLocalPlayerData().Rpc_FinishedLoading();
+
+                // And create a player
+                if (Runner.Topology == Topologies.Shared) {
+
+                }
             } else {
                 // The game HAS already started.
                 SetGameTimestamps();
@@ -519,17 +524,9 @@ namespace NSMB.Game {
             }
 
             if (!Runner.IsSinglePlayer) {
-                foreach (PlayerRef player in Runner.ActivePlayers) {
-                    PlayerData data = player.GetPlayerData();
-
-                    if (!data || data.IsCurrentlySpectating) {
-                        continue;
-                    }
-
-                    // I'm still loading!
-                    if (!data.IsLoaded) {
-                        return;
-                    }
+                // Check if any player is still loading
+                if (SessionData.Instance.PlayerDatas.Any(kvp => !kvp.Value.IsCurrentlySpectating && !kvp.Value.IsLoaded)) {
+                    return;
                 }
             }
 
@@ -539,37 +536,37 @@ namespace NSMB.Game {
             GameStartTimer = TickTimer.CreateFromSeconds(Runner, Runner.IsSinglePlayer ? 0.2f : 5.7f);
 
             // Find out how many players we have
-            foreach (PlayerRef client in Runner.ActivePlayers) {
-                PlayerData data = client.GetPlayerData();
-                if (!data || data.IsCurrentlySpectating) {
-                    continue;
-                }
+            RealPlayerCount = (byte)
+                SessionData.Instance.PlayerDatas
+                    .Select(kvp => kvp.Value)
+                    .Where(pd => !pd.IsCurrentlySpectating)
+                    .Count();
 
-                RealPlayerCount++;
+            // Assign spawnpoints (SpawnpointIds)
+            List<int> playerIds = Enumerable.Range(0, RealPlayerCount).ToList();
+            foreach ((_, PlayerData data) in SessionData.Instance.PlayerDatas) {
+                data.IsLoaded = false;
+
+                if (data.IsCurrentlySpectating) {
+                    data.SpawnpointId = -1;
+                } else {
+                    int index = UnityEngine.Random.Range(0, playerIds.Count);
+                    int newPlayerId = playerIds[index];
+                    playerIds.RemoveAt(index);
+                    data.SpawnpointId = (sbyte) newPlayerId;
+                }
             }
 
-            List<int> spawnpoints = Enumerable.Range(0, RealPlayerCount).ToList();
+            if (Runner.Topology == Topologies.ClientServer) {
+                foreach ((PlayerRef player, PlayerData data) in SessionData.Instance.PlayerDatas) {
+                    if (data.IsCurrentlySpectating) {
+                        continue;
+                    }
 
-            // Create player instances
-            foreach (PlayerRef player in Runner.ActivePlayers) {
-                PlayerData data = player.GetPlayerData();
-                if (!data) {
-                    continue;
+                    Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
                 }
-
-                data.IsLoaded = false;
-                if (data.IsCurrentlySpectating) {
-                    continue;
-                }
-
-                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player, onBeforeSpawned: (runner, obj) => {
-                    // Set the spawnpoint that they should spawn at
-                    int index = UnityEngine.Random.Range(0, spawnpoints.Count);
-                    int spawnpoint = spawnpoints[index];
-                    spawnpoints.RemoveAt(index);
-
-                    obj.GetComponent<PlayerController>().OnBeforeSpawned(spawnpoint);
-                });
+            } else {
+                Rpc_SpawnPlayers();
             }
 
             // Create pooled Fireball instances (max of 6 per player)
@@ -600,7 +597,8 @@ namespace NSMB.Game {
             // Kill player if they are still alive
             if (Object.HasStateAuthority) {
                 foreach (PlayerController pl in AlivePlayers) {
-                    if (pl.Object.InputAuthority == player) {
+                    if (pl.Data.Owner == player) {
+                        pl.Object.RequestStateAuthority();
                         pl.Rpc_DisconnectDeath();
                     }
                 }
@@ -611,6 +609,13 @@ namespace NSMB.Game {
         }
 
         //---RPCs
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_SpawnPlayers() {
+            PlayerData data = Runner.GetLocalPlayerData();
+            if (!data.IsCurrentlySpectating) {
+                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: data.Owner);
+            }
+        }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_EndGame(int team) {
@@ -629,11 +634,6 @@ namespace NSMB.Game {
 
         //---Helpers
         private void Host_StartGame() {
-            // Respawn players
-            foreach (PlayerController player in AlivePlayers) {
-                player.PreRespawn();
-            }
-
             // Respawn enemies
             foreach (KillableEntity enemy in enemies) {
                 enemy.RespawnEntity();
@@ -654,6 +654,13 @@ namespace NSMB.Game {
         private void Rpc_StartGame() {
             // Play start jingle
             sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+
+            // Respawn our player, if we have one.
+            foreach (PlayerController player in AlivePlayers) {
+                if (player.HasStateAuthority) {
+                    player.PreRespawn();
+                }
+            }
 
             StartCoroutine(WaitToStartGame());
         }

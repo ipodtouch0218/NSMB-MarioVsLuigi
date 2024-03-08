@@ -233,12 +233,12 @@ namespace NSMB.UI.MainMenu {
 
             // Set the player settings
             PlayerData data = Runner.GetLocalPlayerData();
-            characterDropdown.SetValueWithoutNotify(data ? data.CharacterIndex : Settings.Instance.generalCharacter);
-            SwapPlayerSkin(data ? data.SkinIndex : (byte) Settings.Instance.generalSkin, false);
-            spectateToggle.isOn = data ? data.IsManualSpectator : false;
+            characterDropdown.SetValueWithoutNotify(data.CharacterIndex);
+            SwapPlayerSkin(data.SkinIndex, false);
+            spectateToggle.isOn = data.IsManualSpectator;
 
             // Set the room settings
-            hostControlsGroup.interactable = Runner.IsServer || (bool) (data ? data.IsRoomOwner : true);
+            hostControlsGroup.interactable = data.IsRoomOwner;
             roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
 
             // Preview the current level

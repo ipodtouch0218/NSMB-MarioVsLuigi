@@ -101,6 +101,10 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectateNextPlayer(InputAction.CallbackContext context) {
+        if (!Spectating) {
+            return;
+        }
+
         SpectateNextPlayer();
     }
 
@@ -128,6 +132,10 @@ public class SpectationManager : MonoBehaviour {
     }
 
     public void SpectatePreviousPlayer(InputAction.CallbackContext context) {
+        if (!Spectating) {
+            return;
+        }
+
         SpectateNextPlayer();
     }
 

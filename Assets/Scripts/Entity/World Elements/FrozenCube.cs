@@ -62,7 +62,9 @@ namespace NSMB.Entities {
 
             body.LockX = true;
             transform.position = new(transform.position.x, transform.position.y, -4.5f);
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState) {

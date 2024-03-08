@@ -65,6 +65,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _RawNickname: noname
   _PlayerId: 0
+  _SpawnpointId: 0
   _Wins: 0
   _Team: 0
   _IsManualSpectator:

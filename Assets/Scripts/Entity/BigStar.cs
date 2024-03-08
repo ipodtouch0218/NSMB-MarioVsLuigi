@@ -94,7 +94,9 @@ namespace NSMB.Entities.Collectable {
                 GroundFilter.useTriggers = true;
             }
 
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
         }
 
         public override void Render() {

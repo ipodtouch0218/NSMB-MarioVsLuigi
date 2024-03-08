@@ -117,7 +117,9 @@ namespace NSMB.Entities {
             base.Spawned();
             OnFacingRightChanged();
 
-            Runner.SetIsSimulated(Object, true);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Runner.SetIsSimulated(Object, true);
+            }
         }
 
         public override void Render() {

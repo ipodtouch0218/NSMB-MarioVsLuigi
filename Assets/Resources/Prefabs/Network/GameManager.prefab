@@ -5236,7 +5236,6 @@ MonoBehaviour:
   gameEndTimestamp: 0
   paused: 0
   gameEndTime: 0
-  dontPlaySounds: 0
   sceneTiles: []
   originalTiles: 
   tileManager: {fileID: 3199354014281383139}
@@ -5495,7 +5494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 922207020
   ObjectInterest: 1
-  Flags: 262145
+  Flags: 131073
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5500062339093502114}
