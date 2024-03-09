@@ -40,16 +40,18 @@ namespace NSMB.Entities.World {
         }
 
         private void Initialize() {
-            if (this == null)
+            if (this == null) {
                 // What
                 return;
+            }
 
             spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.size = new Vector2(platformWidth, 1.25f);
 
             boxCollider = GetComponent<BoxCollider2D>();
-            if (changeCollider)
+            if (changeCollider) {
                 boxCollider.size = new Vector2(platformWidth, 5f / 8f);
+            }
 
             displacementMap = new(platformWidth * samplesPerTile, 1);
             pixels = new Color32[platformWidth * samplesPerTile];
@@ -62,8 +64,9 @@ namespace NSMB.Entities.World {
         }
 
         public override void Render() {
-            for (int i = 0; i < platformWidth * samplesPerTile; i++)
+            for (int i = 0; i < platformWidth * samplesPerTile; i++) {
                 pixels[i] = BlankColor;
+            }
 
             foreach (BumpInfo bump in Bumps) {
                 float percentageCompleted = (Runner.LocalRenderTime - (bump.spawnTick * Runner.DeltaTime)) / bumpDuration;
@@ -71,16 +74,18 @@ namespace NSMB.Entities.World {
 
                 for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {
                     int index = bump.point + x;
-                    if (index < 0 || index >= platformWidth * samplesPerTile)
+                    if (index < 0 || index >= platformWidth * samplesPerTile) {
                         continue;
+                    }
 
                     float color = v;
                     if (x < -bumpWidthPoints || x > bumpWidthPoints) {
                         color *= Mathf.SmoothStep(1, 0, (float) (Mathf.Abs(x) - bumpWidthPoints) / bumpBlurPoints);
                     }
 
-                    if ((pixels[index].r / 255f) >= color)
+                    if ((pixels[index].r / 255f) >= color) {
                         continue;
+                    }
 
                     pixels[index].r = (byte) (Mathf.Clamp01(color) * 255);
                 }
@@ -96,12 +101,14 @@ namespace NSMB.Entities.World {
         public override void FixedUpdateNetwork() {
             for (int i = Bumps.Count - 1; i >= 0; i--) {
                 BumpInfo bump = Bumps[i];
-                if (bump.spawnTick + (bumpDuration / Runner.DeltaTime) < Runner.Tick)
+                if (bump.spawnTick + (bumpDuration / Runner.DeltaTime) < Runner.Tick) {
                     Bumps.Remove(bump);
+                }
             }
         }
 
-        public void Bump(PlayerController player, Vector2 worldPos) {
+        [Rpc]
+        public void Rpc_Bump(PlayerController player, Vector2 worldPos) {
 
             float localPos = transform.InverseTransformPoint(worldPos).x;
 
@@ -117,8 +124,9 @@ namespace NSMB.Entities.World {
 
             foreach (BumpInfo bump in Bumps) {
                 // If we're too close to another bump, don't create a new one.
-                if (Mathf.Abs(bump.point - localPos) < bumpWidthPoints + bumpBlurPoints)
+                if (Mathf.Abs(bump.point - localPos) < bumpWidthPoints + bumpBlurPoints) {
                     return;
+                }
             }
 
             InteractableTile.Bump(player, InteractionDirection.Up, worldPos + BumpOffset);
@@ -128,13 +136,15 @@ namespace NSMB.Entities.World {
 
         //---IPlayerInteractable overrides
         public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-            if (player.IsInKnockback || player.IsFrozen || player.body.Position.y > transform.position.y)
+            if (player.IsInKnockback || player.IsFrozen || player.body.Position.y > transform.position.y) {
                 return;
+            }
 
-            if (contact == null || contact.direction != InteractionDirection.Up)
+            if (contact == null || contact.direction != InteractionDirection.Up) {
                 return;
+            }
 
-            Bump(player, new(player.body.Position.x, transform.position.y));
+            Rpc_Bump(player, new(player.body.Position.x, transform.position.y));
         }
 
         //---Helpers

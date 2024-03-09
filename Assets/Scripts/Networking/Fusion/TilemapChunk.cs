@@ -23,8 +23,10 @@ namespace NSMB.Tiles {
         private byte latestDirtyCounter;
         private bool updatedDirtyCounterThisTick;
         private bool initialized;
+        private ChangeDetector changeDetector;
 
         public void BeforeTick() {
+            Debug.Log("before tick");
             updatedDirtyCounterThisTick = false;
 
             if (!Runner.IsResimulation || latestDirtyCounter == DirtyCounter) {
@@ -37,6 +39,8 @@ namespace NSMB.Tiles {
         }
 
         public void AfterTick() {
+            Debug.Log("after tick");
+
             // The tilemap was updated via the dirty counter
             if (updatedDirtyCounterThisTick || (latestDirtyCounter != DirtyCounter)) {
                 UpdateTilemapState();
@@ -69,7 +73,20 @@ namespace NSMB.Tiles {
 
             UpdateTilemapState();
             GameManager.Instance.tileManager.AddChunk(this);
+            changeDetector = GetChangeDetector(ChangeDetector.Source.SnapshotTo);
             initialized = true;
+        }
+
+        public override void FixedUpdateNetwork() {
+            if (Runner.Topology == Topologies.Shared) {
+                foreach (var x in changeDetector.DetectChanges(this)) {
+                    switch (x) {
+                    case nameof(DirtyCounter):
+                        UpdateTilemapState();
+                        break;
+                    }
+                }
+            }
         }
 
         public void LoadState() {

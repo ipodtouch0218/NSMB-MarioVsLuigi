@@ -260,18 +260,25 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateRoomHeader() {
-            string name;
-            if (Runner.IsServer && Runner.IsResume) {
-                // In this case, the session property will be incorrect. Because fuck you, that's why.
-                // The PlayerData should exist, though
-                name = Runner.GetLocalPlayerData().RawNickname;
-            } else {
-                SessionInfo session = Runner.SessionInfo;
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out name);
-            }
-            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
+            const int rngSeed = 2035767;
 
-            UnityEngine.Random.InitState(name.GetHashCode() + 2035767);
+            PlayerData host =
+                SessionData.Instance.PlayerDatas
+                    .Select(kvp => kvp.Value)
+                    .Where(pd => pd.IsRoomOwner)
+                    .FirstOrDefault();
+
+            string name;
+            if (host) {
+                name = host.GetNickname();
+
+            } else {
+                // Fallback
+                NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.HostName, out name);
+            }
+
+            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
+            UnityEngine.Random.InitState(name.GetHashCode() + rngSeed);
             colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
         }
 
@@ -662,8 +669,30 @@ namespace NSMB.UI.MainMenu {
             return SceneRef.FromIndex(maps[index].buildIndex);
         }
 
-        // Network callbacks
-        // LOBBY CALLBACKS
+        public void OnCountdownTick(int time) {
+            PlayerData data = Runner.GetLocalPlayerData();
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            if (time > 0) {
+                startGameBtn.interactable = data && data.IsRoomOwner;
+                startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
+                hostControlsGroup.interactable = false;
+                if (time == 1 && fadeMusicCoroutine == null) {
+                    fadeMusicCoroutine = StartCoroutine(FadeMusic());
+                }
+            } else {
+                UpdateStartGameButton();
+                hostControlsGroup.interactable = Runner.IsServer || Runner.IsSharedModeMasterClient || (data && data.IsRoomOwner);
+                if (fadeMusicCoroutine != null) {
+                    StopCoroutine(fadeMusicCoroutine);
+                    fadeMusicCoroutine = null;
+                }
+                music.volume = 1;
+            }
+
+            startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+        }
+
+        //---Callbacks
         public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
             for (int i = 0; i < regionDropdown.options.Count; i++) {
                 RegionOption option = (RegionOption) regionDropdown.options[i];
@@ -674,10 +703,7 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        // ROOM CALLBACKS
-
-        // CONNECTION CALLBACKS
-        public void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
+        private void OnShutdown(NetworkRunner runner, ShutdownReason cause) {
             if (cause != ShutdownReason.Ok) {
                 OpenNetworkErrorBox(cause);
             }
@@ -689,25 +715,17 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
-        public void OnDisconnect(NetworkRunner runner, NetDisconnectReason disconnectReason) {
+        private void OnDisconnect(NetworkRunner runner, NetDisconnectReason disconnectReason) {
             OpenNetworkErrorBox(disconnectReason);
             OpenRoomListMenu();
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
-        public void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
+        private void OnConnectFailed(NetworkRunner runner, NetAddress address, NetConnectFailedReason cause) {
             OpenErrorBox(cause);
 
             if (!runner.IsCloudReady) {
                 roomManager.ClearRooms();
-            }
-        }
-
-        private void OnPause(InputAction.CallbackContext context) {
-            if (NetworkHandler.Runner.SessionInfo.IsValid && !wasSettingsOpen) {
-                // Open the settings menu if we're inside a room (so we dont have to leave)
-                ConfirmSound();
-                OpenOptions();
             }
         }
 
@@ -732,34 +750,12 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public void OnCountdownTick(int time) {
-            PlayerData data = Runner.GetLocalPlayerData();
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            if (time > 0) {
-                startGameBtn.interactable = data && data.IsRoomOwner;
-                startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
-                hostControlsGroup.interactable = false;
-                if (time == 1 && fadeMusicCoroutine == null) {
-                    fadeMusicCoroutine = StartCoroutine(FadeMusic());
-                }
-            } else {
-                UpdateStartGameButton();
-                hostControlsGroup.interactable = Runner.IsServer || Runner.IsSharedModeMasterClient || (data && data.IsRoomOwner);
-                if (fadeMusicCoroutine != null) {
-                    StopCoroutine(fadeMusicCoroutine);
-                    fadeMusicCoroutine = null;
-                }
-                music.volume = 1;
-            }
-
-            startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
-        }
-
         private void OnPlayerDataReady(PlayerData data) {
             if (data.Owner == Runner.LocalPlayer) {
                 EnterRoom(false);
             }
 
+            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
             UpdateStartGameButton();
         }
 
@@ -770,6 +766,14 @@ namespace NSMB.UI.MainMenu {
             }
 
             GlobalController.Instance.discordController.UpdateActivity();
+        }
+
+        private void OnPause(InputAction.CallbackContext context) {
+            if (NetworkHandler.Runner.SessionInfo.IsValid && !wasSettingsOpen) {
+                // Open the settings menu if we're inside a room (so we dont have to leave)
+                ConfirmSound();
+                OpenOptions();
+            }
         }
 
         private void OnRegionPingsUpdated() {

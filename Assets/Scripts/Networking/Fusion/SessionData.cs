@@ -9,7 +9,7 @@ using NSMB.UI.MainMenu;
 using NSMB.Utils;
 using NSMB.Game;
 
-public class SessionData : NetworkBehaviour {
+public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
 
     //---Static Variables
     public static SessionData Instance;
@@ -145,6 +145,12 @@ public class SessionData : NetworkBehaviour {
                 // Start game
                 Rpc_StartGame();
             }
+        }
+    }
+
+    public void StateAuthorityChanged() {
+        if (HasStateAuthority) {
+            UpdateProperty(Enums.NetRoomProperties.HostName, Runner.GetLocalPlayerData().RawNickname);
         }
     }
 

@@ -355,6 +355,11 @@ namespace NSMB.Entities.Player {
 
             ControlSystem.controls.Enable();
 
+            // We've finished loading...
+            if (Object.HasControlAuthority()) {
+                Data.Rpc_FinishedLoading();
+            }
+
             base.Spawned();
         }
 
@@ -370,7 +375,12 @@ namespace NSMB.Entities.Player {
         }
 
         public void StateAuthorityChanged() {
-            Debug.Log($"new state authroity: {Object.StateAuthority}");
+            if (HasStateAuthority) {
+                // Kill the player since they DC'd.
+                Disconnected = true;
+                Lives = 0;
+                Death(false, false);
+            }
         }
 
         public override void Render() {
@@ -3207,13 +3217,6 @@ namespace NSMB.Entities.Player {
 
             SpawnItem(StoredPowerup.GetPowerupScriptable().prefab);
             StoredPowerup = Enums.PowerupState.NoPowerup;
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void Rpc_DisconnectDeath() {
-            Disconnected = true;
-            Lives = 0;
-            Death(false, false);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

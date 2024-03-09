@@ -80,6 +80,8 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
+            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Chat_Send);
+
             if (text.StartsWith('/')) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.command");
             } else {

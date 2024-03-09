@@ -1,8 +1,6 @@
-using System.Text;
+using System.Linq;
 using UnityEngine;
 using TMPro;
-
-using Fusion;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Translation;
@@ -35,52 +33,35 @@ namespace NSMB.Loading {
         public void Update() {
 
             TranslationManager tm = GlobalController.Instance.translationManager;
-            PlayerData ourData = NetworkHandler.Runner.GetLocalPlayerData();
 
             // Loading (as spectator)
-            if (!ourData || ourData.IsCurrentlySpectating) {
+            if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData pd) || pd.IsCurrentlySpectating) {
                 statusText.text = tm.GetTranslation("ui.loading.spectator");
                 playerListParent.SetActive(false);
-                return;
-            }
 
-            // Still loading
-            if (!GameManager.Instance || !GameManager.Instance.Object) {
+            } else if (!pd.IsLoaded) {
+                // *WE* are still loading
                 statusText.text = tm.GetTranslation("ui.loading.loading");
                 playerListParent.SetActive(false);
-                return;
-            }
 
-            // Game starting
-            if (GameManager.Instance.gameObject.activeSelf && GameManager.Instance.GameStartTimer.IsRunning) {
+            } else if (GameManager.Instance.GameState >= Enums.GameState.Starting) {
+                // Game starting
                 statusText.text = tm.GetTranslation("ui.loading.starting");
                 playerListParent.SetActive(false);
-                return;
-            }
 
-            // Waiting for others
-            StringBuilder waitingOnPlayers = new();
-            int waitingCount = 0;
-            NetworkRunner runner = GameManager.Instance.Runner;
-            foreach (PlayerRef player in runner.ActivePlayers) {
-                PlayerData data = player.GetPlayerData();
-                if (!data || data.IsCurrentlySpectating || data.Object.HasControlAuthority()) {
-                    continue;
-                }
-
-                if (!data.IsLoaded) {
-                    waitingOnPlayers.AppendLine(data.GetNickname());
-                    waitingCount++;
-                }
-            }
-
-            if (waitingCount <= 0) {
-                playerListParent.SetActive(false);
             } else {
+                // Waiting for others
                 statusText.text = tm.GetTranslation("ui.loading.waiting");
                 playerListParent.SetActive(true);
-                playerList.text = waitingOnPlayers.ToString();
+                playerList.text =
+                    string.Join('\n',
+                        SessionData.Instance.PlayerDatas
+                            .Select(kvp => kvp.Value)
+                            .Where(pd => !pd.IsCurrentlySpectating && !pd.IsLoaded)
+                            .Select(pd => pd.GetNickname())
+                    );
             }
+
         }
     }
 }

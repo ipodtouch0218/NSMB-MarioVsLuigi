@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 
 using Fusion;
-using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
@@ -53,8 +52,8 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
     private Tick lastUpdatedTick;
     private string filteredNickname;
     private ChangeDetector changeDetector;
-    private bool sentJoinMessage;
     private Coroutine pingRoutine;
+    private bool valid;
 
     public void Awake() {
         DontDestroyOnLoad(gameObject);
@@ -131,28 +130,12 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
             Rpc_SetConnectionToken(GlobalController.Instance.connectionToken);
             Rpc_SetCharacterIndex((byte) Settings.Instance.generalCharacter);
             Rpc_SetSkinIndex((byte) Settings.Instance.generalSkin);
-            StartCoroutine(UpdatePingRoutine());
+            pingRoutine = StartCoroutine(UpdatePingRoutine());
 
             PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenToggled;
         }
 
         UpdateObjectName();
-    }
-
-    public void StateAuthorityChanged() {
-        if (!HasStateAuthority) {
-            return;
-        }
-
-        if (Owner == Runner.LocalPlayer) {
-            // We are the new master client...
-            IsMuted = false;
-            IsRoomOwner = true;
-            IsReady = false;
-        } else {
-            // Other, non-master client player
-            IsRoomOwner = false;
-        }
     }
 
     public override void Render() {
@@ -174,13 +157,14 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
             case nameof(IsReady): OnIsReadyChanged(IsReady); break;
             case nameof(CharacterIndex): OnCharacterChanged(); break;
             case nameof(SkinIndex): OnSkinChanged(); break;
-            case nameof(DisplayNickname): OnDisplayNicknameChanged(); ready = true; break;
+            case nameof(DisplayNickname): UpdateObjectName(); ready = true; break;
             case nameof(ConnectionToken): OnConnectionTokenChanged(); ready = true; break;
             }
         }
 
-        if (ready) {
+        if (ready && !valid) {
             OnPlayerDataReady?.Invoke(this);
+            valid = true;
         }
     }
 
@@ -197,37 +181,19 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState) {
-        if (pingRoutine != null) {
-            StopCoroutine(pingRoutine);
-        }
-
         OnPlayerDataDespawned?.Invoke(this);
 
         if (hasState) {
             SessionData.Instance.SaveWins(this);
         }
 
+        if (pingRoutine != null) {
+            StopCoroutine(pingRoutine);
+        }
+
         if (IsLocal) {
             PauseOptionMenuManager.OnOptionsOpenedToggled -= OnOptionsOpenToggled;
         }
-    }
-
-    public void SendJoinMessageIfNeeded() {
-        if (sentJoinMessage) {
-            return;
-        }
-
-        if (Owner == Runner.LocalPlayer && IsRoomOwner) {
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
-        }
-
-        ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.joined", "playername", GetNickname());
-
-        if (MainMenuManager.Instance) {
-            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
-        }
-
-        sentJoinMessage = true;
     }
 
     public string GetNickname(bool filter = true) {
@@ -418,7 +384,24 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         gameObject.name = "PlayerData (" + DisplayNickname + ", " + UserId.ToString() + ")";
     }
 
-    private void OnOptionsOpenToggled(bool isOpen) {
+    //---Callbacks
+    public void StateAuthorityChanged() {
+        if (!HasStateAuthority) {
+            return;
+        }
+
+        if (Owner == Runner.LocalPlayer) {
+            // We are the new master client...
+            IsMuted = false;
+            IsRoomOwner = true;
+            IsReady = false;
+        } else {
+            // Other, non-master client player
+            IsRoomOwner = false;
+        }
+    }
+
+    public void OnOptionsOpenToggled(bool isOpen) {
         Rpc_SetOptionsOpen(isOpen);
     }
 
@@ -447,6 +430,11 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
 
             if (Runner.LocalPlayer == Owner) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+            }
+
+            // Update header
+            if (MainMenuManager.Instance) {
+                MainMenuManager.Instance.UpdateRoomHeader();
             }
         }
 
@@ -499,11 +487,6 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         }
 
         MainMenuManager.Instance.SwapPlayerSkin(SkinIndex, false);
-    }
-
-    public void OnDisplayNicknameChanged() {
-        UpdateObjectName();
-        SendJoinMessageIfNeeded();
     }
 
     public void OnConnectionTokenChanged() {

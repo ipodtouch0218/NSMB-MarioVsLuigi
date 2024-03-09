@@ -22,11 +22,13 @@ public class ChatManager : MonoBehaviour {
 
     public void OnEnable() {
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
+        PlayerData.OnPlayerDataReady += OnPlayerDataReady;
         OnChatMessage += OnChatMessageCallback;
     }
 
     public void OnDisable() {
         NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
+        PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
         OnChatMessage -= OnChatMessageCallback;
     }
 
@@ -140,6 +142,14 @@ public class ChatManager : MonoBehaviour {
                 data.player = PlayerRef.None;
             }
         }
+    }
+
+    private void OnPlayerDataReady(PlayerData pd) {
+        if (pd.Owner == pd.Runner.LocalPlayer && pd.IsRoomOwner) {
+            AddSystemMessage("ui.inroom.chat.hostreminder");
+        }
+
+        AddSystemMessage("ui.inroom.chat.player.joined", "playername", pd.GetNickname());
     }
 
     private void OnChatMessageCallback(ChatMessage.ChatMessageData data) {

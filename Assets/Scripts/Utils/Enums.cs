@@ -44,7 +44,7 @@ public static class Enums {
 
     //---Sound effects
     public enum Sounds : byte {
-        //CURRENT HIGHEST NUMBER: 101
+        //CURRENT HIGHEST NUMBER: 103
         //Enemy
         [SoundData("enemy/freeze")]                             Enemy_Generic_Freeze = 0,
         [SoundData("enemy/freeze_shatter")]                     Enemy_Generic_FreezeShatter = 1,
@@ -142,6 +142,9 @@ public static class Enums {
         [SoundData("ui/countdown0")]                            UI_Countdown_0 = 88,
         [SoundData("ui/countdown1")]                            UI_Countdown_1 = 89,
         [SoundData("ui/file_select")]                           UI_FileSelect = 98,
+        [SoundData("ui/chat_keyup")]                            UI_Chat_KeyUp = 102,
+        [SoundData("ui/chat_keydown")]                          UI_Chat_KeyDown = 103,
+        [SoundData("ui/chat_send")]                             UI_Chat_Send = 104,
 
         //World Elements
         [SoundData("world/block_break")]                        World_Block_Break = 67,
@@ -245,7 +248,9 @@ public static class AttributeExtensions {
             return cachedStrings[sound];
         }
 
-        return cachedStrings[sound] = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound; ;
+        cachedStrings[sound] = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound;
+        Debug.Log(cachedStrings[sound]);
+        return cachedStrings[sound];
     }
 
     public static GameObject GetGameObject(this Enums.PrefabParticle particle) {

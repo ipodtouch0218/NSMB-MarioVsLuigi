@@ -123,6 +123,7 @@ namespace NSMB.Game {
         private bool pauseStateLastFrame, optionsWereOpenLastFrame;
         private bool hurryUpSoundPlayed, endSoundPlayed;
         private bool calledAllPlayersLoaded;
+        private float playerLoadingTimeoutTime;
         private float previousTimerRenderTime;
 
         //---Components
@@ -200,13 +201,9 @@ namespace NSMB.Game {
 
             if (GameStartTime <= 0 && !GameStartTimer.IsRunning) {
                 // The game hasn't started.
-                // Tell our host that we're done loading
-                Runner.GetLocalPlayerData().Rpc_FinishedLoading();
+                // Create a local player
+                TrySpawnLocalPlayer();
 
-                // And create a player
-                if (Runner.Topology == Topologies.Shared) {
-
-                }
             } else {
                 // The game HAS already started.
                 SetGameTimestamps();
@@ -219,6 +216,9 @@ namespace NSMB.Game {
                 int songs = ScriptableManager.Instance.alternatingStageMusic.Length;
                 mainMusic = ScriptableManager.Instance.alternatingStageMusic[musicIndex % songs];
             }
+
+            // Default loading timeout of 30 seconds
+            playerLoadingTimeoutTime = Time.time + 30f;
         }
 
         public override void Render() {
@@ -524,9 +524,19 @@ namespace NSMB.Game {
             }
 
             if (!Runner.IsSinglePlayer) {
-                // Check if any player is still loading
-                if (SessionData.Instance.PlayerDatas.Any(kvp => !kvp.Value.IsCurrentlySpectating && !kvp.Value.IsLoaded)) {
-                    return;
+                if (playerLoadingTimeoutTime < Time.time) {
+                    // It's been long enough... kick any players that didn't load in time...
+                    foreach ((PlayerRef player, PlayerData pd) in SessionData.Instance.PlayerDatas) {
+                        if (!pd.IsCurrentlySpectating && !pd.IsLoaded) {
+                            pd.IsCurrentlySpectating = true;
+                            SessionData.Instance.Rpc_Disconnect(player);
+                        }
+                    }
+                } else {
+                    // Check if any player is still loading
+                    if (SessionData.Instance.PlayerDatas.Any(kvp => !kvp.Value.IsCurrentlySpectating && !kvp.Value.IsLoaded)) {
+                        return;
+                    }
                 }
             }
 
@@ -565,8 +575,6 @@ namespace NSMB.Game {
 
                     Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: player);
                 }
-            } else {
-                Rpc_SpawnPlayers();
             }
 
             // Create pooled Fireball instances (max of 6 per player)
@@ -576,6 +584,17 @@ namespace NSMB.Game {
 
             // Tell everyone else to start the game
             StartCoroutine(CallLoadingComplete(2));
+        }
+
+        public void TrySpawnLocalPlayer() {
+            if (Runner.Topology != Topologies.Shared) {
+                return;
+            }
+
+            PlayerData data = Runner.GetLocalPlayerData();
+            if (!data.IsCurrentlySpectating) {
+                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: data.Owner);
+            }
         }
 
         public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab, int? tick = null, byte? counter = null) {
@@ -594,29 +613,20 @@ namespace NSMB.Game {
 
         //---Callbacks
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-            // Kill player if they are still alive
+            // Take over the player if they are still alive
             if (Object.HasStateAuthority) {
                 foreach (PlayerController pl in AlivePlayers) {
                     if (pl.Data.Owner == player) {
                         pl.Object.RequestStateAuthority();
-                        pl.Rpc_DisconnectDeath();
                     }
                 }
             }
 
             CheckIfAllPlayersLoaded();
-            CheckForWinner();
+            // CheckForWinner();
         }
 
         //---RPCs
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void Rpc_SpawnPlayers() {
-            PlayerData data = Runner.GetLocalPlayerData();
-            if (!data.IsCurrentlySpectating) {
-                Runner.Spawn(data.GetCharacterData().prefab, spawnpoint, inputAuthority: data.Owner);
-            }
-        }
-
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_EndGame(int team) {
             gameEndTime = Runner.SimulationTime;

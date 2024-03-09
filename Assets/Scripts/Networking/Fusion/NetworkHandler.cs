@@ -628,7 +628,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     #endregion
 
     private static void RoomInitialized(NetworkRunner runner) {
-
         connectionTimeout = 10;
 
         if (runner.IsServer || runner.IsSharedModeMasterClient) {
@@ -639,7 +638,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
     }
 
     private static void HostMigrationResume(NetworkRunner runner) {
-
         if (!runner.IsServer) {
             return;
         }
@@ -651,7 +649,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                 });
             } else {
                 if (resumeNO.TryGetComponent(out PlayerData pd)) {
-
                     // Don't respawn the PlayerData for the host that just left. Stupid.
                     if (pd.IsRoomOwner) {
                         continue;
