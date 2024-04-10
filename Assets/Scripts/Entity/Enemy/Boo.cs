@@ -10,6 +10,10 @@ using NSMB.Utils;
 
 public class Boo : KillableEntity {
 
+    //---Static Variables
+    private static readonly int ParamFacingRight = Animator.StringToHash("FacingRight");
+    private static readonly int ParamScared = Animator.StringToHash("Scared");
+
     //---Networked Variables
     [Networked] private PlayerController CurrentTarget { get; set; }
     [Networked] private NetworkBool Scared { get; set; }
@@ -135,7 +139,6 @@ public class Boo : KillableEntity {
     }
 
     public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-
         if (player.State == Enums.PowerupState.MegaMushroom || player.IsStarmanInvincible || player.IsInShell) {
             bool fromRight = Utils.WrappedDirectionSign(body.Position, CurrentTarget.body.Position + targetingOffset) == -1;
             SpecialKill(!fromRight, false, !player.IsStarmanInvincible, player.StarCombo++);
@@ -196,7 +199,7 @@ public class Boo : KillableEntity {
     }
 
     public override void OnFacingRightChanged() {
-        animator.SetBool("FacingRight", FacingRight);
+        animator.SetBool(ParamFacingRight, FacingRight);
     }
 
     protected override void HandleRenderChanges(bool fillBuffer, ref NetworkBehaviourBuffer oldBuffer, ref NetworkBehaviourBuffer newBuffer) {
@@ -212,7 +215,7 @@ public class Boo : KillableEntity {
     }
 
     private void OnScaredChanged() {
-        animator.SetBool("Scared", Scared);
+        animator.SetBool(ParamScared, Scared);
 
         if (!Scared) {
             sfx.PlayOneShot(Enums.Sounds.Enemy_Boo_Laugh);

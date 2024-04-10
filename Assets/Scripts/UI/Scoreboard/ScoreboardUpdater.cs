@@ -16,11 +16,15 @@ public class ScoreboardUpdater : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private GameObject entryTemplate, teamsHeader;
     [SerializeField] private TMP_Text spectatorText;
+    [SerializeField] private Animator animator;
 
     //---Private Variables
     private readonly List<ScoreboardEntry> entries = new();
-    private Animator animator;
-    private bool manuallyToggled = false, autoToggled = false;
+    private bool manuallyToggled, autoToggled;
+
+    public void OnValidate() {
+        this.SetIfNull(ref animator);
+    }
 
     public void OnEnable() {
         ControlSystem.controls.UI.Scoreboard.performed += OnToggleScoreboard;
@@ -34,7 +38,6 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     public void Awake() {
         Instance = this;
-        animator = GetComponent<Animator>();
 
         teamsHeader.SetActive(SessionData.Instance ? SessionData.Instance.Teams : false);
 
@@ -66,7 +69,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     public void SetEnabled() {
         manuallyToggled = true;
         animator.SetFloat("speed", 1);
-        animator.Play("toggle", 0, 0.99f);
+        animator.Play("toggle", 0, 0.999f);
     }
 
     public void ManualToggle() {

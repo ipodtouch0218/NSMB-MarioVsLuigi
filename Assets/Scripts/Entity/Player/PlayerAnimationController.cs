@@ -13,6 +13,49 @@ namespace NSMB.Entities.Player {
 
         //---Static Variables
         private static readonly WaitForSeconds BlinkDelay = new(0.1f);
+        #region Animator Hashes
+        private static readonly int ParamRainbowEnabled = Shader.PropertyToID("RainbowEnabled");
+        private static readonly int ParamPowerupState = Shader.PropertyToID("PowerupState");
+        private static readonly int ParamEyeState = Shader.PropertyToID("EyeState");
+        private static readonly int ParamModelScale = Shader.PropertyToID("ModelScale");
+        private static readonly int ParamMultiplyColor = Shader.PropertyToID("MultiplyColor");
+        private static readonly int ParamOverallsColor = Shader.PropertyToID("OverallsColor");
+        private static readonly int ParamShirtColor = Shader.PropertyToID("ShirtColor");
+        private static readonly int ParamHatUsesOverallsColor = Shader.PropertyToID("HatUsesOverallsColor");
+        private static readonly int ParamGlowColor = Shader.PropertyToID("GlowColor");
+        private static readonly int ParamVelocityX = Animator.StringToHash("velocityX");
+        private static readonly int ParamVelocityY = Animator.StringToHash("velocityY");
+        private static readonly int ParamOnLeft = Animator.StringToHash("onLeft");
+        private static readonly int ParamOnRight = Animator.StringToHash("onRight");
+        private static readonly int ParamOnGround = Animator.StringToHash("onGround");
+        private static readonly int ParamInvincible = Animator.StringToHash("invincible");
+        private static readonly int ParamSkidding = Animator.StringToHash("skidding");
+        private static readonly int ParamPropeller = Animator.StringToHash("propeller");
+        private static readonly int ParamPropellerSpin = Animator.StringToHash("propellerSpin");
+        private static readonly int ParamPropellerStart = Animator.StringToHash("propellerStart");
+        private static readonly int ParamCrouching = Animator.StringToHash("crouching");
+        private static readonly int ParamGroundpound = Animator.StringToHash("groundpound");
+        private static readonly int ParamSliding = Animator.StringToHash("sliding");
+        private static readonly int ParamKnockback = Animator.StringToHash("knockback");
+        private static readonly int ParamFacingRight = Animator.StringToHash("facingRight");
+        private static readonly int ParamFlying = Animator.StringToHash("flying");
+        private static readonly int ParamDrill = Animator.StringToHash("drill");
+        private static readonly int ParamDoubleJump = Animator.StringToHash("doublejump");
+        private static readonly int ParamTripleJump = Animator.StringToHash("triplejump");
+        private static readonly int ParamHolding = Animator.StringToHash("holding");
+        private static readonly int ParamHeadCarry = Animator.StringToHash("head carry");
+        private static readonly int ParamCarryStart = Animator.StringToHash("carry_start");
+        private static readonly int ParamPipe = Animator.StringToHash("pipe");
+        private static readonly int ParamBlueShell = Animator.StringToHash("blueshell");
+        private static readonly int ParamMini = Animator.StringToHash("mini");
+        private static readonly int ParamMega = Animator.StringToHash("mega");
+        private static readonly int ParamInShell = Animator.StringToHash("inShell");
+        private static readonly int ParamTurnaround = Animator.StringToHash("turnaround");
+        private static readonly int ParamSwimming = Animator.StringToHash("swimming");
+        private static readonly int ParamAHeld = Animator.StringToHash("a_held");
+        private static readonly int ParamFireballKnockback = Animator.StringToHash("fireballKnockback");
+        private static readonly int ParamKnockforwards = Animator.StringToHash("knockforwards");
+        #endregion
 
         //---Public Variables
         public bool deathUp, wasTurnaround, enableGlow;
@@ -22,7 +65,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
-        [SerializeField] public float pipeDuration = 2f, deathUpTime = 0.6f, deathForce = 7f;
+        [SerializeField] public float deathUpTime = 0.6f, deathForce = 7f;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
         [SerializeField] private LoopingSoundData wallSlideData, shellSlideData, spinnerDrillData, propellerDrillData;
@@ -188,7 +231,7 @@ namespace NSMB.Entities.Player {
                 }
                 modelRotateInstantly = true;
 
-            } else if (animator.GetBool("inShell") && (!controller.OnSpinner || Mathf.Abs(body.Velocity.x) > 0.3f)) {
+            } else if (animator.GetBool(ParamInShell) && (!controller.OnSpinner || Mathf.Abs(body.Velocity.x) > 0.3f)) {
                 modelRotationTarget += Mathf.Abs(body.Velocity.x) / controller.RunningMaxSpeed * delta * new Vector3(0, 1400 * (controller.FacingRight ? -1 : 1));
                 modelRotateInstantly = true;
 
@@ -252,39 +295,39 @@ namespace NSMB.Entities.Player {
 
         public void UpdateAnimatorVariables() {
 
-            bool right = controller.PreviousInputs.buttons.IsSet(PlayerControls.Right);
-            bool left = controller.PreviousInputs.buttons.IsSet(PlayerControls.Left);
+            bool right = controller.PreviousInputs.Buttons.IsSet(PlayerControls.Right);
+            bool left = controller.PreviousInputs.Buttons.IsSet(PlayerControls.Left);
 
-            animator.SetBool("onLeft", controller.WallSlideLeft);
-            animator.SetBool("onRight", controller.WallSlideRight);
-            animator.SetBool("onGround", controller.IsOnGround || controller.IsStuckInBlock || (Runner.SimulationTime <= controller.CoyoteTime - 0.05f));
-            animator.SetBool("invincible", controller.IsStarmanInvincible);
-            animator.SetBool("skidding", controller.IsSkidding);
-            animator.SetBool("propeller", controller.IsPropellerFlying);
-            animator.SetBool("propellerSpin", controller.PropellerSpinTimer.IsActive(Runner));
-            animator.SetBool("propellerStart", controller.PropellerLaunchTimer.IsActive(Runner));
-            animator.SetBool("crouching", controller.IsCrouching);
-            animator.SetBool("groundpound", controller.IsGroundpounding);
-            animator.SetBool("sliding", controller.IsSliding);
-            animator.SetBool("knockback", controller.IsInKnockback);
-            animator.SetBool("facingRight", (left ^ right) ? right : controller.FacingRight);
-            animator.SetBool("flying", controller.IsSpinnerFlying);
-            animator.SetBool("drill", controller.IsDrilling);
-            animator.SetBool("doublejump", controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
-            animator.SetBool("triplejump", controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
-            animator.SetBool("holding", controller.HeldEntity);
-            animator.SetBool("head carry", controller.HeldEntity && controller.HeldEntity is FrozenCube);
-            animator.SetBool("carry_start", controller.HeldEntity && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);
-            animator.SetBool("pipe", controller.CurrentPipe);
-            animator.SetBool("blueshell", controller.State == Enums.PowerupState.BlueShell);
-            animator.SetBool("mini", controller.State == Enums.PowerupState.MiniMushroom);
-            animator.SetBool("mega", controller.State == Enums.PowerupState.MegaMushroom);
-            animator.SetBool("inShell", controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding || controller.IsSliding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
-            animator.SetBool("turnaround", controller.IsTurnaround);
-            animator.SetBool("swimming", controller.IsSwimming && !controller.IsGroundpounding && !controller.IsDrilling && !controller.IsFrozen);
-            animator.SetBool("a_held", controller.PreviousInputs.buttons.IsSet(PlayerControls.Jump));
-            animator.SetBool("fireballKnockback", controller.IsWeakKnockback);
-            animator.SetBool("knockforwards", controller.IsForwardsKnockback);
+            animator.SetBool(ParamOnLeft, controller.WallSlideLeft);
+            animator.SetBool(ParamOnRight, controller.WallSlideRight);
+            animator.SetBool(ParamOnGround, controller.IsOnGround || controller.IsStuckInBlock || (Runner.SimulationTime <= controller.CoyoteTime - 0.05f));
+            animator.SetBool(ParamInvincible, controller.IsStarmanInvincible);
+            animator.SetBool(ParamSkidding, controller.IsSkidding);
+            animator.SetBool(ParamPropeller, controller.IsPropellerFlying);
+            animator.SetBool(ParamPropellerSpin, controller.PropellerSpinTimer.IsActive(Runner));
+            animator.SetBool(ParamPropellerStart, controller.PropellerLaunchTimer.IsActive(Runner));
+            animator.SetBool(ParamCrouching, controller.IsCrouching);
+            animator.SetBool(ParamGroundpound, controller.IsGroundpounding);
+            animator.SetBool(ParamSliding, controller.IsSliding);
+            animator.SetBool(ParamKnockback, controller.IsInKnockback);
+            animator.SetBool(ParamFacingRight, (left ^ right) ? right : controller.FacingRight);
+            animator.SetBool(ParamFlying, controller.IsSpinnerFlying);
+            animator.SetBool(ParamDrill, controller.IsDrilling);
+            animator.SetBool(ParamDoubleJump, controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.DoubleJump);
+            animator.SetBool(ParamTripleJump, controller.ProperJump && controller.JumpState == PlayerController.PlayerJumpState.TripleJump);
+            animator.SetBool(ParamHolding, controller.HeldEntity);
+            animator.SetBool(ParamHeadCarry, controller.HeldEntity && controller.HeldEntity is FrozenCube);
+            animator.SetBool(ParamCarryStart, controller.HeldEntity && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);
+            animator.SetBool(ParamPipe, controller.CurrentPipe);
+            animator.SetBool(ParamBlueShell, controller.State == Enums.PowerupState.BlueShell);
+            animator.SetBool(ParamMini, controller.State == Enums.PowerupState.MiniMushroom);
+            animator.SetBool(ParamMega, controller.State == Enums.PowerupState.MegaMushroom);
+            animator.SetBool(ParamInShell, controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding || controller.IsSliding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
+            animator.SetBool(ParamTurnaround, controller.IsTurnaround);
+            animator.SetBool(ParamSwimming, controller.IsSwimming && !controller.IsGroundpounding && !controller.IsDrilling && !controller.IsFrozen);
+            animator.SetBool(ParamAHeld, controller.PreviousInputs.Buttons.IsSet(PlayerControls.Jump));
+            animator.SetBool(ParamFireballKnockback, controller.IsWeakKnockback);
+            animator.SetBool(ParamKnockforwards, controller.IsForwardsKnockback);
 
             float animatedVelocity = controller.IsOnGround ? Mathf.Abs(body.Velocity.x) : body.Velocity.magnitude;
             if (controller.IsStuckInBlock) {
@@ -302,13 +345,14 @@ namespace NSMB.Entities.Player {
                 animatedVelocity = 0;
             }
 
-            animator.SetFloat("velocityX", animatedVelocity);
-            animator.SetFloat("velocityY", body.Velocity.y);
+            animator.SetFloat(ParamVelocityX, animatedVelocity);
+            animator.SetFloat(ParamVelocityY, body.Velocity.y);
         }
 
         private void HandleMiscStates() {
             if (controller.MegaStartTimer.IsActive(Runner)) {
-                if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale") {
+                if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 ||
+                    animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale") {
                     animator.Play("mega-scale");
                 }
             }
@@ -318,24 +362,26 @@ namespace NSMB.Entities.Player {
 
             // Shader effects
             TryCreateMaterialBlock();
-            materialBlock.SetFloat("RainbowEnabled", controller.IsStarmanInvincible ? 1f : 0f);
+            materialBlock.SetFloat(ParamRainbowEnabled, controller.IsStarmanInvincible ? 1f : 0f);
             int ps = controller.State switch {
                 Enums.PowerupState.FireFlower => 1,
                 Enums.PowerupState.PropellerMushroom => 2,
                 Enums.PowerupState.IceFlower => 3,
                 _ => 0
             };
-            materialBlock.SetFloat("PowerupState", ps);
-            materialBlock.SetFloat("EyeState", (int) (controller.IsDead ? Enums.PlayerEyeState.Death : eyeState));
-            materialBlock.SetFloat("ModelScale", transform.lossyScale.x);
+            materialBlock.SetFloat(ParamPowerupState, ps);
+            materialBlock.SetFloat(ParamEyeState, (int) (controller.IsDead ? Enums.PlayerEyeState.Death : eyeState));
+            materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x);
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = controller.MegaTimer.RemainingTime(Runner) ?? 0f;
-            if (controller.State == Enums.PowerupState.MegaMushroom && controller.MegaTimer.IsRunning && giantTimeRemaining < 4) {
+            if (controller.State == Enums.PowerupState.MegaMushroom && controller.MegaTimer.IsRunning &&
+                giantTimeRemaining < 4) {
                 float v = ((Mathf.Sin(giantTimeRemaining * 20f) + 1f) * 0.45f) + 0.1f;
                 giantMultiply = new Vector3(v, 1, v);
             }
-            materialBlock.SetVector("MultiplyColor", giantMultiply);
+
+            materialBlock.SetVector(ParamMultiplyColor, giantMultiply);
 
             foreach (Renderer r in renderers) {
                 r.SetPropertyBlock(materialBlock);
@@ -343,7 +389,11 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = controller.DamageInvincibilityTimer.RemainingRenderTime(Runner) ?? 0f;
-            models.SetActive(!controller.IsRespawning && (GameManager.Instance.GameEnded || controller.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
+            models.SetActive(!controller.IsRespawning && (GameManager.Instance.GameEnded || controller.IsDead ||
+                                                          !(remainingDamageInvincibility > 0 &&
+                                                            remainingDamageInvincibility *
+                                                            (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f <
+                                                            0.1f)));
 
             // Model changing
             bool large = controller.State >= Enums.PowerupState.Mushroom;
@@ -355,7 +405,8 @@ namespace NSMB.Entities.Player {
             largeShellExclude.SetActive(!animator.GetCurrentAnimatorStateInfo(0).IsName("in-shell"));
             propellerHelmet.SetActive(controller.State == Enums.PowerupState.PropellerMushroom);
             animator.avatar = large ? largeAvatar : smallAvatar;
-            animator.runtimeAnimatorController = large ? controller.character.largeOverrides : controller.character.smallOverrides;
+            animator.runtimeAnimatorController =
+                large ? controller.character.largeOverrides : controller.character.smallOverrides;
 
 
             float newZ = -4;
@@ -368,50 +419,6 @@ namespace NSMB.Entities.Player {
             }
 
             transform.position = new(transform.position.x, transform.position.y, newZ);
-        }
-
-        public void HandlePipeAnimation() {
-            if (!controller.CurrentPipe) {
-                return;
-            }
-
-            controller.UpdateHitbox();
-
-            PipeManager pe = controller.CurrentPipe;
-
-            body.IsKinematic = true;
-            body.Velocity = controller.PipeDirection;
-
-            if (controller.PipeTimer.Expired(Runner)) {
-                if (controller.PipeEntering) {
-                    // Teleport to other pipe
-
-                    if (pe.otherPipe.bottom == pe.bottom) {
-                        controller.PipeDirection *= -1;
-                    }
-
-                    Vector2 offset = controller.PipeDirection * (pipeDuration * 0.45f);
-                    if (pe.otherPipe.bottom) {
-                        float size = controller.MainHitbox.size.y * transform.localScale.y;
-                        offset.y += size;
-                    }
-                    Vector3 tpPos = new Vector3(pe.otherPipe.transform.position.x, pe.otherPipe.transform.position.y, 1) - (Vector3) offset;
-                    controller.body.Position = tpPos;
-                    controller.cameraController.Recenter(tpPos + (Vector3) offset);
-                    controller.PipeTimer = TickTimer.CreateFromSeconds(Runner, pipeDuration * 0.5f);
-                    controller.PipeEntering = false;
-                    controller.CurrentPipe = pe.otherPipe;
-                } else {
-                    // End pipe animation
-                    controller.CurrentPipe = null;
-                    body.IsKinematic = false;
-                    controller.IsOnGround = false;
-                    controller.JumpState = PlayerController.PlayerJumpState.None;
-                    controller.IsCrouching = false;
-                    controller.PipeReentryTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
-                    body.Velocity = Vector2.zero;
-                }
-            }
         }
 
         public void DisableAllModels() {
@@ -430,13 +437,13 @@ namespace NSMB.Entities.Player {
             materialBlock = new();
 
             // Customizable player color
-            materialBlock.SetVector("OverallsColor", skin?.overallsColor.linear ?? Color.clear);
-            materialBlock.SetVector("ShirtColor", skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
-            materialBlock.SetFloat("HatUsesOverallsColor", (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
+            materialBlock.SetVector(ParamOverallsColor, skin?.overallsColor.linear ?? Color.clear);
+            materialBlock.SetVector(ParamShirtColor, skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
+            materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
 
             // Glow Color
             if (enableGlow) {
-                materialBlock.SetColor("GlowColor", GlowColor);
+                materialBlock.SetColor(ParamGlowColor, GlowColor);
             }
         }
 

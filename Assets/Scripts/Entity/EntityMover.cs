@@ -10,8 +10,8 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
 
     //---Static Variables
     private static readonly RaycastHit2D[] RaycastBuffer = new RaycastHit2D[32];
-    private static readonly float Skin = 0.015f, LerpInterpValue = 0.33f;
-    private static readonly int MaxIterations = 5;
+    private const float Skin = 0.015f, LerpInterpValue = 0.33f;
+    private const int MaxIterations = 5;
 
     //---Networked Variables
     [Networked] private Vector2 InternalPosition { get; set; }
@@ -74,7 +74,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         transform.position = Position;
     }
 
-    public unsafe override void Render() {
+    public override void Render() {
         Vector3 newPosition;
 
         if (Freeze) {
@@ -301,7 +301,7 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
                     Position += offset;
                     raycastPos += offset;
 
-                    return CollideAndSlide(raycastPos, raycastVel, gravityPass, depth + 1);
+                    return CollideAndSlide(raycastPos, raycastVel, false, depth + 1);
                 }
             }
 

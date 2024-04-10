@@ -13,6 +13,9 @@ namespace NSMB.Entities.World {
         //---Static Variables
         private static readonly Vector2 BumpOffset = new(-0.25f, -0.5f);
         private static readonly Color BlankColor = new(0, 0, 0, 255);
+        private static readonly int ParamPlatformWidth = Shader.PropertyToID("PlatformWidth");
+        private static readonly int ParamPointsPerTile = Shader.PropertyToID("PointsPerTile");
+        private static readonly int ParamDisplacementMap = Shader.PropertyToID("DisplacementMap");
 
         //---Networked Variables
         [Networked, Capacity(10)] private NetworkLinkedList<BumpInfo> Bumps => default;
@@ -34,9 +37,8 @@ namespace NSMB.Entities.World {
         }
 
         public void OnValidate() {
-            ValidationUtility.SafeOnValidate(() => {
-                Initialize();
-            });
+            // Jank.
+            ValidationUtility.SafeOnValidate(Initialize);
         }
 
         private void Initialize() {
@@ -59,8 +61,8 @@ namespace NSMB.Entities.World {
             mpb = new();
             spriteRenderer.GetPropertyBlock(mpb);
 
-            mpb.SetFloat("PlatformWidth", platformWidth);
-            mpb.SetFloat("PointsPerTile", samplesPerTile);
+            mpb.SetFloat(ParamPlatformWidth, platformWidth);
+            mpb.SetFloat(ParamPointsPerTile, samplesPerTile);
         }
 
         public override void Render() {
@@ -69,11 +71,11 @@ namespace NSMB.Entities.World {
             }
 
             foreach (BumpInfo bump in Bumps) {
-                float percentageCompleted = (Runner.LocalRenderTime - (bump.spawnTick * Runner.DeltaTime)) / bumpDuration;
+                float percentageCompleted = (Runner.LocalRenderTime - (bump.SpawnTick * Runner.DeltaTime)) / bumpDuration;
                 float v = Mathf.Sin(Mathf.PI * percentageCompleted);
 
                 for (int x = -bumpWidthPoints - bumpBlurPoints; x <= bumpWidthPoints + bumpBlurPoints; x++) {
-                    int index = bump.point + x;
+                    int index = bump.Point + x;
                     if (index < 0 || index >= platformWidth * samplesPerTile) {
                         continue;
                     }
@@ -94,14 +96,14 @@ namespace NSMB.Entities.World {
             displacementMap.SetPixels32(pixels);
             displacementMap.Apply();
 
-            mpb.SetTexture("DisplacementMap", displacementMap);
+            mpb.SetTexture(ParamDisplacementMap, displacementMap);
             spriteRenderer.SetPropertyBlock(mpb);
         }
 
         public override void FixedUpdateNetwork() {
             for (int i = Bumps.Count - 1; i >= 0; i--) {
                 BumpInfo bump = Bumps[i];
-                if (bump.spawnTick + (bumpDuration / Runner.DeltaTime) < Runner.Tick) {
+                if (bump.SpawnTick + (bumpDuration / Runner.DeltaTime) < Runner.Tick) {
                     Bumps.Remove(bump);
                 }
             }
@@ -124,14 +126,14 @@ namespace NSMB.Entities.World {
 
             foreach (BumpInfo bump in Bumps) {
                 // If we're too close to another bump, don't create a new one.
-                if (Mathf.Abs(bump.point - localPos) < bumpWidthPoints + bumpBlurPoints) {
+                if (Mathf.Abs(bump.Point - localPos) < bumpWidthPoints + bumpBlurPoints) {
                     return;
                 }
             }
 
             InteractableTile.Bump(player, InteractionDirection.Up, worldPos + BumpOffset);
 
-            Bumps.Add(new BumpInfo() { point = (int) localPos, spawnTick = Runner.Tick });
+            Bumps.Add(new BumpInfo() { Point = (int) localPos, SpawnTick = Runner.Tick });
         }
 
         //---IPlayerInteractable overrides
@@ -149,8 +151,8 @@ namespace NSMB.Entities.World {
 
         //---Helpers
         private struct BumpInfo : INetworkStruct {
-            public int point;
-            public int spawnTick;
+            public int Point;
+            public int SpawnTick;
         }
     }
 }

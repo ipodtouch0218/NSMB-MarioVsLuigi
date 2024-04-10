@@ -7,7 +7,7 @@ using Fusion.Sockets;
 namespace NSMB.Utils {
     public static class NetworkUtils {
 
-        public static Dictionary<Enum, string> disconnectMessages = new() {
+        public static Dictionary<Enum, string> DisconnectMessages = new() {
             [ShutdownReason.MaxCcuReached] = "ui.error.ccu",
             [ShutdownReason.CustomAuthenticationFailed] = "ui.error.authentication",
             [ShutdownReason.DisconnectedByPluginLogic] = "ui.error.hosttimeout",

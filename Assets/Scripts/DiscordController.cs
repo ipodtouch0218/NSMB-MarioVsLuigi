@@ -67,7 +67,9 @@ public class DiscordController : MonoBehaviour {
 
         try {
             discord.RunCallbacks();
-        } catch { }
+        } catch {
+            // Ignored
+        }
     }
 
     public void UpdateActivity(SessionInfo session = null) {

@@ -136,14 +136,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         }
     }
 
-    void ReturnToMainMenu(Action callback) {
+    private static void ReturnToMainMenu(Action callback) {
         if (SceneManager.GetActiveScene().buildIndex == 0) {
             callback();
         } else {
             AsyncOperation op = SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
             // Weird null check for exiting play mode in the editor
             if (op != null) {
-                op.completed += delegate (AsyncOperation operation) {
+                op.completed += delegate {
                     callback();
                 };
             }
@@ -161,13 +161,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
     void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {
 
-        if (data.ContainsKey("Token") && data["Token"] != null) {
-            PlayerPrefs.SetString("token", (string) data["Token"]);
+        if (data.TryGetValue("Token", out object token) && token is string tokenString) {
+            PlayerPrefs.SetString("token", tokenString);
             PlayerPrefs.Save();
         }
 
-        if (data.ContainsKey("SignedData")) {
-            SignedResultData signedData = JsonConvert.DeserializeObject<SignedResultData>((string) data["SignedData"]);
+        if (data.TryGetValue("SignedData", out object value)) {
+            SignedResultData signedData = JsonConvert.DeserializeObject<SignedResultData>((string) value);
             ConnectionToken connectionToken = new() {
                 signedData = signedData,
                 signature = (string) data["Signature"],
@@ -255,7 +255,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             runner.Spawn(
                 PrefabList.Instance.PlayerDataHolder,
                 inputAuthority: player,
-                onBeforeSpawned: (runner, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned(player),
+                onBeforeSpawned: (_, obj) => obj.GetComponent<PlayerData>().OnBeforeSpawned(player),
                 flags: NetworkSpawnFlags.DontDestroyOnLoad
             );
         }
@@ -285,14 +285,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         PlayerData data = null;
         foreach ((_, PlayerData d) in SessionData.Instance.PlayerDatas) {
-            if (!d || !d.Object) {
+            if (!d || !d.Object || d.Owner != player) {
                 continue;
             }
 
-            if (d.Owner == player) {
-                data = d;
-                break;
-            }
+            data = d;
+            break;
         }
 
         if (data) {
@@ -339,9 +337,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         if (shutdownReason == ShutdownReason.ServerInRoom && reattemptCreate) {
             reattemptCreate = false;
             return;
-        } else {
-            reattemptCreate = false;
         }
+        reattemptCreate = false;
 
         ReturnToMainMenu(() => {
             OnShutdown?.Invoke(runner, shutdownReason);
@@ -482,6 +479,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
                     OnRegionPingsUpdated?.Invoke();
                 }
             } catch (Exception e) {
+                // ...Uh oh
                 Debug.LogError(e);
             }
 
@@ -495,6 +493,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
             OnLobbyConnect?.Invoke(Runner, Runner.LobbyInfo);
         } else {
+            Debug.Log($"failed to connect to lobby {result.ShutdownReason}");
             OnShutdown?.Invoke(Runner, result.ShutdownReason);
         }
 

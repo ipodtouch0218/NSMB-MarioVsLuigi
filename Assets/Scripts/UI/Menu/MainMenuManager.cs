@@ -185,10 +185,8 @@ namespace NSMB.UI.MainMenu {
 
             if (regionDropdown.options.Count == 0) {
                 // Create brand-new options
-                for (int i = 0; i < NetworkHandler.Regions.Length; i++) {
-                    string region = NetworkHandler.Regions[i];
+                foreach (string region in NetworkHandler.Regions) {
                     NetworkHandler.RegionPings.TryGetValue(region, out int ping);
-
                     regionDropdown.options.Add(new RegionOption(region, ping));
                 }
                 regionDropdown.options.Sort();
@@ -268,21 +266,20 @@ namespace NSMB.UI.MainMenu {
                     .Where(pd => pd.IsRoomOwner)
                     .FirstOrDefault();
 
-            string name;
+            string hostname;
             if (host) {
-                name = host.GetNickname();
-
+                hostname = host.GetNickname();
             } else {
                 // Fallback
-                NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.HostName, out name);
+                NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.HostName, out hostname);
             }
 
-            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", name.ToValidUsername());
-            UnityEngine.Random.InitState(name.GetHashCode() + rngSeed);
+            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
+            UnityEngine.Random.InitState(hostname.GetHashCode() + rngSeed);
             colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
         }
 
-        private IEnumerator SetVerticalNormalizedPositionFix(ScrollRect scroll, float value) {
+        private static IEnumerator SetVerticalNormalizedPositionFix(ScrollRect scroll, float value) {
             for (int i = 0; i < 3; i++) {
                 scroll.verticalNormalizedPosition = value;
                 Canvas.ForceUpdateCanvases();
@@ -381,7 +378,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenErrorBox(Enum cause) {
-            OpenErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(cause, cause.ToString()));
+            OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, cause.ToString()));
         }
 
         public void OpenErrorBox(string key) {
@@ -401,7 +398,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            OpenNetworkErrorBox(NetworkUtils.disconnectMessages.GetValueOrDefault(reason, reason.ToString()));
+            OpenNetworkErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(reason, reason.ToString()));
         }
 
         public void BackSound() {
@@ -484,11 +481,7 @@ namespace NSMB.UI.MainMenu {
 
         public void UpdateReadyButton(bool ready) {
             TranslationManager tm = GlobalController.Instance.translationManager;
-            if (ready) {
-                startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.unready");
-            } else {
-                startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.readyup");
-            }
+            startGameButtonText.text = tm.GetTranslation(ready ? "ui.inroom.buttons.unready" : "ui.inroom.buttons.readyup");
         }
 
         public void UpdateStartGameButton() {
@@ -510,8 +503,7 @@ namespace NSMB.UI.MainMenu {
         public bool IsRoomConfigurationValid() {
             return
                 SessionData.Instance.PlayerDatas
-                    .Where(kvp => !kvp.Value.IsManualSpectator)
-                    .Count() >= 1;
+                    .Any(kvp => !kvp.Value.IsManualSpectator);
         }
 
         public void Kick(PlayerData target) {
@@ -579,13 +571,15 @@ namespace NSMB.UI.MainMenu {
 
         public void SwapPlayerSkin(byte index, bool callback, CharacterData character = null) {
 
+            if (!character) {
+                character = Runner.GetLocalPlayerData().GetCharacterData();
+            }
+
             bool disabled = index == 0;
 
             if (!disabled) {
                 playerColorDisabledIcon.SetActive(false);
                 playerColorPaletteIcon.SetActive(true);
-
-                character ??= Runner.GetLocalPlayerData().GetCharacterData();
                 PlayerColorSet set = ScriptableManager.Instance.skins[index];
                 PlayerColors colors = set.GetPlayerColors(character);
                 overallsColorImage.color = colors.overallsColor;
@@ -696,10 +690,12 @@ namespace NSMB.UI.MainMenu {
         public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
             for (int i = 0; i < regionDropdown.options.Count; i++) {
                 RegionOption option = (RegionOption) regionDropdown.options[i];
-                if (option.Region == info.Region) {
-                    regionDropdown.SetValueWithoutNotify(i);
-                    return;
+                if (option.Region != info.Region) {
+                    continue;
                 }
+
+                regionDropdown.SetValueWithoutNotify(i);
+                return;
             }
         }
 
@@ -738,8 +734,8 @@ namespace NSMB.UI.MainMenu {
             int selectedCharacter = characterDropdown.value;
             characterDropdown.ClearOptions();
             foreach (CharacterData character in ScriptableManager.Instance.characters) {
-                string name = tm.GetTranslation(character.translationString);
-                characterDropdown.options.Add(new TMP_Dropdown.OptionData(name, character.readySprite));
+                string characterName = tm.GetTranslation(character.translationString);
+                characterDropdown.options.Add(new TMP_Dropdown.OptionData(characterName, character.readySprite));
             }
             characterDropdown.SetValueWithoutNotify(selectedCharacter);
             characterDropdown.RefreshShownValue();

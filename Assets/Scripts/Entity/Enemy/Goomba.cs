@@ -18,8 +18,9 @@ namespace NSMB.Entities.Enemies {
 
         public override void FixedUpdateNetwork() {
             base.FixedUpdateNetwork();
-            if (!Object)
+            if (!Object) {
                 return;
+            }
 
             if (!IsActive) {
                 body.Velocity = Vector2.zero;
@@ -47,8 +48,9 @@ namespace NSMB.Entities.Enemies {
         private void HandleWallCollisions() {
             PhysicsDataStruct data = body.Data;
 
-            if (data.HitLeft || data.HitRight)
+            if (data.HitLeft || data.HitRight) {
                 FacingRight = data.HitLeft;
+            }
         }
 
         //---KillableEntity overrides

@@ -14,7 +14,7 @@ public class AuthenticationHandler {
 
     public static bool IsAuthenticating { get; set; }
 
-    public async static Task<AuthenticationValues> Authenticate(string userid, string token) {
+    public static async Task<AuthenticationValues> Authenticate(string userid, string token) {
 
         IsAuthenticating = true;
 

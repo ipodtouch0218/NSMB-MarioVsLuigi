@@ -32,27 +32,31 @@ namespace NSMB.Entities.World {
         }
 
         public void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
-            if (!BumpTimer.ExpiredOrNotRunning(Runner))
+            if (!BumpTimer.ExpiredOrNotRunning(Runner)) {
                 return;
+            }
 
-            //no block can be at our location
+            // No block can be at our location
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(transform.position);
-            if (Utils.Utils.GetTileAtTileLocation(tileLocation))
+            if (Utils.Utils.GetTileAtTileLocation(tileLocation)) {
                 return;
+            }
 
-            //player has to be moving upwards
-            if (player.body.Velocity.y < 0.1f)
+            // Player has to be moving upwards
+            if (player.body.Velocity.y < 0.1f) {
                 return;
+            }
 
-            //player has to bump us from below
-            if (player.body.Position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.body.Velocity.y * Runner.DeltaTime) > transform.position.y)
+            // Player has to bump us from below
+            if (player.body.Position.y + (player.MainHitbox.size.y * player.body.transform.lossyScale.y) - (player.body.Velocity.y * Runner.DeltaTime) > transform.position.y) {
                 return;
+            }
 
             BumpTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
             DoBump(tileLocation, player);
             player.BlockBumpSoundCounter++;
 
-            //stop player velocity
+            // Stop player velocity
             player.body.Velocity = new(player.body.Velocity.x, 0);
         }
 

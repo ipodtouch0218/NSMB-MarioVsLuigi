@@ -10,7 +10,8 @@ namespace NSMB.UI.Pause.Loaders {
             "ui.generic.none",
             "ui.options.audio.specialpowerupmusic.starman",
             "ui.options.audio.specialpowerupmusic.megamushroom",
-            "ui.options.audio.specialpowerupmusic.both" };
+            "ui.options.audio.specialpowerupmusic.both"
+        };
 
         //---Private Variables
         private PauseOption option;

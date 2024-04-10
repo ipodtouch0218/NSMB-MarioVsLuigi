@@ -13,6 +13,11 @@ namespace NSMB.Entities.Enemies {
 
     public class Koopa : HoldableEntity {
 
+        //---Static Variables
+        private static readonly int ParamShell = Animator.StringToHash("shell");
+        private static readonly int ParamXVel = Animator.StringToHash("xVel");
+        private static readonly int ParamDead = Animator.StringToHash("dead");
+
         //---Networked Variables
         [Networked] public TickTimer WakeupTimer { get; set; }
         [Networked] public NetworkBool IsInShell { get; set; }
@@ -47,9 +52,9 @@ namespace NSMB.Entities.Enemies {
             }
 
             // Animation
-            animator.SetBool("shell", IsInShell || Holder != null);
-            animator.SetFloat("xVel", IsStationary ? 0 : Mathf.Abs(body.Velocity.x));
-            animator.SetBool("dead", !IsActive);
+            animator.SetBool(ParamShell, IsInShell || Holder != null);
+            animator.SetFloat(ParamXVel, IsStationary ? 0 : Mathf.Abs(body.Velocity.x));
+            animator.SetBool(ParamDead, !IsActive);
 
             // "Flip" rotation
             float remainingWakeupTimer = WakeupTimer.RemainingRenderTime(Runner) ?? 0f;

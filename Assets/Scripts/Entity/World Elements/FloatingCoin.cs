@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Fusion;
 using NSMB.Entities.Player;
+using NSMB.Extensions;
 
 namespace NSMB.Entities.Collectable {
 
@@ -21,7 +22,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!hitbox) hitbox = GetComponent<BoxCollider2D>();
+            this.SetIfNull(ref hitbox);
 
             defaultCoinAnimate.isDisplaying = !dottedCoin;
             dottedCoinAnimate.isDisplaying = dottedCoin;
@@ -30,8 +31,7 @@ namespace NSMB.Entities.Collectable {
 
         public override void Spawned() {
             base.Spawned();
-            if (dottedCoin)
-                IsDotted = true;
+            IsDotted = dottedCoin;
         }
 
         public override void FixedUpdateNetwork() {
@@ -76,8 +76,9 @@ namespace NSMB.Entities.Collectable {
             defaultCoinAnimate.isDisplaying = !IsDotted;
             dottedCoinAnimate.isDisplaying = IsDotted;
 
-            if (!IsDotted)
+            if (!IsDotted) {
                 PlaySound(Enums.Sounds.World_Coin_Dotted_Spawn);
+            }
         }
     }
 }

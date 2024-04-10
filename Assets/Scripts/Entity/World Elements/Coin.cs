@@ -48,12 +48,11 @@ namespace NSMB.Entities.Collectable {
                 return;
             }
 
-            PlayerController target = null;
-            if (bumper is PlayerController player) {
-                target = player;
-            } else if (bumper is Koopa koopa) {
-                target = koopa.PreviousHolder;
-            }
+            PlayerController target = bumper switch {
+                PlayerController player => player,
+                Koopa koopa => koopa.PreviousHolder,
+                _ => null
+            };
 
             if (!target) {
                 return;

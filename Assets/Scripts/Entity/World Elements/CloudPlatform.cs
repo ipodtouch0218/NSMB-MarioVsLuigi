@@ -9,6 +9,8 @@ public class CloudPlatform : SimulationBehaviour {
 
     //---Static Variables
     private static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
+    private static readonly int ParamDisplacementMap = Shader.PropertyToID("DisplacementMap");
+    private static readonly int ParamPlatformWidth = Shader.PropertyToID("PlatformWidth");
 
     //---Serialized Variables
     [SerializeField] private EdgeCollider2D ground;
@@ -33,9 +35,10 @@ public class CloudPlatform : SimulationBehaviour {
     }
 
     private void Initialize() {
-        if (this == null || !this)
+        if (this == null || !this) {
             //what
             return;
+        }
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.size = new(platformWidth * 0.5f, 1f);
@@ -53,14 +56,16 @@ public class CloudPlatform : SimulationBehaviour {
         };
 
         pixels = new Color32[platformWidth * samplesPerTile];
-        for (int i = 0; i < platformWidth * samplesPerTile; i++)
+        for (int i = 0; i < platformWidth * samplesPerTile; i++) {
             pixels[i] = new Color32(0, 0, 0, 255);
+        }
+
         displacementMap.SetPixels32(pixels);
         displacementMap.Apply();
 
         mpb = new();
         spriteRenderer.GetPropertyBlock(mpb);
-        mpb.SetFloat("PlatformWidth", platformWidth);
+        mpb.SetFloat(ParamPlatformWidth, platformWidth);
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
@@ -76,31 +81,33 @@ public class CloudPlatform : SimulationBehaviour {
 
         // Update collision timers
         foreach (CloudContact contact in positions) {
-            if (!contact.exit && (!contact.collider || !contact.mover.Data.OnGround || !Utils.BufferContains(CollisionBuffer, collisionCount, contact.collider)))
-                contact.exit = true;
+            if (!contact.Exit && (!contact.Collider || !contact.Mover.Data.OnGround || !Utils.BufferContains(CollisionBuffer, collisionCount, contact.Collider))) {
+                contact.Exit = true;
+            }
 
-            if (contact.exit) {
-                contact.timer += Time.deltaTime * 0.333f;
+            if (contact.Exit) {
+                contact.Timer += Time.deltaTime * 0.333f;
             } else {
-                contact.timer = Mathf.Max(0, contact.timer - Time.deltaTime);
+                contact.Timer = Mathf.Max(0, contact.Timer - Time.deltaTime);
             }
         }
 
         // Purge old collisions
         for (int i = positions.Count - 1; i >= 0; i--) {
             CloudContact contact = positions[i];
-            if (!contact.collider || (contact.exit && contact.timer >= time)) {
+            if (!contact.Collider || (contact.Exit && contact.Timer >= time)) {
                 positions.RemoveAt(i);
             }
         }
 
         // Handle graphics
-        for (int i = 0; i < platformWidth * samplesPerTile; i++)
+        for (int i = 0; i < platformWidth * samplesPerTile; i++) {
             pixels[i].r = 0;
+        }
 
         foreach (CloudContact contact in positions) {
 
-            float percentageCompleted = 1f - (contact.timer / time);
+            float percentageCompleted = 1f - (contact.Timer / time);
             float v = Mathf.Sin(Mathf.PI * 0.5f * percentageCompleted);
 
             int point = contact.Point;
@@ -108,14 +115,16 @@ public class CloudPlatform : SimulationBehaviour {
             for (int x = -width; x <= width; x++) {
                 float color = v;
                 int localPoint = point + x;
-                if (localPoint < 0 || localPoint >= platformWidth * samplesPerTile)
+                if (localPoint < 0 || localPoint >= platformWidth * samplesPerTile) {
                     continue;
+                }
 
                 color *= Mathf.SmoothStep(1, 0, ((float) Mathf.Abs(x)) / width);
                 byte final = (byte) (Mathf.Clamp01(color) * 255);
 
-                if (pixels[localPoint].r > final)
+                if (pixels[localPoint].r > final) {
                     continue;
+                }
 
                 pixels[localPoint].r = final;
             }
@@ -124,56 +133,64 @@ public class CloudPlatform : SimulationBehaviour {
         displacementMap.SetPixels32(pixels);
         displacementMap.Apply();
 
-        mpb.SetTexture("DisplacementMap", displacementMap);
+        mpb.SetTexture(ParamDisplacementMap, displacementMap);
         spriteRenderer.SetPropertyBlock(mpb);
     }
 
     private void HandleTrigger(Collider2D collision) {
         EntityMover mover = collision.GetComponentInParent<EntityMover>();
-        if (!mover.Data.OnGround)
+        if (!mover.Data.OnGround) {
             return;
+        }
 
-        if (GetContact(collision) == null)
+        if (GetContact(collision) == null) {
             positions.Add(new(this, mover, collision as BoxCollider2D));
+        }
     }
 
     private CloudContact GetContact(Collider2D collider) {
         foreach (CloudContact contact in positions) {
-            if (contact.exit)
+            if (contact.Exit) {
                 continue;
+            }
 
-            if (contact.collider == collider)
+            if (contact.Collider == collider) {
                 return contact;
+            }
         }
         return null;
     }
 
     public class CloudContact {
-        public EntityMover mover;
-        public CloudPlatform platform;
-        public float timer;
-        public bool exit;
-        public int lastPoint;
+        public EntityMover Mover;
+        public CloudPlatform Platform;
+        public float Timer;
+        public bool Exit;
+        public int LastPoint;
         public int Point {
             get {
-                if (exit)
-                    return lastPoint;
-                return lastPoint = (int) (platform.transform.InverseTransformPoint(collider.transform.position).x * platform.samplesPerTile);
+                if (Exit) {
+                    return LastPoint;
+                }
+
+                return LastPoint = (int) (Platform.transform.InverseTransformPoint(Collider.transform.position).x * Platform.samplesPerTile);
             }
         }
-        public BoxCollider2D collider;
+        public BoxCollider2D Collider;
         public int Width {
             get {
-                if (collider)
-                    return (int) (collider.size.x * collider.transform.lossyScale.x * 4f * platform.samplesPerTile);
-                return (int) (1.75f * platform.samplesPerTile);
+                if (Collider) {
+                    return (int) (Collider.size.x * Collider.transform.lossyScale.x * 4f * Platform.samplesPerTile);
+                }
+
+                return (int) (1.75f * Platform.samplesPerTile);
             }
         }
         public CloudContact(CloudPlatform platform, EntityMover mover, BoxCollider2D collider) {
-            this.platform = platform;
-            this.mover = mover;
-            this.collider = collider;
-            timer = 0.05f;
+            Platform = platform;
+            Mover = mover;
+            Collider = collider;
+            Timer = 0.05f;
         }
     }
 }

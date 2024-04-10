@@ -101,7 +101,7 @@ namespace NSMB.UI.MainMenu {
             Transform parent = transform.parent;
             int childIndex = 0;
             for (int i = 0; i < parent.childCount; i++) {
-                if (parent.GetChild(i) != gameObject) {
+                if (parent.GetChild(i) != transform) {
                     continue;
                 }
 

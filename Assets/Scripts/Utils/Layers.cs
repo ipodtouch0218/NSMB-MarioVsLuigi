@@ -27,8 +27,9 @@ namespace NSMB.Utils {
         public static int LayerGroundEntity         => LazyLoadLayer(ref _layerGroundEntity, "GroundEntity");
 
         public static LayerMask GetCollisionMask(int layer) {
-            if (CollisionMatrixMasks.ContainsKey(layer))
-                return CollisionMatrixMasks[layer];
+            if (CollisionMatrixMasks.TryGetValue(layer, out LayerMask collisionMask)) {
+                return collisionMask;
+            }
 
             int mask = 0;
             for (int j = 0; j < 32; j++) {
@@ -40,8 +41,9 @@ namespace NSMB.Utils {
         }
 
         private static LayerMask LazyLoadMask(ref LayerMask? variable, int? layer1 = null, int? layer2 = null, int? layer3 = null, int? layer4 = null, int? layer5 = null) {
-            if (variable != null)
+            if (variable != null) {
                 return (LayerMask) variable;
+            }
 
             variable = 0;
             ApplyLayerMask(ref variable, layer1);
@@ -54,13 +56,15 @@ namespace NSMB.Utils {
         }
 
         private static void ApplyLayerMask(ref LayerMask? variable, int? layer) {
-            if (layer.HasValue)
+            if (layer.HasValue) {
                 variable |= 1 << layer;
+            }
         }
 
         private static int LazyLoadLayer(ref int? variable, string layer) {
-            if (variable.HasValue)
+            if (variable.HasValue) {
                 return (int) variable;
+            }
 
             return (int) (variable = LayerMask.NameToLayer(layer));
         }

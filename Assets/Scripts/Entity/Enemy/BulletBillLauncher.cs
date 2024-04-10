@@ -4,6 +4,7 @@ using Fusion;
 using NSMB.Entities.Enemies;
 using NSMB.Game;
 using NSMB.Utils;
+using System.Linq;
 
 namespace NSMB.Entities.World {
 
@@ -39,8 +40,9 @@ namespace NSMB.Entities.World {
         }
 
         public override void FixedUpdateNetwork() {
-            if (GameManager.Instance.GameEnded)
+            if (GameManager.Instance.GameEnded) {
                 return;
+            }
 
             if (ShootTimer.Expired(Runner)) {
                 TryToShoot();
@@ -49,16 +51,19 @@ namespace NSMB.Entities.World {
         }
 
         private void TryToShoot() {
-            if (!Utils.Utils.IsTileSolidAtWorldLocation(transform.position))
+            if (!Utils.Utils.IsTileSolidAtWorldLocation(transform.position)) {
                 return;
+            }
 
             BulletBill bill = FindInactiveBill();
-            if (!bill)
+            if (!bill) {
                 return;
+            }
 
             // Check for close players
-            if (IntersectsPlayer(closeSearchPosition, closeSearchBox))
+            if (IntersectsPlayer(closeSearchPosition, closeSearchBox)) {
                 return;
+            }
 
             // Shoot left
             if (IntersectsPlayer(leftSearchPosition, searchBox)) {
@@ -74,9 +79,9 @@ namespace NSMB.Entities.World {
         }
 
         private void SpawnBill(BulletBill bill, Vector2 spawnpoint, bool facingRight) {
-
-            if (!bill)
+            if (!bill) {
                 return;
+            }
 
             bill.RespawnEntity();
             bill.FacingRight = facingRight;
@@ -89,11 +94,7 @@ namespace NSMB.Entities.World {
 
         private BulletBill FindInactiveBill() {
             // Pick out a Bullet Bill that we didnt fire yet.
-            foreach (BulletBill b in bulletBills) {
-                if (!b.IsActive)
-                    return b;
-            }
-            return null;
+            return bulletBills.FirstOrDefault(b => !b.IsActive);
         }
 
 #if UNITY_EDITOR

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -21,12 +22,7 @@ public static class Enums {
             return null;
         }
 
-        foreach (var powerup in ScriptableManager.Instance.powerups) {
-            if (powerup.state == state) {
-                return powerup;
-            }
-        }
-        return null;
+        return ScriptableManager.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
     }
 
     public enum GameState : byte {
@@ -208,14 +204,14 @@ public static class Enums {
 }
 
 public class SoundData : Attribute {
-    public string Sound { get; private set; }
+    public string Sound { get; }
     internal SoundData(string sound) {
         Sound = sound;
     }
 }
 
 public class PrefabParticleData : Attribute {
-    public string Path { get; private set; }
+    public string Path { get; }
     internal PrefabParticleData(string path) {
         Path = path;
     }
@@ -223,9 +219,9 @@ public class PrefabParticleData : Attribute {
 
 public static class AttributeExtensions {
 
-    private readonly static Dictionary<Enums.Sounds, string> cachedStrings = new();
-    private readonly static Dictionary<string, AudioClip> cachedClips = new();
-    private readonly static Dictionary<Enums.PrefabParticle, GameObject> cachedParticles = new();
+    private static readonly Dictionary<Enums.Sounds, string> CachedStrings = new();
+    private static readonly Dictionary<string, AudioClip> CachedClips = new();
+    private static readonly Dictionary<Enums.PrefabParticle, GameObject> CachedParticles = new();
 
     public static AudioClip GetClip(this Enums.Sounds sound, CharacterData player = null, int variant = 0) {
         string name = "Sound/" + GetClipString(sound) + (variant > 0 ? "_" + variant : "");
@@ -234,30 +230,31 @@ public static class AttributeExtensions {
             name = name.Replace("{char}", player.soundFolder);
         }
 
-        if (cachedClips.ContainsKey(name)) {
-            return cachedClips[name];
+        if (CachedClips.TryGetValue(name, out AudioClip cachedClip)) {
+            return cachedClip;
         }
 
         AudioClip clip = Resources.Load(name) as AudioClip;
-        cachedClips[name] = clip;
+        CachedClips[name] = clip;
         return clip;
     }
 
     private static string GetClipString(Enums.Sounds sound) {
-        if (cachedStrings.ContainsKey(sound)) {
-            return cachedStrings[sound];
+        if (CachedStrings.TryGetValue(sound, out string s)) {
+            return s;
         }
 
-        cachedStrings[sound] = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound;
-        Debug.Log(cachedStrings[sound]);
-        return cachedStrings[sound];
+        // Dirty reflection to get data out of an attribute
+        CachedStrings[sound] = sound.GetType().GetMember(sound.ToString())[0].GetCustomAttribute<SoundData>().Sound;
+        return CachedStrings[sound];
     }
 
     public static GameObject GetGameObject(this Enums.PrefabParticle particle) {
-        if (cachedParticles.ContainsKey(particle)) {
-            return cachedParticles[particle];
+        if (CachedParticles.TryGetValue(particle, out GameObject o)) {
+            return o;
         }
 
-        return cachedParticles[particle] = Resources.Load(particle.GetType().GetMember(particle.ToString())[0].GetCustomAttribute<PrefabParticleData>().Path) as GameObject;
+        // Dirty reflection to get data out of an attribute
+        return CachedParticles[particle] = Resources.Load(particle.GetType().GetMember(particle.ToString())[0].GetCustomAttribute<PrefabParticleData>().Path) as GameObject;
     }
 }
