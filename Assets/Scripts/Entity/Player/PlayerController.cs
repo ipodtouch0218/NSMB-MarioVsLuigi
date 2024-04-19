@@ -2261,17 +2261,9 @@ namespace NSMB.Entities.Player {
             float[] maxArray = SPEED_STAGE_MAX;
             if (IsSwimming) {
                 if (IsOnGround) {
-                    if (State == Enums.PowerupState.BlueShell) {
-                        maxArray = SWIM_WALK_SHELL_STAGE_MAX;
-                    } else {
-                        maxArray = SWIM_WALK_STAGE_MAX;
-                    }
+                    maxArray = State == Enums.PowerupState.BlueShell ? SWIM_WALK_SHELL_STAGE_MAX : SWIM_WALK_STAGE_MAX;
                 } else {
-                    if (State == Enums.PowerupState.BlueShell) {
-                        maxArray = SWIM_SHELL_STAGE_MAX;
-                    } else {
-                        maxArray = SWIM_STAGE_MAX;
-                    }
+                    maxArray = State == Enums.PowerupState.BlueShell ? SWIM_SHELL_STAGE_MAX : SWIM_STAGE_MAX;
                 }
             }
             int stage = MovementStage;
@@ -2279,17 +2271,9 @@ namespace NSMB.Entities.Player {
             float acc;
             if (IsSwimming) {
                 if (IsOnGround) {
-                    if (State == Enums.PowerupState.BlueShell) {
-                        acc = SWIM_WALK_SHELL_STAGE_ACC[stage];
-                    } else {
-                        acc = SWIM_WALK_STAGE_ACC[stage];
-                    }
+                    acc = State == Enums.PowerupState.BlueShell ? SWIM_WALK_SHELL_STAGE_ACC[stage] : SWIM_WALK_STAGE_ACC[stage];
                 } else {
-                    if (State == Enums.PowerupState.BlueShell) {
-                        acc = SWIM_SHELL_STAGE_ACC[stage];
-                    } else {
-                        acc = SWIM_STAGE_ACC[stage];
-                    }
+                    acc = State == Enums.PowerupState.BlueShell ? SWIM_SHELL_STAGE_ACC[stage] : SWIM_STAGE_ACC[stage];
                 }
             } else if (OnIce) {
                 acc = ICE_STAGE_ACC[stage];
