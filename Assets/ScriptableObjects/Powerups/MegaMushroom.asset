@@ -24,7 +24,6 @@ MonoBehaviour:
   vertical: 0
   custom: 0
   lives: 0
-  reserveSprite: {fileID: 2690215448161037315, guid: a87d3b028baa82640b06b88398a8c4f0,
-    type: 3}
+  reserveSprite: {fileID: -1604689058, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   statePriority: 4
   itemPriority: 4
