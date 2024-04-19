@@ -15,6 +15,7 @@ MonoBehaviour:
   state: 5
   prefab:
     RawGuidValue: 467d8d6c11c84374a9f38f758becc536
+  soundPlaysEverywhere: 0
   soundEffect: 16
   powerupBlockEffect: 69
   spawnChance: 0.5
@@ -23,6 +24,6 @@ MonoBehaviour:
   vertical: 1
   custom: 1
   lives: 0
-  reserveSprite: {fileID: -1858463510, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
+  reserveSprite: {fileID: -14430133, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   statePriority: 2
   itemPriority: 2
