@@ -4647,7 +4647,7 @@ MonoBehaviour:
     atlasWidth: 512
     atlasHeight: 512
     characterSetSelectionMode: 6
-    characterSequence: 20-7E,AB,BB,E1-E5,E7,E9-EA,F3,F6,FA,103,105,107,119,142,15A-15B,17A,17C,218-21B,386,388-38A,38C,38E-38F,391-3A1,3A3-3CE,2018-2019,201C-201D,2190-2193
+    characterSequence: 20-7E,AB,BB,E1-E5,E7,E9-EA,F3,F6,FA,103,105,107,119,142,15A-15B,17A,17C,218-21B,386,388-38A,38C,38E-38F,391-3A1,3A3-3CE,2018-2019,201C-201D
     referencedFontAssetGUID: 38e8769007229044bb229d69f8cbae74
     referencedTextAssetGUID: 
     fontStyle: 0

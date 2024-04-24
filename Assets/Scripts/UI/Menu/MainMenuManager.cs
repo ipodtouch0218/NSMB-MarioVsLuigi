@@ -213,7 +213,7 @@ namespace NSMB.UI.MainMenu {
             if (WasHostMigration) {
                 // Host chat notification
                 if (Runner.IsServer) {
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
                 }
             } else if (inSameRoom) {
                 chat.ReplayChatMessages();
@@ -511,9 +511,8 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            SessionData.Instance.Rpc_Disconnect(target.Owner);
-            //Runner.Disconnect(target.Owner);
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", "playername", target.GetNickname());
+            SessionData.Instance.Disconnect(target.Owner);
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", ChatManager.Blue, "playername", target.GetNickname());
         }
 
         public void Promote(PlayerData target) {
@@ -521,8 +520,12 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            // ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", "playername", target.GetNickname());
-            Runner.SetMasterClient(target.Owner);
+            if (Runner.Topology == Topologies.ClientServer) {
+                ChatManager.Instance.AddSystemMessage("Cannot promote yet!", ChatManager.Red);
+            } else {
+                Runner.SetMasterClient(target.Owner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", target.GetNickname());
+            }
         }
 
         public void Mute(PlayerData target) {
@@ -532,7 +535,7 @@ namespace NSMB.UI.MainMenu {
 
             bool newMuteState = !target.IsMuted;
             target.IsMuted = newMuteState;
-            ChatManager.Instance.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", "playername", target.GetNickname());
+            ChatManager.Instance.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", ChatManager.Blue, "playername", target.GetNickname());
         }
 
         public void Ban(PlayerData target) {
@@ -540,10 +543,9 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            SessionData.Instance.Rpc_Disconnect(target.Owner);
-            //Runner.Disconnect(target.Owner);
+            SessionData.Instance.Disconnect(target.Owner);
             SessionData.Instance.AddBan(target);
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", "playername", target.GetNickname());
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", ChatManager.Blue, "playername", target.GetNickname());
         }
 
         public void UI_CharacterDropdownChanged() {

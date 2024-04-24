@@ -19,7 +19,7 @@ All power-ups are included and remain faithful to their original counterparts, a
 Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLuigi/releases/latest
 
 ## Default Controls
-| Action | Keyboard | Gamepad *(unstable)* |
+| Action | Keyboard | Gamepad |
 | --- | --- | --- |
 | Movement | WASD / Arrow Keys | Left Analog / DPad |
 | Jump | Space / Z | A / B Buttons |
@@ -55,8 +55,8 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 ### Contributors:
 * [Amy54Desu](https://github.com/Amy54Desu)
 * [AtwerJ](https://github.com/AtwerJ)
-* [AutumnLeafy](https://github.com/AutumnLeafy)
-* [CubbyCrazes](https://github.com/CubbyCrazes)
+* [Ave](https://github.com/AutumnLeafy)
+* [Cubby Crazes](https://github.com/CubbyCrazes)
 * [GithubSPerez](https://github.com/GithubSPerez)
 * GradedWarrior
 * [Jeffjewett27](https://github.com/Jeffjewett27)
@@ -73,7 +73,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [Zest](https://github.com/zestydevy)
 
 ### Music:
-* CubbyCrazes
+* Cubby Crazes
 * [RENREN](https://mistajub.bandcamp.com/)
 * LiamNayru
 * vincells
@@ -110,8 +110,8 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * vlco_o
 
 ### QA Testing:
-* AutumnLeaf
-* CubbyCrazes
+* Ave
+* Cubby Crazes
 * Fawndue
 * Grape
 * mindnomad
@@ -120,7 +120,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 
 ### Level Design:
 * AtwerJ
-* AutumnLeaf
+* Ave
 * mindnomad
 * Skarph
 * TheCyVap
@@ -128,7 +128,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 ### Asset Rips:
 * A Refracted Swindler (UI)
 * Clougo (Tiles)
-* CubbyCrazes (Sound)
+* Cubby Crazes (Sound)
 * Demon2Warrior (Background)
 * Double S (Models)
 * Guywah (Fonts)

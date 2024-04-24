@@ -11,5 +11,4 @@ public class MvLSceneManager : NetworkSceneManagerDefault {
         OnSceneLoadStart?.Invoke();
         return base.LoadSceneCoroutine(sceneRef, sceneParams);
     }
-
 }

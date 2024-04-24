@@ -327,7 +327,7 @@ namespace NSMB.Entities.Player {
 
             body.Freeze = true;
             body.ForceSnapshotInterpolation = IsProxy;
-            Object.AssignInputAuthority(Object.StateAuthority);
+            //Object.AssignInputAuthority(Object.StateAuthority);
 
             Data = Object.ControlAuthority().GetPlayerData();
             if (Object.HasControlAuthority()) {
@@ -356,7 +356,7 @@ namespace NSMB.Entities.Player {
             ControlSystem.controls.Enable();
 
             // We've finished loading...
-            if (Object.HasControlAuthority()) {
+            if (Runner.Topology == Topologies.Shared && Object.HasControlAuthority()) {
                 Data.Rpc_FinishedLoading();
             }
 
@@ -646,7 +646,7 @@ namespace NSMB.Entities.Player {
             foreach (BoxCollider2D hitbox in hitboxes) {
                 Vector2 origin = body.Position + (hitbox.offset * transform.localScale)/* + (body.Velocity * Runner.DeltaTime)*/;
 
-                int hits = Runner.GetPhysicsScene2D().OverlapBox(origin, hitbox.size, 0, TempCollisionBuffer);
+                int hits = Runner.GetPhysicsScene2D().OverlapBox(origin, hitbox.size * transform.localScale, 0, TempCollisionBuffer);
                 Array.Copy(TempCollisionBuffer, 0, CollisionBuffer, totalHits, hits);
                 totalHits += hits;
 

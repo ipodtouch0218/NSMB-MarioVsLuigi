@@ -10,6 +10,9 @@ using NSMB.UI.MainMenu;
 public class ChatManager : MonoBehaviour {
 
     //---Static Variables
+    public static readonly Color32 Red = new Color32(219, 107, 107, 255);
+    public static readonly Color32 Blue = new Color32(85, 85, 202, 255);
+
     public static ChatManager Instance { get; private set; }
     public static event Action<ChatMessage.ChatMessageData> OnChatMessage;
 
@@ -48,13 +51,8 @@ public class ChatManager : MonoBehaviour {
         OnChatMessage?.Invoke(data);
     }
 
-    public void AddSystemMessage(string key, params string[] replacements) {
-        AddSystemMessage(key, null, replacements);
-    }
-
     private static readonly Color SystemMessageColor = new(0x55/255f, 0x55/255f, 0x55/255f, 1);
     public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
-
         ChatMessage.ChatMessageData data = new() {
             isSystemMessage = true,
             color = color ?? SystemMessageColor,
@@ -146,10 +144,10 @@ public class ChatManager : MonoBehaviour {
 
     private void OnPlayerDataReady(PlayerData pd) {
         if (pd.Owner == pd.Runner.LocalPlayer && pd.IsRoomOwner) {
-            AddSystemMessage("ui.inroom.chat.hostreminder");
+            AddSystemMessage("ui.inroom.chat.hostreminder", Red);
         }
 
-        AddSystemMessage("ui.inroom.chat.player.joined", "playername", pd.GetNickname());
+        AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", pd.GetNickname());
     }
 
     private void OnChatMessageCallback(ChatMessage.ChatMessageData data) {

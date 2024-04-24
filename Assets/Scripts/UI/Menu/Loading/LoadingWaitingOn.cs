@@ -58,7 +58,9 @@ namespace NSMB.Loading {
             } else {
                 // Waiting for others
                 // TODO: convert to use the state system, needs to update when the ready list changes
-                statusText.text = tm.GetTranslation("ui.loading.waiting");
+                int secondsUntilKick = (int) Mathf.Max(0, Mathf.Ceil(GameManager.Instance.PlayerLoadingTimeoutTime - NetworkHandler.Runner.SimulationTime));
+
+                statusText.text = secondsUntilKick <= 10 ? secondsUntilKick.ToString() : tm.GetTranslation("ui.loading.waiting");
                 playerListParent.SetActive(true);
                 playerList.text =
                     string.Join('\n',

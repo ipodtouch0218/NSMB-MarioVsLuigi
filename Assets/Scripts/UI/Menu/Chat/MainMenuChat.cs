@@ -83,7 +83,7 @@ namespace NSMB.UI.MainMenu {
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Chat_Send);
 
             if (text.StartsWith('/')) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.command");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.command", ChatManager.Red);
             } else {
                 SessionData.Instance.Rpc_ChatIncomingMessage(text);
             }

@@ -278,6 +278,14 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
         });
     }
 
+    public void Disconnect(PlayerRef target) {
+        if (Runner.Topology == Topologies.ClientServer) {
+            Runner.Disconnect(target);
+        } else {
+            Rpc_Disconnect(target);
+        }
+    }
+
     //---RPCs
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
     public void Rpc_Disconnect([RpcTarget] PlayerRef target) {
@@ -332,7 +340,7 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
             count++;
         }
 
-        ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.started");
+        ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.started", ChatManager.Red);
         SetGameStarted(true);
 
         // Load the correct scene
@@ -367,14 +375,14 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
 
         if (!GameStartTimer.IsRunning) {
             if (playedStartSound) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled", ChatManager.Red);
             }
             lastStartCancelTime = Runner.SimulationTime;
             MainMenuManager.Instance.OnCountdownTick(-1);
             playedStartSound = false;
         } else {
             if (lastStartCancelTime + 3f < time || Runner.GetLocalPlayerData().IsRoomOwner) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", "countdown", Mathf.CeilToInt((GameStartTimer.RemainingTime(Runner) - 0.01f) ?? 0).ToString());
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", ChatManager.Red, "countdown", Mathf.CeilToInt((GameStartTimer.RemainingTime(Runner) - 0.01f) ?? 0).ToString());
                 MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_FileSelect);
                 playedStartSound = true;
             }

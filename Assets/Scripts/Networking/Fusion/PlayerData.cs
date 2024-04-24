@@ -62,33 +62,34 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
     public void OnBeforeSpawned(PlayerRef owner) {
         Owner = owner;
 
-        /*
-        // Expose their connection token :flushed:
-        byte[] token = Runner.GetPlayerConnectionToken(owner);
-        try {
-            ConnectionToken = ConnectionToken.Deserialize(token);
-            if (!ConnectionToken.HasValidSignature()) {
-                // Invalid signature, nice try guy
-                throw new Exception();
-            }
-            if (ConnectionToken.signedData.UserId != Guid.Parse(Runner.GetPlayerUserId(Owner))) {
-                // Attempted to steal from another user???
-                throw new Exception();
-            }
-            // Successful :D
-        } catch {
-            if (!Runner.IsSinglePlayer) {
-                Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Owner)}'.");
+        if (Runner.Topology == Topologies.ClientServer) {
+            Runner.SetPlayerObject(owner, Object);
+            // Expose their connection token :flushed:
+            byte[] token = Runner.GetPlayerConnectionToken(owner);
+            try {
+                ConnectionToken = ConnectionToken.Deserialize(token);
+                if (!ConnectionToken.HasValidSignature()) {
+                    // Invalid signature, nice try guy
+                    throw new Exception();
+                }
+                if (ConnectionToken.signedData.UserId != Guid.Parse(Runner.GetPlayerUserId(Owner))) {
+                    // Attempted to steal from another user???
+                    throw new Exception();
+                }
+                // Successful :D
+            } catch {
+                if (!Runner.IsSinglePlayer) {
+                    Debug.LogWarning($"No/malformed/invalid connection token from player with id '{Runner.GetPlayerUserId(Owner)}'.");
+                }
+                ConnectionToken = new();
             }
 
             SetNickname(ConnectionToken.nickname.Value);
-            ConnectionToken = new();
         }
-        */
 
         // Find the least populated team and automatically join that one.
         if (SessionData.Instance) {
-            int[] teamCounts = new int[5];
+            int[] teamCounts = new int[ScriptableManager.Instance.teams.Length];
             foreach ((_, PlayerData data) in SessionData.Instance.PlayerDatas) {
                 teamCounts[data.Team]++;
             }
@@ -127,10 +128,15 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
 
         if (IsLocal) {
             // We're the client. update with our data.
-            Rpc_SetConnectionToken(GlobalController.Instance.connectionToken);
+            if (Runner.Topology == Topologies.Shared) {
+                Rpc_SetConnectionToken(GlobalController.Instance.connectionToken);
+            }
             Rpc_SetCharacterIndex((byte) Settings.Instance.generalCharacter);
             Rpc_SetSkinIndex((byte) Settings.Instance.generalSkin);
-            pingRoutine = StartCoroutine(UpdatePingRoutine());
+
+            if (Runner.Topology == Topologies.Shared || Runner.IsServer) {
+                pingRoutine = StartCoroutine(UpdatePingRoutine());
+            }
 
             PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenToggled;
         }
@@ -162,21 +168,20 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
             }
         }
 
-        if (ready && !valid) {
+        if ((Runner.IsSinglePlayer || ready || Runner.Topology == Topologies.ClientServer) && !valid) {
             OnPlayerDataReady?.Invoke(this);
             valid = true;
         }
     }
 
     public override void FixedUpdateNetwork() {
-        if (!HasStateAuthority) {
+        if (!HasStateAuthority || IsRoomOwner) {
             return;
         }
 
-        if (!ConnectionToken.HasValidSignature() && (Runner.Tick - JoinTick) > (int) (Runner.TickRate * 10f)) {
+        if (!valid && !ConnectionToken.HasValidSignature() && (Runner.Tick - JoinTick) > (int) (Runner.TickRate * 10f)) {
             // Kick player for not sending the token in time...
-            //Runner.Disconnect(Owner);
-            SessionData.Instance.Rpc_Disconnect(Owner);
+            SessionData.Instance.Disconnect(Owner);
         }
     }
 
@@ -245,12 +250,17 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
                 yield return waitTime;
             }
 
-            Rpc_SetPing((int) (total / avgRate * 1000));
+            int newPing = (int) (total / avgRate * 1000);
+            if (Runner.Topology == Topologies.ClientServer) {
+                Ping = newPing;
+            } else {
+                Rpc_SetPing(newPing);
+            }
             yield return waitTime;
         }
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_SetPing(int ping, RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -259,7 +269,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         Ping = ping;
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_SetConnectionToken(ConnectionToken token, RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -270,7 +280,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         //OnConnectionTokenChanged(); // Needed, for some reason...
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_FinishedLoading(RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -279,7 +289,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         IsLoaded = true;
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_SetPermanentSpectator(bool value, RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -293,7 +303,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         IsManualSpectator = value;
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_SetCharacterIndex(byte index, RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -312,7 +322,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         CharacterIndex = index;
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_SetSkinIndex(byte index, RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -331,7 +341,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         SkinIndex = index;
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_SetTeamNumber(sbyte team, RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -350,7 +360,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
         Team = team;
     }
 
-    [Rpc(RpcSources.All, RpcTargets.InputAuthority | RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.InputAuthority | RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void Rpc_SetOptionsOpen(bool open, RpcInfo info = default) {
         if (info.Source != Owner) {
             return;
@@ -426,10 +436,10 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
     public void OnRoomOwnerChanged() {
         // Send the chat message(s)
         if (IsRoomOwner) {
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promote", "playername", GetNickname());
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promote", ChatManager.Blue, "playername", GetNickname());
 
             if (Runner.LocalPlayer == Owner) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
             }
 
             // Update header

@@ -26,7 +26,6 @@ namespace NSMB.Tiles {
         private ChangeDetector changeDetector;
 
         public void BeforeTick() {
-            Debug.Log("before tick");
             updatedDirtyCounterThisTick = false;
 
             if (!Runner.IsResimulation || latestDirtyCounter == DirtyCounter) {
@@ -39,8 +38,6 @@ namespace NSMB.Tiles {
         }
 
         public void AfterTick() {
-            Debug.Log("after tick");
-
             // The tilemap was updated via the dirty counter
             if (updatedDirtyCounterThisTick || (latestDirtyCounter != DirtyCounter)) {
                 UpdateTilemapState();

@@ -154,13 +154,10 @@ MonoBehaviour:
     - {x: 0, y: -1, z: 0}
     m_RuleTransform: 0
   siblings:
-  - {fileID: 11400000, guid: 04c674c504bd1ad4db89f5270522951c, type: 2}
-  - {fileID: 11400000, guid: de9f9c0e6414c1f41a9823860afd9724, type: 2}
-  - {fileID: 11400000, guid: fa62d5e19cd6de5488c0052ef91a6569, type: 2}
-  - {fileID: 11400000, guid: b2110ed2d78b13b4aa6d29d183c365fa, type: 2}
-  - {fileID: 11400000, guid: c3e47b452b13fa44b863363f9cb23987, type: 2}
-  - {fileID: 11400000, guid: 37b12b99b00090c469bd7f86c35b5f3f, type: 2}
+  - {fileID: 11400000, guid: 1b42132f79dc5944ba33682310458870, type: 2}
+  - {fileID: 11400000, guid: 6a165ecf0526f3448a8806cd54d00dea, type: 2}
   isBackgroundTile: 0
   iceSkidding: 0
+  isSlope: 0
   footstepSound: 31
   footstepParticle: 0

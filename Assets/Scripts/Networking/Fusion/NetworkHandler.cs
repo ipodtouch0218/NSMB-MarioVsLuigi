@@ -208,7 +208,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         if (GameManager.Instance) {
             // If we're in a game, keep that in mind.
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.hostdc");
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.hostdc", color: ChatManager.Red);
         }
 
         await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
@@ -247,7 +247,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
             if (SessionData.Instance) {
                 if (!Guid.TryParse(runner.GetPlayerUserId(player), out Guid guid) || SessionData.Instance.bannedIds.Contains(guid)) {
                     // Banned, or failed to parse.
-                    SessionData.Instance.Rpc_Disconnect(player);
+                    SessionData.Instance.Disconnect(player);
                     return;
                 }
             }
@@ -295,7 +295,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
 
         if (data) {
             Debug.Log($"[Network] {data.GetNickname()} ({data.GetUserIdString()}) left the room");
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.quit", "playername", data.GetNickname());
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.quit", ChatManager.Blue, "playername", data.GetNickname());
             SessionData.Instance.PlayerDatas.Remove(data.Owner);
 
             if (data.HasStateAuthority) {
@@ -457,7 +457,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         }
 
         // And join lobby
-        StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.Shared, authentication: authValues, customAppSettings: appSettings);
+        StartGameResult result = await Runner.JoinSessionLobby(SessionLobby.ClientServer, authentication: authValues, customAppSettings: appSettings);
         if (result.Ok) {
             try {
                 // Wacky reflection to get the region pings.
@@ -501,7 +501,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         return result;
     }
 
-    public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Shared, int players = 10) {
+    public static async Task<StartGameResult> CreateRoom(StartGameArgs args, GameMode gamemode = GameMode.Host, int players = 10) {
         GlobalController.Instance.connectionToken.nickname = Settings.Instance.generalNickname;
 
         connecting++;
@@ -602,12 +602,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, INetworkRunnerCallbacks
         // Attempt to join the room
         StartGameResult result = await Runner.StartGame(new() {
             AuthValues = authValues,
-            GameMode = GameMode.Shared,
+            GameMode = GameMode.Client,
             SessionName = roomId,
             ConnectionToken = GlobalController.Instance.connectionToken.Serialize(),
             EnableClientSessionCreation = false,
             SceneManager = Runner.gameObject.AddComponent<MvLSceneManager>(),
-            OnGameStarted = RoomInitialized,
+            OnGameStarted = RoomInitialized
         });
 
         if (!result.Ok) {

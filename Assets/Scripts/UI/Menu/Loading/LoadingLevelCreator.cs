@@ -1,3 +1,4 @@
+using System.Reflection;
 using UnityEngine;
 using TMPro;
 
@@ -9,14 +10,20 @@ namespace NSMB.Loading {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text text;
+        [SerializeField] private string key = "ui.loading.levelcreator", field = "levelDesigner";
 
         public void OnEnable() {
-            if (string.IsNullOrEmpty(GameManager.Instance.levelDesigner)) {
+            string value = GetValueFromField();
+            if (string.IsNullOrEmpty(value)) {
                 text.text = "";
                 return;
             }
 
-            text.text = GlobalController.Instance.translationManager.GetTranslation("ui.loading.levelcreator").Trim() + " " + GameManager.Instance.levelDesigner;
+            text.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, "username", value);
+        }
+
+        private string GetValueFromField() {
+            return GameManager.Instance.GetType().GetField(field, BindingFlags.Public | BindingFlags.Instance).GetValue(GameManager.Instance) as string;
         }
     }
 }

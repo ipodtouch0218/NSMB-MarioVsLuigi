@@ -5,8 +5,8 @@ ipodtouch0218
 <color=yellow>{ui.about.credits.github}</color>
 Amy54Desu
 AtwerJ
-AutumnLeafy
-CubbyCrazes
+Ave
+Cubby Crazes
 DonKaiStorm
 GithubSPerez
 GradedWarrior
@@ -24,7 +24,7 @@ VLC
 Zest
 
 <color=yellow>{ui.about.credits.music}</color>
-CubbyCrazes
+Cubby Crazes
 RENREN
 LiamNayru
 vincells
@@ -61,8 +61,8 @@ Tombuntu
 vlco_o
 
 <color=yellow>{ui.about.credits.qa}</color>
-AutumnLeaf
-CubbyCrazes
+Ave
+Cubby Crazes
 Fawndue
 Grape
 mindnomad
@@ -71,7 +71,7 @@ TheCyVap
 
 <color=yellow>{ui.about.credits.leveldesign}</color>
 AtwerJ
-AutumnLeaf
+Ave
 mindnomad
 Skarph
 TheCyVap
@@ -85,7 +85,7 @@ Super Mario Maker 2
 <color=yellow>{ui.about.credits.assets}</color>
 A Refracted Swindler (UI)
 Clougo (Tiles)
-CubbyCrazes (Sound)
+Cubby Crazes (Sound)
 Demon2Warrior (Background)
 Double S (Models)
 Guywah (Fonts)
