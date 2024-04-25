@@ -124,6 +124,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * mindnomad
 * Skarph
 * TheCyVap
+* VentureSonic
  
 ### Asset Rips:
 * A Refracted Swindler (UI)

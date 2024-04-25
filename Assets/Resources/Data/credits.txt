@@ -75,6 +75,7 @@ Ave
 mindnomad
 Skarph
 TheCyVap
+VentureSonic
 
 <color=yellow>{ui.about.credits.original}</color>
 New Super Mario Bros.
