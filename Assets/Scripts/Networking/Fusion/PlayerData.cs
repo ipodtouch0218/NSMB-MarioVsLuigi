@@ -109,6 +109,7 @@ public class PlayerData : NetworkBehaviour, IStateAuthorityChanged {
     }
 
     public override void Spawned() {
+        Runner.SetPlayerObject(Owner, Object);
         if (SessionData.Instance) {
             SessionData.Instance.PlayerDatas.Add(Owner, this);
         }

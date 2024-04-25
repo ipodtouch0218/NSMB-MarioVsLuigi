@@ -224,6 +224,11 @@ namespace NSMB.Game {
             }
 
             // Default loading timeout of 30 seconds
+            if (!calledLoadingComplete && Runner.TryGetLocalPlayerData(out PlayerData data2)) {
+                data2.Rpc_FinishedLoading();
+                calledLoadingComplete = true;
+            }
+
             PlayerLoadingTimeoutTime = Runner.SimulationTime + 30f;
         }
 
@@ -548,9 +553,6 @@ namespace NSMB.Game {
 
             // Tell everyone else to start the game
             StartCoroutine(CallLoadingComplete(2));
-        }
-
-        public void TrySpawnLocalPlayer() {
         }
 
         public void BumpBlock(short x, short y, TileBase oldTile, TileBase newTile, bool downwards, Vector2 offset, bool spawnCoin, NetworkPrefabRef spawnPrefab, int? tick = null, byte? counter = null) {
