@@ -71,10 +71,11 @@ Material:
     - WaveHeight: 0.3
     - WaveSpeed: 1.2
     - WaveWidth: 1
-    - WidthTiles: 8
+    - WidthTiles: 67.2
+    - _GlowPower: 4
     - _Points: 256
     - _RandomizeOffset: 0
-    - _WaveWidth: 2.5
+    - _WaveWidth: 65
     m_Colors:
     - BackgroundColor: {r: 0.3798112, g: 0, b: 0.62264144, a: 0.8156863}
     - FoamColor: {r: 1, g: 0.91886795, b: 0.99505395, a: 1}

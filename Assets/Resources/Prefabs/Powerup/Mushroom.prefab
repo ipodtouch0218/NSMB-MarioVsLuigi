@@ -31,6 +31,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1017215213198693191}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -38,7 +39,6 @@ Transform:
   m_Children:
   - {fileID: 2479772350441087688}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1017215213198693185
 MonoBehaviour:
@@ -60,6 +60,7 @@ MonoBehaviour:
   sfx: {fileID: 4207910641862185911}
   checkForNearbyPlayersWhenRespawning: 1
   _Collector: {fileID: 0}
+  _SpawnTick: 0
   powerupScriptable: {fileID: 11400000, guid: a3c6d7fa6c939be4ead398f0d82b5eb9, type: 2}
   speed: 2
   bouncePower: 0
@@ -67,6 +68,7 @@ MonoBehaviour:
   blinkingRate: 4
   scaleSize: 0.3
   scaleRate: 0.13333334
+  launchVelocity: {x: 2, y: 9}
   avoidPlayers: 0
   sRenderer: {fileID: 1145319354374527610}
   childAnimator: {fileID: 0}
@@ -146,9 +148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 2990835447
   ObjectInterest: 0
-  _DestroyWhenStateAuthorityLeaves: 0
-  _AllowStateAuthorityOverride: 0
-  Flags: 2305
+  Flags: 264449
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1017215213198693185}
@@ -341,13 +341,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8453737792750304721}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1017215213198693199}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1145319354374527610
 SpriteRenderer:

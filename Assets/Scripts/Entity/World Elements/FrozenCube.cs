@@ -22,7 +22,8 @@ namespace NSMB.Entities {
         [Networked] public UnfreezeReason KillReason { get; set; }
 
         //---Serialized Variables
-        [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, autoBreak = 3f;
+        public float autoBreak = 3f;
+        [SerializeField] private float shakeSpeed = 1f, shakeAmount = 0.1f, floatSpeed = 0.25f, floatAcceleration = 2f, floatDamping = 0.995f;
 
         public void OnBeforeSpawned(FreezableEntity entityToFreeze, Vector2 size, Vector2 offset) {
             FrozenEntity = entityToFreeze;
@@ -74,7 +75,7 @@ namespace NSMB.Entities {
         public override void Render() {
             base.Render();
 
-            if (!Object || IsDead) {
+            if (!Object || IsDead || !FrozenEntity) {
                 return;
             }
 
@@ -99,6 +100,12 @@ namespace NSMB.Entities {
         }
 
         public override void FixedUpdateNetwork() {
+
+            // Our entity despawned. remove.
+            if (!FrozenEntity) {
+                Runner.Despawn(Object);
+                return;
+            }
 
             if (!Object) {
                 return;
@@ -140,7 +147,6 @@ namespace NSMB.Entities {
             }
 
             if (FrozenEntity is PlayerController || (!Holder && !FastSlide)) {
-
                 if (AutoBreakTimer.Expired(Runner)) {
                     if (!FastSlide) {
                         KillReason = UnfreezeReason.Timer;
@@ -160,12 +166,6 @@ namespace NSMB.Entities {
                 return;
             }
 
-            // Our entity despawned. remove.
-            if (!FrozenEntity) {
-                Runner.Despawn(Object);
-                return;
-            }
-
             // Handle interactions with tiles
             if (FrozenEntity.IsCarryable) {
                 if (!HandleTile()) {
@@ -174,15 +174,23 @@ namespace NSMB.Entities {
             }
 
             if (FastSlide) {
-                //if (body.data.OnGround && body.data.FloorAngle != 0) {
-                //    RaycastHit2D ray = Runner.GetPhysicsScene2D().BoxCast(body.position + Vector2.up * hitbox.size * 0.5f, hitbox.size, 0, Vector2.down, 0.2f, Layers.MaskSolidGround);
-                //    if (ray) {
-                //        body.position = new(body.position.x, ray.point.y + Physics2D.defaultContactOffset);
-                //        if (ray.distance < 0.1f)
-                //            body.velocity = new(body.velocity.x, Mathf.Min(0, body.velocity.y));
-                //    }
-                //}
                 body.Velocity = new(CurrentKickSpeed * (FacingRight ? 1 : -1), body.Velocity.y);
+            }
+
+            if (InWater) {
+                if (FastSlide && FrozenEntity is not PlayerController) {
+                    AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, autoBreak);
+                }
+                FastSlide = false;
+
+                float newVelocity = body.Velocity.y;
+                if (newVelocity < 0) {
+                    newVelocity *= floatDamping;
+                }
+                newVelocity += (floatAcceleration * Runner.DeltaTime);
+                newVelocity = Mathf.Min(floatSpeed, newVelocity);
+
+                body.Velocity = new Vector2(body.Velocity.x * 0.95f, newVelocity);
             }
 
             ApplyConstraints();
@@ -209,7 +217,7 @@ namespace NSMB.Entities {
             body.Freeze = false;
 
             if (!Holder) {
-                body.LockX = !FastSlide;
+                body.LockX = !FastSlide && !InWater;
                 body.LockY = flying && !Fallen;
             } else {
                 body.LockX = false;
@@ -273,7 +281,7 @@ namespace NSMB.Entities {
                 return;
 
             } else if (!Fallen) {
-                if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.IsSwimming) {
+                if (FrozenEntity.IsCarryable && !Holder && !IsDead && player.CanPickupItem && player.IsOnGround && !player.InWater) {
                     // Pickup
                     Fallen = true;
                     Pickup(player);

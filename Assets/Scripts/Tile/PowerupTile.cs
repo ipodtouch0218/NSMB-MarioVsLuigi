@@ -19,8 +19,9 @@ namespace NSMB.Tiles {
         [SerializeField] private TileBase resultTile;
 
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
-            if (base.Interact(interacter, direction, worldLocation, out bumpSound))
+            if (base.Interact(interacter, direction, worldLocation, out bumpSound)) {
                 return true;
+            }
 
             bumpSound = true;
 
@@ -31,15 +32,13 @@ namespace NSMB.Tiles {
             if ((interacter is PlayerController) || (interacter is Koopa koopa && koopa.PreviousHolder != null)) {
                 PlayerController player = interacter is PlayerController controller ? controller : ((Koopa) interacter).PreviousHolder;
 
-                if (player.State >= Enums.PowerupState.Mushroom)
+                if (player.State >= Enums.PowerupState.Mushroom) {
                     spawnResult = PrefabList.Instance.Powerup_FireFlower;
+                }
             }
 
             Bump(interacter, direction, worldLocation);
             bool downwards = direction == InteractionDirection.Down;
-
-            // Don't spawn downwards if the tile below us is solid
-            downwards &= !GameManager.Instance.tileManager.GetTile(tileLocation + Vector2Int.down);
 
             GameManager.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 resultTile, downwards, SpawnOffset, false, spawnResult);

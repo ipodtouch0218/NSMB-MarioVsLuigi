@@ -30,6 +30,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4465303805189439310}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -37,7 +38,6 @@ Transform:
   m_Children:
   - {fileID: 3560772426833456990}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5742616016131993260
 MonoBehaviour:
@@ -55,9 +55,11 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 0
+  _InWater: {fileID: 0}
   body: {fileID: 3575323815080525926}
   sfx: {fileID: -4211955845073762521}
   checkForNearbyPlayersWhenRespawning: 1
+  _height: 0.5
   _IsFrozen:
     _value: 0
   _IsDead:
@@ -81,6 +83,9 @@ MonoBehaviour:
   shakeSpeed: 120
   shakeAmount: 0.03
   autoBreak: 3
+  floatSpeed: 1
+  floatAcceleration: 25
+  floatDamping: 0.85
 --- !u!61 &7126150137336674110
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -349,13 +354,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5906585881545024381}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6697499874741732443}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5772244049117569476
 SpriteRenderer:

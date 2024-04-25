@@ -44,12 +44,15 @@ namespace NSMB.Tiles {
                 doBreak = breakableByBombs;
             }
 
-            if (doBump && doBreak && bumpIfBroken)
+            if (doBump && doBreak && bumpIfBroken) {
                 Bump(interacter, direction, worldLocation);
-            if (doBump && !doBreak && bumpIfNotBroken)
+            }
+            if (doBump && !doBreak && bumpIfNotBroken) {
                 BumpWithAnimation(interacter, direction, worldLocation);
-            if (doBreak)
+            }
+            if (doBreak) {
                 Break(interacter, worldLocation, giantBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
+            }
 
             return doBreak;
         }

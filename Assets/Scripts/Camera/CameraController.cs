@@ -95,7 +95,7 @@ public class CameraController : NetworkBehaviour {
             } else {
                 dest = Vector2.Lerp(fromVectorRelative, toVectorRelative, alpha);
             }
-            Utils.WrapWorldLocation(ref dest);
+            //Utils.WrapWorldLocation(ref dest);
 
             newPosition = dest;
             newPosition.z = CurrentPosition.z;
@@ -117,6 +117,7 @@ public class CameraController : NetworkBehaviour {
 
     public void Recenter(Vector2 pos) {
         PlayerPos = CurrentPosition = pos + AirOffset;
+        LastFloorHeight = CurrentPosition.y;
         SmoothDampVel = Vector3.zero;
         SetPosition(PlayerPos);
     }

@@ -4895,9 +4895,11 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 1
+  _InWater: {fileID: 0}
   body: {fileID: 4392193488416578036}
   sfx: {fileID: 7844204986304545686}
   checkForNearbyPlayersWhenRespawning: 1
+  _height: 0.5
   _Collector: {fileID: 0}
   _IsStationary:
     _value: 0

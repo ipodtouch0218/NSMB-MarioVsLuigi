@@ -20,19 +20,20 @@ namespace NSMB.Entities.Collectable.Powerups {
         //---Networked Variables
         [Networked] protected PlayerController FollowPlayer { get; set; }
         [Networked] private TickTimer IgnorePlayerTimer { get; set; }
-
         [Networked] private Vector2 BlockSpawnOrigin { get; set; }
         [Networked] private Vector2 BlockSpawnDestination { get; set; }
         [Networked] private NetworkBool BlockSpawn { get; set; }
         [Networked] private float BlockSpawnAnimationLength { get; set; }
-
+        [Networked] private NetworkBool LaunchSpawn { get; set; }
         [Networked] public TickTimer SpawnAnimationTimer { get; set; }
+        [Networked] public int SpawnTick { get; set; }
 
         //---Public Variables
         public PowerupScriptable powerupScriptable;
 
         //---Serialized Variables
         [SerializeField] private float speed, bouncePower, terminalVelocity = 4, blinkingRate = 4, scaleSize = 0.5f, scaleRate = 30f/4f;
+        [SerializeField] private Vector2 launchVelocity = new Vector2(4f, 9f);
         [SerializeField] private bool avoidPlayers;
 
         //---Components
@@ -74,10 +75,11 @@ namespace NSMB.Entities.Collectable.Powerups {
             transform.position = body.Position = new(playerToFollow.transform.position.x, playerToFollow.cameraController.CurrentPosition.y + 1.68f);
         }
 
-        public void OnBeforeSpawned(float pickupDelay, Vector2 spawnOrigin, Vector2 spawnDestination) {
+        public void OnBeforeSpawned(float pickupDelay, Vector2 spawnOrigin, Vector2 spawnDestination, bool launch = false) {
             OnBeforeSpawned(pickupDelay);
 
-            BlockSpawn = true;
+            LaunchSpawn = launch;
+            BlockSpawn = !launch;
             BlockSpawnOrigin = spawnOrigin;
             BlockSpawnDestination = spawnDestination;
             BlockSpawnAnimationLength = pickupDelay;
@@ -91,6 +93,8 @@ namespace NSMB.Entities.Collectable.Powerups {
 
         public override void Spawned() {
             base.Spawned();
+            SpawnTick = Runner.Tick;
+
             if (Runner.Topology == Topologies.ClientServer) {
                 Runner.SetIsSimulated(Object, true);
             }
@@ -118,6 +122,13 @@ namespace NSMB.Entities.Collectable.Powerups {
                     if (childAnimation) {
                         childAnimation.Play();
                     }
+                } else if (LaunchSpawn) {
+                    // Spawn with velocity
+                    body.Freeze = false;
+                    body.Velocity = launchVelocity;
+                    sRenderer.sortingOrder = -1000;
+                    gameObject.layer = Layers.LayerHitsNothing;
+
                 } else {
                     // Spawned by any other means (blue koopa, usually.)
                     body.Freeze = false;
@@ -197,6 +208,13 @@ namespace NSMB.Entities.Collectable.Powerups {
                 }
 
                 return;
+            } else if (LaunchSpawn) {
+                // Back to normal layers
+                if (Runner.Tick - SpawnTick > 5) {
+                    sRenderer.sortingOrder = OriginalSortingOrder;
+                    gameObject.layer = Layers.LayerEntityNoGroundEntity;
+                    LaunchSpawn = false;
+                }
             }
 
             Vector2 size = hitbox.size * transform.lossyScale * 0.7f;

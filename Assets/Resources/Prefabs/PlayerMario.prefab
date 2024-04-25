@@ -10526,9 +10526,11 @@ MonoBehaviour:
     _value: 0
   _IsActive:
     _value: 1
+  _InWater: {fileID: 0}
   body: {fileID: 7021228977528019271}
   sfx: {fileID: 5377451828833222271}
   checkForNearbyPlayersWhenRespawning: 1
+  _height: 0.5
   _IsFrozen:
     _value: 0
   _State: 2
@@ -10600,8 +10602,6 @@ MonoBehaviour:
   _SwimJump:
     _value: 0
   _SwimLeaveForceHoldJumpTime: 0
-  _IsSwimming:
-    _value: 0
   _IsWaterWalking:
     _value: 0
   _Disconnected:
@@ -10644,6 +10644,7 @@ MonoBehaviour:
   soundRange: 10
   slopeSlidingAngle: 12.5
   pickupTime: 0.45
+  pipeDuration: 2
   megaStartTime: 1.5
   propellerLaunchVelocity: 6
   propellerFallSpeed: 2
@@ -10684,7 +10685,6 @@ MonoBehaviour:
   blueShell: {fileID: 3629787967981286811}
   propellerHelmet: {fileID: 8712194458326895251}
   propeller: {fileID: 8626919663303982960}
-  pipeDuration: 2
   deathUpTime: 0.6
   deathForce: 7
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}

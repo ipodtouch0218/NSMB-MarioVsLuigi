@@ -41,6 +41,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomGhost.unity
     guid: 39b9f67bcc00dd640a5971ac500078e9
+  - enabled: 1
+    path: Assets/Scenes/Levels/CustomBeach.unity
+    guid: fb42e791761c8774688977ac600ab52b
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: b02bce592fba21b4982d8cf5e36a1459,
       type: 2}

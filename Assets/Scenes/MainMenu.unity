@@ -36500,6 +36500,9 @@ MonoBehaviour:
   - translationKey: level.custom.ghosthouse
     levelPreviewPosition: {fileID: 158027833}
     buildIndex: 11
+  - translationKey: level.custom.beach
+    levelPreviewPosition: {fileID: 158027833}
+    buildIndex: 12
 --- !u!4 &887693662
 Transform:
   m_ObjectHideFlags: 0

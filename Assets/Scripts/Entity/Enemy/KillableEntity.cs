@@ -36,6 +36,7 @@ namespace NSMB.Entities {
         [Networked] protected byte ComboCounter { get; set; }
 
         //---Properties
+        public override float Height => hitbox.size.y;
         public override bool IsCarryable => iceCarryable;
         public override bool IsFlying => flying;
         public override Vector2 FrozenSize {
@@ -244,9 +245,7 @@ namespace NSMB.Entities {
                 return;
             }
 
-            IsDead = true;
-            WasSpecialKilled = false;
-            WasGroundpounded = false;
+            DespawnEntity();
             IsActive = false;
             WasCrushed = true;
             ComboCounter = 0;

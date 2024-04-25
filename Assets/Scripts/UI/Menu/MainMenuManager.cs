@@ -710,6 +710,7 @@ namespace NSMB.UI.MainMenu {
                 OpenRoomListMenu();
             }
 
+            music.volume = 1;
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 

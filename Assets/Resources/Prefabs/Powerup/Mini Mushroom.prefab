@@ -40,6 +40,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1017215213198693185, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
+      propertyPath: launchVelocity
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1017215213198693185, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: launchVelocity.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1017215213198693185, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
       propertyPath: powerupScriptable
       value: 
       objectReference: {fileID: 11400000, guid: b3cbb6a3699975d4fb0a2e641a09684c,

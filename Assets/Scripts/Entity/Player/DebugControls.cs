@@ -64,6 +64,9 @@ public class DebugControls : MonoBehaviour {
         if (kb[Key.P].wasPressedThisFrame) {
             GameManager.Instance.localPlayer.Death(false, false);
         }
+        if (kb[Key.LeftBracket].wasPressedThisFrame) {
+            GameManager.Instance.localPlayer.DoKnockback(GameManager.Instance.localPlayer.FacingRight, 1, false, null);
+        }
     }
 
     private void FreezePlayer(Key key) {

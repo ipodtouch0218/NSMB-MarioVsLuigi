@@ -237,10 +237,10 @@ MonoBehaviour:
   pointsPerTile: 4
   splashWidth: 1
   heightTiles: 3
-  tension: 0.9
-  kconstant: 100
-  damping: 0.985
-  splashVelocity: 10
+  tension: 3
+  kconstant: 700
+  damping: 0.9
+  splashVelocity: 30
   animationSpeed: 9
   liquidType: 0
 --- !u!114 &4157375552812710484

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Fusion;
+using NSMB.Entities.World;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
@@ -20,6 +21,7 @@ namespace NSMB.Entities {
         [Networked] public TickTimer DespawnTimer { get; set; }
         [Networked] protected NetworkBool FirstSpawn { get; set; } = true;
         [Networked] protected Vector2 SpawnLocation { get; set; }
+        [Networked] public WaterSplash InWater { get; set; }
 
         //---Components
         [SerializeField] public EntityMover body;
@@ -27,9 +29,13 @@ namespace NSMB.Entities {
 
         //---Properties
         public bool IsRespawningEntity => Object.NetworkTypeId.IsSceneObject;
+        public virtual float Height => _height;
 
         //---Public Variables
         public bool checkForNearbyPlayersWhenRespawning = true;
+
+        //---Serialized Variables
+        [SerializeField] private float _height = 0.5f;
 
         //---Private Variables
         private bool brickBreakSound;
@@ -250,5 +256,14 @@ namespace NSMB.Entities {
                 }
             }
         }
+
+#if UNITY_EDITOR
+        //---Editor
+        public void OnDrawGizmosSelected() {
+            Gizmos.color = Color.red;
+            Vector3 center = transform.position + Height * 0.5f * Vector3.up;
+            Gizmos.DrawLine(center + Vector3.left * 0.25f, center + Vector3.right * 0.25f);
+        }
+#endif
     }
 }

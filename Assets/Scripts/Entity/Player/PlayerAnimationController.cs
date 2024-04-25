@@ -169,7 +169,7 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(dust, !controller.IsDead && (controller.WallSlideLeft || controller.WallSlideRight || (controller.IsOnGround && (controller.IsSkidding || (controller.IsCrouching && body.Velocity.sqrMagnitude > 0.25f))) || (((controller.IsSliding && body.Velocity.sqrMagnitude > 0.25f) || controller.IsInShell) && controller.IsOnGround)) && !controller.CurrentPipe);
             SetParticleEmission(giantParticle, !controller.IsDead && controller.State == Enums.PowerupState.MegaMushroom && controller.MegaStartTimer.ExpiredOrNotRunning(Runner));
             SetParticleEmission(fireParticle, !controller.IsRespawning && controller.FireDeath && controller.IsDead && deathTimer > deathUpTime);
-            SetParticleEmission(bubblesParticle, controller.IsSwimming);
+            SetParticleEmission(bubblesParticle, controller.InWater);
 
             if (controller.IsCrouching || controller.IsSliding || controller.IsSkidding) {
                 dust.transform.localPosition = Vector2.zero;
@@ -217,7 +217,7 @@ namespace NSMB.Entities.Player {
 
             if (controller.IsInKnockback || controller.IsFrozen) {
                 bool right = controller.FacingRight;
-                if (controller.IsInKnockback && controller.IsWeakKnockback) {
+                if (controller.IsInKnockback && (controller.InWater || controller.IsWeakKnockback)) {
                     right = controller.KnockbackWasOriginallyFacingRight;
                 }
                 modelRotationTarget.Set(0, right ? 110 : 250, 0);
@@ -324,7 +324,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamMega, controller.State == Enums.PowerupState.MegaMushroom);
             animator.SetBool(ParamInShell, controller.IsInShell || (controller.State == Enums.PowerupState.BlueShell && (controller.IsCrouching || controller.IsGroundpounding || controller.IsSliding) && (controller.GroundpoundStartTimer.RemainingTime(Runner) ?? 0f) <= 0.15f));
             animator.SetBool(ParamTurnaround, controller.IsTurnaround);
-            animator.SetBool(ParamSwimming, controller.IsSwimming && !controller.IsGroundpounding && !controller.IsDrilling && !controller.IsFrozen);
+            animator.SetBool(ParamSwimming, controller.InWater && !controller.IsGroundpounding && !controller.IsDrilling && !controller.IsFrozen);
             animator.SetBool(ParamAHeld, controller.PreviousInputs.Buttons.IsSet(PlayerControls.Jump));
             animator.SetBool(ParamFireballKnockback, controller.IsWeakKnockback);
             animator.SetBool(ParamKnockforwards, controller.IsForwardsKnockback);

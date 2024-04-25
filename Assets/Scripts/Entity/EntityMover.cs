@@ -80,7 +80,6 @@ public class EntityMover : NetworkBehaviour, IBeforeTick, IAfterTick, IAfterAllT
         if (Freeze) {
             newPosition = Position;
         } else if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
-
             // Snapshot interpolation with no smoothing:
             Vector2 fromVector;
             Vector2 toVector;

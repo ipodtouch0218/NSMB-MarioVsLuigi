@@ -6,6 +6,7 @@ using NSMB.Entities.Collectable.Powerups;
 using NSMB.Extensions;
 using NSMB.Game;
 using NSMB.Tiles;
+using NSMB.Utils;
 
 public class BlockBump : NetworkBehaviour {
 
@@ -128,8 +129,11 @@ public class BlockBump : NetworkBehaviour {
             animDestination = animOrigin + (Vector2.up * 0.5f);
         }
 
+        // Launch if downwards bump and theres a (solid) block below us
+        bool launch = Utils.IsTileSolidAtTileLocation(TileLocation + Vector2Int.down);
+
         Runner.Spawn(SpawnPrefab, animOrigin, onBeforeSpawned: (runner, obj) => {
-            obj.GetComponent<Powerup>().OnBeforeSpawned(pickupDelay, animOrigin, animDestination);
+            obj.GetComponent<Powerup>().OnBeforeSpawned(pickupDelay, animOrigin, animDestination, launch);
         });
         Runner.Despawn(Object);
     }
