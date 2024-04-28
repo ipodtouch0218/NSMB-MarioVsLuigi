@@ -41,20 +41,22 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
     private void SetSprite() {
 
-        if (!isDisplaying || frames.Length == 0)
+        if (!isDisplaying)
             return;
 
         frame = Mathf.Repeat(frame, frames.Length);
-        int currentFrame = Mathf.FloorToInt(frame);
-        Sprite currentSprite = frames[currentFrame];
 
+        //If the Sprite Renderer is visible
+        if (sRenderer.isVisible) {
+            int currentFrame = Mathf.FloorToInt(frame);
+            Sprite currentSprite = frames[currentFrame];
+            if (sRenderer && currentSprite != sRenderer.sprite) {
+                sRenderer.sprite = currentSprite;
+            }
 
-        if (sRenderer && currentSprite != sRenderer.sprite) {
-            sRenderer.sprite = currentSprite;
-        }
-
-        if (image && currentSprite != image.sprite) {
-            image.sprite = currentSprite;
+            if (image && currentSprite != image.sprite) {
+                image.sprite = currentSprite;
+            }
         }
     }
 }

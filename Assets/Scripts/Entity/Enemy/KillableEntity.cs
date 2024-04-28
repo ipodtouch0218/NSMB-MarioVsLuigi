@@ -151,6 +151,10 @@ namespace NSMB.Entities {
                 return;
 
             } else if (IsDead || IsFrozen) {
+                //If the enemy is dead, disable the volume distance modifier so that dead enemies don't call that function...
+                if (IsDead) {
+                    GetComponent<VolumeWithDistance>().enabled = false;
+                }
                 gameObject.layer = Layers.LayerHitsNothing;
                 body.Freeze = false;
 
@@ -317,6 +321,9 @@ namespace NSMB.Entities {
             WasKilledByMega = false;
             WasCrushed = false;
             ComboCounter = 0;
+
+            //Re-enable the Volume with Distance when brought back to life
+            GetComponent<VolumeWithDistance>().enabled = true;
 
             if (body) {
                 body.Gravity = Vector2.down * 21.5f;
