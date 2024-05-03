@@ -5,17 +5,17 @@ AudioImporter:
   serializedVersion: 7
   defaultSettings:
     serializedVersion: 2
-    loadType: 0
-    sampleRateSetting: 0
+    loadType: 2
+    sampleRateSetting: 2
     sampleRateOverride: 44100
     compressionFormat: 1
     quality: 0.5
     conversionMode: 0
-    preloadAudioData: 1
+    preloadAudioData: 0
   platformSettingOverrides: {}
   forceToMono: 0
   normalize: 1
-  loadInBackground: 0
+  loadInBackground: 1
   ambisonic: 0
   3D: 1
   userData: 
