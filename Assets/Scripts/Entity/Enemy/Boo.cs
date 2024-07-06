@@ -141,7 +141,7 @@ public class Boo : KillableEntity {
     public override void InteractWithPlayer(PlayerController player, PhysicsDataStruct.IContactStruct contact = null) {
         if (player.State == Enums.PowerupState.MegaMushroom || player.IsStarmanInvincible || player.IsInShell) {
             bool fromRight = Utils.WrappedDirectionSign(body.Position, CurrentTarget.body.Position + targetingOffset) == -1;
-            SpecialKill(!fromRight, false, !player.IsStarmanInvincible, player.StarCombo++);
+            SpecialKill(!fromRight, false, player.State == Enums.PowerupState.MegaMushroom, player.StarCombo++);
             return;
         }
 

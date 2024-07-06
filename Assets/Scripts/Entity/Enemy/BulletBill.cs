@@ -190,7 +190,7 @@ namespace NSMB.Entities.Enemies {
         //---Debug
         private static readonly Color RedHalfAlpha = new(1f, 0f, 0f, 0.5f);
         private Vector2? boxOffset;
-        public void OnDrawGizmosSelected() {
+        public override void OnDrawGizmosSelected() {
             if (!GameManager.Instance || !body.Object) {
                 return;
             }

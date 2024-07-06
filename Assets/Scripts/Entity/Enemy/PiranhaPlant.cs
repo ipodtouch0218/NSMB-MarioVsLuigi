@@ -187,7 +187,7 @@ namespace NSMB.Entities.Enemies {
 
 #if UNITY_EDITOR
         //---Debug
-        public void OnDrawGizmosSelected() {
+        public override void OnDrawGizmosSelected() {
             Gizmos.color = new Color(1, 0, 0, 0.5f);
             Gizmos.DrawSphere(transform.position + (Vector3) (playerDetectSize * 0.5f * Vector2.up), playerDetectSize);
         }

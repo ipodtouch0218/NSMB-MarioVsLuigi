@@ -259,7 +259,7 @@ namespace NSMB.Entities {
 
 #if UNITY_EDITOR
         //---Editor
-        public void OnDrawGizmosSelected() {
+        public virtual void OnDrawGizmosSelected() {
             Gizmos.color = Color.red;
             Vector3 center = transform.position + Height * 0.5f * Vector3.up;
             Gizmos.DrawLine(center + Vector3.left * 0.25f, center + Vector3.right * 0.25f);
