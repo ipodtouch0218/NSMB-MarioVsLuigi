@@ -1,0 +1,67 @@
+{
+    "name": "Quantum.Unity.Editor",
+    "rootNamespace": "Quantum.Editor",
+    "references": [
+        "GUID:831409e8f9d13b5479a3baef9822ad34",
+        "GUID:f6fa0c2f8b9a9f64897d3351666f3d66",
+        "GUID:5d82202959c2f144ea95e134645b6833",
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:69448af7b92c7f342b298e06a37122aa",
+        "GUID:32c49a2b46293194aa4cf793bc0e6010",
+        "GUID:fdae25391b6090942b63551d0cc45292",
+        "GUID:8c4dd21966739024fbd72155091d199e",
+        "GUID:86c9d8e67265f41469be06142c397d17"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.addressables",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_ADDRESSABLES"
+        },
+        {
+            "name": "com.unity.modules.physics",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_PHYSICS3D"
+        },
+        {
+            "name": "com.unity.modules.physics2d",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_PHYSICS2D"
+        },
+        {
+            "name": "com.unity.modules.ai",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_AI"
+        },
+        {
+            "name": "com.unity.modules.terrain",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_TERRAIN"
+        },
+        {
+            "name": "com.photonengine.quantum",
+            "expression": "1.0",
+            "define": "QUANTUM_UPM"
+        },
+        {
+            "name": "com.unity.ai.navigation",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_AI_NAVIGATION"
+        },
+        {
+            "name": "com.unity.multiplayer.playmode",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_MPPM"
+        }
+    ],
+    "noEngineReferences": false
+}

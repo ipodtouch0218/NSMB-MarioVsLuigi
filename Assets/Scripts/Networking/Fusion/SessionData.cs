@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-using Fusion;
 using NSMB.Extensions;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
@@ -343,10 +340,12 @@ public class SessionData : NetworkBehaviour, IStateAuthorityChanged {
         ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.started", ChatManager.Red);
         SetGameStarted(true);
 
+        /* TODO
         // Load the correct scene
         if (Runner.IsSceneAuthority) {
             Runner.LoadScene(MainMenuManager.Instance.GetCurrentSceneRef(), LoadSceneMode.Single);
         }
+        */
     }
 
     //---OnChangeds

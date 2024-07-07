@@ -1,0 +1,31 @@
+{
+    "name": "Quantum.Menu.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Quantum.Menu",
+        "Quantum.Simulation",
+        "Quantum.Unity"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_TEXTMESHPRO"
+        },
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "QUANTUM_ENABLE_TEXTMESHPRO"
+        }
+    ],
+    "noEngineReferences": false
+}

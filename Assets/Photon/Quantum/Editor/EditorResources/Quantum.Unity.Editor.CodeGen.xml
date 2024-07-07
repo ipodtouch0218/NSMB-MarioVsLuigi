@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Quantum.Unity.Editor.CodeGen</name>
+    </assembly>
+    <members>
+        <member name="F:Quantum.Editor.QuantumCodeGenQtn.VersionFilepath">
+            <summary>
+            The Quantum CodeGen version that the SDK expects. This is used to show a hint to restart UnityEditor during upgrading for example.
+            </summary>
+        </member>
+    </members>
+</doc>

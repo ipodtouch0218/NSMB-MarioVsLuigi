@@ -1,0 +1,8 @@
+namespace Quantum {
+  using Photon.Deterministic;
+
+  public unsafe class #SCRIPTNAME# : SystemMainThread {
+    public override void Update(Frame f) {
+    }
+  }
+}

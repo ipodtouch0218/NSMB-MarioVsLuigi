@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Quantum.CodeGen.Qtn</name></assembly>
+<members>
+<member name="P:Quantum.CodeGen.CompileError.SourceCode">
+ <summary>
+ Source snippet where the error occurred.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.CompileError.Position">
+ <summary>
+ Line and column position of the error.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.CompileError.Path">
+ <summary>
+ Source file path where the error occurred.
+ </summary>
+</member>
+<member name="T:Quantum.CodeGen.CompileError">
+ <summary>
+ Represents a compile error.
+ </summary>
+</member>
+<member name="T:Quantum.CodeGen.WarningCallback">
+ <summary>
+ The warning handler delegate.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.CompileWarning.SourceCode">
+ <summary>
+ Source snippet where the error occurred.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.CompileWarning.Position">
+ <summary>
+ Line and column position of the error.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.CompileWarning.Path">
+ <summary>
+ Source file path where the error occurred.
+ </summary>
+</member>
+<member name="T:Quantum.CodeGen.CompileWarning">
+ <summary>
+ Represents a compile warning.
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFile.UserFolder@">
+ <summary>The user folder where the file should be placed.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFile.Kind@">
+ <summary>The kind of the file.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFile.FormerNames@">
+ <summary>Former names of the file. Can be used to migrate old .meta files.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFile.Contents@">
+ <summary>The file contents.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFile.Name@">
+ <summary>The file name.</summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOutputFile.UserFolder">
+ <summary>The user folder where the file should be placed.</summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOutputFile.Name">
+ <summary>The file name.</summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOutputFile.Kind">
+ <summary>The kind of the file.</summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOutputFile.FormerNames">
+ <summary>Former names of the file. Can be used to migrate old .meta files.</summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOutputFile.Contents">
+ <summary>The file contents.</summary>
+</member>
+<member name="T:Quantum.CodeGen.GeneratorOutputFile">
+ <summary>
+ Represents a generated file.
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.UnityPrototypeAdapters">
+ <summary>File with component prototype Unity adapters. Used if prototype's field needs to be represented differently
+ for the sake of Unity serialization/inspection.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.UnityPrototypeWrapper">
+ <summary>File with component prototype Unity wrappers.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.UnityLegacyAssetBase">
+ <summary>File with legacy AssetBase wrappers. Generated if <see cref="GeneratorLegacyOptions.AssetBaseStubs"/> is used.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.LegacyPrototypes">
+ <summary>File with legacy prototypes. Generated if <see cref="GeneratorLegacyOptions.UnderscorePrototypesSuffix"/> is used.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.LegacyAssetRefs">
+ <summary>File with legacy AssetRef structs. Generated if <see cref="GeneratorLegacyOptions.AssetRefs/> is used."/></summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.LegacyAssetObjects">
+ <summary>File with code generated due to legacy <c>asset</c> directives.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.Prototypes">
+ <summary>Prototypes file.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.Events">
+ <summary>Events file.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOutputFileKind.Core">
+ <summary>Core file.</summary>
+</member>
+<member name="T:Quantum.CodeGen.GeneratorOutputFileKind">
+ <summary>
+ Represents the kind of generated files.
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.FileNamePrefix@">
+ <summary>Prefix for the generated file names. Default is "Quantum".</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.LibName@">
+ <summary>
+ If not <see langword="null"/> or empty, runs code generator in "Lib mode":
+ <list type="bullet">
+ <item><description>No inputs</description></item>
+ <item><description>No signals</description></item>
+ <item><description>No events</description></item>
+ <item><description>No component type ids</description></item>
+ <item><description>No globals</description></item>
+ </list>
+ Such library can be integrated into the main project:
+ <list type="bullet">
+ <item><description>Use <c>import component</c> to register components defined in the library.</description></item>
+ <item><description>Call <c>StaticLibName.InitStaticDelegates</c> & <c>StaticLibName.RegisterSimulationTypes</c> to initialize the library in <c>Statics.InitStaticDelegatesUser</c> & <c>Simulation.RegisterTypesUser</c>, respectively.</description></item>
+ </list>
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.LegacyCodeGenOptions@">
+ <summary>
+ Legacy options for the code generator, useful when migrating from previous Quantum versions.
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.ImportLegacyScripts@">
+ <summary>
+ If <see langword="true"/>, legacy existing EntityComponent wrappers script guids will be reused for newly generated prototype wrappers.
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.UnityPrototypePrefix@">
+ <summary>
+ Prototype types prefix for Unity prototype wrappers. Default is "QPrototype".
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.UnityPrototypeSuffix@">
+ <summary>
+ Prototype types suffix for Unity prototype wrappers. Default is "".
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.PrototypePrefix@">
+ <summary>
+ Prototype types prefix. Default is "".
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.PrototypeSuffix@">
+ <summary>
+ Prototype types suffix. Default is "Prototype".
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.UserUsings@">
+ <summary>
+ Custom using section to be added to the generated code.
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorOptions.NewLine@">
+ <summary>
+ New line characters. If <see langword="null"/>, the default new line characters for the current environment are used.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.UnityPrototypeSuffix(System.String)">
+ <summary>
+ Prototype types suffix for Unity prototype wrappers. Default is "".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.UnityPrototypePrefix(System.String)">
+ <summary>
+ Prototype types prefix for Unity prototype wrappers. Default is "QPrototype".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.PrototypeSuffix(System.String)">
+ <summary>
+ Prototype types suffix. Default is "Prototype".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.PrototypePrefix(System.String)">
+ <summary>
+ Prototype types prefix. Default is "".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.NewLine(System.String)">
+ <summary>
+ New line characters. If <see langword="null"/>, the default new line characters for the current environment are used.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.LibName(System.String)">
+ <summary>
+ If not <see langword="null"/> or empty, runs code generator in "Lib mode":
+ <list type="bullet">
+ <item><description>No inputs</description></item>
+ <item><description>No signals</description></item>
+ <item><description>No events</description></item>
+ <item><description>No component type ids</description></item>
+ <item><description>No globals</description></item>
+ </list>
+ Such library can be integrated into the main project:
+ <list type="bullet">
+ <item><description>Use <c>import component</c> to register components defined in the library.</description></item>
+ <item><description>Call <c>StaticLibName.InitStaticDelegates</c> & <c>StaticLibName.RegisterSimulationTypes</c> to initialize the library in <c>Statics.InitStaticDelegatesUser</c> & <c>Simulation.RegisterTypesUser</c>, respectively.</description></item>
+ </list>
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.LegacyCodeGenOptions(Quantum.CodeGen.GeneratorLegacyOptions)">
+ <summary>
+ Legacy options for the code generator, useful when migrating from previous Quantum versions.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.ImportLegacyScripts(System.Boolean)">
+ <summary>
+ If <see langword="true"/>, legacy existing EntityComponent wrappers script guids will be reused for newly generated prototype wrappers.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.FileNamePrefix(System.String)">
+ <summary>Prefix for the generated file names. Default is "Quantum".</summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.UserUsings">
+ <summary>
+ Custom using section to be added to the generated code.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.UnityPrototypeSuffix">
+ <summary>
+ Prototype types suffix for Unity prototype wrappers. Default is "".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.UnityPrototypePrefix">
+ <summary>
+ Prototype types prefix for Unity prototype wrappers. Default is "QPrototype".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.PrototypeSuffix">
+ <summary>
+ Prototype types suffix. Default is "Prototype".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.PrototypePrefix">
+ <summary>
+ Prototype types prefix. Default is "".
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.NewLine">
+ <summary>
+ New line characters. If <see langword="null"/>, the default new line characters for the current environment are used.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.LibName">
+ <summary>
+ If not <see langword="null"/> or empty, runs code generator in "Lib mode":
+ <list type="bullet">
+ <item><description>No inputs</description></item>
+ <item><description>No signals</description></item>
+ <item><description>No events</description></item>
+ <item><description>No component type ids</description></item>
+ <item><description>No globals</description></item>
+ </list>
+ Such library can be integrated into the main project:
+ <list type="bullet">
+ <item><description>Use <c>import component</c> to register components defined in the library.</description></item>
+ <item><description>Call <c>StaticLibName.InitStaticDelegates</c> & <c>StaticLibName.RegisterSimulationTypes</c> to initialize the library in <c>Statics.InitStaticDelegatesUser</c> & <c>Simulation.RegisterTypesUser</c>, respectively.</description></item>
+ </list>
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.LegacyCodeGenOptions">
+ <summary>
+ Legacy options for the code generator, useful when migrating from previous Quantum versions.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.IsLib">
+ <summary>Returns <see langword="true"/> if LibName is set.</summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.ImportLegacyScripts">
+ <summary>
+ If <see langword="true"/>, legacy existing EntityComponent wrappers script guids will be reused for newly generated prototype wrappers.
+ </summary>
+</member>
+<member name="P:Quantum.CodeGen.GeneratorOptions.FileNamePrefix">
+ <summary>Prefix for the generated file names. Default is "Quantum".</summary>
+</member>
+<member name="T:Quantum.CodeGen.GeneratorOptions">
+ <summary>
+ Options for the code generator.
+ </summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.UnityUpgradableObsoleteAttributes">
+ <summary>Generates Unity-upgradeable Obsolete attributes</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.BuiltInComponentPrototypeWrappers">
+ <summary>Generates QPrototype wrappers for built-in prototypes</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.DefaultMigrationFlags">
+ <summary> Default legacy options: AssetRefs | AssetObjectAccessors | AssetBaseStubs | UnderscorePrototypesSuffix | AssetObjects | EntityComponentStubs</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.EntityComponentStubs">
+ <summary>Generates legacy EntityComponent wrappers for component prototypes</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.AssetObjectStubs">
+ <summary>Generates <c>: AssetObject</c> per each <c>asset</c> directive</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.UnderscorePrototypesSuffix">
+ <summary>Generates prototypes with _Prototype suffix additionally to the default prototypes</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.AssetBaseStubs">
+ <summary>Generates legacy AssetBase wrappers</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.AssetObjectAccessors">
+ <summary>Generates Settings, GetUnityAsset and AssetObject properties/methods.</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.AssetRefs">
+ <summary>Generates legacy AssetRefs (a specific struct per asset)</summary>
+</member>
+<member name="F:Quantum.CodeGen.GeneratorLegacyOptions.None">
+ <summary>None</summary>
+</member>
+<member name="T:Quantum.CodeGen.GeneratorLegacyOptions">
+ <summary>
+ Represents the legacy options for the code generator.
+ </summary>
+</member>
+<member name="M:Quantum.CodeGen.Generator.Generate(System.Collections.Generic.IEnumerable{System.String},Quantum.CodeGen.GeneratorOptions,System.Action{Quantum.CodeGen.CompileWarning})">
+ <summary>
+ Generates code from the given files.
+ </summary>
+ <param name="files">List of QTN files</param>
+ <param name="options">Generator options</param>
+ <param name="warningCallback">Warning handler</param>
+</member>
+<member name="P:Quantum.CodeGen.Generator.Version">
+ <summary>
+ The current version of the code generator.
+ </summary>
+</member>
+<member name="T:Quantum.CodeGen.Generator">
+ <summary>
+ Code generator for Quantum.
+ </summary>
+</member>
+</members>
+</doc>

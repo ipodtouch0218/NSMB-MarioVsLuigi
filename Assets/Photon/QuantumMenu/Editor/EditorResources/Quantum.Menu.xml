@@ -1,0 +1,1916 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Quantum.Menu</name>
+    </assembly>
+    <members>
+        <member name="T:Quantum.Menu.QuantumMenuUIMain">
+            <summary>
+            Partial extension for the Quantum SDK menu.
+            </summary>
+            <summary>
+            The main menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain.IsReconnectionCheckEnabled">
+            <summary>
+            Check if reconnect information is valid and try to reconnect when entering the linked screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain.ConnectionAttemptsCount">
+            <summary>
+            The number of the reconnection triggers when entering the screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._usernameLabel">
+            <summary>
+            The username label.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._sceneThumbnail">
+            <summary>
+            The scene thumbnail. Can be null.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._usernameView">
+            <summary>
+            The username input UI part.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._usernameInput">
+            <summary>
+            The actual username input field.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._usernameConfirmButton">
+            <summary>
+            The username confirmation button (background).
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._usernameButton">
+            <summary>
+            The username change button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._characterButton">
+            <summary>
+            The open character selection button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._partyButton">
+            <summary>
+            The open party screen button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._playButton">
+            <summary>
+            The quick play button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._quitButton">
+            <summary>
+            The quit button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._sceneButton">
+            <summary>
+            The open scene screen button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIMain._settingsButton">
+            <summary>
+            The open setting button.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.Awake">
+            <summary>
+            The Unity awake method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIMain.AwakeUser"/> to be implemented on the SDK side.
+            Applies the current selected graphics settings (loaded from PlayerPrefs)
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.Init">
+            <summary>
+            The screen init method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIMain.InitUser"/> to be implemented on the SDK side.
+            Initialized the default arguments.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.Show">
+            <summary>
+            The screen show method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIMain.ShowUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.Hide">
+            <summary>
+            The screen hide method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIMain.HideUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnFinishUsernameEdit">
+            <summary>
+            Is called when the scceen background is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnFinishUsernameEdit(System.String)">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._usernameInput"/> has finished editing using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnUsernameButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._usernameButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnPlayButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._playButton"/> is pressed using SendMessage() from the UI object.
+            Initiates the connection and expects the connection object to set further screen states.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnPartyButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._partyButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnScenesButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._sceneButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnSettingsButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._settingsButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnCharacterButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._characterButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIMain.OnQuitButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIMain._quitButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuScreenPluginVersion">
+            <summary>
+            The version plugin is used to format informational parts of the <see cref="T:Quantum.Menu.QuantumMenuConnectArgs"/> or <see cref="T:Quantum.Menu.QuantumMenuConnectionBehaviour"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginVersion._textField">
+            <summary>
+            The text field to write version information into.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginVersion.Show(Quantum.Menu.QuantumMenuUIScreen)">
+            <summary>
+            The parent screen is shown. Use the connection object (is available) or the connection args to format a version string.
+            </summary>
+            <param name="screen"></param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginVersion.GetInformationalVersion(Quantum.Menu.QuantumMenuConnectArgs)">
+            <summary>
+            Format a version string from the <see cref="T:Quantum.Menu.QuantumMenuConnectArgs"/>.
+            </summary>
+            <param name="connectionArgs">Connection args.</param>
+            <returns>Informational version string</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginVersion.GetInformationalVersion(Quantum.Menu.QuantumMenuConnectionBehaviour)">
+            <summary>
+            Format a version string from the <see cref="T:Quantum.Menu.QuantumMenuConnectionBehaviour"/>.
+            </summary>
+            <param name="connection">Connection object.</param>
+            <returns>Informational version string</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginVersion.CreateInformationVersion(System.String,System.String)">
+            <summary>
+            Construct the informational version string.
+            </summary>
+            <param name="region">Region</param>
+            <param name="appVersion">AppVersion</param>
+            <returns>Informational version string</returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUISettings">
+            <summary>
+            Partial extension for the Quantum SDK menu settings view.
+            </summary>
+            <summary>
+            The settings screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiAppVersion">
+            <summary>
+            The ui app version dropdown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._goAppVersion">
+            <summary>
+            The app version GameObject to disable this option.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiFullscreen">
+            <summary>
+            The fullscreen toggle.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._goFullscreenn">
+            <summary>
+            The fullscreen GameObject to disable this option.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiFramerate">
+            <summary>
+            The framerate dropdown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiGraphicsQuality">
+            <summary>
+            The graphics quality dropdown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiMaxPlayers">
+            <summary>
+            The max player input field.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiRegion">
+            <summary>
+            The region dropdown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._goRegion">
+            <summary>
+            The region GameObject to disable this option.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiResolution">
+            <summary>
+            The resolution dropdown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._goResolution">
+            <summary>
+            The resoltion GameObject to disable this option.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._uiVSyncCount">
+            <summary>
+            The VSync toggle.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._backButton">
+            <summary>
+            The back button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._sdkLabel">
+            <summary>
+            The sdk information label.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._entryRegion">
+            <summary>
+            The region dropdown option map.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._entryAppVersion">
+            <summary>
+            The app version dropdown option map.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._entryFramerate">
+            <summary>
+            The framerate dropdown option map.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._entryResolution">
+            <summary>
+            The resolution dropdown option map.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._entryGraphicsQuality">
+            <summary>
+            The graphics quality dropdown option map.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._graphicsSettings">
+            <summary>
+            The graphics settings object.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUISettings._appVersions">
+            <summary>
+            The app version list including the machine-id.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUISettings.Awake">
+            <summary>
+            The Unity awake method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUISettings.AwakeUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUISettings.Init">
+            <summary>
+            The screen init method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUISettings.InitUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUISettings.Show">
+            <summary>
+            The screen show method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUISettings.ShowUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUISettings.Hide">
+            <summary>
+            The screen hide method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUISettings.HideUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUISettings.SaveChanges">
+            <summary>
+            Saving changes callbacks are registered to all ui elements during <see cref="M:Quantum.Menu.QuantumMenuUISettings.Show"/>.
+            If defined the partial SaveChangesUser() is also called in the end.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUISettings.OnBackButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUISettings._backButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuScreenPluginTooltip">
+            <summary>
+            The tooltip plugin can be used to add tooltip text to a button.
+            The <see cref="T:Quantum.Menu.QuantumMenuUIPopup"/> screen will be shown.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginTooltip._header">
+            <summary>
+            The header text of the tooltip popup. Can be null.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginTooltip._tooltip">
+            <summary>
+            The tooltip text.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginTooltip._button">
+            <summary>
+            The button that activates the tooltip popup.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginTooltip.Awake">
+            <summary>
+            Unity awake method to add the tooltip listener to the button.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginTooltip.Show(Quantum.Menu.QuantumMenuUIScreen)">
+            <summary>
+            The parent screen is shown. Cache the UI controller.
+            </summary>
+            <param name="screen">The parent screen</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginTooltip.Hide(Quantum.Menu.QuantumMenuUIScreen)">
+            <summary>
+            The parent screen is hidden. Clear the cached controller.
+            </summary>
+            <param name="screen">Parent screen</param>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuConfig">
+            <summary>
+            Photon menu config file implements <see cref="T:Quantum.Menu.QuantumMenuConfig"/>.
+            Stores static options that affect parts of the menu behavior and selectable configurations.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConfig._maxPlayers">
+            <summary>
+            The maximum player count allowed for all game modes.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConfig._adaptFramerateForMobilePlatform">
+            <summary>
+            Force 60 FPS during menu animations.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConfig._availableAppVersions">
+            <summary>
+            The available Photon AppVersions to be selectable by the user.
+            An empty list will hide the related dropdown on the settings screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConfig._availableRegions">
+            <summary>
+            Static list of regions available in the settings.
+            An empty entry symbolizes best region option.
+            An empty list will hide the related dropdown on the settings screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConfig._availableScenes">
+            <summary>
+            Static list of scenes available in the scenes menu.
+            An empty list will hide the related button in the main screen.
+            PhotonMenuSceneInfo.Name = displayed name
+            PhotonMenuSceneInfo.ScenePath = the actual Unity scene (must be included in BuildSettings)
+            PhotonMenuSceneInfo.Preview = a sprite with a preview of the scene (screenshot) that is displayed in the main menu and scene selection screen (can be null)
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConfig._machineId">
+            <summary>
+            The <see cref="T:Quantum.Menu.QuantumMenuMachineId"/> ScriptableObject that stores local ids to use as an option in for AppVersion.
+            Designed as a convenient development feature.
+            Can be null.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConfig._codeGenerator">
+            <summary>
+            The <see cref="T:Quantum.Menu.QuantumMenuPartyCodeGenerator"/> ScriptableObject that is required for party code generation.
+            Also used to create random player names.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConfig.AvailableAppVersions">
+            <summary>
+            Return the available app versions.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConfig.AvailableRegions">
+            <summary>
+            Returns the available regions.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConfig.AvailableScenes">
+            <summary>
+            Returns the available scenes.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConfig.MaxPlayerCount">
+            <summary>
+            Returns the max player count.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConfig.MachineId">
+            <summary>
+            Returns an id that should be unique to this machine.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConfig.CodeGenerator">
+            <summary>
+            Returns the code generator.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConfig.AdaptFramerateForMobilePlatform">
+            <summary>
+            Returns true if the framerate should be adapted for mobile platforms to force the menu animations to run at 60 FPS.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuMachineId">
+            <summary>
+            A scriptable object that has an id used by the QuantumMenu as AppVersion.
+            Mostly a development feature to ensure to only meet compatible clients in the Photon matchmaking.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuMachineId.Id">
+            <summary>
+            An id that should be unique to this machine, used by the QuantumMenu as AppVersion.
+            An explicit asset importer is used to create local ids during import (see QuantumMenuMachineIdImporter).
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuImageFitter">
+            <summary>
+            To support any sprite aspect ratio in landscape and portrait mode this script calculates new image sizes
+            aligned to the top/bottom or left/right without changing the aspect ratio.
+            Any changes in the resolution of the parent rect (Editor resize, screen orientation, etc) will result in a recalculation.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuImageFitter.Awake">
+            <summary>
+            Unity Awake method, cache transforms and image.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuImageFitter.OnResolutionChanged">
+            <summary>
+            A Unity message that will recalculate the aspect ratio when the resolution changes.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuImageFitter.Start">
+            <summary>
+            Unity Start method.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuImageFitter.Update">
+            <summary>
+            Unity Update method.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuConnectionBehaviour">
+            <summary>
+            This class creates the initial Photon connection and can be overridden by the SDK.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.Client">
+            <summary>
+            Add the realtime client to the base connection behaviour.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.SessionName">
+            <summary>
+            Access the session name/ Photon room name.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.MaxPlayerCount">
+            <summary>
+            Access the max player count.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.Region">
+            <summary>
+            Access the actual region connected to.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.AppVersion">
+            <summary>
+            Access the AppVersion used.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.Usernames">
+            <summary>
+            Get a list of usernames that are inside this session.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.IsConnected">
+            <summary>
+            Is connection alive.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviour.Ping">
+            <summary>
+            Get current connection ping.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectionBehaviour.OnBeforeConnect">
+            <summary>
+            A shortcut to inject any code to change the connection args before the connection is started.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectionBehaviour.OnBeforeDisconnect">
+            <summary>
+            A shortcut to easily get notified about an impending disconnection.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectionBehaviour.OnProgress">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviour.ConnectAsync(Quantum.Menu.QuantumMenuConnectArgs)">
+            <summary>
+            Connect using <see cref="T:Quantum.Menu.QuantumMenuConnectArgs"/>.
+            </summary>
+            <param name="connectionArgs">Connection arguments.</param>
+            <returns>When the connection is established</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviour.DisconnectAsync(System.Int32)">
+            <summary>
+            Disconnect the current connection.
+            </summary>
+            <param name="reason">The disconnect reason <see cref="T:Quantum.Menu.ConnectFailReason"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviour.RequestAvailableOnlineRegionsAsync(Quantum.Menu.QuantumMenuConnectArgs)">
+            <summary>
+            Requests a list of available regions from the name server.
+            </summary>
+            <param name="connectionArgs">Connection arguments</param>
+            <returns>List of available region configured in the dashboard for this app.</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviour.ConnectAsyncInternal(Quantum.Menu.QuantumMenuConnectArgs)">
+            <summary>
+            The connection task.
+            </summary>
+            <param name="connectArgs">Connection args.</param>
+            <returns>When the connection is established and the game ready.</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviour.DisconnectAsyncInternal(System.Int32)">
+            <summary>
+            Disconnect task.
+            </summary>
+            <param name="reason">Disconnect reason <see cref="T:Quantum.Menu.ConnectFailReason"/></param>
+            <returns>When the connection has terminated gracefully.</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviour.ReportProgress(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuConnectionBehaviourSDK">
+            <summary>
+            A wrapper for the connection object. Derive this class to add more functionality.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.SessionName">
+            <summary>
+            Return the actual room name of the connection.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.Region">
+            <summary>
+            Return the actual region connected to.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.AppVersion">
+            <summary>
+            Return the actual AppVersion that is used.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.MaxPlayerCount">
+            <summary>
+            Return the max player count for the Photon room.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.Usernames">
+            <summary>
+            Return a list a Photon client names also connected to the room.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.IsConnected">
+            <summary>
+            Return true if connecting or connected to any server.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.Ping">
+            <summary>
+            Return the current ping.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.Client">
+            <summary>
+            The RealtimeClient object that is operated on.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.Runner">
+            <summary>
+            The QuantumRunner object that is created and started.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.ConnectAsyncInternal(Quantum.Menu.QuantumMenuConnectArgs)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.DisconnectAsyncInternal(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.RequestAvailableOnlineRegionsAsync(Quantum.Menu.QuantumMenuConnectArgs)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectionBehaviourSDK.DetermineFailReason(Photon.Realtime.DisconnectCause,System.String)">
+            <summary>
+            Match errors to one error number.
+            </summary>
+            <param name="disconnectCause">Photon disconnect reason</param>
+            <param name="pluginDisconnectReason">Plugin disconnect message</param>
+            <returns></returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUIGameplay">
+            <summary>
+            The gameplay screen.
+            </summary>
+            <summary>
+            Partial extension for the Quantum SDK menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._codeText">
+            <summary>
+            The session code label.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._playersText">
+            <summary>
+            The list of players.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._playersCountText">
+            <summary>
+            The current player count.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._playersMaxCountText">
+            <summary>
+            The max player count.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._headerText">
+            <summary>
+            The menu header text.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._sessionGameObject">
+            <summary>
+            The GameObject of the session part to be toggled off.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._playersGameObject">
+            <summary>
+            The GameObject of the player part to be toggled off.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._copySessionButton">
+            <summary>
+            The copy session button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._disconnectButton">
+            <summary>
+            The disconnect button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._detectAndToggleMenuCamera">
+            <summary>
+            Uses FindFirstObjectByType to find a camera to toggle on/off when going and leaving into the game screen.
+            Sets <see cref="F:Quantum.Menu.QuantumMenuUIGameplay._menuCamera"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._menuCamera">
+            <summary>
+            Toggles this camera on/off when entering or leaving the game screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay.UpdateUsernameRateInSeconds">
+            <summary>
+            In what frequency are the usernames refreshed.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay._updateUsernamesCoroutine">
+            <summary>
+            The coroutine is started during Show() and updates the Usernames using this interval <see cref="F:Quantum.Menu.QuantumMenuUIGameplay.UpdateUsernameRateInSeconds"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.ShowUser">
+            <summary>
+            Partial method used to extend shared Photon menu. 
+            Creates a listener for connection disconnect during gameplay.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.HideUser">
+            <summary>
+            Partial method used to extend shared Photon menu.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.Awake">
+            <summary>
+            The Unity awake method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIGameplay.AwakeUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.Init">
+            <summary>
+            The screen init method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIGameplay.InitUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.Show">
+            <summary>
+            The screen show method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIGameplay.ShowUser"/> to be implemented on the SDK side.
+            Will check is the session code is compatible with the party code to toggle the session UI part.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.Hide">
+            <summary>
+            The screen hide method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIGameplay.HideUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.OnDisconnectPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIGameplay._disconnectButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.OnCopySessionPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIGameplay._copySessionButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.UpdateUsernamesCoroutine">
+            <summary>
+            Update the usernames list. Will cancel itself if UpdateUsernameRateInSeconds less or equal to 0.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.UpdateUsernames">
+            <summary>
+            Update the usernames and toggle the UI part on/off depending on the <see cref="P:Quantum.Menu.QuantumMenuConnectionBehaviour.Usernames"/>
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIGameplay.IsReconnectionCheckEnabled">
+            <summary>
+            Shows reconnection 
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.OnPluginDisconnect(Quantum.CallbackPluginDisconnect)">
+            <summary>
+            React to plugin disconnects that are received by the protocol.
+            </summary>
+            <param name="callback"></param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.OnDisconnect(Photon.Realtime.OnDisconnectedMsg)">
+            <summary>
+            Connection signaled disconnect, stopping the menu connection object.
+            If enabled trying to perform a reconnection
+            </summary>
+            <param name="msg">Photon disconnect message</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIGameplay.ProcessDisconnect(System.String)">
+            <summary>
+            Process the disconnect which also offers reconnection.
+            </summary>
+            <param name="disconnectReason">Disconnect reason shown to users.</param>
+            <returns>When done</returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUIScenes">
+            <summary>
+            The scene selection screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScenes._availableScenes">
+            <summary>
+            The dropdown element for the scene selection.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScenes._preview">
+            <summary>
+            The image element for the screenshot preview.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScenes._defaultSprite">
+            <summary>
+            The default sprite to use when there is no scene preview.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScenes._backButton">
+            <summary>
+            The back button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScenes.WaitAfterSelectionAndReturnToMainMenuInMs">
+            <summary>
+            Set this to automatically transition to main menu after selecting a map.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScenes.Awake">
+            <summary>
+            The Unity awake method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIScenes.AwakeUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScenes.Init">
+            <summary>
+            The screen init method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIScenes.InitUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScenes.Show">
+            <summary>
+            The screen show method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIScenes.ShowUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScenes.Hide">
+            <summary>
+            The screen hide method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIScenes.HideUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScenes.OnBackButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIScenes._backButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScenes.OnSaveChanges">
+            <summary>
+            Is called when <see cref="F:Quantum.Menu.QuantumMenuUIScenes._availableScenes"/> has changed it's value from the UI using SendMessage().
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScenes.RefreshPreviewSprite">
+            <summary>
+            Updates the preview sprite and calls <see cref="M:Quantum.Menu.QuantumMenuImageFitter.OnResolutionChanged"/> via SendMessage().
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUIController">
+            <summary>
+            All screens are registed by this controller in the <see cref="F:Quantum.Menu.QuantumMenuUIController._screens"/> list.
+            Every screen gets a reference of this controller, the assigned <see cref="F:Quantum.Menu.QuantumMenuUIController._config"/> and <see cref="F:Quantum.Menu.QuantumMenuUIController.Connection"/> wrapper.
+            The first screen in the <see cref="F:Quantum.Menu.QuantumMenuUIController._screens"/> list is the screen that is shown on app start.
+            Controller is used to progress from one screen to another <see cref="M:Quantum.Menu.QuantumMenuUIController.Show``1"/>.
+            E.g. Show&lt;QuantumMenuUILoading&gt;().
+            When deriving a screen the base type will still be functionally to use for Get() and Show(). But only the derived type or the base are useable.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIController._config">
+            <summary>
+            The menu config.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIController.Connection">
+            <summary>
+            The connection wrapper.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIController._screens">
+            <summary>
+            The list of screens. The first one is the default screen shown on start.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIController._screenLookup">
+            <summary>
+            A type to screen lookup to support <see cref="M:Quantum.Menu.QuantumMenuUIController.Get``1"/>
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIController._popupHandler">
+            <summary>
+            The popup handler is automatically set if present based on the interface <see cref="T:Quantum.Menu.QuantumMenuUIPopup"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIController._activeScreen">
+            <summary>
+            The current active screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIController.ConnectArgs">
+            <summary>
+            Current connection args. Shared by all screens.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIController.Awake">
+            <summary>
+            Unity awake method. Populates internal structures based on the <see cref="F:Quantum.Menu.QuantumMenuUIController._screens"/> list.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIController.Start">
+            <summary>
+            The Unity start method to enable the default screen.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIController.Show``1">
+            <summary>
+            Show a screen will automatically disable the current active screen and call animations.
+            </summary>
+            <typeparam name="S">Screen type</typeparam>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIController.Get``1">
+            <summary>
+            Get a screen based on type.
+            </summary>
+            <typeparam name="S">Screen type</typeparam>
+            <returns>Screen object</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIController.Popup(System.String,System.String)">
+            <summary>
+            Show the popup/notification.
+            </summary>
+            <param name="msg">Popup message</param>
+            <param name="header">Popup header</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIController.PopupAsync(System.String,System.String)">
+            <summary>
+            Show the popup but wait until it hides.
+            </summary>
+            <param name="msg">Popup message</param>
+            <param name="header">Popup header</param>
+            <returns>When the user clicked okay.</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIController.HandleConnectionResult(Quantum.Menu.ConnectResult,Quantum.Menu.QuantumMenuUIController)">
+            <summary>
+            Default connection error handling is reused in a couple places.
+            </summary>
+            <param name="result">Connect result</param>
+            <param name="controller">UI Controller</param>
+            <returns>When handling is completed</returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuPartyCodeGenerator">
+            <summary>
+            Party code generator.
+            Creates human readable random codes to be shared with other players.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuPartyCodeGenerator.ValidCharacters">
+            <summary>
+            Available characters for the code generation. The default setup skips O and 0 for example.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuPartyCodeGenerator.Length">
+            <summary>
+            The length of the party code.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuPartyCodeGenerator.EncodedRegionPosition">
+            <summary>
+            The position of the encoded region.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuPartyCodeGenerator.Create">
+            <summary>
+            Create a random party code with default length.
+            </summary>
+            <returns>Random code</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuPartyCodeGenerator.Create(System.Int32)">
+            <summary>
+            Create a party code with variable length.
+            </summary>
+            <param name="length">Code length</param>
+            <returns>Random code</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuPartyCodeGenerator.Create(System.Int32,System.String)">
+            <summary>
+            Creates a random party code.
+            </summary>
+            <param name="length">Code length</param>
+            <param name="validCharacters">Useable characters</param>
+            <returns>Random code</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuPartyCodeGenerator.IsValid(System.String)">
+            <summary>
+            Checks if a party code is valid.
+            </summary>
+            <param name="code">Code</param>
+            <returns>True, if the party code consists of the desired length and characters</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuPartyCodeGenerator.IsValid(System.String,System.Int32)">
+            <summary>
+            Checks if a party code is valid.
+            </summary>
+            <param name="code">Code</param>
+            <param name="length">Variable length</param>
+            <returns>True, if the party code consists of the desired length and characters</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuPartyCodeGenerator.EncodeRegion(System.String,System.Int32)">
+            <summary>
+            Substitutes one character with the region.
+            </summary>
+            <param name="code">Code</param>
+            <param name="region">Region index</param>
+            <returns>New code</returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuPartyCodeGenerator.DecodeRegion(System.String)">
+            <summary>
+            Reads the character at the position <see cref="F:Quantum.Menu.QuantumMenuPartyCodeGenerator.EncodedRegionPosition"/> as a int.
+            </summary>
+            <param name="code">Code</param>
+            <returns>Region index</returns>
+        </member>
+        <member name="T:Quantum.Menu.PhotonMenuSceneInfo">
+            <summary>
+            Extends the shared PhotonMenuSceneInfo.
+            </summary>
+            <summary>
+            Info struct for creating configurable selectable scenes in the Photon menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.PhotonMenuSceneInfo.RuntimeConfig">
+            <summary>
+            When using a menu config the runtime config from the <see cref="F:Quantum.Menu.QuantumMenuConnectArgs.RuntimeConfig"/> is always overwritten.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.PhotonMenuSceneInfo.Map">
+            <summary>
+            Quantum map that is loaded. Must be set.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.PhotonMenuSceneInfo.SystemsConfig">
+            <summary>
+            Override Quantum systems configuration for this scene. Can be null.
+            If this is set it will overwrite the <see cref="F:Quantum.RuntimeConfig.SystemsConfig"/> settings during the connection sequence.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.PhotonMenuSceneInfo.Name">
+            <summary>
+            Displayed scene name.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.PhotonMenuSceneInfo.NameOrSceneName">
+            <summary>
+            Returns either <see cref="F:Quantum.Menu.PhotonMenuSceneInfo.Name"/> or <see cref="P:Quantum.Menu.PhotonMenuSceneInfo.SceneName"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.PhotonMenuSceneInfo.ScenePath">
+            <summary>
+            The path to the scene asset.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.PhotonMenuSceneInfo.SceneName">
+            <summary>
+            Gets the filename of the ScenePath to set as Unity scene to load during connection sequence.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.PhotonMenuSceneInfo.Preview">
+            <summary>
+            The sprite displayed as scene preview in the scene selection UI.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuScreenPluginPing">
+            <summary>
+            The ping plugin can display the current <see cref="P:Quantum.Menu.QuantumMenuConnectionBehaviour.Ping"/> and/or show a color code.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuScreenPluginPing.ColorThresholds">
+            <summary>
+            Saves a maximum ping number and the related color code.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginPing.ColorThresholds.MaxPing">
+            <summary>
+            Max ping number that this color code is valid for.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginPing.ColorThresholds.Color">
+            <summary>
+            Color code symbolizing the connection quality.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginPing._pingText">
+            <summary>
+            The ping text. Can be null.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginPing._coloredImage">
+            <summary>
+            The ping color. Can be null.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuScreenPluginPing._colorsThresholds">
+            <summary>
+            The color thresholds. Must be set if <see cref="F:Quantum.Menu.QuantumMenuScreenPluginPing._coloredImage"/> is set.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginPing.Show(Quantum.Menu.QuantumMenuUIScreen)">
+            <summary>
+            The parent screen is shown. Cache the connection object.
+            </summary>
+            <param name="screen">Parent screen</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginPing.Hide(Quantum.Menu.QuantumMenuUIScreen)">
+            <summary>
+            The parent screen is hidden. Clear the connection object.
+            </summary>
+            <param name="screen">Parent screen</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPluginPing.Update">
+            <summary>
+            Unity update method to update text and/or color code.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUIParty">
+            <summary>
+            The party screen shows two modes. Creating a new game or joining a game with a party code.
+            After creating a game the session party code can be optained via the ingame menu.
+            One speciality is that a region list is requested from the connection when entering the screen in order to create a matching session codes.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIParty._sessionCodeField">
+            <summary>
+            The session code input field.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIParty._createButton">
+            <summary>
+            The create game button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIParty._joinButton">
+            <summary>
+            The join game button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIParty._backButton">
+            <summary>
+            The back button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIParty._regionRequest">
+            <summary>
+            The task of requesting the regions.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.Awake">
+            <summary>
+            The Unity awake method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIParty.AwakeUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.Init">
+            <summary>
+            The screen init method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIParty.InitUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.Show">
+            <summary>
+            The screen show method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIParty.ShowUser"/> to be implemented on the SDK side.
+            When entering this screen an async request to retrieve the available regions is started.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.Hide">
+            <summary>
+            The screen hide method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIParty.HideUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.OnCreateButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIParty._createButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.OnJoinButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIParty._joinButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.OnBackButtonPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUIParty._backButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.ConnectAsync(System.Boolean)">
+            <summary>
+            The connect method to handle create and join.
+            Internally the region request is awaited.
+            </summary>
+            <param name="creating">Create or join</param>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIParty.FindBestAvailableOnlineRegionIndex(System.Collections.Generic.List{Quantum.Menu.QuantumMenuOnlineRegion})">
+            <summary>
+            Find the region with the lowest ping.
+            </summary>
+            <param name="regions">Region list</param>
+            <returns>The index of the region with the lowest ping</returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUIPopup">
+            <summary>
+            The popup screen handles notificaction.
+            The screen has be <see cref="P:Quantum.Menu.QuantumMenuUIScreen.IsModal"/> true.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIPopup._text">
+            <summary>
+            The text field for the message.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIPopup._header">
+            <summary>
+            The text field for the header.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIPopup._button">
+            <summary>
+            The okay button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIPopup._taskCompletionSource">
+            <summary>
+            The completion source will be triggered when the screen has been hidden.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIPopup.Awake">
+            <summary>
+            The Unity awake method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIPopup.AwakeUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIPopup.Init">
+            <summary>
+            The screen init method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIPopup.InitUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIPopup.Show">
+            <summary>
+            The screen show method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIPopup.ShowUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIPopup.Hide">
+            <summary>
+            The screen hide method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUIPopup.HideUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIPopup.OpenPopup(System.String,System.String)">
+            <summary>
+            Open the screen in overlay mode
+            </summary>
+            <param name="msg">Message</param>
+            <param name="header">Header, can be null</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIPopup.OpenPopupAsync(System.String,System.String)">
+            <summary>
+            Open the screen and wait for it being hidden
+            </summary>
+            <param name="msg">Message</param>
+            <param name="header">Header, can be null</param>
+            <returns>When the screen is hidden.</returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUILoading">
+            <summary>
+            The loading screen.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUILoading._disconnectButton">
+            <summary>
+            The disconnect button.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUILoading._text">
+            <summary>
+            The loading screen status text.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUILoading.Awake">
+            <summary>
+            The Unity awake method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUILoading.AwakeUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUILoading.Init">
+            <summary>
+            The screen init method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUILoading.InitUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUILoading.Show">
+            <summary>
+            The screen show method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUILoading.ShowUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUILoading.Hide">
+            <summary>
+            The screen hide method. Calls partial method <see cref="M:Quantum.Menu.QuantumMenuUILoading.HideUser"/> to be implemented on the SDK side.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUILoading.SetStatusText(System.String)">
+            <summary>
+            Update the text of the loading screen.
+            </summary>
+            <param name="text">Text</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUILoading.OnDisconnectPressed">
+            <summary>
+            Is called when the <see cref="F:Quantum.Menu.QuantumMenuUILoading._disconnectButton"/> is pressed using SendMessage() from the UI object.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.ConnectFailReason">
+            <summary>
+            Is used to convey some information about a connection error back to the caller.
+            </summary>
+            <summary>
+            Is used to convey some information about a connection error back to the caller.
+            Is not an enum to allow SDK implementation to add errors.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.ConnectingFailed">
+            <summary>
+            The connection to Photon servers failed.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.MapNotFound">
+            <summary>
+            The Quantum map asset was not found.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.LoadingFailed">
+            <summary>
+            The scene loading failed.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.RunnerFailed">
+            <summary>
+            Starting the runner failed.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.PluginError">
+            <summary>
+            Plugin disconnected.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.None">
+            <summary>
+            No reason code available.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.UserRequest">
+            <summary>
+            User requested cancellation or disconnect.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.ApplicationQuit">
+            <summary>
+            App or Editor closed
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectFailReason.Disconnect">
+            <summary>
+            Connection disconnected.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuConnectionShutdownFlag">
+            <summary>
+            Cleanup steps of <see cref="!:QuantumMenuConnection.DisconnectAsync(int)"/>
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectionShutdownFlag.Disconnect">
+            <summary>
+             Disconnect the connection
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectionShutdownFlag.ShutdownRunner">
+            <summary>
+            Shutdown the runner
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectionShutdownFlag.UnloadScene">
+            <summary>
+            Unload the loaded scene
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectionShutdownFlag.All">
+            <summary>
+            All flags
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuScreenPlugin">
+            <summary>
+            Screen plugin are usually a UI features that is shared between multiple screens.
+            The plugin must be registered at <see cref="P:Quantum.Menu.QuantumMenuUIScreen.Plugins"/> and receieve Show and Hide callbacks.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPlugin.Show(Quantum.Menu.QuantumMenuUIScreen)">
+            <summary>
+            The parent screen is shown.
+            </summary>
+            <param name="screen">Parent screen</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuScreenPlugin.Hide(Quantum.Menu.QuantumMenuUIScreen)">
+            <summary>
+            The parent screen is hidden.
+            </summary>
+            <param name="screen">Parent screen</param>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuFpsAvgCounter">
+            <summary>
+            Displays the average current fps
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuFpsAvgCounter._fpsText">
+            <summary>
+            The fps text. Can be null.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuFpsAvgCounter.Update">
+            <summary>
+            Unity update method to update text.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuConnectArgs">
+            <summary>
+            The connection options selected by the client which are operated on directly from <see cref="T:UnityEngine.PlayerPrefs"/>.
+            The menu screens all have the same instance of this object.
+            Fields marked with HideInInspector should not show editable in the inspector.
+            Fields marked with NonSerialized should not be serialized anywhere and only be set during runtime, e.g. by <see cref="T:Quantum.Menu.PhotonMenuSceneInfo"/>.
+            </summary>
+            <summary>
+            Quantum specific arguments to start the Quantum simulation after connecting to Photon.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.Username">
+            <summary>
+            The username configured in the menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.Session">
+            <summary>
+            The session that the client wants to join. Is not persisted. Use ReconnectionInformation instead to recover it between application shutdowns.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.PreferredRegion">
+            <summary>
+            The preferred region the user selected in the menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.Region">
+            <summary>
+            The actual region that the client will connect to.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.AppVersion">
+            <summary>
+            The app version used for the Photon connection.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.MaxPlayerCount">
+            <summary>
+            The max player count that the user selected in the menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.Scene">
+            <summary>
+            The map or scene information that the user selected in the menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.Creating">
+            <summary>
+            Toggle to create or join-only game sessions/rooms.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectArgs.LoadFromPlayerPrefsUser(System.String)">
+            <summary>
+            Load members from Player Prefs
+            </summary>
+            <param name="keyPrefix">Player prefs key prefix</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectArgs.SaveToPlayerPrefsUser(System.String)">
+            <summary>
+            Save members from Player Prefs
+            </summary>
+            <param name="keyPrefix">Player prefs key prefix</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectArgs.SetDefaultsUser(Quantum.Menu.QuantumMenuConfig)">
+            <summary>
+            Set all values to their default.
+            </summary>
+            <param name="config"></param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectArgs.LoadFromPlayerPrefs(System.String)">
+            <summary>
+            Save the class to Unity player prefs.
+            Will create a new instance if loading fails.
+            Will run <see cref="M:Quantum.Menu.QuantumMenuConnectArgs.SetDefaults(Quantum.Menu.QuantumMenuConfig)"/> if config is set.
+            </summary>
+            <param name="keyPrefix">Player prefs key prefix</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectArgs.SaveToPlayerPrefs(System.String)">
+            <summary>
+            Saves the instance to Unity player prefs.
+            </summary>
+            <param name="keyPrefix">Player prefs key prefix</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuConnectArgs.SetDefaults(Quantum.Menu.QuantumMenuConfig)">
+            <summary>
+            Make sure that all configuration have a default settings.
+            </summary>
+            <param name="config">The menu config.</param>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuConnectArgs.AppSettings">
+            <summary>
+            Getter to retrieve Photon Realtime <see cref="T:Photon.Realtime.AppSettings"/> from <see cref="F:Quantum.Menu.QuantumMenuConnectArgs.ServerSettings"/>
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.AuthValues">
+            <summary>
+            Photon Realtime authentication settings.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.Client">
+            <summary>
+            (optional) Photon Realtime connection object for reconnection.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.PhotonPluginName">
+            <summary>
+            The Photon plugin name. Default is "QuantumPlugin".
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.QuantumClientId">
+            <summary>
+            The Quantum client id. This is a secret between the client and the server and should not be shared with anyone else.
+            It does not have to be the Photon UserId for example. It's used to reclaim the same player slot after a reconnection.
+            If null, the <see cref="P:Photon.Realtime.AuthenticationValues.UserId"/> is used.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.Reconnecting">
+            <summary>
+            Set to true to try to perform a reconnect. <see cref="F:Quantum.Menu.QuantumMenuConnectArgs.ReconnectInformation"/> must be available then.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.ReconnectInformation">
+            <summary>
+            The reconnection information used to try to reconnect quickly to the same room.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.RuntimeConfig">
+            <summary>
+            The runtime config of the Quantum simulation. Every client sends theirs to the server.
+            This is controlled by <see cref="F:Quantum.Menu.PhotonMenuSceneInfo.RuntimeConfig"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.RuntimePlayers">
+            <summary>
+            The RuntimePlayer which are automatically added to the simulation after is started.
+            When empty a default player is created when connecting.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.SessionConfig">
+            <summary>
+            The session config used for the simulation. Every client sends theirs to the server. If null the global config will be searched.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.ServerSettings">
+            <summary>
+            The server settings file used for the connection attempts. If null the global config will be searched.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.ShutdownFlags">
+            <summary>
+            Fine-tune what internals gets disposed when the connection is terminated.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.RecordingFlags">
+            <summary>
+            Start Quantum game in recording mode.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.InstantReplaySettings">
+            <summary>
+            Instant replay settings.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.DeltaTimeType">
+            <summary>
+            How to update the session using <see cref="T:Quantum.SimulationUpdateTime"/>. 
+            Default is EngineDeltaTime.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuConnectArgs.StartGameTimeoutInSeconds">
+            <summary>
+            A client timeout for the Quantum start game protocol, measured in seconds.
+            Large snapshots and/or slow webhooks could make this go above the default value of 10 sec. Configure this value appropriately.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.ConnectResult">
+            <summary>
+            Connection result info object.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectResult.Success">
+            <summary>
+            Is successful
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectResult.FailReason">
+            <summary>
+            The fail reason code <see cref="T:Quantum.Menu.ConnectFailReason"/>
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectResult.DisconnectCause">
+            <summary>
+            Another custom code that can be filled by out by RealtimeClient.DisconnectCause for example.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectResult.DebugMessage">
+            <summary>
+            A debug message.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectResult.CustomResultHandling">
+            <summary>
+            Set to true to disable all error handling by the menu.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.ConnectResult.WaitForCleanup">
+            <summary>
+            An optional task to signal the menu to wait until cleanup operation have completed (e.g. level unloading).
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.ConnectResult.Ok">
+            <summary>
+            Creates a successful result.
+            </summary>
+            <returns>Initialized result object</returns>
+        </member>
+        <member name="M:Quantum.Menu.ConnectResult.Fail(System.Int32,System.String,System.Threading.Tasks.Task)">
+            <summary>
+            Create a failed result.
+            </summary>
+            <param name="failReason">Fail reason <see cref="F:Quantum.Menu.ConnectResult.FailReason"/></param>
+            <param name="debugMessage">Debug message</param>
+            <param name="waitForCleanup">Should the receiving code wait unil the connection or the scene has been cleaned up.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuGraphicsSettings">
+            <summary>
+            Graphics settings that can be changed in the settings screen.
+            Selected values are stored in <see cref="T:UnityEngine.PlayerPrefs"/>
+            Use <see cref="M:Quantum.Menu.QuantumMenuGraphicsSettings.Apply"/> to apply all after starting the app.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuGraphicsSettings.PossibleFramerates">
+            <summary>
+            Available framerates.
+            -1 = platform default
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.Framerate">
+            <summary>
+            Target framerate
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.Fullscreen">
+            <summary>
+            Fullscreen mode.
+            Is not shown for mobile platforms.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.Resolution">
+            <summary>
+            Selected resolution index based on Screen.resolutions.
+            Is not shown for mobile platforms.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.VSync">
+            <summary>
+            Select VSync.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.QualityLevel">
+            <summary>
+            Select Unity quality level index based on QualitySettings.names.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.CreateFramerateOptions">
+            <summary>
+            Return a list of possible framerates filtered by Screen.currentResolution.refreshRate.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.CreateResolutionOptions">
+            <summary>
+            Returns a list of resolution option indices based on Screen.resolutions.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuGraphicsSettings.CreateGraphicsQualityOptions">
+            <summary>
+            Returns a list of graphics quality indices based on QualitySettings.names.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuGraphicsSettings.Apply">
+            <summary>
+            Applies all graphics settings.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuGraphicsSettings.GetCurrentResolutionIndex">
+            <summary>
+            Return the current selected resolution index based on Screen.resolutions.
+            </summary>
+            <returns>Index into Screen.resolutions</returns>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuMppmJoinCommand">
+            <summary>
+            The command to for a Mppm to join a session.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuMppmJoinCommand.AppVersion">
+            <summary>
+            The AppVersion to use.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuMppmJoinCommand.Region">
+            <summary>
+            The region to connect to.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuMppmJoinCommand.Session">
+            <summary>
+            The session/room name to join.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuMppmJoinCommand.Execute">
+            <summary>
+            Execute the command.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuMppmJoinCommand.Apply(Quantum.Menu.QuantumMenuConnectArgs)">
+            <summary>
+            Apply the command data to the connection args.
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuOnlineRegion">
+            <summary>
+            Includes Photon ping regions result used by the Party menu to pre select the best region and encode the region into the party code.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuOnlineRegion.Code">
+            <summary>
+            Photon region code.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuOnlineRegion.Ping">
+            <summary>
+            Last ping result.
+            </summary>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuSettingsEntry`1">
+            <summary>
+            A helper class that maps a option name into the actual value.
+            Is used to simplifiy dropdown UI code in <see cref="T:Quantum.Menu.QuantumMenuUISettings"/>.
+            </summary>
+            <typeparam name="T">The option value type</typeparam>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuSettingsEntry`1.Value">
+            <summary>
+            Returns the value of this option.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuSettingsEntry`1.#ctor(TMPro.TMP_Dropdown,System.Action)">
+            <summary>
+            Creates an option for this dropdown element.
+            </summary>
+            <param name="dropdown">Dropdown UI element</param>
+            <param name="onValueChanged">Forward the value changed callback</param>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuSettingsEntry`1.SetOptions(System.Collections.Generic.List{`0},`0,System.Func{`0,System.String})">
+            <summary>
+            Clear all options and set new.
+            </summary>
+            <param name="options">List of options</param>
+            <param name="current">The current selected option</param>
+            <param name="ToString">A callback to format the option text</param>
+        </member>
+        <member name="T:Quantum.Menu.QuantumMenuUIScreen">
+            <summary>
+            The screen base class contains a lot of accessors (e.g. Config, Connection, ConnectArgs) for convenient access.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScreen.HideAnimHash">
+            <summary>
+            Cached Hide animation hash.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScreen.ShowAnimHash">
+            <summary>
+            Cached Show animation hash.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScreen._isModal">
+            <summary>
+            Is modal flag must be set for overlay screens.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScreen._plugins">
+            <summary>
+            The list of screen plugins for the screen. The actual plugin scripts can be distributed insde the UI hierarchy but must be liked here.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScreen._animator">
+            <summary>
+            The animator object.
+            </summary>
+        </member>
+        <member name="F:Quantum.Menu.QuantumMenuUIScreen._hideCoroutine">
+            <summary>
+            The hide animation coroutine.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuUIScreen.Plugins">
+            <summary>
+            The list of screen plugins.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuUIScreen.IsModal">
+            <summary>
+            Is modal property.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuUIScreen.IsShowing">
+            <summary>
+            Is the screen currently showing.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuUIScreen.Config">
+            <summary>
+            The menu config, assigned by the <see cref="T:Quantum.Menu.QuantumMenuUIController"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuUIScreen.Connection">
+            <summary>
+            The menu connection object, The menu config, assigned by the <see cref="T:Quantum.Menu.QuantumMenuUIController"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuUIScreen.ConnectionArgs">
+            <summary>
+            The menu connection args.
+            </summary>
+        </member>
+        <member name="P:Quantum.Menu.QuantumMenuUIScreen.Controller">
+            <summary>
+            The menu UI controller that owns this screen.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScreen.Start">
+            <summary>
+            Unity start method to find the animator.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScreen.Awake">
+            <summary>
+            Unit awake method to be overwritten by derived screens.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScreen.Init">
+            <summary>
+            The screen init method is called during <see cref="M:Quantum.Menu.QuantumMenuUIController.Awake"/> after all screen have been assigned and configured.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScreen.Hide">
+            <summary>
+            The screen hide method.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScreen.Show">
+            <summary>
+            The screen show method.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.QuantumMenuUIScreen.HideAnimCoroutine">
+            <summary>
+            Play the hide animation wrapped in a coroutine.
+            Forces the target framerate to 60 during the transition animations.
+            </summary>
+            <returns>When done</returns>
+        </member>
+    </members>
+</doc>

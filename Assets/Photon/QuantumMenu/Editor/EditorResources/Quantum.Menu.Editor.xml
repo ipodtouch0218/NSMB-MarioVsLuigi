@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Quantum.Menu.Editor</name>
+    </assembly>
+    <members>
+        <member name="T:Quantum.Menu.Editor.QuantumMenuConfigEditor">
+            <summary>
+            Custom inspector for <see cref="T:Quantum.Menu.QuantumMenuConfig"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.Editor.QuantumMenuConfigEditor.OnInspectorGUI">
+            <summary>
+            Overriding drawing.
+            </summary>
+        </member>
+        <member name="M:Quantum.Menu.Editor.QuantumMenuConfigEditor.AddCurrentScene(Quantum.Menu.QuantumMenuConfig,Quantum.RuntimeConfig)">
+            <summary>
+            Add the current open Unity scene to a QuantumMenuConfig.
+            </summary>
+            <param name="menuConfig">The menu config asset</param>
+            <param name="runtimeConfig">Set an optional <see cref="T:Quantum.RuntimeConfig"/></param>
+        </member>
+        <member name="T:Quantum.Editor.QuantumMenuUIScreenEditor">
+            <summary>
+            Debug QuantumMenuUIScreen content.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumMenuUIScreenEditor.OnInspectorGUI">
+            <inheritdoc/>
+        </member>
+        <member name="T:Quantum.Editor.QuantumMenuMachineIdImporter">
+            <summary>
+            All asset ending with .id will be tried for a <see cref="T:Quantum.Menu.QuantumMenuMachineId"/> script.
+            A local id is created for it that will never go into version control.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumMenuMachineIdImporter.OnImportAsset(UnityEditor.AssetImporters.AssetImportContext)">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,37 @@
+{
+    "name": "Quantum.Simulation",
+    "rootNamespace": "Quantum",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Quantum.Deterministic.dll",
+        "Quantum.Engine.dll",
+        "Quantum.Log.dll",
+        "Quantum.BotSDK.Core.dll",
+        "Sirenix.Serialization.dll",
+        "Sirenix.OdinInspector.Attributes.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "2021",
+            "define": "QUANTUM_UNITY"
+        },
+        {
+            "name": "com.unity.modules.physics",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_PHYSICS3D"
+        },
+        {
+            "name": "com.unity.modules.physics2d",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_PHYSICS2D"
+        }
+    ],
+    "noEngineReferences": false
+}

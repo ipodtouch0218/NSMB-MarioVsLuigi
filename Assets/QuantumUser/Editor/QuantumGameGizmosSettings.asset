@@ -1,0 +1,263 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78309dfa22fa6a346938352a195a6be7, type: 3}
+  m_Name: QuantumGameGizmosSettings
+  m_EditorClassIdentifier: 
+  Settings:
+    IconScale: 1
+    SelectedBrightness: 1.1
+    PredictionArea:
+      Enabled: 1
+      Color: {r: 1, g: 0, b: 0, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 1
+    CharacterController:
+      Enabled: 1
+      Color: {r: 1, g: 0.92156863, b: 0.015686275, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    StaticColliders:
+      Enabled: 1
+      Color: {r: 0.4705882, g: 0.7371198, b: 1, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    DynamicColliders:
+      Enabled: 1
+      Color: {r: 0.4925605, g: 0.9176471, b: 0.5050631, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    KinematicColliders:
+      Enabled: 1
+      Color: {r: 1, g: 1, b: 1, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    AsleepColliders:
+      Enabled: 1
+      Color: {r: 0.5192922, g: 0.4622621, b: 0.6985294, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    DisabledColliders:
+      Enabled: 1
+      Color: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    PhysicsArea:
+      Enabled: 0
+      Color: {r: 0, g: 0.75, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    PhysicsBuckets:
+      Enabled: 0
+      Color: {r: 0, g: 0.75, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    StaticMeshNormals:
+      Enabled: 0
+      Color: {r: 1, g: 0, b: 0, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    StaticMeshTriangles:
+      Enabled: 0
+      Color: {r: 0, g: 0.75, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    SceneMeshCells:
+      Enabled: 0
+      Color: {r: 0, g: 0.75, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    SceneMeshTriangles:
+      Enabled: 0
+      Color: {r: 0, g: 0.75, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    PhysicsJoints:
+      Enabled: 1
+      Color: {r: 0.4925605, g: 0.9176471, b: 0.5050631, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 1
+      SecondaryColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 0.5}
+      WarningColor: {r: 1, g: 0, b: 0, a: 0.5}
+    ScaleComponentsWithAgentRadius: 1
+    NavMesh:
+      Enabled: 1
+      Color: {r: 0, g: 0.75, b: 1, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+      RegionColor: {r: 1, g: 0, b: 0.5, a: 0.5}
+    NavMeshBorders:
+      Enabled: 1
+      Color: {r: 0, g: 0, b: 0, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+      DrawNormals: 0
+      BorderNormalColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    NavMeshArea:
+      Enabled: 0
+      Color: {r: 0, g: 0.75, b: 1, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+    NavMeshGrid:
+      Enabled: 0
+      Color: {r: 0.4, g: 1, b: 0.7, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+    NavMeshLinks:
+      Enabled: 0
+      Color: {r: 0, g: 0, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+    NavMeshVertexNormals:
+      Enabled: 0
+      Color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+    NavMeshTriangleIds:
+      Enabled: 0
+      Color: {r: 0, g: 0.75, b: 1, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+    NavMeshRegionIds:
+      Enabled: 0
+      Color: {r: 1, g: 0, b: 0.5, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+    NavMeshVertexIds:
+      Enabled: 0
+      Color: {r: 0, g: 1, b: 0, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 1
+      DisableFill:
+        _value: 0
+    NavMeshPathfinder:
+      Enabled: 0
+      Color: {r: 1, g: 0, b: 1, a: 1}
+      Scale: 0.5
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 1
+    NavMeshSteeringAgent:
+      Enabled: 0
+      Color: {r: 0, g: 1, b: 0, a: 0.5}
+      Scale: 0.5
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 1
+    NavMeshAvoidanceAgent:
+      Enabled: 0
+      Color: {r: 0, g: 0, b: 1, a: 0.5}
+      Scale: 0.5
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 1
+    NavMeshAvoidanceObstacles:
+      Enabled: 0
+      Color: {r: 1, g: 0, b: 0, a: 0.5}
+      Scale: 0.5
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 1
+    PathfinderRawPath:
+      Enabled: 0
+      Color: {r: 1, g: 0, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    PathfinderRawTrianglePath:
+      Enabled: 0
+      Color: {r: 1, g: 0, b: 1, a: 0.5}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
+    PathfinderFunnel:
+      Enabled: 0
+      Color: {r: 0, g: 1, b: 0, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0

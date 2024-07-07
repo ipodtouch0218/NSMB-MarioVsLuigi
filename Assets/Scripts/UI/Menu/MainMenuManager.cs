@@ -8,9 +8,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
-
-using Fusion;
-using Fusion.Sockets;
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
@@ -24,8 +21,8 @@ namespace NSMB.UI.MainMenu {
         public static bool WasHostMigration;
 
         //---Properties
-        private NetworkRunner Runner => NetworkHandler.Runner;
-        private PlayerData LocalData => Runner.GetLocalPlayerData();
+        // private NetworkRunner Runner => NetworkHandler.Runner;
+        // private PlayerData LocalData => Runner.GetLocalPlayerData();
 
         //---Public Variables
         public bool nonNetworkShutdown;
@@ -76,12 +73,11 @@ namespace NSMB.UI.MainMenu {
             // Register callbacks
             PlayerData.OnPlayerDataReady += OnPlayerDataReady;
             PlayerData.OnPlayerDataDespawned += OnPlayerDataDespawned;
-            NetworkHandler.OnLobbyConnect += OnLobbyConnect;
-            NetworkHandler.OnShutdown += OnShutdown;
-            NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
-            NetworkHandler.OnConnectFailed += OnConnectFailed;
+            //NetworkHandler.OnLobbyConnect += OnLobbyConnect;
+            //NetworkHandler.OnShutdown += OnShutdown;
+            //NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
+            //NetworkHandler.OnConnectFailed += OnConnectFailed;
             NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
-            NetworkHandler.OnHostMigration += OnHostMigration;
             MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
 
             ControlSystem.controls.UI.Pause.performed += OnPause;
@@ -93,12 +89,11 @@ namespace NSMB.UI.MainMenu {
             // Unregister callbacks
             PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
             PlayerData.OnPlayerDataDespawned -= OnPlayerDataDespawned;
-            NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
-            NetworkHandler.OnShutdown -= OnShutdown;
-            NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
-            NetworkHandler.OnConnectFailed -= OnConnectFailed;
+            //NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
+            //NetworkHandler.OnShutdown -= OnShutdown;
+            //NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
+            //NetworkHandler.OnConnectFailed -= OnConnectFailed;
             NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
-            NetworkHandler.OnHostMigration -= OnHostMigration;
             MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
 
             ControlSystem.controls.UI.Pause.performed -= OnPause;
@@ -115,6 +110,8 @@ namespace NSMB.UI.MainMenu {
             UpdateRegionDropdown();
             //StartCoroutine(NetworkHandler.PingRegions());
 
+            /* TODO
+
             // Photon stuff.
             if (GlobalController.Instance.firstConnection) {
                 // Initial connection to the game
@@ -128,6 +125,7 @@ namespace NSMB.UI.MainMenu {
                 // Quit out of a room unexpectedly
                 OpenRoomListMenu();
             }
+            */
 
             // Controls & Settings
             nicknameField.text = Settings.Instance.generalNickname;
@@ -159,7 +157,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Update() {
-
+            /* TODO
             bool connectedToNetwork = NetworkHandler.Connected && !Runner.SessionInfo;
             bool connectingToNetwork = NetworkHandler.Connecting || Runner.SessionInfo;
 
@@ -171,6 +169,7 @@ namespace NSMB.UI.MainMenu {
 
             reconnectBtn.gameObject.SetActive(NetworkHandler.Disconnected);
             joinPrivateRoomBtn.gameObject.SetActive(connectedToNetwork);
+            */
 
             wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
         }
@@ -211,10 +210,12 @@ namespace NSMB.UI.MainMenu {
 
             // Chat
             if (WasHostMigration) {
+                /* TODO
                 // Host chat notification
                 if (Runner.IsServer) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
                 }
+                */
             } else if (inSameRoom) {
                 chat.ReplayChatMessages();
             } else {
@@ -229,6 +230,8 @@ namespace NSMB.UI.MainMenu {
                 StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
             }
 
+            /* TODO
+
             // Set the player settings
             PlayerData data = Runner.GetLocalPlayerData();
             characterDropdown.SetValueWithoutNotify(data.CharacterIndex);
@@ -239,8 +242,11 @@ namespace NSMB.UI.MainMenu {
             hostControlsGroup.interactable = data.IsRoomOwner;
             roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
 
+
             // Preview the current level
             PreviewLevel(SessionData.Instance.Level);
+
+            */
 
             // Reset the "Game start" button counting down
             OnCountdownTick(-1);
@@ -260,6 +266,7 @@ namespace NSMB.UI.MainMenu {
         public void UpdateRoomHeader() {
             const int rngSeed = 2035767;
 
+            /* TODO
             PlayerData host =
                 SessionData.Instance.PlayerDatas
                     .Select(kvp => kvp.Value)
@@ -274,8 +281,10 @@ namespace NSMB.UI.MainMenu {
                 NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.HostName, out hostname);
             }
 
+
             lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
             UnityEngine.Random.InitState(hostname.GetHashCode() + rngSeed);
+            */
             colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
         }
 
@@ -449,6 +458,8 @@ namespace NSMB.UI.MainMenu {
 
         public void StartCountdown() {
 
+            /* TODO
+
             PlayerData data = Runner.GetLocalPlayerData();
             if (!data.IsRoomOwner) {
                 // Toggle ready up state instead
@@ -470,6 +481,8 @@ namespace NSMB.UI.MainMenu {
                 // Actually start the game.
                 SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
             }
+
+            */
         }
 
         private IEnumerator FadeMusic() {
@@ -485,6 +498,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void UpdateStartGameButton() {
+            /* TODO
             if (!SessionData.Instance || SessionData.Instance.GameStartTimer.IsRunning) {
                 return;
             }
@@ -498,6 +512,7 @@ namespace NSMB.UI.MainMenu {
                 UpdateReadyButton(data && data.IsReady);
                 startGameBtn.interactable = true;
             }
+            */
         }
 
         public bool IsRoomConfigurationValid() {
@@ -507,15 +522,18 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Kick(PlayerData target) {
+            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
 
             SessionData.Instance.Disconnect(target.Owner);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", ChatManager.Blue, "playername", target.GetNickname());
+            */
         }
 
         public void Promote(PlayerData target) {
+            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
@@ -526,9 +544,11 @@ namespace NSMB.UI.MainMenu {
                 Runner.SetMasterClient(target.Owner);
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", target.GetNickname());
             }
+            */
         }
 
         public void Mute(PlayerData target) {
+            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
@@ -536,9 +556,11 @@ namespace NSMB.UI.MainMenu {
             bool newMuteState = !target.IsMuted;
             target.IsMuted = newMuteState;
             ChatManager.Instance.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", ChatManager.Blue, "playername", target.GetNickname());
+            */
         }
 
         public void Ban(PlayerData target) {
+            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
@@ -546,6 +568,7 @@ namespace NSMB.UI.MainMenu {
             SessionData.Instance.Disconnect(target.Owner);
             SessionData.Instance.AddBan(target);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", ChatManager.Blue, "playername", target.GetNickname());
+            */
         }
 
         public void UI_CharacterDropdownChanged() {
@@ -557,6 +580,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void SwapCharacter(byte character, bool callback) {
+            /* TODO
             if (callback) {
                 LocalData.Rpc_SetCharacterIndex(character);
             } else {
@@ -569,9 +593,11 @@ namespace NSMB.UI.MainMenu {
             CharacterData data = ScriptableManager.Instance.characters[character];
             colorManager.ChangeCharacter(data);
             SwapPlayerSkin(currentSkin, false, data);
+            */
         }
 
         public void SwapPlayerSkin(byte index, bool callback, CharacterData character = null) {
+            /* TODO
 
             if (!character) {
                 character = Runner.GetLocalPlayerData().GetCharacterData();
@@ -599,9 +625,11 @@ namespace NSMB.UI.MainMenu {
             }
 
             currentSkin = index;
+            */
         }
 
         private void UpdateNickname() {
+            /* TODO
             validName = Settings.Instance.generalNickname.IsValidUsername();
             if (!validName) {
                 ColorBlock colors = nicknameField.colors;
@@ -614,6 +642,7 @@ namespace NSMB.UI.MainMenu {
                 colors.highlightedColor = new(0.7f, 0.7f, 0.7f, 1);
                 nicknameField.colors = colors;
             }
+            */
         }
 
         public void SetUsername(TMP_InputField field) {
@@ -651,11 +680,14 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void EnableSpectator(Toggle toggle) {
+            /* TODO
             PlayerData data = Runner.GetLocalPlayerData();
 
             data.Rpc_SetPermanentSpectator(toggle.isOn);
+            */
         }
 
+        /* TODO
         public SceneRef GetCurrentSceneRef() {
             if (!SessionData.Instance) {
                 return SceneRef.None;
@@ -664,8 +696,10 @@ namespace NSMB.UI.MainMenu {
             byte index = SessionData.Instance.Level;
             return SceneRef.FromIndex(maps[index].buildIndex);
         }
+        */
 
         public void OnCountdownTick(int time) {
+            /* TODO
             PlayerData data = Runner.GetLocalPlayerData();
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (time > 0) {
@@ -686,9 +720,11 @@ namespace NSMB.UI.MainMenu {
             }
 
             startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            */
         }
 
         //---Callbacks
+        /* TODO
         public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
             for (int i = 0; i < regionDropdown.options.Count; i++) {
                 RegionOption option = (RegionOption) regionDropdown.options[i];
@@ -727,6 +763,7 @@ namespace NSMB.UI.MainMenu {
                 roomManager.ClearRooms();
             }
         }
+        */
 
         private void OnLanguageChanged(TranslationManager tm) {
             int selectedLevel = levelDropdown.value;
@@ -743,28 +780,34 @@ namespace NSMB.UI.MainMenu {
             characterDropdown.SetValueWithoutNotify(selectedCharacter);
             characterDropdown.RefreshShownValue();
 
+            /* TODO
             if (SessionData.Instance && SessionData.Instance.Object) {
                 UpdateRoomHeader();
                 OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
             }
+            */
         }
 
         private void OnPlayerDataReady(PlayerData data) {
+            /* TODO
             if (data.Owner == Runner.LocalPlayer) {
                 EnterRoom(false);
             }
 
             sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
             UpdateStartGameButton();
+            */
         }
 
         private void OnPlayerDataDespawned(PlayerData data) {
+            /* TODO
             if (!Runner.IsShutdown && data.Owner != Runner.LocalPlayer) {
                 sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
                 UpdateStartGameButton();
             }
 
             GlobalController.Instance.discordController.UpdateActivity();
+            */
         }
 
         private void OnPause(InputAction.CallbackContext context) {
@@ -779,14 +822,12 @@ namespace NSMB.UI.MainMenu {
             UpdateRegionDropdown();
         }
 
-        private void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {
-            playerList.RemoveAllPlayerEntries();
-        }
-
         private void OnSceneLoadStart() {
+            /* TODO
             if (!Runner.TryGetSceneInfo(out var sceneInfo) || sceneInfo.Scenes[0].AsIndex != 0) {
                 GlobalController.Instance.loadingCanvas.Initialize();
             }
+            */
         }
 
         //---Debug
