@@ -64,6 +64,7 @@ namespace NSMB.Entities.Collectable {
         //CollectableEntity overrides
         public override void OnCollectedChanged() {
             sRenderer.enabled = !Collector;
+            GetComponent<VolumeWithDistance>().enabled = !Collector;
         }
     }
 }
