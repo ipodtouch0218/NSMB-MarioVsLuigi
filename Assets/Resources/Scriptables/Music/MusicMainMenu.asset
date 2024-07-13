@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
   m_Name: MusicMainMenu
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: c9850c9bc8b015b4eb42ff8acd836e8b, type: 3}
-  loopStartSample: 3.6685
-  loopEndSample: 18.427
+  clip: {fileID: 8300000, guid: 9371a3b6ae5682f4aa684a83f3cee94f, type: 3}
+  fastClip: {fileID: 0}
+  loopStartSample: 21.828
+  loopEndSample: 61.096

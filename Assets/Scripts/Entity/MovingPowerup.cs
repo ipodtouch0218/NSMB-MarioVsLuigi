@@ -14,6 +14,7 @@ public class MovingPowerup : MonoBehaviourPun {
     public PlayerController followMe;
     public float followMeCounter, despawnCounter = 15, ignoreCounter;
     private PhysicsEntity physics;
+    public bool hasAnimation;
     private Animator childAnimator;
     private BoxCollider2D hitbox;
     private int originalLayer;
@@ -110,7 +111,7 @@ public class MovingPowerup : MonoBehaviourPun {
             HandleCollision();
         }
 
-        if (physics.onGround && childAnimator) {
+        if (physics.onGround && childAnimator && hasAnimation) {
             childAnimator.SetTrigger("trigger");
             hitbox.enabled = false;
             body.isKinematic = true;

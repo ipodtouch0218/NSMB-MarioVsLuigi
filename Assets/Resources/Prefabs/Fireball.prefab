@@ -56,11 +56,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0145365c476308445a9e47dafba82648, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  left: 0
+  isIceball: 0
   speed: 6.25
   bounceHeight: 6.75
   terminalVelocity: 6.25
-  left: 0
-  isIceball: 0
 --- !u!212 &1011982274984717419
 SpriteRenderer:
   m_ObjectHideFlags: 0

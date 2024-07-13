@@ -837,6 +837,7 @@ public class PlayerController : MonoBehaviourPun, IFreezableEntity, ICustomSeria
         wallSlideRight = false;
 
         if (onGround) {
+            SpawnParticle("Prefabs/Particle/GroundpoundDust", body.position);
             onGround = false;
             doGroundSnap = false;
             body.position += Vector2.up * 0.15f;

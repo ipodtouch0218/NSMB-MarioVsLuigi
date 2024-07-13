@@ -32,6 +32,7 @@ public class Settings : Singleton<Settings> {
 
     public string nickname;
     public int character, skin;
+    public int menuBackground, redBgColor, greenBgColor, blueBgColor, alphaBgColor;
     public bool ndsResolution = false, fireballFromSprint = true, vsync = false, fourByThreeRatio = false;
     public bool scoreboardAlways = false, filter = true;
 
@@ -60,6 +61,11 @@ public class Settings : Singleton<Settings> {
         filter = PlayerPrefs.GetInt("ChatFilter", 1) == 1;
         character = PlayerPrefs.GetInt("Character", 0);
         skin = PlayerPrefs.GetInt("Skin", 0);
+        menuBackground = PlayerPrefs.GetInt("MenuBackground", 0);
+        redBgColor = PlayerPrefs.GetInt("RedBackgroundColor", 214);
+        greenBgColor = PlayerPrefs.GetInt("GreenBackgroundColor", 206);
+        blueBgColor = PlayerPrefs.GetInt("BlueBackgroundColor", 205);
+        alphaBgColor = PlayerPrefs.GetInt("AlphaBackgroundColor", 150);
     }
     public void SaveSettingsToPreferences() {
         PlayerPrefs.SetString("Nickname", Regex.Replace(PhotonNetwork.NickName, "\\(\\d*\\)", ""));
@@ -74,6 +80,11 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("ChatFilter", filter ? 1 : 0);
         PlayerPrefs.SetInt("Character", character);
         PlayerPrefs.SetInt("Skin", skin);
+        PlayerPrefs.SetInt("MenuBackground", menuBackground);
+        PlayerPrefs.SetInt("RedBackgroundColor", redBgColor);
+        PlayerPrefs.SetInt("GreenBackgroundColor", greenBgColor);
+        PlayerPrefs.SetInt("BlueBackgroundColor", blueBgColor);
+        PlayerPrefs.SetInt("AlphaBackgroundColor", alphaBgColor);
         PlayerPrefs.Save();
     }
 

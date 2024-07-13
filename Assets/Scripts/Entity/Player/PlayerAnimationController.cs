@@ -9,6 +9,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
     [SerializeField] private Avatar smallAvatar, largeAvatar;
     [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle;
     [SerializeField] private GameObject models, smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
+    [SerializeField] private GameObject drillEffect;
     [SerializeField] private Material glowMaterial;
     [SerializeField] private Color primaryColor = Color.clear, secondaryColor = Color.clear;
     [SerializeField] [ColorUsage(true, false)] private Color? _glowColor = null;
@@ -137,6 +138,7 @@ public class PlayerAnimationController : MonoBehaviourPun {
         SetParticleEmission(drillParticle, !gameover && controller.drill);
         if (controller.drill)
             drillParticleAudio.clip = (controller.state == Enums.PowerupState.PropellerMushroom ? propellerDrill : normalDrill);
+        drillEffect.SetActive(controller.drill);
         SetParticleEmission(sparkles, !gameover && controller.invincible > 0);
         SetParticleEmission(giantParticle, !gameover && controller.state == Enums.PowerupState.MegaMushroom && controller.giantStartTimer <= 0);
         SetParticleEmission(fireParticle, !gameover && animator.GetBool("firedeath") && controller.dead && deathTimer > deathUpTime);

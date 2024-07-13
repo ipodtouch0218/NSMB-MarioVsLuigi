@@ -1,20 +1,22 @@
 ﻿using UnityEngine;
 
 public class ParallaxMover : MonoBehaviour {
-    [SerializeField] private float speed;
-    private Vector3 moveBy;
+    [SerializeField] protected float speed;
+    [SerializeField] protected bool bypassLimit = false;
+    protected Vector3 moveBy;
+
 
     public void Start() {
         moveBy = new(speed, 0, 0);
         foreach (var mover in GetComponentsInParent<ParallaxMover>()) {
-            if (mover.transform != transform) {
+            if (mover.transform != transform && !bypassLimit) {
                 enabled = false;
                 break;
             }
         }
     }
 
-    public void Update() {
+    public virtual void Update() {
         transform.position += Time.deltaTime * moveBy;
     }
 }
