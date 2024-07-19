@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-using NSMB.Extensions;
-
 public class TeamButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     //---Serialized Variables
@@ -12,11 +10,13 @@ public class TeamButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
     [SerializeField] public int index;
 
     public void OnEnable() {
+        /* TODO
         PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
         overlay.enabled = (Mathf.Clamp(data.Team, 0, 4) == index);
 
         Team team = ScriptableManager.Instance.teams[index];
         flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
+        */
     }
 
     public void OnSelect(BaseEventData eventData) {

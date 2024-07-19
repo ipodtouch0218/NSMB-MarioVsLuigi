@@ -1,14 +1,9 @@
+using Photon.Realtime;
+using Quantum;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Tilemaps;
-
-using Fusion;
-using NSMB.Entities.Player;
-using NSMB.Extensions;
-using NSMB.Game;
-using NSMB.Tiles;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -57,7 +52,7 @@ namespace NSMB.Utils {
             }
         }
 
-
+        /* TODO
         public static Vector2Int WorldToTilemapPosition(Vector2 worldVec, GameManager gm = null, bool wrap = true) {
             if (!gm) {
                 gm = GameManager.Instance;
@@ -126,22 +121,6 @@ namespace NSMB.Utils {
                 return true;
             }
             return false;
-        }
-
-        public static int WrappedDirectionSign(Vector2 a, Vector2 b, GameManager gm = null) {
-            if (!gm) {
-                gm = GameManager.Instance;
-            }
-
-            if (!gm.loopingLevel) {
-                return a.x > b.x ? 1 : -1;
-            }
-
-            if (Mathf.Abs(a.x - b.x) > GameManager.Instance.LevelWidth * 0.5f) {
-                return (a.x < b.x) ? 1 : -1;
-            } else {
-                return (a.x > b.x) ? 1 : -1;
-            }
         }
 
         public static void WrapTileLocation(ref Vector3Int tileLocation, GameManager gm = null) {
@@ -304,6 +283,8 @@ namespace NSMB.Utils {
             return IsTileSolidAtTileLocation(WorldToTilemapPosition(worldLocation));
         }
 
+        */
+
         // https://stackoverflow.com/questions/10635040/how-to-detect-overlapping-polygons
         private static bool DoPolygonsOverlap(IList<Vector2> firstPolygon, IList<Vector2> secondPolygon) {
             foreach (var item in firstPolygon) {
@@ -333,6 +314,7 @@ namespace NSMB.Utils {
             return result;
         }
 
+        /* TODO
         public static bool IsTileSolidAtWorldLocation(Vector2 worldLocation) {
             Collider2D collision = NetworkHandler.Runner.GetPhysicsScene2D().OverlapPoint(worldLocation, Layers.MaskSolidGround);
             if (collision && !collision.isTrigger && !collision.CompareTag("Player")) {
@@ -393,79 +375,7 @@ namespace NSMB.Utils {
             }
             return false;
         }
-
-        public static float WrappedDistance(Vector2 a, Vector2 b) {
-            GameManager gm = GameManager.Instance;
-            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f) {
-                a.x -= gm.LevelWidth * Mathf.Sign(a.x - b.x);
-            }
-
-            return Vector2.Distance(a, b);
-        }
-
-        public static float WrappedDistance(Vector2 a, Vector2 b, out float xDifference) {
-            GameManager gm = GameManager.Instance;
-            if (gm && gm.loopingLevel && Mathf.Abs(a.x - b.x) > gm.LevelWidth * 0.5f) {
-                a.x -= gm.LevelWidth * Mathf.Sign(a.x - b.x);
-            }
-
-            xDifference = a.x - b.x;
-            return Vector2.Distance(a, b);
-        }
-
-        // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
-        public static PowerupScriptable GetRandomItem(PlayerController player) {
-            PowerupScriptable[] powerups = ScriptableManager.Instance.powerups;
-            GameManager gm = GameManager.Instance;
-
-            // "Losing" variable based on ln(x+1), x being the # of stars we're behind
-            gm.teamManager.GetTeamStars(player.Data.Team, out int ourStars);
-            int leaderStars = gm.teamManager.GetFirstPlaceStars();
-
-            int starsToWin = SessionData.Instance.StarRequirement;
-            bool custom = SessionData.Instance.CustomPowerups;
-            bool lives = SessionData.Instance.Lives > 0;
-
-
-            bool big = gm.spawnBigPowerups;
-            bool vertical = gm.spawnVerticalPowerups;
-
-            bool cantSpawnMega = GameManager.Instance.AlivePlayers.Any(pc => pc.State == Enums.PowerupState.MegaMushroom);
-
-            float totalChance = 0;
-            foreach (PowerupScriptable powerup in powerups) {
-                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega) {
-                    continue;
-                }
-
-                if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives)) {
-                    continue;
-                }
-
-                totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
-            }
-
-            float rand = GameManager.Instance.random.NextSingleExclusive() * totalChance;
-            foreach (PowerupScriptable powerup in powerups) {
-                if (powerup.state == Enums.PowerupState.MegaMushroom && cantSpawnMega) {
-                    continue;
-                }
-
-                if ((powerup.big && !big) || (powerup.vertical && !vertical) || (powerup.custom && !custom) || (powerup.lives && !lives)) {
-                    continue;
-                }
-
-                float chance = powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
-
-                if (rand < chance) {
-                    return powerup;
-                }
-
-                rand -= chance;
-            }
-
-            return powerups[1];
-        }
+        */
 
         public static float QuadraticEaseOut(float v) {
             return -1 * v * (v - 2);
@@ -528,39 +438,57 @@ namespace NSMB.Utils {
         }
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
-        public static Color GetPlayerColor(PlayerRef player, float s = 1, float v = 1) {
-            if (!player.IsRealPlayer) {
+        public static Color GetPlayerColor(QuantumGame game, PlayerRef player, float s = 1, float v = 1) {
+            MarioPlayer? mario = null;
+            int playerCount = 0;
+            var allPlayers = game.Frames.Predicted.Filter<MarioPlayer>();
+            while (allPlayers.Next(out _, out MarioPlayer aMario)) {
+                playerCount++;
+                if (aMario.PlayerRef == player) {
+                    mario = aMario;
+                }
+            }
+
+            if (!mario.HasValue) {
                 return spectatorColor;
             }
 
-            return GetPlayerColor(player.GetPlayerData(), s, v);
+            if (game.Configurations.Simulation.TeamsEnabled) {
+                return GetTeamColor(mario.Value.Team, s, v);
+            }
+
+            return Color.HSVToRGB((player._index - 1) / (playerCount + 1f), s, v);
         }
 
-        public static Color GetPlayerColor(PlayerData player, float s = 1, float v = 1) {
+        public static Color GetPlayerColor(Player player, float s = 1, float v = 1) {
 
             // Prioritize spectator status
-            if (!player || player.IsManualSpectator || player.IsCurrentlySpectating) {
+            if (player == null /* TODO || player.IsManualSpectator || player.IsCurrentlySpectating */) {
                 return spectatorColor;
             }
 
             // Then teams
-            if (SessionData.Instance && SessionData.Instance.Teams && player.Team >= 0 && player.Team < ScriptableManager.Instance.teams.Length) {
-                return GetTeamColor(player.Team, s, v);
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (game != null && game.Configurations.Simulation.TeamsEnabled) {
+
             }
 
             // Then id based color
             int result = -1;
             int count = 0;
-            var players = SessionData.Instance.PlayerDatas.OrderBy(pd => pd.Value.JoinTick);
+            var players = NetworkHandler.Client.CurrentRoom.Players.OrderBy(kvp => kvp.Key);
 
-            foreach ((_, PlayerData playerData) in players) {
+            foreach ((int otherPlayerActorNumber, Player otherPlayer) in players) {
+                /* TODO
                 // Skip spectators in color calculations
                 if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating) {
                     continue;
                 }
+                */
 
-                if (playerData == player) {
+                if (otherPlayerActorNumber == player.ActorNumber) {
                     result = count;
+                    break;
                 }
 
                 count++;
@@ -601,13 +529,9 @@ namespace NSMB.Utils {
             return pingSymbol;
         }
 
-        public static Color GetRainbowColor(NetworkRunner runner) {
+        public static Color GetRainbowColor() {
             // Four seconds per revolution
-            if (!runner) {
-                return Color.white;
-            }
-
-            double time = (runner.LocalRenderTime * 0.25d) % 1d;
+            double time = (Time.timeAsDouble * 0.25d) % 1d;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }
 

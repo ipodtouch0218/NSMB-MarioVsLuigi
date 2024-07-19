@@ -3894,7 +3894,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="value"
             >A pointer to data that should be copied as value to the component added.
@@ -3917,7 +3917,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="result">
             A pointer to the component added.
@@ -3940,7 +3940,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="value"
             >A pointer to data that should be copied as value to the component added.
@@ -3980,7 +3980,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="result">A pointer to the component added or already existing. <see langword="null"/> if the <paramref name="entity"/> does not exist.</param>
             <exception cref="T:System.IndexOutOfRangeException">If the <paramref name="componentIndex"/> does not identify a valid component.</exception>
@@ -4008,7 +4008,7 @@
             <param name="entity">Entity ref</param>
             <param name="componentIndex">
             The index of the component being set.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to get the index of a component.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to get the index of a component.
             </param>
             <param name="value">
             A pointer to data that should be copied as value to the component.

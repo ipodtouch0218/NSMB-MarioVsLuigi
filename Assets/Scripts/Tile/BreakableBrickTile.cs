@@ -1,12 +1,5 @@
 using UnityEngine;
 using UnityEngine.Serialization;
-
-using Fusion;
-using NSMB.Entities;
-using NSMB.Entities.Enemies;
-using NSMB.Entities.Player;
-using NSMB.Game;
-
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "BreakableBrickTile", menuName = "ScriptableObjects/Tiles/BreakableBrickTile")]
@@ -22,6 +15,7 @@ namespace NSMB.Tiles {
         [SerializeField, FormerlySerializedAs("breakableByGiantMario")] public bool breakableByMegaMario = true;
         [SerializeField] private Vector2Int tileSize = Vector2Int.one;
 
+        /*
         protected bool BreakBlockCheck(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             bool doBump = false, doBreak = false, giantBreak = false;
             if (interacter is PlayerController pl) {
@@ -56,7 +50,9 @@ namespace NSMB.Tiles {
 
             return doBreak;
         }
+        */
 
+        /*
         public void Break(BasicEntity interacter, Vector3 worldLocation, Enums.Sounds sound) {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
@@ -74,7 +70,9 @@ namespace NSMB.Tiles {
 
             interacter.PlayNetworkedSound(sound);
         }
+        */
 
+        /*
         public void BumpWithAnimation(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             Bump(interacter, direction, worldLocation);
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
@@ -84,7 +82,9 @@ namespace NSMB.Tiles {
             GameManager.Instance.BumpBlock((short) tileLocation.x, (short) tileLocation.y, this,
                 this, downwards, downwards ? -SpawnOffset : SpawnOffset, false, NetworkPrefabRef.Empty);
         }
+        */
 
+        /*
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             // Breaking block check.
             bool broken = BreakBlockCheck(interacter, direction, worldLocation);
@@ -98,5 +98,6 @@ namespace NSMB.Tiles {
 
             return broken;
         }
+        */
     }
 }

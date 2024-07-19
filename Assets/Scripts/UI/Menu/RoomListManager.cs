@@ -3,27 +3,32 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-using Fusion;
 using NSMB.Utils;
+using Photon.Realtime;
 
 namespace NSMB.UI.MainMenu {
-    public class RoomListManager : MonoBehaviour {
+    public class RoomListManager : MonoBehaviour, ILobbyCallbacks {
 
         //---Properties
-        private RoomIcon _selectedRoom;
-        public RoomIcon SelectedRoom {
-            get => _selectedRoom;
-            private set {
-                if (_selectedRoom != null) {
-                    _selectedRoom.Unselect();
+        public string SelectedRoomCode {
+            get => selectedRoomCode;
+            set {
+                if (SelectedRoomIcon) {
+                    SelectedRoomIcon.Unselect();
                 }
 
-                _selectedRoom = value;
+                selectedRoomCode = value;
+                joinRoomButton.interactable = value != null;
 
-                if (_selectedRoom != null) {
-                    _selectedRoom.Select();
+                if (SelectedRoomIcon) {
+                    SelectedRoomIcon.Select();
                 }
             }
+        }
+
+        public RoomIcon SelectedRoomIcon {
+            get => rooms.FirstOrDefault(kvp => kvp.Key == selectedRoomCode).Value;
+            set => selectedRoomCode = rooms.FirstOrDefault(kvp => kvp.Value == value).Key;
         }
 
         //---Serialized Variables
@@ -34,35 +39,40 @@ namespace NSMB.UI.MainMenu {
         //---Private Variables
         private readonly Dictionary<string, RoomIcon> rooms = new();
         private float lastSelectTime;
+        private string selectedRoomCode;
+
 
         public void Awake() {
-            NetworkHandler.OnSessionListUpdated += OnSessionListUpdated;
-            NetworkHandler.OnShutdown +=           OnShutdown;
+            NetworkHandler.Client.AddCallbackTarget(this);
+            joinRoomButton.interactable = false;
         }
         public void OnDestroy() {
-            NetworkHandler.OnSessionListUpdated -= OnSessionListUpdated;
-            NetworkHandler.OnShutdown -=           OnShutdown;
+            NetworkHandler.Client?.RemoveCallbackTarget(this);
         }
 
         public void SelectRoom(RoomIcon room) {
-            if (SelectedRoom == room) {
+            if (SelectedRoomIcon == room) {
                 if (Time.time - lastSelectTime < 0.3f) {
+                    // Double-click
                     JoinSelectedRoom();
                     return;
                 }
             }
 
-            SelectedRoom = room;
-            joinRoomButton.interactable = SelectedRoom && Settings.Instance.generalNickname.IsValidUsername(false);
+            SelectedRoomIcon = room;
+            joinRoomButton.interactable = SelectedRoomIcon && Settings.Instance.generalNickname.IsValidUsername(false);
             lastSelectTime = Time.time;
         }
 
         public async void JoinSelectedRoom() {
-            if (!SelectedRoom) {
+            if (SelectedRoomCode == null) {
                 return;
             }
 
-            await NetworkHandler.JoinRoom(SelectedRoom.session.Name);
+            await NetworkHandler.JoinRoom(new EnterRoomArgs() {
+                RoomName = SelectedRoomCode
+            });
+            // TODO await NetworkHandler.JoinRoom(SelectedRoom.session.Name);
         }
 
         public void OpenPrivateRoomPrompt() {
@@ -71,16 +81,16 @@ namespace NSMB.UI.MainMenu {
 
         public void RefreshRooms() {
             foreach (RoomIcon room in rooms.Values) {
-                room.UpdateUI(room.session);
+                // TODO room.UpdateUI(room.session);
             }
         }
 
         public void RemoveRoom(RoomIcon icon) {
             Destroy(icon.gameObject);
-            rooms.Remove(icon.session.Name);
+            // TODO rooms.Remove(icon.session.Name);
 
-            if (SelectedRoom == icon) {
-                SelectedRoom = null;
+            if (SelectedRoomIcon == icon) {
+                SelectedRoomIcon = null;
             }
         }
 
@@ -90,16 +100,48 @@ namespace NSMB.UI.MainMenu {
             }
 
             rooms.Clear();
-            SelectedRoom = null;
+            SelectedRoomCode = null;
         }
 
         //---Callbacks
-        private void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
+        public void OnJoinedLobby() { }
+
+        public void OnLeftLobby() {
             ClearRooms();
         }
 
-        private void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
+        public void OnRoomListUpdate(List<RoomInfo> roomList) {
 
+            foreach (RoomInfo newRoomInfo in roomList) {
+
+                string roomName = newRoomInfo.Name;
+                if (rooms.TryGetValue(roomName, out RoomIcon roomIcon)) {
+                    // RoomIcon exists
+                    if (newRoomInfo.RemovedFromList) {
+                        // But we shouldn't display it anymore.
+                        Destroy(roomIcon.gameObject);
+                        rooms.Remove(roomName);
+                    } else {
+                        // And it should still exist
+                        roomIcon.UpdateUI(newRoomInfo);
+                    }
+                } else {
+                    // RoomIcon doesn't exist
+                    if (!newRoomInfo.RemovedFromList) {
+                        // And it should
+                        roomIcon = Instantiate(roomIconPrefab, Vector3.zero, Quaternion.identity);
+                        roomIcon.name = newRoomInfo.Name;
+                        roomIcon.gameObject.SetActive(true);
+                        roomIcon.transform.SetParent(roomListScrollRect.transform, false);
+                        roomIcon.UpdateUI(newRoomInfo);
+
+                        rooms[newRoomInfo.Name] = roomIcon;
+                    }
+                }
+            }
+
+
+            /*
             List<string> invalidRooms = rooms.Keys.ToList();
 
             foreach (SessionInfo session in sessionList) {
@@ -157,6 +199,9 @@ namespace NSMB.UI.MainMenu {
             //}
 
             //privateRoomIcon.transform.SetAsFirstSibling();
+            */
         }
+
+        public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics) { }
     }
 }

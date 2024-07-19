@@ -19,9 +19,17 @@ namespace NSMB.UI.MainMenu {
         private Vector2 anchor, adjustedAnchor;
 
         public void OnValidate() {
-            rect = GetComponent<RectTransform>();
-            button = GetComponent<Button>();
-            image = GetComponentInChildren<Image>();
+            if (!rect) {
+                rect = GetComponent<RectTransform>();
+            }
+
+            if (!button) {
+                button = GetComponent<Button>();
+            }
+
+            if (!image) {
+                image = GetComponentInChildren<Image>();
+            }
         }
 
         public void Start() {
@@ -31,7 +39,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Update() {
-            if (!button.interactable) {
+            if (!button.IsInteractable()) {
                 SetAnchor(adjustedAnchor);
                 image.color = disabledColor;
                 return;
@@ -46,10 +54,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void SetAnchor(Vector2 value) {
-            if (leftAnchored)
+            if (leftAnchored) {
                 rect.anchorMax = value;
-            else
+            } else {
                 rect.anchorMin = value;
+            }
         }
     }
 }

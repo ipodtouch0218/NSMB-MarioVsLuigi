@@ -1,7 +1,7 @@
+using NSMB.UI.MainMenu;
+using Photon.Realtime;
 using UnityEngine;
 using TMPro;
-
-using NSMB.UI.MainMenu;
 
 namespace NSMB.UI.Prompts {
     public class JoinPrivateRoomPrompt : UIPrompt {
@@ -13,16 +13,21 @@ namespace NSMB.UI.Prompts {
             roomIdInput.text = "";
         }
 
-        public void JoinPrivateRoom() {
+        public async void JoinPrivateRoom() {
             string id = roomIdInput.text.ToUpper();
             int index = id.Length > 0 ? NetworkHandler.RoomIdValidChars.IndexOf(id[0]) : -1;
-            if (id.Length < 8 || index < 0 || index >= NetworkHandler.Regions.Length) {
+            if (id.Length < 8 || index < 0 || index >= NetworkHandler.Regions.Count) {
                 MainMenuManager.Instance.OpenErrorBox("ui.rooms.joinprivate.invalid");
                 return;
             }
 
             gameObject.SetActive(false);
-            _ = NetworkHandler.JoinRoom(id);
+            short result = await NetworkHandler.JoinRoom(new EnterRoomArgs() {
+                RoomName = id,
+            });
+            if (result != 0) {
+                MainMenuManager.Instance.OpenErrorBox(result);
+            }
         }
     }
 }

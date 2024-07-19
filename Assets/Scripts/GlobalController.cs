@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
 
-using Fusion;
+//using Fusion;
 using NSMB.Extensions;
 using NSMB.Loading;
 using NSMB.Translation;
@@ -19,7 +19,7 @@ public class GlobalController : Singleton<GlobalController> {
 
     //---Public Variables
     public TranslationManager translationManager;
-    public DiscordController discordController;
+    //public DiscordController discordController;
     public RumbleManager rumbleManager;
     public Gradient rainbowGradient;
 
@@ -36,7 +36,7 @@ public class GlobalController : Singleton<GlobalController> {
     public bool checkedForVersion = false, firstConnection = true;
     public int windowWidth = 1280, windowHeight = 720;
 
-    public ConnectionToken connectionToken;
+    //public ConnectionToken connectionToken;
 
     //---Serialized Variables
     [SerializeField] private AudioMixer mixer;
@@ -53,7 +53,7 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void OnValidate() {
-        if (!discordController) discordController = GetComponent<DiscordController>();
+        //if (!discordController) discordController = GetComponent<DiscordController>();
     }
 
     public void Awake() {
@@ -65,27 +65,30 @@ public class GlobalController : Singleton<GlobalController> {
 
     public void Start() {
         AuthenticationHandler.IsAuthenticating = false;
-        NetworkHandler.connecting = 0;
+        //NetworkHandler.connecting = 0;
 
         if (!Application.isFocused) {
-            if (Settings.Instance.audioMuteMusicOnUnfocus) mixer.SetFloat("MusicVolume", -80f);
-            if (Settings.Instance.audioMuteSFXOnUnfocus) mixer.SetFloat("SoundVolume", -80f);
+            if (Settings.Instance.audioMuteMusicOnUnfocus) {
+                mixer.SetFloat("MusicVolume", -80f);
+            }
+
+            if (Settings.Instance.audioMuteSFXOnUnfocus) {
+                mixer.SetFloat("SoundVolume", -80f);
+            }
         }
         ControlSystem.controls.Enable();
         ControlSystem.controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
 
-        NetworkHandler.OnShutdown += OnShutdown;
-        NetworkHandler.OnHostMigration += OnHostMigration;
-
-        CreateFusionStatsInstance();
+        //NetworkHandler.OnShutdown += OnShutdown;
+        //NetworkHandler.OnHostMigration += OnHostMigration;
     }
 
     public void OnDestroy() {
         ControlSystem.controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
         ControlSystem.controls.Disable();
 
-        NetworkHandler.OnShutdown -= OnShutdown;
-        NetworkHandler.OnHostMigration -= OnHostMigration;
+        //NetworkHandler.OnShutdown -= OnShutdown;
+        //NetworkHandler.OnHostMigration -= OnHostMigration;
     }
 
     public void Update() {
@@ -98,8 +101,9 @@ public class GlobalController : Singleton<GlobalController> {
             int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : (float) windowWidth / windowHeight));
 
             if (!ndsTexture || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
-                if (ndsTexture)
+                if (ndsTexture) {
                     ndsTexture.Release();
+                }
 
                 ndsTexture = RenderTexture.GetTemporary(targetWidth, targetHeight);
                 ndsTexture.filterMode = FilterMode.Point;
@@ -143,10 +147,13 @@ public class GlobalController : Singleton<GlobalController> {
 #endif
 
         } else {
-            if (Settings.Instance.audioMuteMusicOnUnfocus)
+            if (Settings.Instance.audioMuteMusicOnUnfocus) {
                 fadeMusicRoutine ??= StartCoroutine(FadeVolume("MusicVolume"));
-            if (Settings.Instance.audioMuteSFXOnUnfocus)
+            }
+
+            if (Settings.Instance.audioMuteSFXOnUnfocus) {
                 fadeSfxRoutine ??= StartCoroutine(FadeVolume("SoundVolume"));
+            }
 
 #if UNITY_WEBGL
             QualitySettings.vSyncCount = previousVsyncCount;
@@ -156,8 +163,9 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     private void StopCoroutineNullable(ref Coroutine coroutine) {
-        if (coroutine == null)
+        if (coroutine == null) {
             return;
+        }
 
         StopCoroutine(coroutine);
         coroutine = null;
@@ -176,8 +184,8 @@ public class GlobalController : Singleton<GlobalController> {
         mixer.SetFloat(key, -80f);
     }
 
-    public void PlaySound(Enums.Sounds sound) {
-        sfx.PlayOneShot(sound);
+    public void PlaySound(SoundEffect soundEffect) {
+        sfx.PlayOneShot(soundEffect);
     }
 
     private static float ToLinearScale(float x) {
@@ -186,22 +194,6 @@ public class GlobalController : Singleton<GlobalController> {
 
     private static float ToLogScale(float x) {
         return 20 * Mathf.Log10(x);
-    }
-
-    private void CreateFusionStatsInstance() {
-        if (fusionStats)
-            DestroyImmediate(fusionStats);
-
-        fusionStats = Instantiate(fusionStatsTemplate, fusionStatsTemplate.transform.parent);
-        fusionStats.SetActive(true);
-    }
-
-    private void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
-        CreateFusionStatsInstance();
-    }
-
-    private void OnHostMigration(NetworkRunner runner, HostMigrationToken token) {
-        CreateFusionStatsInstance();
     }
 
     private void ToggleFpsMonitor(InputAction.CallbackContext obj) {

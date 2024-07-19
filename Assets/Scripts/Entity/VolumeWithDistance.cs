@@ -1,9 +1,10 @@
 using UnityEngine;
 
-using NSMB.Game;
 using NSMB.Utils;
+using Photon.Deterministic;
+using Quantum;
 
-public class VolumeWithDistance : MonoBehaviour {
+public class VolumeWithDistance : QuantumCallbacks {
 
     //---Serialized Variables
     [SerializeField] private AudioSource[] audioSources;
@@ -36,14 +37,12 @@ public class VolumeWithDistance : MonoBehaviour {
     }
 
     public void LateUpdate() {
-        GameManager inst = GameManager.Instance;
-        if (!inst) {
-            return;
-        }
+        // TODO FPVector2 listener = (!useDistanceToCamera && gm.localPlayer) ? gm.localPlayer.transform.position : Camera.main.transform.position;
+        FPVector2 listener = Camera.main.transform.position.ToFPVector2();
 
-        Vector3 listener = (!useDistanceToCamera && inst && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
+        Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-        float distance = Utils.WrappedDistance(listener, soundOrigin.position, out float xDifference);
+        float distance = QuantumUtils.WrappedDistance(f, listener, soundOrigin.position.ToFPVector2(), out FP xDifference).AsFloat;
         if (distance > soundRange) {
             foreach (AudioSource source in audioSources) {
                 source.volume = 0;
@@ -54,7 +53,7 @@ public class VolumeWithDistance : MonoBehaviour {
 
         float percentage = 1f - (distance * soundRangeInverse);
         float volume = Utils.QuadraticEaseOut(percentage);
-        float panning = Settings.Instance.audioPanning ? Utils.QuadraticEaseOut(-xDifference * soundRangeInverse) * maxPanning : 0f;
+        float panning = Settings.Instance.audioPanning ? Utils.QuadraticEaseOut(-xDifference.AsFloat * soundRangeInverse) * maxPanning : 0f;
 
         for (int i = 0; i < audioSources.Length; i++) {
             AudioSource source = audioSources[i];

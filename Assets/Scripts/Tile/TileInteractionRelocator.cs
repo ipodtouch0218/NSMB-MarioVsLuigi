@@ -1,7 +1,5 @@
 using UnityEngine;
 
-using NSMB.Entities;
-
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "InteractionRelocator", menuName = "ScriptableObjects/Tiles/InteractionRelocator", order = 8)]
@@ -9,6 +7,7 @@ namespace NSMB.Tiles {
 
         public Vector2Int offset;
 
+        /*
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             Vector2Int tileLocation = Utils.Utils.WorldToTilemapPosition(worldLocation);
 
@@ -18,5 +17,6 @@ namespace NSMB.Tiles {
             bumpSound = true;
             return false;
         }
+        */
     }
 }

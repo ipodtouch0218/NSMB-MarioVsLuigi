@@ -38,6 +38,7 @@ public class TeamChooser : MonoBehaviour {
     }
 
     public void SelectTeam(TeamButton team) {
+        /* TODO
         int selected = team.index;
 
         PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
@@ -48,9 +49,11 @@ public class TeamChooser : MonoBehaviour {
 
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
+        */
     }
 
     public void Open() {
+        /* TODO
         PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
         int selected = Mathf.Clamp(data.Team, 0, 4);
         blockerInstance = Instantiate(blockerTemplate, baseCanvas.transform);
@@ -64,25 +67,30 @@ public class TeamChooser : MonoBehaviour {
 
         if (MainMenuManager.Instance)
             MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
+        */
     }
 
     public void Close(bool playSound) {
-        if (!blockerInstance)
+        if (!blockerInstance) {
             return;
+        }
 
         Destroy(blockerInstance);
         EventSystem.current.SetSelectedGameObject(gameObject);
         content.SetActive(false);
 
-        if (playSound && MainMenuManager.Instance)
-            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Back);
+        if (playSound && MainMenuManager.Instance) {
+            MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
+        }
     }
 
     private void OnColorblindModeChanged() {
+        /* TODO
         if (!button.interactable || !NetworkHandler.Runner.GetLocalPlayerData()) return;
 
         int selected = NetworkHandler.Runner.GetLocalPlayerData().Team % 5;
         Team teamScriptable = ScriptableManager.Instance.teams[selected];
         flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
+        */
     }
 }

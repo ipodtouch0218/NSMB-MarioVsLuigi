@@ -12,13 +12,18 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
+using Photon.Client;
+using Photon.Deterministic;
+using Photon.Realtime;
+using Quantum;
+using System.Threading.Tasks;
+using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu {
-    public class MainMenuManager : Singleton<MainMenuManager> {
+    public class MainMenuManager : Singleton<MainMenuManager>, IOnEventCallback {
 
         //---Static Variables
         public static readonly int NicknameMin = 2, NicknameMax = 20;
-        public static bool WasHostMigration;
 
         //---Properties
         // private NetworkRunner Runner => NetworkHandler.Runner;
@@ -50,7 +55,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private TMP_Text lobbyHeaderText, updateText, startGameButtonText;
         [SerializeField] private ScrollRect settingsScroll;
         [SerializeField] private Slider lobbyPlayersSlider;
-        [SerializeField] private CanvasGroup hostControlsGroup, copyRoomIdCanvasGroup;
+        [SerializeField] private CanvasGroup hostControlsGroup, copyRoomIdCanvasGroup, roomListCanvasGroup, joinStartButtonCanvasGroup;
         [SerializeField] private ErrorPrompt errorPrompt, networkErrorPrompt;
 
         [SerializeField, FormerlySerializedAs("ColorBar")] private Image colorBar;
@@ -61,9 +66,8 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] public List<MapData> maps;
 
         //---Private Variables
-        private Coroutine playerPingUpdateCoroutine, quitCoroutine, fadeMusicCoroutine;
-        private bool validName;
-        private bool wasSettingsOpen;
+        private Coroutine quitCoroutine, fadeMusicCoroutine;
+        private bool wasSettingsOpen, isCountdownStarted, isReady;
 
         public void Awake() {
             Set(this, false);
@@ -71,14 +75,16 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             // Register callbacks
-            PlayerData.OnPlayerDataReady += OnPlayerDataReady;
-            PlayerData.OnPlayerDataDespawned += OnPlayerDataDespawned;
+            //PlayerData.OnPlayerDataReady += OnPlayerDataReady;
+            //PlayerData.OnPlayerDataDespawned += OnPlayerDataDespawned;
             //NetworkHandler.OnLobbyConnect += OnLobbyConnect;
             //NetworkHandler.OnShutdown += OnShutdown;
             //NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
             //NetworkHandler.OnConnectFailed += OnConnectFailed;
-            NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
-            MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
+            //NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
+            //MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
+            NetworkHandler.Client.StateChanged += OnClientStateChanged;
+            NetworkHandler.Client.AddCallbackTarget(this);
 
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -87,14 +93,16 @@ namespace NSMB.UI.MainMenu {
 
         public void OnDisable() {
             // Unregister callbacks
-            PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
-            PlayerData.OnPlayerDataDespawned -= OnPlayerDataDespawned;
+            //PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
+            //PlayerData.OnPlayerDataDespawned -= OnPlayerDataDespawned;
             //NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
             //NetworkHandler.OnShutdown -= OnShutdown;
             //NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
             //NetworkHandler.OnConnectFailed -= OnConnectFailed;
-            NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
-            MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
+            //NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
+            //MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
+            NetworkHandler.Client.StateChanged -= OnClientStateChanged;
+            NetworkHandler.Client.RemoveCallbackTarget(this);
 
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -102,22 +110,21 @@ namespace NSMB.UI.MainMenu {
 
         public void Start() {
             // Clear game-specific settings so they don't carry over
-            WasHostMigration = false;
+            /* TODO
             HorizontalCamera.SizeIncreaseTarget = 0;
             HorizontalCamera.SizeIncreaseCurrent = 0;
+            */
 
             PreviewLevel(UnityEngine.Random.Range(0, maps.Count));
-            UpdateRegionDropdown();
+            //UpdateRegionDropdown();
             //StartCoroutine(NetworkHandler.PingRegions());
 
-            /* TODO
-
-            // Photon stuff.
+            // Multiplayer stuff
             if (GlobalController.Instance.firstConnection) {
-                // Initial connection to the game
                 OpenTitleScreen();
-
-            } else if ((Runner.IsServer || Runner.IsConnectedToServer) && SessionData.Instance && SessionData.Instance.Object) {
+            }
+            /* TODO
+            else if ((Runner.IsServer || Runner.IsConnectedToServer) && SessionData.Instance && SessionData.Instance.Object) {
                 // Call enterroom callback
                 EnterRoom(true);
 
@@ -133,7 +140,7 @@ namespace NSMB.UI.MainMenu {
             UpdateNickname();
 
             // Discord RPC
-            GlobalController.Instance.discordController.UpdateActivity();
+            // TODO GlobalController.Instance.discordController.UpdateActivity();
 
 #if PLATFORM_WEBGL
             copyRoomIdCanvasGroup.interactable = false;
@@ -157,46 +164,29 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Update() {
-            /* TODO
-            bool connectedToNetwork = NetworkHandler.Connected && !Runner.SessionInfo;
-            bool connectingToNetwork = NetworkHandler.Connecting || Runner.SessionInfo;
-
-            GlobalController.Instance.connecting.SetActive((connectingToNetwork && lobbyMenu.activeInHierarchy) || WasHostMigration);
-
-            joinRoomBtn.interactable = connectedToNetwork && roomManager.SelectedRoom != null && validName;
-            createRoomBtn.interactable = connectedToNetwork && validName;
-            //regionDropdown.interactable = connectedToNetwork;
-
-            reconnectBtn.gameObject.SetActive(NetworkHandler.Disconnected);
-            joinPrivateRoomBtn.gameObject.SetActive(connectedToNetwork);
-            */
-
             wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
         }
 
-        public void OnDestroy() {
-            if (GlobalController.Instance) {
-                GlobalController.Instance.connecting.SetActive(false);
-            }
-        }
-
         public void UpdateRegionDropdown() {
+            if (NetworkHandler.Regions == null) {
+                return;
+            }
 
             if (regionDropdown.options.Count == 0) {
                 // Create brand-new options
-                foreach (string region in NetworkHandler.Regions) {
-                    NetworkHandler.RegionPings.TryGetValue(region, out int ping);
-                    regionDropdown.options.Add(new RegionOption(region, ping));
+                for (int i = 0; i < NetworkHandler.Regions.Count; i++) {
+                    Region region = NetworkHandler.Regions[i];
+                    regionDropdown.options.Add(new RegionOption(i, region.Code, region.Ping));
                 }
                 regionDropdown.options.Sort();
             } else {
                 // Update existing options
                 RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
 
-                if (NetworkHandler.RegionPings != null) {
+                if (NetworkHandler.Regions != null) {
                     foreach (var option in regionDropdown.options) {
                         if (option is RegionOption ro) {
-                            ro.Ping = NetworkHandler.RegionPings[ro.Region];
+                            ro.Ping = NetworkHandler.Regions[ro.Index].Ping;
                         }
                     }
                 }
@@ -209,26 +199,25 @@ namespace NSMB.UI.MainMenu {
         public void EnterRoom(bool inSameRoom) {
 
             // Chat
-            if (WasHostMigration) {
-                /* TODO
-                // Host chat notification
-                if (Runner.IsServer) {
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
-                }
-                */
-            } else if (inSameRoom) {
+            if (inSameRoom) {
                 chat.ReplayChatMessages();
             } else {
                 chatTextField.SetTextWithoutNotify("");
+                sfx.PlayOneShot(SoundEffect.UI_PlayerConnect);
+                if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
+                }
             }
+
+            isReady = false;
+            isCountdownStarted = false;
 
             // Open the in-room menu
             OpenInRoomMenu();
 
-            if (!WasHostMigration) {
-                // Fix the damned setting scroll menu
-                StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
-            }
+            // Fix the damned setting scroll menu
+            StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
+
 
             /* TODO
 
@@ -255,36 +244,20 @@ namespace NSMB.UI.MainMenu {
             UpdateRoomHeader();
 
             // Discord RPC
-            GlobalController.Instance.discordController.UpdateActivity();
+            // TODO GlobalController.Instance.discordController.UpdateActivity();
 
             // Create player icons
             playerList.PopulatePlayerEntries();
-
-            WasHostMigration = false;
         }
 
         public void UpdateRoomHeader() {
             const int rngSeed = 2035767;
 
-            /* TODO
-            PlayerData host =
-                SessionData.Instance.PlayerDatas
-                    .Select(kvp => kvp.Value)
-                    .Where(pd => pd.IsRoomOwner)
-                    .FirstOrDefault();
-
-            string hostname;
-            if (host) {
-                hostname = host.GetNickname();
-            } else {
-                // Fallback
-                NetworkUtils.GetSessionProperty(Runner.SessionInfo, Enums.NetRoomProperties.HostName, out hostname);
-            }
-
+            Room room = NetworkHandler.Client.CurrentRoom;
+            string hostname = room.Players[room.MasterClientId].NickName.ToValidUsername();
 
             lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
             UnityEngine.Random.InitState(hostname.GetHashCode() + rngSeed);
-            */
             colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
         }
 
@@ -336,8 +309,9 @@ namespace NSMB.UI.MainMenu {
             lobbyMenu.SetActive(true);
             chat.ClearChat();
 
-            if (!errorPrompt.gameObject.activeSelf && !networkErrorPrompt.gameObject.activeSelf && NetworkHandler.Disconnected) {
-                Reconnect();
+            // First connection on play game button.
+            if (NetworkHandler.Client.State == ClientState.PeerCreated) {
+                _ = Reconnect();
             }
 
             roomManager.RefreshRooms();
@@ -386,8 +360,8 @@ namespace NSMB.UI.MainMenu {
             EventSystem.current.SetSelectedGameObject(currentLobbySelected);
         }
 
-        public void OpenErrorBox(Enum cause) {
-            OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, cause.ToString()));
+        public void OpenErrorBox(short cause) {
+             OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
         }
 
         public void OpenErrorBox(string key) {
@@ -401,88 +375,98 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
-        public void OpenNetworkErrorBox(Enum reason) {
+        public void OpenNetworkErrorBox(short cause) {
             if (nonNetworkShutdown) {
-                OpenErrorBox(reason);
+                OpenErrorBox(cause);
                 return;
             }
 
-            OpenNetworkErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(reason, reason.ToString()));
+            OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
         }
 
         public void BackSound() {
-            sfx.PlayOneShot(Enums.Sounds.UI_Back);
+            sfx.PlayOneShot(SoundEffect.UI_Back);
         }
 
         public void ConfirmSound() {
-            sfx.PlayOneShot(Enums.Sounds.UI_Decide);
+            sfx.PlayOneShot(SoundEffect.UI_Decide);
         }
 
         public void CursorSound() {
-            sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
+            sfx.PlayOneShot(SoundEffect.UI_Cursor);
         }
 
         public void StartSound() {
-            sfx.PlayOneShot(Enums.Sounds.UI_StartGame);
+            sfx.PlayOneShot(SoundEffect.UI_StartGame);
         }
 
         public void ConnectToDropdownRegion() {
             RegionOption selectedRegion = (RegionOption) regionDropdown.options[regionDropdown.value];
             string targetRegion = selectedRegion.Region;
-            if (NetworkHandler.CurrentRegion == targetRegion) {
+            if (NetworkHandler.Region == targetRegion) {
                 return;
             }
 
             roomManager.ClearRooms();
-            NetworkHandler.CurrentRegion = targetRegion;
-
             _ = NetworkHandler.ConnectToRegion(targetRegion);
         }
 
-        public void Reconnect() {
-            Debug.Log("[Network] (Re)connecting to the master server");
-            _ = NetworkHandler.ConnectToSameRegion();
+        public async Task<bool> Reconnect() {
+            GlobalController.Instance.connecting.SetActive(true);
+            roomListCanvasGroup.interactable = false;
+            return await NetworkHandler.ConnectToRegion(null);
         }
 
         public void QuitRoom() {
             OpenRoomListMenu();
+            _ = Reconnect();
 
-            if (playerPingUpdateCoroutine != null) {
-                StopCoroutine(playerPingUpdateCoroutine);
-                playerPingUpdateCoroutine = null;
-            }
-
-            _ = NetworkHandler.ConnectToRegion();
+            /* TODO
             GlobalController.Instance.discordController.UpdateActivity();
+            */
         }
 
         public void StartCountdown() {
 
-            /* TODO
+            if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
 
-            PlayerData data = Runner.GetLocalPlayerData();
-            if (!data.IsRoomOwner) {
-                // Toggle ready up state instead
-                sfx.PlayOneShot(data.IsReady ? Enums.Sounds.UI_Back : Enums.Sounds.UI_Decide);
-                data.Rpc_SetIsReady(!data.IsReady);
-                return;
-            }
-
-            if (SessionData.Instance.GameStartTimer.IsRunning) {
-                // Cancel early.
-                SessionData.Instance.GameStartTimer = TickTimer.None;
-                sfx.PlayOneShot(Enums.Sounds.UI_Back);
-            } else {
-                // Make sure we can actually start the game
-                if (!IsRoomConfigurationValid()) {
+                /* TODO
+                if (!cowndownStarted && !IsRoomConfigurationValid()) {
                     return;
                 }
+                */
 
-                // Actually start the game.
-                SessionData.Instance.GameStartTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+                /*
+                Debug.Log("CHANGE COUTNDOWN STATE");
+                Debug.Log(NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.ChangeCountdownState, !isCountdownStarted,
+                    new RaiseEventArgs() { Receivers = ReceiverGroup.All, }, SendOptions.SendReliable
+                ));
+                */
+
+                var sessionRunnerArguments = new SessionRunner.Arguments {
+                    RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
+                    GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
+                    ClientId = NetworkHandler.Client.UserId,
+                    RuntimeConfig = new RuntimeConfig() {
+
+                    },
+                    SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
+                    GameMode = DeterministicGameMode.Multiplayer,
+                    PlayerCount = 1,
+                    StartGameTimeoutInSeconds = 10,
+                    Communicator = new QuantumNetworkCommunicator(NetworkHandler.Client),
+                };
+
+                _ = SessionRunner.StartAsync(sessionRunnerArguments);
+
+            } else {
+                isReady = !isReady;
+                NetworkHandler.Client.LocalPlayer.SetCustomProperties(new() {
+                    [Enums.NetPlayerProperties.Ready] = isReady,
+                });
+
+                sfx.PlayOneShot(isReady ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
             }
-
-            */
         }
 
         private IEnumerator FadeMusic() {
@@ -515,25 +499,27 @@ namespace NSMB.UI.MainMenu {
             */
         }
 
+        /*
         public bool IsRoomConfigurationValid() {
             return
                 SessionData.Instance.PlayerDatas
                     .Any(kvp => !kvp.Value.IsManualSpectator);
         }
+        */
 
+        /* TODO
         public void Kick(PlayerData target) {
-            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
 
             SessionData.Instance.Disconnect(target.Owner);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.kicked", ChatManager.Blue, "playername", target.GetNickname());
-            */
         }
+        */
 
+        /* TODO
         public void Promote(PlayerData target) {
-            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
@@ -544,11 +530,11 @@ namespace NSMB.UI.MainMenu {
                 Runner.SetMasterClient(target.Owner);
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", target.GetNickname());
             }
-            */
         }
+        */
 
+        /* TODO
         public void Mute(PlayerData target) {
-            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
@@ -556,11 +542,11 @@ namespace NSMB.UI.MainMenu {
             bool newMuteState = !target.IsMuted;
             target.IsMuted = newMuteState;
             ChatManager.Instance.AddSystemMessage(newMuteState ? "ui.inroom.chat.player.muted" : "ui.inroom.chat.player.unmuted", ChatManager.Blue, "playername", target.GetNickname());
-            */
         }
+        */
 
+        /* TODO
         public void Ban(PlayerData target) {
-            /* TODO
             if (target.Owner == Runner.LocalPlayer) {
                 return;
             }
@@ -568,16 +554,18 @@ namespace NSMB.UI.MainMenu {
             SessionData.Instance.Disconnect(target.Owner);
             SessionData.Instance.AddBan(target);
             ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.banned", ChatManager.Blue, "playername", target.GetNickname());
-            */
         }
+        */
 
+        /* TODO
         public void UI_CharacterDropdownChanged() {
             byte value = (byte) characterDropdown.value;
             SwapCharacter(value, true);
 
             CharacterData data = ScriptableManager.Instance.characters[value];
-            sfx.PlayOneShot(Enums.Sounds.Player_Voice_Selected, data);
+            sfx.PlayOneShot(Sounds.Player_Voice_Selected, data);
         }
+        */
 
         public void SwapCharacter(byte character, bool callback) {
             /* TODO
@@ -596,8 +584,8 @@ namespace NSMB.UI.MainMenu {
             */
         }
 
+        /* TODO
         public void SwapPlayerSkin(byte index, bool callback, CharacterData character = null) {
-            /* TODO
 
             if (!character) {
                 character = Runner.GetLocalPlayerData().GetCharacterData();
@@ -625,30 +613,28 @@ namespace NSMB.UI.MainMenu {
             }
 
             currentSkin = index;
-            */
         }
+        */
 
         private void UpdateNickname() {
-            /* TODO
-            validName = Settings.Instance.generalNickname.IsValidUsername();
-            if (!validName) {
-                ColorBlock colors = nicknameField.colors;
-                colors.normalColor = new(1, 0.7f, 0.7f, 1);
-                colors.highlightedColor = new(1, 0.55f, 0.55f, 1);
-                nicknameField.colors = colors;
-            } else {
-                ColorBlock colors = nicknameField.colors;
+            bool validUsername = Settings.Instance.generalNickname.IsValidUsername();
+            ColorBlock colors = nicknameField.colors;
+            if (validUsername) {
                 colors.normalColor = Color.white;
                 colors.highlightedColor = new(0.7f, 0.7f, 0.7f, 1);
-                nicknameField.colors = colors;
+            } else {
+                colors.normalColor = new(1, 0.7f, 0.7f, 1);
+                colors.highlightedColor = new(1, 0.55f, 0.55f, 1);
             }
-            */
+
+            nicknameField.colors = colors;
+            joinStartButtonCanvasGroup.interactable = validUsername;
+            NetworkHandler.Client.NickName = Settings.Instance.generalNickname;
         }
 
         public void SetUsername(TMP_InputField field) {
             Settings.Instance.generalNickname = field.text;
             UpdateNickname();
-
             Settings.Instance.SaveSettings();
         }
 
@@ -663,7 +649,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private IEnumerator FinishQuitting() {
-            AudioClip clip = Enums.Sounds.UI_Quit.GetClip();
+            AudioClip clip = SoundEffect.UI_Quit.GetClip();
             sfx.PlayOneShot(clip);
             yield return new WaitForSeconds(clip.length);
 
@@ -765,12 +751,42 @@ namespace NSMB.UI.MainMenu {
         }
         */
 
+        private void OnClientStateChanged(ClientState oldState, ClientState newState) {
+            switch (newState) {
+            case ClientState.Joined:
+                // Joined a room
+                EnterRoom(false);
+                break;
+            case ClientState.DisconnectingFromNameServer:
+                // Add regions to dropdown
+                UpdateRegionDropdown();
+                break;
+            case ClientState.ConnectedToMasterServer:
+                // Change region dropdown
+                int index =
+                    regionDropdown.options
+                        .Cast<RegionOption>()
+                        .IndexOf(ro => ro.Region == NetworkHandler.Region);
+
+                if (index != -1) {
+                    regionDropdown.SetValueWithoutNotify(index);
+                    regionDropdown.RefreshShownValue();
+                }
+                break;
+            }
+
+            roomListCanvasGroup.interactable = newState == ClientState.ConnectedToMasterServer;
+            reconnectBtn.gameObject.SetActive(newState == ClientState.Disconnected);
+            joinPrivateRoomBtn.gameObject.SetActive(newState == ClientState.ConnectedToMasterServer);
+        }
+
         private void OnLanguageChanged(TranslationManager tm) {
             int selectedLevel = levelDropdown.value;
             levelDropdown.ClearOptions();
             levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
             levelDropdown.SetValueWithoutNotify(selectedLevel);
 
+            /* TODO
             int selectedCharacter = characterDropdown.value;
             characterDropdown.ClearOptions();
             foreach (CharacterData character in ScriptableManager.Instance.characters) {
@@ -780,7 +796,6 @@ namespace NSMB.UI.MainMenu {
             characterDropdown.SetValueWithoutNotify(selectedCharacter);
             characterDropdown.RefreshShownValue();
 
-            /* TODO
             if (SessionData.Instance && SessionData.Instance.Object) {
                 UpdateRoomHeader();
                 OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
@@ -788,38 +803,36 @@ namespace NSMB.UI.MainMenu {
             */
         }
 
+        /* TODO
         private void OnPlayerDataReady(PlayerData data) {
-            /* TODO
             if (data.Owner == Runner.LocalPlayer) {
                 EnterRoom(false);
             }
 
-            sfx.PlayOneShot(Enums.Sounds.UI_PlayerConnect);
+            sfx.PlayOneShot(Sounds.UI_PlayerConnect);
             UpdateStartGameButton();
-            */
         }
+        */
 
+        /* TODO
         private void OnPlayerDataDespawned(PlayerData data) {
-            /* TODO
             if (!Runner.IsShutdown && data.Owner != Runner.LocalPlayer) {
-                sfx.PlayOneShot(Enums.Sounds.UI_PlayerDisconnect);
+                sfx.PlayOneShot(Sounds.UI_PlayerDisconnect);
                 UpdateStartGameButton();
             }
 
             GlobalController.Instance.discordController.UpdateActivity();
-            */
         }
+        */
 
         private void OnPause(InputAction.CallbackContext context) {
+            /* TODO
             if (NetworkHandler.Runner.SessionInfo.IsValid && !wasSettingsOpen) {
                 // Open the settings menu if we're inside a room (so we dont have to leave)
                 ConfirmSound();
                 OpenOptions();
             }
-        }
-
-        private void OnRegionPingsUpdated() {
-            UpdateRegionDropdown();
+            */
         }
 
         private void OnSceneLoadStart() {
@@ -828,6 +841,14 @@ namespace NSMB.UI.MainMenu {
                 GlobalController.Instance.loadingCanvas.Initialize();
             }
             */
+        }
+
+        public void OnEvent(EventData photonEvent) {
+            if (photonEvent.Code == (byte) Enums.NetEvents.ChangeCountdownState) {
+                isCountdownStarted = (bool) photonEvent.CustomData;
+                sfx.PlayOneShot(isCountdownStarted ? SoundEffect.UI_Back : SoundEffect.UI_StartGame);
+            }
+            Debug.Log(photonEvent.Code + " - " + photonEvent.CustomData);
         }
 
         //---Debug
@@ -849,11 +870,12 @@ namespace NSMB.UI.MainMenu {
         public class MapData {
             public string translationKey;
             public GameObject levelPreviewPosition;
-            public int buildIndex;
+            public AssetRef<Map> mapAsset;
         }
 
         public class RegionOption : TMP_Dropdown.OptionData, IComparable {
-            public string Region { get; private set; }
+            public int Index { get; }
+            public string Region { get; }
             private int _ping = -1;
             public int Ping {
                 get => _ping;
@@ -867,7 +889,8 @@ namespace NSMB.UI.MainMenu {
                 }
             }
 
-            public RegionOption(string region, int ping) {
+            public RegionOption(int index, string region, int ping) {
+                Index = index;
                 Region = region;
                 Ping = ping;
             }

@@ -1,8 +1,5 @@
-using System.Reflection;
 using UnityEngine;
 using TMPro;
-
-using NSMB.Game;
 
 namespace NSMB.Loading {
 
@@ -23,7 +20,10 @@ namespace NSMB.Loading {
         }
 
         private string GetValueFromField() {
+            /* TODO
             return GameManager.Instance.GetType().GetField(field, BindingFlags.Public | BindingFlags.Instance).GetValue(GameManager.Instance) as string;
+            */
+            return null;
         }
     }
 }

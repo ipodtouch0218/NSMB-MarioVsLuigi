@@ -40,7 +40,7 @@ namespace NSMB.UI.MainMenu {
                 switch (processingEvent.rawType) {
                 case EventType.KeyUp:
                     // TODO: Figure out way to handle navigation during IME Composition.
-                    MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Chat_KeyUp, null, 0, 0.3f);
+                    MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyUp, null, 0, 0.3f);
 
                     break;
 
@@ -48,7 +48,7 @@ namespace NSMB.UI.MainMenu {
                 case EventType.KeyDown:
                     consumedEvent = true;
                     if (processingEvent.keyCode != KeyCode.Return) {
-                        MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Chat_KeyDown, null, 0, 0.3f);
+                        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyDown, null, 0, 0.3f);
                     }
 
                     // Special handling on OSX which produces more events which need to be suppressed.

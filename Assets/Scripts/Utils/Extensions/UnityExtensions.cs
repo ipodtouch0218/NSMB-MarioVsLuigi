@@ -83,7 +83,7 @@ namespace NSMB.Extensions {
         }
 
         //easy sound clips
-        public static void PlayOneShot(this AudioSource source, Enums.Sounds clip, CharacterData character = null, byte variant = 0, float volume = 1f) {
+        public static void PlayOneShot(this AudioSource source, SoundEffect clip, CharacterData character = null, byte variant = 0, float volume = 1f) {
             source.PlayOneShot(clip.GetClip(character, variant), volume);
         }
 

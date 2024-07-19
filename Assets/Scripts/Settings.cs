@@ -3,8 +3,6 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
-
-using NSMB.Game;
 using NSMB.Utils;
 
 public class Settings : Singleton<Settings> {
@@ -54,10 +52,7 @@ public class Settings : Singleton<Settings> {
     private bool _generalDiscordIntegration;
     public bool GeneralDiscordIntegration {
         get => _generalDiscordIntegration;
-        set {
-            _generalDiscordIntegration = value;
-            GlobalController.Instance.discordController.UpdateActivity();
-        }
+        set => _generalDiscordIntegration = value;// TODO GlobalController.Instance.discordController.UpdateActivity();
     }
 
 
@@ -144,12 +139,11 @@ public class Settings : Singleton<Settings> {
     private bool _graphicsPlayerNametags;
     public bool GraphicsPlayerNametags {
         get => _graphicsPlayerNametags;
-        set {
-            _graphicsPlayerNametags = value;
+        set => _graphicsPlayerNametags = value;/* TODO
             if (GameManager.Instance) {
                 GameManager.Instance.nametagCanvas.gameObject.SetActive(value);
             }
-        }
+            */
     }
 
     private bool _graphicsColorblind;

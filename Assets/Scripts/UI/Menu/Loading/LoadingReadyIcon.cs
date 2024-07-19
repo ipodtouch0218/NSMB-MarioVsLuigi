@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-using NSMB.Extensions;
-
 namespace NSMB.Loading {
     public class LoadingReadyIcon : MonoBehaviour {
 
@@ -10,8 +8,10 @@ namespace NSMB.Loading {
         [SerializeField] private Image image;
 
         public void OnEnable() {
+            /* TODO
             CharacterData character = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
             image.sprite = character.readySprite;
+            */
         }
     }
 }

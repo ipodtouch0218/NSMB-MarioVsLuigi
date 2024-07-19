@@ -3,10 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using Fusion;
 using NSMB.Extensions;
 using NSMB.Translation;
-using NSMB.Utils;
 
 public class ChatMessage : MonoBehaviour {
 
@@ -28,8 +26,6 @@ public class ChatMessage : MonoBehaviour {
 
     private void OnLanguageChanged(TranslationManager tm) {
         chatText.text = tm.GetTranslationWithReplacements(data.message, data.replacements);
-        //chatText.isRightToLeftText = tm.RightToLeft;
-
         chatText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
     }
 
@@ -58,11 +54,11 @@ public class ChatMessage : MonoBehaviour {
             return;
         }
 
-        image.color = Utils.GetPlayerColor(data.player, 0.2f);
+        // TODO image.color = Utils.GetPlayerColor(data.player, 0.2f);
     }
 
     public class ChatMessageData {
-        public PlayerRef player;
+        public int playerNumber;
         public Color color;
         public bool isSystemMessage;
         public string message;

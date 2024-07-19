@@ -11,16 +11,18 @@ namespace NSMB.UI.Prompts {
         [SerializeField] protected TMP_Text errorText;
 
         public void OpenWithText(string key) {
-            if (!gameObject.activeSelf && MainMenuManager.Instance)
-                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Error);
+            if (!gameObject.activeSelf && MainMenuManager.Instance) {
+                MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
+            }
 
             gameObject.SetActive(true);
             errorText.text = GlobalController.Instance.translationManager.GetTranslation(key);
         }
 
         public void Close() {
-            if (MainMenuManager.Instance)
+            if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.BackSound();
+            }
 
             gameObject.SetActive(false);
         }

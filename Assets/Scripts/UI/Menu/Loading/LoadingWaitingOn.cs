@@ -1,10 +1,8 @@
 using System;
-using System.Linq;
 using UnityEngine;
 using TMPro;
 
 using NSMB.Extensions;
-using NSMB.Game;
 using NSMB.Translation;
 
 namespace NSMB.Loading {
@@ -36,6 +34,7 @@ namespace NSMB.Loading {
         public void Update() {
             TranslationManager tm = GlobalController.Instance.translationManager;
 
+            /*
             if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData pd) || pd.IsCurrentlySpectating) {
                 // Loading (as spectator)
                 RunIfNewState(LoadingState.Spectator, () => {
@@ -70,6 +69,7 @@ namespace NSMB.Loading {
                             .Select(data => data.GetNickname())
                     );
             }
+            */
         }
 
         private void RunIfNewState(LoadingState newState, Action action) {

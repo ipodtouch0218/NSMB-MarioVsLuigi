@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5459405921194852354
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: Flags
+      value: 2305
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: SortKey
+      value: 1281116551
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      value: -823218629998474212
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      value: 6865852533852809515
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599239963448220710, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: Prototype.Scriptable.Id.Value
+      value: 372382251364764784
+      objectReference: {fileID: 0}
+    - target: {fileID: 8509900707630130961, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: m_Name
+      value: Ice Flower
+      objectReference: {fileID: 0}
+    - target: {fileID: 8509900707630130967, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: physics
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8509900707630130967, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: powerupScriptable
+      value: 
+      objectReference: {fileID: 11400000, guid: ef97a693c40ceef42867ab6091a3a1c7,
+        type: 2}
+    - target: {fileID: 8509900707630130969, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8509900707630130969, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8509900707630130969, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8509900707630130969, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8637938864149294636, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 4928671260392873470, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
+        type: 3}
+    m_RemovedComponents:
+    - {fileID: 5900531122030324632, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}

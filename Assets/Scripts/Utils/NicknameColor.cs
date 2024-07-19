@@ -1,7 +1,4 @@
-using System;
 using UnityEngine;
-
-using Fusion;
 
 public class NicknameColor {
     public readonly Color color;
@@ -13,6 +10,8 @@ public class NicknameColor {
     }
 
     public static readonly NicknameColor White = new();
+
+    /* TODO
     public static NicknameColor FromConnectionToken(ConnectionToken data) {
 
         if (!data.HasValidSignature()) {
@@ -39,4 +38,5 @@ public class NicknameColor {
 
         return ret;
     }
+    */
 }

@@ -2,8 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-using NSMB.Extensions;
-
 namespace NSMB.Loading {
     public class MarioLoader : MonoBehaviour {
 
@@ -20,8 +18,9 @@ namespace NSMB.Loading {
             set {
                 previousScale = _scale;
                 _scale = value;
-                if (flashRoutine != null)
+                if (flashRoutine != null) {
                     StopCoroutine(flashRoutine);
+                }
 
                 StartCoroutine(DoGrowShrinkFlash());
             }
@@ -66,13 +65,14 @@ namespace NSMB.Loading {
         }
 
         public void Initialize() {
-            data = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
+            // TODO data = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
             Scale = 0;
             previousScale = 0;
             image.sprite = data.loadingSmallSprite;
 
-            if (flashRoutine != null)
+            if (flashRoutine != null) {
                 StopCoroutine(flashRoutine);
+            }
         }
     }
 }

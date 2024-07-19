@@ -1,0 +1,9 @@
+component Projectile {
+	asset_ref<ProjectileAsset> Asset;
+	FP Speed;
+	EntityRef Owner;
+	bool FacingRight;
+	bool HasBounced;
+}
+
+signal OnProjectileDestroyed(EntityRef Entity, Projectile* projectile);

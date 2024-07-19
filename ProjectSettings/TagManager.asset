@@ -22,6 +22,7 @@ TagManager:
   - Squishy
   - Powerup
   - water
+  - MainTilemap
   layers:
   - Default
   - TransparentFX

@@ -2,9 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-using NSMB.Extensions;
-using NSMB.Game;
-
 namespace NSMB.Loading {
     public class LoadingCanvas : MonoBehaviour {
 
@@ -21,11 +18,11 @@ namespace NSMB.Loading {
         private Coroutine fadeCoroutine;
 
         public void Awake() {
-            GameManager.OnAllPlayersLoaded += EndLoading;
+            // TODO GameManager.OnAllPlayersLoaded += EndLoading;
         }
 
         public void OnDestroy() {
-            GameManager.OnAllPlayersLoaded -= EndLoading;
+            // TODO GameManager.OnAllPlayersLoaded -= EndLoading;
         }
 
         public void Initialize() {
@@ -57,7 +54,9 @@ namespace NSMB.Loading {
         }
 
         public void EndLoading() {
-            bool spectator = NetworkHandler.Runner.GetLocalPlayerData().IsCurrentlySpectating;
+
+            bool spectator = false;
+            // TODO bool spectator = NetworkHandler.Runner.GetLocalPlayerData().IsCurrentlySpectating;
             readyGroup.gameObject.SetActive(true);
             animator.SetTrigger(spectator ? "spectating" : "loaded");
 

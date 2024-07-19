@@ -82,9 +82,11 @@ namespace NSMB.UI.Pause.Options {
             }
             OnOptionsOpenedToggled?.Invoke(false);
 
+            /* TODO
             if (RequireReconnect && NetworkHandler.Runner.LobbyInfo.IsValid) {
                 _ = NetworkHandler.ConnectToSameRegion();
             }
+            */
             RequireReconnect = false;
         }
 
@@ -149,7 +151,7 @@ namespace NSMB.UI.Pause.Options {
                 } else {
                     SelectedTab.Highlighted();
                 }
-                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
                 return;
 
             } else if (!Back && diff < 0 && currentTabIndex == 0) {
@@ -157,7 +159,7 @@ namespace NSMB.UI.Pause.Options {
                 Back = true;
                 SetCurrentOption(-1);
                 SelectedTab.Unhighlighted();
-                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
             }
             int newTabIndex = Mathf.Clamp(currentTabIndex + diff, 0, tabs.Count - 1);
             SetTab(newTabIndex);
@@ -180,7 +182,7 @@ namespace NSMB.UI.Pause.Options {
             Back = true;
             SetCurrentOption(-1);
             SelectedTab.Unhighlighted();
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
         }
 
         private void OnSubmit(InputAction.CallbackContext context) {
@@ -310,7 +312,7 @@ namespace NSMB.UI.Pause.Options {
 
             EnableInput = false;
             gameObject.SetActive(false);
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Back);
         }
 
         public void SetCurrentOption(int index, bool center = false) {
@@ -390,7 +392,7 @@ namespace NSMB.UI.Pause.Options {
             }
 
             if (sound) {
-                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
             }
 
             Canvas.ForceUpdateCanvases();

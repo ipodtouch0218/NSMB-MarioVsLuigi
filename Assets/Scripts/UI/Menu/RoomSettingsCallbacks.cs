@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using Fusion;
-using NSMB.Translation;
-
 namespace NSMB.UI.MainMenu {
     public class RoomSettingsCallbacks : MonoBehaviour {
 
@@ -16,9 +13,9 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle;
         [SerializeField] private TeamChooser teamSelectorButton;
 
+        /* TODO
+
         //---Properties
-        private NetworkRunner Runner => NetworkHandler.Runner;
-        private SessionData Room => SessionData.Instance;
 
         //---Private Variables
         private bool isRoomCodeVisible;
@@ -353,5 +350,7 @@ namespace NSMB.UI.MainMenu {
             SetRoomIdVisibility(isRoomCodeVisible);
             roomIdText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
+
+        */
     }
 }

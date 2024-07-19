@@ -1,16 +1,15 @@
-﻿using UnityEngine;
+﻿using NSMB.Translation;
+using NSMB.Utils;
+using Photon.Realtime;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
-using Fusion;
-using NSMB.Translation;
-using NSMB.Utils;
 
 namespace NSMB.UI.MainMenu {
     public class RoomIcon : MonoBehaviour {
 
         //---Public Variables
-        public SessionInfo session;
+        public RoomInfo room;
 
         //---Serialized Variables
         [SerializeField] private Color defaultColor, highlightColor, selectedColor;
@@ -24,11 +23,15 @@ namespace NSMB.UI.MainMenu {
             Unselect();
         }
 
-        public void UpdateUI(SessionInfo newSession) {
-            session = newSession;
+        public void UpdateUI(RoomInfo newRoomInfo) {
+            room = newRoomInfo;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
 
+            string host = newRoomInfo.CustomProperties[Enums.NetRoomProperties.HostName] as string;
+            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", host.ToValidUsername());
+
+            /*
             NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
             NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.IntProperties, out int packedIntProperties);
             NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
@@ -36,7 +39,6 @@ namespace NSMB.UI.MainMenu {
             NetworkUtils.IntegerProperties intProperties = (NetworkUtils.IntegerProperties) packedIntProperties;
             NetworkUtils.BooleanProperties boolProperties = (NetworkUtils.BooleanProperties) packedBoolProperties;
 
-            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
             playersText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.players", "players", session.PlayerCount.ToString(), "maxplayers", intProperties.maxPlayers.ToString());
             inProgressText.text = boolProperties.gameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
 
@@ -62,6 +64,7 @@ namespace NSMB.UI.MainMenu {
             symbols += "<sprite name=room_coins>" + Utils.Utils.GetSymbolString(intProperties.coinRequirement.ToString(), Utils.Utils.smallSymbols);
 
             symbolsText.text = symbols;
+            */
         }
 
         public void Select() {
@@ -77,7 +80,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Unhover() {
-            if (MainMenuManager.Instance.roomManager.SelectedRoom == this) {
+            if (MainMenuManager.Instance.roomManager.SelectedRoomIcon == this) {
                 Select();
             } else {
                 Unselect();

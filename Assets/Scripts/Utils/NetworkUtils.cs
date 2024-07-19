@@ -1,12 +1,13 @@
-using System;
 using System.Collections.Generic;
-
-using Fusion;
-using Fusion.Sockets;
 
 namespace NSMB.Utils {
     public static class NetworkUtils {
 
+        public static Dictionary<short, string> DisconnectMessages = new() {
+            [32758] = "ui.error.joinnotfound",
+        };
+
+            /*
         public static Dictionary<Enum, string> DisconnectMessages = new() {
             [ShutdownReason.MaxCcuReached] = "ui.error.ccu",
             [ShutdownReason.CustomAuthenticationFailed] = "ui.error.authentication",
@@ -26,12 +27,15 @@ namespace NSMB.Utils {
             [NetDisconnectReason.Timeout] = "ui.error.hosttimeout",
             [NetDisconnectReason.Unknown] = "ui.error.unknown"
         };
+            */
 
+            /*
         public static Dictionary<string, SessionProperty> DefaultRoomProperties = new() {
             [Enums.NetRoomProperties.IntProperties] = (int) new IntegerProperties(),
             [Enums.NetRoomProperties.BoolProperties] = (int) new BooleanProperties(),
             [Enums.NetRoomProperties.HostName] = "noname",
         };
+            */
 
         public class IntegerProperties {
             // Level :: Value ranges from 0-63: 6 bits
@@ -99,6 +103,7 @@ namespace NSMB.Utils {
             }
         };
 
+        /*
         public static bool GetSessionProperty(SessionInfo session, string key, out int value) {
             if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
                 value = property;
@@ -125,5 +130,6 @@ namespace NSMB.Utils {
             value = default;
             return false;
         }
+        */
     }
 }

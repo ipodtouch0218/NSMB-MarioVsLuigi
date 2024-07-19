@@ -4,9 +4,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
-
-using Fusion;
-using NSMB.Extensions;
 using NSMB.Translation;
 
 namespace NSMB.UI.MainMenu {
@@ -25,7 +22,7 @@ namespace NSMB.UI.MainMenu {
         private int previousTextLength;
 
         public void OnEnable() {
-            ChatManager.OnChatMessage += OnChatMessage;
+            // TODO ChatManager.OnChatMessage += OnChatMessage;
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
 
@@ -33,15 +30,17 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisable() {
-            ChatManager.OnChatMessage -= OnChatMessage;
+            // TODO ChatManager.OnChatMessage -= OnChatMessage;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         public void ReplayChatMessages() {
+            /* TODO
             foreach (ChatMessage.ChatMessageData message in ChatManager.Instance.chatHistory) {
                 OnChatMessage(message);
             }
+            */
             Canvas.ForceUpdateCanvases();
         }
 
@@ -51,6 +50,7 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
+        /* TODO
         public void SetTypingIndicator(PlayerRef player) {
             if (!MainMenuManager.Instance) {
                 return;
@@ -89,6 +89,7 @@ namespace NSMB.UI.MainMenu {
             }
             StartCoroutine(SelectTextboxNextFrame());
         }
+        */
 
         public void ClearChat() {
             foreach (ChatMessage message in chatMessages) {
@@ -113,6 +114,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisableChatChanged() {
+            /* TODO
             if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData data)) {
                 return;
             }
@@ -128,9 +130,11 @@ namespace NSMB.UI.MainMenu {
             }
 
             OnLanguageChanged(GlobalController.Instance.translationManager);
+            */
         }
 
         public void OnLanguageChanged(TranslationManager tm) {
+            /* TODO
             if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData data)) {
                 return;
             }
@@ -145,9 +149,11 @@ namespace NSMB.UI.MainMenu {
             }
 
             chatPrompt.text = tm.GetTranslation(key);
+            */
         }
 
         public void OnTextboxChanged() {
+            /* TODO
             if (!MainMenuManager.Instance) {
                 return;
             }
@@ -165,6 +171,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             SessionData.Instance.Rpc_UpdateTypingCounter();
+            */
         }
     }
 }

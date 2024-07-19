@@ -1,0 +1,16 @@
+import enum LiquidType(byte);
+
+component Liquid {
+	LiquidType LiquidType;
+	int WidthTiles;
+	FP HeightTiles;
+
+	[FreeOnComponentRemoved] list<EntityRef> SplashedEntities;
+}
+
+event LiquidSplashed {
+	entity_ref Entity;
+	FP Force;
+	FPVector2 Position;
+	bool Exit;
+}

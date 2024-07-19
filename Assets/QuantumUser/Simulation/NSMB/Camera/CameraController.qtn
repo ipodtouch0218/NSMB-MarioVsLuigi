@@ -1,0 +1,7 @@
+component CameraController {
+	FPVector2 CurrentPosition;
+
+	FP LastFloorHeight;
+	FPVector2 LastPlayerPosition;
+	FPVector2 SmoothDampVelocity;
+}

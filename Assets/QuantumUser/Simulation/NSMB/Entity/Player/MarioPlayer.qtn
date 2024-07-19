@@ -1,0 +1,163 @@
+import enum PowerupState(byte);
+import enum JumpState(byte);
+import enum PowerupReserveResult(byte);
+
+input {
+	button Up;
+	button Down;
+	button Left;
+	button Right;
+	button Jump;
+	button Sprint;
+	button PowerupAction;
+}
+
+component MarioPlayer {
+    asset_ref<MarioPlayerPhysicsInfo> PhysicsAsset;
+	PlayerRef PlayerRef;
+	byte Team;
+
+	PowerupState CurrentPowerupState;
+	asset_ref<PowerupAsset> CurrentPowerupScriptable;
+	PowerupState PreviousPowerupState;
+	asset_ref<PowerupAsset> ReserveItem;
+
+	byte Stars;
+	byte Coins;
+	byte Lives;
+
+	bool IsDead;
+	bool FireDeath;
+	bool IsRespawning;
+
+	// Walk/Running
+    bool FacingRight;
+    bool IsSkidding;
+    bool IsTurnaround;
+    byte FastTurnaroundFrames;
+    byte SlowTurnaroundFrames;
+
+	// Jumping
+	JumpState JumpState;
+    byte JumpLandingFrames;
+	byte JumpBufferFrames;
+	byte CoyoteTimeFrames;
+	int LandedFrame;
+	bool WasTouchingGroundLastFrame;
+
+	// Wallslide
+	bool WallslideLeft;
+	bool WallslideRight;
+	byte WallslideEndFrames;
+    byte WalljumpFrames;
+
+	// Groundpound
+    bool IsGroundpounding;
+	bool IsGroundpoundActive;
+	byte GroundpoundStartFrames;
+	byte GroundpoundCooldownFrames;
+	byte GroundpoundStandFrames;
+
+	// Swimming
+	byte WaterColliderCount;
+	bool SwimExitForceJump;
+
+	// Knockback
+    bool IsInKnockback;
+	bool IsInWeakKnockback;
+	bool KnockbackWasOriginallyFacingRight;
+	byte DamageInvincibilityFrames;
+
+	// Crouching
+    bool IsCrouching;
+    bool IsSliding;
+
+	// Block Interactions
+    bool IsSpinnerFlying;
+	bool IsDrilling;
+
+	// Powerups
+    int InvincibilityFrames;
+	byte ProjectileDelayFrames;
+	byte ProjectileVolleyFrames;
+	byte CurrentProjectiles;
+	byte CurrentVolley;
+    bool IsInShell;
+    byte ShellSlowdownFrames;
+    bool IsPropellerFlying;
+	byte PropellerLaunchFrames;
+	byte PropellerSpinFrames;
+	bool UsedPropellerThisJump;
+	byte PropellerDrillCooldown;
+
+	// Objects
+    entity_ref HeldEntity;
+    entity_ref CurrentPipe;
+}
+
+event MarioPlayerJumped {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	JumpState JumpState;
+}
+
+event MarioPlayerGroundpoundStarted {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+event MarioPlayerGroundpounded {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+event MarioPlayerCrouched {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+synced event MarioPlayerCollectedPowerup {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	PowerupReserveResult Result;
+	PowerupAsset Scriptable;
+}
+
+event MarioPlayerUsedReserveItem {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	bool Success;
+}
+
+event MarioPlayerWalljumped {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	FPVector2 Position;
+	bool WasOnRightWall;
+}
+
+event MarioPlayerShotProjectile {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	Projectile Projectile;
+}
+
+event MarioPlayerUsedPropeller {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+event MarioPlayerPropellerSpin {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}

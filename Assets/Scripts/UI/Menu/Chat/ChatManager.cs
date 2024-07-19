@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-using Fusion;
-using NSMB.Extensions;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
+using Photon.Realtime;
 
 public class ChatManager : MonoBehaviour {
 
@@ -24,18 +22,22 @@ public class ChatManager : MonoBehaviour {
     }
 
     public void OnEnable() {
+        /*
         NetworkHandler.OnPlayerLeft += OnPlayerLeft;
         PlayerData.OnPlayerDataReady += OnPlayerDataReady;
+        */
         OnChatMessage += OnChatMessageCallback;
     }
 
     public void OnDisable() {
+        /*
         NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
         PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
+        */
         OnChatMessage -= OnChatMessageCallback;
     }
 
-    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
+    public void AddChatMessage(string message, int player, Color? color = null, bool filter = false) {
 
         if (filter) {
             message = message.Filter();
@@ -43,7 +45,7 @@ public class ChatManager : MonoBehaviour {
 
         ChatMessage.ChatMessageData data = new() {
             isSystemMessage = false,
-            player = player,
+            playerNumber = player,
             color = color ?? Color.black,
             message = message,
         };
@@ -63,7 +65,8 @@ public class ChatManager : MonoBehaviour {
         OnChatMessage?.Invoke(data);
     }
 
-    public void DisplayPlayerMessage(string message, PlayerRef source) {
+    /* TODO
+    public void DisplayPlayerMessage(string message, int source) {
         // What
         if (!source.IsRealPlayer) {
             return;
@@ -125,6 +128,7 @@ public class ChatManager : MonoBehaviour {
         // Message seems fine, send to rest of lobby.
         SessionData.Instance.Rpc_ChatDisplayMessage(message, player);
     }
+    */
 
     public void ClearChat() {
         chatHistory.Clear();
@@ -134,6 +138,7 @@ public class ChatManager : MonoBehaviour {
     }
 
     //---Callbacks
+    /* TODO
     private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
         foreach (ChatMessage.ChatMessageData data in chatHistory) {
             if (data.player == player) {
@@ -149,13 +154,14 @@ public class ChatManager : MonoBehaviour {
 
         AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", pd.GetNickname());
     }
+    */
 
     private void OnChatMessageCallback(ChatMessage.ChatMessageData data) {
         if (data.isSystemMessage) {
             Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
         } else {
-            PlayerData pd = data.player.GetPlayerData();
-            Debug.Log($"[Chat] ({pd.GetUserIdString()}) {data.message}");
+            Player player = NetworkHandler.Client.CurrentRoom.Players[data.playerNumber];
+            Debug.Log($"[Chat] ({player.UserId}) {data.message}");
         }
     }
 }

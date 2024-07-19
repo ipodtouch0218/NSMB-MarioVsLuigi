@@ -67,8 +67,10 @@ namespace NSMB.UI.MainMenu {
                 buttons[i].navigation = navigations[i];
             }
 
+            /* TODO
             CharacterData character = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
             ChangeCharacter(character);
+            */
         }
 
         public void ChangeCharacter(CharacterData data) {
@@ -79,11 +81,11 @@ namespace NSMB.UI.MainMenu {
 
         public void SelectColor(Button button) {
             selected = buttons.IndexOf(button);
-            MainMenuManager.Instance.SwapPlayerSkin((byte) buttons.IndexOf(button), true);
+            // TODO MainMenuManager.Instance.SwapPlayerSkin((byte) buttons.IndexOf(button), true);
             Close(false);
 
             if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
+                MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
             }
         }
 
@@ -95,7 +97,7 @@ namespace NSMB.UI.MainMenu {
             EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
 
             if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
+                MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Cursor);
             }
         }
 
@@ -105,7 +107,7 @@ namespace NSMB.UI.MainMenu {
             content.SetActive(false);
 
             if (playSound && MainMenuManager.Instance) {
-                MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Back);
+                MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
             }
         }
     }

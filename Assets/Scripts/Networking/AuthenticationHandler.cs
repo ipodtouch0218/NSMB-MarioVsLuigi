@@ -1,11 +1,10 @@
+using NSMB.Utils;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
-
-using Fusion.Photon.Realtime;
-using NSMB.Utils;
+using Photon.Realtime;
 
 public class AuthenticationHandler {
 
@@ -14,7 +13,10 @@ public class AuthenticationHandler {
 
     public static bool IsAuthenticating { get; set; }
 
-    public static async Task<AuthenticationValues> Authenticate(string userid, string token) {
+    public static async Task<AuthenticationValues> Authenticate() {
+
+        string userid = PlayerPrefs.GetString("id", null);
+        string token = PlayerPrefs.GetString("token", null);
 
         IsAuthenticating = true;
 

@@ -1,6 +1,8 @@
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using NSMB.UI.MainMenu;
 
 namespace NSMB.UI.Prompts {
     public class CreateRoomPrompt : UIPrompt {
@@ -23,9 +25,16 @@ namespace NSMB.UI.Prompts {
             byte maxPlayers = (byte) maxPlayersSlider.value;
             gameObject.SetActive(false);
 
-            await NetworkHandler.CreateRoom(new() {
-                IsVisible = !privateRoomToggle.isOn
-            }, players: maxPlayers);
+            short result = await NetworkHandler.CreateRoom(new EnterRoomArgs() {
+                RoomOptions = new RoomOptions() {
+                    MaxPlayers = maxPlayers,
+                    IsVisible = !privateRoomToggle.isOn,
+                    IsOpen = true
+                },
+            });
+            if (result != 0) {
+                MainMenuManager.Instance.OpenErrorBox(result);
+            }
         }
     }
 }

@@ -1,21 +1,16 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using Fusion;
-using NSMB.Entities;
-using NSMB.Entities.Enemies;
-using NSMB.Entities.Player;
-using NSMB.Game;
-
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "RouletteTile", menuName = "ScriptableObjects/Tiles/RouletteTile")]
-    public class RouletteTile : BreakableBrickTile, IHaveTileDependencies {
+    public class RouletteTile : BreakableBrickTile {
 
         //---Serialized Variables
         [SerializeField] private TileBase resultTile;
         [SerializeField] private Vector2 topSpawnOffset;
 
+        /*
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             if (base.Interact(interacter, direction, worldLocation, out bumpSound))
                 return true;
@@ -42,5 +37,6 @@ namespace NSMB.Tiles {
         public TileBase[] GetTileDependencies() {
             return new TileBase[] { resultTile };
         }
+        */
     }
 }

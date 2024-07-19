@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using NSMB.Entities;
-
 namespace NSMB.Tiles {
     public abstract class InteractableTile : AnimatedTile {
 
@@ -10,7 +8,8 @@ namespace NSMB.Tiles {
         private static readonly Vector3 BumpOffset = new(0.25f, 0.5f), BumpSize = new(0.45f, 0.1f);
         private static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
 
-        public abstract bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool playBumpSound);
+        /*
+        public virtual bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool playBumpSound);
 
         public static void Bump(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation) {
             // Check for entities above to bump
@@ -25,6 +24,7 @@ namespace NSMB.Tiles {
 #pragma warning restore CS0252
             }
         }
+        */
     }
 
     public enum InteractionDirection {

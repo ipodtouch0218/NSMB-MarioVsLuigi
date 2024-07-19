@@ -31,7 +31,7 @@ MonoBehaviour:
     RawValue: 13107
   MaxContacts: 4
   LayerMask:
-    BitMask: -1
+    BitMask: 65527
   UseManifoldNormal: 0
   AirControl: 1
   Acceleration:
@@ -199,6 +199,31 @@ MonoBehaviour:
   HeapPageShift: 15
   HeapPageCount: 256
   HeapExtraCount: 0
+  AllPowerups:
+  - {fileID: 11400000, guid: e76c0ec90859dff49866293da2354232, type: 2}
+  - {fileID: 11400000, guid: ad249570d3ae629428779f2a5f287379, type: 2}
+  - {fileID: 11400000, guid: 96d0e671b1aa9184889fe00ea87ee1cf, type: 2}
+  - {fileID: 11400000, guid: f7c732f643070ec48bd813f077972b86, type: 2}
+  - {fileID: 11400000, guid: 348238c0b7671f944aaa8b9d272994f5, type: 2}
+  - {fileID: 11400000, guid: a79a59f03b5eabb41aabf2f6476ce154, type: 2}
+  - {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
+  - {fileID: 11400000, guid: 66847e430712048408ec06255e8732aa, type: 2}
+  - {fileID: 11400000, guid: 937b975636292004d99a857288a07edc, type: 2}
+  FallbackPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
+  FireballPrototype:
+    Id:
+      Value: 1460912212237464861
+  IceballPrototype:
+    Id:
+      Value: 1531419298539715423
+  BigStarPrototype:
+    Id:
+      Value: 1295981493910502871
+  StarsToWin: 10
+  CoinsForPowerup: 8
+  Lives: 0
+  TeamsEnabled: 0
+  CustomPowerupsEnabled: 1
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,7 +282,7 @@ MonoBehaviour:
     RawValue: 32768
   AvoidanceLayer: 0
   AvoidanceMask:
-    BitMask: -1
+    BitMask: 65527
   MaxAvoidanceCandidates: 64
   ReduceAvoidanceAtWaypoints: 0
   ReduceAvoidanceFactor:
@@ -398,7 +423,7 @@ MonoBehaviour:
     RawValue: 6554
   MaxContacts: 8
   LayerMask:
-    BitMask: -1
+    BitMask: 65527
   UseManifoldNormal: 0
   AirControl: 1
   Acceleration:

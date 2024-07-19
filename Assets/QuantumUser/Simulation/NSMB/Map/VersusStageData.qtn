@@ -1,0 +1,11 @@
+struct StageTileInstance {
+    asset_ref<StageTile> Tile;
+    FP Rotation;
+    FPVector2 Scale;
+}
+
+global {
+    list<StageTileInstance> Stage;
+}
+
+signal OnStageReset();

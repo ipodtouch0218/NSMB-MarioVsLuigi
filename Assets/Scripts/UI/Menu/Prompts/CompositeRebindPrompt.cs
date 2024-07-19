@@ -49,11 +49,14 @@ namespace NSMB.UI.Prompts {
         public void Close(bool playSound = true) {
             gameObject.SetActive(false);
 
-            if (playSound)
-                GlobalController.Instance.PlaySound(Enums.Sounds.UI_Back);
+            if (playSound) {
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Back);
+            }
 
-            foreach (RebindCompositeOption option in options)
+            foreach (RebindCompositeOption option in options) {
                 Destroy(option.gameObject);
+            }
+
             options.Clear();
         }
 
@@ -81,7 +84,7 @@ namespace NSMB.UI.Prompts {
             }
 
             SelectBackOption();
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
         }
 
         public void SelectBackOption() {
@@ -93,8 +96,9 @@ namespace NSMB.UI.Prompts {
         }
 
         private void SetSelectedIndex(int index, bool forceSelect = false) {
-            if (!forceSelect && selectedIndex == index)
+            if (!forceSelect && selectedIndex == index) {
                 return;
+            }
 
             DeselectOption(selectedIndex);
             selectedIndex = index;

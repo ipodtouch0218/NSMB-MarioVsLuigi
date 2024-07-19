@@ -1,17 +1,10 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using Fusion;
-using NSMB.Entities;
-using NSMB.Entities.Collectable;
-using NSMB.Entities.Enemies;
-using NSMB.Entities.Player;
-using NSMB.Game;
-
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "CoinTile", menuName = "ScriptableObjects/Tiles/CoinTile", order = 1)]
-    public class CoinTile : BreakableBrickTile, IHaveTileDependencies {
+    public class CoinTile : BreakableBrickTile {
 
         //---Static Variables
         private static readonly Vector2 SpawnOffset = new(0, -0.25f);
@@ -19,6 +12,7 @@ namespace NSMB.Tiles {
         //---Serialized Variables
         [SerializeField] private TileBase resultTile;
 
+        /*
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             if (base.Interact(interacter, direction, worldLocation, out bumpSound))
                 return true;
@@ -48,9 +42,12 @@ namespace NSMB.Tiles {
 
             return false;
         }
+        */
 
+        /*
         public TileBase[] GetTileDependencies() {
             return new TileBase[] { resultTile };
         }
+        */
     }
 }

@@ -1,14 +1,10 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using NSMB.Entities;
-using NSMB.Entities.Player;
-using NSMB.Game;
-
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "BreakablePipeTile", menuName = "ScriptableObjects/Tiles/BreakablePipeTile", order = 4)]
-    public class BreakablePipeTile : InteractableTile, IHaveTileDependencies {
+    public class BreakablePipeTile : InteractableTile {
 
         //---Public Variables
         public bool upsideDownPipe, leftOfPipe;
@@ -17,6 +13,7 @@ namespace NSMB.Tiles {
         [SerializeField] private TileBase leftBrokenHatTile, rightBrokenHatTile;
         [SerializeField] private Enums.PrefabParticle pipeParticle, destroyedPipeParticle;
 
+        /*
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             bumpSound = true;
             if (interacter is not PlayerController player)
@@ -161,5 +158,6 @@ namespace NSMB.Tiles {
         public TileBase[] GetTileDependencies() {
             return new TileBase[] { leftBrokenHatTile, rightBrokenHatTile };
         }
+        */
     }
 }

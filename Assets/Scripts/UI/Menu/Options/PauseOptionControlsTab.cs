@@ -77,8 +77,9 @@ namespace NSMB.UI.Pause.Options {
                 InputActionMap map = Controls.actionMaps[i];
 
                 // Controls starting with '!' are not rebindable
-                if (map.name.StartsWith("!"))
+                if (map.name.StartsWith("!")) {
                     continue;
+                }
 
                 NonselectableOption newHeader = Instantiate(headerTemplate);
                 newHeader.name = "ControlsHeader (" + map.name + ")";
@@ -91,8 +92,9 @@ namespace NSMB.UI.Pause.Options {
                 foreach (InputAction action in map.actions) {
 
                     // Controls starting with '!' are not rebindable
-                    if (action.name.StartsWith("!"))
+                    if (action.name.StartsWith("!")) {
                         continue;
+                    }
 
                     RebindPauseOption newOption = Instantiate(controlTemplate);
                     newOption.name = "ControlsButton (" + map.name + ", " + action.name + ")";
@@ -131,11 +133,12 @@ namespace NSMB.UI.Pause.Options {
 
         public void StartRebind(RebindPauseOptionButton option, int index = -1) {
 
-            if (currentRebinding != null)
+            if (currentRebinding != null) {
                 DisposeRebind(currentRebinding);
+            }
 
             PauseOptionMenuManager.Instance.SetCurrentOption(option.parent);
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Cursor);
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
 
             //if (manager.IsUnbinding) {
             //    targetAction.ApplyBindingOverride(index, path: "");
@@ -208,7 +211,7 @@ namespace NSMB.UI.Pause.Options {
             DisposeRebind(operation);
             SaveRebindings();
 
-            GlobalController.Instance.PlaySound(Enums.Sounds.UI_Decide);
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
         }
 
         private void DisposeRebind(RebindingOperation operation) {
@@ -235,50 +238,58 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public override bool OnLeftPress(bool held) {
-            if (!IsCompositeRebind)
+            if (!IsCompositeRebind) {
                 return false;
+            }
 
             return true;
         }
 
         public override bool OnRightPress(bool held) {
-            if (!IsCompositeRebind)
+            if (!IsCompositeRebind) {
                 return false;
+            }
 
             return true;
         }
 
         public override bool OnUpPress(bool held) {
-            if (!IsCompositeRebind)
+            if (!IsCompositeRebind) {
                 return false;
+            }
 
-            if (!held)
+            if (!held) {
                 rebindCompositePrompt.OnUpPress();
+            }
 
             return true;
         }
 
         public override bool OnDownPress(bool held) {
-            if (!IsCompositeRebind)
+            if (!IsCompositeRebind) {
                 return false;
+            }
 
-            if (!held)
+            if (!held) {
                 rebindCompositePrompt.OnDownPress();
+            }
 
             return true;
         }
 
         public override bool OnSubmit() {
-            if (!IsCompositeRebind)
+            if (!IsCompositeRebind) {
                 return false;
+            }
 
             rebindCompositePrompt.OnSubmit();
             return true;
         }
 
         public override bool OnCancel() {
-            if (!IsCompositeRebind)
+            if (!IsCompositeRebind) {
                 return false;
+            }
 
             rebindCompositePrompt.OnCancel();
             return true;

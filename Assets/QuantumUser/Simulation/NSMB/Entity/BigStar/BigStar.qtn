@@ -1,0 +1,20 @@
+global {
+	int BigStarSpawnTimer;
+	entity_ref MainBigStar;
+	bitset[64] UsedStarSpawns;
+	int UsedStarSpawnCount;
+}
+
+component BigStar {
+	bool IsStationary;
+	int Lifetime;
+	FP Speed;
+	FP BounceForce;
+	bool FacingRight;
+}
+
+synced event MarioPlayerCollectedStar {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}

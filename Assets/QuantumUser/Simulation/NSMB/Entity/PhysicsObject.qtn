@@ -1,0 +1,24 @@
+component PhysicsObject {
+    FPVector2 Velocity;
+    FPVector2 Gravity;
+    FP TerminalVelocity;
+    bool IsFrozen;
+    bool DisableCollision;
+
+    bool IsTouchingLeftWall;
+    bool IsTouchingRightWall;
+    bool IsTouchingCeiling;
+
+    bool IsTouchingGround;
+    FP FloorAngle;
+    bool IsOnSlipperyGround;
+    bool IsOnSlideableGround;
+
+    list<TileContact> Contacts;
+}
+
+struct TileContact {
+    int X;
+    int Y;
+    FPVector2 Normal;
+}

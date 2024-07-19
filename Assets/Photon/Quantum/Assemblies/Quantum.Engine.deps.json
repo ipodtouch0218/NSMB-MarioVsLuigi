@@ -7,10 +7,10 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "Quantum.Engine/3.0.0.1519-UnityRelease": {
+      "Quantum.Engine/3.0.0.1519-UnityDebug": {
         "dependencies": {
           "JetBrains.Annotations": "2023.3.0",
-          "Quantum.Deterministic": "3.0.0.1519-UnityRelease"
+          "Quantum.Deterministic": "3.0.0.1519-UnityDebug"
         },
         "runtime": {
           "Quantum.Engine.dll": {}
@@ -24,15 +24,15 @@
           }
         }
       },
-      "Quantum.Deterministic/3.0.0.1519-UnityRelease": {
+      "Quantum.Deterministic/3.0.0.1519-UnityDebug": {
         "dependencies": {
-          "Quantum.Log": "3.0.0.1519-UnityRelease"
+          "Quantum.Log": "3.0.0.1519-UnityDebug"
         },
         "runtime": {
           "Quantum.Deterministic.dll": {}
         }
       },
-      "Quantum.Log/3.0.0.1519-UnityRelease": {
+      "Quantum.Log/3.0.0.1519-UnityDebug": {
         "runtime": {
           "Quantum.Log.dll": {}
         }
@@ -40,7 +40,7 @@
     }
   },
   "libraries": {
-    "Quantum.Engine/3.0.0.1519-UnityRelease": {
+    "Quantum.Engine/3.0.0.1519-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -52,12 +52,12 @@
       "path": "jetbrains.annotations/2023.3.0",
       "hashPath": "jetbrains.annotations.2023.3.0.nupkg.sha512"
     },
-    "Quantum.Deterministic/3.0.0.1519-UnityRelease": {
+    "Quantum.Deterministic/3.0.0.1519-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Quantum.Log/3.0.0.1519-UnityRelease": {
+    "Quantum.Log/3.0.0.1519-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,16 +1,10 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using Fusion;
-using NSMB.Entities;
-using NSMB.Entities.Enemies;
-using NSMB.Entities.Player;
-using NSMB.Game;
-
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "PowerupTile", menuName = "ScriptableObjects/Tiles/PowerupTile")]
-    public class PowerupTile : BreakableBrickTile, IHaveTileDependencies {
+    public class PowerupTile : BreakableBrickTile {
 
         //---Static Variables
         private static readonly Vector2 SpawnOffset = new(0, -0.25f);
@@ -18,6 +12,7 @@ namespace NSMB.Tiles {
         //---Serialized Variables
         [SerializeField] private TileBase resultTile;
 
+        /*
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             if (base.Interact(interacter, direction, worldLocation, out bumpSound)) {
                 return true;
@@ -48,5 +43,6 @@ namespace NSMB.Tiles {
         public TileBase[] GetTileDependencies() {
             return new TileBase[] { resultTile };
         }
+        */
     }
 }

@@ -49,6 +49,202 @@ namespace Quantum.Prototypes.Unity {
   using RuntimeInitializeOnLoadMethodAttribute = UnityEngine.RuntimeInitializeOnLoadMethodAttribute;
   #endif //;
   
+  [System.SerializableAttribute()]
+  public unsafe partial class LiquidPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.LiquidPrototype> {
+    public LiquidType LiquidType;
+    public Int32 WidthTiles;
+    public FP HeightTiles;
+    [FreeOnComponentRemoved()]
+    [DynamicCollectionAttribute()]
+    public Quantum.QuantumEntityPrototype[] SplashedEntities = {};
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.LiquidPrototype prototype);
+    public override Quantum.Prototypes.LiquidPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.LiquidPrototype();
+      converter.Convert(this.LiquidType, out result.LiquidType);
+      converter.Convert(this.WidthTiles, out result.WidthTiles);
+      converter.Convert(this.HeightTiles, out result.HeightTiles);
+      converter.Convert(this.SplashedEntities, out result.SplashedEntities);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
+  public unsafe partial class MarioPlayerPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.MarioPlayerPrototype> {
+    public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+    public PlayerRef PlayerRef;
+    public Byte Team;
+    public PowerupState CurrentPowerupState;
+    public AssetRef<PowerupAsset> CurrentPowerupScriptable;
+    public PowerupState PreviousPowerupState;
+    public AssetRef<PowerupAsset> ReserveItem;
+    public Byte Stars;
+    public Byte Coins;
+    public Byte Lives;
+    public QBoolean IsDead;
+    public QBoolean FireDeath;
+    public QBoolean IsRespawning;
+    public QBoolean FacingRight;
+    public QBoolean IsSkidding;
+    public QBoolean IsTurnaround;
+    public Byte FastTurnaroundFrames;
+    public Byte SlowTurnaroundFrames;
+    public JumpState JumpState;
+    public Byte JumpLandingFrames;
+    public Byte JumpBufferFrames;
+    public Byte CoyoteTimeFrames;
+    public Int32 LandedFrame;
+    public QBoolean WasTouchingGroundLastFrame;
+    public QBoolean WallslideLeft;
+    public QBoolean WallslideRight;
+    public Byte WallslideEndFrames;
+    public Byte WalljumpFrames;
+    public QBoolean IsGroundpounding;
+    public QBoolean IsGroundpoundActive;
+    public Byte GroundpoundStartFrames;
+    public Byte GroundpoundCooldownFrames;
+    public Byte GroundpoundStandFrames;
+    public Byte WaterColliderCount;
+    public QBoolean SwimExitForceJump;
+    public QBoolean IsInKnockback;
+    public QBoolean IsInWeakKnockback;
+    public QBoolean KnockbackWasOriginallyFacingRight;
+    public Byte DamageInvincibilityFrames;
+    public QBoolean IsCrouching;
+    public QBoolean IsSliding;
+    public QBoolean IsSpinnerFlying;
+    public QBoolean IsDrilling;
+    public Int32 InvincibilityFrames;
+    public Byte ProjectileDelayFrames;
+    public Byte ProjectileVolleyFrames;
+    public Byte CurrentProjectiles;
+    public Byte CurrentVolley;
+    public QBoolean IsInShell;
+    public Byte ShellSlowdownFrames;
+    public QBoolean IsPropellerFlying;
+    public Byte PropellerLaunchFrames;
+    public Byte PropellerSpinFrames;
+    public QBoolean UsedPropellerThisJump;
+    public Byte PropellerDrillCooldown;
+    public Quantum.QuantumEntityPrototype HeldEntity;
+    public Quantum.QuantumEntityPrototype CurrentPipe;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.MarioPlayerPrototype prototype);
+    public override Quantum.Prototypes.MarioPlayerPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.MarioPlayerPrototype();
+      converter.Convert(this.PhysicsAsset, out result.PhysicsAsset);
+      converter.Convert(this.PlayerRef, out result.PlayerRef);
+      converter.Convert(this.Team, out result.Team);
+      converter.Convert(this.CurrentPowerupState, out result.CurrentPowerupState);
+      converter.Convert(this.CurrentPowerupScriptable, out result.CurrentPowerupScriptable);
+      converter.Convert(this.PreviousPowerupState, out result.PreviousPowerupState);
+      converter.Convert(this.ReserveItem, out result.ReserveItem);
+      converter.Convert(this.Stars, out result.Stars);
+      converter.Convert(this.Coins, out result.Coins);
+      converter.Convert(this.Lives, out result.Lives);
+      converter.Convert(this.IsDead, out result.IsDead);
+      converter.Convert(this.FireDeath, out result.FireDeath);
+      converter.Convert(this.IsRespawning, out result.IsRespawning);
+      converter.Convert(this.FacingRight, out result.FacingRight);
+      converter.Convert(this.IsSkidding, out result.IsSkidding);
+      converter.Convert(this.IsTurnaround, out result.IsTurnaround);
+      converter.Convert(this.FastTurnaroundFrames, out result.FastTurnaroundFrames);
+      converter.Convert(this.SlowTurnaroundFrames, out result.SlowTurnaroundFrames);
+      converter.Convert(this.JumpState, out result.JumpState);
+      converter.Convert(this.JumpLandingFrames, out result.JumpLandingFrames);
+      converter.Convert(this.JumpBufferFrames, out result.JumpBufferFrames);
+      converter.Convert(this.CoyoteTimeFrames, out result.CoyoteTimeFrames);
+      converter.Convert(this.LandedFrame, out result.LandedFrame);
+      converter.Convert(this.WasTouchingGroundLastFrame, out result.WasTouchingGroundLastFrame);
+      converter.Convert(this.WallslideLeft, out result.WallslideLeft);
+      converter.Convert(this.WallslideRight, out result.WallslideRight);
+      converter.Convert(this.WallslideEndFrames, out result.WallslideEndFrames);
+      converter.Convert(this.WalljumpFrames, out result.WalljumpFrames);
+      converter.Convert(this.IsGroundpounding, out result.IsGroundpounding);
+      converter.Convert(this.IsGroundpoundActive, out result.IsGroundpoundActive);
+      converter.Convert(this.GroundpoundStartFrames, out result.GroundpoundStartFrames);
+      converter.Convert(this.GroundpoundCooldownFrames, out result.GroundpoundCooldownFrames);
+      converter.Convert(this.GroundpoundStandFrames, out result.GroundpoundStandFrames);
+      converter.Convert(this.WaterColliderCount, out result.WaterColliderCount);
+      converter.Convert(this.SwimExitForceJump, out result.SwimExitForceJump);
+      converter.Convert(this.IsInKnockback, out result.IsInKnockback);
+      converter.Convert(this.IsInWeakKnockback, out result.IsInWeakKnockback);
+      converter.Convert(this.KnockbackWasOriginallyFacingRight, out result.KnockbackWasOriginallyFacingRight);
+      converter.Convert(this.DamageInvincibilityFrames, out result.DamageInvincibilityFrames);
+      converter.Convert(this.IsCrouching, out result.IsCrouching);
+      converter.Convert(this.IsSliding, out result.IsSliding);
+      converter.Convert(this.IsSpinnerFlying, out result.IsSpinnerFlying);
+      converter.Convert(this.IsDrilling, out result.IsDrilling);
+      converter.Convert(this.InvincibilityFrames, out result.InvincibilityFrames);
+      converter.Convert(this.ProjectileDelayFrames, out result.ProjectileDelayFrames);
+      converter.Convert(this.ProjectileVolleyFrames, out result.ProjectileVolleyFrames);
+      converter.Convert(this.CurrentProjectiles, out result.CurrentProjectiles);
+      converter.Convert(this.CurrentVolley, out result.CurrentVolley);
+      converter.Convert(this.IsInShell, out result.IsInShell);
+      converter.Convert(this.ShellSlowdownFrames, out result.ShellSlowdownFrames);
+      converter.Convert(this.IsPropellerFlying, out result.IsPropellerFlying);
+      converter.Convert(this.PropellerLaunchFrames, out result.PropellerLaunchFrames);
+      converter.Convert(this.PropellerSpinFrames, out result.PropellerSpinFrames);
+      converter.Convert(this.UsedPropellerThisJump, out result.UsedPropellerThisJump);
+      converter.Convert(this.PropellerDrillCooldown, out result.PropellerDrillCooldown);
+      converter.Convert(this.HeldEntity, out result.HeldEntity);
+      converter.Convert(this.CurrentPipe, out result.CurrentPipe);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
+  public unsafe partial class PowerupPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PowerupPrototype> {
+    public AssetRef<PowerupAsset> Scriptable;
+    public QBoolean FacingRight;
+    public Int32 Lifetime;
+    public QBoolean BlockSpawn;
+    public QBoolean LaunchSpawn;
+    public FPVector2 BlockSpawnOrigin;
+    public FPVector2 BlockSpawnDestination;
+    public Byte BlockSpawnAnimationLength;
+    public Byte SpawnAnimationFrames;
+    public Byte IgnorePlayerFrames;
+    public Quantum.QuantumEntityPrototype ParentMarioPlayer;
+    public FPVector2 AnimationCurveOrigin;
+    public FP AnimationCurveTimer;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PowerupPrototype prototype);
+    public override Quantum.Prototypes.PowerupPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.PowerupPrototype();
+      converter.Convert(this.Scriptable, out result.Scriptable);
+      converter.Convert(this.FacingRight, out result.FacingRight);
+      converter.Convert(this.Lifetime, out result.Lifetime);
+      converter.Convert(this.BlockSpawn, out result.BlockSpawn);
+      converter.Convert(this.LaunchSpawn, out result.LaunchSpawn);
+      converter.Convert(this.BlockSpawnOrigin, out result.BlockSpawnOrigin);
+      converter.Convert(this.BlockSpawnDestination, out result.BlockSpawnDestination);
+      converter.Convert(this.BlockSpawnAnimationLength, out result.BlockSpawnAnimationLength);
+      converter.Convert(this.SpawnAnimationFrames, out result.SpawnAnimationFrames);
+      converter.Convert(this.IgnorePlayerFrames, out result.IgnorePlayerFrames);
+      converter.Convert(this.ParentMarioPlayer, out result.ParentMarioPlayer);
+      converter.Convert(this.AnimationCurveOrigin, out result.AnimationCurveOrigin);
+      converter.Convert(this.AnimationCurveTimer, out result.AnimationCurveTimer);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
+  public unsafe partial class ProjectilePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.ProjectilePrototype> {
+    public AssetRef<ProjectileAsset> Asset;
+    public FP Speed;
+    public Quantum.QuantumEntityPrototype Owner;
+    public QBoolean FacingRight;
+    public QBoolean HasBounced;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.ProjectilePrototype prototype);
+    public override Quantum.Prototypes.ProjectilePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.ProjectilePrototype();
+      converter.Convert(this.Asset, out result.Asset);
+      converter.Convert(this.Speed, out result.Speed);
+      converter.Convert(this.Owner, out result.Owner);
+      converter.Convert(this.FacingRight, out result.FacingRight);
+      converter.Convert(this.HasBounced, out result.HasBounced);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
 }
 #pragma warning restore 0109
 #pragma warning restore 1591

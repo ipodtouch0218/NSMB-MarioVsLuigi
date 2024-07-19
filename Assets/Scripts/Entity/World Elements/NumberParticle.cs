@@ -21,21 +21,16 @@ public class NumberParticle : MonoBehaviour {
     private bool final;
 
     public void OnValidate() {
-        if (!text) text = GetComponentInChildren<TMP_Text>();
-        if (!legacyAnimation) legacyAnimation = GetComponentInChildren<Animation>();
-    }
-
-    public void Update() {
-        if (final) {
-            mpb.SetVector("_ColorOffset", colorOffset);
-            mpb.SetColor("_Overlay", overlay);
-            mr.SetPropertyBlock(mpb);
+        if (!text) {
+            text = GetComponentInChildren<TMP_Text>();
         }
 
-        transform.localPosition = Vector3.up * yMovement.Evaluate(Time.time - spawnTime);
+        if (!legacyAnimation) {
+            legacyAnimation = GetComponentInChildren<Animation>();
+        }
     }
 
-    public void ApplyColorAndText(string newText, Color color, bool final) {
+    public void Initialize(string newText, Color color, bool final) {
         this.final = final;
 
         text.text = newText;
@@ -50,5 +45,15 @@ public class NumberParticle : MonoBehaviour {
 
         spawnTime = Time.time;
         Destroy(gameObject.transform.parent.gameObject, final ? 1.42f : 0.666f);
+    }
+
+    public void Update() {
+        if (final) {
+            mpb.SetVector("_ColorOffset", colorOffset);
+            mpb.SetColor("_Overlay", overlay);
+            mr.SetPropertyBlock(mpb);
+        }
+
+        transform.localPosition = Vector3.up * yMovement.Evaluate(Time.time - spawnTime);
     }
 }

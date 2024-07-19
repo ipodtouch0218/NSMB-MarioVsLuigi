@@ -1,9 +1,5 @@
 using UnityEngine;
 
-using NSMB.Entities;
-using NSMB.Entities.Player;
-using NSMB.Game;
-
 namespace NSMB.Tiles {
 
     [CreateAssetMenu(fileName = "BreakableBulletBillLauncher", menuName = "ScriptableObjects/Tiles/BreakableBulletBillLauncher")]
@@ -12,6 +8,7 @@ namespace NSMB.Tiles {
         //---Serialized Variables
         [SerializeField] private Enums.PrefabParticle breakParticle;
 
+        /*
         public override bool Interact(BasicEntity interacter, InteractionDirection direction, Vector3 worldLocation, out bool bumpSound) {
             if (interacter is not PlayerController) {
                 bumpSound = true;
@@ -66,5 +63,6 @@ namespace NSMB.Tiles {
             }
             return height;
         }
+        */
     }
 }

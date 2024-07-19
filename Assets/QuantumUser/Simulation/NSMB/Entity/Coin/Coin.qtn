@@ -1,0 +1,15 @@
+component Coin {
+	bool IsFloating;
+
+	bool IsDotted;
+	byte DottedChangeTimer;
+}
+
+synced event MarioPlayerCollectedCoin {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	byte Coins;
+	bool ItemSpawned;
+	FPVector2 CoinLocation;
+}
