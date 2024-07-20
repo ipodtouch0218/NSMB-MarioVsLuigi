@@ -45,19 +45,57 @@ public unsafe class VersusStageData : AssetObject {
         return Spawnpoint + offset;
     }
 
-    public StageTileInstance GetTileWorld(Frame f, FPVector2 worldPosition) {
-        worldPosition -= TilemapWorldPosition;
-        worldPosition *= 2;
-        int x = FPMath.FloorToInt(worldPosition.X) - TileOrigin.x;
-        x = (x % TileDimensions.x + TileDimensions.x) % TileDimensions.x; // Wrapping
-        int y = FPMath.FloorToInt(worldPosition.Y) - TileOrigin.y;
+    public StageTileInstance GetTile(Frame f, int x, int y) {
         int index = x + y * TileDimensions.x;
 
         QList<StageTileInstance> stageLayout = f.ResolveList(f.Global->Stage);
         if (index < 0 || index >= stageLayout.Count) {
             return default;
         }
+
         return stageLayout[index];
     }
 
+    public StageTileInstance GetTile(Frame f, FPVector2 tile) {
+        return GetTile(f, tile.X.AsInt, tile.Y.AsInt);
+    }
+
+    public StageTileInstance GetTileWorld(Frame f, FPVector2 worldPosition) {
+        return GetTile(f, QuantumUtils.WorldToRelativeTile(f, worldPosition));
+    }
+
+    public void SetTile(Frame f, int x, int y, StageTileInstance tile) {
+        int index = x + y * TileDimensions.x;
+
+        QList<StageTileInstance> stageLayout = f.ResolveList(f.Global->Stage);
+        if (index < 0 || index >= stageLayout.Count) {
+            return;
+        }
+
+        stageLayout[index] = tile;
+        f.Events.TileChanged(f, x + TileOrigin.x, y + TileOrigin.y, tile);
+    }
+
+    public void ResetStage(Frame f) {
+        if (!f.TryResolveList(f.Global->Stage, out QList<StageTileInstance> stageData)) {
+            stageData = f.AllocateList<StageTileInstance>(TileData.Length);
+            f.Global->Stage = stageData;
+            for (int i = 0; i < TileData.Length; i++) {
+                stageData.Add(TileData[i]);
+            }
+        } else {
+            for (int i = 0; i < TileData.Length; i++) {
+                if (!stageData[i].Equals(TileData[i])) {
+                    int x = i % TileDimensions.x + TileOrigin.x;
+                    int y = i / TileDimensions.x + TileOrigin.y;
+                    f.Events.TileChanged(f, x, y, TileData[i]);
+                }
+                stageData[i] = TileData[i];
+            }
+        }
+    }
+
+    public static void BumpTile(Vector2Int position) {
+
+    }
 }

@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
+using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class StageTile : AssetObject {
@@ -17,5 +18,14 @@ public class StageTile : AssetObject {
         public struct TileShape {
             public FPVector2[] Vertices;
         }
+    }
+}
+
+public unsafe interface IInteractableTile {
+
+    bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance);
+
+    public enum InteractionDirection {
+        Up, Down, Left, Right
     }
 }

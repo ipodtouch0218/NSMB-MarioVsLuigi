@@ -532,6 +532,40 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct PhysicsContact {
+    public const Int32 SIZE = 48;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(32)]
+    public FPVector2 Position;
+    [FieldOffset(16)]
+    public FPVector2 Normal;
+    [FieldOffset(8)]
+    public FP Distance;
+    [FieldOffset(0)]
+    public Int32 TileX;
+    [FieldOffset(4)]
+    public Int32 TileY;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 3581;
+        hash = hash * 31 + Position.GetHashCode();
+        hash = hash * 31 + Normal.GetHashCode();
+        hash = hash * 31 + Distance.GetHashCode();
+        hash = hash * 31 + TileX.GetHashCode();
+        hash = hash * 31 + TileY.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (PhysicsContact*)ptr;
+        serializer.Stream.Serialize(&p->TileX);
+        serializer.Stream.Serialize(&p->TileY);
+        FP.Serialize(&p->Distance, serializer);
+        FPVector2.Serialize(&p->Normal, serializer);
+        FPVector2.Serialize(&p->Position, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct StageTileInstance {
     public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
@@ -555,32 +589,6 @@ namespace Quantum {
         AssetRef.Serialize(&p->Tile, serializer);
         FP.Serialize(&p->Rotation, serializer);
         FPVector2.Serialize(&p->Scale, serializer);
-    }
-  }
-  [StructLayout(LayoutKind.Explicit)]
-  public unsafe partial struct TileContact {
-    public const Int32 SIZE = 24;
-    public const Int32 ALIGNMENT = 8;
-    [FieldOffset(0)]
-    public Int32 X;
-    [FieldOffset(4)]
-    public Int32 Y;
-    [FieldOffset(8)]
-    public FPVector2 Normal;
-    public override Int32 GetHashCode() {
-      unchecked { 
-        var hash = 3407;
-        hash = hash * 31 + X.GetHashCode();
-        hash = hash * 31 + Y.GetHashCode();
-        hash = hash * 31 + Normal.GetHashCode();
-        return hash;
-      }
-    }
-    public static void Serialize(void* ptr, FrameSerializer serializer) {
-        var p = (TileContact*)ptr;
-        serializer.Stream.Serialize(&p->X);
-        serializer.Stream.Serialize(&p->Y);
-        FPVector2.Serialize(&p->Normal, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1073,7 +1081,7 @@ namespace Quantum {
     [FieldOffset(8)]
     public QBoolean IsOnSlideableGround;
     [FieldOffset(32)]
-    public QListPtr<TileContact> Contacts;
+    public QListPtr<PhysicsContact> Contacts;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 8311;
@@ -1110,7 +1118,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsTouchingGround, serializer);
         QBoolean.Serialize(&p->IsTouchingLeftWall, serializer);
         QBoolean.Serialize(&p->IsTouchingRightWall, serializer);
-        QList.Serialize(&p->Contacts, serializer, Statics.SerializeTileContact);
+        QList.Serialize(&p->Contacts, serializer, Statics.SerializePhysicsContact);
         FP.Serialize(&p->FloorAngle, serializer);
         FP.Serialize(&p->TerminalVelocity, serializer);
         FPVector2.Serialize(&p->Gravity, serializer);
@@ -1185,18 +1193,20 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Projectile : Quantum.IComponent {
-    public const Int32 SIZE = 32;
+    public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(8)]
-    public AssetRef<ProjectileAsset> Asset;
-    [FieldOffset(24)]
-    public FP Speed;
     [FieldOffset(16)]
+    public AssetRef<ProjectileAsset> Asset;
+    [FieldOffset(32)]
+    public FP Speed;
+    [FieldOffset(24)]
     public EntityRef Owner;
     [FieldOffset(0)]
     public QBoolean FacingRight;
     [FieldOffset(4)]
     public QBoolean HasBounced;
+    [FieldOffset(8)]
+    public QBoolean PlayDestroySound;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 16141;
@@ -1205,6 +1215,7 @@ namespace Quantum {
         hash = hash * 31 + Owner.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + HasBounced.GetHashCode();
+        hash = hash * 31 + PlayDestroySound.GetHashCode();
         return hash;
       }
     }
@@ -1212,6 +1223,7 @@ namespace Quantum {
         var p = (Projectile*)ptr;
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->HasBounced, serializer);
+        QBoolean.Serialize(&p->PlayDestroySound, serializer);
         AssetRef.Serialize(&p->Asset, serializer);
         EntityRef.Serialize(&p->Owner, serializer);
         FP.Serialize(&p->Speed, serializer);
@@ -1233,16 +1245,12 @@ namespace Quantum {
         var p = (WrappingObject*)ptr;
     }
   }
-  public unsafe partial interface ISignalOnProjectileDestroyed : ISignal {
-    void OnProjectileDestroyed(Frame f, EntityRef Entity, Projectile* projectile);
-  }
   public unsafe partial interface ISignalOnStageReset : ISignal {
     void OnStageReset(Frame f);
   }
   public static unsafe partial class Constants {
   }
   public unsafe partial class Frame {
-    private ISignalOnProjectileDestroyed[] _ISignalOnProjectileDestroyedSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
     partial void AllocGen() {
       _globals = (_globals_*)Context.Allocator.AllocAndClear(sizeof(_globals_));
@@ -1255,7 +1263,6 @@ namespace Quantum {
     }
     partial void InitGen() {
       Initialize(this, this.SimulationConfig.Entities, 256);
-      _ISignalOnProjectileDestroyedSystems = BuildSignalsArray<ISignalOnProjectileDestroyed>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
       _ComponentSignalsOnAdded = new ComponentReactiveCallbackInvoker[ComponentTypeId.Type.Length];
       _ComponentSignalsOnRemoved = new ComponentReactiveCallbackInvoker[ComponentTypeId.Type.Length];
@@ -1341,15 +1348,6 @@ namespace Quantum {
       Physics3D.Init(_globals->PhysicsState3D.MapStaticCollidersState.TrackedMap);
     }
     public unsafe partial struct FrameSignals {
-      public void OnProjectileDestroyed(EntityRef Entity, Projectile* projectile) {
-        var array = _f._ISignalOnProjectileDestroyedSystems;
-        for (Int32 i = 0; i < array.Length; ++i) {
-          var s = array[i];
-          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnProjectileDestroyed(_f, Entity, projectile);
-          }
-        }
-      }
       public void OnStageReset() {
         var array = _f._ISignalOnStageResetSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
@@ -1363,12 +1361,12 @@ namespace Quantum {
   }
   public unsafe partial class Statics {
     public static FrameSerializer.Delegate SerializeEntityRef;
-    public static FrameSerializer.Delegate SerializeTileContact;
+    public static FrameSerializer.Delegate SerializePhysicsContact;
     public static FrameSerializer.Delegate SerializeStageTileInstance;
     public static FrameSerializer.Delegate SerializeInput;
     static partial void InitStaticDelegatesGen() {
       SerializeEntityRef = EntityRef.Serialize;
-      SerializeTileContact = Quantum.TileContact.Serialize;
+      SerializePhysicsContact = Quantum.PhysicsContact.Serialize;
       SerializeStageTileInstance = Quantum.StageTileInstance.Serialize;
       SerializeInput = Quantum.Input.Serialize;
     }
@@ -1437,6 +1435,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(PhysicsCallbacks3D), PhysicsCallbacks3D.SIZE);
       typeRegistry.Register(typeof(PhysicsCollider2D), PhysicsCollider2D.SIZE);
       typeRegistry.Register(typeof(PhysicsCollider3D), PhysicsCollider3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.PhysicsContact), Quantum.PhysicsContact.SIZE);
       typeRegistry.Register(typeof(PhysicsEngineState), PhysicsEngineState.SIZE);
       typeRegistry.Register(typeof(PhysicsJoints2D), PhysicsJoints2D.SIZE);
       typeRegistry.Register(typeof(PhysicsJoints3D), PhysicsJoints3D.SIZE);
@@ -1457,7 +1456,6 @@ namespace Quantum {
       typeRegistry.Register(typeof(SpringJoint), SpringJoint.SIZE);
       typeRegistry.Register(typeof(SpringJoint3D), SpringJoint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.StageTileInstance), Quantum.StageTileInstance.SIZE);
-      typeRegistry.Register(typeof(Quantum.TileContact), Quantum.TileContact.SIZE);
       typeRegistry.Register(typeof(Transform2D), Transform2D.SIZE);
       typeRegistry.Register(typeof(Transform2DVertical), Transform2DVertical.SIZE);
       typeRegistry.Register(typeof(Transform3D), Transform3D.SIZE);

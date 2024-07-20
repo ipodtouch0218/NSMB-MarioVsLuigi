@@ -19,8 +19,16 @@ namespace Quantum {
             for (int shape = 0; shape < polygons.Length; shape++) {
                 polygons[shape] = new FPVector2[stageTile.CollisionData.Shapes[shape].Vertices.Length];
 
-                for (int point = 0; point < polygons[shape].Length; point++) {
-                    FPVector2 p = stageTile.CollisionData.Shapes[shape].Vertices[point];
+                int shapePointCount = polygons[shape].Length;
+                for (int point = 0; point < shapePointCount; point++) {
+                    int index = point;
+                    if (Scale.X < 0 ^ Scale.Y < 0) {
+                        // Flipping produced counter-clockwise points;
+                        // Invert order for proper normals
+                        index = shapePointCount - point - 1;
+                    }
+
+                    FPVector2 p = stageTile.CollisionData.Shapes[shape].Vertices[index];
                     // Scale
                     p = FPVector2.Scale(p, Scale) / 2;
                     // Rotate

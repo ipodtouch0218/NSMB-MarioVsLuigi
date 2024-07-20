@@ -233,6 +233,7 @@ namespace Quantum.Prototypes.Unity {
     public Quantum.QuantumEntityPrototype Owner;
     public QBoolean FacingRight;
     public QBoolean HasBounced;
+    public QBoolean PlayDestroySound;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.ProjectilePrototype prototype);
     public override Quantum.Prototypes.ProjectilePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.ProjectilePrototype();
@@ -241,6 +242,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.Owner, out result.Owner);
       converter.Convert(this.FacingRight, out result.FacingRight);
       converter.Convert(this.HasBounced, out result.HasBounced);
+      converter.Convert(this.PlayDestroySound, out result.PlayDestroySound);
       ConvertUser(converter, ref result);
       return result;
     }

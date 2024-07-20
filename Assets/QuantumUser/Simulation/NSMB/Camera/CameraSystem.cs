@@ -4,47 +4,30 @@ namespace Quantum {
     public unsafe class CameraSystem : SystemMainThreadFilter<CameraSystem.Filter> {
         public struct Filter {
             public EntityRef Entity;
-            public Transform2D Transform;
+            public Transform2D* Transform;
             public CameraController* Camera;
-            public MarioPlayer Mario;
-            public PhysicsObject PhysicsObject;
-            public PhysicsCollider2D Collider;
+            public MarioPlayer* Mario;
+            public PhysicsObject* PhysicsObject;
+            public PhysicsCollider2D* Collider;
         }
 
         public override void Update(Frame f, ref Filter filter) {
             filter.Camera->CurrentPosition = CalculateNewPosition(f, filter);
         }
 
-        /*
-        public void Recenter(Vector2 pos) {
-            PlayerPos = CurrentPosition = pos + AirOffset;
-            LastFloorHeight = CurrentPosition.y;
-            SmoothDampVel = Vector3.zero;
-            SetPosition(PlayerPos);
+        public void Recenter(Frame f, EntityRef entity, FPVector2 pos) {
+            var camera = f.Unsafe.GetPointer<CameraController>(entity);
+
+            camera->LastPlayerPosition = camera->CurrentPosition = pos + new FPVector2(0, FP.FromString("0.65"));
+            camera->LastFloorHeight = camera->CurrentPosition.Y;
+            camera->SmoothDampVelocity = FPVector2.Zero;
         }
-        */
-
-        /*
-        private void SetPosition(Vector3 position) {
-            if (!IsControllingCamera) {
-                return;
-            }
-
-            TargetCamera.transform.position = position;
-            if (BackgroundLoop.Instance) {
-                BackgroundLoop.Instance.Reposition();
-            }
-
-            secondaryPositioners.RemoveAll(scp => !scp);
-            secondaryPositioners.ForEach(scp => scp.UpdatePosition());
-        }
-        */
 
         private FPVector2 CalculateNewPosition(Frame f, Filter filter) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var camera = filter.Camera;
-            var mario = filter.Mario;
-            var transform = filter.Transform;
+            var mario = *filter.Mario;
+            var transform = *filter.Transform;
             var physicsObject = filter.PhysicsObject;
 
             if (!mario.IsDead && !mario.IsRespawning) {
@@ -52,12 +35,12 @@ namespace Quantum {
             }
 
             FP vOrtho = FP.FromString("3.5");
-            FP xOrtho = (FP) 16 / 9;
+            FP xOrtho = vOrtho * FP.FromString("1.777777");
             FPVector2 newCameraPosition = camera->CurrentPosition;
 
             // Lagging camera movements
             bool validFloor;
-            if (physicsObject.IsTouchingGround) {
+            if (physicsObject->IsTouchingGround) {
                 camera->LastFloorHeight = transform.Position.Y;
                 validFloor = true;
             } else {
@@ -85,7 +68,7 @@ namespace Quantum {
             }
 
             // Top camera clip
-            FP playerHeight = filter.Collider.Shape.Box.Extents.Y * 2;
+            FP playerHeight = filter.Collider->Shape.Box.Extents.Y * 2;
             FP cameraTop = newCameraPosition.Y + vOrtho;
             FP cameraTopDistanceToPlayer = cameraTop - (camera->LastPlayerPosition.Y + playerHeight);
             FP cameraTopMinDistance = (FP.FromString("2.5") / 7) * vOrtho;

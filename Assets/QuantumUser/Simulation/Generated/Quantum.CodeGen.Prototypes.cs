@@ -290,6 +290,24 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PhysicsContact))]
+  public unsafe partial class PhysicsContactPrototype : StructPrototype {
+    public FPVector2 Position;
+    public FPVector2 Normal;
+    public FP Distance;
+    public Int32 TileX;
+    public Int32 TileY;
+    partial void MaterializeUser(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context = default) {
+        result.Position = this.Position;
+        result.Normal = this.Normal;
+        result.Distance = this.Distance;
+        result.TileX = this.TileX;
+        result.TileY = this.TileY;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.PhysicsObject))]
   public unsafe partial class PhysicsObjectPrototype : ComponentPrototype<Quantum.PhysicsObject> {
     public FPVector2 Velocity;
@@ -305,7 +323,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsOnSlipperyGround;
     public QBoolean IsOnSlideableGround;
     [DynamicCollectionAttribute()]
-    public Quantum.Prototypes.TileContactPrototype[] Contacts = {};
+    public Quantum.Prototypes.PhysicsContactPrototype[] Contacts = {};
     partial void MaterializeUser(Frame frame, ref Quantum.PhysicsObject result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.PhysicsObject component = default;
@@ -330,7 +348,7 @@ namespace Quantum.Prototypes {
         } else {
           var list = frame.AllocateList(out result.Contacts, this.Contacts.Length);
           for (int i = 0; i < this.Contacts.Length; ++i) {
-            Quantum.TileContact tmp = default;
+            Quantum.PhysicsContact tmp = default;
             this.Contacts[i].Materialize(frame, ref tmp, in context);
             list.Add(tmp);
           }
@@ -383,6 +401,7 @@ namespace Quantum.Prototypes {
     public MapEntityId Owner;
     public QBoolean FacingRight;
     public QBoolean HasBounced;
+    public QBoolean PlayDestroySound;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Projectile component = default;
         Materialize((Frame)f, ref component, in context);
@@ -394,6 +413,7 @@ namespace Quantum.Prototypes {
         PrototypeValidator.FindMapEntity(this.Owner, in context, out result.Owner);
         result.FacingRight = this.FacingRight;
         result.HasBounced = this.HasBounced;
+        result.PlayDestroySound = this.PlayDestroySound;
     }
   }
   [System.SerializableAttribute()]
@@ -407,20 +427,6 @@ namespace Quantum.Prototypes {
         result.Tile = this.Tile;
         result.Rotation = this.Rotation;
         result.Scale = this.Scale;
-        MaterializeUser(frame, ref result, in context);
-    }
-  }
-  [System.SerializableAttribute()]
-  [Quantum.Prototypes.Prototype(typeof(Quantum.TileContact))]
-  public unsafe partial class TileContactPrototype : StructPrototype {
-    public Int32 X;
-    public Int32 Y;
-    public FPVector2 Normal;
-    partial void MaterializeUser(Frame frame, ref Quantum.TileContact result, in PrototypeMaterializationContext context);
-    public void Materialize(Frame frame, ref Quantum.TileContact result, in PrototypeMaterializationContext context = default) {
-        result.X = this.X;
-        result.Y = this.Y;
-        result.Normal = this.Normal;
         MaterializeUser(frame, ref result, in context);
     }
   }

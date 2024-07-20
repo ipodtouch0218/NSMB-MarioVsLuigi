@@ -9,3 +9,18 @@ global {
 }
 
 signal OnStageReset();
+
+event TileChanged {
+    Frame Frame;
+    int TileX;
+    int TileY;
+    StageTileInstance NewTile;
+}
+
+event TileBroken {
+    Frame Frame;
+    entity_ref Entity;
+    int TileX;
+    int TileY;
+    StageTileInstance Tile;
+}

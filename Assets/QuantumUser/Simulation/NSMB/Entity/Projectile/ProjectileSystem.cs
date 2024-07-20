@@ -4,7 +4,7 @@ namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadFilter<ProjectileSystem.Filter>, ISignalOnTrigger2D {
         public struct Filter {
             public EntityRef Entity;
-            public Transform2D Transform;
+            public Transform2D* Transform;
             public Projectile* Projectile;
             public PhysicsObject* PhysicsObject;
         }
@@ -14,8 +14,8 @@ namespace Quantum {
             var asset = f.FindAsset(projectile->Asset);
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            if (filter.Transform.Position.Y < stage.StageWorldMin.Y) {
-                f.Destroy(filter.Entity);
+            if (filter.Transform->Position.Y < stage.StageWorldMin.Y) {
+                Destroy(f, filter.Entity, false);
                 return;
             }
 
@@ -37,7 +37,8 @@ namespace Quantum {
                 physicsObject->IsTouchingCeiling ||
                 (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))) {
 
-                f.Destroy(filter.Entity);
+
+                Destroy(f, filter.Entity, true);
                 return;
             }
 
@@ -62,10 +63,9 @@ namespace Quantum {
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
             if (TryDamagePlayer(f, info)) {
-                f.Destroy(info.Other);
+                Destroy(f, info.Other, true);
                 return;
             }
-
         }
 
         private bool TryDamagePlayer(Frame f, TriggerInfo2D info) {
@@ -129,6 +129,11 @@ namespace Quantum {
             }
 
             return true;
+        }
+
+        private void Destroy(Frame f, EntityRef entity, bool playEffect) {
+            f.Destroy(entity);
+            f.Events.ProjectileDestroyed(f, entity, playEffect);
         }
     }
 }

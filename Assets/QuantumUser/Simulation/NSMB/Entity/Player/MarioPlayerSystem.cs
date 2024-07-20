@@ -1,5 +1,7 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 using UnityEngine;
+using static IInteractableTile;
 
 namespace Quantum {
 
@@ -24,6 +26,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var physics = f.FindAsset(filter.MarioPlayer->PhysicsAsset);
 
+            HandleBreakingBlocks(f, filter, physics);
             HandleSwimming(f, filter, physics, input);
             HandlePowerups(f, filter, physics, input);
             HandleCrouching(f, filter, physics, input);
@@ -425,7 +428,7 @@ namespace Quantum {
                 } else {
                     FP remainingTime = mario->PropellerLaunchFrames / 60;
                     // TODO remove magic number
-                    FP htv = maxWalkSpeed * FP.FromString("1.18") + (remainingTime * 2);
+                    FP htv = maxWalkSpeed + (FP.FromString("1.18") * (remainingTime * 2));
                     terminalVelocity = mario->PropellerSpinFrames > 0 ? physics.TerminalVelocityPropellerSpin : physics.TerminalVelocityPropeller;
                     physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -htv, htv);
                 }
@@ -981,6 +984,37 @@ namespace Quantum {
             collider->Shape.Box.Extents = newExtents;
             collider->Shape.Centroid = FPVector2.Up * newExtents.Y;
             collider->IsTrigger = mario->IsDead;
+        }
+
+        private void HandleBreakingBlocks(Frame f, Filter filter, MarioPlayerPhysicsInfo physics) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+
+            if (physicsObject->IsTouchingCeiling) {
+                bool tempHitBlock = false;
+                bool interactedAny = false;
+
+                QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Down) < FP._0_75) {
+                        continue;
+                    }
+
+                    // Ceiling tiles.
+                    var tileInstance = stage.GetTile(f, contact.TileX, contact.TileY);
+                    StageTile tile = f.FindAsset(tileInstance.Tile);
+                    if (tile is IInteractableTile it) {
+                        it.Interact(f, filter.Entity, InteractionDirection.Up,
+                            new Vector2Int(contact.TileX, contact.TileY), tileInstance);
+                    }
+                }
+
+                if (mario->IsInWater) {
+                    // TODO: magic value
+                    physicsObject->Velocity.Y = -2;
+                }
+            }
         }
 
         public static void SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab) {

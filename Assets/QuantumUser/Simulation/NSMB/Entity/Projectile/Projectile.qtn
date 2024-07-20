@@ -4,6 +4,11 @@ component Projectile {
 	EntityRef Owner;
 	bool FacingRight;
 	bool HasBounced;
+	bool PlayDestroySound;
 }
 
-signal OnProjectileDestroyed(EntityRef Entity, Projectile* projectile);
+event ProjectileDestroyed {
+	Frame Frame;
+	EntityRef Entity;
+	bool PlayEffect;
+}

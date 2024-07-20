@@ -36,3 +36,5 @@ MonoBehaviour:
           RawValue: -32768
         Y:
           RawValue: 32768
+  IsSlipperyGround: 0
+  IsSlideableGround: 0

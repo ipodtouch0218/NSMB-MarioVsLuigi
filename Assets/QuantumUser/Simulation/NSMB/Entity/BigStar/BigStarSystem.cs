@@ -72,7 +72,6 @@ namespace Quantum {
                     physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
                 }
             }
-
         }
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
@@ -87,6 +86,8 @@ namespace Quantum {
             }
 
             mario->Stars++;
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            stage.ResetStage(f);
             f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario);
             f.Destroy(info.Other);
         }

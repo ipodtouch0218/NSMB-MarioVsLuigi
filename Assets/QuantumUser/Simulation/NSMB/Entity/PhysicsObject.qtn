@@ -14,11 +14,13 @@ component PhysicsObject {
     bool IsOnSlipperyGround;
     bool IsOnSlideableGround;
 
-    list<TileContact> Contacts;
+    list<PhysicsContact> Contacts;
 }
 
-struct TileContact {
-    int X;
-    int Y;
+struct PhysicsContact {
+    FPVector2 Position;
     FPVector2 Normal;
+    FP Distance;
+    int TileX;
+    int TileY;
 }
