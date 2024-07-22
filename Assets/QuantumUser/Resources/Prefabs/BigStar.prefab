@@ -5310,7 +5310,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSources:
   - {fileID: 7844204986304545686}
-  - {fileID: 7844204986304545686}
   soundOrigin: {fileID: 1973747262660636105}
   soundRange: 5
   maxPanning: 0.8

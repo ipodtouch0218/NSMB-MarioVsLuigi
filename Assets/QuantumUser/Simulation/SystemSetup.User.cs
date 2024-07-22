@@ -11,10 +11,12 @@ namespace Quantum {
             systems.Add(new ProjectileSystem());
             systems.Add(new PowerupSystem());
             systems.Add(new LiquidSystem());
+            systems.Add(new BlockBumpSystem());
             systems.Add(new PhysicsObjectSystem());
             systems.Add(new CoinSystem());
             systems.Add(new WrappingObjectSystem());
             systems.Add(new CameraSystem());
+            systems.Add(new ClientSystem());
         }
     }
 }

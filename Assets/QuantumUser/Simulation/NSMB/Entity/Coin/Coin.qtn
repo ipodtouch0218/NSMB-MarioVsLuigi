@@ -1,9 +1,13 @@
 component Coin {
 	bool IsFloating;
-
 	bool IsDotted;
+
+	bool IsCollected;
+	bool IsCurrentlyDotted;
 	byte DottedChangeTimer;
 }
+
+signal MarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation);
 
 synced event MarioPlayerCollectedCoin {
 	Frame Frame;
@@ -12,4 +16,16 @@ synced event MarioPlayerCollectedCoin {
 	byte Coins;
 	bool ItemSpawned;
 	FPVector2 CoinLocation;
+}
+
+event CoinChangedType {
+	Frame Frame;
+	entity_ref Entity;
+	Coin Coin;
+}
+
+event CoinChangeCollected {
+	Frame Frame;
+	entity_ref Entity;
+	Coin Coin;
 }

@@ -2243,13 +2243,7 @@ namespace Quantum {
 
   [Serializable]
   public partial class RuntimePlayer : IRuntimePlayer {
-    /// <summary>
-    /// Optionally let players select an avatar prototype using RuntimePlayer. This field can be removed from RuntimePlayer if not needed.
-    /// </summary>
-    public Quantum.AssetRef<Quantum.EntityPrototype> PlayerAvatar;
-    /// <summary>
-    /// Optionally assign a nickname to players using RuntimePlayer. This field can be removed from RuntimePlayer if not needed.
-    /// </summary>
+
     public string PlayerNickname;
 
     #region Legacy

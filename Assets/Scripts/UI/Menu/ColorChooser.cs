@@ -73,7 +73,7 @@ namespace NSMB.UI.MainMenu {
             */
         }
 
-        public void ChangeCharacter(CharacterData data) {
+        public void ChangeCharacter(CharacterAsset data) {
             foreach (ColorButton b in colorButtons) {
                 b.Instantiate(data);
             }

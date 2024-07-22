@@ -210,6 +210,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 66847e430712048408ec06255e8732aa, type: 2}
   - {fileID: 11400000, guid: 937b975636292004d99a857288a07edc, type: 2}
   FallbackPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
+  CharacterDatas:
+  - {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
+  - {fileID: 11400000, guid: 20241e3c68674eb4dbb58f063d01cfd2, type: 2}
   FireballPrototype:
     Id:
       Value: 1460912212237464861
@@ -219,9 +222,13 @@ MonoBehaviour:
   BigStarPrototype:
     Id:
       Value: 1295981493910502871
+  BlockBumpPrototype:
+    Id:
+      Value: 1308320651839637093
   StarsToWin: 10
   CoinsForPowerup: 8
   Lives: 0
+  TimerSeconds: 0
   TeamsEnabled: 0
   CustomPowerupsEnabled: 1
 --- !u!114 &-100545808229499591

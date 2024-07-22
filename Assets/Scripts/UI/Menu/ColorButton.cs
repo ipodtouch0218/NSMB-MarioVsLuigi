@@ -13,7 +13,7 @@ public class ColorButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
     [SerializeField] private Sprite overlayUnpressed, overlayPressed;
     [SerializeField] private Image shirt, overalls, overlay;
 
-    public void Instantiate(CharacterData player) {
+    public void Instantiate(CharacterAsset player) {
         if (palette == null) {
             shirt.enabled = false;
             overalls.enabled = false;

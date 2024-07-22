@@ -38,6 +38,8 @@ public class BigStarAnimator : QuantumCallbacks {
 
         stationary = star.IsStationary;
         sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
+
+        Debug.Log(sfx2);
     }
 
     public void EntityDestroyed(QuantumGame game) {

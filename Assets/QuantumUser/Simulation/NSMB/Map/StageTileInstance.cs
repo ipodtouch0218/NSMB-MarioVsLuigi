@@ -5,15 +5,16 @@ namespace Quantum {
     [Serializable]
     public unsafe partial struct StageTileInstance {
 
-        public FPVector2[][] GetWorldPolygons(Frame f, FPVector2 worldPos) {
-            return GetWorldPolygons(f.FindAsset(Tile), worldPos);
+        public FPVector2[][] GetWorldPolygons(Frame f, FPVector2? worldPos = null) {
+            return GetWorldPolygons(f.FindAsset(Tile), worldPos ?? FPVector2.Zero);
         }
 
-        public FPVector2[][] GetWorldPolygons(StageTile stageTile, FPVector2 worldPos) {
+        public FPVector2[][] GetWorldPolygons(StageTile stageTile, FPVector2? worldPos = null) {
             if (!stageTile || stageTile.CollisionData.Shapes == null) {
                 return Array.Empty<FPVector2[]>();
             }
 
+            worldPos ??= FPVector2.Zero;
             FPVector2[][] polygons = new FPVector2[stageTile.CollisionData.Shapes.Length][];
 
             for (int shape = 0; shape < polygons.Length; shape++) {
@@ -34,7 +35,7 @@ namespace Quantum {
                     // Rotate
                     p = RotateAroundOrigin(p, Rotation);
                     // Translate
-                    p += worldPos;
+                    p += worldPos.Value;
                     polygons[shape][point] = p;
                 }
             }

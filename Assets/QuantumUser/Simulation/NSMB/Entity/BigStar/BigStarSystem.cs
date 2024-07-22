@@ -87,7 +87,7 @@ namespace Quantum {
 
             mario->Stars++;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            stage.ResetStage(f);
+            stage.ResetStage(f, false);
             f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario);
             f.Destroy(info.Other);
         }

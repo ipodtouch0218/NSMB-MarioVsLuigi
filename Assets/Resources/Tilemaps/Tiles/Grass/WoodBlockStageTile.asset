@@ -39,5 +39,5 @@ MonoBehaviour:
   IsSlipperyGround: 0
   IsSlideableGround: 0
   ParticleColor: {r: 0.72156864, g: 0.5647059, b: 0.2509804, a: 1}
-  BreakingRules: 160
+  BreakingRules: 320
   BumpIfNotBroken: 0

@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using static IInteractableTile;
 
@@ -25,12 +26,13 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var physics = f.FindAsset(filter.MarioPlayer->PhysicsAsset);
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            HandleBreakingBlocks(f, filter, physics);
+            HandleBreakingBlocks(f, filter, physics, input, stage);
             HandleSwimming(f, filter, physics, input);
-            HandlePowerups(f, filter, physics, input);
+            HandlePowerups(f, filter, physics, input, stage);
             HandleCrouching(f, filter, physics, input);
-            HandleGroundpound(f, filter, physics, input);
+            HandleGroundpound(f, filter, physics, input, stage);
             HandleWalkingRunning(f, filter, physics, input);
             HandleJumping(f, filter, physics, input);
             HandleBlueShell(f, filter, physics, input);
@@ -646,7 +648,7 @@ namespace Quantum {
             return false;
         }
 
-        public void HandleGroundpound(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        public void HandleGroundpound(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -658,7 +660,7 @@ namespace Quantum {
             }
 
             HandleGroundpoundStartAnimation(filter, physics);
-            HandleGroundpoundBlockCollision(f, filter);
+            HandleGroundpoundBlockCollision(f, filter, stage);
 
             if (mario->IsInWater && (mario->IsGroundpounding || mario->IsDrilling)) {
                 physicsObject->Velocity.Y += physics.SwimGroundpoundDeceleration * f.DeltaTime;
@@ -748,7 +750,7 @@ namespace Quantum {
             };
         }
 
-        private void HandleGroundpoundBlockCollision(Frame f, Filter filter) {
+        private void HandleGroundpoundBlockCollision(Frame f, Filter filter, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -761,14 +763,23 @@ namespace Quantum {
             }
 
             mario->IsGroundpoundActive = false;
-            /* TODO
-            foreach (PhysicsDataStruct.TileContact tile in body.Data.TilesStandingOn) {
-                ContinueGroundpound |= InteractWithTile(tile.location, InteractionDirection.Down, out bool _, out bool bumpSound);
-                if (bumpSound) {
-                    BlockBumpSoundCounter++;
+            bool tempHitBlock = false;
+            bool interactedAny = false;
+
+            QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+            foreach (var contact in contacts) {
+                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < FP._0_75) {
+                    continue;
+                }
+
+                // Floor tiles.
+                var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                StageTile tile = f.FindAsset(tileInstance.Tile);
+                if (tile is IInteractableTile it) {
+                    it.Interact(f, filter.Entity, InteractionDirection.Down,
+                        new Vector2Int(contact.TileX, contact.TileY), tileInstance);
                 }
             }
-            */
 
             if (mario->IsDrilling) {
                 mario->IsSpinnerFlying &= mario->IsGroundpoundActive;
@@ -817,7 +828,7 @@ namespace Quantum {
             physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
         }
 
-        private void HandlePowerups(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        private void HandlePowerups(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -855,7 +866,32 @@ namespace Quantum {
                 mario->UsedPropellerThisJump = false;
             }
 
-            if (!inputs.PowerupAction.WasPressed) {
+            if (mario->IsInShell && (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall)) {
+                bool tempHitBlock = false;
+                bool interactedAny = false;
+
+                QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    FP dot = FPVector2.Dot(contact.Normal, FPVector2.Right);
+                    if (FPMath.Abs(dot) < FP._0_75) {
+                        continue;
+                    }
+
+                    // Wall tiles.
+                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTile tile = f.FindAsset(tileInstance.Tile);
+                    if (tile is IInteractableTile it) {
+                        it.Interact(f, filter.Entity, dot > 0 ? InteractionDirection.Right : InteractionDirection.Left,
+                            new Vector2Int(contact.TileX, contact.TileY), tileInstance);
+                    }
+                }
+                mario->FacingRight = physicsObject->IsTouchingLeftWall;
+            }
+
+            PowerupState state = mario->CurrentPowerupState;
+            if (!(inputs.PowerupAction.WasPressed 
+                || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed) 
+                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower) && inputs.FireballPowerupAction.WasPressed))) {
                 return;
             }
 
@@ -978,18 +1014,21 @@ namespace Quantum {
                 newHeight *= mario->CurrentPowerupState <= PowerupState.MiniMushroom ? FP._0_75 : FP._0_50;
             }
 
-
             FPVector2 newExtents = collider->Shape.Box.Extents;
             newExtents.Y = newHeight / 2;
+
+            if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
+                newExtents /= 2;    
+            }
+
             collider->Shape.Box.Extents = newExtents;
             collider->Shape.Centroid = FPVector2.Up * newExtents.Y;
             collider->IsTrigger = mario->IsDead;
         }
 
-        private void HandleBreakingBlocks(Frame f, Filter filter, MarioPlayerPhysicsInfo physics) {
+        private void HandleBreakingBlocks(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
             if (physicsObject->IsTouchingCeiling) {
                 bool tempHitBlock = false;
@@ -1002,7 +1041,7 @@ namespace Quantum {
                     }
 
                     // Ceiling tiles.
-                    var tileInstance = stage.GetTile(f, contact.TileX, contact.TileY);
+                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
                         it.Interact(f, filter.Entity, InteractionDirection.Up,

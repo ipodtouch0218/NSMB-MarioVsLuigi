@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum;
+using System.ComponentModel.Design;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Input = Quantum.Input;
@@ -34,14 +35,19 @@ public class InputCollector : MonoBehaviour {
         bool left = Vector2.Dot(normalizedJoystick, Vector2.left) > 0.4f;
         bool right = Vector2.Dot(normalizedJoystick, Vector2.right) > 0.4f;
 
+        bool jump = jumpAction.action.ReadValue<float>() > 0.5f;
+        bool sprint = sprintAction.action.ReadValue<float>() > 0.5f;
+
         Input i = new() {
             Up = up,
             Down = down,
             Left = left,
             Right = right,
-            Jump = jumpAction.action.ReadValue<float>() > 0.5f,
-            Sprint = sprintAction.action.ReadValue<float>() > 0.5f ^ Settings.Instance.controlsAutoSprint,
+            Jump = jump,
+            Sprint = sprint ^ Settings.Instance.controlsAutoSprint,
             PowerupAction = powerupAction.action.ReadValue<float>() > 0.5f,
+            FireballPowerupAction = Settings.Instance.controlsFireballSprint && sprint,
+            PropellerPowerupAction = Settings.Instance.controlsPropellerJump && jump,
         };
 
         callback.SetInput(i, DeterministicInputFlags.Repeatable);

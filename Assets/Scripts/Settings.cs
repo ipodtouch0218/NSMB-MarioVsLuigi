@@ -357,7 +357,7 @@ public class Settings : Singleton<Settings> {
         TryGetSetting<string>("Controls_Bindings", nameof(ControlsBindings));
     }
 
-    private bool TryGetSetting<T>(string key, string propertyName) {
+    private bool TryGetSetting<T>(string key, string propertyName, T defaultValue = default) {
         if (!PlayerPrefs.HasKey(key)) {
             return false;
         }
@@ -398,7 +398,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref string value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 
@@ -408,7 +407,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref int value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 
@@ -418,7 +416,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref float value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 
@@ -428,7 +425,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref bool value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 

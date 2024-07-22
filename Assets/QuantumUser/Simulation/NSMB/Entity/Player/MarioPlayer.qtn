@@ -10,6 +10,8 @@ input {
 	button Jump;
 	button Sprint;
 	button PowerupAction;
+	button FireballPowerupAction;
+	button PropellerPowerupAction;
 }
 
 component MarioPlayer {
@@ -157,6 +159,18 @@ event MarioPlayerUsedPropeller {
 }
 
 event MarioPlayerPropellerSpin {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+synced event MarioPlayerDied {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+event MarioPlayerRespawned {
 	Frame Frame;
 	entity_ref Entity;
 	MarioPlayer Mario;

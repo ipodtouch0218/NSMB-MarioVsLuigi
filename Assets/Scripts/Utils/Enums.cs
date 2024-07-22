@@ -99,11 +99,11 @@ public static class AttributeExtensions {
     private static readonly Dictionary<string, AudioClip> CachedClips = new();
     private static readonly Dictionary<Enums.PrefabParticle, GameObject> CachedParticles = new();
 
-    public static AudioClip GetClip(this SoundEffect soundEffect, CharacterData player = null, int variant = 0) {
+    public static AudioClip GetClip(this SoundEffect soundEffect, CharacterAsset player = null, int variant = 0) {
         string name = "Sound/" + GetClipString(soundEffect) + (variant > 0 ? "_" + variant : "");
 
         if (player != null) {
-            name = name.Replace("{char}", player.soundFolder);
+            name = name.Replace("{char}", player.SoundFolder);
         }
 
         if (CachedClips.TryGetValue(name, out AudioClip cachedClip)) {

@@ -2,7 +2,7 @@ namespace Quantum {
     public unsafe class StageSystem : SystemMainThread {
         public override void OnInit(Frame f) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            stage.ResetStage(f);
+            stage.ResetStage(f, true);
         }
 
         public override void OnDisabled(Frame f) {

@@ -20,7 +20,7 @@ MonoBehaviour:
   State: 6
   Prefab:
     Id:
-      Value: 0
+      Value: 1466930856010351358
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   BlockSpawnSoundEffectEffect: 69
@@ -49,8 +49,8 @@ MonoBehaviour:
     StartTime:
       RawValue: 0
     EndTime:
-      RawValue: 0
-    Resolution: 0
+      RawValue: 65536
+    Resolution: 32
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
@@ -61,8 +61,8 @@ MonoBehaviour:
     StartTime:
       RawValue: 0
     EndTime:
-      RawValue: 0
-    Resolution: 0
+      RawValue: 65536
+    Resolution: 32
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []

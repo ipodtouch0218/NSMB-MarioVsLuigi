@@ -1,75 +1,95 @@
+using static IInteractableTile;
 using Quantum;
 using System;
 using UnityEngine;
+using Photon.Deterministic;
+using UnityEditor.SceneManagement;
 
 public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
     public Color ParticleColor;
-    public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioGroundpound | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs;
+    public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioDrill | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs;
     public bool BumpIfNotBroken;
 
     // [SerializeField] private Vector2Int tileSize = Vector2Int.one;
 
-    public bool Interact(Frame f, EntityRef entity, IInteractableTile.InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance) {
+    public virtual bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance) {
         bool doBreak = false;
+        bool doBump = true;
 
         if (f.TryGet(entity, out MarioPlayer mario)) {
             // Mario interacting with the block
             if (mario.CurrentPowerupState < PowerupState.Mushroom) {
                 doBreak = direction switch {
                     // Small Mario
-                    IInteractableTile.InteractionDirection.Down when mario.IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.SmallMarioGroundpound),
-                    IInteractableTile.InteractionDirection.Down when mario.IsDrilling => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
-                    IInteractableTile.InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.SmallMario),
+                    InteractionDirection.Down when mario.IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.SmallMarioGroundpound),
+                    InteractionDirection.Down when mario.IsDrilling => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
+                    InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.SmallMario),
                     _ => false
                 };
             } else if (mario.CurrentPowerupState == PowerupState.MegaMushroom) {
                 // Mega Mario
                 doBreak = BreakingRules.HasFlag(BreakableBy.MegaMario);
+            } else if (mario.IsInShell) {
+                // Blue Shell
+                doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
             } else {
                 doBreak = direction switch {
                     // Large Mario
-                    IInteractableTile.InteractionDirection.Down when mario.IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.LargeMarioGroundpound),
-                    IInteractableTile.InteractionDirection.Down when mario.IsDrilling => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
-                    IInteractableTile.InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.LargeMario),
+                    InteractionDirection.Down when mario.IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.LargeMarioGroundpound),
+                    InteractionDirection.Down when mario.IsDrilling => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
+                    InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.LargeMario),
                     _ => false
                 };
             }
         } /*else if (f.TryGet(entity, out Koopa koopa)) {
-
              doBreak = breakableByShells;
              doBump = true;
 
         } else if (f.TryGet(entity, out Bobomb bobomb)) {
-
-
-             doBump = false;
              doBreak = breakableByBombs;
+             doBump = false;
         }*/
 
+        var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
         if (doBreak) {
-            // Break(interacter, worldLocation, giantBreak ? Enums.Sounds.Powerup_MegaMushroom_Break_Block : Enums.Sounds.World_Block_Break);
-            // Bump(interacter, direction, worldLocation);
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             f.Events.TileBroken(f, entity, tilePosition.x, tilePosition.y, tileInstance);
-            stage.SetTile(f, tilePosition.x, tilePosition.y, default);
-        } else if (BumpIfNotBroken) {
-            // BumpWithAnimation(interacter, direction, worldLocation);
+            stage.SetTileRelative(f, tilePosition.x, tilePosition.y, default);
+        } else if (BumpIfNotBroken && doBump) {
+            Bump(f, stage, tilePosition, tileInstance, direction == InteractionDirection.Down, null);
         }
 
         return doBreak;
     }
 
+    public void Bump(Frame f, VersusStageData stage, Vector2Int tile, StageTileInstance result, bool downwards, AssetRef<EntityPrototype> powerup = default) {
+        stage = stage ? stage : f.FindAsset<VersusStageData>(f.Map.UserAsset);
+        EntityRef newEntity = f.Create(f.SimulationConfig.BlockBumpPrototype);
+        var blockBump = f.Unsafe.GetPointer<BlockBump>(newEntity);
+        var transform = f.Unsafe.GetPointer<Transform2D>(newEntity);
+
+        transform->Position = QuantumUtils.RelativeTileToWorld(f, new FPVector2(tile.x, tile.y)) + FPVector2.One * FP._0_25;
+        blockBump->Origin = transform->Position;
+        blockBump->StartTile = stage.GetTileRelative(f, tile.x, tile.y).Tile;
+        blockBump->ResultTile = result;
+        blockBump->Powerup = powerup;
+        blockBump->IsDownwards = downwards;
+        blockBump->TileX = tile.x;
+        blockBump->TileY = tile.y;
+
+        stage.SetTileRelative(f, tile.x, tile.y, default);
+    }
+
     [Flags]
     public enum BreakableBy {
-        SmallMario = 0,
-        SmallMarioGroundpound = 1 << 0,
-        SmallMarioDrill = 1 << 1,
-        LargeMario = 1 << 2,
-        LargeMarioGroundpound = 1 << 3,
-        LargeMarioDrill = 1 << 4,
-        MegaMario = 1 << 5,
-        Shells = 1 << 6,
-        Bombs = 1 << 7,
+        SmallMario = 1 << 0,
+        SmallMarioGroundpound = 1 << 1,
+        SmallMarioDrill = 1 << 2,
+        LargeMario = 1 << 3,
+        LargeMarioGroundpound = 1 << 4,
+        LargeMarioDrill = 1 << 5,
+        MegaMario = 1 << 6,
+        Shells = 1 << 7,
+        Bombs = 1 << 8,
     }
 }

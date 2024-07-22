@@ -10633,7 +10633,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0008c51fe3af00b4da5d44f02d9b3dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BindBehaviour: 0
+  BindBehaviour: 1
   ManualDisposal: 0
   ViewFlags: 0
   InterpolationMode: 0
@@ -10693,7 +10693,7 @@ MonoBehaviour:
   wasTurnaround: 0
   enableGlow: 0
   models: {fileID: 8422425992379838812}
-  character: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
+  character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   coinNumberParticle: {fileID: 4677531960176377302, guid: 818e60315a414df48a229c8d1186ce98,
     type: 3}
   entity: {fileID: 8832712012989740833}

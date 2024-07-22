@@ -1,0 +1,10 @@
+component BlockBump {
+	byte Lifetime;
+	asset_ref<StageTile> StartTile;
+	StageTileInstance ResultTile;
+	bool IsDownwards;
+	asset_ref<EntityPrototype> Powerup;
+	FPVector2 Origin;
+	int TileX;
+	int TileY;
+}

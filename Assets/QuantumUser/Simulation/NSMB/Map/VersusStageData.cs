@@ -26,6 +26,10 @@ public unsafe class VersusStageData : AssetObject {
     public FPVector2 CameraMinPosition;
     public FPVector2 CameraMaxPosition;
 
+    [Header("-- UI")]
+    public Color UIColor = new(24, 178, 170);
+    public bool HidePlayersOnMinimap;
+
     [Header("-- Powerups")]
     public bool SpawnBigPowerups = true;
     public bool SpawnVerticalPowerups = true;
@@ -45,7 +49,7 @@ public unsafe class VersusStageData : AssetObject {
         return Spawnpoint + offset;
     }
 
-    public StageTileInstance GetTile(Frame f, int x, int y) {
+    public StageTileInstance GetTileRelative(Frame f, int x, int y) {
         int index = x + y * TileDimensions.x;
 
         QList<StageTileInstance> stageLayout = f.ResolveList(f.Global->Stage);
@@ -56,15 +60,15 @@ public unsafe class VersusStageData : AssetObject {
         return stageLayout[index];
     }
 
-    public StageTileInstance GetTile(Frame f, FPVector2 tile) {
-        return GetTile(f, tile.X.AsInt, tile.Y.AsInt);
+    public StageTileInstance GetTileRelative(Frame f, FPVector2 tile) {
+        return GetTileRelative(f, tile.X.AsInt, tile.Y.AsInt);
     }
 
     public StageTileInstance GetTileWorld(Frame f, FPVector2 worldPosition) {
-        return GetTile(f, QuantumUtils.WorldToRelativeTile(f, worldPosition));
+        return GetTileRelative(f, QuantumUtils.WorldToRelativeTile(f, worldPosition));
     }
 
-    public void SetTile(Frame f, int x, int y, StageTileInstance tile) {
+    public void SetTileRelative(Frame f, int x, int y, StageTileInstance tile) {
         int index = x + y * TileDimensions.x;
 
         QList<StageTileInstance> stageLayout = f.ResolveList(f.Global->Stage);
@@ -76,7 +80,7 @@ public unsafe class VersusStageData : AssetObject {
         f.Events.TileChanged(f, x + TileOrigin.x, y + TileOrigin.y, tile);
     }
 
-    public void ResetStage(Frame f) {
+    public void ResetStage(Frame f, bool full) {
         if (!f.TryResolveList(f.Global->Stage, out QList<StageTileInstance> stageData)) {
             stageData = f.AllocateList<StageTileInstance>(TileData.Length);
             f.Global->Stage = stageData;
@@ -93,6 +97,7 @@ public unsafe class VersusStageData : AssetObject {
                 stageData[i] = TileData[i];
             }
         }
+        f.Signals.OnStageReset(full);
     }
 
     public static void BumpTile(Vector2Int position) {

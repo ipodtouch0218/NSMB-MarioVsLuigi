@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
+using System.Diagnostics;
 
 public static unsafe class QuantumUtils {
 
@@ -174,6 +175,7 @@ public static unsafe class QuantumUtils {
             FP chance = powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
 
             if (rand < chance) {
+                UnityEngine.Debug.Log(powerup);
                 return powerup;
             }
 

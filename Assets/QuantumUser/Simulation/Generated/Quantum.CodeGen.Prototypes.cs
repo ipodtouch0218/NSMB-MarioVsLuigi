@@ -73,6 +73,35 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BlockBump))]
+  public unsafe partial class BlockBumpPrototype : ComponentPrototype<Quantum.BlockBump> {
+    public Byte Lifetime;
+    public AssetRef<StageTile> StartTile;
+    public Quantum.Prototypes.StageTileInstancePrototype ResultTile;
+    public QBoolean IsDownwards;
+    public AssetRef<EntityPrototype> Powerup;
+    public FPVector2 Origin;
+    public Int32 TileX;
+    public Int32 TileY;
+    partial void MaterializeUser(Frame frame, ref Quantum.BlockBump result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.BlockBump component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.BlockBump result, in PrototypeMaterializationContext context = default) {
+        result.Lifetime = this.Lifetime;
+        result.StartTile = this.StartTile;
+        this.ResultTile.Materialize(frame, ref result.ResultTile, in context);
+        result.IsDownwards = this.IsDownwards;
+        result.Powerup = this.Powerup;
+        result.Origin = this.Origin;
+        result.TileX = this.TileX;
+        result.TileY = this.TileY;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.CameraController))]
   public unsafe partial class CameraControllerPrototype : ComponentPrototype<Quantum.CameraController> {
     public FPVector2 CurrentPosition;
@@ -98,6 +127,8 @@ namespace Quantum.Prototypes {
   public unsafe partial class CoinPrototype : ComponentPrototype<Quantum.Coin> {
     public QBoolean IsFloating;
     public QBoolean IsDotted;
+    public QBoolean IsCollected;
+    public QBoolean IsCurrentlyDotted;
     public Byte DottedChangeTimer;
     partial void MaterializeUser(Frame frame, ref Quantum.Coin result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
@@ -108,6 +139,8 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.Coin result, in PrototypeMaterializationContext context = default) {
         result.IsFloating = this.IsFloating;
         result.IsDotted = this.IsDotted;
+        result.IsCollected = this.IsCollected;
+        result.IsCurrentlyDotted = this.IsCurrentlyDotted;
         result.DottedChangeTimer = this.DottedChangeTimer;
         MaterializeUser(frame, ref result, in context);
     }
@@ -122,6 +155,8 @@ namespace Quantum.Prototypes {
     public Button Jump;
     public Button Sprint;
     public Button PowerupAction;
+    public Button FireballPowerupAction;
+    public Button PropellerPowerupAction;
     partial void MaterializeUser(Frame frame, ref Quantum.Input result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.Input result, in PrototypeMaterializationContext context = default) {
         result.Up = this.Up;
@@ -131,6 +166,8 @@ namespace Quantum.Prototypes {
         result.Jump = this.Jump;
         result.Sprint = this.Sprint;
         result.PowerupAction = this.PowerupAction;
+        result.FireballPowerupAction = this.FireballPowerupAction;
+        result.PropellerPowerupAction = this.PropellerPowerupAction;
         MaterializeUser(frame, ref result, in context);
     }
   }

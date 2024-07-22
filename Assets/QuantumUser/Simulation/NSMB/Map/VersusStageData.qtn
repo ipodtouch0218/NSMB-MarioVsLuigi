@@ -6,9 +6,10 @@ struct StageTileInstance {
 
 global {
     list<StageTileInstance> Stage;
+    FP Timer;
 }
 
-signal OnStageReset();
+signal OnStageReset(bool full);
 
 event TileChanged {
     Frame Frame;
@@ -23,4 +24,8 @@ event TileBroken {
     int TileX;
     int TileY;
     StageTileInstance Tile;
+}
+
+event TimerExpired {
+    Frame Frame;
 }

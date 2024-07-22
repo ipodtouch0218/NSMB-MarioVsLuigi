@@ -457,6 +457,7 @@ MonoBehaviour:
       Value: 0
     IsOnSlideableGround:
       Value: 0
+    Contacts: []
 --- !u!114 &1256801405142820976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -472,7 +473,7 @@ MonoBehaviour:
   Prototype:
     Scriptable:
       Id:
-        Value: 271390802845879304
+        Value: 390055422968795145
     FacingRight:
       Value: 1
     Lifetime: 900
@@ -494,6 +495,13 @@ MonoBehaviour:
     SpawnAnimationFrames: 0
     IgnorePlayerFrames: 0
     ParentMarioPlayer: {fileID: 0}
+    AnimationCurveOrigin:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    AnimationCurveTimer:
+      RawValue: 0
 --- !u!114 &7318776400371000510
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -62,9 +62,9 @@ namespace NSMB.Entities.Player {
         public GameObject models;
 
         //---Serialized Variables
-        [SerializeField] private CharacterData character;
+        [SerializeField] private CharacterAsset character;
         [SerializeField] private GameObject coinNumberParticle;
-        //[SerializeField] private CameraController cameraController;
+        [SerializeField] private Animator animator;
         [SerializeField] private QuantumEntityView entity;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
@@ -78,7 +78,6 @@ namespace NSMB.Entities.Player {
 
         //---Components
         private readonly List<Renderer> renderers = new();
-        private Animator animator;
         private MaterialPropertyBlock materialBlock;
 
         //---Properties
@@ -464,7 +463,7 @@ namespace NSMB.Entities.Player {
             blueShell.SetActive(mario.CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(mario.CurrentPowerupState == PowerupState.PropellerMushroom);
             animator.avatar = large ? largeAvatar : smallAvatar;
-            animator.runtimeAnimatorController = large ? character.largeOverrides : character.smallOverrides;
+            animator.runtimeAnimatorController = large ? character.LargeOverrides : character.SmallOverrides;
 
             float newZ = -4;
             if (mario.IsDead) {
@@ -507,7 +506,7 @@ namespace NSMB.Entities.Player {
         public void PlaySoundEverywhere(SoundEffect soundEffect) {
             // GameManager.Instance.sfx.PlayOneShot(sound, character);
         }
-        public void PlaySound(SoundEffect soundEffect, CharacterData characterData = null, byte variant = 0, float volume = 1) {
+        public void PlaySound(SoundEffect soundEffect, CharacterAsset characterData = null, byte variant = 0, float volume = 1) {
             characterData ??= character;
             sfx.PlayOneShot(soundEffect, characterData, variant, volume);
         }

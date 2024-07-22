@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c8a2a7c3b3c8694a83f3b72e87ca64a, type: 3}
-  m_Name: BrownBrickData
+  m_Script: {fileID: 11500000, guid: 445236dd458722a4fb9d9111c0fd8acd, type: 3}
+  m_Name: YellowCoinStageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/SpecialTiles/BrownBrickData
+    Path: Resources/Tilemaps/Tiles/SpecialTiles/YellowCoinStageTile
     Guid:
-      Value: 362633902293829697
-  Tile: {fileID: 11400000, guid: 5b752973dc1c0dc42a34828d1f33c6fd, type: 2}
+      Value: 342476424856818660
+  Tile: {fileID: 11400000, guid: bcd5c9c2415a9104a849cb42bdbb4fc0, type: 2}
   CollisionData:
     Shapes:
     - Vertices:
@@ -38,6 +38,17 @@ MonoBehaviour:
           RawValue: -32768
   IsSlipperyGround: 0
   IsSlideableGround: 0
-  ParticleColor: {r: 0.84705883, g: 0.627451, b: 0.15686275, a: 1}
-  BreakingRules: 254
-  BumpIfNotBroken: 1
+  ParticleColor: {r: 0.9725491, g: 0.81568635, b: 0.1254902, a: 1}
+  BreakingRules: 320
+  BumpIfNotBroken: 0
+  resultTile:
+    Tile:
+      Id:
+        Value: 306871595018640749
+    Rotation:
+      RawValue: 0
+    Scale:
+      X:
+        RawValue: 65536
+      Y:
+        RawValue: 65536

@@ -48,8 +48,8 @@ MonoBehaviour:
     StartTime:
       RawValue: 0
     EndTime:
-      RawValue: 0
-    Resolution: 0
+      RawValue: 65536
+    Resolution: 32
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
@@ -60,8 +60,8 @@ MonoBehaviour:
     StartTime:
       RawValue: 0
     EndTime:
-      RawValue: 0
-    Resolution: 0
+      RawValue: 65536
+    Resolution: 32
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
