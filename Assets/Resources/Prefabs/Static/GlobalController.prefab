@@ -5348,6 +5348,7 @@ GameObject:
   - component: {fileID: 683556531089429554}
   - component: {fileID: 6698765608120709345}
   - component: {fileID: 4516345658174944940}
+  - component: {fileID: 618037541108876504}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -5389,6 +5390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   translationManager: {fileID: 3868230376764802969}
+  discordController: {fileID: 618037541108876504}
   rumbleManager: {fileID: 6698765608120709345}
   rainbowGradient:
     serializedVersion: 2
@@ -5686,6 +5688,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c4220a57fb14b7478ef8c716bc64eb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &618037541108876504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706591211145739144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0698a7e52086b6a439d448874dcfc1bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1715789198208522384
@@ -20595,7 +20609,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
+  m_fontSize: 23.45
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

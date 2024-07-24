@@ -25,10 +25,6 @@ namespace NSMB.UI.MainMenu {
         //---Static Variables
         public static readonly int NicknameMin = 2, NicknameMax = 20;
 
-        //---Properties
-        // private NetworkRunner Runner => NetworkHandler.Runner;
-        // private PlayerData LocalData => Runner.GetLocalPlayerData();
-
         //---Public Variables
         public bool nonNetworkShutdown;
         public AudioSource sfx, music;

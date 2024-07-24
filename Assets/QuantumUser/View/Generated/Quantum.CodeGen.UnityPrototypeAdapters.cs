@@ -72,6 +72,7 @@ namespace Quantum.Prototypes.Unity {
   public unsafe partial class MarioPlayerPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.MarioPlayerPrototype> {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     public PlayerRef PlayerRef;
+    public Byte SpawnpointIndex;
     public Byte Team;
     public PowerupState CurrentPowerupState;
     public AssetRef<PowerupAsset> CurrentPowerupScriptable;
@@ -80,9 +81,14 @@ namespace Quantum.Prototypes.Unity {
     public Byte Stars;
     public Byte Coins;
     public Byte Lives;
+    public QBoolean Disconnected;
     public QBoolean IsDead;
     public QBoolean FireDeath;
     public QBoolean IsRespawning;
+    public Byte DeathAnimationFrames;
+    public Byte PreRespawnFrames;
+    public Byte RespawnFrames;
+    public Byte NoLivesStarDirection;
     public QBoolean FacingRight;
     public QBoolean IsSkidding;
     public QBoolean IsTurnaround;
@@ -113,7 +119,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean IsSliding;
     public QBoolean IsSpinnerFlying;
     public QBoolean IsDrilling;
-    public Int32 InvincibilityFrames;
+    public UInt16 InvincibilityFrames;
     public Byte ProjectileDelayFrames;
     public Byte ProjectileVolleyFrames;
     public Byte CurrentProjectiles;
@@ -132,6 +138,7 @@ namespace Quantum.Prototypes.Unity {
       var result = new Quantum.Prototypes.MarioPlayerPrototype();
       converter.Convert(this.PhysicsAsset, out result.PhysicsAsset);
       converter.Convert(this.PlayerRef, out result.PlayerRef);
+      converter.Convert(this.SpawnpointIndex, out result.SpawnpointIndex);
       converter.Convert(this.Team, out result.Team);
       converter.Convert(this.CurrentPowerupState, out result.CurrentPowerupState);
       converter.Convert(this.CurrentPowerupScriptable, out result.CurrentPowerupScriptable);
@@ -140,9 +147,14 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.Stars, out result.Stars);
       converter.Convert(this.Coins, out result.Coins);
       converter.Convert(this.Lives, out result.Lives);
+      converter.Convert(this.Disconnected, out result.Disconnected);
       converter.Convert(this.IsDead, out result.IsDead);
       converter.Convert(this.FireDeath, out result.FireDeath);
       converter.Convert(this.IsRespawning, out result.IsRespawning);
+      converter.Convert(this.DeathAnimationFrames, out result.DeathAnimationFrames);
+      converter.Convert(this.PreRespawnFrames, out result.PreRespawnFrames);
+      converter.Convert(this.RespawnFrames, out result.RespawnFrames);
+      converter.Convert(this.NoLivesStarDirection, out result.NoLivesStarDirection);
       converter.Convert(this.FacingRight, out result.FacingRight);
       converter.Convert(this.IsSkidding, out result.IsSkidding);
       converter.Convert(this.IsTurnaround, out result.IsTurnaround);

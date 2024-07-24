@@ -19,11 +19,6 @@ namespace Quantum {
             f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = spawnOrigin;
             f.Unsafe.GetPointer<PhysicsObject>(thisEntity)->IsFrozen = true;
 
-            if (BlockSpawnDestination.Y < BlockSpawnOrigin.Y) {
-                // Downwards powerup, adjust based on the powerup's height.
-                BlockSpawnDestination.Y -= f.Get<PhysicsCollider2D>(thisEntity).Shape.Box.Extents.Y * 2;
-            }
-
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(thisEntity);
             if (launch) {
                 // TODO magic number

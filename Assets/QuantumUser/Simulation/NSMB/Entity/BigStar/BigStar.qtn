@@ -1,5 +1,5 @@
 global {
-	int BigStarSpawnTimer;
+	ushort BigStarSpawnTimer;
 	entity_ref MainBigStar;
 	bitset[64] UsedStarSpawns;
 	int UsedStarSpawnCount;
@@ -7,7 +7,9 @@ global {
 
 component BigStar {
 	bool IsStationary;
-	int Lifetime;
+	ushort Lifetime;
+	byte PassthroughFrames;
+	byte UncollectableFrames;
 	FP Speed;
 	FP BounceForce;
 	bool FacingRight;

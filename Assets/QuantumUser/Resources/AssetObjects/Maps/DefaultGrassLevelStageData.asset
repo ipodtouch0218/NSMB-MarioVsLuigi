@@ -16,6 +16,10 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/DefaultGrassLevelStageData
     Guid:
       Value: 274863242883854470
+  StageAuthor: 
+  MusicComposer: 
+  TranslationKey: level.default.grass
+  DiscordStageImage: level-grassland
   OverrideAutomaticTilemapSettings: 0
   TileDimensions: {x: 64, y: 12}
   TileOrigin: {x: -48, y: -13}
@@ -46,7 +50,7 @@ MonoBehaviour:
       RawValue: 6553600
     Y:
       RawValue: 294912
-  UIColor: {r: 0, g: 0, b: 0, a: 0}
+  UIColor: {r: 0.09411765, g: 0.69803923, b: 0.6666667, a: 1}
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1
@@ -4653,7 +4657,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 404632403293626365
+        Value: 477683130632991220
     Rotation:
       RawValue: 0
     Scale:
@@ -4913,7 +4917,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 342476424856818660
+        Value: 477683130632991220
     Rotation:
       RawValue: 0
     Scale:

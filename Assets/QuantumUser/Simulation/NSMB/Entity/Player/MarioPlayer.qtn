@@ -2,6 +2,10 @@ import enum PowerupState(byte);
 import enum JumpState(byte);
 import enum PowerupReserveResult(byte);
 
+global {
+	byte TotalPlayers;
+}
+
 input {
 	button Up;
 	button Down;
@@ -17,6 +21,7 @@ input {
 component MarioPlayer {
     asset_ref<MarioPlayerPhysicsInfo> PhysicsAsset;
 	PlayerRef PlayerRef;
+	byte SpawnpointIndex;
 	byte Team;
 
 	PowerupState CurrentPowerupState;
@@ -28,9 +33,14 @@ component MarioPlayer {
 	byte Coins;
 	byte Lives;
 
+	bool Disconnected;
 	bool IsDead;
 	bool FireDeath;
 	bool IsRespawning;
+	byte DeathAnimationFrames;
+	byte PreRespawnFrames;
+	byte RespawnFrames;
+	byte NoLivesStarDirection;
 
 	// Walk/Running
     bool FacingRight;
@@ -79,7 +89,7 @@ component MarioPlayer {
 	bool IsDrilling;
 
 	// Powerups
-    int InvincibilityFrames;
+    ushort InvincibilityFrames;
 	byte ProjectileDelayFrames;
 	byte ProjectileVolleyFrames;
 	byte CurrentProjectiles;
@@ -165,6 +175,18 @@ event MarioPlayerPropellerSpin {
 }
 
 synced event MarioPlayerDied {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+synced event MarioPlayerTookDamage {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+}
+
+event MarioPlayerPreRespawned {
 	Frame Frame;
 	entity_ref Entity;
 	MarioPlayer Mario;

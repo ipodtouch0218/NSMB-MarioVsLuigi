@@ -53,7 +53,9 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.BigStar))]
   public unsafe partial class BigStarPrototype : ComponentPrototype<Quantum.BigStar> {
     public QBoolean IsStationary;
-    public Int32 Lifetime;
+    public UInt16 Lifetime;
+    public Byte PassthroughFrames;
+    public Byte UncollectableFrames;
     public FP Speed;
     public FP BounceForce;
     public QBoolean FacingRight;
@@ -66,6 +68,8 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.BigStar result, in PrototypeMaterializationContext context = default) {
         result.IsStationary = this.IsStationary;
         result.Lifetime = this.Lifetime;
+        result.PassthroughFrames = this.PassthroughFrames;
+        result.UncollectableFrames = this.UncollectableFrames;
         result.Speed = this.Speed;
         result.BounceForce = this.BounceForce;
         result.FacingRight = this.FacingRight;
@@ -206,6 +210,7 @@ namespace Quantum.Prototypes {
   public unsafe class MarioPlayerPrototype : ComponentPrototype<Quantum.MarioPlayer> {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     public PlayerRef PlayerRef;
+    public Byte SpawnpointIndex;
     public Byte Team;
     public PowerupState CurrentPowerupState;
     public AssetRef<PowerupAsset> CurrentPowerupScriptable;
@@ -214,9 +219,14 @@ namespace Quantum.Prototypes {
     public Byte Stars;
     public Byte Coins;
     public Byte Lives;
+    public QBoolean Disconnected;
     public QBoolean IsDead;
     public QBoolean FireDeath;
     public QBoolean IsRespawning;
+    public Byte DeathAnimationFrames;
+    public Byte PreRespawnFrames;
+    public Byte RespawnFrames;
+    public Byte NoLivesStarDirection;
     public QBoolean FacingRight;
     public QBoolean IsSkidding;
     public QBoolean IsTurnaround;
@@ -247,7 +257,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsSliding;
     public QBoolean IsSpinnerFlying;
     public QBoolean IsDrilling;
-    public Int32 InvincibilityFrames;
+    public UInt16 InvincibilityFrames;
     public Byte ProjectileDelayFrames;
     public Byte ProjectileVolleyFrames;
     public Byte CurrentProjectiles;
@@ -269,6 +279,7 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.MarioPlayer result, in PrototypeMaterializationContext context = default) {
         result.PhysicsAsset = this.PhysicsAsset;
         result.PlayerRef = this.PlayerRef;
+        result.SpawnpointIndex = this.SpawnpointIndex;
         result.Team = this.Team;
         result.CurrentPowerupState = this.CurrentPowerupState;
         result.CurrentPowerupScriptable = this.CurrentPowerupScriptable;
@@ -277,9 +288,14 @@ namespace Quantum.Prototypes {
         result.Stars = this.Stars;
         result.Coins = this.Coins;
         result.Lives = this.Lives;
+        result.Disconnected = this.Disconnected;
         result.IsDead = this.IsDead;
         result.FireDeath = this.FireDeath;
         result.IsRespawning = this.IsRespawning;
+        result.DeathAnimationFrames = this.DeathAnimationFrames;
+        result.PreRespawnFrames = this.PreRespawnFrames;
+        result.RespawnFrames = this.RespawnFrames;
+        result.NoLivesStarDirection = this.NoLivesStarDirection;
         result.FacingRight = this.FacingRight;
         result.IsSkidding = this.IsSkidding;
         result.IsTurnaround = this.IsTurnaround;

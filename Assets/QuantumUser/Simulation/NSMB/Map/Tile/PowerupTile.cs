@@ -1,12 +1,12 @@
 using static IInteractableTile;
 using Quantum;
 using UnityEngine;
-using Photon.Deterministic;
 
-public unsafe class CoinTile : BreakableBrickTile {
+public unsafe class PowerupTile : BreakableBrickTile {
 
     //---Serialized Variables
     [SerializeField] private StageTileInstance resultTile;
+    [SerializeField] private PowerupAsset smallPowerup, largePowerup;
 
     public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance) {
         if (base.Interact(f, entity, direction, tilePosition, tileInstance)) {
@@ -25,10 +25,8 @@ public unsafe class CoinTile : BreakableBrickTile {
             return false;
         }
 
-        // Give coin to player
-        f.Signals.MarioPlayerCollectedCoin(entity, mario, QuantumUtils.RelativeTileToWorld(f, new FPVector2(tilePosition.x, tilePosition.y)) + FPVector2.One * FP._0_25);
-        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down);
-
+        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, 
+            (mario->CurrentPowerupState < PowerupState.Mushroom ? smallPowerup : largePowerup).Prefab);
         return false;
     }
 }

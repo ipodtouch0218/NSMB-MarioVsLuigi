@@ -19,12 +19,13 @@ namespace Quantum {
             var collider = filter.Collider;
             var transform = filter.Transform;
 
+            bool kill = QuantumUtils.Decrement(ref blockBump->Lifetime);
             FP size = FPMath.Sin(((FP) blockBump->Lifetime / 60 / bumpDuration) * FP.Pi) * bumpScale;
 
             collider->Shape.Box.Extents = new FPVector2(FP._0_25 + size, FP._0_25 + size);
             transform->Position = blockBump->Origin + new FPVector2(0, size * (blockBump->IsDownwards ? -1 : 1));
 
-            if (QuantumUtils.Decrement(ref blockBump->Lifetime)) {
+            if (kill) {
                 Kill(f, filter);
             }
         }
@@ -39,11 +40,13 @@ namespace Quantum {
                 EntityRef newPowerup = f.Create(blockBump->Powerup);
                 if (f.Unsafe.TryGetPointer(newPowerup, out Powerup* powerup)) {
                     // Launch if downwards bump and theres a (solid) block below us
-                    StageTileInstance tileInstance = stage.GetTileRelative(f, blockBump->TileX, blockBump->TileY);
-                    bool launch = tileInstance.GetWorldPolygons(f).Length != 0;
-                    
-                    powerup->Initialize(f, newPowerup, 60, filter.Transform->Position, 
-                        filter.Transform->Position + ((blockBump->IsDownwards ? FPVector2.Up : FPVector2.Down) / 2), launch);
+                    StageTileInstance tileInstance = stage.GetTileRelative(f, blockBump->TileX, blockBump->TileY - 1);
+                    bool launch = blockBump->IsDownwards && tileInstance.GetWorldPolygons(f).Length != 0;
+
+                    FP height = f.Get<PhysicsCollider2D>(newPowerup).Shape.Box.Extents.Y * 2;
+                    FPVector2 origin = filter.Transform->Position + FPVector2.Down * FP._0_25;
+                    powerup->Initialize(f, newPowerup, 60, origin, 
+                        origin + (blockBump->IsDownwards ? FPVector2.Down * height : FPVector2.Up * FP._0_50), launch);
                 }
 
                 /*

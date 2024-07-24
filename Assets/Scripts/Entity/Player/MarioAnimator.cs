@@ -8,7 +8,6 @@ using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
 
-    //[OrderAfter(typeof(PlayerController))]
     public unsafe class MarioAnimator : QuantumCallbacks {
 
         //---Static Variables
@@ -63,7 +62,7 @@ namespace NSMB.Entities.Player {
 
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
-        [SerializeField] private GameObject coinNumberParticle;
+        [SerializeField] private GameObject coinNumberParticle, respawnParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private QuantumEntityView entity;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
@@ -131,6 +130,10 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerUsedPropeller>(this, OnMarioPlayerUsedPropeller);
             QuantumEvent.Subscribe<EventMarioPlayerPropellerSpin>(this, OnMarioPlayerPropellerSpin);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
+            QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
+            QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
+            QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
+
         }
 
         public void Initialize(QuantumGame game) {
@@ -141,9 +144,14 @@ namespace NSMB.Entities.Player {
                 skin = colorSet.GetPlayerColors(character);
             }
 
-            //if (!game.PlayerIsLocal(mario.PlayerRef)) {
-                GlowColor = Utils.Utils.GetPlayerColor(game, mario.PlayerRef);
-            //}
+            GlowColor = Utils.Utils.GetPlayerColor(game, mario.PlayerRef);
+
+            foreach (PlayerElements pe in PlayerElements.AllPlayerElements) {
+                if (pe.Player == mario.PlayerRef) {
+                    pe.SetEntity(entity.EntityRef);
+                    break;
+                }
+            }
         }
 
         public void OnDestroy() {
@@ -206,7 +214,7 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(bubblesParticle, mario.IsInWater);
 
             var hitbox = f.Get<PhysicsCollider2D>(entity.EntityRef);
-            if (mario.IsCrouching || mario.IsSliding || mario.IsSkidding) {
+            if (mario.IsCrouching || mario.IsSliding || mario.IsSkidding || mario.IsInShell) {
                 dust.transform.localPosition = Vector2.zero;
             } else if (mario.IsWallsliding) {
                 dust.transform.localPosition = hitbox.Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario.WallslideLeft ? new Vector2(-1, 1) : Vector2.one);
@@ -452,7 +460,7 @@ namespace NSMB.Entities.Player {
             }
 
             // Hit flash
-            float remainingDamageInvincibility = mario.InvincibilityFrames / 60f;
+            float remainingDamageInvincibility = mario.DamageInvincibilityFrames / 60f;
             models.SetActive(!mario.IsRespawning && (mario.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
 
             // Model changing
@@ -475,14 +483,6 @@ namespace NSMB.Entities.Player {
             }
 
             transform.position = new(transform.position.x, transform.position.y, newZ);
-        }
-
-        public void DisableAllModels() {
-            smallModel.SetActive(false);
-            largeModel.SetActive(false);
-            blueShell.SetActive(false);
-            propellerHelmet.SetActive(false);
-            animator.avatar = smallAvatar;
         }
 
         private void TryCreateMaterialBlock() {
@@ -574,6 +574,36 @@ namespace NSMB.Entities.Player {
             TryCreateMaterialBlock();
         }
         */
+
+        private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+        }
+
+        private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            var marioTransform = e.Frame.Get<Transform2D>(e.Entity);
+            GameObject respawn = SpawnParticle(respawnParticle, marioTransform.Position.ToUnityVector3());
+            foreach (ParticleSystem particle in respawn.GetComponentsInChildren<ParticleSystem>()) {
+                var main = particle.main;    
+                main.startColor = GlowColor;
+            }
+            PlaySound(SoundEffect.Player_Sound_Respawn);
+        }
+
+        private void OnMarioPlayerDied(EventMarioPlayerDied e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            var mario = e.Frame.Get<MarioPlayer>(e.Entity);
+            PlaySound(e.Game.PlayerIsLocal(mario.PlayerRef) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);
+        }
 
         private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
             if (e.Entity != entity.EntityRef) {

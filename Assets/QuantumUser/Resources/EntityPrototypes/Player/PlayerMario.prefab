@@ -10382,7 +10382,6 @@ GameObject:
   - component: {fileID: -2541758970786198444}
   - component: {fileID: 1243069589342051944}
   - component: {fileID: 987974179557327879}
-  - component: {fileID: 2967436041499988727}
   m_Layer: 10
   m_Name: PlayerMario
   m_TagString: Player
@@ -10662,18 +10661,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2967436041499988727}
-        m_TargetAssemblyTypeName: CameraAnimator, Assembly-CSharp
-        m_MethodName: Initialize
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   OnEntityDestroyed:
     m_PersistentCalls:
       m_Calls: []
@@ -10696,6 +10683,9 @@ MonoBehaviour:
   character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   coinNumberParticle: {fileID: 4677531960176377302, guid: 818e60315a414df48a229c8d1186ce98,
     type: 3}
+  respawnParticle: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
+    type: 3}
+  animator: {fileID: 2254935152879088866}
   entity: {fileID: 8832712012989740833}
   smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
   largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
@@ -10973,6 +10963,7 @@ MonoBehaviour:
         Value: 429607978212108660
     PlayerRef:
       _index: 0
+    SpawnpointIndex: 0
     Team: 0
     CurrentPowerupState: 0
     CurrentPowerupScriptable:
@@ -10985,12 +10976,18 @@ MonoBehaviour:
     Stars: 0
     Coins: 0
     Lives: 0
+    Disconnected:
+      Value: 0
     IsDead:
       Value: 0
     FireDeath:
       Value: 0
     IsRespawning:
       Value: 0
+    DeathAnimationFrames: 0
+    PreRespawnFrames: 0
+    RespawnFrames: 0
+    NoLivesStarDirection: 0
     FacingRight:
       Value: 0
     IsSkidding:
@@ -11161,19 +11158,6 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
---- !u!114 &2967436041499988727
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824223341387914446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71ec3ca12489981448a4f52766f2246b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  entity: {fileID: 8832712012989740833}
 --- !u!1 &4824223342336871188
 GameObject:
   m_ObjectHideFlags: 0

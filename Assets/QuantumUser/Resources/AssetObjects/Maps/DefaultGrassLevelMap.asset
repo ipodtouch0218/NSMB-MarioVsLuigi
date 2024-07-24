@@ -110,6 +110,13 @@ MonoBehaviour:
     - rid: 2013420180192886787
     - rid: 2013420180192886788
     - rid: 2013420180192886789
+  - Components:
+    - rid: 8067358050568110080
+    - rid: 8067358050568110081
+    - rid: 8067358050568110082
+    - rid: 8067358050568110083
+    - rid: 8067358050568110084
+    - rid: 8067358050568110085
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -649,11 +656,11 @@ MonoBehaviour:
         IsFloating:
           Value: 1
         IsDotted:
-          Value: 1
+          Value: 0
         IsCollected:
           Value: 0
         IsCurrentlyDotted:
-          Value: 1
+          Value: 0
         DottedChangeTimer: 0
     - rid: 2967068392109899780
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1080,11 +1087,11 @@ MonoBehaviour:
         IsFloating:
           Value: 1
         IsDotted:
-          Value: 1
+          Value: 0
         IsCollected:
           Value: 0
         IsCurrentlyDotted:
-          Value: 1
+          Value: 0
         DottedChangeTimer: 0
     - rid: 4573175170545483780
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1223,6 +1230,131 @@ MonoBehaviour:
           Value: 0
         Contacts: []
     - rid: 6570762336053755909
+      type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
+    - rid: 8067358050568110080
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -294752
+          Y:
+            RawValue: 86569
+        Rotation:
+          RawValue: 0
+    - rid: 8067358050568110081
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 11468
+            Y:
+              RawValue: 13107
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 15155
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 9
+        IsTrigger: 1
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 8067358050568110082
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 8067358050568110083
+      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Velocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        Gravity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: -1414398
+        TerminalVelocity:
+          RawValue: -524288
+        IsFrozen:
+          Value: 0
+        DisableCollision:
+          Value: 0
+        IsTouchingLeftWall:
+          Value: 0
+        IsTouchingRightWall:
+          Value: 0
+        IsTouchingCeiling:
+          Value: 0
+        IsTouchingGround:
+          Value: 0
+        FloorAngle:
+          RawValue: 0
+        IsOnSlipperyGround:
+          Value: 0
+        IsOnSlideableGround:
+          Value: 0
+        Contacts: []
+    - rid: 8067358050568110084
+      type: {class: PowerupPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Scriptable:
+          Id:
+            Value: 378514462062875007
+        FacingRight:
+          Value: 1
+        Lifetime: 900
+        BlockSpawn:
+          Value: 0
+        LaunchSpawn:
+          Value: 0
+        BlockSpawnOrigin:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        BlockSpawnDestination:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        BlockSpawnAnimationLength: 0
+        SpawnAnimationFrames: 0
+        IgnorePlayerFrames: 0
+        ParentMarioPlayer:
+          SceneIndexPlusOne: 0
+        AnimationCurveOrigin:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        AnimationCurveTimer:
+          RawValue: 0
+    - rid: 8067358050568110085
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0

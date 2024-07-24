@@ -17,7 +17,7 @@ public class UIUpdater : QuantumCallbacks {
     private static readonly int ParamHasItem = Animator.StringToHash("has-item");
 
     //---Properties
-    public EntityRef TargetPlayer { get; set; }
+    public EntityRef Target { get; set; }
 
     //---Serialized Variables
     [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
@@ -79,11 +79,11 @@ public class UIUpdater : QuantumCallbacks {
     public override void OnUpdateView(QuantumGame game) {
         // PlayerTrackIcon.HideAllPlayerIcons = !GameManager.Instance.spectationManager.Spectating && GameManager.Instance.hidePlayersOnMinimap;
 
-        if (!TargetPlayer.IsValid) {
+        if (!Target.IsValid) {
             return;
         }
 
-        if (!game.Frames.Predicted.TryGet(TargetPlayer, out MarioPlayer mario)) {
+        if (!game.Frames.Predicted.TryGet(Target, out MarioPlayer mario)) {
             return;
         }
 
@@ -103,6 +103,7 @@ public class UIUpdater : QuantumCallbacks {
 
         UpdateStoredItemUI(mario);
         UpdateTextUI(mario);
+        ApplyUIColor(mario);
     }
 
     private void ToggleUI(bool hidden) {
@@ -116,7 +117,6 @@ public class UIUpdater : QuantumCallbacks {
     }
 
     private void UpdateStoredItemUI(MarioPlayer mario) {
-        
         PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario.ReserveItem);
         reserveAnimator.SetBool(ParamHasItem, powerup && powerup.ReserveSprite);
 

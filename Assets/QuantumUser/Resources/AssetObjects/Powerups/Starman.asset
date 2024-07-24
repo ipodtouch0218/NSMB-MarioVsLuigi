@@ -16,11 +16,11 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Powerups/Starman
     Guid:
       Value: 378514462062875007
-  Type: 0
+  Type: 1
   State: 0
   Prefab:
     Id:
-      Value: 0
+      Value: 1502268950446962426
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   BlockSpawnSoundEffectEffect: 69
@@ -35,9 +35,9 @@ MonoBehaviour:
   ReserveSprite: {fileID: 0}
   AvoidPlayers: 0
   Speed:
-    RawValue: 0
+    RawValue: 131072
   BounceStrength:
-    RawValue: 0
+    RawValue: 393216
   TerminalVelocity:
     RawValue: -524288
   FollowAnimationCurve: 0

@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Physics2D;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class BigStarSystem : SystemMainThread, ISignalOnTrigger2D {
@@ -46,7 +47,9 @@ namespace Quantum {
                     }
                 }
 
-                f.Global->BigStarSpawnTimer = f.Exists(f.Global->MainBigStar) ? (624 - (f.PlayerConnectedCount * 12)) : 30;
+                if (!f.Exists(f.Global->MainBigStar)) {
+                    f.Global->BigStarSpawnTimer = 30;
+                }
             }
 
             var allStars = f.Filter<BigStar>();
@@ -61,8 +64,8 @@ namespace Quantum {
                 return;
             }
 
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             if (bigStar->IsStationary) {
-                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
                 if (physicsObject->IsTouchingGround) {
                     physicsObject->Velocity.Y = bigStar->BounceForce;
                 }
@@ -71,13 +74,19 @@ namespace Quantum {
                     bigStar->FacingRight = physicsObject->IsTouchingLeftWall;
                     physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
                 }
+            } else {
+                if (QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
+                    physicsObject->DisableCollision = false;
+                } 
+                QuantumUtils.Decrement(ref bigStar->UncollectableFrames);
             }
         }
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (f.DestroyPending(info.Other) ||
-                !f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario) ||
-                !f.Unsafe.TryGetPointer(info.Other, out BigStar* star)) {
+            if (f.DestroyPending(info.Other)
+                || !f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario) 
+                || !f.Unsafe.TryGetPointer(info.Other, out BigStar* star)
+                || star->UncollectableFrames > 0) {
                 return;
             }
 
@@ -89,6 +98,7 @@ namespace Quantum {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             stage.ResetStage(f, false);
             f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario);
+            f.Global->BigStarSpawnTimer = (ushort) (624 - (f.PlayerConnectedCount * 12));
             f.Destroy(info.Other);
         }
     }

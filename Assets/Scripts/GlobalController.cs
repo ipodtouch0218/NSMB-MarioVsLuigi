@@ -16,10 +16,11 @@ public class GlobalController : Singleton<GlobalController> {
 
     //---Events
     public event Action<RenderTexture> RenderTextureChanged;
+    public static event Action ResolutionChanged;
 
     //---Public Variables
     public TranslationManager translationManager;
-    //public DiscordController discordController;
+    public DiscordController discordController;
     public RumbleManager rumbleManager;
     public Gradient rainbowGradient;
 
@@ -45,7 +46,7 @@ public class GlobalController : Singleton<GlobalController> {
     //---Private Variables
     private Coroutine fadeMusicRoutine;
     private Coroutine fadeSfxRoutine;
-    private GameObject fusionStats;
+    //private GameObject fusionStats;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
@@ -53,7 +54,7 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void OnValidate() {
-        //if (!discordController) discordController = GetComponent<DiscordController>();
+        this.SetIfNull(ref discordController);
     }
 
     public void Awake() {
@@ -92,13 +93,17 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void Update() {
-        int windowWidth = Screen.width;
-        int windowHeight = Screen.height;
+        int newWindowWidth = Screen.width;
+        int newWindowHeight = Screen.height;
+
+        if (windowWidth != newWindowWidth || windowHeight != newWindowHeight) {
+            ResolutionChanged?.Invoke();
+        }
 
         if (Settings.Instance.graphicsNdsEnabled && SceneManager.GetActiveScene().buildIndex != 0) {
 
             int targetHeight = 224;
-            int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : (float) windowWidth / windowHeight));
+            int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : (float) newWindowWidth / newWindowHeight));
 
             if (!ndsTexture || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
                 if (ndsTexture) {
@@ -117,13 +122,18 @@ public class GlobalController : Singleton<GlobalController> {
 
         //todo: this jitters to hell
 #if UNITY_STANDALONE
-        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (this.windowWidth != windowWidth || this.windowHeight != windowHeight)) {
-            windowHeight = (int) (windowWidth * (9f / 16f));
-            Screen.SetResolution(windowWidth, windowHeight, FullScreenMode.Windowed);
+        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (this.windowWidth != newWindowWidth || this.windowHeight != newWindowHeight)) {
+            newWindowHeight = (int) (newWindowWidth * (9f / 16f));
+            Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
         }
-        this.windowWidth = windowWidth;
-        this.windowHeight = windowHeight;
+        this.windowWidth = newWindowWidth;
+        this.windowHeight = newWindowHeight;
 #endif
+
+        if ((int) (Time.time + Time.deltaTime) > (int) Time.time) {
+            // Update discord every second for now
+            discordController.UpdateActivity();
+        }
     }
 
 #if UNITY_WEBGL

@@ -175,7 +175,6 @@ public static unsafe class QuantumUtils {
             FP chance = powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
 
             if (rand < chance) {
-                UnityEngine.Debug.Log(powerup);
                 return powerup;
             }
 
@@ -264,7 +263,24 @@ public static unsafe class QuantumUtils {
         return (a.X > b.X ^ FPMath.Abs(a.X - b.X) > stage.TileDimensions.x * FP._0_25) ? 1 : -1;
     }
 
+    public static PowerupAsset FindPowerupAsset(Frame f, PowerupState state) {
+        foreach (var powerup in f.SimulationConfig.AllPowerups) {
+            if (powerup.State == state) {
+                return powerup;
+            }
+        }
+        return null;
+    }
+
     public static bool Decrement(ref byte timer) {
+        if (timer > 0) {
+            return --timer == 0;
+        }
+
+        return true;
+    }
+
+    public static bool Decrement(ref ushort timer) {
         if (timer > 0) {
             return --timer == 0;
         }

@@ -10,6 +10,7 @@ public class PowerupAnimator : QuantumCallbacks {
     [SerializeField] private Animator childAnimator;
     [SerializeField] private Animation childAnimation;
     [SerializeField] private float blinkingRate = 4, scaleRate = 0.1333f, scaleSize = 0.3f;
+    [SerializeField] private AudioSource sfx;
 
     //---Private
     private int originalSortingOrder;
@@ -21,6 +22,7 @@ public class PowerupAnimator : QuantumCallbacks {
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref childAnimator, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref childAnimation, UnityExtensions.GetComponentType.Children);
+        this.SetIfNull(ref sfx);
     }
 
     public void Start() {
@@ -42,6 +44,7 @@ public class PowerupAnimator : QuantumCallbacks {
         } else if (powerup.BlockSpawn) {
             // Block spawn
             sRenderer.sortingOrder = -1000;
+            sfx.PlayOneShot(SoundEffect.World_Block_Powerup);
             if (childAnimation) {
                 childAnimation.Play();
             }

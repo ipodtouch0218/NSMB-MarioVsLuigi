@@ -4,7 +4,7 @@ using NSMB.Utils;
 using Photon.Deterministic;
 using Quantum;
 
-public class VolumeWithDistance : QuantumCallbacks {
+public class VolumeWithDistance : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private AudioSource[] audioSources;
@@ -37,13 +37,19 @@ public class VolumeWithDistance : QuantumCallbacks {
     }
 
     public void LateUpdate() {
-        // TODO FPVector2 listener = (!useDistanceToCamera && gm.localPlayer) ? gm.localPlayer.transform.position : Camera.main.transform.position;
-        FPVector2 listener = Camera.main.transform.position.ToFPVector2();
-
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-        float distance = QuantumUtils.WrappedDistance(f, listener, soundOrigin.position.ToFPVector2(), out FP xDifference).AsFloat;
-        if (distance > soundRange) {
+        float minDistance = float.MaxValue;
+        FP xDifference = 0;
+        foreach (var pe in PlayerElements.AllPlayerElements) {
+            float distance = QuantumUtils.WrappedDistance(f, pe.Camera.transform.position.ToFPVector2(), soundOrigin.position.ToFPVector2(), out FP tempXDifference).AsFloat;
+            if (distance < minDistance) {
+                minDistance = distance;
+                xDifference = tempXDifference;
+            }
+        }
+
+        if (minDistance > soundRange) {
             foreach (AudioSource source in audioSources) {
                 source.volume = 0;
                 source.panStereo = 0;
@@ -51,7 +57,7 @@ public class VolumeWithDistance : QuantumCallbacks {
             return;
         }
 
-        float percentage = 1f - (distance * soundRangeInverse);
+        float percentage = 1f - (minDistance * soundRangeInverse);
         float volume = Utils.QuadraticEaseOut(percentage);
         float panning = Settings.Instance.audioPanning ? Utils.QuadraticEaseOut(-xDifference.AsFloat * soundRangeInverse) * maxPanning : 0f;
 

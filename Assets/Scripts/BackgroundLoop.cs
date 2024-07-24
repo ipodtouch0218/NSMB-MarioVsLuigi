@@ -4,6 +4,7 @@ using UnityEngine;
 using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
+using System.Collections.Generic;
 
 public class BackgroundLoop : QuantumCallbacks {
 
@@ -16,12 +17,10 @@ public class BackgroundLoop : QuantumCallbacks {
     private Vector3[] truePositions;
     private float[] ppus, halfWidths;
     private VersusStageData stage;
-    private FPVector2 lastPosition;
-    private Transform cameraTransform;
+    private Dictionary<Camera,FPVector2> lastPositions = new();
 
     public void Start() {
         Instance = this;
-        cameraTransform = Camera.main.transform;
 
         children = new GameObject[transform.childCount];
         ppus = new float[transform.childCount];
@@ -40,18 +39,21 @@ public class BackgroundLoop : QuantumCallbacks {
             LoadChildObjects(obj);
         }
 
-        lastPosition = cameraTransform.position.ToFPVector2();
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
-    public void LateUpdate() {
-        Reposition();
+    public void OnWillRenderObject() {
+        Reposition(Camera.current);
     }
 
-    public void Reposition() {
+    public void Reposition(Camera camera) {
         if (!stage) {
             return;
         }
+
+        Transform cameraTransform = camera.transform;
+        lastPositions.TryGetValue(camera, out FPVector2 lastPosition);
+        lastPositions[camera] = camera.transform.position.ToFPVector2();
 
         QuantumUtils.WrappedDistance(stage, cameraTransform.position.ToFPVector2(), lastPosition, out FP xDifference);
         float absoluteDifference = cameraTransform.position.x - lastPosition.X.AsFloat;
@@ -72,9 +74,8 @@ public class BackgroundLoop : QuantumCallbacks {
                 obj.transform.position = newPosition;
             }
 
-            RepositionChildObjects(obj);
+            RepositionChildObjects(cameraTransform, obj);
         }
-        lastPosition = cameraTransform.position.ToFPVector2();
     }
 
     private void LoadChildObjects(GameObject obj) {
@@ -97,7 +98,7 @@ public class BackgroundLoop : QuantumCallbacks {
         }
     }
 
-    private void RepositionChildObjects(GameObject obj) {
+    private void RepositionChildObjects(Transform camera, GameObject obj) {
         if (!obj) {
             return;
         }
@@ -107,15 +108,13 @@ public class BackgroundLoop : QuantumCallbacks {
             GameObject firstChild = parent.GetChild(0).gameObject;
             GameObject lastChild = parent.GetChild(parent.childCount - 1).gameObject;
             float halfObjectWidth = halfWidths[Array.IndexOf(children, obj)];
-            Debug.DrawRay(cameraTransform.position + Vector3.right.Multiply(ScreenBounds), Vector2.up, Color.green);
-            Debug.DrawRay(cameraTransform.position - Vector3.right.Multiply(ScreenBounds), Vector2.up, Color.green);
-            while (cameraTransform.position.x + ScreenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
+            while (camera.position.x + ScreenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
                 firstChild.transform.SetAsLastSibling();
                 firstChild.transform.position = new Vector3(lastChild.transform.position.x + halfObjectWidth * 2, lastChild.transform.position.y, lastChild.transform.position.z);
                 firstChild = parent.GetChild(0).gameObject;
                 lastChild = parent.GetChild(parent.childCount - 1).gameObject;
             }
-            while (cameraTransform.position.x - ScreenBounds.x < firstChild.transform.position.x - halfObjectWidth) {
+            while (camera.position.x - ScreenBounds.x < firstChild.transform.position.x - halfObjectWidth) {
                 lastChild.transform.SetAsFirstSibling();
                 lastChild.transform.position = new Vector3(firstChild.transform.position.x - halfObjectWidth * 2, firstChild.transform.position.y, firstChild.transform.position.z);
                 firstChild = parent.GetChild(0).gameObject;

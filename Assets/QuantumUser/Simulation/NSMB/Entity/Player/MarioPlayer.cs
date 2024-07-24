@@ -1,12 +1,13 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public partial struct MarioPlayer {
+    public unsafe partial struct MarioPlayer {
 
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsInWater => WaterColliderCount > 0;
+        public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
 
         public int GetSpeedStage(PhysicsObject physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP xVel = FPMath.Abs(physicsObject.Velocity.X) - FP._0_01;
@@ -67,6 +68,231 @@ namespace Quantum {
 
             // Replace our current reserve item with the new one
             ReserveItem = newItem;
+        }
+
+        public void Death(Frame f, EntityRef entity, bool fire) {
+            if (IsDead) {
+                return;
+            }
+
+            IsDead = true;
+            // DeathplaneDeath = deathplane;
+            FireDeath = fire;
+
+            PreRespawnFrames = 180;
+            RespawnFrames = 78;
+
+            if ((f.SimulationConfig.LivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
+                // Last death - drop all stars at 0.5s each
+                // TODO if (!GameManager.Instance.CheckForWinner()) {
+                    SpawnStars(f, entity, 1);
+                // }
+
+                PreRespawnFrames = 0;
+                RespawnFrames = 0;
+                DeathAnimationFrames = (Stars > 0) ? (byte) 30 : (byte) 36;
+            } else {
+                SpawnStars(f, entity, 1);
+                DeathAnimationFrames = 36;
+            }
+
+            // OnSpinner = null;
+            CurrentPipe = default;
+            IsInShell = false;
+            IsPropellerFlying = false;
+            PropellerLaunchFrames = 0;
+            PropellerSpinFrames = 0;
+            IsSpinnerFlying = false;
+            IsDrilling = false;
+            IsSliding = false;
+            IsCrouching = false;
+            IsSkidding = false;
+            IsTurnaround = false;
+            IsGroundpounding = false;
+            IsInKnockback = false;
+            WallslideRight = false;
+            WallslideLeft = false;
+            
+            /*
+            IsWaterWalking = false;
+            IsFrozen = false;
+           
+            if (FrozenCube) {
+                Runner.Despawn(FrozenCube.Object);
+            }
+            */
+
+            f.Unsafe.GetPointer<PhysicsObject>(entity)->IsFrozen = true;
+            f.Events.MarioPlayerDied(f, entity, this);
+        }
+
+        public bool Powerdown(Frame f, EntityRef entity, bool ignoreInvincible) {
+            if (!ignoreInvincible && !IsDamageable) {
+                return false;
+            }
+
+            PreviousPowerupState = CurrentPowerupState;
+
+            switch (CurrentPowerupState) {
+            case PowerupState.MiniMushroom:
+            case PowerupState.NoPowerup: {
+                Death(f,entity, false);
+                break;
+            }
+            case PowerupState.Mushroom: {
+                CurrentPowerupState = PowerupState.NoPowerup;
+                CurrentPowerupScriptable = null;
+                SpawnStars(f, entity, 1);
+                break;
+            }
+            case PowerupState.FireFlower:
+            case PowerupState.IceFlower:
+            case PowerupState.PropellerMushroom:
+            case PowerupState.BlueShell: {
+                CurrentPowerupState = PowerupState.Mushroom;
+                CurrentPowerupScriptable = null;
+                SpawnStars(f, entity, 1);
+                break;
+            }
+            }
+
+            IsDrilling &= !IsPropellerFlying;
+            IsPropellerFlying = false;
+            IsInShell = false;
+            PropellerLaunchFrames = 0;
+            PropellerSpinFrames = 0;
+            UsedPropellerThisJump = false;
+
+            if (!IsDead) {
+                DamageInvincibilityFrames = 2 * 60;
+                f.Events.MarioPlayerTookDamage(f, entity, this);
+            }
+            return true;
+        }
+
+        public void SpawnStars(Frame f, EntityRef entity, int amount) {
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var transform = f.Get<Transform2D>(entity);
+            bool fastStars = amount > 2 && Stars > 2;
+            int starDirection = FacingRight ? 1 : 2;
+
+            // If the level doesn't loop, don't have stars go towards the edges of the map
+            if (!stage.IsWrappingLevel) {
+                if (transform.Position.X > stage.StageWorldMin.X - 3) {
+                    starDirection = 1;
+                } else if (transform.Position.X < stage.StageWorldMax.X + 3) {
+                    starDirection = 2;
+                }
+            }
+
+            if (f.SimulationConfig.LivesEnabled && Lives == 0) {
+                fastStars = true;
+                NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
+                starDirection = NoLivesStarDirection;
+
+                starDirection = starDirection switch {
+                    2 => 1,
+                    1 => 2,
+                    _ => starDirection
+                };
+            }
+
+            while (amount > 0) {
+                if (Stars <= 0) {
+                    break;
+                }
+
+                if (!fastStars) {
+                    starDirection = starDirection switch {
+                        0 => 2,
+                        3 => 1,
+                        _ => starDirection
+                    };
+                }
+
+                EntityRef newStarEntity = f.Create(f.SimulationConfig.BigStarPrototype);
+                var newStar = f.Unsafe.GetPointer<BigStar>(newStarEntity);
+                var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newStarEntity);
+                newStarTransform->Position = transform.Position;
+
+                newStar->InitializeMovingStar(f, newStarEntity, starDirection);
+
+                Stars--;
+                amount--;
+            }
+            // TODO GameManager.Instance.CheckForWinner();
+        }
+
+        public void PreRespawn(Frame f, EntityRef entity, VersusStageData stage) {
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+
+            RespawnFrames = 78;
+
+            /*
+            if (OutOfLives) {
+                GameManager.Instance.CheckForWinner();
+
+                if (Object.HasControlAuthority()) {
+                    GameManager.Instance.spectationManager.Spectating = true;
+                }
+
+                Runner.Despawn(Object);
+                return;
+            }
+            */
+
+            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalPlayers);
+            transform->Position = spawnpoint;
+            f.Unsafe.GetPointer<CameraController>(entity)->CurrentPosition = spawnpoint;
+
+            IsDead = true;
+            // IsFrozen = false;
+            IsRespawning = true;
+            FacingRight = true;
+            WallslideLeft = false;
+            WallslideRight = false;
+            WallslideEndFrames = 0;
+            WalljumpFrames = 0;
+            IsPropellerFlying = false;
+            UsedPropellerThisJump = false;
+            IsSpinnerFlying = false;
+            PropellerLaunchFrames = 0;
+            PropellerSpinFrames = 0;
+            JumpState = JumpState.None;
+            PreviousPowerupState = CurrentPowerupState = PowerupState.NoPowerup;
+            CurrentPowerupScriptable = null;
+            //animationController.DisableAllModels();
+            DamageInvincibilityFrames = 0;
+            InvincibilityFrames = 0;
+            //MegaTimer = TickTimer.None;
+            //MegaEndTimer = TickTimer.None;
+            //MegaStartTimer = TickTimer.None;
+            IsCrouching = false;
+            IsSliding = false;
+            IsTurnaround = false;
+            IsInKnockback = false;
+            IsGroundpounding = false;
+            IsSkidding = false;
+            IsInShell = false;
+            IsTurnaround = false;
+
+            physicsObject->IsFrozen = true;
+            physicsObject->Velocity = FPVector2.Zero;
+
+            f.Events.MarioPlayerPreRespawned(f, entity, this);
+        }
+
+        public void Respawn(Frame f, EntityRef entity) {
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+
+            IsDead = false;
+            IsRespawning = false;
+            DamageInvincibilityFrames = 120;
+
+            physicsObject->IsFrozen = false;
+
+            f.Events.MarioPlayerRespawned(f, entity, this);
         }
     }
 }

@@ -1,45 +1,35 @@
-using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class CameraAnimator : QuantumCallbacks {
 
     //---Properties
-    public bool IsActive { get; set; }
+    public EntityRef Target { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
+    [SerializeField] private Camera camera;
+    [SerializeField] private List<SecondaryCameraPositioner> secondaryPositioners;
 
     //---Private Variables
-    private Transform cameraTransform;
-    private List<SecondaryCameraPositioner> secondaryPositioners;
     private VersusStageData stage;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
+        GetComponentsInChildren(secondaryPositioners); 
     }
 
     public void Start() {
-        cameraTransform = Camera.main.transform;
-        secondaryPositioners = FindObjectsOfType<SecondaryCameraPositioner>().ToList();
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
-    public void Initialize(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        IsActive = game.PlayerIsLocal(f.Get<MarioPlayer>(entity.EntityRef).PlayerRef);
-    }
-
     public override void OnUpdateView(QuantumGame game) {
-        if (!IsActive) {
+        if (!Target.IsValid || !game.Frames.Predicted.Exists(Target)) {
             return;
         }
 
-        var cameraControllerCurrent = game.Frames.Predicted.Get<CameraController>(entity.EntityRef);
-        var cameraControllerPrevious = game.Frames.PredictedPrevious.Get<CameraController>(entity.EntityRef);
+        var cameraControllerCurrent = game.Frames.Predicted.Get<CameraController>(Target);
+        var cameraControllerPrevious = game.Frames.PredictedPrevious.Get<CameraController>(Target);
 
         FPVector2 origin = cameraControllerPrevious.CurrentPosition;
         FPVector2 target = cameraControllerCurrent.CurrentPosition;
@@ -55,9 +45,9 @@ public class CameraAnimator : QuantumCallbacks {
 
         Vector3 newPosition = QuantumUtils.WrapWorld(game.Frames.Predicted, FPVector2.Lerp(origin, target, game.InterpolationFactor.ToFP()), out _).ToUnityVector3();
         newPosition.z = -10;
-        cameraTransform.position = newPosition;
+        camera.transform.position = newPosition;
         if (BackgroundLoop.Instance) {
-            BackgroundLoop.Instance.Reposition();
+            BackgroundLoop.Instance.Reposition(camera);
         }
 
         secondaryPositioners.RemoveAll(scp => !scp);

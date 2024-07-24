@@ -97,6 +97,7 @@ namespace Quantum {
 
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 powerup->FacingRight = physicsObject->IsTouchingLeftWall;
+                physicsObject->Velocity.X = asset.Speed * (powerup->FacingRight ? 1 : -1);
             }
 
             if (physicsObject->IsTouchingGround) {
@@ -165,6 +166,12 @@ namespace Quantum {
         }
 
         public PowerupReserveResult PowerupCollect(Frame f, MarioPlayer* mario, PhysicsObject physicsObject, PowerupAsset newPowerup) {
+            
+            if (newPowerup.Type == PowerupType.Starman) {
+                mario->InvincibilityFrames = 600;
+                return PowerupReserveResult.NoneButPlaySound;
+            }
+
             PowerupState newState = newPowerup.State;
             var currentPowerup = f.FindAsset(mario->CurrentPowerupScriptable);
 
@@ -190,6 +197,7 @@ namespace Quantum {
 
             mario->PreviousPowerupState = mario->CurrentPowerupState;
             mario->CurrentPowerupState = newState;
+            mario->CurrentPowerupScriptable = newPowerup;
             //mario->powerupFlash = 2;
             //mario->IsCrouching |= mario->ForceCrouchCheck();
             mario->IsPropellerFlying = false;

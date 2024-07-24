@@ -199,6 +199,7 @@ MonoBehaviour:
   HeapPageShift: 15
   HeapPageCount: 256
   HeapExtraCount: 0
+  InvisibleSolidTile: {fileID: 11400000, guid: af92f900a1bff3d459eaf5b25d41a4ac, type: 2}
   AllPowerups:
   - {fileID: 11400000, guid: e76c0ec90859dff49866293da2354232, type: 2}
   - {fileID: 11400000, guid: ad249570d3ae629428779f2a5f287379, type: 2}

@@ -23,6 +23,7 @@ TagManager:
   - Powerup
   - water
   - MainTilemap
+  - MasterCanvas
   layers:
   - Default
   - TransparentFX

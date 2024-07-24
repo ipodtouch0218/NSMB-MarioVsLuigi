@@ -10,6 +10,12 @@ public unsafe class VersusStageData : AssetObject {
     public FPVector2 StageWorldMax => new FPVector2(TileOrigin.x + TileDimensions.x, TileOrigin.y + TileDimensions.y) / 2 + TilemapWorldPosition;
 
     //---Serialized
+    [Header("-- Information")]
+    public string StageAuthor;
+    public string MusicComposer;
+    public string TranslationKey;
+    public string DiscordStageImage;
+
     [Header("-- Tilemap")]
     public bool OverrideAutomaticTilemapSettings;
     public Vector2Int TileDimensions;
