@@ -252,6 +252,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3211edc9ee1951f4780bd104a9fbd597, type: 2}
   - {fileID: 11400000, guid: 245cea6ccab8e0d47a215ef6df104e09, type: 2}
   - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
+  menuBackgrounds:
+  - {fileID: -671353878, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
+  - {fileID: -426860635, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
+  - {fileID: -724142355, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
+  - {fileID: -1604326065, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
+  - {fileID: 2087001191, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
+  - {fileID: 1696041442, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
+  - {fileID: 252352157, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
+  - {fileID: 1826252326, guid: e464768291506ed4a8064798fe2cfd0a, type: 3}
   rainbowGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0.13913044, b: 0.11304349, a: 1}
@@ -309,6 +318,11 @@ MonoBehaviour:
   nickname: 
   character: 0
   skin: 0
+  menuBackground: 0
+  redBgColor: 0
+  greenBgColor: 0
+  blueBgColor: 0
+  alphaBgColor: 0
   ndsResolution: 0
   fireballFromSprint: 1
   vsync: 0

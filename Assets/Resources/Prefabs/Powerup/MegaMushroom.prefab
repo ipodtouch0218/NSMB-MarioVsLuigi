@@ -122,6 +122,7 @@ MonoBehaviour:
   followMeCounter: 0
   despawnCounter: 15
   ignoreCounter: 0
+  hasAnimation: 0
   powerupScriptable: {fileID: 11400000, guid: fb2d384f538256445be350e60f8473a4, type: 2}
 --- !u!212 &6853285212139825911
 SpriteRenderer:

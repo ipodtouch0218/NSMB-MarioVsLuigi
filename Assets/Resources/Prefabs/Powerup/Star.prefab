@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 6365433543461850840}
   - component: {fileID: 7343601609350963997}
   - component: {fileID: -3505814145142131810}
+  - component: {fileID: 5448134289071580917}
   m_Layer: 9
   m_Name: Star
   m_TagString: Powerup
@@ -64,6 +65,7 @@ MonoBehaviour:
   followMeCounter: 0
   despawnCounter: 15
   ignoreCounter: 0
+  hasAnimation: 0
   powerupScriptable: {fileID: 11400000, guid: c00c1b56106aee544b8facce85b9f455, type: 2}
 --- !u!212 &387509546018045249
 SpriteRenderer:
@@ -262,6 +264,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interpolate: 1
   body: {fileID: 387509546018045311}
+--- !u!95 &5448134289071580917
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 387509546018045309}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e5e2656d7b4e71141886142b9b9a40b1, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &387509546627058580
 GameObject:
   m_ObjectHideFlags: 0
@@ -485,7 +507,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0.994378, b: 0, a: 1}
+      maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -1130,7 +1152,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 7
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -1560,7 +1582,7 @@ ParticleSystem:
         m_RotationOrder: 4
     separateAxes: 0
   ColorModule:
-    enabled: 0
+    enabled: 1
     gradient:
       serializedVersion: 2
       minMaxState: 1
@@ -1585,8 +1607,8 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 65535
-        atime2: 0
+        atime1: 32768
+        atime2: 65535
         atime3: 0
         atime4: 0
         atime5: 0
@@ -1594,7 +1616,7 @@ ParticleSystem:
         atime7: 0
         m_Mode: 0
         m_NumColorKeys: 2
-        m_NumAlphaKeys: 2
+        m_NumAlphaKeys: 3
       minGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -1626,8 +1648,8 @@ ParticleSystem:
         m_NumAlphaKeys: 2
   UVModule:
     serializedVersion: 2
-    enabled: 0
-    mode: 0
+    enabled: 1
+    mode: 1
     timeMode: 0
     fps: 30
     frameOverTime:
@@ -1745,7 +1767,9 @@ ParticleSystem:
     uvChannelMask: -1
     rowMode: 1
     sprites:
-    - sprite: {fileID: 0}
+    - sprite: {fileID: -1851515260, guid: e40e99bfab9cd0a4d84d6ccbf0bc53d5, type: 3}
+    - sprite: {fileID: 675079213, guid: e40e99bfab9cd0a4d84d6ccbf0bc53d5, type: 3}
+    - sprite: {fileID: 114020849, guid: e40e99bfab9cd0a4d84d6ccbf0bc53d5, type: 3}
     flipU: 0
     flipV: 0
   VelocityModule:

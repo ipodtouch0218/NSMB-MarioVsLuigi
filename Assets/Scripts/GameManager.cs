@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.UI;
 
 using Photon.Pun;
 using Photon.Realtime;
@@ -36,6 +37,9 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
     public int levelMinTileX, levelMinTileY, levelWidthTile, levelHeightTile;
     public float cameraMinY, cameraHeightY, cameraMinX = -1000, cameraMaxX = 1000;
     public bool loopingLevel = true;
+    public Slider masterSlider, musicSlider, sfxSlider;
+    public Toggle ndsToggle, aspectToggle, fullScreenToggle, vsyncToggle, scoreboardToggle;
+    public TMP_ColorGradient loseDrawGradient, luigiWinGradient, nullWinGradient;
     public Vector3 spawnpoint;
     public Tilemap tilemap;
     [ColorUsage(false)] public Color levelUIColor = new(24, 178, 170);
@@ -58,7 +62,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
 
     public GameObject localPlayer;
     public bool paused, loaded, started;
-    public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton;
+    public GameObject pauseUI, pausePanel, pauseButton, hostExitUI, hostExitButton, optionsPanel, optionsButton;
     public bool gameover = false, musicEnabled = false;
     public readonly HashSet<Player> loadedPlayers = new();
     public int starRequirement, timedGameDuration = -1, coinRequirement;
@@ -582,7 +586,27 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         gameover = true;
         music.Stop();
         GameObject text = GameObject.FindWithTag("wintext");
-        text.GetComponent<TMP_Text>().text = winner != null ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a draw...";
+
+        bool win = winner != null && winner.IsLocal;
+        bool draw = winner == null;
+
+        int c = 0;
+        if (winner != null)
+            Utils.GetCustomProperty(Enums.NetPlayerProperties.Character, out c, winner.CustomProperties);
+
+        text.GetComponent<TMP_Text>().text = !draw ? $"{ winner.GetUniqueNickname() } Wins!" : "It's a draw...";
+        
+        if (winner != null) {
+            if (GameManager.Instance.localPlayer == null) {
+                text.GetComponent<TMP_Text>().colorGradientPreset = nullWinGradient;
+            } else if (win) {
+                if (c == 1)
+                    text.GetComponent<TMP_Text>().colorGradientPreset = luigiWinGradient;
+            }
+        } else if (winner == null || !win) {
+            text.GetComponent<TMP_Text>().colorGradientPreset = loseDrawGradient;
+        }
+
 
         yield return new WaitForSecondsRealtime(1);
         text.GetComponent<Animator>().SetTrigger("start");
@@ -591,8 +615,6 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         mixer.SetFloat("MusicSpeed", 1f);
         mixer.SetFloat("MusicPitch", 1f);
 
-        bool win = winner != null && winner.IsLocal;
-        bool draw = winner == null;
         int secondsUntilMenu;
         secondsUntilMenu = draw ? 5 : 4;
 
@@ -640,7 +662,20 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
             break;
         }
     }
+    private void LoadSettings() {
 
+        musicSlider.value = Settings.Instance.VolumeMusic;
+        sfxSlider.value = Settings.Instance.VolumeSFX;
+        masterSlider.value = Settings.Instance.VolumeMaster;
+
+        aspectToggle.interactable = ndsToggle.isOn;
+        ndsToggle.isOn = Settings.Instance.ndsResolution;
+        aspectToggle.isOn = Settings.Instance.fourByThreeRatio;
+        fullScreenToggle.isOn = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
+        vsyncToggle.isOn = Settings.Instance.vsync;
+        scoreboardToggle.isOn = Settings.Instance.scoreboardAlways;
+        QualitySettings.vSyncCount = Settings.Instance.vsync ? 1 : 0;
+    }
     public void Update() {
         if (gameover)
             return;
@@ -800,6 +835,7 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         pauseUI.SetActive(paused);
         pausePanel.SetActive(true);
         hostExitUI.SetActive(false);
+        optionsPanel.SetActive(false);
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
@@ -835,6 +871,26 @@ public class GameManager : MonoBehaviour, IOnEventCallback, IInRoomCallbacks, IC
         EventSystem.current.SetSelectedGameObject(pauseButton);
     }
 
+    public void OpenOptions() {
+        pausePanel.SetActive(false);
+        optionsPanel.SetActive(true);
+        LoadSettings();
+        EventSystem.current.SetSelectedGameObject(optionsButton);
+    }
+    public void BackSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Back.GetClip());
+    }
+
+    public void ConfirmSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_Decide.GetClip());
+    }
+    public void WindowOpenSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_WindowOpen.GetClip());
+    }
+
+    public void WindowCloseSound() {
+        sfx.PlayOneShot(Enums.Sounds.UI_WindowClose.GetClip());
+    }
     //lazy mofo
     private float? middleX, minX, minY, maxX, maxY;
     public float GetLevelMiddleX() {

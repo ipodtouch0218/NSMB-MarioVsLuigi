@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
+  m_Name: MusicLevelDesert
+  m_EditorClassIdentifier: 
+  clip: {fileID: 8300000, guid: c68f759360bb5994583b7acb9ea960ce, type: 3}
+  fastClip: {fileID: 8300000, guid: 34d15bd5bd1c07c4f86b3532dc8c261e, type: 3}
+  loopStartSample: 8.569
+  loopEndSample: 44.059
