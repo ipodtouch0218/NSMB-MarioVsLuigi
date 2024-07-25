@@ -75,6 +75,14 @@ public class VersusStageBaker : MapDataBakerCallback {
             LogError($"The stage has a hard limit of 64 star spawns! (Found {starSpawns.Length})");
         }
 
+        // --- Bake Enemies
+        QPrototypeGoomba[] goombas = GameObject.FindObjectsByType<QPrototypeGoomba>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var goomba in goombas) {
+            goomba.Prototype.Spawnpoint = goomba.transform.position.ToFPVector2();
+            EditorUtility.SetDirty(goomba);
+        }
+        LogInfo($"Baked {goombas.Length} Goomba enemies");
+
         EditorUtility.SetDirty(stage);
     }
 

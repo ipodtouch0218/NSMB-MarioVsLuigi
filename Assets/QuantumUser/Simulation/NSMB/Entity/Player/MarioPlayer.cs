@@ -1,4 +1,6 @@
 using Photon.Deterministic;
+using System;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -8,6 +10,10 @@ namespace Quantum {
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsInWater => WaterColliderCount > 0;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+
+        public bool InstakillsEnemies(PhysicsObject physicsObject) {
+            return CurrentPowerupState == PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (IsSliding && FPMath.Abs(physicsObject.Velocity.X) > FP._0_10);
+        }
 
         public int GetSpeedStage(PhysicsObject physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP xVel = FPMath.Abs(physicsObject.Velocity.X) - FP._0_01;
@@ -82,14 +88,12 @@ namespace Quantum {
             PreRespawnFrames = 180;
             RespawnFrames = 78;
 
-            if ((f.SimulationConfig.LivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
+            if ((f.RuntimeConfig.LivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
                 // Last death - drop all stars at 0.5s each
                 // TODO if (!GameManager.Instance.CheckForWinner()) {
                     SpawnStars(f, entity, 1);
                 // }
 
-                PreRespawnFrames = 0;
-                RespawnFrames = 0;
                 DeathAnimationFrames = (Stars > 0) ? (byte) 30 : (byte) 36;
             } else {
                 SpawnStars(f, entity, 1);
@@ -185,7 +189,7 @@ namespace Quantum {
                 }
             }
 
-            if (f.SimulationConfig.LivesEnabled && Lives == 0) {
+            if (f.RuntimeConfig.LivesEnabled && Lives == 0) {
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
                 starDirection = NoLivesStarDirection;
@@ -229,23 +233,16 @@ namespace Quantum {
 
             RespawnFrames = 78;
 
-            /*
-            if (OutOfLives) {
-                GameManager.Instance.CheckForWinner();
-
-                if (Object.HasControlAuthority()) {
-                    GameManager.Instance.spectationManager.Spectating = true;
-                }
-
-                Runner.Despawn(Object);
+            if (f.RuntimeConfig.LivesEnabled && Lives == 0) {
+                // TODO GameManager.Instance.CheckForWinner();
+                f.Destroy(entity);
                 return;
             }
-            */
 
-            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalPlayers);
+            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.RuntimeConfig.ExpectedPlayers);
             transform->Position = spawnpoint;
-            f.Unsafe.GetPointer<CameraController>(entity)->CurrentPosition = spawnpoint;
-
+            f.Unsafe.GetPointer<CameraController>(entity)->Recenter(spawnpoint);
+            
             IsDead = true;
             // IsFrozen = false;
             IsRespawning = true;
@@ -291,6 +288,7 @@ namespace Quantum {
             DamageInvincibilityFrames = 120;
 
             physicsObject->IsFrozen = false;
+            physicsObject->DisableCollision = false;
 
             f.Events.MarioPlayerRespawned(f, entity, this);
         }

@@ -1,9 +1,23 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
-using System.Diagnostics;
+using UnityEngine;
 
 public static unsafe class QuantumUtils {
+
+    private static SoundEffect[] ComboSounds = {
+        SoundEffect.Enemy_Shell_Kick,
+        SoundEffect.Enemy_Shell_Combo1,
+        SoundEffect.Enemy_Shell_Combo2,
+        SoundEffect.Enemy_Shell_Combo3,
+        SoundEffect.Enemy_Shell_Combo4,
+        SoundEffect.Enemy_Shell_Combo5,
+        SoundEffect.Enemy_Shell_Combo6,
+        SoundEffect.Enemy_Shell_Combo7,
+    };
+    public static SoundEffect GetComboSoundEffect(int combo) {
+        return ComboSounds[Mathf.Clamp(combo, 0, ComboSounds.Length - 1)];
+    }
 
     public static FPVector2 WorldToUnityTile(Frame f, FPVector2 worldPos) {
         return WorldToUnityTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos);
@@ -82,6 +96,25 @@ public static unsafe class QuantumUtils {
         return worldPos;
     }
 
+
+    public static void UnwrapWorldLocations(Frame f, FPVector2 a, FPVector2 b, out FPVector2 newA, out FPVector2 newB) {
+        UnwrapWorldLocations(f.FindAsset<VersusStageData>(f.Map.UserAsset), a, b, out newA, out newB);
+    }
+
+    public static void UnwrapWorldLocations(VersusStageData stage, FPVector2 a, FPVector2 b, out FPVector2 newA, out FPVector2 newB) {
+        newA = a;
+        newB = b;
+
+        if (!stage.IsWrappingLevel) {
+            return;
+        }
+
+        FP width = stage.TileDimensions.x * FP._0_50;
+        if (FPMath.Abs(newA.X - newB.X) > width / 2) {
+            newB.X += width * (newB.X > stage.StageWorldMin.X + (width / 2) ? -1 : 1);
+        }
+    }
+
     public enum WrapDirection {
         NoWrap,
         Left,
@@ -127,9 +160,9 @@ public static unsafe class QuantumUtils {
         //gm.teamManager.GetTeamStars(player.Data.Team, out int ourStars);
         int ourStars = GetTeamStars(f, mario.Team);
         int leaderStars = GetFirstPlaceStars(f);
-        int starsToWin = f.SimulationConfig.StarsToWin;
-        bool custom = f.SimulationConfig.CustomPowerupsEnabled;
-        bool lives = f.SimulationConfig.LivesEnabled;
+        int starsToWin = f.RuntimeConfig.StarsToWin;
+        bool custom = f.RuntimeConfig.CustomPowerupsEnabled;
+        bool lives = f.RuntimeConfig.LivesEnabled;
 
         bool big = stage.SpawnBigPowerups;
         bool vertical = stage.SpawnVerticalPowerups;

@@ -12,15 +12,9 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter) {
-            filter.Camera->CurrentPosition = CalculateNewPosition(f, filter);
-        }
-
-        public void Recenter(Frame f, EntityRef entity, FPVector2 pos) {
-            var camera = f.Unsafe.GetPointer<CameraController>(entity);
-
-            camera->LastPlayerPosition = camera->CurrentPosition = pos + new FPVector2(0, FP.FromString("0.65"));
-            camera->LastFloorHeight = camera->CurrentPosition.Y;
-            camera->SmoothDampVelocity = FPVector2.Zero;
+            if (!filter.Mario->IsDead) {
+                filter.Camera->CurrentPosition = CalculateNewPosition(f, filter);
+            }
         }
 
         private FPVector2 CalculateNewPosition(Frame f, Filter filter) {

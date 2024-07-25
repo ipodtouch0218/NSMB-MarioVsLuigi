@@ -62,19 +62,45 @@ namespace Quantum {
         }
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (TryDamagePlayer(f, info)) {
-                Destroy(f, info.Other, true);
+            if (f.DestroyPending(info.Other)) {
                 return;
             }
+
+            if (TryDamagePlayer(f, info)
+                || TryDamageEnemy(f, info)) {
+
+                Destroy(f, info.Other, true);
+            }
+        }
+
+        private bool TryDamageEnemy(Frame f, TriggerInfo2D info) {
+            if (f.Unsafe.TryGetPointer(info.Entity, out Goomba* goomba) 
+                && f.Unsafe.TryGetPointer(info.Other, out Projectile* projectile)) {
+
+                if (goomba->IsDead || !goomba->IsActive) {
+                    return false;
+                }
+
+                var asset = f.FindAsset(projectile->Asset);
+                switch (asset.Effect) {
+                case ProjectileEffectType.Knockback: {
+                    goomba->Kill(f, info.Entity, info.Other, true);
+                    break;
+                }
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         private bool TryDamagePlayer(Frame f, TriggerInfo2D info) {
 
-            if (f.DestroyPending(info.Other) ||
-                !f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario) ||
-                !f.TryGet(info.Entity, out PhysicsObject physicsObject) ||
-                !f.Unsafe.TryGetPointer(info.Other, out Projectile* projectile) ||
-                !f.TryGet(projectile->Owner, out MarioPlayer ownerMario)) {
+            if (!f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)
+                || !f.TryGet(info.Entity, out PhysicsObject physicsObject) 
+                || !f.Unsafe.TryGetPointer(info.Other, out Projectile* projectile)
+                || !f.TryGet(projectile->Owner, out MarioPlayer ownerMario)) {
                 return false;
             }
 

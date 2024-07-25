@@ -122,18 +122,19 @@ public class GlobalController : Singleton<GlobalController> {
 
         //todo: this jitters to hell
 #if UNITY_STANDALONE
-        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (this.windowWidth != newWindowWidth || this.windowHeight != newWindowHeight)) {
+        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
             newWindowHeight = (int) (newWindowWidth * (9f / 16f));
             Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
         }
-        this.windowWidth = newWindowWidth;
-        this.windowHeight = newWindowHeight;
 #endif
 
         if ((int) (Time.time + Time.deltaTime) > (int) Time.time) {
             // Update discord every second for now
             discordController.UpdateActivity();
         }
+
+        windowWidth = newWindowWidth;
+        windowHeight = newWindowHeight;
     }
 
 #if UNITY_WEBGL

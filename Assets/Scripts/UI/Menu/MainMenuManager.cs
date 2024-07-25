@@ -423,7 +423,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void StartCountdown() {
-
+            Debug.Log(NetworkHandler.Client);
             if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
 
                 /* TODO
@@ -444,7 +444,13 @@ namespace NSMB.UI.MainMenu {
                     GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
                     ClientId = NetworkHandler.Client.UserId,
                     RuntimeConfig = new RuntimeConfig() {
-
+                        Seed = unchecked((int) (uint) (UnityEngine.Random.value * uint.MaxValue)),
+                        StarsToWin = 10,
+                        CoinsForPowerup = 8,
+                        Lives = 0,
+                        TimerSeconds = 0,
+                        TeamsEnabled = false,
+                        CustomPowerupsEnabled = true,
                     },
                     SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
                     GameMode = DeterministicGameMode.Multiplayer,

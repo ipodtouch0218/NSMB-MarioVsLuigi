@@ -8,8 +8,8 @@ public unsafe class CoinTile : BreakableBrickTile {
     //---Serialized Variables
     [SerializeField] private StageTileInstance resultTile;
 
-    public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance) {
-        if (base.Interact(f, entity, direction, tilePosition, tileInstance)) {
+    public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
+        if (base.Interact(f, entity, direction, tilePosition, tileInstance, out playBumpSound)) {
             return true;
         }
 
@@ -26,8 +26,9 @@ public unsafe class CoinTile : BreakableBrickTile {
         }
 
         // Give coin to player
-        f.Signals.MarioPlayerCollectedCoin(entity, mario, QuantumUtils.RelativeTileToWorld(f, new FPVector2(tilePosition.x, tilePosition.y)) + FPVector2.One * FP._0_25);
+        f.Signals.MarioPlayerCollectedCoin(entity, mario, QuantumUtils.RelativeTileToWorld(f, new FPVector2(tilePosition.x, tilePosition.y)) + FPVector2.One * FP._0_25, true, direction == InteractionDirection.Down);
         Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down);
+        playBumpSound = false;
 
         return false;
     }

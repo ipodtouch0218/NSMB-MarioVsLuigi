@@ -23,6 +23,7 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamHatUsesOverallsColor = Shader.PropertyToID("HatUsesOverallsColor");
         private static readonly int ParamGlowColor = Shader.PropertyToID("GlowColor");
         private static readonly int ParamVelocityX = Animator.StringToHash("velocityX");
+        private static readonly int ParamDead = Animator.StringToHash("dead");
         private static readonly int ParamVelocityY = Animator.StringToHash("velocityY");
         private static readonly int ParamOnLeft = Animator.StringToHash("onLeft");
         private static readonly int ParamOnRight = Animator.StringToHash("onRight");
@@ -57,18 +58,17 @@ namespace NSMB.Entities.Player {
         #endregion
 
         //---Public Variables
-        public bool deathUp, wasTurnaround, enableGlow;
+        public bool wasTurnaround, enableGlow;
         public GameObject models;
 
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
-        [SerializeField] private GameObject coinNumberParticle, respawnParticle;
+        [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private QuantumEntityView entity;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
-        [SerializeField] public float deathUpTime = 0.6f, deathForce = 7f;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
         [SerializeField] private LoopingSoundData wallSlideData, shellSlideData, spinnerDrillData, propellerDrillData;
@@ -89,6 +89,8 @@ namespace NSMB.Entities.Player {
         private bool modelRotateInstantly, footstepVariant;
         private Coroutine blinkRoutine;
         private PlayerColors skin;
+        private bool doDeathUp;
+        private float lastBumpSound;
         // private TrackIcon icon;
 
         public void OnValidate() {
@@ -133,7 +135,8 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
-
+            QuantumEvent.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage);
+            QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound);
         }
 
         public void Initialize(QuantumGame game) {
@@ -202,16 +205,18 @@ namespace NSMB.Entities.Player {
             }
             */
 
-            // float deathTimer = 3f - (controller.PreRespawnTimer.RemainingTime(Runner) ?? 0f);
-            float deathTimer = 3f;
-
             // Particles
             SetParticleEmission(drillParticle, !mario.IsDead && mario.IsDrilling);
             SetParticleEmission(sparkles, !mario.IsDead && mario.IsStarmanInvincible);
             SetParticleEmission(dust, !mario.IsDead && (mario.IsWallsliding || (physicsObject.IsTouchingGround && (mario.IsSkidding || (mario.IsCrouching && physicsObject.Velocity.SqrMagnitude.AsFloat > 0.25f))) || (((mario.IsSliding && physicsObject.Velocity.SqrMagnitude.AsFloat > 0.25f) || mario.IsInShell) && physicsObject.IsTouchingGround)) && !mario.CurrentPipe.IsValid);
             //SetParticleEmission(giantParticle, !mario.IsDead && mario.CurrentPowerupState == PowerupState.MegaMushroom && controller.MegaStartTimer.ExpiredOrNotRunning(Runner));
-            SetParticleEmission(fireParticle, mario.IsDead && !mario.IsRespawning && mario.FireDeath && deathTimer > deathUpTime);
+            SetParticleEmission(fireParticle, mario.IsDead && !mario.IsRespawning && mario.FireDeath && !physicsObject.IsFrozen);
             SetParticleEmission(bubblesParticle, mario.IsInWater);
+
+            if (mario.IsDead && !physicsObject.IsFrozen && doDeathUp) {
+                animator.SetTrigger("deathup");
+                doDeathUp = false;
+            }
 
             var hitbox = f.Get<PhysicsCollider2D>(entity.EntityRef);
             if (mario.IsCrouching || mario.IsSliding || mario.IsSkidding || mario.IsInShell) {
@@ -346,6 +351,7 @@ namespace NSMB.Entities.Player {
             bool right = inputs.Right.IsDown;
             bool left = inputs.Left.IsDown;
 
+            animator.SetBool(ParamDead, mario.IsDead);
             animator.SetBool(ParamOnLeft, mario.WallslideLeft);
             animator.SetBool(ParamOnRight, mario.WallslideRight);
             animator.SetBool(ParamOnGround, physicsObject.IsTouchingGround /* || controller.IsStuckInBlock */ || mario.CoyoteTimeFrames > 0);
@@ -575,11 +581,33 @@ namespace NSMB.Entities.Player {
         }
         */
 
+        private void OnPlayBumpSound(EventPlayBumpSound e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            if (Time.time - lastBumpSound < 0.25f) {
+                return;
+            }
+
+            PlaySound(SoundEffect.World_Block_Bump);
+            lastBumpSound = Time.time;
+        }
+
+        private void OnMarioPlayerTookDamage(EventMarioPlayerTookDamage e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            PlaySound(SoundEffect.Player_Sound_Powerdown);
+        }
+
         private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
             if (e.Entity != entity.EntityRef) {
                 return;
             }
 
+            doDeathUp = false;
         }
 
         private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
@@ -603,6 +631,8 @@ namespace NSMB.Entities.Player {
 
             var mario = e.Frame.Get<MarioPlayer>(e.Entity);
             PlaySound(e.Game.PlayerIsLocal(mario.PlayerRef) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);
+            animator.Play("deadstart");
+            doDeathUp = true;
         }
 
         private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
@@ -612,6 +642,7 @@ namespace NSMB.Entities.Player {
 
             var mario = e.Frame.Get<MarioPlayer>(e.Entity);
             PlaySound(e.Game.PlayerIsLocal(mario.PlayerRef) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
+            Instantiate(starCollectParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
         private void OnMarioPlayerPropellerSpin(EventMarioPlayerPropellerSpin e) {
@@ -672,6 +703,12 @@ namespace NSMB.Entities.Player {
             PlaySound(SoundEffect.World_Coin_Collect);
             if (e.ItemSpawned) {
                 PlaySound(SoundEffect.Player_Sound_PowerupReserveUse);
+            }
+
+            if (e.CoinFromBlock) {
+                GameObject coin = Instantiate(coinFromBlockParticle, e.CoinLocation.ToUnityVector3(), Quaternion.identity);
+                coin.GetComponentInChildren<Animator>().SetBool("down", e.Downwards);
+                Destroy(coin, 1);
             }
         }
 
@@ -783,8 +820,10 @@ namespace NSMB.Entities.Player {
 
             if (mario.IsInWater) {
                 // Paddle
-                PlaySound(SoundEffect.Player_Sound_Swim);
-                animator.SetTrigger("paddle");
+                if (!e.WasBounce) {
+                    PlaySound(SoundEffect.Player_Sound_Swim);
+                    animator.SetTrigger("paddle");
+                }
                 return;
             }
 
@@ -810,12 +849,14 @@ namespace NSMB.Entities.Player {
             */
 
             // Jump SFX
-            SoundEffect soundEffect = mario.CurrentPowerupState switch {
-                PowerupState.MiniMushroom => SoundEffect.Powerup_MiniMushroom_Jump,
-                PowerupState.MegaMushroom => SoundEffect.Powerup_MegaMushroom_Jump,
-                _ => SoundEffect.Player_Sound_Jump,
-            };
-            PlaySound(soundEffect);
+            if (!e.WasBounce) {
+                SoundEffect soundEffect = mario.CurrentPowerupState switch {
+                    PowerupState.MiniMushroom => SoundEffect.Powerup_MiniMushroom_Jump,
+                    PowerupState.MegaMushroom => SoundEffect.Powerup_MegaMushroom_Jump,
+                    _ => SoundEffect.Player_Sound_Jump,
+                };
+                PlaySound(soundEffect);
+            }
         }
     }
 }

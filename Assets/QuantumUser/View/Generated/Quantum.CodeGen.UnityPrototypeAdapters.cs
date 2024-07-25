@@ -100,6 +100,7 @@ namespace Quantum.Prototypes.Unity {
     public Byte CoyoteTimeFrames;
     public Int32 LandedFrame;
     public QBoolean WasTouchingGroundLastFrame;
+    public QBoolean DoEntityBounce;
     public QBoolean WallslideLeft;
     public QBoolean WallslideRight;
     public Byte WallslideEndFrames;
@@ -120,6 +121,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean IsSpinnerFlying;
     public QBoolean IsDrilling;
     public UInt16 InvincibilityFrames;
+    public Byte Combo;
     public Byte ProjectileDelayFrames;
     public Byte ProjectileVolleyFrames;
     public Byte CurrentProjectiles;
@@ -166,6 +168,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.CoyoteTimeFrames, out result.CoyoteTimeFrames);
       converter.Convert(this.LandedFrame, out result.LandedFrame);
       converter.Convert(this.WasTouchingGroundLastFrame, out result.WasTouchingGroundLastFrame);
+      converter.Convert(this.DoEntityBounce, out result.DoEntityBounce);
       converter.Convert(this.WallslideLeft, out result.WallslideLeft);
       converter.Convert(this.WallslideRight, out result.WallslideRight);
       converter.Convert(this.WallslideEndFrames, out result.WallslideEndFrames);
@@ -186,6 +189,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.IsSpinnerFlying, out result.IsSpinnerFlying);
       converter.Convert(this.IsDrilling, out result.IsDrilling);
       converter.Convert(this.InvincibilityFrames, out result.InvincibilityFrames);
+      converter.Convert(this.Combo, out result.Combo);
       converter.Convert(this.ProjectileDelayFrames, out result.ProjectileDelayFrames);
       converter.Convert(this.ProjectileVolleyFrames, out result.ProjectileVolleyFrames);
       converter.Convert(this.CurrentProjectiles, out result.CurrentProjectiles);

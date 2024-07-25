@@ -1,0 +1,13 @@
+import enum GameState(byte);
+
+global {
+	GameState GameState;
+	ushort GameStartFrames;
+}
+
+signal OnGameStarting();
+
+event GameStateChanged {
+	Frame Frame;
+	GameState NewState;
+}

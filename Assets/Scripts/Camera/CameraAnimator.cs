@@ -24,7 +24,7 @@ public class CameraAnimator : QuantumCallbacks {
     }
 
     public override void OnUpdateView(QuantumGame game) {
-        if (!Target.IsValid || !game.Frames.Predicted.Exists(Target)) {
+        if (!Target.IsValid || !game.Frames.Predicted.Exists(Target) || !game.Frames.PredictedPrevious.Exists(Target)) {
             return;
         }
 
@@ -48,6 +48,19 @@ public class CameraAnimator : QuantumCallbacks {
         camera.transform.position = newPosition;
         if (BackgroundLoop.Instance) {
             BackgroundLoop.Instance.Reposition(camera);
+        }
+
+        if (camera.orthographicSize < 14/4f) {
+            // Offset to always put the player in the center for extremely long aspect ratios
+            var targetTransformPrevious = game.Frames.PredictedPrevious.Get<Transform2D>(Target);
+            var targetTransformCurrent = game.Frames.Predicted.Get<Transform2D>(Target);
+            var targetCollider = game.Frames.Predicted.Get<PhysicsCollider2D>(Target);
+
+            float cameraFocusY = Mathf.Lerp(targetTransformPrevious.Position.Y.AsFloat, targetTransformCurrent.Position.Y.AsFloat, game.InterpolationFactor) + targetCollider.Shape.Centroid.Y.AsFloat;
+            Vector3 offsetPosition = camera.transform.position;
+            offsetPosition.y -= offsetPosition.y - cameraFocusY;
+            offsetPosition.y = Mathf.Clamp(offsetPosition.y, stage.CameraMinPosition.Y.AsFloat + camera.orthographicSize, Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - camera.orthographicSize);
+            camera.transform.position = offsetPosition;
         }
 
         secondaryPositioners.RemoveAll(scp => !scp);

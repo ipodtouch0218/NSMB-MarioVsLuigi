@@ -117,7 +117,7 @@ public unsafe class DiscordController : MonoBehaviour {
             };
 
             long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            if (f.SimulationConfig.TimerEnabled) {
+            if (game.Configurations.Runtime.TimerEnabled) {
                 activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
             } else {
                 activity.Timestamps = new() { Start = now - (f.Number * f.DeltaTime * 1000).AsLong };

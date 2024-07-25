@@ -5212,7 +5212,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: a6a625e3bb2c8ee41be41a59e4f81fe4, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -5345,6 +5345,8 @@ MonoBehaviour:
     IsStationary:
       Value: 0
     Lifetime: 900
+    PassthroughFrames: 0
+    UncollectableFrames: 0
     Speed:
       RawValue: 98304
     BounceForce:
@@ -5378,7 +5380,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0

@@ -34,7 +34,7 @@ public class PlayerTrackIcon : TrackIcon {
 
     public void Start() {
         var game = QuantumRunner.DefaultGame;
-        var config = game.Configurations.Simulation;
+        var config = game.Configurations.Runtime;
 
         var mario = game.Frames.Predicted.Get<MarioPlayer>(targetEntity);
         image.color = Utils.GetPlayerColor(game, mario.PlayerRef);

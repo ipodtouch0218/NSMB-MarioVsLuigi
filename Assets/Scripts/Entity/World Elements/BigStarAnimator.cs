@@ -32,16 +32,14 @@ public class BigStarAnimator : QuantumCallbacks {
         this.SetIfNull(ref sfx);
     }
 
-    public void Initialize(QuantumGame game) {
+    public unsafe void Initialize(QuantumGame game) {
         Frame f = game.Frames.Verified;
         var star = f.Get<BigStar>(entity.EntityRef);
 
         stationary = star.IsStationary;
-        sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
-    }
-
-    public void EntityDestroyed(QuantumGame game) {
-        Instantiate(starCollectPrefab, transform.position, Quaternion.identity);
+        if (f.Global->GameState == GameState.Playing) {
+            sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
+        }
     }
 
     public void Update() {

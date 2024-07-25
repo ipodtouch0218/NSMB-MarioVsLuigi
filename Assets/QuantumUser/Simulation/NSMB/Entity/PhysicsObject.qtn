@@ -14,7 +14,7 @@ component PhysicsObject {
     bool IsOnSlipperyGround;
     bool IsOnSlideableGround;
 
-    list<PhysicsContact> Contacts;
+    [FreeOnComponentRemoved] list<PhysicsContact> Contacts;
 }
 
 struct PhysicsContact {

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Quantum {
-    public unsafe class PhysicsObjectSystem : SystemMainThreadFilter<PhysicsObjectSystem.Filter>, ISignalOnComponentAdded<PhysicsObject>, ISignalOnComponentRemoved<PhysicsObject> {
+    public unsafe class PhysicsObjectSystem : SystemMainThreadFilter<PhysicsObjectSystem.Filter> {
 
         private static readonly FP Skin = FP.FromString("0.001");
 
@@ -23,7 +23,10 @@ namespace Quantum {
 
             physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
             physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
-            QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+
+            if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
+                contacts = f.AllocateList(out physicsObject->Contacts);
+            }
             contacts.Clear();
 
             physicsObject->IsOnSlideableGround = false;
@@ -362,14 +365,6 @@ namespace Quantum {
 
         private static FPVector2 Project(FPVector2 a, FPVector2 b) {
             return b * (FPVector2.Dot(a, b) / b.Magnitude);
-        }
-
-        public void OnAdded(Frame f, EntityRef entity, PhysicsObject* component) {
-            f.AllocateList(out component->Contacts);
-        }
-
-        public void OnRemoved(Frame f, EntityRef entity, PhysicsObject* component) {
-            f.FreeList(component->Contacts);
         }
     }
 }

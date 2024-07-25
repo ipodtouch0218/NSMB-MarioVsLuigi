@@ -13,9 +13,10 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
     // [SerializeField] private Vector2Int tileSize = Vector2Int.one;
 
-    public virtual bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance) {
+    public virtual bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
         bool doBreak = false;
         bool doBump = true;
+        playBumpSound = false;
 
         if (f.TryGet(entity, out MarioPlayer mario)) {
             // Mario interacting with the block
@@ -57,6 +58,8 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
             stage.SetTileRelative(f, tilePosition.x, tilePosition.y, default);
         } else if (BumpIfNotBroken && doBump) {
             Bump(f, stage, tilePosition, tileInstance, direction == InteractionDirection.Down, null);
+        } else {
+            playBumpSound = true;
         }
 
         return doBreak;

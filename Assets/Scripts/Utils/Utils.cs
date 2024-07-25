@@ -453,7 +453,7 @@ namespace NSMB.Utils {
                 return spectatorColor;
             }
 
-            if (game.Configurations.Simulation.TeamsEnabled) {
+            if (game.Configurations.Runtime.TeamsEnabled) {
                 return GetTeamColor(mario.Value.Team, s, v);
             }
 
@@ -469,7 +469,7 @@ namespace NSMB.Utils {
 
             // Then teams
             QuantumGame game = QuantumRunner.DefaultGame;
-            if (game != null && game.Configurations.Simulation.TeamsEnabled) {
+            if (game != null && game.Configurations.Runtime.TeamsEnabled) {
 
             }
 

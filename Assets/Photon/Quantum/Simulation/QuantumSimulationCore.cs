@@ -9344,6 +9344,11 @@ namespace Quantum.Core {
     /// Update the player connected system.
     /// </summary>
     /// <param name="f">The frame reference.</param>
+    /// 
+    public override void OnInit(Frame f) {
+      f.PlayerConnectedCount = 0;
+    }
+
     public override void Update(Frame f) {
       if (f.IsVerified == false) {
         return;

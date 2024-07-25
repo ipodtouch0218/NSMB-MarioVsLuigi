@@ -19,4 +19,5 @@ synced event MarioPlayerCollectedStar {
 	Frame Frame;
 	entity_ref Entity;
 	MarioPlayer Mario;
+	FPVector2 Position;
 }

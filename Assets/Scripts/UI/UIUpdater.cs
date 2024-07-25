@@ -5,11 +5,10 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class UIUpdater : QuantumCallbacks {
-
-    public static UIUpdater Instance { get; set; }
 
     //---Static Variables
     private static readonly int ParamIn = Animator.StringToHash("in");
@@ -26,28 +25,32 @@ public class UIUpdater : QuantumCallbacks {
     [SerializeField] private Image itemReserve, itemColor;
     [SerializeField] private GameObject boos;
     [SerializeField] private Animator reserveAnimator;
+    [SerializeField] private InputActionReference pauseAction;
 
     //---Private Variables
     private readonly List<Image> backgrounds = new();
     private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
     private Material timerMaterial;
     private PlayerRef localPlayer;
-    private bool uiHidden;
+    private bool uiHidden, paused;
 
     //private TeamManager teamManager;
-    private bool teams;
     private int cachedCoins = -1, teamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1;
     private PowerupAsset previousPowerup;
     private VersusStageData stage;
 
-    public void Awake() {
-        Instance = this;
+    protected override void OnEnable() {
+        base.OnEnable();
+        TranslationManager.OnLanguageChanged += OnLanguageChanged;
+        OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
-    public void Start() {
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-        QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
+    protected override void OnDisable() {
+        base.OnDisable();
+        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
 
+    public void Awake() {
         teamsParent = uiTeamStars.transform.parent.gameObject;
         starsParent = uiStars.transform.parent.gameObject;
         coinsParent = uiCoins.transform.parent.gameObject;
@@ -60,20 +63,12 @@ public class UIUpdater : QuantumCallbacks {
         backgrounds.Add(livesParent.GetComponentInChildren<Image>());
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
 
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+    }
+
+    public void Start() {
+        QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
         boos.SetActive(stage.HidePlayersOnMinimap);
-    }
-
-    protected override void OnEnable() {
-        base.OnEnable();
-        //GameManager.OnAllPlayersLoaded += OnAllPlayersLoaded;
-        TranslationManager.OnLanguageChanged += OnLanguageChanged;
-        OnLanguageChanged(GlobalController.Instance.translationManager);
-    }
-
-    protected override void OnDisable() {
-        base.OnDisable();
-        //GameManager.OnAllPlayersLoaded -= OnAllPlayersLoaded;
-        TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
     public override void OnUpdateView(QuantumGame game) {
@@ -98,7 +93,7 @@ public class UIUpdater : QuantumCallbacks {
         */
 
         if (uiHidden) {
-            ToggleUI(false);
+            ToggleUI(game, false);
         }
 
         UpdateStoredItemUI(mario);
@@ -106,10 +101,10 @@ public class UIUpdater : QuantumCallbacks {
         ApplyUIColor(mario);
     }
 
-    private void ToggleUI(bool hidden) {
+    private void ToggleUI(QuantumGame game, bool hidden) {
         uiHidden = hidden;
 
-        teamsParent.SetActive(!hidden && teams);
+        teamsParent.SetActive(!hidden && game.Configurations.Runtime.TeamsEnabled);
         starsParent.SetActive(!hidden);
         livesParent.SetActive(!hidden);
         coinsParent.SetActive(!hidden);
@@ -150,7 +145,7 @@ public class UIUpdater : QuantumCallbacks {
 
     private unsafe void UpdateTextUI(MarioPlayer mario) {
         var game = QuantumRunner.DefaultGame;
-        var config = game.Configurations.Simulation;
+        var config = game.Configurations.Runtime;
         int starRequirement = config.StarsToWin;
         int coinRequirement = config.CoinsForPowerup;
 
@@ -163,7 +158,7 @@ public class UIUpdater : QuantumCallbacks {
         if (mario.Stars != cachedStars) {
             cachedStars = mario.Stars;
             string starString = "Sx" + cachedStars;
-            if (!teams) {
+            if (!game.Configurations.Runtime.TeamsEnabled) {
                 starString += "/" + starRequirement;
             }
 
@@ -233,7 +228,7 @@ public class UIUpdater : QuantumCallbacks {
     }
 
     private void ApplyUIColor(MarioPlayer mario) {
-        var config = QuantumRunner.DefaultGame.Configurations.Simulation;
+        var config = QuantumRunner.DefaultGame.Configurations.Runtime;
         Color color = config.TeamsEnabled ? Utils.GetTeamColor(mario.Team, 0.8f, 1f) : stage.UIColor;
 
         foreach (Image bg in backgrounds) {

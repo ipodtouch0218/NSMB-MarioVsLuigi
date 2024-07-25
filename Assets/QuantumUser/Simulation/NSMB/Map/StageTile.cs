@@ -23,7 +23,7 @@ public class StageTile : AssetObject {
 
 public unsafe interface IInteractableTile {
 
-    bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance);
+    bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance, out bool playBumpSound);
 
     public enum InteractionDirection {
         Up, Down, Left, Right

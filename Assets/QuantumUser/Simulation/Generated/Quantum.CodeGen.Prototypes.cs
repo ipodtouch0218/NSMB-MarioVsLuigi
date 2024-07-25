@@ -150,6 +150,31 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Goomba))]
+  public unsafe partial class GoombaPrototype : ComponentPrototype<Quantum.Goomba> {
+    public FPVector2 Spawnpoint;
+    public QBoolean IsActive;
+    public QBoolean IsDead;
+    public QBoolean FacingRight;
+    public Byte DeathAnimationFrames;
+    public FP Speed;
+    partial void MaterializeUser(Frame frame, ref Quantum.Goomba result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Goomba component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Goomba result, in PrototypeMaterializationContext context = default) {
+        result.Spawnpoint = this.Spawnpoint;
+        result.IsActive = this.IsActive;
+        result.IsDead = this.IsDead;
+        result.FacingRight = this.FacingRight;
+        result.DeathAnimationFrames = this.DeathAnimationFrames;
+        result.Speed = this.Speed;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Input))]
   public unsafe partial class InputPrototype : StructPrototype {
     public Button Up;
@@ -238,6 +263,7 @@ namespace Quantum.Prototypes {
     public Byte CoyoteTimeFrames;
     public Int32 LandedFrame;
     public QBoolean WasTouchingGroundLastFrame;
+    public QBoolean DoEntityBounce;
     public QBoolean WallslideLeft;
     public QBoolean WallslideRight;
     public Byte WallslideEndFrames;
@@ -258,6 +284,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsSpinnerFlying;
     public QBoolean IsDrilling;
     public UInt16 InvincibilityFrames;
+    public Byte Combo;
     public Byte ProjectileDelayFrames;
     public Byte ProjectileVolleyFrames;
     public Byte CurrentProjectiles;
@@ -307,6 +334,7 @@ namespace Quantum.Prototypes {
         result.CoyoteTimeFrames = this.CoyoteTimeFrames;
         result.LandedFrame = this.LandedFrame;
         result.WasTouchingGroundLastFrame = this.WasTouchingGroundLastFrame;
+        result.DoEntityBounce = this.DoEntityBounce;
         result.WallslideLeft = this.WallslideLeft;
         result.WallslideRight = this.WallslideRight;
         result.WallslideEndFrames = this.WallslideEndFrames;
@@ -327,6 +355,7 @@ namespace Quantum.Prototypes {
         result.IsSpinnerFlying = this.IsSpinnerFlying;
         result.IsDrilling = this.IsDrilling;
         result.InvincibilityFrames = this.InvincibilityFrames;
+        result.Combo = this.Combo;
         result.ProjectileDelayFrames = this.ProjectileDelayFrames;
         result.ProjectileVolleyFrames = this.ProjectileVolleyFrames;
         result.CurrentProjectiles = this.CurrentProjectiles;
@@ -375,6 +404,7 @@ namespace Quantum.Prototypes {
     public FP FloorAngle;
     public QBoolean IsOnSlipperyGround;
     public QBoolean IsOnSlideableGround;
+    [FreeOnComponentRemoved()]
     [DynamicCollectionAttribute()]
     public Quantum.Prototypes.PhysicsContactPrototype[] Contacts = {};
     partial void MaterializeUser(Frame frame, ref Quantum.PhysicsObject result, in PrototypeMaterializationContext context);

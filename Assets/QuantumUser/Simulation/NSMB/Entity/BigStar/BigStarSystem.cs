@@ -59,27 +59,29 @@ namespace Quantum {
         }
 
         private void HandleStar(Frame f, EntityRef entity, BigStar* bigStar) {
-            if (!bigStar->IsStationary && QuantumUtils.Decrement(ref bigStar->Lifetime)) {
+            if (bigStar->IsStationary) {
+                return;
+            }
+
+            if (QuantumUtils.Decrement(ref bigStar->Lifetime)) {
                 f.Destroy(entity);
                 return;
             }
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            if (bigStar->IsStationary) {
-                if (physicsObject->IsTouchingGround) {
-                    physicsObject->Velocity.Y = bigStar->BounceForce;
-                }
-
-                if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                    bigStar->FacingRight = physicsObject->IsTouchingLeftWall;
-                    physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
-                }
-            } else {
-                if (QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
-                    physicsObject->DisableCollision = false;
-                } 
-                QuantumUtils.Decrement(ref bigStar->UncollectableFrames);
+            if (physicsObject->IsTouchingGround) {
+                physicsObject->Velocity.Y = bigStar->BounceForce;
             }
+
+            if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
+                bigStar->FacingRight = physicsObject->IsTouchingLeftWall;
+                physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
+            }
+
+            if (QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
+                physicsObject->DisableCollision = false;
+            }
+            QuantumUtils.Decrement(ref bigStar->UncollectableFrames);
         }
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
@@ -97,7 +99,7 @@ namespace Quantum {
             mario->Stars++;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             stage.ResetStage(f, false);
-            f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario);
+            f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario, f.Get<Transform2D>(info.Other).Position);
             f.Global->BigStarSpawnTimer = (ushort) (624 - (f.PlayerConnectedCount * 12));
             f.Destroy(info.Other);
         }

@@ -56,13 +56,13 @@ namespace Quantum {
 
             // f.Destroy(info.Other);
             coin->IsCollected = true;
-            f.Signals.MarioPlayerCollectedCoin(info.Entity, mario, coinTransform.Position + coinCollider.Shape.Centroid);
+            f.Signals.MarioPlayerCollectedCoin(info.Entity, mario, coinTransform.Position + coinCollider.Shape.Centroid, false, false);
             f.Events.CoinChangeCollected(f, info.Other, *coin);
         }
 
-        public void MarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation) {
+        public void MarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
             byte newCoins = (byte) (mario->Coins + 1);
-            bool item = newCoins == f.SimulationConfig.CoinsForPowerup;
+            bool item = newCoins == f.RuntimeConfig.CoinsForPowerup;
             if (item) {
                 mario->Coins = 0;
                 MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default);
@@ -70,7 +70,7 @@ namespace Quantum {
                 mario->Coins = newCoins;
             }
 
-            f.Events.MarioPlayerCollectedCoin(f, marioEntity, *mario, newCoins, item, worldLocation);
+            f.Events.MarioPlayerCollectedCoin(f, marioEntity, *mario, newCoins, item, worldLocation, fromBlock, downwards);
         }
     }
 }

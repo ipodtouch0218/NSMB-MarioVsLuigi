@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3638499823851830700}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8279152070748857899}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: ModelParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -79,7 +79,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2980164799084004172}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1219925783544720256}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_r2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,7 +143,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1433334807171778901}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: skl_root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -177,7 +177,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4933164484788221609}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_r2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -211,7 +211,7 @@ GameObject:
   - component: {fileID: 7204722370227943865}
   - component: {fileID: 5294398626607194392}
   - component: {fileID: 8077331287960115309}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: giant-sparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5051,7 +5051,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8756309788239541312}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_l1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5082,7 +5082,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 198728429308258363}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_r1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5113,7 +5113,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5068560201834717611}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: skl_root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5148,7 +5148,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8831282989301427645}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5180,7 +5180,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 452413856756074398}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5212,7 +5212,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3521057838884173712}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5244,7 +5244,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5733968507810422890}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5276,7 +5276,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1211978846233103415}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_r1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5307,7 +5307,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6349655338469039543}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5339,7 +5339,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7858362646198559833}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_l1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5370,7 +5370,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5058115847807929162}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_r1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5401,7 +5401,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4284220071347618257}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_l2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5433,7 +5433,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7840069683890638377}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: mario_all_root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5465,7 +5465,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4492217531765388655}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_r2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5497,7 +5497,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8552391510409829437}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5531,7 +5531,7 @@ GameObject:
   - component: {fileID: 4824223340723290472}
   - component: {fileID: 4824223340723290478}
   - component: {fileID: 4824223340723290473}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: sparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10382,7 +10382,7 @@ GameObject:
   - component: {fileID: -2541758970786198444}
   - component: {fileID: 1243069589342051944}
   - component: {fileID: 987974179557327879}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: PlayerMario
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -10553,8 +10553,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 1
-    Layer: 6
+    LayerSource: 0
+    Layer: 0
     CallbackFlags:
       Value: 4095
   PhysicsBody:
@@ -10676,14 +10676,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf9d71929a202541b352e506ca0197e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathUp: 0
   wasTurnaround: 0
   enableGlow: 0
   models: {fileID: 8422425992379838812}
   character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   coinNumberParticle: {fileID: 4677531960176377302, guid: 818e60315a414df48a229c8d1186ce98,
     type: 3}
+  coinFromBlockParticle: {fileID: 4355208377719065490, guid: e55364fb26d178a4fbb31ba42edc3c9a,
+    type: 3}
   respawnParticle: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
+    type: 3}
+  starCollectParticle: {fileID: 817659606265668166, guid: 0d07cd0662b5f394fa4d95667c1d1814,
     type: 3}
   animator: {fileID: 2254935152879088866}
   entity: {fileID: 8832712012989740833}
@@ -10701,8 +10704,6 @@ MonoBehaviour:
   blueShell: {fileID: 3629787967981286811}
   propellerHelmet: {fileID: 8712194458326895251}
   propeller: {fileID: 8626919663303982960}
-  deathUpTime: 0.6
-  deathForce: 7
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
   dustPlayer: {fileID: 8224161238141519067}
@@ -11003,6 +11004,8 @@ MonoBehaviour:
     LandedFrame: 0
     WasTouchingGroundLastFrame:
       Value: 0
+    DoEntityBounce:
+      Value: 0
     WallslideLeft:
       Value: 0
     WallslideRight:
@@ -11035,6 +11038,7 @@ MonoBehaviour:
     IsDrilling:
       Value: 0
     InvincibilityFrames: 0
+    Combo: 0
     ProjectileDelayFrames: 0
     ProjectileVolleyFrames: 0
     CurrentProjectiles: 0
@@ -11173,7 +11177,7 @@ GameObject:
   - component: {fileID: 2064833281695251147}
   - component: {fileID: 8224161238141519067}
   - component: {fileID: 8439958257386823327}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: smoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16157,7 +16161,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5217951796219813988}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_l2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16189,7 +16193,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2113652169554726192}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_l2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16221,7 +16225,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6427910858855450154}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_r1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16252,7 +16256,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4078759689169169523}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_r2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16284,7 +16288,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8736727807199108367}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16316,7 +16320,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1880873140710159763}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: mario_all_root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16348,7 +16352,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1254238186468149646}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_l1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16379,7 +16383,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3645199178670507552}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_l1_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16410,7 +16414,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7629356642749584772}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: small_model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16443,7 +16447,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1432577407981189343}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16475,7 +16479,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6901870043112136189}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16507,7 +16511,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2540033029915098234}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: spin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16542,7 +16546,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6155689919788558835}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: LargeMario
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16574,7 +16578,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1753710069429635317}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: mario_model_mg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16607,7 +16611,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8940269827555309624}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16639,7 +16643,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2374463411169806254}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16671,7 +16675,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8353271781567155463}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: leg_l2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16703,7 +16707,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1132835275629858788}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21714,7 +21718,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4137521744276395462}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21746,7 +21750,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1707676135549005119}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: head_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21777,7 +21781,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4496846458282351552}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: arm_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21809,7 +21813,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3403594837583651993}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: spin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21844,7 +21848,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8422425991972032554}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: SmallMario
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21876,7 +21880,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8422425992379838804}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Models
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21910,7 +21914,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3987834665772828627}
   - component: {fileID: 7522462425768199910}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: small_model.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22013,7 +22017,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1500746234220062036}
   - component: {fileID: 5459105025968855876}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: mario_model_mg.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22114,7 +22118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1647000041625153642}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ankle_l1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22148,7 +22152,7 @@ GameObject:
   - component: {fileID: 55892875068643011}
   - component: {fileID: 5320528148583097166}
   - component: {fileID: 6711445992480148219}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: firedeath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26988,7 +26992,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5834066782864747009}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: wrist_r1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27107,7 +27111,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: f9541b8e97f76f4419778d672831fc42,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f9541b8e97f76f4419778d672831fc42,
         type: 3}
@@ -27342,7 +27346,7 @@ PrefabInstance:
     - target: {fileID: -782207623202608722, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 260785308833826994, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
@@ -27352,7 +27356,7 @@ PrefabInstance:
     - target: {fileID: 260785308833826994, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
@@ -27362,7 +27366,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 165babb21afc2ba47bfbc27cb6af3182,
         type: 3}

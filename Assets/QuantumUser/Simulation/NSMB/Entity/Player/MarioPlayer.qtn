@@ -1,10 +1,8 @@
+#define maxplayers 10
+
 import enum PowerupState(byte);
 import enum JumpState(byte);
 import enum PowerupReserveResult(byte);
-
-global {
-	byte TotalPlayers;
-}
 
 input {
 	button Up;
@@ -56,6 +54,7 @@ component MarioPlayer {
 	byte CoyoteTimeFrames;
 	int LandedFrame;
 	bool WasTouchingGroundLastFrame;
+	bool DoEntityBounce;
 
 	// Wallslide
 	bool WallslideLeft;
@@ -90,6 +89,7 @@ component MarioPlayer {
 
 	// Powerups
     ushort InvincibilityFrames;
+	byte Combo;
 	byte ProjectileDelayFrames;
 	byte ProjectileVolleyFrames;
 	byte CurrentProjectiles;
@@ -112,6 +112,7 @@ event MarioPlayerJumped {
 	entity_ref Entity;
 	MarioPlayer Mario;
 	JumpState JumpState;
+	bool WasBounce;
 }
 
 event MarioPlayerGroundpoundStarted {
