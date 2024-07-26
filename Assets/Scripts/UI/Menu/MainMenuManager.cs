@@ -60,6 +60,7 @@ namespace NSMB.UI.MainMenu {
 
         [Header("Misc")]
         [SerializeField] public List<MapData> maps;
+        [SerializeField] private SimulationConfig config;
 
         //---Private Variables
         private Coroutine quitCoroutine, fadeMusicCoroutine;
@@ -422,7 +423,7 @@ namespace NSMB.UI.MainMenu {
             */
         }
 
-        public void StartCountdown() {
+        public async void StartCountdown() {
             Debug.Log(NetworkHandler.Client);
             if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
 
@@ -444,22 +445,33 @@ namespace NSMB.UI.MainMenu {
                     GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
                     ClientId = NetworkHandler.Client.UserId,
                     RuntimeConfig = new RuntimeConfig() {
-                        Seed = unchecked((int) (uint) (UnityEngine.Random.value * uint.MaxValue)),
+                        SimulationConfig = config,
+                        Map = maps[0].mapAsset,
+                        Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
                         StarsToWin = 10,
                         CoinsForPowerup = 8,
                         Lives = 0,
                         TimerSeconds = 0,
                         TeamsEnabled = false,
                         CustomPowerupsEnabled = true,
+                        ExpectedPlayers = 1,
                     },
                     SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
                     GameMode = DeterministicGameMode.Multiplayer,
                     PlayerCount = 1,
                     StartGameTimeoutInSeconds = 10,
                     Communicator = new QuantumNetworkCommunicator(NetworkHandler.Client),
+                    RecordingFlags = RecordingFlags.All,
                 };
 
-                _ = SessionRunner.StartAsync(sessionRunnerArguments);
+                QuantumRunner runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
+                runner.Game.AddPlayer(new RuntimePlayer {
+                    CharacterIndex = 0,
+                    SkinIndex = 0,
+                    RequestedTeam = 0,
+                    PlayerNickname = "ipodtouch0218",
+                });
+                transform.parent.gameObject.SetActive(false);
 
             } else {
                 isReady = !isReady;
@@ -846,11 +858,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEvent(EventData photonEvent) {
+            /*
             if (photonEvent.Code == (byte) Enums.NetEvents.ChangeCountdownState) {
                 isCountdownStarted = (bool) photonEvent.CustomData;
                 sfx.PlayOneShot(isCountdownStarted ? SoundEffect.UI_Back : SoundEffect.UI_StartGame);
             }
-            Debug.Log(photonEvent.Code + " - " + photonEvent.CustomData);
+            */
+            //Debug.Log(photonEvent.Code + " - " + photonEvent.CustomData);
         }
 
         //---Debug

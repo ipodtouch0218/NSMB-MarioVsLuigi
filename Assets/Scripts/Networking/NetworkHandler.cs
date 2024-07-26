@@ -65,9 +65,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public IEnumerator PingUpdateCoroutine() {
         WaitForSeconds seconds = new(1);
         while (true) {
+            /*
             realtimeClient.LocalPlayer.SetCustomProperties(new PhotonHashtable() {
                 [Enums.NetPlayerProperties.Ping] = realtimeClient.RealtimePeer.Stats.RoundtripTime
             });
+            */
             yield return seconds;
         }
     }

@@ -50,6 +50,7 @@ public class PlayerElements : MonoBehaviour {
         this.player = player;
         image.transform.SetParent(transform.parent);
         transform.SetParent(null);
+        transform.position = Vector3.zero;
         OnResolutionChanged();
     }
 

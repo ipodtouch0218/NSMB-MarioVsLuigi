@@ -45,6 +45,11 @@ public class BlockBumpAnimator : QuantumCallbacks {
     }
 
     public override void OnUpdateView(QuantumGame game) {
+        Frame f = game.Frames.Predicted;
+        if (!f.Exists(entity.EntityRef)) {
+            return;
+        }
+    
         float bumpScale = 0.35f;
         float bumpDuration = 0.25f;
 

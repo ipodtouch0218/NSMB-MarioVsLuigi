@@ -12,14 +12,14 @@ global {
 signal OnStageReset(bool full);
 
 event TileChanged {
-    Frame Frame;
+    nothashed Frame Frame;
     int TileX;
     int TileY;
     StageTileInstance NewTile;
 }
 
 event TileBroken {
-    Frame Frame;
+    nothashed Frame Frame;
     entity_ref Entity;
     int TileX;
     int TileY;

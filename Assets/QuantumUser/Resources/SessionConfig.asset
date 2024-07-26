@@ -21,7 +21,7 @@ MonoBehaviour:
     ChecksumInterval: 60
     RollbackWindow: 60
     InputHardTolerance: 8
-    InputRedundancy: 3
+    InputRedundancy: 2
     InputRepeatMaxDistance: 10
     SessionStartTimeout: 1
     TimeCorrectionRate: 4
@@ -30,7 +30,7 @@ MonoBehaviour:
     TimeScaleMin: 100
     TimeScalePingMin: 100
     TimeScalePingMax: 300
-    InputDelayMin: 0
+    InputDelayMin: 1
     InputDelayMax: 60
-    InputDelayPingStart: 100
+    InputDelayPingStart: 80
     InputFixedSize: 0

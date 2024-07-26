@@ -10,7 +10,7 @@ component Liquid {
 
 event LiquidSplashed {
 	entity_ref Entity;
-	FP Force;
-	FPVector2 Position;
+	nothashed FP Force;
+	nothashed FPVector2 Position;
 	bool Exit;
 }

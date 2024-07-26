@@ -1,18 +1,17 @@
 event EnemyKilled {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Enemy;
 	entity_ref Killer;
-
 	bool IsSpecialKill;
 }
 
 event PlayComboSound {
-	Frame Frame;
+	nothashed Frame Frame;
 	EntityRef Entity;
-	byte Combo;
+	nothashed byte Combo;
 }
 
 event PlayBumpSound {
-	Frame Frame;
+	nothashed Frame Frame;
 	EntityRef Entity;
 }

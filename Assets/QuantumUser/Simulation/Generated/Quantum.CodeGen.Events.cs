@@ -488,7 +488,6 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 59;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Enemy.GetHashCode();
         hash = hash * 31 + Killer.GetHashCode();
         hash = hash * 31 + IsSpecialKill.GetHashCode();
@@ -518,9 +517,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 61;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Combo.GetHashCode();
         return hash;
       }
     }
@@ -546,7 +543,6 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 67;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
         return hash;
       }
@@ -603,8 +599,6 @@ namespace Quantum {
       unchecked {
         var hash = 73;
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Force.GetHashCode();
-        hash = hash * 31 + Position.GetHashCode();
         hash = hash * 31 + Exit.GetHashCode();
         return hash;
       }
@@ -634,11 +628,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 79;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
-        hash = hash * 31 + JumpState.GetHashCode();
-        hash = hash * 31 + WasBounce.GetHashCode();
         return hash;
       }
     }
@@ -665,9 +655,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 83;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
         return hash;
       }
     }
@@ -694,9 +682,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 89;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
         return hash;
       }
     }
@@ -723,9 +709,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 97;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
         return hash;
       }
     }
@@ -754,11 +738,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 101;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
-        hash = hash * 31 + Result.GetHashCode();
-        hash = hash * 31 + Scriptable.GetHashCode();
         return hash;
       }
     }
@@ -786,10 +766,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 103;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
-        hash = hash * 31 + Success.GetHashCode();
         return hash;
       }
     }
@@ -818,11 +795,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 107;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
-        hash = hash * 31 + Position.GetHashCode();
-        hash = hash * 31 + WasOnRightWall.GetHashCode();
         return hash;
       }
     }
@@ -850,10 +823,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 109;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
-        hash = hash * 31 + Projectile.GetHashCode();
         return hash;
       }
     }
@@ -880,9 +850,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 113;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
         return hash;
       }
     }
@@ -909,9 +877,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 127;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
         return hash;
       }
     }
@@ -996,9 +962,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 139;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
         return hash;
       }
     }
@@ -1025,9 +989,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 149;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Mario.GetHashCode();
         return hash;
       }
     }
@@ -1111,7 +1073,6 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 163;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + TileX.GetHashCode();
         hash = hash * 31 + TileY.GetHashCode();
         hash = hash * 31 + NewTile.GetHashCode();
@@ -1143,7 +1104,6 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 167;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
         hash = hash * 31 + TileX.GetHashCode();
         hash = hash * 31 + TileY.GetHashCode();

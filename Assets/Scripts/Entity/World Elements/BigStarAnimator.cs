@@ -17,8 +17,9 @@ public class BigStarAnimator : QuantumCallbacks {
     [SerializeField] private QuantumEntityView entity;
     [SerializeField] public SpriteRenderer sRenderer;
     [SerializeField] private BoxCollider2D worldCollider;
-    [SerializeField] private Animator animator;
+    [SerializeField] private Animation animation;
     [SerializeField] private AudioSource sfx, sfx2;
+    [SerializeField] private Color uncollectableColor = new Color(1, 1, 1, 0.5f);
 
     //--Private Variables
     private float pulseEffectCounter;
@@ -27,7 +28,7 @@ public class BigStarAnimator : QuantumCallbacks {
     public void OnValidate() {
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref worldCollider);
-        this.SetIfNull(ref animator);
+        this.SetIfNull(ref animation);
         this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
     }
@@ -39,6 +40,9 @@ public class BigStarAnimator : QuantumCallbacks {
         stationary = star.IsStationary;
         if (f.Global->GameState == GameState.Playing) {
             sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
+        }
+        if (stationary) {
+            animation.Play();
         }
     }
 
@@ -52,12 +56,17 @@ public class BigStarAnimator : QuantumCallbacks {
 
     public override void OnUpdateView(QuantumGame game) {
         Frame f = game.Frames.Predicted;
+        if (!f.Exists(entity.EntityRef)) {
+            return;
+        }
+
         var star = f.Get<BigStar>(entity.EntityRef);
 
         if (!stationary) {
             graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star.FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
             float timeRemaining = star.Lifetime / 60f;
             sRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
+            sRenderer.color = star.UncollectableFrames > 0 ? uncollectableColor : Color.white;
         }
     }
 }

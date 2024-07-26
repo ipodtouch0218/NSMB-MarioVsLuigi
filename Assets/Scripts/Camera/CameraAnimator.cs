@@ -50,7 +50,7 @@ public class CameraAnimator : QuantumCallbacks {
             BackgroundLoop.Instance.Reposition(camera);
         }
 
-        if (camera.orthographicSize < 14/4f) {
+        if (camera.orthographicSize < 14/4f - 0.05f) {
             // Offset to always put the player in the center for extremely long aspect ratios
             var targetTransformPrevious = game.Frames.PredictedPrevious.Get<Transform2D>(Target);
             var targetTransformCurrent = game.Frames.Predicted.Get<Transform2D>(Target);

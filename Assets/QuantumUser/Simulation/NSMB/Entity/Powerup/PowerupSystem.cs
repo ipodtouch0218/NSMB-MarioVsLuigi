@@ -120,9 +120,10 @@ namespace Quantum {
         }
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario) ||
-                !f.TryGet(info.Entity, out PhysicsObject physicsObject) ||
-                !f.Unsafe.TryGetPointer(info.Other, out Powerup* powerup)) {
+            if (!f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)
+                || mario->IsDead
+                || !f.TryGet(info.Entity, out PhysicsObject physicsObject)
+                || !f.Unsafe.TryGetPointer(info.Other, out Powerup* powerup)) {
                 return;
             }
 

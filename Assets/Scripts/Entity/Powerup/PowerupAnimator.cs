@@ -59,6 +59,10 @@ public class PowerupAnimator : QuantumCallbacks {
 
     public override void OnUpdateView(QuantumGame game) {
         Frame f = game.Frames.Predicted;
+        if (!f.Exists(entity.EntityRef)) {
+            return;
+        }
+
         var powerup = f.Get<Powerup>(entity.EntityRef);
         var physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
 

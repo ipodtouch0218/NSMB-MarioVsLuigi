@@ -69,6 +69,7 @@ public class UIUpdater : QuantumCallbacks {
     public void Start() {
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
         boos.SetActive(stage.HidePlayersOnMinimap);
+        StartCoroutine(UpdatePingTextCoroutine());
     }
 
     public override void OnUpdateView(QuantumGame game) {
@@ -207,7 +208,7 @@ public class UIUpdater : QuantumCallbacks {
 
     private int GetCurrentPing() {
         try {
-            return (int) QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.RoundtripTime * 1000;
+            return (int) QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.RoundtripTime;
         } catch {
             return 0;
         }

@@ -108,71 +108,71 @@ component MarioPlayer {
 }
 
 event MarioPlayerJumped {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
-	JumpState JumpState;
-	bool WasBounce;
+	nothashed MarioPlayer Mario;
+	nothashed JumpState JumpState;
+	nothashed bool WasBounce;
 }
 
 event MarioPlayerGroundpoundStarted {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
+	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerGroundpounded {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
+	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerCrouched {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
+	nothashed MarioPlayer Mario;
 }
 
 synced event MarioPlayerCollectedPowerup {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
-	PowerupReserveResult Result;
-	PowerupAsset Scriptable;
+	nothashed MarioPlayer Mario;
+	nothashed PowerupReserveResult Result;
+	nothashed PowerupAsset Scriptable;
 }
 
 event MarioPlayerUsedReserveItem {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
-	bool Success;
+	nothashed MarioPlayer Mario;
+	nothashed bool Success;
 }
 
 event MarioPlayerWalljumped {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
-	FPVector2 Position;
-	bool WasOnRightWall;
+	nothashed MarioPlayer Mario;
+	nothashed FPVector2 Position;
+	nothashed bool WasOnRightWall;
 }
 
 event MarioPlayerShotProjectile {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
-	Projectile Projectile;
+	nothashed MarioPlayer Mario;
+	nothashed Projectile Projectile;
 }
 
 event MarioPlayerUsedPropeller {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
+	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerPropellerSpin {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
+	nothashed MarioPlayer Mario;
 }
 
 synced event MarioPlayerDied {
@@ -188,13 +188,13 @@ synced event MarioPlayerTookDamage {
 }
 
 event MarioPlayerPreRespawned {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
+	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerRespawned {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
+	nothashed MarioPlayer Mario;
 }

@@ -1030,11 +1030,9 @@ namespace Quantum {
                 newHeight *= mario->CurrentPowerupState <= PowerupState.MiniMushroom ? FP._0_75 : FP._0_50;
             }
 
-            FPVector2 newExtents = collider->Shape.Box.Extents;
-            newExtents.Y = newHeight / 2;
-
+            FPVector2 newExtents = new(FP.FromString("0.175"), newHeight / 2);
             if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                newExtents /= 2;    
+                newExtents /= 2;
             }
 
             collider->Shape.Box.Extents = newExtents;

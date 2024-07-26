@@ -4851,13 +4851,13 @@ GameObject:
   - component: {fileID: 7876065870857250358}
   - component: {fileID: 9002122264368128006}
   - component: {fileID: -4072674724814133322}
-  - component: {fileID: 7013426154861581906}
+  - component: {fileID: 130453169333135730}
   - component: {fileID: 7844204986304545686}
-  - component: {fileID: 858852620204674597}
+  - component: {fileID: 6181925638399383012}
   - component: {fileID: 8025866746367081787}
+  - component: {fileID: 858852620204674597}
   - component: {fileID: 1605029935836861777}
   - component: {fileID: 5641718087526033968}
-  - component: {fileID: 6181925638399383012}
   - component: {fileID: 5279632371919351669}
   m_Layer: 9
   m_Name: BigStar
@@ -5175,30 +5175,26 @@ MonoBehaviour:
   entity: {fileID: 9002122264368128006}
   sRenderer: {fileID: 3409460790137144535}
   worldCollider: {fileID: 0}
-  animator: {fileID: 7013426154861581906}
+  animation: {fileID: 130453169333135730}
   sfx: {fileID: 7844204986304545686}
   sfx2: {fileID: 6181925638399383012}
---- !u!95 &7013426154861581906
-Animator:
-  serializedVersion: 5
+  uncollectableColor: {r: 1, g: 1, b: 1, a: 0.5}
+--- !u!111 &130453169333135730
+Animation:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1585ef5c5e82551468c0f24e1785529c, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 72b10467aa195f6409a95fcfb5502dfe, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 72b10467aa195f6409a95fcfb5502dfe, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!82 &7844204986304545686
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5296,77 +5292,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &858852620204674597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioSources:
-  - {fileID: 7844204986304545686}
-  soundOrigin: {fileID: 1973747262660636105}
-  soundRange: 5
-  maxPanning: 0.8
-  useDistanceToCamera: 0
---- !u!114 &8025866746367081787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 557273f467ae31f4b8e07bbb89e73e8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioSource: {fileID: 7844204986304545686}
-  currentAudio: {fileID: 11400000, guid: e9a2e1bbfff2f404c83d4d3a5e6f78e8, type: 2}
-  playOnAwake: 1
---- !u!114 &1605029935836861777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3c69813075aaea49a63531d19694117, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prototype:
-    IsStationary:
-      Value: 0
-    Lifetime: 900
-    PassthroughFrames: 0
-    UncollectableFrames: 0
-    Speed:
-      RawValue: 98304
-    BounceForce:
-      RawValue: 491520
-    FacingRight:
-      Value: 1
---- !u!114 &5641718087526033968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1973747262660636106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bb5ba24fc1efae4bab9294e76e613fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prototype:
-    _empty_prototype_dummy_field_: 0
 --- !u!82 &6181925638399383012
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5464,6 +5389,77 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8025866746367081787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557273f467ae31f4b8e07bbb89e73e8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 7844204986304545686}
+  currentAudio: {fileID: 11400000, guid: e9a2e1bbfff2f404c83d4d3a5e6f78e8, type: 2}
+  playOnAwake: 1
+--- !u!114 &858852620204674597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSources:
+  - {fileID: 7844204986304545686}
+  soundOrigin: {fileID: 1973747262660636105}
+  soundRange: 5
+  maxPanning: 0.8
+  useDistanceToCamera: 0
+--- !u!114 &1605029935836861777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3c69813075aaea49a63531d19694117, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    IsStationary:
+      Value: 0
+    Lifetime: 900
+    PassthroughFrames: 0
+    UncollectableFrames: 0
+    Speed:
+      RawValue: 98304
+    BounceForce:
+      RawValue: 491520
+    FacingRight:
+      Value: 1
+--- !u!114 &5641718087526033968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bb5ba24fc1efae4bab9294e76e613fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    _empty_prototype_dummy_field_: 0
 --- !u!114 &5279632371919351669
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -189,7 +189,7 @@ MonoBehaviour:
     MaxAvoidanceCandidates: 64
     VelocityObstacleTruncationFactor:
       RawValue: 72090
-  AutoLoadSceneFromMap: 2
+  AutoLoadSceneFromMap: 3
   DeltaTimeType: 0
   ThreadCount: 2
   ChecksumSnapshotHistoryLengthSeconds:
@@ -226,12 +226,6 @@ MonoBehaviour:
   BlockBumpPrototype:
     Id:
       Value: 1308320651839637093
-  StarsToWin: 10
-  CoinsForPowerup: 8
-  Lives: 0
-  TimerSeconds: 0
-  TeamsEnabled: 0
-  CustomPowerupsEnabled: 1
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0
