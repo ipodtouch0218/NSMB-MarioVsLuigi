@@ -1,0 +1,8 @@
+component Holdable {
+
+	entity_ref Holder;
+	entity_ref PreviousHolder;
+
+}
+
+signal OnThrowHoldable(EntityRef entity, EntityRef mario, bool crouching);

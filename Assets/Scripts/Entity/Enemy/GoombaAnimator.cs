@@ -45,6 +45,8 @@ public class GoombaAnimator : MonoBehaviour {
                 // Special killed
                 transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (goomba.FacingRight ? -1 : 1) * Time.deltaTime));
             }
+        } else {
+            previousRotation = Quaternion.identity;
         }
     }
 
@@ -61,7 +63,6 @@ public class GoombaAnimator : MonoBehaviour {
             return;
         }
 
-        previousRotation = Quaternion.identity;
         if (e.IsSpecialKill) {
             if (e.Frame.TryGet(e.Killer, out MarioPlayer mario) && mario.IsGroundpoundActive) {
                 Instantiate(specialKillParticle, transform.position + Vector3.up * 0.2f, Quaternion.identity);

@@ -111,6 +111,7 @@ namespace Quantum {
                     mario->Powerdown(f, hit.Entity, false);
                     goomba->FacingRight = damageDirection.X > 0;
                 }
+                return;
             }
         }
 

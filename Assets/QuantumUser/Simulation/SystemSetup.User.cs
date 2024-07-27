@@ -13,14 +13,16 @@ namespace Quantum {
             systems.Add(
                 new GameplaySystemGroup(
                     new GoombaSystem(),
+                    new KoopaSystem(),
                     new MarioPlayerSystem(),
-                    new BigStarSystem(),
                     new ProjectileSystem(),
                     new PowerupSystem(),
                     new BlockBumpSystem(),
                     new PhysicsObjectSystem(),
                     new CoinSystem(),
                     new WrappingObjectSystem(),
+                    new BigStarSystem(),
+                    new HoldableObjectSystem(),
                     new CameraSystem()
                 )
             );

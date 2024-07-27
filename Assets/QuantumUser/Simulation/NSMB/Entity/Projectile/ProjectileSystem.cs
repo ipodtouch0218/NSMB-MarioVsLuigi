@@ -74,9 +74,11 @@ namespace Quantum {
         }
 
         private bool TryDamageEnemy(Frame f, TriggerInfo2D info) {
-            if (f.Unsafe.TryGetPointer(info.Entity, out Goomba* goomba) 
-                && f.Unsafe.TryGetPointer(info.Other, out Projectile* projectile)) {
+            if (!f.Unsafe.TryGetPointer(info.Other, out Projectile* projectile)) {
+                return false;
+            }
 
+            if (f.Unsafe.TryGetPointer(info.Entity, out Goomba* goomba)) {
                 if (goomba->IsDead || !goomba->IsActive) {
                     return false;
                 }
@@ -85,6 +87,20 @@ namespace Quantum {
                 switch (asset.Effect) {
                 case ProjectileEffectType.Knockback: {
                     goomba->Kill(f, info.Entity, info.Other, true);
+                    break;
+                }
+                }
+
+                return true;
+            } else if (f.Unsafe.TryGetPointer(info.Entity, out Koopa* koopa)) {
+                if (koopa->IsDead || !koopa->IsActive) {
+                    return false;
+                }
+
+                var asset = f.FindAsset(projectile->Asset);
+                switch (asset.Effect) {
+                case ProjectileEffectType.Knockback: {
+                    koopa->Kill(f, info.Entity, info.Other, true);
                     break;
                 }
                 }

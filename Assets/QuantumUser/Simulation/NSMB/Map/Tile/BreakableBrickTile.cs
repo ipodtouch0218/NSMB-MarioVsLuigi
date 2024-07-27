@@ -43,11 +43,11 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
                     _ => false
                 };
             }
-        } /*else if (f.TryGet(entity, out Koopa koopa)) {
-             doBreak = breakableByShells;
+        } else if (f.TryGet(entity, out Koopa koopa) && koopa.IsKicked) {
+             doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
              doBump = true;
 
-        } else if (f.TryGet(entity, out Bobomb bobomb)) {
+        } /*else if (f.TryGet(entity, out Bobomb bobomb)) {
              doBreak = breakableByBombs;
              doBump = false;
         }*/

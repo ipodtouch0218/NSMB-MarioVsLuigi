@@ -76,12 +76,22 @@ public class VersusStageBaker : MapDataBakerCallback {
         }
 
         // --- Bake Enemies
+        int enemies = 0;
+
         QPrototypeGoomba[] goombas = GameObject.FindObjectsByType<QPrototypeGoomba>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var goomba in goombas) {
+            enemies++;
             goomba.Prototype.Spawnpoint = goomba.transform.position.ToFPVector2();
             EditorUtility.SetDirty(goomba);
         }
-        LogInfo($"Baked {goombas.Length} Goomba enemies");
+        QPrototypeKoopa[] koopas = GameObject.FindObjectsByType<QPrototypeKoopa>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var koopa in koopas) {
+            enemies++;
+            koopa.Prototype.Spawnpoint = koopa.transform.position.ToFPVector2();
+            EditorUtility.SetDirty(koopa);
+        }
+
+        LogInfo($"Baked {enemies} enemies");
 
         EditorUtility.SetDirty(stage);
     }

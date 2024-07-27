@@ -1,0 +1,24 @@
+import enum KoopaType(byte);
+
+component Koopa {
+	KoopaType Type;
+	FP Speed;
+	FP KickSpeed;
+	FPVector2 Spawnpoint;
+	
+	bool IsActive;
+	bool IsDead;
+
+	FP CurrentSpeed;
+	bool FacingRight;
+	bool IsInShell;
+	bool IsFlipped;
+	bool IsKicked;
+	ushort WakeupFrames;
+	byte IgnoreOwnerFrames;
+}
+
+event KoopaEnteredShell {
+	nothashed Frame Frame;
+	EntityRef Entity;
+}

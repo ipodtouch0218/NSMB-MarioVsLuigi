@@ -1,6 +1,4 @@
 using Photon.Deterministic;
-using System;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -10,6 +8,32 @@ namespace Quantum {
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsInWater => WaterColliderCount > 0;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+       
+        public FPVector2 GetHeldItemOffset(Frame f) {
+            if (!f.Exists(HeldEntity)) {
+                return default;
+            }
+
+            /*
+             * if (f.TryGet(HeldEntity, out IceBlock ice)) {
+                float time = Mathf.Clamp01(((renderTime ? Runner.LocalRenderTime : Runner.SimulationTime) - HoldStartTime) / pickupTime);
+                HeldEntity.holderOffset = new(0, MainHitbox.size.y * (1f - Utils.Utils.QuadraticEaseOut(1f - time)), -2);
+            } else */{
+                var shape = f.Get<PhysicsCollider2D>(HeldEntity).Shape;
+                return new FPVector2(
+                    (FacingRight ? 1 : -1) * FP._0_25,
+                    (CurrentPowerupState >= PowerupState.Mushroom ? FP.FromString("0.3") : FP.FromString("0.075")) + shape.Centroid.Y + shape.Box.Extents.Y
+                );
+            }
+        }
+
+        public bool CanHoldItem(Frame f) {
+            return f.GetPlayerInput(PlayerRef)->Sprint.IsDown && /*!IsFrozen &&*/ CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && JumpState < JumpState.DoubleJump && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && f.GetPlayerInput(PlayerRef)->Jump.IsDown);
+        }
+
+        public bool CanPickupItem(Frame f) {
+            return !f.Exists(HeldEntity) && CanHoldItem(f);
+        }
 
         public bool InstakillsEnemies(PhysicsObject physicsObject) {
             return CurrentPowerupState == PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (IsSliding && FPMath.Abs(physicsObject.Velocity.X) > FP._0_10);
@@ -125,6 +149,10 @@ namespace Quantum {
                 Runner.Despawn(FrozenCube.Object);
             }
             */
+
+            if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
+                holdable->Drop(f, HeldEntity);
+            }
 
             f.Unsafe.GetPointer<PhysicsObject>(entity)->IsFrozen = true;
             f.Events.MarioPlayerDied(f, entity, this);

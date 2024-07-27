@@ -137,6 +137,8 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
             QuantumEvent.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage);
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound);
+            QuantumEvent.Subscribe<EventMarioPlayerPickedUpObject>(this, OnMarioPlayerPickedUpObject);
+            QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject);
         }
 
         public void Initialize(QuantumGame game) {
@@ -580,6 +582,27 @@ namespace NSMB.Entities.Player {
             TryCreateMaterialBlock();
         }
         */
+
+        private void OnMarioPlayerThrewObject(EventMarioPlayerThrewObject e) {
+            PlaySound(SoundEffect.Player_Voice_WallJump, variant: 2);
+            animator.SetTrigger("throw");
+        }
+
+        private void OnMarioPlayerPickedUpObject(EventMarioPlayerPickedUpObject e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            /*
+            if (HeldEntity is FrozenCube) {
+                animator.Play("head-pickup");
+                animator.ResetTrigger("fireball");
+                PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);
+            }
+            */
+
+            animator.ResetTrigger("throw");
+        }
 
         private void OnPlayBumpSound(EventPlayBumpSound e) {
             if (e.Entity != entity.EntityRef) {

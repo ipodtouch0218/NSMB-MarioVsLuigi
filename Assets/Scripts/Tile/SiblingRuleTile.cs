@@ -1,3 +1,5 @@
+using Photon.Deterministic;
+using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -9,6 +11,10 @@ namespace NSMB.Tiles {
     /// </summary>
     [ExecuteInEditMode]
     public class SiblingRuleTile : RuleTile {
+
+        //---Static Variables
+        private static QuantumMapData mapData;
+        private static VersusStageData cachedStage;
 
         //---Serialized Variables
         [SerializeField] public List<TileBase> siblings;
@@ -23,24 +29,34 @@ namespace NSMB.Tiles {
 
         public override Vector3Int GetOffsetPosition(Vector3Int position, Vector3Int offset) {
             Vector3Int result = position + offset;
-            /*
-            if (!GameManager.Instance)
-                return result;
+            if (!cachedStage || !mapData) {
+                if ((mapData = FindFirstObjectByType<QuantumMapData>(FindObjectsInactive.Include)) is not { }) {
+                    return result;
+                }
+                cachedStage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(mapData.Asset.UserAsset);
+                if (!cachedStage) {
+                    return result;
+                }
+            }
 
-            Utils.Utils.WrapTileLocation(ref result);
-            */
-            return result;
+            FPVector2 wrapped = QuantumUtils.WrapUnityTile(cachedStage, new FPVector2(result.x, result.y), out _);
+            return new Vector3Int(wrapped.X.AsInt, wrapped.Y.AsInt, result.z);
         }
 
         public override Vector3Int GetOffsetPositionReverse(Vector3Int position, Vector3Int offset) {
             Vector3Int result = position - offset;
-            /*
-            if (!GameManager.Instance)
-                return result;
+            if (!cachedStage || !mapData) {
+                if ((mapData = FindFirstObjectByType<QuantumMapData>(FindObjectsInactive.Include)) is not { }) {
+                    return result;
+                }
+                cachedStage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(mapData.Asset.UserAsset);
+                if (!cachedStage) {
+                    return result;
+                }
+            }
 
-            Utils.Utils.WrapTileLocation(ref result);
-            */
-            return result;
+            FPVector2 wrapped = QuantumUtils.WrapUnityTile(cachedStage, new FPVector2(result.x, result.y), out _);
+            return new Vector3Int(wrapped.X.AsInt, wrapped.Y.AsInt, result.z);
         }
     }
 }

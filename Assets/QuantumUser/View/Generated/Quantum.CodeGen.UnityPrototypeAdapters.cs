@@ -50,6 +50,19 @@ namespace Quantum.Prototypes.Unity {
   #endif //;
   
   [System.SerializableAttribute()]
+  public unsafe partial class HoldablePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.HoldablePrototype> {
+    public Quantum.QuantumEntityPrototype Holder;
+    public Quantum.QuantumEntityPrototype PreviousHolder;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.HoldablePrototype prototype);
+    public override Quantum.Prototypes.HoldablePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.HoldablePrototype();
+      converter.Convert(this.Holder, out result.Holder);
+      converter.Convert(this.PreviousHolder, out result.PreviousHolder);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
   public unsafe partial class LiquidPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.LiquidPrototype> {
     public LiquidType LiquidType;
     public Int32 WidthTiles;

@@ -1342,10 +1342,10 @@ MonoBehaviour:
       Id:
         Value: 508553503855572043
     Rotation:
-      RawValue: -3
+      RawValue: 0
     Scale:
       X:
-        RawValue: -65536
+        RawValue: 65536
       Y:
         RawValue: 65536
   - Tile:
@@ -2612,10 +2612,10 @@ MonoBehaviour:
       Id:
         Value: 508553503855572043
     Rotation:
-      RawValue: -3
+      RawValue: 0
     Scale:
       X:
-        RawValue: -65536
+        RawValue: 65536
       Y:
         RawValue: 65536
   - Tile:

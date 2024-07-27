@@ -175,6 +175,21 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Holdable))]
+  public unsafe class HoldablePrototype : ComponentPrototype<Quantum.Holdable> {
+    public MapEntityId Holder;
+    public MapEntityId PreviousHolder;
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Holdable component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Holdable result, in PrototypeMaterializationContext context = default) {
+        PrototypeValidator.FindMapEntity(this.Holder, in context, out result.Holder);
+        PrototypeValidator.FindMapEntity(this.PreviousHolder, in context, out result.PreviousHolder);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Input))]
   public unsafe partial class InputPrototype : StructPrototype {
     public Button Up;
@@ -197,6 +212,45 @@ namespace Quantum.Prototypes {
         result.PowerupAction = this.PowerupAction;
         result.FireballPowerupAction = this.FireballPowerupAction;
         result.PropellerPowerupAction = this.PropellerPowerupAction;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Koopa))]
+  public unsafe partial class KoopaPrototype : ComponentPrototype<Quantum.Koopa> {
+    public KoopaType Type;
+    public FP Speed;
+    public FP KickSpeed;
+    public FPVector2 Spawnpoint;
+    public QBoolean IsActive;
+    public QBoolean IsDead;
+    public FP CurrentSpeed;
+    public QBoolean FacingRight;
+    public QBoolean IsInShell;
+    public QBoolean IsFlipped;
+    public QBoolean IsKicked;
+    public UInt16 WakeupFrames;
+    public Byte IgnoreOwnerFrames;
+    partial void MaterializeUser(Frame frame, ref Quantum.Koopa result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Koopa component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Koopa result, in PrototypeMaterializationContext context = default) {
+        result.Type = this.Type;
+        result.Speed = this.Speed;
+        result.KickSpeed = this.KickSpeed;
+        result.Spawnpoint = this.Spawnpoint;
+        result.IsActive = this.IsActive;
+        result.IsDead = this.IsDead;
+        result.CurrentSpeed = this.CurrentSpeed;
+        result.FacingRight = this.FacingRight;
+        result.IsInShell = this.IsInShell;
+        result.IsFlipped = this.IsFlipped;
+        result.IsKicked = this.IsKicked;
+        result.WakeupFrames = this.WakeupFrames;
+        result.IgnoreOwnerFrames = this.IgnoreOwnerFrames;
         MaterializeUser(frame, ref result, in context);
     }
   }

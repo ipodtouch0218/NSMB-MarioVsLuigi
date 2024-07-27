@@ -83,6 +83,14 @@ MonoBehaviour:
     - rid: 4446608830146543620
     - rid: 4446608830146543621
   - Components:
+    - rid: 7515263985617207296
+    - rid: 7515263985617207297
+    - rid: 7515263985617207298
+    - rid: 7515263985617207299
+    - rid: 7515263985617207300
+    - rid: 7515263985617207301
+    - rid: 7515263985617207302
+  - Components:
     - rid: 777974220477956096
     - rid: 777974220477956097
     - rid: 777974220477956098
@@ -1037,6 +1045,132 @@ MonoBehaviour:
           Value: 0
         Contacts: []
     - rid: 6570762336053755909
+      type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
+    - rid: 7515263985617207296
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -180224
+          Y:
+            RawValue: 45875
+        Rotation:
+          RawValue: 0
+    - rid: 7515263985617207297
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 9830
+            Y:
+              RawValue: 16711
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 3932
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 0
+        IsTrigger: 0
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 7515263985617207298
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 4095
+    - rid: 7515263985617207299
+      type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Holder:
+          SceneIndexPlusOne: 0
+        PreviousHolder:
+          SceneIndexPlusOne: 0
+    - rid: 7515263985617207300
+      type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Type: 0
+        Speed:
+          RawValue: 57344
+        KickSpeed:
+          RawValue: 327680
+        Spawnpoint:
+          X:
+            RawValue: -180224
+          Y:
+            RawValue: 45875
+        IsActive:
+          Value: 0
+        IsDead:
+          Value: 0
+        CurrentSpeed:
+          RawValue: 0
+        FacingRight:
+          Value: 0
+        IsInShell:
+          Value: 0
+        IsFlipped:
+          Value: 0
+        IsKicked:
+          Value: 0
+        WakeupFrames: 0
+        IgnoreOwnerFrames: 0
+    - rid: 7515263985617207301
+      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Velocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        Gravity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: -1409024
+        TerminalVelocity:
+          RawValue: -524288
+        IsFrozen:
+          Value: 0
+        DisableCollision:
+          Value: 0
+        IsTouchingLeftWall:
+          Value: 0
+        IsTouchingRightWall:
+          Value: 0
+        IsTouchingCeiling:
+          Value: 0
+        IsTouchingGround:
+          Value: 0
+        FloorAngle:
+          RawValue: 0
+        IsOnSlipperyGround:
+          Value: 0
+        IsOnSlideableGround:
+          Value: 0
+        Contacts: []
+    - rid: 7515263985617207302
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0

@@ -198,3 +198,17 @@ event MarioPlayerRespawned {
 	entity_ref Entity;
 	nothashed MarioPlayer Mario;
 }
+
+event MarioPlayerPickedUpObject {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	nothashed MarioPlayer* Mario;
+	entity_ref OtherEntity;
+}
+
+event MarioPlayerThrewObject {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	nothashed MarioPlayer* Mario;
+	entity_ref OtherEntity;
+}

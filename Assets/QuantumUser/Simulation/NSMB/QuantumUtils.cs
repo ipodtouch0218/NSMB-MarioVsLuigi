@@ -74,20 +74,34 @@ public static unsafe class QuantumUtils {
         return UnityTileToWorld(stage, RelativeTileToUnityTile(stage, relativeTile));
     }
 
+    public static FPVector2 WrapUnityTile(Frame f, FPVector2 unityTile, out WrapDirection wrapDirection) {
+        return WrapUnityTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), unityTile, out wrapDirection);
+    }
+
+    public static FPVector2 WrapUnityTile(VersusStageData stage, FPVector2 unityTile, out WrapDirection wrapDirection) {
+        if (unityTile.X < stage.TileOrigin.x) {
+            unityTile.X += stage.TileDimensions.x;
+            wrapDirection = WrapDirection.Left;
+        } else if (unityTile.X >= stage.TileOrigin.x + stage.TileDimensions.x) {
+            unityTile.X -= stage.TileDimensions.x;
+            wrapDirection = WrapDirection.Right;
+        } else {
+            wrapDirection = WrapDirection.NoWrap;
+        }
+
+        return unityTile;
+    }
+
     public static FPVector2 WrapWorld(Frame f, FPVector2 worldPos, out WrapDirection wrapDirection) {
         return WrapWorld(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos, out wrapDirection);
     }
 
     public static FPVector2 WrapWorld(VersusStageData stage, FPVector2 worldPos, out WrapDirection wrapDirection) {
-        FP minX = stage.TileOrigin.x / 2;
-        FP stageWidth = stage.TileDimensions.x / 2;
-        FP maxX = minX + stageWidth;
-
-        if (worldPos.X < minX) {
-            worldPos.X += stageWidth;
+        if (worldPos.X < stage.StageWorldMin.X) {
+            worldPos.X += stage.TileDimensions.x / 2;
             wrapDirection = WrapDirection.Left;
-        } else if (worldPos.X > maxX) {
-            worldPos.X -= stageWidth;
+        } else if (worldPos.X >= stage.StageWorldMax.X) {
+            worldPos.X -= stage.TileDimensions.x / 2;
             wrapDirection = WrapDirection.Right;
         } else {
             wrapDirection = WrapDirection.NoWrap;

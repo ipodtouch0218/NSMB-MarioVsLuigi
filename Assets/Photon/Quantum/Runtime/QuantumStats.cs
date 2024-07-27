@@ -150,7 +150,9 @@ namespace Quantum {
         Toggles[i].SetActive(state);
       }
 
-      ToggleButtonText.text = state ? "Hide Stats" : "Show Stats";
+      if (ToggleButtonText) {
+        ToggleButtonText.text = state ? "Hide Stats" : "Show Stats";
+      }
     }
 
     /// <summary>
