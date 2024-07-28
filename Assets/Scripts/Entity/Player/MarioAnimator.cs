@@ -5,10 +5,15 @@ using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
 using Input = Quantum.Input;
+using System;
 
 namespace NSMB.Entities.Player {
 
     public unsafe class MarioAnimator : QuantumCallbacks {
+
+        //---Static
+        public static event Action<Frame, MarioAnimator> MarioPlayerInitialized;
+        public static event Action<Frame, MarioAnimator> MarioPlayerDestroyed;
 
         //---Static Variables
         private static readonly WaitForSeconds BlinkDelay = new(0.1f);
@@ -62,10 +67,10 @@ namespace NSMB.Entities.Player {
         public GameObject models;
 
         //---Serialized Variables
+        [SerializeField] public QuantumEntityView entity;
         [SerializeField] private CharacterAsset character;
         [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
         [SerializeField] private Animator animator;
-        [SerializeField] private QuantumEntityView entity;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
@@ -91,7 +96,6 @@ namespace NSMB.Entities.Player {
         private PlayerColors skin;
         private bool doDeathUp;
         private float lastBumpSound;
-        // private TrackIcon icon;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -157,14 +161,12 @@ namespace NSMB.Entities.Player {
                     break;
                 }
             }
+
+            MarioPlayerInitialized?.Invoke(game.Frames.Verified, this);
         }
 
-        public void OnDestroy() {
-            /*
-            if (icon) {
-                Destroy(icon.gameObject);
-            }
-            */
+        public void Destroy(QuantumGame game) {
+            MarioPlayerDestroyed?.Invoke(game.Frames.Verified, this);
         }
 
         public void Update() {
@@ -478,7 +480,28 @@ namespace NSMB.Entities.Player {
             smallModel.SetActive(!large);
             blueShell.SetActive(mario.CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(mario.CurrentPowerupState == PowerupState.PropellerMushroom);
-            animator.avatar = large ? largeAvatar : smallAvatar;
+
+            Avatar targetAvatar = large ? largeAvatar : smallAvatar;
+            if (animator.avatar != targetAvatar) {
+                // Preserve Animations
+                AnimatorStateInfo[] layerInfo = new AnimatorStateInfo[animator.layerCount];
+                for (int i = 0; i < animator.layerCount; i++) {
+                    layerInfo[i] = animator.GetCurrentAnimatorStateInfo(i);
+                    Debug.Log(layerInfo[i].fullPathHash);
+                }
+
+                animator.avatar = targetAvatar;
+
+                // Push back state
+                animator.Update(0);
+
+                for (int i = 0; i < animator.layerCount; i++) {
+                    animator.Play(layerInfo[i].fullPathHash, i, layerInfo[i].normalizedTime);
+                    animator.Update(0);
+                    Debug.Log(animator.GetCurrentAnimatorStateInfo(i).fullPathHash);
+                }
+            }
+
             animator.runtimeAnimatorController = large ? character.LargeOverrides : character.SmallOverrides;
 
             float newZ = -4;
@@ -707,7 +730,7 @@ namespace NSMB.Entities.Player {
 
 
             PlaySound(SoundEffect.Player_Sound_WallJump);
-            PlaySound(SoundEffect.Player_Voice_WallJump, variant: (byte) Random.Range(1, 3));
+            PlaySound(SoundEffect.Player_Voice_WallJump, variant: (byte) UnityEngine.Random.Range(1, 3));
             animator.SetTrigger("walljump");
         }
 

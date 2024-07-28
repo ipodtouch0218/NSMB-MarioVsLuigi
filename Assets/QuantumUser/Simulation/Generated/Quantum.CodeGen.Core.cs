@@ -861,28 +861,46 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
-  public unsafe partial struct Goomba : Quantum.IComponent {
-    public const Int32 SIZE = 40;
+  public unsafe partial struct Enemy : Quantum.IComponent {
+    public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(24)]
-    public FPVector2 Spawnpoint;
-    [FieldOffset(8)]
-    public QBoolean IsActive;
-    [FieldOffset(12)]
-    public QBoolean IsDead;
-    [FieldOffset(4)]
-    public QBoolean FacingRight;
-    [FieldOffset(0)]
-    public Byte DeathAnimationFrames;
     [FieldOffset(16)]
-    public FP Speed;
+    public FPVector2 Spawnpoint;
+    [FieldOffset(4)]
+    public QBoolean IsActive;
+    [FieldOffset(8)]
+    public QBoolean IsDead;
+    [FieldOffset(0)]
+    public QBoolean FacingRight;
     public override Int32 GetHashCode() {
       unchecked { 
-        var hash = 20731;
+        var hash = 11071;
         hash = hash * 31 + Spawnpoint.GetHashCode();
         hash = hash * 31 + IsActive.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (Enemy*)ptr;
+        QBoolean.Serialize(&p->FacingRight, serializer);
+        QBoolean.Serialize(&p->IsActive, serializer);
+        QBoolean.Serialize(&p->IsDead, serializer);
+        FPVector2.Serialize(&p->Spawnpoint, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct Goomba : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(0)]
+    public Byte DeathAnimationFrames;
+    [FieldOffset(8)]
+    public FP Speed;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 20731;
         hash = hash * 31 + DeathAnimationFrames.GetHashCode();
         hash = hash * 31 + Speed.GetHashCode();
         return hash;
@@ -891,11 +909,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Goomba*)ptr;
         serializer.Stream.Serialize(&p->DeathAnimationFrames);
-        QBoolean.Serialize(&p->FacingRight, serializer);
-        QBoolean.Serialize(&p->IsActive, serializer);
-        QBoolean.Serialize(&p->IsDead, serializer);
         FP.Serialize(&p->Speed, serializer);
-        FPVector2.Serialize(&p->Spawnpoint, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -922,45 +936,39 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Koopa : Quantum.IComponent {
-    public const Int32 SIZE = 72;
+    public const Int32 SIZE = 56;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(24)]
+    public AssetRef<EntityPrototype> SpawnWhenStomped;
     [FieldOffset(4)]
-    public KoopaType Type;
+    public QBoolean DontWalkOfLedges;
     [FieldOffset(48)]
     public FP Speed;
     [FieldOffset(40)]
     public FP KickSpeed;
-    [FieldOffset(56)]
-    public FPVector2 Spawnpoint;
-    [FieldOffset(12)]
-    public QBoolean IsActive;
-    [FieldOffset(16)]
-    public QBoolean IsDead;
+    [FieldOffset(0)]
+    public Byte Combo;
     [FieldOffset(32)]
     public FP CurrentSpeed;
-    [FieldOffset(8)]
-    public QBoolean FacingRight;
-    [FieldOffset(24)]
+    [FieldOffset(12)]
     public QBoolean IsInShell;
-    [FieldOffset(20)]
+    [FieldOffset(8)]
     public QBoolean IsFlipped;
-    [FieldOffset(28)]
+    [FieldOffset(16)]
     public QBoolean IsKicked;
-    [FieldOffset(6)]
+    [FieldOffset(2)]
     public UInt16 WakeupFrames;
-    [FieldOffset(0)]
+    [FieldOffset(1)]
     public Byte IgnoreOwnerFrames;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 16001;
-        hash = hash * 31 + (byte)Type;
+        hash = hash * 31 + SpawnWhenStomped.GetHashCode();
+        hash = hash * 31 + DontWalkOfLedges.GetHashCode();
         hash = hash * 31 + Speed.GetHashCode();
         hash = hash * 31 + KickSpeed.GetHashCode();
-        hash = hash * 31 + Spawnpoint.GetHashCode();
-        hash = hash * 31 + IsActive.GetHashCode();
-        hash = hash * 31 + IsDead.GetHashCode();
+        hash = hash * 31 + Combo.GetHashCode();
         hash = hash * 31 + CurrentSpeed.GetHashCode();
-        hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + IsInShell.GetHashCode();
         hash = hash * 31 + IsFlipped.GetHashCode();
         hash = hash * 31 + IsKicked.GetHashCode();
@@ -971,19 +979,17 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Koopa*)ptr;
+        serializer.Stream.Serialize(&p->Combo);
         serializer.Stream.Serialize(&p->IgnoreOwnerFrames);
-        serializer.Stream.Serialize((byte*)&p->Type);
         serializer.Stream.Serialize(&p->WakeupFrames);
-        QBoolean.Serialize(&p->FacingRight, serializer);
-        QBoolean.Serialize(&p->IsActive, serializer);
-        QBoolean.Serialize(&p->IsDead, serializer);
+        QBoolean.Serialize(&p->DontWalkOfLedges, serializer);
         QBoolean.Serialize(&p->IsFlipped, serializer);
         QBoolean.Serialize(&p->IsInShell, serializer);
         QBoolean.Serialize(&p->IsKicked, serializer);
+        AssetRef.Serialize(&p->SpawnWhenStomped, serializer);
         FP.Serialize(&p->CurrentSpeed, serializer);
         FP.Serialize(&p->KickSpeed, serializer);
         FP.Serialize(&p->Speed, serializer);
-        FPVector2.Serialize(&p->Spawnpoint, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1495,6 +1501,12 @@ namespace Quantum {
   public unsafe partial interface ISignalMarioPlayerCollectedCoin : ISignal {
     void MarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards);
   }
+  public unsafe partial interface ISignalOnEnemyDespawned : ISignal {
+    void OnEnemyDespawned(Frame f, EntityRef Entity);
+  }
+  public unsafe partial interface ISignalOnEnemyRespawned : ISignal {
+    void OnEnemyRespawned(Frame f, EntityRef Entity);
+  }
   public unsafe partial interface ISignalOnGameStarting : ISignal {
     void OnGameStarting(Frame f);
   }
@@ -1509,6 +1521,8 @@ namespace Quantum {
   }
   public unsafe partial class Frame {
     private ISignalMarioPlayerCollectedCoin[] _ISignalMarioPlayerCollectedCoinSystems;
+    private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
+    private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
@@ -1524,6 +1538,8 @@ namespace Quantum {
     partial void InitGen() {
       Initialize(this, this.SimulationConfig.Entities, 256);
       _ISignalMarioPlayerCollectedCoinSystems = BuildSignalsArray<ISignalMarioPlayerCollectedCoin>();
+      _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
+      _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
@@ -1541,6 +1557,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<CharacterController3D>();
       BuildSignalsArrayOnComponentAdded<Quantum.Coin>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Coin>();
+      BuildSignalsArrayOnComponentAdded<Quantum.Enemy>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.Enemy>();
       BuildSignalsArrayOnComponentAdded<Quantum.Goomba>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Goomba>();
       BuildSignalsArrayOnComponentAdded<Quantum.Holdable>();
@@ -1630,6 +1648,24 @@ namespace Quantum {
           }
         }
       }
+      public void OnEnemyDespawned(EntityRef Entity) {
+        var array = _f._ISignalOnEnemyDespawnedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEnemyDespawned(_f, Entity);
+          }
+        }
+      }
+      public void OnEnemyRespawned(EntityRef Entity) {
+        var array = _f._ISignalOnEnemyRespawnedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEnemyRespawned(_f, Entity);
+          }
+        }
+      }
       public void OnGameStarting() {
         var array = _f._ISignalOnGameStartingSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
@@ -1693,6 +1729,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(ComponentTypeRef), ComponentTypeRef.SIZE);
       typeRegistry.Register(typeof(DistanceJoint), DistanceJoint.SIZE);
       typeRegistry.Register(typeof(DistanceJoint3D), DistanceJoint3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.Enemy), Quantum.Enemy.SIZE);
       typeRegistry.Register(typeof(EntityPrototypeRef), EntityPrototypeRef.SIZE);
       typeRegistry.Register(typeof(EntityRef), EntityRef.SIZE);
       typeRegistry.Register(typeof(FP), FP.SIZE);
@@ -1719,7 +1756,6 @@ namespace Quantum {
       typeRegistry.Register(typeof(Joint3D), Joint3D.SIZE);
       typeRegistry.Register(typeof(JumpState), 1);
       typeRegistry.Register(typeof(Quantum.Koopa), Quantum.Koopa.SIZE);
-      typeRegistry.Register(typeof(KoopaType), 1);
       typeRegistry.Register(typeof(LayerMask), LayerMask.SIZE);
       typeRegistry.Register(typeof(Quantum.Liquid), Quantum.Liquid.SIZE);
       typeRegistry.Register(typeof(LiquidType), 1);
@@ -1770,12 +1806,13 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 13)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 14)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Coin>(Quantum.Coin.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.Enemy>(Quantum.Enemy.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Goomba>(Quantum.Goomba.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Koopa>(Quantum.Koopa.Serialize, null, null, ComponentFlags.None)
@@ -1793,7 +1830,6 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<GameState>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InputButtons>();
       FramePrinter.EnsurePrimitiveNotStripped<JumpState>();
-      FramePrinter.EnsurePrimitiveNotStripped<KoopaType>();
       FramePrinter.EnsurePrimitiveNotStripped<LiquidType>();
       FramePrinter.EnsurePrimitiveNotStripped<PowerupReserveResult>();
       FramePrinter.EnsurePrimitiveNotStripped<PowerupState>();

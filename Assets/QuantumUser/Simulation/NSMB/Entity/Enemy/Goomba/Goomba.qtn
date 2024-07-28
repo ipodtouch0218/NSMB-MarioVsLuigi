@@ -1,8 +1,4 @@
 component Goomba {
-	FPVector2 Spawnpoint;
-	bool IsActive;
-	bool IsDead;
-	bool FacingRight;
 	byte DeathAnimationFrames;
 	FP Speed;
 }

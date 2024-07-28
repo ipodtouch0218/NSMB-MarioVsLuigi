@@ -5,7 +5,7 @@ using static IInteractableTile;
 
 namespace Quantum {
 
-    public unsafe class MarioPlayerSystem : SystemMainThreadFilter<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, ISignalOnGameStarting {
+    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, ISignalOnGameStarting {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -14,7 +14,7 @@ namespace Quantum {
             public PhysicsCollider2D* PhysicsCollider;
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var player = filter.MarioPlayer->PlayerRef;
             Input input = *f.GetPlayerInput(player);
 
@@ -25,7 +25,6 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var physics = f.FindAsset(filter.MarioPlayer->PhysicsAsset);
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
             if (HandleDeathAndRespawning(f, filter, stage)) {
                 return;

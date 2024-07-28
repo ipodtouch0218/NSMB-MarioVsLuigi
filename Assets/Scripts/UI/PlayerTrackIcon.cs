@@ -48,6 +48,10 @@ public class PlayerTrackIcon : TrackIcon {
 
     public override void OnUpdateView(QuantumGame game) {
         base.OnUpdateView(game);
+
+        bool controllingCamera = playerElements.CameraAnimator.Target == targetEntity;
+        transform.localScale = controllingCamera ? FlipY : TwoThirds;
+        teamIcon.gameObject.SetActive(Settings.Instance.GraphicsColorblind && game.Configurations.Runtime.TeamsEnabled && !controllingCamera);
     }
 
     private IEnumerator Flash() {
@@ -62,7 +66,7 @@ public class PlayerTrackIcon : TrackIcon {
             return;
         }
 
-        StartCoroutine(Flash());
+        flashRoutine = StartCoroutine(Flash());
     }
 
     public void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {

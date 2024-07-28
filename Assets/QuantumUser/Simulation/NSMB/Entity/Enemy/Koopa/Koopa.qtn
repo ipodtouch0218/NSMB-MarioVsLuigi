@@ -1,16 +1,11 @@
-import enum KoopaType(byte);
-
 component Koopa {
-	KoopaType Type;
+	asset_ref<EntityPrototype> SpawnWhenStomped;
+	bool DontWalkOfLedges;
 	FP Speed;
 	FP KickSpeed;
-	FPVector2 Spawnpoint;
 	
-	bool IsActive;
-	bool IsDead;
-
+	byte Combo;
 	FP CurrentSpeed;
-	bool FacingRight;
 	bool IsInShell;
 	bool IsFlipped;
 	bool IsKicked;

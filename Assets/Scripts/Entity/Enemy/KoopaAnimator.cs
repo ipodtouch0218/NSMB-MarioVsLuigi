@@ -44,6 +44,7 @@ public class KoopaAnimator : MonoBehaviour {
             return;
         }
 
+        var enemy = f.Get<Enemy>(entity.EntityRef);
         var koopa = f.Get<Koopa>(entity.EntityRef);
         var holdable = f.Get<Holdable>(entity.EntityRef);
         var physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
@@ -51,12 +52,12 @@ public class KoopaAnimator : MonoBehaviour {
         // Animation
         animator.SetBool(ParamShell, koopa.IsInShell || holdable.Holder.IsValid);
         animator.SetFloat(ParamXVel, (koopa.IsInShell && !koopa.IsKicked) ? 0 : Mathf.Abs(physicsObject.Velocity.X.AsFloat));
-        animator.SetBool(ParamDead, koopa.IsDead);
+        animator.SetBool(ParamDead, enemy.IsDead);
 
         // "Flip" rotation
         float remainingWakeupTimer = koopa.WakeupFrames / 60f;
-        if (koopa.IsDead) {
-            transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (koopa.FacingRight ? -1 : 1) * Time.deltaTime));
+        if (enemy.IsDead) {
+            transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime));
 
         } else if (koopa.IsFlipped) {
             previousRotation = Quaternion.identity;
@@ -75,9 +76,9 @@ public class KoopaAnimator : MonoBehaviour {
                 remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
         }
 
-        sRenderer.enabled = koopa.IsActive;
-        sRenderer.flipX = koopa.FacingRight;
-        if (koopa.IsDead) {
+        sRenderer.enabled = enemy.IsActive;
+        sRenderer.flipX = enemy.FacingRight;
+        if (enemy.IsDead) {
             sRenderer.sprite = deadSprite;
         }
     }

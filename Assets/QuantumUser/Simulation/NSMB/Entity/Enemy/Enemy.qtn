@@ -1,3 +1,19 @@
+component Enemy {
+	FPVector2 Spawnpoint;
+	bool IsActive;
+	bool IsDead;
+	bool FacingRight;
+}
+
+signal OnEnemyDespawned(entity_ref Entity);
+
+signal OnEnemyRespawned(entity_ref Entity);
+
+event EnemyDespawned {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}
+
 event EnemyKilled {
 	nothashed Frame Frame;
 	entity_ref Enemy;
@@ -7,11 +23,11 @@ event EnemyKilled {
 
 event PlayComboSound {
 	nothashed Frame Frame;
-	EntityRef Entity;
+	entity_ref Entity;
 	nothashed byte Combo;
 }
 
 event PlayBumpSound {
 	nothashed Frame Frame;
-	EntityRef Entity;
+	entity_ref Entity;
 }

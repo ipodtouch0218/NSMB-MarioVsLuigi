@@ -1,53 +1,45 @@
 using Photon.Deterministic;
 using Quantum.Physics2D;
-using System.Diagnostics;
 
 namespace Quantum {
-    public unsafe class GoombaSystem : SystemMainThreadFilter<GoombaSystem.Filter>, ISignalOnStageReset {
+    public unsafe class GoombaSystem : SystemMainThreadFilterStage<GoombaSystem.Filter> {
         public struct Filter {
 			public EntityRef Entity;
 			public Transform2D* Transform;
+            public Enemy* Enemy;
 			public Goomba* Goomba;
 			public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
 		}
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            var enemy = filter.Enemy;
             var goomba = filter.Goomba;
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
 
-            // Inactive check
-            if (!goomba->IsActive) {
-                return;
-            }
-
-            // Despawn off bottom of stage
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            if (transform->Position.Y < stage.StageWorldMin.Y) {
-                goomba->IsActive = false;
-                goomba->IsDead = true;
-                physicsObject->IsFrozen = true;
-                return;
-            }
-
-            // Goomba is dead
-            if (goomba->IsDead) {
+            // Death animation
+            if (enemy->IsDead) {
                 // Check if they're fully dead now.
                 if (goomba->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref goomba->DeathAnimationFrames)) {
-                    goomba->IsActive = false;
+                    enemy->IsActive = false;
                     physicsObject->IsFrozen = true;
                 }
                 return;
             }
 
+            // Inactive check
+            if (!enemy->IsAlive) {
+                return;
+            }
+            
             // Turn around when hitting a wall.
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                goomba->FacingRight = physicsObject->IsTouchingLeftWall;
+                enemy->FacingRight = physicsObject->IsTouchingLeftWall;
             }
 
             // Move
-            physicsObject->Velocity.X = goomba->Speed * (goomba->FacingRight ? 1 : -1);
+            physicsObject->Velocity.X = goomba->Speed * (enemy->FacingRight ? 1 : -1);
 
             // Collide
             var hits = f.Physics2D.OverlapShape(*transform, filter.Collider->Shape);
@@ -61,6 +53,7 @@ namespace Quantum {
                 return;
             }
 
+            var enemy = filter.Enemy;
             var goomba = filter.Goomba;
             var goombaTransform = filter.Transform;
             var collider = filter.Collider;
@@ -109,18 +102,9 @@ namespace Quantum {
 
                 } else if (mario->IsDamageable) {
                     mario->Powerdown(f, hit.Entity, false);
-                    goomba->FacingRight = damageDirection.X > 0;
+                    enemy->FacingRight = damageDirection.X > 0;
                 }
                 return;
-            }
-        }
-
-        public void OnStageReset(Frame f, QBoolean full) {
-            var filter = f.Filter<Goomba>();
-            while (filter.NextUnsafe(out EntityRef entity, out Goomba* goomba)) {
-                if (!goomba->IsActive) {
-                    goomba->Reset(f, entity);
-                }
             }
         }
     }

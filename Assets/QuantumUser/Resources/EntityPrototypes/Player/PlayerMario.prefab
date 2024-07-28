@@ -10663,7 +10663,19 @@ MonoBehaviour:
         m_CallState: 2
   OnEntityDestroyed:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 79918617084146557}
+        m_TargetAssemblyTypeName: NSMB.Entities.Player.MarioAnimator, Assembly-CSharp
+        m_MethodName: Destroy
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &79918617084146557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10679,6 +10691,7 @@ MonoBehaviour:
   wasTurnaround: 0
   enableGlow: 0
   models: {fileID: 8422425992379838812}
+  entity: {fileID: 8832712012989740833}
   character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   coinNumberParticle: {fileID: 4677531960176377302, guid: 818e60315a414df48a229c8d1186ce98,
     type: 3}
@@ -10689,7 +10702,6 @@ MonoBehaviour:
   starCollectParticle: {fileID: 817659606265668166, guid: 0d07cd0662b5f394fa4d95667c1d1814,
     type: 3}
   animator: {fileID: 2254935152879088866}
-  entity: {fileID: 8832712012989740833}
   smallAvatar: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292, type: 3}
   largeAvatar: {fileID: 9000000, guid: 024ceb223bceebd488dbc425555f4df0, type: 3}
   dust: {fileID: 4824223342336871185}

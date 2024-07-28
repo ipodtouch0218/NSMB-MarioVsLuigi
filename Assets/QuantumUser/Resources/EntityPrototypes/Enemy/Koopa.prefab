@@ -156,6 +156,7 @@ GameObject:
   - component: {fileID: 5456890200873101150}
   - component: {fileID: 8298405619030623519}
   - component: {fileID: 715936171356774739}
+  - component: {fileID: -8052371499079056490}
   m_Layer: 0
   m_Name: Koopa
   m_TagString: Untagged
@@ -440,6 +441,7 @@ MonoBehaviour:
   entity: {fileID: 3939497445895134035}
   animator: {fileID: 3696720750550087088}
   sfx: {fileID: 3399800873378663516}
+  sRenderer: {fileID: 8133877121043965814}
   rotation: {fileID: 2807488173691552591}
   deadSprite: {fileID: 5077748761105158669, guid: dbd41633b1a7b504aa8c1f606333f9cc,
     type: 3}
@@ -580,24 +582,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Type: 0
+    SpawnWhenStomped:
+      Id:
+        Value: 0
+    DontWalkOfLedges:
+      Value: 0
     Speed:
       RawValue: 57344
     KickSpeed:
       RawValue: 327680
-    Spawnpoint:
-      X:
-        RawValue: -1253048
-      Y:
-        RawValue: 53739
-    IsActive:
-      Value: 0
-    IsDead:
-      Value: 0
+    Combo: 0
     CurrentSpeed:
       RawValue: 0
-    FacingRight:
-      Value: 0
     IsInShell:
       Value: 0
     IsFlipped:
@@ -621,11 +617,6 @@ MonoBehaviour:
   Prototype:
     Holder: {fileID: 0}
     PreviousHolder: {fileID: 0}
-    Offset:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
 --- !u!114 &8298405619030623519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -684,3 +675,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     _empty_prototype_dummy_field_: 0
+--- !u!114 &-8052371499079056490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8836298984178612590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1885d2a17ace89e469f425b39de1291c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    Spawnpoint:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    IsActive:
+      Value: 0
+    IsDead:
+      Value: 0
+    FacingRight:
+      Value: 0

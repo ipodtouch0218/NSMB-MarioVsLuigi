@@ -55,6 +55,12 @@ namespace Quantum {
                     powerup->LaunchSpawn = false;
                     f.Events.PowerupBecameActive(f, filter.Entity);
                 }
+            } else {
+                QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames);
+                //if () {
+                //    powerup->LaunchSpawn = false;
+                //    f.Events.PowerupBecameActive(f, filter.Entity);
+                //}
             }
 
             var asset = f.FindAsset(powerup->Scriptable);

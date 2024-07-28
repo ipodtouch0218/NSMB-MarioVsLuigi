@@ -6,8 +6,9 @@ namespace Quantum {
     public unsafe class BigStarSystem : SystemMainThread, ISignalOnTrigger2D {
 
         public override void Update(Frame f) {
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+
             if (!f.Exists(f.Global->MainBigStar) && QuantumUtils.Decrement(ref f.Global->BigStarSpawnTimer)) {
-                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 int spawnpoints = stage.BigStarSpawnpoints.Length;
                 ref BitSet64 usedSpawnpoints = ref f.Global->UsedStarSpawns;
                 for (int i = 0; i < spawnpoints; i++) {
@@ -54,16 +55,18 @@ namespace Quantum {
 
             var allStars = f.Filter<BigStar>();
             while (allStars.NextUnsafe(out EntityRef entity, out BigStar* bigStar)) {
-                HandleStar(f, entity, bigStar);
+                HandleStar(f, stage, entity, bigStar);
             }
         }
 
-        private void HandleStar(Frame f, EntityRef entity, BigStar* bigStar) {
+        private void HandleStar(Frame f, VersusStageData stage, EntityRef entity, BigStar* bigStar) {
             if (bigStar->IsStationary) {
                 return;
             }
 
-            if (QuantumUtils.Decrement(ref bigStar->Lifetime)) {
+            var transform = f.Get<Transform2D>(entity);
+
+            if (QuantumUtils.Decrement(ref bigStar->Lifetime) || (transform.Position.Y < stage.StageWorldMin.Y && bigStar->UncollectableFrames == 0)) {
                 f.Destroy(entity);
                 return;
             }
@@ -78,15 +81,18 @@ namespace Quantum {
                 physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
             }
 
-            if (QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
-                physicsObject->DisableCollision = false;
+            if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
+                var physicsCollider = f.Get<PhysicsCollider2D>(entity);
+                if ((f.Number % 4) == 0 && !PhysicsObjectSystem.BoxInsideTile(f, transform.Position, physicsCollider.Shape)) {
+                    physicsObject->DisableCollision = false;
+                }
             }
             QuantumUtils.Decrement(ref bigStar->UncollectableFrames);
         }
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
             if (f.DestroyPending(info.Other)
-                || !f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario) 
+                || !f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)
                 || !f.Unsafe.TryGetPointer(info.Other, out BigStar* star)
                 || star->UncollectableFrames > 0) {
                 return;
@@ -98,7 +104,11 @@ namespace Quantum {
 
             mario->Stars++;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            stage.ResetStage(f, false);
+
+            if (star->IsStationary) {
+                stage.ResetStage(f, false);
+            }
+
             f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario, f.Get<Transform2D>(info.Other).Position);
             f.Global->BigStarSpawnTimer = (ushort) (624 - (f.PlayerConnectedCount * 12));
             f.Destroy(info.Other);

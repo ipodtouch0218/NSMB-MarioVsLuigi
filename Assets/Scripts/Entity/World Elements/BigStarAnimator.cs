@@ -1,10 +1,13 @@
 using NSMB.Extensions;
 using Quantum;
+using System;
 using UnityEngine;
 
 public class BigStarAnimator : QuantumCallbacks {
 
     //---Static Variables
+    public static event Action<Frame, BigStarAnimator> BigStarInitialized;
+    public static event Action<Frame, BigStarAnimator> BigStarDestroyed;
     private static Color UncollectableColor = new(1, 1, 1, 0.55f);
 
     //---Serialized Variables
@@ -14,8 +17,8 @@ public class BigStarAnimator : QuantumCallbacks {
     [SerializeField] private GameObject starCollectPrefab;
 
     //---Components
-    [SerializeField] private QuantumEntityView entity;
-    [SerializeField] public SpriteRenderer sRenderer;
+    [SerializeField] public QuantumEntityView entity;
+    [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private BoxCollider2D worldCollider;
     [SerializeField] private Animation animation;
     [SerializeField] private AudioSource sfx, sfx2;
@@ -44,6 +47,12 @@ public class BigStarAnimator : QuantumCallbacks {
         if (stationary) {
             animation.Play();
         }
+
+        BigStarInitialized?.Invoke(f, this);
+    }
+
+    public void Destroy(QuantumGame game) {
+        BigStarDestroyed?.Invoke(game.Frames.Verified, this);
     }
 
     public void Update() {

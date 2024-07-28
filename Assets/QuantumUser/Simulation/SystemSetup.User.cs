@@ -12,6 +12,7 @@ namespace Quantum {
             systems.Add(new GameLogicSystem());
             systems.Add(
                 new GameplaySystemGroup(
+                    new EnemySystem(),
                     new GoombaSystem(),
                     new KoopaSystem(),
                     new MarioPlayerSystem(),

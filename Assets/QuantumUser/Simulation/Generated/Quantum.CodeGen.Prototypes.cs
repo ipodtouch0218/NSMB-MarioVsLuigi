@@ -150,12 +150,29 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
-  [Quantum.Prototypes.Prototype(typeof(Quantum.Goomba))]
-  public unsafe partial class GoombaPrototype : ComponentPrototype<Quantum.Goomba> {
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Enemy))]
+  public unsafe partial class EnemyPrototype : ComponentPrototype<Quantum.Enemy> {
     public FPVector2 Spawnpoint;
     public QBoolean IsActive;
     public QBoolean IsDead;
     public QBoolean FacingRight;
+    partial void MaterializeUser(Frame frame, ref Quantum.Enemy result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Enemy component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Enemy result, in PrototypeMaterializationContext context = default) {
+        result.Spawnpoint = this.Spawnpoint;
+        result.IsActive = this.IsActive;
+        result.IsDead = this.IsDead;
+        result.FacingRight = this.FacingRight;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Goomba))]
+  public unsafe partial class GoombaPrototype : ComponentPrototype<Quantum.Goomba> {
     public Byte DeathAnimationFrames;
     public FP Speed;
     partial void MaterializeUser(Frame frame, ref Quantum.Goomba result, in PrototypeMaterializationContext context);
@@ -165,10 +182,6 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.Goomba result, in PrototypeMaterializationContext context = default) {
-        result.Spawnpoint = this.Spawnpoint;
-        result.IsActive = this.IsActive;
-        result.IsDead = this.IsDead;
-        result.FacingRight = this.FacingRight;
         result.DeathAnimationFrames = this.DeathAnimationFrames;
         result.Speed = this.Speed;
         MaterializeUser(frame, ref result, in context);
@@ -218,14 +231,12 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Koopa))]
   public unsafe partial class KoopaPrototype : ComponentPrototype<Quantum.Koopa> {
-    public KoopaType Type;
+    public AssetRef<EntityPrototype> SpawnWhenStomped;
+    public QBoolean DontWalkOfLedges;
     public FP Speed;
     public FP KickSpeed;
-    public FPVector2 Spawnpoint;
-    public QBoolean IsActive;
-    public QBoolean IsDead;
+    public Byte Combo;
     public FP CurrentSpeed;
-    public QBoolean FacingRight;
     public QBoolean IsInShell;
     public QBoolean IsFlipped;
     public QBoolean IsKicked;
@@ -238,14 +249,12 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.Koopa result, in PrototypeMaterializationContext context = default) {
-        result.Type = this.Type;
+        result.SpawnWhenStomped = this.SpawnWhenStomped;
+        result.DontWalkOfLedges = this.DontWalkOfLedges;
         result.Speed = this.Speed;
         result.KickSpeed = this.KickSpeed;
-        result.Spawnpoint = this.Spawnpoint;
-        result.IsActive = this.IsActive;
-        result.IsDead = this.IsDead;
+        result.Combo = this.Combo;
         result.CurrentSpeed = this.CurrentSpeed;
-        result.FacingRight = this.FacingRight;
         result.IsInShell = this.IsInShell;
         result.IsFlipped = this.IsFlipped;
         result.IsKicked = this.IsKicked;

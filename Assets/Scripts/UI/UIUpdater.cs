@@ -1,3 +1,4 @@
+using NSMB.Entities.Player;
 using NSMB.Translation;
 using NSMB.Utils;
 using Quantum;
@@ -19,6 +20,7 @@ public class UIUpdater : QuantumCallbacks {
     public EntityRef Target { get; set; }
 
     //---Serialized Variables
+    [SerializeField] private PlayerElements playerElements;
     [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
     [SerializeField] private Sprite storedItemNull;
     [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
@@ -28,6 +30,7 @@ public class UIUpdater : QuantumCallbacks {
     [SerializeField] private InputActionReference pauseAction;
 
     //---Private Variables
+    private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
     private readonly List<Image> backgrounds = new();
     private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
     private Material timerMaterial;
@@ -41,12 +44,22 @@ public class UIUpdater : QuantumCallbacks {
 
     protected override void OnEnable() {
         base.OnEnable();
+
+        MarioAnimator.MarioPlayerInitialized += OnMarioInitialized;
+        MarioAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
+        BigStarAnimator.BigStarInitialized += OnStarInitialized;
+        BigStarAnimator.BigStarDestroyed += OnStarDestroyed;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
     protected override void OnDisable() {
         base.OnDisable();
+
+        MarioAnimator.MarioPlayerInitialized -= OnMarioInitialized;
+        MarioAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
+        BigStarAnimator.BigStarInitialized -= OnStarInitialized;
+        BigStarAnimator.BigStarDestroyed -= OnStarDestroyed;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
@@ -75,11 +88,11 @@ public class UIUpdater : QuantumCallbacks {
     public override void OnUpdateView(QuantumGame game) {
         // PlayerTrackIcon.HideAllPlayerIcons = !GameManager.Instance.spectationManager.Spectating && GameManager.Instance.hidePlayersOnMinimap;
 
-        if (!Target.IsValid) {
-            return;
-        }
+        Frame f = game.Frames.Predicted;
+        UpdateTrackIcons(f);
 
-        if (!game.Frames.Predicted.TryGet(Target, out MarioPlayer mario)) {
+        if (!Target.IsValid
+            || !f.TryGet(Target, out MarioPlayer mario)) {
             return;
         }
 
@@ -100,6 +113,36 @@ public class UIUpdater : QuantumCallbacks {
         UpdateStoredItemUI(mario);
         UpdateTextUI(mario);
         ApplyUIColor(mario);
+    }
+
+    private void OnMarioInitialized(Frame f, MarioAnimator mario) {
+        entityTrackIcons[mario] = CreateTrackIcon(f, mario.entity.EntityRef, mario.transform);
+    }
+
+    private void OnMarioDestroyed(Frame f, MarioAnimator mario) {
+        if (entityTrackIcons.TryGetValue(mario, out TrackIcon icon)) {
+            Destroy(icon.gameObject);
+        }
+    }
+
+    private void OnStarInitialized(Frame f, BigStarAnimator star) {
+        entityTrackIcons[star] = CreateTrackIcon(f, star.entity.EntityRef, star.transform);
+    }
+
+    private void OnStarDestroyed(Frame f, BigStarAnimator star) {
+        if (entityTrackIcons.TryGetValue(star, out TrackIcon icon)) {
+            Destroy(icon.gameObject);
+        }
+    }
+
+    private void UpdateTrackIcons(Frame f) {
+        HashSet<EntityRef> validEntities = new();
+
+        var filter = f.Filter<BigStar>();
+        while (filter.Next(out EntityRef entity, out _)) {
+            validEntities.Add(entity);
+        }
+
     }
 
     private void ToggleUI(QuantumGame game, bool hidden) {
@@ -193,15 +236,15 @@ public class UIUpdater : QuantumCallbacks {
         }
     }
 
-    public TrackIcon CreateTrackIcon(EntityRef entity, Transform target, bool isStar) {
+    public TrackIcon CreateTrackIcon(Frame f, EntityRef entity, Transform target) {
         TrackIcon icon;
-        if (isStar) {
+        if (f.Has<BigStar>(entity)) {
             icon = Instantiate(starTrackTemplate, starTrackTemplate.transform.parent);
         } else {
             icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
         }
 
-        icon.Initialize(entity, target, stage);
+        icon.Initialize(playerElements, entity, target, stage);
         icon.gameObject.SetActive(true);
         return icon;
     }

@@ -11,6 +11,7 @@ public class PlayerElements : MonoBehaviour {
     //---Properties
     public PlayerRef Player => player;
     public Camera Camera => ourCamera;
+    public CameraAnimator CameraAnimator => cameraAnimator;
 
     //---Serialized Variables
     [SerializeField] private RawImage image;
@@ -48,9 +49,8 @@ public class PlayerElements : MonoBehaviour {
 
     public void Initialize(PlayerRef player) {
         this.player = player;
-        image.transform.SetParent(transform.parent);
-        transform.SetParent(null);
-        transform.position = Vector3.zero;
+        Camera.transform.SetParent(null);
+        Camera.transform.localScale = Vector3.one;
         OnResolutionChanged();
     }
 
@@ -67,6 +67,7 @@ public class PlayerElements : MonoBehaviour {
 
         texture = RenderTexture.GetTemporary(Screen.width, Screen.height);
         image.texture = texture;
+        Camera.targetTexture = texture;
 
         float aspect = ourCamera.aspect;
         double size = (14 / 4f) /*+ SizeIncreaseCurrent*/;

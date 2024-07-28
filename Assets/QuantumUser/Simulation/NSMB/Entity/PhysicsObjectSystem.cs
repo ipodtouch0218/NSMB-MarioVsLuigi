@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilter<PhysicsObjectSystem.Filter> {
@@ -224,7 +225,7 @@ namespace Quantum {
             filter.Transform->Position += directionVector * FPMath.Abs(velocityX);
         }
 
-        public void ResolveContacts(PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
+        private void ResolveContacts(PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
 
             physicsObject->FloorAngle = 0;
             physicsObject->IsTouchingGround = false;
@@ -365,6 +366,172 @@ namespace Quantum {
 
         private static FPVector2 Project(FPVector2 a, FPVector2 b) {
             return b * (FPVector2.Dot(a, b) / b.Magnitude);
+        }
+
+        public static bool BoxInsideTile(Frame f, FPVector2 position, Shape2D shape) {
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var extents = shape.Box.Extents;
+
+            FPVector2 origin = position + shape.Centroid;
+            FPVector2 boxMin = origin - extents;
+            FPVector2 boxMax = origin + extents;
+
+            FPVector2[] boxCorners = {
+                new(origin.X - extents.X, origin.Y + extents.Y),
+                boxMax,
+                new(origin.X + extents.X, origin.Y - extents.Y),
+                boxMin,
+            };
+
+            for (int x = FPMath.FloorToInt((origin.X - extents.X) * 2); x <= FPMath.FloorToInt((origin.X + extents.X) * 2); x++) {
+                for (int y = FPMath.FloorToInt((origin.Y - extents.Y) * 2); y <= FPMath.FloorToInt((origin.Y + extents.Y) * 2); y++) {
+                    FPVector2 testTile = new FPVector2(x, y) / 2;
+                    FPVector2[][] tilePolygons = stage.GetTileWorld(f, testTile).GetWorldPolygons(f, QuantumUtils.RoundWorld(testTile));
+
+                    foreach (var polygon in tilePolygons) {
+                    /*
+                        foreach (var corner in boxCorners) {
+                            if (PointIsInsidePolygon(corner, polygon)) {
+                                return true;
+                            }
+                        }
+                        */
+                        for (int i = 0; i < polygon.Length; i++) {
+                            if (LineIntersectsBox(polygon[i], polygon[(i + 1) % polygon.Length], boxMin, boxMax)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool PointIsInsidePolygon(FPVector2 point, FPVector2[] polygon) {
+            // Can't be inside a line...
+            if (polygon.Length < 3) {
+                return false;
+            }
+
+            // https://stackoverflow.com/a/49434625/19635374
+            bool result = false;
+            var a = polygon[^1];
+            foreach (var b in polygon) {
+                if ((b.X == point.X) && (b.Y == point.Y)) {
+                    return true;
+                }
+
+                if ((b.Y == a.Y) && (point.Y == a.Y)) {
+                    if ((a.X <= point.X) && (point.X <= b.X)) {
+                        return true;
+                    }
+
+                    if ((b.X <= point.X) && (point.X <= a.X)) {
+                        return true;
+                    }
+                }
+
+                if ((b.Y < point.Y) && (a.Y >= point.Y) || (a.Y < point.Y) && (b.Y >= point.Y)) {
+                    if (b.X + (point.Y - b.Y) / (a.Y - b.Y) * (a.X - b.X) <= point.X) {
+                        result = !result;
+                    }
+                }
+                a = b;
+            }
+
+            // Invert result if counterclockwise (outside)
+            return result ^ FPVector2.IsCounterClockWise(polygon);
+        }
+
+        // ------------ https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm ------------ //
+        [Flags]
+        enum OutCode {
+            Inside = 0,
+            Left = 1 << 0,
+            Right = 1 << 1,
+            Bottom = 1 << 2,
+            Top = 1 << 3,
+        }
+
+        private static OutCode ComputeOutCode(FPVector2 point, FPVector2 boxMin, FPVector2 boxMax) {
+            OutCode code = OutCode.Inside;  // initialised as being inside of clip window
+
+            if (point.X < boxMin.X) {
+                code |= OutCode.Left;
+            } else if (point.X > boxMax.X) {
+                code |= OutCode.Right;
+            }
+            if (point.Y < boxMin.Y) {
+                code |= OutCode.Bottom;
+            } else if (point.Y > boxMax.Y) {
+                code |= OutCode.Top;
+            }
+
+            return code;
+        }
+
+        // Cohen–Sutherland clipping algorithm clips a line from
+        // P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
+        // diagonal from (xmin, ymin) to (xmax, ymax).
+        private static bool LineIntersectsBox(FPVector2 a, FPVector2 b, FPVector2 boxMin, FPVector2 boxMax) {
+            // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
+            int outcode0 = (int) ComputeOutCode(a, boxMin, boxMax);
+            int outcode1 = (int) ComputeOutCode(b, boxMin, boxMax);
+            bool accept = false;
+
+            while (true) {
+                if ((outcode0 | outcode1) == 0) {
+                    // bitwise OR is 0: both points inside window; trivially accept and exit loop
+                    accept = true;
+                    break;
+                } else if ((outcode0 & outcode1) != 0) {
+                    // bitwise AND is not 0: both points share an outside zone (LEFT, RIGHT, TOP,
+                    // or BOTTOM), so both must be outside window; exit loop (accept is false)
+                    break;
+                } else {
+                    // failed both tests, so calculate the line segment to clip
+                    // from an outside point to an intersection with clip edge
+                    FP x = 0, y = 0;
+
+                    // At least one endpoint is outside the clip rectangle; pick it.
+                    int outcodeOut = (outcode1 > outcode0) ? outcode1 : outcode0;
+
+                    // Now find the intersection point;
+                    // use formulas:
+                    //   slope = (y1 - y0) / (x1 - x0)
+                    //   x = x0 + (1 / slope) * (ym - y0), where ym is ymin or ymax
+                    //   y = y0 + slope * (xm - x0), where xm is xmin or xmax
+                    // No need to worry about divide-by-zero because, in each case, the
+                    // outcode bit being tested guarantees the denominator is non-zero
+                    if (((OutCode) outcodeOut).HasFlag(OutCode.Top)) {           // point is above the clip window
+                        x = a.X + (b.X - a.X) * (boxMax.Y - a.Y) / (b.Y - a.Y);
+                        y = boxMax.Y;
+                    } else if (((OutCode) outcodeOut).HasFlag(OutCode.Bottom)) { // point is below the clip window
+                        x = a.X + (b.X - a.X) * (boxMin.Y - a.Y) / (b.Y - a.Y);
+                        y = boxMin.Y;
+                    } else if (((OutCode) outcodeOut).HasFlag(OutCode.Right)) {  // point is to the right of clip window
+                        y = a.Y + (b.Y - a.Y) * (boxMax.X - a.X) / (b.X - a.X);
+                        x = boxMax.X;
+                    } else if (((OutCode) outcodeOut).HasFlag(OutCode.Left)) {   // point is to the left of clip window
+                        y = a.Y + (b.Y - a.Y) * (boxMin.X - a.X) / (b.X - a.X);
+                        x = boxMin.X;
+                    }
+
+                    // Now we move outside point to intersection point to clip
+                    // and get ready for next pass.
+                    if (outcodeOut == outcode0) {
+                        a.X = x;
+                        a.Y = y;
+                        outcode0 = (int) ComputeOutCode(a, boxMin, boxMax);
+                    } else {
+                        b.X = x;
+                        b.Y = y;
+                        outcode1 = (int) ComputeOutCode(b, boxMin, boxMax);
+                    }
+                }
+            }
+            return accept;
         }
     }
 }

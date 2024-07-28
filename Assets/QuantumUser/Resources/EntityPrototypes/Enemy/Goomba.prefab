@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 6594219812404515847}
   - component: {fileID: 6536869809639107625}
   - component: {fileID: 269757506607064473}
+  - component: {fileID: 148468707364900969}
   m_Layer: 0
   m_Name: Goomba
   m_TagString: Untagged
@@ -614,6 +615,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
+    DeathAnimationFrames: 0
+    Speed:
+      RawValue: 57344
+--- !u!114 &148468707364900969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7523289063499453450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1885d2a17ace89e469f425b39de1291c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
     Spawnpoint:
       X:
         RawValue: 0
@@ -625,6 +642,3 @@ MonoBehaviour:
       Value: 0
     FacingRight:
       Value: 0
-    DeathAnimationFrames: 0
-    Speed:
-      RawValue: 57344

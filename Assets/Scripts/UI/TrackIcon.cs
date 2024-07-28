@@ -13,15 +13,18 @@ public abstract class TrackIcon : QuantumCallbacks {
     protected EntityRef targetEntity;
     protected Transform targetTransform;
     protected VersusStageData stage;
+    protected PlayerElements playerElements;
+
     private float levelWidthReciprocal;
     private float levelMinX;
     private float trackWidth;
 
-    public void OnValidate() {
+    public virtual void OnValidate() {
         this.SetIfNull(ref image);
     }
 
-    public void Initialize(EntityRef targetEntity, Transform targetTransform, VersusStageData stage) {
+    public void Initialize(PlayerElements playerElements, EntityRef targetEntity, Transform targetTransform, VersusStageData stage) {
+        this.playerElements = playerElements;
         this.targetEntity = targetEntity;
         this.targetTransform = targetTransform;
         this.stage = stage;

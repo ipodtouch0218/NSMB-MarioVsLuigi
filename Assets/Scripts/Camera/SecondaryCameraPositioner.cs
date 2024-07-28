@@ -40,7 +40,7 @@ public class SecondaryCameraPositioner : MonoBehaviour {
         if (enable) {
             float middle = stage.StageWorldMin.X.AsFloat + stage.TileDimensions.x * 0.25f;
             bool rightHalf = mainCamera.transform.position.x > middle;
-            transform.localPosition = new(stage.TileDimensions.x * (rightHalf ? -1 : 1), 0, 0);
+            transform.localPosition = new(stage.TileDimensions.x * (rightHalf ? -1 : 1) * 0.5f, 0, 0);
         }
     }
 }

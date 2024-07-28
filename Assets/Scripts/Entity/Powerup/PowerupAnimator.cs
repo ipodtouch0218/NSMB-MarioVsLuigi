@@ -53,6 +53,10 @@ public class PowerupAnimator : QuantumCallbacks {
             sRenderer.sortingOrder = -1000;
         } else {
             // Spawned by any other means (blue koopa, usually.)
+            sfx.PlayOneShot(SoundEffect.World_Block_Powerup);
+            if (childAnimation) {
+                childAnimation.Play();
+            }
             sRenderer.sortingOrder = originalSortingOrder;
         }
     }

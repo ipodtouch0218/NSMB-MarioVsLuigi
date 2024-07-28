@@ -110,7 +110,6 @@ public static unsafe class QuantumUtils {
         return worldPos;
     }
 
-
     public static void UnwrapWorldLocations(Frame f, FPVector2 a, FPVector2 b, out FPVector2 newA, out FPVector2 newB) {
         UnwrapWorldLocations(f.FindAsset<VersusStageData>(f.Map.UserAsset), a, b, out newA, out newB);
     }
@@ -133,6 +132,13 @@ public static unsafe class QuantumUtils {
         NoWrap,
         Left,
         Right
+    }
+
+    public static FPVector2 RoundWorld(FPVector2 worldPos) {
+        return new FPVector2(
+            FPMath.Floor(worldPos.X * 2) / 2 + FP._0_25,
+            FPMath.Floor(worldPos.Y * 2) / 2 + FP._0_25
+        );
     }
 
     public static int GetTeamStars(Frame f, int team) {

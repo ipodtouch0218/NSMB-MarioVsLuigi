@@ -31,19 +31,21 @@ public class GoombaAnimator : MonoBehaviour {
     private void OnUpdateView(CallbackUpdateView view) {
         QuantumGame game = view.Game;
         Frame f = game.Frames.Predicted;
+
+        var enemy = f.Get<Enemy>(entity.EntityRef);
         var goomba = f.Get<Goomba>(entity.EntityRef);
 
-        sRenderer.enabled = goomba.IsActive;
-        legacyAnimation.enabled = goomba.IsActive && !goomba.IsDead;
-        sRenderer.flipX = goomba.FacingRight;
+        sRenderer.enabled = enemy.IsActive;
+        legacyAnimation.enabled = enemy.IsAlive;
+        sRenderer.flipX = enemy.FacingRight;
 
-        if (goomba.IsDead) {
+        if (enemy.IsDead) {
             if (goomba.DeathAnimationFrames > 0) {
                 // Stomped
                 sRenderer.sprite = deadSprite;
             } else {
                 // Special killed
-                transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (goomba.FacingRight ? -1 : 1) * Time.deltaTime));
+                transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime));
             }
         } else {
             previousRotation = Quaternion.identity;

@@ -5142,7 +5142,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: -4072674724814133322}
         m_TargetAssemblyTypeName: BigStarAnimator, Assembly-CSharp
-        m_MethodName: EntityDestroyed
+        m_MethodName: Destroy
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
