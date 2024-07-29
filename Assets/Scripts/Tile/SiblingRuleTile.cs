@@ -9,6 +9,7 @@ namespace NSMB.Tiles {
     /// A RuleTile that can match with both itself, and other defined "sibling" tiles.
     /// Credit: https://github.com/Unity-Technologies/2d-extras/issues/67#issuecomment-616013310
     /// </summary>
+    [CreateAssetMenu(fileName = "New Sibling Rule Tile", menuName = "Sibling RuleTile", order = 0)]
     [ExecuteInEditMode]
     public class SiblingRuleTile : RuleTile {
 

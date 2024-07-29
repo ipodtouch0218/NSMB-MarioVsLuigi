@@ -131,9 +131,12 @@ namespace Quantum.Prototypes {
   public unsafe partial class CoinPrototype : ComponentPrototype<Quantum.Coin> {
     public QBoolean IsFloating;
     public QBoolean IsDotted;
+    public UInt16 Lifetime;
+    public Byte UncollectableFrames;
+    public FPVector2 PreviousVelocity;
     public QBoolean IsCollected;
     public QBoolean IsCurrentlyDotted;
-    public Byte DottedChangeTimer;
+    public Byte DottedChangeFrames;
     partial void MaterializeUser(Frame frame, ref Quantum.Coin result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Coin component = default;
@@ -143,9 +146,12 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.Coin result, in PrototypeMaterializationContext context = default) {
         result.IsFloating = this.IsFloating;
         result.IsDotted = this.IsDotted;
+        result.Lifetime = this.Lifetime;
+        result.UncollectableFrames = this.UncollectableFrames;
+        result.PreviousVelocity = this.PreviousVelocity;
         result.IsCollected = this.IsCollected;
         result.IsCurrentlyDotted = this.IsCurrentlyDotted;
-        result.DottedChangeTimer = this.DottedChangeTimer;
+        result.DottedChangeFrames = this.DottedChangeFrames;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -301,7 +307,6 @@ namespace Quantum.Prototypes {
     public Byte SpawnpointIndex;
     public Byte Team;
     public PowerupState CurrentPowerupState;
-    public AssetRef<PowerupAsset> CurrentPowerupScriptable;
     public PowerupState PreviousPowerupState;
     public AssetRef<PowerupAsset> ReserveItem;
     public Byte Stars;
@@ -346,8 +351,12 @@ namespace Quantum.Prototypes {
     public QBoolean IsSliding;
     public QBoolean IsSpinnerFlying;
     public QBoolean IsDrilling;
-    public UInt16 InvincibilityFrames;
     public Byte Combo;
+    public UInt16 InvincibilityFrames;
+    public Byte MegaMushroomStartFrames;
+    public UInt16 MegaMushroomFrames;
+    public Byte MegaMushroomEndFrames;
+    public QBoolean MegaMushroomStationaryEnd;
     public Byte ProjectileDelayFrames;
     public Byte ProjectileVolleyFrames;
     public Byte CurrentProjectiles;
@@ -372,7 +381,6 @@ namespace Quantum.Prototypes {
         result.SpawnpointIndex = this.SpawnpointIndex;
         result.Team = this.Team;
         result.CurrentPowerupState = this.CurrentPowerupState;
-        result.CurrentPowerupScriptable = this.CurrentPowerupScriptable;
         result.PreviousPowerupState = this.PreviousPowerupState;
         result.ReserveItem = this.ReserveItem;
         result.Stars = this.Stars;
@@ -417,8 +425,12 @@ namespace Quantum.Prototypes {
         result.IsSliding = this.IsSliding;
         result.IsSpinnerFlying = this.IsSpinnerFlying;
         result.IsDrilling = this.IsDrilling;
-        result.InvincibilityFrames = this.InvincibilityFrames;
         result.Combo = this.Combo;
+        result.InvincibilityFrames = this.InvincibilityFrames;
+        result.MegaMushroomStartFrames = this.MegaMushroomStartFrames;
+        result.MegaMushroomFrames = this.MegaMushroomFrames;
+        result.MegaMushroomEndFrames = this.MegaMushroomEndFrames;
+        result.MegaMushroomStationaryEnd = this.MegaMushroomStationaryEnd;
         result.ProjectileDelayFrames = this.ProjectileDelayFrames;
         result.ProjectileVolleyFrames = this.ProjectileVolleyFrames;
         result.CurrentProjectiles = this.CurrentProjectiles;
@@ -548,6 +560,7 @@ namespace Quantum.Prototypes {
     public QBoolean FacingRight;
     public QBoolean HasBounced;
     public QBoolean PlayDestroySound;
+    public QBoolean CheckedCollision;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Projectile component = default;
         Materialize((Frame)f, ref component, in context);
@@ -560,6 +573,7 @@ namespace Quantum.Prototypes {
         result.FacingRight = this.FacingRight;
         result.HasBounced = this.HasBounced;
         result.PlayDestroySound = this.PlayDestroySound;
+        result.CheckedCollision = this.CheckedCollision;
     }
   }
   [System.SerializableAttribute()]

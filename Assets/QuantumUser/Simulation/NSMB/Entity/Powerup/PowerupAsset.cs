@@ -10,7 +10,7 @@ public class PowerupAsset : AssetObject {
     public AssetRef<EntityPrototype> Prefab;
     public bool SoundPlaysEverywhere;
     public SoundEffect SoundEffect = SoundEffect.Player_Sound_PowerupCollect;
-    public SoundEffect BlockSpawnSoundEffectEffect = SoundEffect.World_Block_Powerup;
+    public SoundEffect BlockSpawnSoundEffect = SoundEffect.World_Block_Powerup;
     public FP SpawnChance = FP._0_10, LosingSpawnBonus = 0;
     public bool BigPowerup, VerticalPowerup, CustomPowerup, LivesOnlyPowerup;
     public Sprite ReserveSprite;

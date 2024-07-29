@@ -167,7 +167,7 @@ namespace Quantum {
                     }
                 } else {
                     // Stationary in shell, always kick (if we cant pick it up)
-                    if (mario->CanPickupItem(f)) {
+                    if (mario->CanPickupItem(f, hit.Entity)) {
                         filter.Holdable->Pickup(f, filter.Entity, hit.Entity);
                     } else {
                         koopa->Kick(f, filter.Entity, hit.Entity, marioPhysicsObject->Velocity.X / 7);

@@ -64,15 +64,6 @@ namespace Quantum {
             }
 
             var asset = f.FindAsset(powerup->Scriptable);
-            HandleCollision(filter, asset);
-
-            if (powerup->AnimationCurveTimer > 0) {
-                transform->Position = powerup->AnimationCurveOrigin + new FPVector2(
-                    asset.AnimationCurveX.Evaluate(FPMath.Clamp(powerup->AnimationCurveTimer, 0, asset.AnimationCurveX.EndTime - FP._0_10)),
-                    asset.AnimationCurveY.Evaluate(FPMath.Clamp(powerup->AnimationCurveTimer, 0, asset.AnimationCurveY.EndTime - FP._0_10))
-                );
-                powerup->AnimationCurveTimer += f.DeltaTime;
-            }
 
             if (asset.AvoidPlayers && physicsObject->IsTouchingGround) {
                 FPVector2? closestMarioPosition = null;
@@ -86,6 +77,16 @@ namespace Quantum {
                 if (closestMarioPosition.HasValue) {
                     powerup->FacingRight = QuantumUtils.WrappedDirectionSign(f, closestMarioPosition.Value, transform->Position) == -1;
                 }
+            }
+
+            HandleCollision(filter, asset);
+
+            if (powerup->AnimationCurveTimer > 0) {
+                transform->Position = powerup->AnimationCurveOrigin + new FPVector2(
+                    asset.AnimationCurveX.Evaluate(FPMath.Clamp(powerup->AnimationCurveTimer, 0, asset.AnimationCurveX.EndTime - FP._0_10)),
+                    asset.AnimationCurveY.Evaluate(FPMath.Clamp(powerup->AnimationCurveTimer, 0, asset.AnimationCurveY.EndTime - FP._0_10))
+                );
+                powerup->AnimationCurveTimer += f.DeltaTime;
             }
 
             if (QuantumUtils.Decrement(ref powerup->Lifetime)) {
@@ -128,7 +129,7 @@ namespace Quantum {
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
             if (!f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)
                 || mario->IsDead
-                || !f.TryGet(info.Entity, out PhysicsObject physicsObject)
+                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* physicsObject)
                 || !f.Unsafe.TryGetPointer(info.Other, out Powerup* powerup)) {
                 return;
             }
@@ -149,11 +150,11 @@ namespace Quantum {
                 return;
             }
 
-            var currentScriptable = f.FindAsset(mario->CurrentPowerupScriptable);
+            var currentScriptable = QuantumUtils.FindPowerupAsset(f, mario->CurrentPowerupState);
             var newScriptable = f.FindAsset(powerup->Scriptable);
 
             // Change the player's powerup state
-            PowerupReserveResult result = PowerupCollect(f, mario, physicsObject, newScriptable);
+            PowerupReserveResult result = PowerupCollect(f, info.Entity, mario, physicsObject, newScriptable);
 
             switch (result) {
             case PowerupReserveResult.ReserveOldPowerup: {
@@ -172,7 +173,7 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedPowerup(f, info.Entity, *mario, result, newScriptable);
         }
 
-        public PowerupReserveResult PowerupCollect(Frame f, MarioPlayer* mario, PhysicsObject physicsObject, PowerupAsset newPowerup) {
+        public PowerupReserveResult PowerupCollect(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* physicsObject, PowerupAsset newPowerup) {
             
             if (newPowerup.Type == PowerupType.Starman) {
                 mario->InvincibilityFrames = 600;
@@ -180,19 +181,24 @@ namespace Quantum {
             }
 
             PowerupState newState = newPowerup.State;
-            var currentPowerup = f.FindAsset(mario->CurrentPowerupScriptable);
+            var currentPowerup = QuantumUtils.FindPowerupAsset(f, mario->CurrentPowerupState);
 
             // Reserve if it's the same item
             if (mario->CurrentPowerupState == newState) {
                 return PowerupReserveResult.ReserveNewPowerup;
             }
 
-            /* TODO
-            // Reserve if we cant fit with our new hitbox
-            if (mario->State == Enums.PowerupState.MiniMushroom && physicsObject.IsTouchingGround && runner.GetPhysicsScene2D().Raycast(player.body.Position, Vector2.up, 0.3f, Layers.MaskSolidGround)) {
-                return PowerupReserveResult.ReserveNewPowerup;
+            if (mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsTouchingGround) {
+                var transform = f.Get<Transform2D>(marioEntity);
+                var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioEntity);
+                Shape2D shape = collider->Shape;
+                shape.Box.Extents *= 2;
+                shape.Centroid.Y = shape.Box.Extents.Y / 2;
+
+                if (PhysicsObjectSystem.BoxInsideTile(f, transform.Position, shape)) {
+                    return PowerupReserveResult.ReserveNewPowerup;
+                }
             }
-            */
 
             sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.StatePriority : (sbyte) -1;
             sbyte newPowerupItemPriority = newPowerup ? newPowerup.ItemPriority : (sbyte) -1;
@@ -202,9 +208,14 @@ namespace Quantum {
                 return PowerupReserveResult.ReserveNewPowerup;
             }
 
+            if (newState == PowerupState.MegaMushroom) {
+                mario->MegaMushroomStartFrames = 90;
+                physicsObject->IsFrozen = true;
+                physicsObject->Velocity = FPVector2.Zero;
+            }
+
             mario->PreviousPowerupState = mario->CurrentPowerupState;
             mario->CurrentPowerupState = newState;
-            mario->CurrentPowerupScriptable = newPowerup;
             //mario->powerupFlash = 2;
             //mario->IsCrouching |= mario->ForceCrouchCheck();
             mario->IsPropellerFlying = false;

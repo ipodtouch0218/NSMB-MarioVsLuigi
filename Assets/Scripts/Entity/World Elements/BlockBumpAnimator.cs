@@ -32,7 +32,7 @@ public class BlockBumpAnimator : QuantumCallbacks {
         StageTile stageTile = QuantumUnityDB.GetGlobalAsset(blockBump.StartTile);
         TileBase tile = stageTile.Tile;
         Sprite sprite;
-        if (tile is TileWithProperties tp) {
+        if (tile is SiblingRuleTile tp) {
             sprite = tp.m_DefaultSprite;
         } else if (tile is AnimatedTile at) {
             sprite = at.m_AnimatedSprites[0];

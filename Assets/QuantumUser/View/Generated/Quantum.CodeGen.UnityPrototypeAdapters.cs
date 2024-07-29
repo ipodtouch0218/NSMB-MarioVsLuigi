@@ -88,7 +88,6 @@ namespace Quantum.Prototypes.Unity {
     public Byte SpawnpointIndex;
     public Byte Team;
     public PowerupState CurrentPowerupState;
-    public AssetRef<PowerupAsset> CurrentPowerupScriptable;
     public PowerupState PreviousPowerupState;
     public AssetRef<PowerupAsset> ReserveItem;
     public Byte Stars;
@@ -133,8 +132,12 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean IsSliding;
     public QBoolean IsSpinnerFlying;
     public QBoolean IsDrilling;
-    public UInt16 InvincibilityFrames;
     public Byte Combo;
+    public UInt16 InvincibilityFrames;
+    public Byte MegaMushroomStartFrames;
+    public UInt16 MegaMushroomFrames;
+    public Byte MegaMushroomEndFrames;
+    public QBoolean MegaMushroomStationaryEnd;
     public Byte ProjectileDelayFrames;
     public Byte ProjectileVolleyFrames;
     public Byte CurrentProjectiles;
@@ -156,7 +159,6 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.SpawnpointIndex, out result.SpawnpointIndex);
       converter.Convert(this.Team, out result.Team);
       converter.Convert(this.CurrentPowerupState, out result.CurrentPowerupState);
-      converter.Convert(this.CurrentPowerupScriptable, out result.CurrentPowerupScriptable);
       converter.Convert(this.PreviousPowerupState, out result.PreviousPowerupState);
       converter.Convert(this.ReserveItem, out result.ReserveItem);
       converter.Convert(this.Stars, out result.Stars);
@@ -201,8 +203,12 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.IsSliding, out result.IsSliding);
       converter.Convert(this.IsSpinnerFlying, out result.IsSpinnerFlying);
       converter.Convert(this.IsDrilling, out result.IsDrilling);
-      converter.Convert(this.InvincibilityFrames, out result.InvincibilityFrames);
       converter.Convert(this.Combo, out result.Combo);
+      converter.Convert(this.InvincibilityFrames, out result.InvincibilityFrames);
+      converter.Convert(this.MegaMushroomStartFrames, out result.MegaMushroomStartFrames);
+      converter.Convert(this.MegaMushroomFrames, out result.MegaMushroomFrames);
+      converter.Convert(this.MegaMushroomEndFrames, out result.MegaMushroomEndFrames);
+      converter.Convert(this.MegaMushroomStationaryEnd, out result.MegaMushroomStationaryEnd);
       converter.Convert(this.ProjectileDelayFrames, out result.ProjectileDelayFrames);
       converter.Convert(this.ProjectileVolleyFrames, out result.ProjectileVolleyFrames);
       converter.Convert(this.CurrentProjectiles, out result.CurrentProjectiles);
@@ -263,6 +269,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean FacingRight;
     public QBoolean HasBounced;
     public QBoolean PlayDestroySound;
+    public QBoolean CheckedCollision;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.ProjectilePrototype prototype);
     public override Quantum.Prototypes.ProjectilePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.ProjectilePrototype();
@@ -272,6 +279,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.FacingRight, out result.FacingRight);
       converter.Convert(this.HasBounced, out result.HasBounced);
       converter.Convert(this.PlayDestroySound, out result.PlayDestroySound);
+      converter.Convert(this.CheckedCollision, out result.CheckedCollision);
       ConvertUser(converter, ref result);
       return result;
     }

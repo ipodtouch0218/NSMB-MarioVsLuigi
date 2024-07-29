@@ -1,13 +1,16 @@
 component Coin {
 	bool IsFloating;
 	bool IsDotted;
+	ushort Lifetime;
+	byte UncollectableFrames;
+	FPVector2 PreviousVelocity;
 
 	bool IsCollected;
 	bool IsCurrentlyDotted;
-	byte DottedChangeTimer;
+	byte DottedChangeFrames;
 }
 
-signal MarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, bool fromBlock, bool downwards);
+signal OnMarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, bool fromBlock, bool downwards);
 
 synced event MarioPlayerCollectedCoin {
 	Frame Frame;
@@ -22,13 +25,19 @@ synced event MarioPlayerCollectedCoin {
 }
 
 event CoinChangedType {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	Coin Coin;
+	nothashed Coin Coin;
 }
 
 event CoinChangeCollected {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
-	Coin Coin;
+	nothashed Coin Coin;
+}
+
+event CoinBounced {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	nothashed Coin Coin;
 }

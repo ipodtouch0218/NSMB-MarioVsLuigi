@@ -32,6 +32,7 @@ public class PowerupAnimator : QuantumCallbacks {
 
     public void Initialize(QuantumGame game) {
         var powerup = game.Frames.Predicted.Get<Powerup>(entity.EntityRef);
+        var scriptable = QuantumUnityDB.GetGlobalAsset(powerup.Scriptable);
 
         if (powerup.ParentMarioPlayer.IsValid) {
             // Following mario
@@ -44,7 +45,7 @@ public class PowerupAnimator : QuantumCallbacks {
         } else if (powerup.BlockSpawn) {
             // Block spawn
             sRenderer.sortingOrder = -1000;
-            sfx.PlayOneShot(SoundEffect.World_Block_Powerup);
+            sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
             if (childAnimation) {
                 childAnimation.Play();
             }
@@ -53,7 +54,7 @@ public class PowerupAnimator : QuantumCallbacks {
             sRenderer.sortingOrder = -1000;
         } else {
             // Spawned by any other means (blue koopa, usually.)
-            sfx.PlayOneShot(SoundEffect.World_Block_Powerup);
+            sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
             if (childAnimation) {
                 childAnimation.Play();
             }

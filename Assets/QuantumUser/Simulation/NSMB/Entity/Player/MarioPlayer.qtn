@@ -23,7 +23,6 @@ component MarioPlayer {
 	byte Team;
 
 	PowerupState CurrentPowerupState;
-	asset_ref<PowerupAsset> CurrentPowerupScriptable;
 	PowerupState PreviousPowerupState;
 	asset_ref<PowerupAsset> ReserveItem;
 
@@ -88,14 +87,22 @@ component MarioPlayer {
 	bool IsDrilling;
 
 	// Powerups
-    ushort InvincibilityFrames;
 	byte Combo;
+    ushort InvincibilityFrames;
+	
+	byte MegaMushroomStartFrames;
+	ushort MegaMushroomFrames;
+	byte MegaMushroomEndFrames;
+	bool MegaMushroomStationaryEnd;
+
 	byte ProjectileDelayFrames;
 	byte ProjectileVolleyFrames;
 	byte CurrentProjectiles;
 	byte CurrentVolley;
+
     bool IsInShell;
     byte ShellSlowdownFrames;
+
     bool IsPropellerFlying;
 	byte PropellerLaunchFrames;
 	byte PropellerSpinFrames;
@@ -211,4 +218,15 @@ event MarioPlayerThrewObject {
 	entity_ref Entity;
 	nothashed MarioPlayer* Mario;
 	entity_ref OtherEntity;
+}
+
+event MarioPlayerMegaStart {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}
+
+event MarioPlayerMegaEnd {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	bool Cancelled;
 }

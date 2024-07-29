@@ -60,7 +60,8 @@ public static class Enums {
         [PrefabParticleData("Prefabs/Particle/Puff")] Enemy_Puff,
 
         [PrefabParticleData("Prefabs/Particle/WalljumpParticle")] Player_WallJump,
-        [PrefabParticleData("Prefabs/Particle/GroundpoundDust")] Player_Groundpound
+        [PrefabParticleData("Prefabs/Particle/GroundpoundDust")] Player_Groundpound,
+        [PrefabParticleData("Prefabs/Particle/MegaMushroomGrow")] Player_MegaMushroom,
     }
 
     #endregion

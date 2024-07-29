@@ -16,6 +16,7 @@ public unsafe class PowerupTile : BreakableBrickTile {
         if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario) && f.TryGet(entity, out Koopa koopa) && f.TryGet(entity, out Holdable holdable)) {
             if (koopa.IsKicked && holdable.PreviousHolder.IsValid) {
                 f.Unsafe.TryGetPointer(holdable.PreviousHolder, out mario);
+                entity = holdable.PreviousHolder;
             }
         }
 

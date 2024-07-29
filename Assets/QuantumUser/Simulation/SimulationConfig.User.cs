@@ -7,7 +7,7 @@
         public PowerupAsset FallbackPowerup;
         public CharacterAsset[] CharacterDatas;
 
-        public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, BigStarPrototype, BlockBumpPrototype;
+        public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype;
 
     }
 }

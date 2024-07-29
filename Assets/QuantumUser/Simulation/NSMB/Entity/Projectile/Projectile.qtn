@@ -5,6 +5,7 @@ component Projectile {
 	bool FacingRight;
 	bool HasBounced;
 	bool PlayDestroySound;
+	bool CheckedCollision;
 }
 
 event ProjectileDestroyed {

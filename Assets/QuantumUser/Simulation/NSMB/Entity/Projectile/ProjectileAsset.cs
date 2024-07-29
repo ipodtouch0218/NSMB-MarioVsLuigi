@@ -11,6 +11,7 @@ public class ProjectileAsset : AssetObject {
     public bool DestroyOnSecondBounce;
     public bool LockTo45Degrees = true;
     public bool InheritShooterVelocity;
+    public bool HasCollision = true;
 
     public bool DoesntEffectBlueShell = true;
     public byte BlueShellSlowdownFrames = 40;

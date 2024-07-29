@@ -27,12 +27,12 @@ namespace Quantum {
             }
         }
 
-        public bool CanHoldItem(Frame f) {
-            return f.GetPlayerInput(PlayerRef)->Sprint.IsDown && /*!IsFrozen &&*/ CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && JumpState < JumpState.DoubleJump && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && f.GetPlayerInput(PlayerRef)->Jump.IsDown);
+        public bool CanHoldItem(Frame f, EntityRef mario) {
+            return f.GetPlayerInput(PlayerRef)->Sprint.IsDown && /*!IsFrozen &&*/ CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (f.Get<PhysicsObject>(mario).IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && f.GetPlayerInput(PlayerRef)->Jump.IsDown);
         }
 
-        public bool CanPickupItem(Frame f) {
-            return !f.Exists(HeldEntity) && CanHoldItem(f);
+        public bool CanPickupItem(Frame f, EntityRef mario) {
+            return !f.Exists(HeldEntity) && CanHoldItem(f, mario);
         }
 
         public bool InstakillsEnemies(PhysicsObject physicsObject) {
@@ -173,7 +173,6 @@ namespace Quantum {
             }
             case PowerupState.Mushroom: {
                 CurrentPowerupState = PowerupState.NoPowerup;
-                CurrentPowerupScriptable = null;
                 SpawnStars(f, entity, 1);
                 break;
             }
@@ -182,7 +181,6 @@ namespace Quantum {
             case PowerupState.PropellerMushroom:
             case PowerupState.BlueShell: {
                 CurrentPowerupState = PowerupState.Mushroom;
-                CurrentPowerupScriptable = null;
                 SpawnStars(f, entity, 1);
                 break;
             }
@@ -286,7 +284,6 @@ namespace Quantum {
             PropellerSpinFrames = 0;
             JumpState = JumpState.None;
             PreviousPowerupState = CurrentPowerupState = PowerupState.NoPowerup;
-            CurrentPowerupScriptable = null;
             //animationController.DisableAllModels();
             DamageInvincibilityFrames = 0;
             InvincibilityFrames = 0;

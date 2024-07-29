@@ -1,19 +1,42 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-
-    public unsafe class CoinSystem : SystemMainThreadFilter<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnTrigger2D, ISignalMarioPlayerCollectedCoin {
+    public unsafe class CoinSystem : SystemMainThreadFilter<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnTrigger2D, ISignalOnMarioPlayerCollectedCoin {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
             public Coin* Coin;
-            public PhysicsObject* PhysicsObject;
         }
 
         public override void Update(Frame f, ref Filter filter) {
             var coin = filter.Coin;
 
-            if (coin->DottedChangeTimer > 0 && QuantumUtils.Decrement(ref coin->DottedChangeTimer)) {
+            QuantumUtils.Decrement(ref coin->UncollectableFrames);
+
+            if (!coin->IsFloating) {
+                if (QuantumUtils.Decrement(ref coin->Lifetime)) {
+                    f.Destroy(filter.Entity);
+                    return;
+                }
+
+                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(filter.Entity);
+                foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < FP._0_33 * 2) {
+                        continue;
+                    }
+
+                    physicsObject->Velocity = coin->PreviousVelocity;
+                    physicsObject->Velocity.Y *= -FP._0_75;
+
+                    if (physicsObject->Velocity.Y > FP._0_75) {
+                        f.Events.CoinBounced(f, filter.Entity, *coin);
+                    }
+                }
+
+                coin->PreviousVelocity = physicsObject->Velocity;
+            }
+
+            if (coin->DottedChangeFrames > 0 && QuantumUtils.Decrement(ref coin->DottedChangeFrames)) {
                 // Become a normal coin
                 coin->IsCurrentlyDotted = false;
                 f.Events.CoinChangedType(f, filter.Entity, *coin);
@@ -41,6 +64,7 @@ namespace Quantum {
             // Collecting a coin
             if (!f.Unsafe.TryGetPointer(info.Other, out Coin* coin)
                 || coin->IsCollected
+                || coin->UncollectableFrames > 0
                 || !f.TryGet(info.Other, out Transform2D coinTransform)
                 || !f.TryGet(info.Other, out PhysicsCollider2D coinCollider)
                 || f.DestroyPending(info.Other)) {
@@ -63,8 +87,8 @@ namespace Quantum {
             }
 
             if (coin->IsCurrentlyDotted) {
-                if (coin->DottedChangeTimer == 0) {
-                    coin->DottedChangeTimer = 30;
+                if (coin->DottedChangeFrames == 0) {
+                    coin->DottedChangeFrames = 30;
                 }
                 return;
             }
@@ -73,12 +97,12 @@ namespace Quantum {
                 coin->IsCollected = true;
                 f.Events.CoinChangeCollected(f, info.Other, *coin);
             } else {
-                // f.Destroy(info.Other);
+                 f.Destroy(info.Other);
             }
-            f.Signals.MarioPlayerCollectedCoin(marioEntity, mario, coinTransform.Position + coinCollider.Shape.Centroid, false, false);
+            f.Signals.OnMarioPlayerCollectedCoin(marioEntity, mario, coinTransform.Position + coinCollider.Shape.Centroid, false, false);
         }
 
-        public void MarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
+        public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
             byte newCoins = (byte) (mario->Coins + 1);
             bool item = newCoins == f.RuntimeConfig.CoinsForPowerup;
             if (item) {

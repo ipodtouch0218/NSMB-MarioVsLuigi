@@ -22,7 +22,7 @@ namespace Quantum {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(holdable->Holder);
 
-            if (!mario->CanHoldItem(f)) {
+            if (!mario->CanHoldItem(f, holdable->Holder)) {
                 holdable->Throw(f, filter.Entity);
                 return;
             }

@@ -1,29 +1,42 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class ProjectileSystem : SystemMainThreadFilter<ProjectileSystem.Filter>, ISignalOnTrigger2D {
+    public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter>, ISignalOnTrigger2D {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
             public Projectile* Projectile;
             public PhysicsObject* PhysicsObject;
+            public PhysicsCollider2D* PhysicsCollider;
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var projectile = filter.Projectile;
-            var asset = f.FindAsset(projectile->Asset);
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var collider = filter.PhysicsCollider;
+            var transform = filter.Transform;
+            var physicsObject = filter.PhysicsObject;
 
-            if (filter.Transform->Position.Y < stage.StageWorldMin.Y) {
+            if (filter.Transform->Position.Y + collider->Shape.Centroid.Y + collider->Shape.Box.Extents.Y < stage.StageWorldMin.Y) {
                 Destroy(f, filter.Entity, false);
                 return;
             }
 
+
+            if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
+                if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape)) {
+                    f.Destroy(filter.Entity);
+                    return;
+                }
+                projectile->CheckedCollision = true;
+            }
+
+            var asset = f.FindAsset(projectile->Asset);
             HandleTileCollision(f, filter, asset);
-            filter.PhysicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
+
+            physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
 
             if (asset.LockTo45Degrees) {
-                filter.PhysicsObject->TerminalVelocity = -projectile->Speed;
+                physicsObject->TerminalVelocity = -projectile->Speed;
             }
         }
 
@@ -32,11 +45,10 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             // Despawn
-            if (physicsObject->IsTouchingLeftWall ||
-                physicsObject->IsTouchingRightWall ||
-                physicsObject->IsTouchingCeiling ||
-                (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))) {
-
+            if (physicsObject->IsTouchingLeftWall
+                || physicsObject->IsTouchingRightWall
+                || physicsObject->IsTouchingCeiling
+                || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))) {
 
                 Destroy(f, filter.Entity, true);
                 return;

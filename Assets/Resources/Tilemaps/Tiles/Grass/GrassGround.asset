@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ffb1820c005ca6489850e83a844726b, type: 3}
+  m_Script: {fileID: 11500000, guid: 46e46a8425517b044a7157fe94384767, type: 3}
   m_Name: GrassGround
   m_EditorClassIdentifier: 
   m_DefaultSprite: {fileID: -1238084574743955201, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
@@ -154,10 +154,5 @@ MonoBehaviour:
     - {x: 0, y: -1, z: 0}
     m_RuleTransform: 0
   siblings:
-  - {fileID: 11400000, guid: 1b42132f79dc5944ba33682310458870, type: 2}
-  - {fileID: 11400000, guid: 6a165ecf0526f3448a8806cd54d00dea, type: 2}
-  isBackgroundTile: 0
-  iceSkidding: 0
-  isSlope: 0
-  footstepSound: 31
-  footstepParticle: 0
+  - {fileID: 0}
+  - {fileID: 0}

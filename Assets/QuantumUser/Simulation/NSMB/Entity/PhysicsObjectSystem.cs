@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 
 namespace Quantum {
@@ -10,7 +11,7 @@ namespace Quantum {
         private static readonly FP Skin = FP.FromString("0.001");
 
         public struct Filter {
-            public EntityRef EntityRef;
+            public EntityRef Entity;
             public Transform2D* Transform;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
@@ -65,7 +66,7 @@ namespace Quantum {
                 FP direction = directionVector.Y;
 
                 for (FP y = start; (direction > 0 ? (y <= end) : (y >= end)); y += direction / 2) {
-                    List<PhysicsContact> tempContacts = new();
+                    List<PhysicsContact> potentialContacts = new();
 
                     for (FP x = left; x <= right; x += FP._0_50) {
                         FPVector2 worldPos = new FPVector2(x, y) + (FPVector2.One / 4);
@@ -82,33 +83,51 @@ namespace Quantum {
                                 PhysicsContact newContact = contact;
                                 newContact.TileX = tilePos.X.AsInt;
                                 newContact.TileY = tilePos.Y.AsInt;
-                                tempContacts.Add(newContact);
 
-                                physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
-                                physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
+                                potentialContacts.Add(newContact);
                             }
                         }
                     }
 
-                    if (tempContacts.Count == 0) {
+                    if (potentialContacts.Count == 0) {
                         continue;
                     }
 
                     // Get n-lowest contacts (within tolerance)
-                    tempContacts.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+                    potentialContacts.Sort((a, b) => a.Distance.CompareTo(b.Distance));
                     FP tolerance = FP._0_05;
-                    FP min = tempContacts[0].Distance;
+                    FP min = potentialContacts[0].Distance;
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;
 
-                    foreach (var contact in tempContacts) {
-                        if (contact.Distance - min > tolerance) {
+                    HashSet<(int, int)> removedContacts = new();
+
+                    foreach (var contact in potentialContacts) {
+                        var coords = (contact.TileX, contact.TileY);
+                        if (contact.Distance - min > tolerance
+                            || contact.Distance > FPMath.Abs(velocityY)
+                            || removedContacts.Contains(coords)
+                            /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             break;
                         }
 
-                        contacts.Add(contact);
-                        avgNormal += contact.Normal;
-                        contactCount++;
+                        bool keepContact = true;
+                        f.Signals.OnPreTileCollide(stage, filter.Entity, &contact, &keepContact);
+                        if (keepContact) {
+                            contacts.Add(contact);
+                            avgNormal += contact.Normal;
+                            contactCount++;
+
+                            StageTile tile = f.FindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile);
+                            physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
+                            physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
+                        } else {
+                            removedContacts.Add(coords);
+                        }
+                    }
+
+                    if (contactCount <= 0) {
+                        continue;
                     }
 
                     avgNormal /= contactCount;
@@ -165,7 +184,7 @@ namespace Quantum {
                 FP direction = directionVector.X;
 
                 for (FP x = start; (direction > 0 ? (x <= end) : (x >= end)); x += direction / 2) {
-                    List<PhysicsContact> tempContacts = new();
+                    List<PhysicsContact> potentialContacts = new();
 
                     for (FP y = bottom; y <= top; y += FP._0_50) {
                         FPVector2 worldPos = new FPVector2(x, y) + (FPVector2.One / 4);
@@ -180,30 +199,52 @@ namespace Quantum {
                                 PhysicsContact newContact = contact;
                                 newContact.TileX = tilePos.X.AsInt;
                                 newContact.TileY = tilePos.Y.AsInt;
-                                tempContacts.Add(newContact);
+
+                                potentialContacts.Add(newContact);
                             }
                         }
                     }
 
-                    if (tempContacts.Count == 0) {
+                    if (potentialContacts.Count == 0) {
                         continue;
                     }
 
                     // Get n-lowest contacts (within tolerance)
-                    tempContacts.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+                    potentialContacts.Sort((a, b) => a.Distance.CompareTo(b.Distance));
                     FP tolerance = FP._0_05;
-                    FP min = tempContacts[0].Distance;
+                    FP min = potentialContacts[0].Distance;
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;
 
-                    foreach (var contact in tempContacts) {
-                        if (contact.Distance - min > tolerance) {
+                    HashSet<(int, int)> removedContacts = new();
+
+                    foreach (var contact in potentialContacts) {
+                        var coords = (contact.TileX, contact.TileY);
+                        if (contact.Distance - min > tolerance
+                            || contact.Distance > FPMath.Abs(velocityX)
+                            || removedContacts.Contains(coords)
+                            /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             break;
                         }
 
-                        contacts.Add(contact);
-                        avgNormal += contact.Normal;
-                        contactCount++;
+                        bool keepContact = true;
+                        f.Signals.OnPreTileCollide(stage, filter.Entity, &contact, &keepContact);
+
+                        if (keepContact) {
+                            contacts.Add(contact);
+                            avgNormal += contact.Normal;
+                            contactCount++;
+
+                            StageTile tile = f.FindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile);
+                            physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
+                            physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
+                        } else {
+                            removedContacts.Add(coords);
+                        }
+                    }
+
+                    if (contactCount <= 0) {
+                        continue;
                     }
 
                     avgNormal /= contactCount;
@@ -277,16 +318,33 @@ namespace Quantum {
             }
 
             // Then raycast in the opposite direction for all polygon vertices
-            foreach (var point in polygon) {
+            int length = polygon.Length;
+            if (length == 2) {
+                length = 1;
+            }
+            for (int i = 0; i < length; i++) {
+                var point = polygon[i];
                 if (!TryRayLineIntersection(point, -direction, b, a, out contact)) {
                     continue;
                 }
 
-                contact.Normal *= -1; // Inverted normals
-                possibleContacts.Add(contact);
+                bool valid = false;
+                valid |= FPVector2.Dot(GetNormal(point, polygon[(i + 1) % polygon.Length]), direction) < 0;
+                if (length > 2)
+                    valid |= FPVector2.Dot(GetNormal(polygon[(i + polygon.Length - 1) % polygon.Length], point), direction) < 0;
+
+                if (valid) {
+                    contact.Normal *= -1; // Inverted normals
+                    possibleContacts.Add(contact);
+                }
             }
 
             return possibleContacts;
+        }
+
+        private static FPVector2 GetNormal(FPVector2 a, FPVector2 b) {
+            FPVector2 diff = b - a;
+            return new FPVector2(-diff.Y, diff.X);
         }
 
         private bool TryRayPolygonIntersection(FPVector2 rayOrigin, FPVector2 rayDirection, FPVector2[] polygon, out PhysicsContact contact) {
@@ -294,7 +352,14 @@ namespace Quantum {
             contact = default;
             contact.Distance = FP.MaxValue;
 
-            for (int i = 0; i < polygon.Length; i++) {
+            int length = polygon.Length;
+            if (length <= 1) {
+                return false;
+            }
+            if (length == 2) {
+                length = 1;
+            }
+            for (int i = 0; i < length; i++) {
                 if (!TryRayLineIntersection(rayOrigin, rayDirection, polygon[i], polygon[(i + 1) % polygon.Length], out var newContact)) {
                     continue;
                 }
@@ -309,24 +374,6 @@ namespace Quantum {
             }
 
             return hit;
-        }
-
-        private bool MinFpVector2Distance(ref FP? min, FP? value) {
-            if (!value.HasValue) {
-                return false;
-            }
-
-            if (!min.HasValue) {
-                min = value.Value;
-                return true;
-            }
-
-            if (value.Value < min.Value) {
-                min = value.Value;
-                return true;
-            }
-
-            return false;
         }
 
         private bool TryRayLineIntersection(FPVector2 rayOrigin, FPVector2 rayDirection, FPVector2 x, FPVector2 y, out PhysicsContact contact) {
@@ -376,12 +423,14 @@ namespace Quantum {
             FPVector2 boxMin = origin - extents;
             FPVector2 boxMax = origin + extents;
 
+            /*
             FPVector2[] boxCorners = {
                 new(origin.X - extents.X, origin.Y + extents.Y),
                 boxMax,
                 new(origin.X + extents.X, origin.Y - extents.Y),
                 boxMin,
             };
+            */
 
             for (int x = FPMath.FloorToInt((origin.X - extents.X) * 2); x <= FPMath.FloorToInt((origin.X + extents.X) * 2); x++) {
                 for (int y = FPMath.FloorToInt((origin.Y - extents.Y) * 2); y <= FPMath.FloorToInt((origin.Y + extents.Y) * 2); y++) {

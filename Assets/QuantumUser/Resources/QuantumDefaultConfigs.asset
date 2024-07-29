@@ -226,6 +226,9 @@ MonoBehaviour:
   BlockBumpPrototype:
     Id:
       Value: 1308320651839637093
+  LooseCoinPrototype:
+    Id:
+      Value: 1464681621458001613
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -45,8 +45,14 @@ namespace Quantum {
 
                     FP height = f.Get<PhysicsCollider2D>(newPowerup).Shape.Box.Extents.Y * 2;
                     FPVector2 origin = filter.Transform->Position + FPVector2.Down * FP._0_25;
-                    powerup->Initialize(f, newPowerup, 60, origin, 
-                        origin + (blockBump->IsDownwards ? FPVector2.Down * height : FPVector2.Up * FP._0_50), launch);
+
+                    var powerupScriptable = f.FindAsset(powerup->Scriptable);
+                    if (powerupScriptable.State == PowerupState.MegaMushroom) {
+                        powerup->Initialize(f, newPowerup, 90, origin + FPVector2.Up * FP._0_50, origin + FPVector2.Up * FP._0_50, false);
+                    } else {
+                        powerup->Initialize(f, newPowerup, 60, origin,
+                            origin + (blockBump->IsDownwards ? FPVector2.Down * height : FPVector2.Up * FP._0_50), launch);
+                    }
                 }
 
                 /*

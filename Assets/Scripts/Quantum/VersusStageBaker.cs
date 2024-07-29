@@ -15,7 +15,6 @@ public class VersusStageBaker : MapDataBakerCallback {
     private QuantumMapData data;
 
     public override void OnBeforeBake(QuantumMapData data) {
-
     }
 
     public override void OnBake(QuantumMapData data) {

@@ -13,6 +13,11 @@ PrefabInstance:
       propertyPath: _interpolationDataSource
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 473443410690841455, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: childAnimation
+      value: 
+      objectReference: {fileID: 5810651595624241853}
     - target: {fileID: 1017215213198693184, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: m_Size.x
@@ -115,6 +120,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -142270678, guid: 9f188d58ca4de6148a6e6d1ee86fda7b,
         type: 3}
+    - target: {fileID: 1256801405142820976, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: Prototype.Scriptable.Id.Value
+      value: 269903407669338010
+      objectReference: {fileID: 0}
     - target: {fileID: 2479772350441087688, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: m_LocalPosition.y
@@ -140,15 +150,41 @@ PrefabInstance:
       propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
       value: -3262420308651461944
       objectReference: {fileID: 0}
+    - target: {fileID: 6673749068647908742, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
+      value: 29491
+      objectReference: {fileID: 0}
+    - target: {fileID: 6673749068647908742, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.BoxExtents.Y.RawValue
+      value: 29491
+      objectReference: {fileID: 0}
+    - target: {fileID: 6673749068647908742, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
+      value: 29491
+      objectReference: {fileID: 0}
+    - target: {fileID: 6673749068647908742, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.X.RawValue
+      value: 23592
+      objectReference: {fileID: 0}
+    - target: {fileID: 6673749068647908742, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
+      value: 23592
+      objectReference: {fileID: 0}
+    - target: {fileID: 6673749068647908742, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
+      value: 23592
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7863306663182383513, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1017215213198693191, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 32958358}
     - targetCorrespondingSourceObject: {fileID: 8453737792750304721, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       insertIndex: -1
@@ -158,24 +194,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5361538109907593751}
   m_SourcePrefab: {fileID: 100100000, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19, type: 3}
---- !u!1 &1930655606418932876 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1017215213198693191, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
-    type: 3}
-  m_PrefabInstance: {fileID: 1501614932865800139}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &32958358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1930655606418932876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c3af63798495214db478bad74e4da48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &1959685073963634097 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 1145319354374527610, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,

@@ -153,8 +153,6 @@ GameObject:
   - component: {fileID: 8756655141056688795}
   - component: {fileID: 6321124393289553252}
   - component: {fileID: 9053290319332969542}
-  - component: {fileID: 1173340272915162886}
-  - component: {fileID: 1728249163796113136}
   - component: {fileID: 2115189598253090278}
   m_Layer: 10
   m_Name: FloatingCoin
@@ -573,64 +571,6 @@ MonoBehaviour:
     IsCurrentlyDotted:
       Value: 0
     DottedChangeTimer: 0
---- !u!114 &1173340272915162886
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5780648777663731097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bb5ba24fc1efae4bab9294e76e613fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prototype:
-    _empty_prototype_dummy_field_: 0
---- !u!114 &1728249163796113136
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5780648777663731097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 385320c580a374c44b3da48163df570b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    Gravity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    TerminalVelocity:
-      RawValue: 0
-    IsFrozen:
-      Value: 1
-    DisableCollision:
-      Value: 0
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &2115189598253090278
 MonoBehaviour:
   m_ObjectHideFlags: 0

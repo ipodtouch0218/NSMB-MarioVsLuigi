@@ -24,3 +24,5 @@ struct PhysicsContact {
     int TileX;
     int TileY;
 }
+
+signal OnPreTileCollide(VersusStageData stage, entity_ref Entity, PhysicsContact* Contact, bool* AllowCollision);

@@ -1,11 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
-using Input = Quantum.Input;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
 
@@ -143,6 +143,8 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound);
             QuantumEvent.Subscribe<EventMarioPlayerPickedUpObject>(this, OnMarioPlayerPickedUpObject);
             QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject);
+            QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart);
+            QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd);
         }
 
         public void Initialize(QuantumGame game) {
@@ -409,32 +411,21 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleMiscStates(MarioPlayer mario) {
-
-            /* TODO
-            if (controller.MegaStartTimer.IsActive(Runner)) {
-                if (animator.GetCurrentAnimatorClipInfo(0).Length <= 0 ||
-                    animator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "mega-scale") {
-                    animator.Play("mega-scale");
-                }
-            }
-            */
-
             // Scale
             Vector3 scale;
-            /* TODO
-            if (MegaEndTimer.IsActive(Runner)) {
-                float endTimer = (render ? MegaEndTimer.RemainingRenderTime(Runner) : MegaEndTimer.RemainingTime(Runner)) ?? 0f;
-                if (!IsStationaryMegaShrink) {
+            if (mario.MegaMushroomEndFrames > 0) {
+                float endTimer = mario.MegaMushroomEndFrames / 60f;
+                if (!mario.MegaMushroomStationaryEnd) {
                     endTimer *= 2;
                 }
 
-                scale = Vector3.one + (Vector3.one * (Mathf.Min(1, endTimer / megaStartTime) * 2.6f));
-            } else */ {
-                // float startTimer = (render ? MegaStartTimer.RemainingRenderTime(Runner) : MegaStartTimer.RemainingTime(Runner)) ?? 0f;
+                scale = Vector3.one + (Vector3.one * (Mathf.Min(1, endTimer / 1.5f) * 2.6f));
+            } else {
+                float startTimer = mario.MegaMushroomStartFrames / 60f;
 
                 scale = mario.CurrentPowerupState switch {
                     PowerupState.MiniMushroom => Vector3.one * 0.5f,
-                    // PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (startTimer / megaStartTime)) * 2.6f)),
+                    PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (startTimer / 1.5f)) * 2.6f)),
                     _ => Vector3.one,
                 };
             }
@@ -454,14 +445,11 @@ namespace NSMB.Entities.Player {
             materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x);
 
             Vector3 giantMultiply = Vector3.one;
-            /*
-            float giantTimeRemaining = controller.MegaTimer.RemainingTime(Runner) ?? 0f;
-            if (mario.CurrentPowerupState == PowerupState.MegaMushroom && controller.MegaTimer.IsRunning &&
-                giantTimeRemaining < 4) {
+            float giantTimeRemaining = mario.MegaMushroomFrames / 60f;
+            if (giantTimeRemaining > 0 && giantTimeRemaining < 4) {
                 float v = ((Mathf.Sin(giantTimeRemaining * 20f) + 1f) * 0.45f) + 0.1f;
                 giantMultiply = new Vector3(v, 1, v);
             }
-            */
 
             materialBlock.SetVector(ParamMultiplyColor, giantMultiply);
 
@@ -471,7 +459,7 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = mario.DamageInvincibilityFrames / 60f;
-            models.SetActive(!mario.IsRespawning && (mario.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)));
+            models.SetActive(mario.MegaMushroomStartFrames > 0 || (!mario.IsRespawning && (mario.IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f))));
 
             // Model changing
             bool large = mario.CurrentPowerupState >= PowerupState.Mushroom;
@@ -592,6 +580,23 @@ namespace NSMB.Entities.Player {
             footstepVariant = !footstepVariant;
         }
 
+
+        public void PlayMegaFootstep() {
+            Frame f = entity.Game.Frames.Predicted;
+            var mario = f.Get<MarioPlayer>(entity.EntityRef);
+            if (mario.IsInWater) {
+                return;
+
+            }
+            var marioTransform = f.Get<Transform2D>(entity.EntityRef);
+
+            // CameraController.ScreenShake = 0.15f;
+            SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform.Position.ToUnityVector2() + new Vector2(mario.FacingRight ? 0.5f : -0.5f, 0));
+            PlaySound(SoundEffect.Powerup_MegaMushroom_Walk, variant: (byte) (footstepVariant ? 1 : 2));
+            GlobalController.Instance.rumbleManager.RumbleForSeconds(0.5f, 0f, 0.1f, RumbleManager.RumbleSetting.High);
+            footstepVariant = !footstepVariant;
+        }
+
         /*
         private void OnAllPlayersLoaded() {
             enableGlow = SessionData.Instance.Teams || !Object.HasControlAuthority();
@@ -606,7 +611,29 @@ namespace NSMB.Entities.Player {
         }
         */
 
+        private void OnMarioPlayerMegaEnd(EventMarioPlayerMegaEnd e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            if (!e.Cancelled) {
+                PlaySound(SoundEffect.Powerup_MegaMushroom_End);
+            }
+        }
+
+        private void OnMarioPlayerMegaStart(EventMarioPlayerMegaStart e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            PlaySound(SoundEffect.Player_Voice_MegaMushroom);
+        }
+
         private void OnMarioPlayerThrewObject(EventMarioPlayerThrewObject e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
             PlaySound(SoundEffect.Player_Voice_WallJump, variant: 2);
             animator.SetTrigger("throw");
         }
@@ -776,6 +803,7 @@ namespace NSMB.Entities.Player {
             }
 
             var powerup = e.Scriptable;
+            var marioTransform = e.Frame.Get<Transform2D>(e.Entity);
 
             switch (e.Result) {
             case PowerupReserveResult.ReserveOldPowerup:
@@ -785,6 +813,11 @@ namespace NSMB.Entities.Player {
                     PlaySoundEverywhere(powerup.SoundEffect);
                 } else {
                     PlaySound(powerup.SoundEffect);
+                }
+
+                if (powerup.State == PowerupState.MegaMushroom) {
+                    animator.Play("mega-scale");
+                    SpawnParticle(Enums.PrefabParticle.Player_MegaMushroom.GetGameObject(), marioTransform.Position.ToUnityVector2());
                 }
                 break;
             }
@@ -821,7 +854,20 @@ namespace NSMB.Entities.Player {
             var marioTransform = e.Frame.Get<Transform2D>(e.Entity);
 
             // Groundpound
-            if (mario.CurrentPowerupState != PowerupState.MegaMushroom) {
+            if (mario.CurrentPowerupState == PowerupState.MegaMushroom) {
+                PlaySound(SoundEffect.Powerup_MegaMushroom_Groundpound);
+
+                SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform.Position.ToUnityVector2());
+                /* TODO
+                CameraController.ScreenShake = 0.35f;
+
+                if (cameraController.IsControllingCamera) {
+                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f,
+                        RumbleManager.RumbleSetting.Low);
+                }
+                */
+
+            } else {
                 SoundEffect soundEffect = mario.CurrentPowerupState switch {
                     PowerupState.MiniMushroom => SoundEffect.Powerup_MiniMushroom_Groundpound,
                     _ => SoundEffect.Player_Sound_GroundpoundLanding,
@@ -833,24 +879,6 @@ namespace NSMB.Entities.Player {
 
                 if (cameraController.IsControllingCamera) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f,
-                        RumbleManager.RumbleSetting.Low);
-                }
-                */
-            } else {
-                /* TODO
-                CameraController.ScreenShake = 0.15f;
-                */
-            }
-
-            if (!mario.IsGroundpoundActive && mario.CurrentPowerupState == PowerupState.MegaMushroom) {
-                PlaySound(SoundEffect.Powerup_MegaMushroom_Groundpound);
-
-                SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform.Position.ToUnityVector2());
-                /* TODO
-                CameraController.ScreenShake = 0.35f;
-
-                if (cameraController.IsControllingCamera) {
-                    GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f,
                         RumbleManager.RumbleSetting.Low);
                 }
                 */

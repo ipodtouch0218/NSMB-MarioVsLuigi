@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using System;
 
 namespace Quantum {
     public unsafe partial struct Goomba {
@@ -10,6 +9,13 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
 
             if (special) {
+                // Spawn coin
+                EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
+                var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
+                var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
+                coinTransform->Position = f.Get<Transform2D>(entity).Position;
+                coinPhysicsObject->Velocity.Y = f.RNG->Next(FP.FromString("4.5"), 5);
+
                 // Fall off screen
                 var goombaTransform = f.Get<Transform2D>(entity);
                 var killerTransform = f.Get<Transform2D>(killerEntity);

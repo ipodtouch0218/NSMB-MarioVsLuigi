@@ -53,7 +53,7 @@ public class MusicManager : MonoBehaviour {
                 continue;
             }
 
-            mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && mario.CurrentPowerupState == PowerupState.MegaMushroom /*&& player.MegaStartTimer.ExpiredOrNotRunning(Runner)*/;
+            mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && mario.MegaMushroomFrames > 0;
             invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && mario.IsStarmanInvincible;
         }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static unsafe class QuantumUtils {
 
-    private static SoundEffect[] ComboSounds = {
+    private static readonly SoundEffect[] ComboSounds = {
         SoundEffect.Enemy_Shell_Kick,
         SoundEffect.Enemy_Shell_Combo1,
         SoundEffect.Enemy_Shell_Combo2,
@@ -15,6 +15,7 @@ public static unsafe class QuantumUtils {
         SoundEffect.Enemy_Shell_Combo6,
         SoundEffect.Enemy_Shell_Combo7,
     };
+
     public static SoundEffect GetComboSoundEffect(int combo) {
         return ComboSounds[Mathf.Clamp(combo, 0, ComboSounds.Length - 1)];
     }
