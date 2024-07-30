@@ -78,7 +78,7 @@ namespace Quantum.Prototypes {
   }
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BlockBump))]
-  public unsafe partial class BlockBumpPrototype : ComponentPrototype<Quantum.BlockBump> {
+  public unsafe class BlockBumpPrototype : ComponentPrototype<Quantum.BlockBump> {
     public Byte Lifetime;
     public AssetRef<StageTile> StartTile;
     public Quantum.Prototypes.StageTileInstancePrototype ResultTile;
@@ -87,7 +87,8 @@ namespace Quantum.Prototypes {
     public FPVector2 Origin;
     public Int32 TileX;
     public Int32 TileY;
-    partial void MaterializeUser(Frame frame, ref Quantum.BlockBump result, in PrototypeMaterializationContext context);
+    public MapEntityId Owner;
+    public QBoolean HasBumped;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.BlockBump component = default;
         Materialize((Frame)f, ref component, in context);
@@ -102,7 +103,8 @@ namespace Quantum.Prototypes {
         result.Origin = this.Origin;
         result.TileX = this.TileX;
         result.TileY = this.TileY;
-        MaterializeUser(frame, ref result, in context);
+        PrototypeValidator.FindMapEntity(this.Owner, in context, out result.Owner);
+        result.HasBumped = this.HasBumped;
     }
   }
   [System.SerializableAttribute()]
@@ -239,6 +241,7 @@ namespace Quantum.Prototypes {
   public unsafe partial class KoopaPrototype : ComponentPrototype<Quantum.Koopa> {
     public AssetRef<EntityPrototype> SpawnWhenStomped;
     public QBoolean DontWalkOfLedges;
+    public QBoolean IsSpiny;
     public FP Speed;
     public FP KickSpeed;
     public Byte Combo;
@@ -257,6 +260,7 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.Koopa result, in PrototypeMaterializationContext context = default) {
         result.SpawnWhenStomped = this.SpawnWhenStomped;
         result.DontWalkOfLedges = this.DontWalkOfLedges;
+        result.IsSpiny = this.IsSpiny;
         result.Speed = this.Speed;
         result.KickSpeed = this.KickSpeed;
         result.Combo = this.Combo;

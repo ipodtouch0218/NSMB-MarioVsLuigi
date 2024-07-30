@@ -1,6 +1,7 @@
 component Koopa {
 	asset_ref<EntityPrototype> SpawnWhenStomped;
 	bool DontWalkOfLedges;
+	bool IsSpiny;
 	FP Speed;
 	FP KickSpeed;
 	

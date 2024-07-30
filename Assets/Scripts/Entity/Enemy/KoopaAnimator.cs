@@ -18,6 +18,8 @@ public class KoopaAnimator : MonoBehaviour {
     [SerializeField] private Transform rotation;
     [SerializeField] private Sprite deadSprite;
 
+    [SerializeField] private bool mirrorSprite;
+
     //---Private Variables
     private float dampVelocity;
     private Quaternion previousRotation;
@@ -77,7 +79,7 @@ public class KoopaAnimator : MonoBehaviour {
         }
 
         sRenderer.enabled = enemy.IsActive;
-        sRenderer.flipX = enemy.FacingRight;
+        sRenderer.flipX = enemy.FacingRight ^ mirrorSprite;
         if (enemy.IsDead) {
             sRenderer.sprite = deadSprite;
         }

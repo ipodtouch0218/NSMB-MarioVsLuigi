@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class CoinSystem : SystemMainThreadFilter<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnTrigger2D, ISignalOnMarioPlayerCollectedCoin {
+    public unsafe class CoinSystem : SystemMainThreadFilter<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnTrigger2D, ISignalOnMarioPlayerCollectedCoin, ISignalOnEntityBumped {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -113,6 +113,31 @@ namespace Quantum {
             }
 
             f.Events.MarioPlayerCollectedCoin(f, marioEntity, *mario, newCoins, item, worldLocation, fromBlock, downwards);
+        }
+
+        public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
+            if (!f.Unsafe.TryGetPointer(entity, out Coin* coin)
+                || !f.TryGet(entity, out Transform2D transform)
+                || coin->IsCollected
+                || !f.TryGet(blockBump, out BlockBump block)) {
+                return;
+            }
+
+            if (coin->IsCurrentlyDotted) {
+                if (coin->DottedChangeFrames == 0) {
+                    coin->DottedChangeFrames = 30;
+                }
+                return;
+            } else if (!coin->IsCollected && f.Unsafe.TryGetPointer(block.Owner, out MarioPlayer* mario)) {
+                f.Signals.OnMarioPlayerCollectedCoin(block.Owner, mario, transform.Position, false, false);
+
+                if (coin->IsFloating) {
+                    coin->IsCollected = true;
+                    f.Events.CoinChangeCollected(f, entity, *coin);
+                } else {
+                    f.Destroy(entity);
+                }
+            }
         }
     }
 }

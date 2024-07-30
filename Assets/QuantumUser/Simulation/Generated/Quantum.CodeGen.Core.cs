@@ -752,24 +752,28 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BlockBump : Quantum.IComponent {
-    public const Int32 SIZE = 80;
+    public const Int32 SIZE = 96;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public Byte Lifetime;
-    [FieldOffset(24)]
-    public AssetRef<StageTile> StartTile;
-    [FieldOffset(48)]
-    public StageTileInstance ResultTile;
-    [FieldOffset(12)]
-    public QBoolean IsDownwards;
-    [FieldOffset(16)]
-    public AssetRef<EntityPrototype> Powerup;
     [FieldOffset(32)]
+    public AssetRef<StageTile> StartTile;
+    [FieldOffset(64)]
+    public StageTileInstance ResultTile;
+    [FieldOffset(16)]
+    public QBoolean IsDownwards;
+    [FieldOffset(24)]
+    public AssetRef<EntityPrototype> Powerup;
+    [FieldOffset(48)]
     public FPVector2 Origin;
     [FieldOffset(4)]
     public Int32 TileX;
     [FieldOffset(8)]
     public Int32 TileY;
+    [FieldOffset(40)]
+    public EntityRef Owner;
+    [FieldOffset(12)]
+    public QBoolean HasBumped;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 21089;
@@ -781,6 +785,8 @@ namespace Quantum {
         hash = hash * 31 + Origin.GetHashCode();
         hash = hash * 31 + TileX.GetHashCode();
         hash = hash * 31 + TileY.GetHashCode();
+        hash = hash * 31 + Owner.GetHashCode();
+        hash = hash * 31 + HasBumped.GetHashCode();
         return hash;
       }
     }
@@ -789,9 +795,11 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Lifetime);
         serializer.Stream.Serialize(&p->TileX);
         serializer.Stream.Serialize(&p->TileY);
+        QBoolean.Serialize(&p->HasBumped, serializer);
         QBoolean.Serialize(&p->IsDownwards, serializer);
         AssetRef.Serialize(&p->Powerup, serializer);
         AssetRef.Serialize(&p->StartTile, serializer);
+        EntityRef.Serialize(&p->Owner, serializer);
         FPVector2.Serialize(&p->Origin, serializer);
         Quantum.StageTileInstance.Serialize(&p->ResultTile, serializer);
     }
@@ -954,6 +962,8 @@ namespace Quantum {
     public AssetRef<EntityPrototype> SpawnWhenStomped;
     [FieldOffset(4)]
     public QBoolean DontWalkOfLedges;
+    [FieldOffset(20)]
+    public QBoolean IsSpiny;
     [FieldOffset(48)]
     public FP Speed;
     [FieldOffset(40)]
@@ -977,6 +987,7 @@ namespace Quantum {
         var hash = 16001;
         hash = hash * 31 + SpawnWhenStomped.GetHashCode();
         hash = hash * 31 + DontWalkOfLedges.GetHashCode();
+        hash = hash * 31 + IsSpiny.GetHashCode();
         hash = hash * 31 + Speed.GetHashCode();
         hash = hash * 31 + KickSpeed.GetHashCode();
         hash = hash * 31 + Combo.GetHashCode();
@@ -998,6 +1009,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsFlipped, serializer);
         QBoolean.Serialize(&p->IsInShell, serializer);
         QBoolean.Serialize(&p->IsKicked, serializer);
+        QBoolean.Serialize(&p->IsSpiny, serializer);
         AssetRef.Serialize(&p->SpawnWhenStomped, serializer);
         FP.Serialize(&p->CurrentSpeed, serializer);
         FP.Serialize(&p->KickSpeed, serializer);
@@ -1526,6 +1538,9 @@ namespace Quantum {
         var p = (WrappingObject*)ptr;
     }
   }
+  public unsafe partial interface ISignalOnEntityBumped : ISignal {
+    void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump);
+  }
   public unsafe partial interface ISignalOnMarioPlayerCollectedCoin : ISignal {
     void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards);
   }
@@ -1551,6 +1566,7 @@ namespace Quantum {
     public const Int32 maxplayers = 10;
   }
   public unsafe partial class Frame {
+    private ISignalOnEntityBumped[] _ISignalOnEntityBumpedSystems;
     private ISignalOnMarioPlayerCollectedCoin[] _ISignalOnMarioPlayerCollectedCoinSystems;
     private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
     private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
@@ -1569,6 +1585,7 @@ namespace Quantum {
     }
     partial void InitGen() {
       Initialize(this, this.SimulationConfig.Entities, 256);
+      _ISignalOnEntityBumpedSystems = BuildSignalsArray<ISignalOnEntityBumped>();
       _ISignalOnMarioPlayerCollectedCoinSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedCoin>();
       _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
       _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
@@ -1672,6 +1689,15 @@ namespace Quantum {
       Physics3D.Init(_globals->PhysicsState3D.MapStaticCollidersState.TrackedMap);
     }
     public unsafe partial struct FrameSignals {
+      public void OnEntityBumped(EntityRef entity, EntityRef blockBump) {
+        var array = _f._ISignalOnEntityBumpedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEntityBumped(_f, entity, blockBump);
+          }
+        }
+      }
       public void OnMarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
         var array = _f._ISignalOnMarioPlayerCollectedCoinSystems;
         for (Int32 i = 0; i < array.Length; ++i) {

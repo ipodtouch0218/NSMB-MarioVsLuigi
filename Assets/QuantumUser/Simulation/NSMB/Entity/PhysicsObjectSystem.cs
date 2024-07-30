@@ -296,7 +296,62 @@ namespace Quantum {
             }
         }
 
-        private HashSet<PhysicsContact> LineSweepPolygonIntersection(FPVector2 a, FPVector2 b, FPVector2 direction, FPVector2[] polygon) {
+        public static bool Raycast(Frame f, VersusStageData stage, FPVector2 position, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
+            FPVector2 stepSize = new(
+                direction.X == 0 ? 0 : FPMath.Sqrt(1 + (direction.Y / direction.X) * (direction.Y / direction.X)),
+                direction.Y == 0 ? 0 : FPMath.Sqrt(1 + (direction.X / direction.Y) * (direction.X / direction.Y))
+            );
+            FPVector2 rayLength = default;
+            Vector2Int step = default;
+
+            if (direction.X < 0) {
+                step.x = -1;
+                rayLength.X = (position.X - FPMath.FloorToInt(position.X * 2) / 2) * stepSize.X;
+            } else if (direction.X > 0) {
+                step.x = 1;
+                rayLength.X = (FPMath.FloorToInt(position.X * 2 + 1) / 2 - position.X) * stepSize.X;
+            } else {
+                step.x = 0;
+                rayLength.X = maxDistance;
+            }
+
+            if (direction.Y < 0) {
+                step.y = -1;
+                rayLength.Y = (position.Y - FPMath.FloorToInt(position.Y * 2) / 2) * stepSize.Y;
+            } else if (direction.Y > 0) {
+                step.y = 1;
+                rayLength.Y = (FPMath.FloorToInt(position.Y * 2 + 1) / 2 - position.Y) * stepSize.Y;
+            } else {
+                step.y = 0;
+                rayLength.Y = maxDistance;
+            }
+
+            Vector2Int tile = QuantumUtils.FPVectorToIntVector(QuantumUtils.WorldToRelativeTile(stage, position));
+            FP distance = 0;
+            while (distance < maxDistance) {
+                if (rayLength.X < rayLength.Y) {
+                    tile.x += step.x;
+                    distance = rayLength.X;
+                    rayLength.X += stepSize.X;
+                } else {
+                    tile.y += step.y;
+                    distance = rayLength.Y;
+                    rayLength.Y += stepSize.Y;
+                }
+
+                StageTileInstance tileInstance = stage.GetTileRelative(f, tile.x, tile.y);
+                foreach (var polygon in tileInstance.GetWorldPolygons(f, QuantumUtils.RoundWorld(QuantumUtils.RelativeTileToWorld(stage, new FPVector2(tile.x, tile.y))))) {
+                    if (TryRayPolygonIntersection(position, direction, polygon, out contact)) {
+                        return contact.Distance < maxDistance;
+                    }
+                }
+            }
+
+            contact = default;
+            return false;
+        }
+
+        private static HashSet<PhysicsContact> LineSweepPolygonIntersection(FPVector2 a, FPVector2 b, FPVector2 direction, FPVector2[] polygon) {
             if (polygon.Length <= 1) {
                 throw new ArgumentException("Polygon must have at least 2 points!");
             }
@@ -319,9 +374,6 @@ namespace Quantum {
 
             // Then raycast in the opposite direction for all polygon vertices
             int length = polygon.Length;
-            if (length == 2) {
-                length = 1;
-            }
             for (int i = 0; i < length; i++) {
                 var point = polygon[i];
                 if (!TryRayLineIntersection(point, -direction, b, a, out contact)) {
@@ -329,9 +381,12 @@ namespace Quantum {
                 }
 
                 bool valid = false;
-                valid |= FPVector2.Dot(GetNormal(point, polygon[(i + 1) % polygon.Length]), direction) < 0;
-                if (length > 2)
+                if (length == 2) {
+                    valid = FPVector2.Dot(GetNormal(polygon[0], polygon[1]), direction) < 0;
+                } else {
+                    valid |= FPVector2.Dot(GetNormal(point, polygon[(i + 1) % polygon.Length]), direction) < 0;
                     valid |= FPVector2.Dot(GetNormal(polygon[(i + polygon.Length - 1) % polygon.Length], point), direction) < 0;
+                }
 
                 if (valid) {
                     contact.Normal *= -1; // Inverted normals
@@ -347,7 +402,7 @@ namespace Quantum {
             return new FPVector2(-diff.Y, diff.X);
         }
 
-        private bool TryRayPolygonIntersection(FPVector2 rayOrigin, FPVector2 rayDirection, FPVector2[] polygon, out PhysicsContact contact) {
+        private static bool TryRayPolygonIntersection(FPVector2 rayOrigin, FPVector2 rayDirection, FPVector2[] polygon, out PhysicsContact contact) {
             bool hit = false;
             contact = default;
             contact.Distance = FP.MaxValue;
@@ -376,7 +431,7 @@ namespace Quantum {
             return hit;
         }
 
-        private bool TryRayLineIntersection(FPVector2 rayOrigin, FPVector2 rayDirection, FPVector2 x, FPVector2 y, out PhysicsContact contact) {
+        private static bool TryRayLineIntersection(FPVector2 rayOrigin, FPVector2 rayDirection, FPVector2 x, FPVector2 y, out PhysicsContact contact) {
             contact = default;
             contact.Distance = FP.MaxValue;
 

@@ -3,7 +3,6 @@ using Quantum;
 using System;
 using UnityEngine;
 using Photon.Deterministic;
-using UnityEditor.SceneManagement;
 
 public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
@@ -18,6 +17,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         bool doBump = true;
         playBumpSound = false;
 
+        EntityRef bumpOwner = default;
         if (f.TryGet(entity, out MarioPlayer mario)) {
             // Mario interacting with the block
             if (mario.CurrentPowerupState < PowerupState.Mushroom) {
@@ -43,9 +43,11 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
                     _ => false
                 };
             }
+            bumpOwner = entity;
         } else if (f.TryGet(entity, out Koopa koopa) && koopa.IsKicked) {
-             doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
-             doBump = true;
+            doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
+            doBump = true;
+            bumpOwner = f.Get<Holdable>(entity).PreviousHolder;
 
         } /*else if (f.TryGet(entity, out Bobomb bobomb)) {
              doBreak = breakableByBombs;
@@ -57,7 +59,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
             f.Events.TileBroken(f, entity, tilePosition.x, tilePosition.y, tileInstance);
             stage.SetTileRelative(f, tilePosition.x, tilePosition.y, default);
         } else if (BumpIfNotBroken && doBump) {
-            Bump(f, stage, tilePosition, tileInstance, direction == InteractionDirection.Down, null);
+            Bump(f, stage, tilePosition, tileInstance, direction == InteractionDirection.Down, bumpOwner);
         } else {
             playBumpSound = true;
         }
@@ -65,7 +67,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         return doBreak;
     }
 
-    public void Bump(Frame f, VersusStageData stage, Vector2Int tile, StageTileInstance result, bool downwards, AssetRef<EntityPrototype> powerup = default) {
+    public void Bump(Frame f, VersusStageData stage, Vector2Int tile, StageTileInstance result, bool downwards, EntityRef owner, AssetRef<EntityPrototype> powerup = default) {
         stage = stage ? stage : f.FindAsset<VersusStageData>(f.Map.UserAsset);
         EntityRef newEntity = f.Create(f.SimulationConfig.BlockBumpPrototype);
         var blockBump = f.Unsafe.GetPointer<BlockBump>(newEntity);
@@ -79,6 +81,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         blockBump->IsDownwards = downwards;
         blockBump->TileX = tile.x;
         blockBump->TileY = tile.y;
+        blockBump->Owner = owner;
 
         stage.SetTileRelative(f, tile.x, tile.y, new StageTileInstance {
             Tile = f.SimulationConfig.InvisibleSolidTile,

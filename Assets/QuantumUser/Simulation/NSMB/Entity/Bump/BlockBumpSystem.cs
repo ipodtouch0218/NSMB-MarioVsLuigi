@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
@@ -24,6 +25,17 @@ namespace Quantum {
 
             collider->Shape.Box.Extents = new FPVector2(FP._0_25 + size, FP._0_25 + size);
             transform->Position = blockBump->Origin + new FPVector2(0, size * (blockBump->IsDownwards ? -1 : 1));
+
+            if (!blockBump->HasBumped) {
+                FPVector2 extents = new(bumpScale, FP._0_10);
+                var hits = f.Physics2D.OverlapShape(*transform, Shape2D.CreateBox(extents, FPVector2.Up * (extents.Y + FP._0_25)));
+                for (int i = 0; i < hits.Count; i++) {
+                    var hit = hits[i];
+                    f.Signals.OnEntityBumped(hit.Entity, filter.Entity);
+                }
+
+                blockBump->HasBumped = true;
+            }
 
             if (kill) {
                 Kill(f, filter);

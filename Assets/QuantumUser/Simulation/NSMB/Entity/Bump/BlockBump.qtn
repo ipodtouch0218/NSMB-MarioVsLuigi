@@ -7,4 +7,9 @@ component BlockBump {
 	FPVector2 Origin;
 	int TileX;
 	int TileY;
+	entity_ref Owner;
+
+	bool HasBumped;
 }
+
+signal OnEntityBumped(entity_ref entity, entity_ref blockBump);

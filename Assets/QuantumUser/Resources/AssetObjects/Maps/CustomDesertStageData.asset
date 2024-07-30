@@ -17,8 +17,8 @@ MonoBehaviour:
     Guid:
       Value: 311970299389930735
   StageAuthor: mindnomad
-  MusicComposer: ---
-  TranslationKey: 
+  MusicComposer: LiamNayru
+  TranslationKey: level.custom.desert
   DiscordStageImage: level-desert
   OverrideAutomaticTilemapSettings: 1
   TileDimensions: {x: 70, y: 13}
@@ -50,11 +50,11 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 327680
-  UIColor: {r: 24, g: 178, b: 170, a: 1}
+  UIColor: {r: 0.941176, g: 0.878431, b: 0.435294, a: 1}
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1
-  MainMusic: {fileID: 11400000, guid: 853814253b9d46741895bfc7bc7b2972, type: 2}
+  MainMusic: {fileID: 11400000, guid: d9392922fa3a1c24a950e33cdea91807, type: 2}
   InvincibleMusic: {fileID: 11400000, guid: 628804e165b231243abe39caa050a76c, type: 2}
   MegaMushroomMusic: {fileID: 11400000, guid: d2c80d3a80e82cb4b988278210db3bb9, type: 2}
   TileData:
@@ -3690,7 +3690,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 328240524793459333
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:

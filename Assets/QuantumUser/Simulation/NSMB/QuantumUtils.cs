@@ -41,6 +41,10 @@ public static unsafe class QuantumUtils {
         return new FPVector2(x, y);
     }
 
+    public static Vector2Int FPVectorToIntVector(FPVector2 vec) {
+        return new Vector2Int(FPMath.FloorToInt(vec.X), FPMath.FloorToInt(vec.Y));
+    }
+
     public static FPVector2 WorldToRelativeTile(Frame f, FPVector2 worldPos) {
         return WorldToRelativeTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos);
     }

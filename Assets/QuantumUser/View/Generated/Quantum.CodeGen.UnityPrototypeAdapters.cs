@@ -50,6 +50,35 @@ namespace Quantum.Prototypes.Unity {
   #endif //;
   
   [System.SerializableAttribute()]
+  public unsafe partial class BlockBumpPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BlockBumpPrototype> {
+    public Byte Lifetime;
+    public AssetRef<StageTile> StartTile;
+    public Quantum.Prototypes.StageTileInstancePrototype ResultTile;
+    public QBoolean IsDownwards;
+    public AssetRef<EntityPrototype> Powerup;
+    public FPVector2 Origin;
+    public Int32 TileX;
+    public Int32 TileY;
+    public Quantum.QuantumEntityPrototype Owner;
+    public QBoolean HasBumped;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BlockBumpPrototype prototype);
+    public override Quantum.Prototypes.BlockBumpPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.BlockBumpPrototype();
+      converter.Convert(this.Lifetime, out result.Lifetime);
+      converter.Convert(this.StartTile, out result.StartTile);
+      converter.Convert(this.ResultTile, out result.ResultTile);
+      converter.Convert(this.IsDownwards, out result.IsDownwards);
+      converter.Convert(this.Powerup, out result.Powerup);
+      converter.Convert(this.Origin, out result.Origin);
+      converter.Convert(this.TileX, out result.TileX);
+      converter.Convert(this.TileY, out result.TileY);
+      converter.Convert(this.Owner, out result.Owner);
+      converter.Convert(this.HasBumped, out result.HasBumped);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
   public unsafe partial class HoldablePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.HoldablePrototype> {
     public Quantum.QuantumEntityPrototype Holder;
     public Quantum.QuantumEntityPrototype PreviousHolder;

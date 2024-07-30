@@ -25,7 +25,7 @@ public unsafe class PowerupTile : BreakableBrickTile {
             return false;
         }
 
-        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, 
+        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, entity,
             (mario->CurrentPowerupState < PowerupState.Mushroom ? smallPowerup : largePowerup).Prefab);
         playBumpSound = false;
         return false;
