@@ -1,5 +1,5 @@
 component Koopa {
-	asset_ref<EntityPrototype> SpawnWhenStomped;
+	asset_ref<PowerupAsset> SpawnPowerupWhenStomped;
 	bool DontWalkOfLedges;
 	bool IsSpiny;
 	FP Speed;

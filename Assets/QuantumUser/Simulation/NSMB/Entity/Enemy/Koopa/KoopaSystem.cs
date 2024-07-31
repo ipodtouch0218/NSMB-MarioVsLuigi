@@ -89,8 +89,9 @@ namespace Quantum {
             }
 
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
-                FPVector2 checkPosition = transform->Position + (FPVector2.Up * FP._0_01) + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
-                if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_33, out _)) {
+                FPVector2 checkPosition = transform->Position + (FPVector2.Up * FP._0_05) + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
+                if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_50, out var hit)) {
+                    Debug.Log(hit.Position + " - " + hit.Distance);
                     enemy->FacingRight = !enemy->FacingRight;
                 }
             }
@@ -138,13 +139,19 @@ namespace Quantum {
 
                 bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
                 if (groundpounded) {
-                    if (!koopa->IsSpiny || koopa->IsInShell) {
+                    if (koopa->SpawnPowerupWhenStomped.IsValid && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
+                        // Powerup (for blue koopa): give to mario immediately
+                        PowerupSystem.CollectPowerup(f, hit.Entity, mario, marioPhysicsObject, powerup);
+                        enemy->IsActive = false;
+                        enemy->IsDead = true;
+
+                    } else if (!koopa->IsSpiny || koopa->IsInShell) {
                         // Kick
                         koopa->IsInShell = true;
                         koopa->IsKicked = false;
                         koopa->EnterShell(f, filter.Entity, hit.Entity, false);
                         koopa->Kick(f, filter.Entity, hit.Entity, 3);
-                        filter.PhysicsObject->Velocity.Y = 1;
+                        filter.PhysicsObject->Velocity.Y = 2;
                     } else {
                         // Groundpounded a Spiny, damage player.
                         if (mario->IsDamageable) {
@@ -157,8 +164,9 @@ namespace Quantum {
                     if (attackedFromAbove) {
                         if (koopa->IsInShell || !koopa->IsSpiny) {
                             // Enter Shell
-                            if (koopa->SpawnWhenStomped.IsValid) {
-                                EntityRef powerupEntity = f.Create(koopa->SpawnWhenStomped);
+                            if (koopa->SpawnPowerupWhenStomped.IsValid) {
+                                PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
+                                EntityRef powerupEntity = f.Create(powerupAsset.Prefab);
                                 var powerupTransform = f.Unsafe.GetPointer<Transform2D>(powerupEntity);
                                 var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
 

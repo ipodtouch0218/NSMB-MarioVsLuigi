@@ -239,7 +239,7 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Koopa))]
   public unsafe partial class KoopaPrototype : ComponentPrototype<Quantum.Koopa> {
-    public AssetRef<EntityPrototype> SpawnWhenStomped;
+    public AssetRef<PowerupAsset> SpawnPowerupWhenStomped;
     public QBoolean DontWalkOfLedges;
     public QBoolean IsSpiny;
     public FP Speed;
@@ -258,7 +258,7 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.Koopa result, in PrototypeMaterializationContext context = default) {
-        result.SpawnWhenStomped = this.SpawnWhenStomped;
+        result.SpawnPowerupWhenStomped = this.SpawnPowerupWhenStomped;
         result.DontWalkOfLedges = this.DontWalkOfLedges;
         result.IsSpiny = this.IsSpiny;
         result.Speed = this.Speed;

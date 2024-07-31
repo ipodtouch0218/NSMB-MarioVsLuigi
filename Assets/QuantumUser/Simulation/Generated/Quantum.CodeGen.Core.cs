@@ -959,7 +959,7 @@ namespace Quantum {
     public const Int32 SIZE = 56;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(24)]
-    public AssetRef<EntityPrototype> SpawnWhenStomped;
+    public AssetRef<PowerupAsset> SpawnPowerupWhenStomped;
     [FieldOffset(4)]
     public QBoolean DontWalkOfLedges;
     [FieldOffset(20)]
@@ -985,7 +985,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 16001;
-        hash = hash * 31 + SpawnWhenStomped.GetHashCode();
+        hash = hash * 31 + SpawnPowerupWhenStomped.GetHashCode();
         hash = hash * 31 + DontWalkOfLedges.GetHashCode();
         hash = hash * 31 + IsSpiny.GetHashCode();
         hash = hash * 31 + Speed.GetHashCode();
@@ -1010,7 +1010,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsInShell, serializer);
         QBoolean.Serialize(&p->IsKicked, serializer);
         QBoolean.Serialize(&p->IsSpiny, serializer);
-        AssetRef.Serialize(&p->SpawnWhenStomped, serializer);
+        AssetRef.Serialize(&p->SpawnPowerupWhenStomped, serializer);
         FP.Serialize(&p->CurrentSpeed, serializer);
         FP.Serialize(&p->KickSpeed, serializer);
         FP.Serialize(&p->Speed, serializer);

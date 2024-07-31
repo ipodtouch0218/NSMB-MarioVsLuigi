@@ -300,7 +300,9 @@ namespace Quantum {
             }
         }
 
+        private static bool log = false;
         public static bool Raycast(Frame f, VersusStageData stage, FPVector2 position, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
+            log = true;
             FPVector2 stepSize = new(
                 direction.X == 0 ? 0 : FPMath.Sqrt(1 + (direction.Y / direction.X) * (direction.Y / direction.X)),
                 direction.Y == 0 ? 0 : FPMath.Sqrt(1 + (direction.X / direction.Y) * (direction.X / direction.Y))
@@ -346,11 +348,14 @@ namespace Quantum {
                 StageTileInstance tileInstance = stage.GetTileRelative(f, tile.x, tile.y);
                 foreach (var polygon in tileInstance.GetWorldPolygons(f, QuantumUtils.RoundWorld(QuantumUtils.RelativeTileToWorld(stage, new FPVector2(tile.x, tile.y))))) {
                     if (TryRayPolygonIntersection(position, direction, polygon, out contact)) {
-                        return contact.Distance < maxDistance;
+                        Debug.Log($"hit at {contact.Position} {contact.Distance}");
+                        log = false;
+                        return contact.Distance <= maxDistance;
                     }
                 }
             }
 
+            log = false;
             contact = default;
             return false;
         }
@@ -389,7 +394,7 @@ namespace Quantum {
                     valid = FPVector2.Dot(GetNormal(polygon[0], polygon[1]), direction) < 0;
                 } else {
                     valid |= FPVector2.Dot(GetNormal(point, polygon[(i + 1) % polygon.Length]), direction) < 0;
-                    valid |= FPVector2.Dot(GetNormal(polygon[(i + polygon.Length - 1) % polygon.Length], point), direction) < 0;
+                    valid |= FPVector2.Dot(GetNormal(polygon[(i - 1 + polygon.Length) % polygon.Length], point), direction) < 0;
                 }
 
                 if (valid) {
@@ -459,6 +464,9 @@ namespace Quantum {
 
             // Don't hit internal edges
             if (FPVector2.Dot(rayDirection, normal) > 0) {
+                if (log) {
+                    Debug.Log("hit internal edge");
+                }
                 return false;
             }
 

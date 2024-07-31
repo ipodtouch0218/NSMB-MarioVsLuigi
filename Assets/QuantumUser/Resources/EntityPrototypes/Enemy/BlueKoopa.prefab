@@ -23,6 +23,11 @@ PrefabInstance:
       propertyPath: Prototype.SpawnWhenStomped.Id.Value
       value: 1466930856010351358
       objectReference: {fileID: 0}
+    - target: {fileID: 1172164201446178320, guid: 8cf8f49ac0882ed44953ea53ff901f11,
+        type: 3}
+      propertyPath: Prototype.SpawnPowerupWhenStomped.Id.Value
+      value: 279725308049324760
+      objectReference: {fileID: 0}
     - target: {fileID: 1229317872784120394, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: ObservedComponents.Array.size

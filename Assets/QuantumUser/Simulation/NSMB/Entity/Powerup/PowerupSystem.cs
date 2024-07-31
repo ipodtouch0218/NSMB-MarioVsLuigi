@@ -154,7 +154,7 @@ namespace Quantum {
             var newScriptable = f.FindAsset(powerup->Scriptable);
 
             // Change the player's powerup state
-            PowerupReserveResult result = PowerupCollect(f, info.Entity, mario, physicsObject, newScriptable);
+            PowerupReserveResult result = CollectPowerup(f, info.Entity, mario, physicsObject, newScriptable);
 
             switch (result) {
             case PowerupReserveResult.ReserveOldPowerup: {
@@ -173,7 +173,7 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedPowerup(f, info.Entity, *mario, result, newScriptable);
         }
 
-        public PowerupReserveResult PowerupCollect(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* physicsObject, PowerupAsset newPowerup) {
+        public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* physicsObject, PowerupAsset newPowerup) {
             
             if (newPowerup.Type == PowerupType.Starman) {
                 mario->InvincibilityFrames = 600;
