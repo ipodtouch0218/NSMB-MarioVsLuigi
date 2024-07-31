@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadFilter<PowerupSystem.Filter>, ISignalOnTrigger2D {
+    public unsafe class PowerupSystem : SystemMainThreadFilter<PowerupSystem.Filter>, ISignalOnTrigger2D, ISignalOnEntityBumped {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -230,6 +230,25 @@ namespace Quantum {
             }
 
             return PowerupReserveResult.ReserveOldPowerup;
+        }
+
+        public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
+            if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
+                || !f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
+                || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                || powerup->SpawnAnimationFrames > 0
+                || !f.TryGet(blockBump, out Transform2D bumpTransform)) {
+
+                return;
+            }
+
+            QuantumUtils.UnwrapWorldLocations(f, transform->Position, bumpTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            physicsObject->Velocity = new FPVector2(
+                f.FindAsset(powerup->Scriptable).Speed * (ourPos.X > theirPos.X ? 1 : -1),
+                FP.FromString("5.5")
+            );
+            physicsObject->IsTouchingGround = false;
+            powerup->FacingRight = ourPos.X > theirPos.X;
         }
     }
 }

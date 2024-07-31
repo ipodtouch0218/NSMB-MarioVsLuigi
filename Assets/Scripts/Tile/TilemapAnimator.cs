@@ -1,6 +1,8 @@
 using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,7 +14,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     //---Private Variables
     private VersusStageData stage;
-
+    private readonly Dictionary<EntityRef, AudioSource> entityBreakBlockSounds = new();
 
     public void OnValidate() {
         this.SetIfNull(ref tilemap);
@@ -34,10 +36,16 @@ public class TilemapAnimator : MonoBehaviour {
         }
 
         if (particle.TryGetComponent(out AudioSource sfx)) {
+            if (entityBreakBlockSounds.TryGetValue(e.Entity, out AudioSource audio) && audio) {
+                audio.Stop();
+            }
+
             sfx.PlayOneShot(
                 e.Frame.TryGet(e.Entity, out MarioPlayer mario) && mario.CurrentPowerupState == PowerupState.MegaMushroom
                     ? SoundEffect.Powerup_MegaMushroom_Break_Block
                     : SoundEffect.World_Block_Break);
+
+            entityBreakBlockSounds[e.Entity] = sfx;
         }
 
         particle.Play();

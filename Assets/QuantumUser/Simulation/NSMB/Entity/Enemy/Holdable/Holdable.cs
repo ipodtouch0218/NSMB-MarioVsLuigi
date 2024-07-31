@@ -21,6 +21,7 @@ namespace Quantum {
         public void Throw(Frame f, EntityRef entity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(Holder);
             mario->HeldEntity = default;
+            mario->ProjectileDelayFrames = 15;
             PreviousHolder = Holder;
             Holder = default;
 

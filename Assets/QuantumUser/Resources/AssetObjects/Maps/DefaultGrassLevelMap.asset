@@ -944,6 +944,8 @@ MonoBehaviour:
             Value: 0
         DontWalkOfLedges:
           Value: 0
+        IsSpiny:
+          Value: 0
         Speed:
           RawValue: 57344
         KickSpeed:

@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using System;
 using UnityEngine;
 using static IInteractableTile;
 
@@ -1284,6 +1283,8 @@ namespace Quantum {
             } else {
                 direction = InteractionDirection.Left;
             }
+
+            Debug.Log($"pre tile collide {contact->TileX} {contact->TileY}");
 
             // Try to break this tile as mega mario...
             StageTileInstance tileInstance = stage.GetTileRelative(f, contact->TileX, contact->TileY);

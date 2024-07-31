@@ -183,7 +183,9 @@ namespace Quantum {
 
                             } else if (mario->IsDamageable) {
                                 mario->Powerdown(f, hit.Entity, false);
-                                enemy->FacingRight = damageDirection.X > 0;
+                                if (koopa->IsKicked) {
+                                    enemy->FacingRight = damageDirection.X > 0;
+                                }
                             }
                         }
                     } else {
@@ -202,7 +204,7 @@ namespace Quantum {
                     if (mario->CanPickupItem(f, hit.Entity)) {
                         filter.Holdable->Pickup(f, filter.Entity, hit.Entity);
                     } else {
-                        koopa->Kick(f, filter.Entity, hit.Entity, marioPhysicsObject->Velocity.X / 7);
+                        koopa->Kick(f, filter.Entity, hit.Entity, marioPhysicsObject->Velocity.X / 3);
                         enemy->FacingRight = filter.Transform->Position.X > marioTransform->Position.X;
                     }
                 }
@@ -273,7 +275,7 @@ namespace Quantum {
                 koopa->CurrentSpeed = 0;
             } else {
                 koopa->IsKicked = true;
-                koopa->CurrentSpeed = koopa->KickSpeed + FPMath.Abs(marioPhysics->Velocity.X / 7);
+                koopa->CurrentSpeed = koopa->KickSpeed + FPMath.Abs(marioPhysics->Velocity.X / 3);
                 f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
             }
             enemy->FacingRight = mario->FacingRight;
@@ -289,7 +291,7 @@ namespace Quantum {
         public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
-                || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physics)
+                || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
                 || !f.TryGet(entity, out Enemy enemy)
                 || !f.TryGet(blockBump, out Transform2D bumpTransform)
                 || !enemy.IsAlive) {
@@ -297,14 +299,16 @@ namespace Quantum {
                 return;
             }
 
-            koopa->IsInShell = false; // Force sound effect
+            koopa->IsInShell = true; // Force sound effect off
             koopa->EnterShell(f, entity, blockBump, true);
+            f.Events.PlayComboSound(f, entity, 0);
 
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, bumpTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
-            physics->Velocity = new FPVector2(
-                ourPos.X < theirPos.X ? 1 : -1,
-                2
+            physicsObject->Velocity = new FPVector2(
+                ourPos.X > theirPos.X ? 1 : -1,
+                FP.FromString("5.5")
             );
+            physicsObject->IsTouchingGround = false;
         }
     }
 }

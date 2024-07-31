@@ -96,7 +96,7 @@ namespace Quantum {
                     // Get n-lowest contacts (within tolerance)
                     potentialContacts.Sort((a, b) => a.Distance.CompareTo(b.Distance));
                     FP tolerance = FP._0_05;
-                    FP min = potentialContacts[0].Distance;
+                    FP? min = null;
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;
 
@@ -104,23 +104,25 @@ namespace Quantum {
 
                     foreach (var contact in potentialContacts) {
                         var coords = (contact.TileX, contact.TileY);
-                        if (contact.Distance - min > tolerance
+                        if ((min.HasValue && contact.Distance - min.Value > tolerance)
                             || contact.Distance > FPMath.Abs(velocityY)
                             || removedContacts.Contains(coords)
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
-                            break;
+                            continue;
                         }
 
                         bool keepContact = true;
                         f.Signals.OnPreTileCollide(stage, filter.Entity, &contact, &keepContact);
                         if (keepContact) {
                             contacts.Add(contact);
+                            min ??= contact.Distance;
                             avgNormal += contact.Normal;
                             contactCount++;
 
                             StageTile tile = f.FindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile);
                             physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
                             physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
+
                         } else {
                             removedContacts.Add(coords);
                         }
@@ -133,10 +135,10 @@ namespace Quantum {
                     avgNormal /= contactCount;
 
                     // Snap to point.
-                    filter.Transform->Position += directionVector * (min - Skin);
+                    filter.Transform->Position += directionVector * (min.Value - Skin);
 
                     // Readjust the remaining velocity
-                    FP remainingVelocity = filter.PhysicsObject->Velocity.Magnitude - min;
+                    FP remainingVelocity = filter.PhysicsObject->Velocity.Magnitude - min.Value;
                     FPVector2 newDirection = new(-avgNormal.Y, avgNormal.X);
 
                     // Only care about the Y aspect to not slide up/down hills via gravity
@@ -212,7 +214,7 @@ namespace Quantum {
                     // Get n-lowest contacts (within tolerance)
                     potentialContacts.Sort((a, b) => a.Distance.CompareTo(b.Distance));
                     FP tolerance = FP._0_05;
-                    FP min = potentialContacts[0].Distance;
+                    FP? min = null;
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;
 
@@ -220,11 +222,11 @@ namespace Quantum {
 
                     foreach (var contact in potentialContacts) {
                         var coords = (contact.TileX, contact.TileY);
-                        if (contact.Distance - min > tolerance
+                        if ((min.HasValue && contact.Distance - min.Value > tolerance)
                             || contact.Distance > FPMath.Abs(velocityX)
                             || removedContacts.Contains(coords)
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
-                            break;
+                            continue;
                         }
 
                         bool keepContact = true;
@@ -232,12 +234,14 @@ namespace Quantum {
 
                         if (keepContact) {
                             contacts.Add(contact);
+                            min ??= contact.Distance;
                             avgNormal += contact.Normal;
                             contactCount++;
 
                             StageTile tile = f.FindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile);
                             physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
                             physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
+
                         } else {
                             removedContacts.Add(coords);
                         }
@@ -250,10 +254,10 @@ namespace Quantum {
                     avgNormal /= contactCount;
 
                     // Snap to point.
-                    filter.Transform->Position += directionVector * (min - Skin);
+                    filter.Transform->Position += directionVector * (min.Value - Skin);
 
                     // Readjust the remaining velocity
-                    FP remainingVelocity = physicsObject->Velocity.Magnitude - min;
+                    FP remainingVelocity = physicsObject->Velocity.Magnitude - min.Value;
                     FPVector2 newDirection = new(-avgNormal.Y, avgNormal.X);
 
                     physicsObject->Velocity =
