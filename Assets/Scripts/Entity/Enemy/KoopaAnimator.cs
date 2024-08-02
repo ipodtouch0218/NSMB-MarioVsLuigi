@@ -18,7 +18,7 @@ public class KoopaAnimator : MonoBehaviour {
     [SerializeField] private Transform rotation;
     [SerializeField] private Sprite deadSprite;
 
-    [SerializeField] private bool mirrorSprite;
+    [SerializeField] private bool mirrorSprite, dontFlip;
 
     //---Private Variables
     private float dampVelocity;
@@ -61,7 +61,7 @@ public class KoopaAnimator : MonoBehaviour {
         if (enemy.IsDead) {
             transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime));
 
-        } else if (koopa.IsFlipped) {
+        } else if (koopa.IsFlipped && !dontFlip) {
             previousRotation = Quaternion.identity;
             dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
             rotation.eulerAngles = new Vector3(

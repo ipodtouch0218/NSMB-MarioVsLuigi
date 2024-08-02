@@ -20,63 +20,63 @@ public static unsafe class QuantumUtils {
         return ComboSounds[Mathf.Clamp(combo, 0, ComboSounds.Length - 1)];
     }
 
-    public static FPVector2 WorldToUnityTile(Frame f, FPVector2 worldPos) {
+    public static Vector2Int WorldToUnityTile(Frame f, FPVector2 worldPos) {
         return WorldToUnityTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos);
     }
 
-    public static FPVector2 WorldToUnityTile(VersusStageData stage, FPVector2 worldPos) {
+    public static Vector2Int WorldToUnityTile(VersusStageData stage, FPVector2 worldPos) {
         worldPos -= stage.TilemapWorldPosition;
         worldPos *= 2;
-        return worldPos;
+        return new Vector2Int(FPMath.FloorToInt(worldPos.X), FPMath.FloorToInt(worldPos.Y));
     }
 
-    public static FPVector2 UntiyTileToRelativeTile(Frame f, FPVector2 unityTile) {
+    public static Vector2Int UntiyTileToRelativeTile(Frame f, Vector2Int unityTile) {
         return UnityTileToRelativeTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), unityTile);
     }
 
-    public static FPVector2 UnityTileToRelativeTile(VersusStageData stage, FPVector2 unityTile) {
-        int x = FPMath.FloorToInt(unityTile.X) - stage.TileOrigin.x;
+    public static Vector2Int UnityTileToRelativeTile(VersusStageData stage, Vector2Int unityTile) {
+        int x = unityTile.x - stage.TileOrigin.x;
         x = (x % stage.TileDimensions.x + stage.TileDimensions.x) % stage.TileDimensions.x; // Wrapping
-        int y = FPMath.FloorToInt(unityTile.Y) - stage.TileOrigin.y;
-        return new FPVector2(x, y);
+        int y = unityTile.y - stage.TileOrigin.y;
+        return new Vector2Int(x, y);
     }
 
-    public static Vector2Int FPVectorToIntVector(FPVector2 vec) {
-        return new Vector2Int(FPMath.FloorToInt(vec.X), FPMath.FloorToInt(vec.Y));
-    }
-
-    public static FPVector2 WorldToRelativeTile(Frame f, FPVector2 worldPos) {
+    public static Vector2Int WorldToRelativeTile(Frame f, FPVector2 worldPos) {
         return WorldToRelativeTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos);
     }
 
-    public static FPVector2 WorldToRelativeTile(VersusStageData stage, FPVector2 worldPos) {
+    public static Vector2Int WorldToRelativeTile(VersusStageData stage, FPVector2 worldPos) {
         return UnityTileToRelativeTile(stage, WorldToUnityTile(stage, worldPos));
     }
 
-    public static FPVector2 UnityTileToWorld(Frame f, FPVector2 unityTile) {
+    public static FPVector2 UnityTileToWorld(Frame f, Vector2Int unityTile) {
         return UnityTileToWorld(f.FindAsset<VersusStageData>(f.Map.UserAsset), unityTile);
     }
 
-    public static FPVector2 UnityTileToWorld(VersusStageData stage, FPVector2 unityTile) {
-        return (unityTile / 2) + stage.TilemapWorldPosition;
+    public static FPVector2 UnityTileToWorld(VersusStageData stage, Vector2Int unityTile) {
+        return (new FPVector2(unityTile.x, unityTile.y) / 2) + stage.TilemapWorldPosition;
     }
 
-    public static FPVector2 RelativeTileToUnityTile(Frame f, FPVector2 relativeTile) {
+    public static Vector2Int RelativeTileToUnityTile(Frame f, Vector2Int relativeTile) {
         return RelativeTileToUnityTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), relativeTile);
     }
 
-    public static FPVector2 RelativeTileToUnityTile(VersusStageData stage, FPVector2 relativeTile) {
-        int x = relativeTile.X.AsInt + stage.TileOrigin.x;
-        int y = relativeTile.Y.AsInt + stage.TileOrigin.y;
-        return new FPVector2(x, y);
+    public static Vector2Int RelativeTileToUnityTile(VersusStageData stage, Vector2Int relativeTile) {
+        int x = relativeTile.x + stage.TileOrigin.x;
+        int y = relativeTile.y + stage.TileOrigin.y;
+        return new Vector2Int(x, y);
     }
 
-    public static FPVector2 RelativeTileToWorld(Frame f, FPVector2 relativeTile) {
+    public static FPVector2 RelativeTileToWorld(Frame f, Vector2Int relativeTile) {
         return RelativeTileToWorld(f.FindAsset<VersusStageData>(f.Map.UserAsset), relativeTile);
     }
 
-    public static FPVector2 RelativeTileToWorld(VersusStageData stage, FPVector2 relativeTile) {
+    public static FPVector2 RelativeTileToWorld(VersusStageData stage, Vector2Int relativeTile) {
         return UnityTileToWorld(stage, RelativeTileToUnityTile(stage, relativeTile));
+    }
+
+    public static FPVector2 RelativeTileToWorldRounded(VersusStageData stage, Vector2Int relativeTile) {
+        return RelativeTileToWorld(stage, relativeTile) + FPVector2.One * FP._0_25;
     }
 
     public static FPVector2 WrapUnityTile(Frame f, FPVector2 unityTile, out WrapDirection wrapDirection) {
@@ -87,9 +87,11 @@ public static unsafe class QuantumUtils {
         if (unityTile.X < stage.TileOrigin.x) {
             unityTile.X += stage.TileDimensions.x;
             wrapDirection = WrapDirection.Left;
+
         } else if (unityTile.X >= stage.TileOrigin.x + stage.TileDimensions.x) {
             unityTile.X -= stage.TileDimensions.x;
             wrapDirection = WrapDirection.Right;
+
         } else {
             wrapDirection = WrapDirection.NoWrap;
         }
@@ -105,9 +107,11 @@ public static unsafe class QuantumUtils {
         if (worldPos.X < stage.StageWorldMin.X) {
             worldPos.X += stage.TileDimensions.x / 2;
             wrapDirection = WrapDirection.Left;
+
         } else if (worldPos.X >= stage.StageWorldMax.X) {
             worldPos.X -= stage.TileDimensions.x / 2;
             wrapDirection = WrapDirection.Right;
+
         } else {
             wrapDirection = WrapDirection.NoWrap;
         }
@@ -137,13 +141,6 @@ public static unsafe class QuantumUtils {
         NoWrap,
         Left,
         Right
-    }
-
-    public static FPVector2 RoundWorld(FPVector2 worldPos) {
-        return new FPVector2(
-            FPMath.Floor(worldPos.X * 2) / 2 + FP._0_25,
-            FPMath.Floor(worldPos.Y * 2) / 2 + FP._0_25
-        );
     }
 
     public static int GetTeamStars(Frame f, int team) {

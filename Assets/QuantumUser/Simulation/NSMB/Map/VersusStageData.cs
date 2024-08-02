@@ -72,8 +72,8 @@ public unsafe class VersusStageData : AssetObject {
         return stageLayout[index];
     }
 
-    public StageTileInstance GetTileRelative(Frame f, FPVector2 tile) {
-        return GetTileRelative(f, tile.X.AsInt, tile.Y.AsInt);
+    public StageTileInstance GetTileRelative(Frame f, Vector2Int tile) {
+        return GetTileRelative(f, tile.x, tile.y);
     }
 
     public StageTileInstance GetTileWorld(Frame f, FPVector2 worldPosition) {

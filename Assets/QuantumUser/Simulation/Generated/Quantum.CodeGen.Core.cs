@@ -1342,10 +1342,12 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PhysicsObject : Quantum.IComponent {
-    public const Int32 SIZE = 88;
+    public const Int32 SIZE = 104;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(72)]
+    [FieldOffset(88)]
     public FPVector2 Velocity;
+    [FieldOffset(72)]
+    public FPVector2 PreviousVelocity;
     [FieldOffset(56)]
     public FPVector2 Gravity;
     [FieldOffset(48)]
@@ -1375,6 +1377,7 @@ namespace Quantum {
       unchecked { 
         var hash = 8311;
         hash = hash * 31 + Velocity.GetHashCode();
+        hash = hash * 31 + PreviousVelocity.GetHashCode();
         hash = hash * 31 + Gravity.GetHashCode();
         hash = hash * 31 + TerminalVelocity.GetHashCode();
         hash = hash * 31 + IsFrozen.GetHashCode();
@@ -1411,6 +1414,7 @@ namespace Quantum {
         FP.Serialize(&p->FloorAngle, serializer);
         FP.Serialize(&p->TerminalVelocity, serializer);
         FPVector2.Serialize(&p->Gravity, serializer);
+        FPVector2.Serialize(&p->PreviousVelocity, serializer);
         FPVector2.Serialize(&p->Velocity, serializer);
     }
   }

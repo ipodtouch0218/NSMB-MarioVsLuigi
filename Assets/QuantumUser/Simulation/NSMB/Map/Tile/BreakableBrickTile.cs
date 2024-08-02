@@ -58,7 +58,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         if (doBreak) {
             f.Events.TileBroken(f, entity, tilePosition.x, tilePosition.y, tileInstance);
             stage.SetTileRelative(f, tilePosition.x, tilePosition.y, default);
-            BlockBumpSystem.Bump(f, QuantumUtils.RoundWorld(QuantumUtils.RelativeTileToWorld(stage, new FPVector2(tilePosition.x, tilePosition.y))), bumpOwner);
+            BlockBumpSystem.Bump(f, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition), bumpOwner);
 
         } else if (BumpIfNotBroken && doBump) {
             Bump(f, stage, tilePosition, tileInstance, direction == InteractionDirection.Down, bumpOwner);
@@ -75,7 +75,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         var blockBump = f.Unsafe.GetPointer<BlockBump>(newEntity);
         var transform = f.Unsafe.GetPointer<Transform2D>(newEntity);
 
-        transform->Position = QuantumUtils.RelativeTileToWorld(f, new FPVector2(tile.x, tile.y)) + FPVector2.One * FP._0_25;
+        transform->Position = QuantumUtils.RelativeTileToWorld(f, tile) + FPVector2.One * FP._0_25;
         blockBump->Origin = transform->Position;
         blockBump->StartTile = stage.GetTileRelative(f, tile.x, tile.y).Tile;
         blockBump->ResultTile = result;

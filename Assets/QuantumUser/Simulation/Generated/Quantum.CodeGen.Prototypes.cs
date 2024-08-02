@@ -472,6 +472,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.PhysicsObject))]
   public unsafe partial class PhysicsObjectPrototype : ComponentPrototype<Quantum.PhysicsObject> {
     public FPVector2 Velocity;
+    public FPVector2 PreviousVelocity;
     public FPVector2 Gravity;
     public FP TerminalVelocity;
     public QBoolean IsFrozen;
@@ -494,6 +495,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.PhysicsObject result, in PrototypeMaterializationContext context = default) {
         result.Velocity = this.Velocity;
+        result.PreviousVelocity = this.PreviousVelocity;
         result.Gravity = this.Gravity;
         result.TerminalVelocity = this.TerminalVelocity;
         result.IsFrozen = this.IsFrozen;

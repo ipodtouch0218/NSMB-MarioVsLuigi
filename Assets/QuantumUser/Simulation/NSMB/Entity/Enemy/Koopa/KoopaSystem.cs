@@ -91,7 +91,6 @@ namespace Quantum {
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
                 FPVector2 checkPosition = transform->Position + (FPVector2.Up * FP._0_05) + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
                 if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_50, out var hit)) {
-                    Debug.Log(hit.Position + " - " + hit.Distance);
                     enemy->FacingRight = !enemy->FacingRight;
                 }
             }
@@ -156,7 +155,9 @@ namespace Quantum {
                         // Groundpounded a Spiny, damage player.
                         if (mario->IsDamageable) {
                             mario->Powerdown(f, hit.Entity, false);
-                            enemy->FacingRight = damageDirection.X > 0;
+                            if (!koopa->IsInShell) {
+                                enemy->FacingRight = damageDirection.X > 0;
+                            }
                         }
                     }
                 } else if (koopa->IsKicked || !koopa->IsInShell) {
@@ -191,7 +192,7 @@ namespace Quantum {
 
                             } else if (mario->IsDamageable) {
                                 mario->Powerdown(f, hit.Entity, false);
-                                if (koopa->IsKicked) {
+                                if (!koopa->IsInShell) {
                                     enemy->FacingRight = damageDirection.X > 0;
                                 }
                             }
@@ -204,7 +205,9 @@ namespace Quantum {
 
                         } else if (mario->IsDamageable) {
                             mario->Powerdown(f, hit.Entity, false);
-                            enemy->FacingRight = damageDirection.X > 0;
+                            if (!koopa->IsInShell) {
+                                enemy->FacingRight = damageDirection.X > 0;
+                            }
                         }
                     }
                 } else {

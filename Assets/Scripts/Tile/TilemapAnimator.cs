@@ -1,8 +1,6 @@
 using NSMB.Extensions;
-using Photon.Deterministic;
 using Quantum;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -28,7 +26,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     private void OnTileBroken(EventTileBroken e) {
         ParticleSystem particle = Instantiate(tileBreakParticleSystem,
-            QuantumUtils.RelativeTileToWorld(stage, new FPVector2(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
+            QuantumUtils.RelativeTileToWorld(stage, new Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
 
         if (QuantumUnityDB.GetGlobalAsset(e.Tile.Tile) is BreakableBrickTile bbt) {
             var main = particle.main;

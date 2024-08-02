@@ -1229,7 +1229,7 @@ PrefabInstance:
     - target: {fileID: 1435431862184428454, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.75
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1435431862184428454, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
@@ -1276,10 +1276,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2736979299832079342, guid: acafae0748a6d984ca08e285f836acaf,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5327661004347306627, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: 49152
+      value: 32768
       objectReference: {fileID: 0}
     - target: {fileID: 5327661004347306627, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}

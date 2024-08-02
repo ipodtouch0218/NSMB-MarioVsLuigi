@@ -36,6 +36,7 @@ namespace Quantum {
             HandleBreakingBlocks(f, filter, physics, input, stage);
             HandleCrouching(f, filter, physics, input);
             HandleGroundpound(f, filter, physics, input, stage);
+            HandleSliding(f, filter, physics, input);
             HandleWalkingRunning(f, filter, physics, input);
             HandleJumping(f, filter, physics, input);
             HandleSwimming(f, filter, physics, input);
@@ -221,7 +222,7 @@ namespace Quantum {
                 } else if (mario->IsSliding) {
                     if (angle > physics.SlideMinimumAngle) {
                         // Uphill / downhill
-                        acc = (angle > 30 ? physics.SlideFastAcceleration : physics.SlideSlowAcceleration) * (uphill ? -1 : 1);
+                        acc = (angle > 30 ? physics.SlideFastAcceleration : physics.SlideSlowAcceleration) * (uphill ? 1 : -1);
                     } else {
                         // Flat ground
                         acc = -physics.WalkAcceleration[0];
@@ -666,7 +667,7 @@ namespace Quantum {
             }
 
             HandleGroundpoundStartAnimation(filter, physics);
-            HandleGroundpoundBlockCollision(f, filter, stage);
+            HandleGroundpoundBlockCollision(f, filter, physics, stage);
 
             if (mario->IsInWater && (mario->IsGroundpounding || mario->IsDrilling)) {
                 physicsObject->Velocity.Y += physics.SwimGroundpoundDeceleration * f.DeltaTime;
@@ -760,7 +761,7 @@ namespace Quantum {
             };
         }
 
-        private void HandleGroundpoundBlockCollision(Frame f, Filter filter, VersusStageData stage) {
+        private void HandleGroundpoundBlockCollision(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -799,6 +800,12 @@ namespace Quantum {
 
             continueGroundpound &= interactedAny;
             mario->IsGroundpoundActive &= continueGroundpound;
+
+            if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle && physicsObject->IsOnSlideableGround) {
+                mario->IsGroundpounding = false;
+                mario->IsSliding = true;
+                physicsObject->Velocity.X = FPMath.Sign(physicsObject->FloorAngle) * physics.SlideMaxVelocity;
+            }
 
             if (mario->IsDrilling) {
                 mario->IsSpinnerFlying &= continueGroundpound;
@@ -1096,6 +1103,35 @@ namespace Quantum {
                 mario->IsCrouching = false;
 
                 f.Events.MarioPlayerJumped(f, filter.Entity, *mario, JumpState.None, false);
+            }
+        }
+
+        private void HandleSliding(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            if (physicsObject->IsOnSlideableGround 
+                && (!((mario->FacingRight && physicsObject->IsTouchingRightWall) || (!mario->FacingRight && physicsObject->IsTouchingLeftWall))
+                && mario->IsCrouching && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle
+                && !mario->IsInShell && mario->CurrentPowerupState != PowerupState.MegaMushroom)) {
+
+                mario->IsSliding = true;
+                mario->IsCrouching = false;
+            }
+            if (mario->IsSliding && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->FloorAngle) > physics.SlideMinimumAngle) {
+                FP runningMaxSpeed = physics.WalkMaxVelocity[physics.RunSpeedStage];
+                FP angleDeg = physicsObject->FloorAngle * FP.Deg2Rad;
+
+                bool uphill = FPMath.Sign(physicsObject->FloorAngle) != FPMath.Sign(physicsObject->Velocity.X);
+                FP speed = f.DeltaTime * 5 * (uphill ? FPMath.Clamp01(1 - (FPMath.Abs(physicsObject->Velocity.X) / runningMaxSpeed)) : 4);
+
+                physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X + (FPMath.Sin(angleDeg) * speed), -(runningMaxSpeed * FP._1_25), runningMaxSpeed * FP._1_25);
+                //FP newY = (uphill ? 0 : -FP._1_50) * FPMath.Abs(newX);
+                //= new FPVector2(newX, newY);
+            }
+
+            if (inputs.Up.IsDown || ((inputs.Left.IsDown ^ inputs.Right.IsDown) && !inputs.Down.IsDown) || (physicsObject->IsOnSlideableGround && FPMath.Abs(physicsObject->FloorAngle) < physics.SlideMinimumAngle && physicsObject->IsTouchingGround && physicsObject->Velocity.X == 0 && !inputs.Down.IsDown) || (mario->FacingRight && physicsObject->IsTouchingRightWall) || (!mario->FacingRight && physicsObject->IsTouchingLeftWall)) {
+                mario->IsSliding = false;
             }
         }
 

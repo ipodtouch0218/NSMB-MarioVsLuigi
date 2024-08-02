@@ -1,5 +1,6 @@
 component PhysicsObject {
     FPVector2 Velocity;
+    FPVector2 PreviousVelocity;
     FPVector2 Gravity;
     FP TerminalVelocity;
     bool IsFrozen;

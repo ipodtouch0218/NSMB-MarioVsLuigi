@@ -675,7 +675,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 49152
+            RawValue: 32768
           Y:
             RawValue: 340787
         Rotation:
@@ -712,7 +712,7 @@ MonoBehaviour:
           UserTag: 0
           IsPersistent: 1
           CompoundShapes: []
-        Layer: 9
+        Layer: 0
         IsTrigger: 0
         PhysicsMaterial:
           Id:
@@ -721,13 +721,13 @@ MonoBehaviour:
       type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         CallbackFlags:
-          Value: 0
+          Value: 4095
     - rid: 8510292287580798979
       type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Spawnpoint:
           X:
-            RawValue: 49152
+            RawValue: 32768
           Y:
             RawValue: 340787
         IsActive:
@@ -746,7 +746,7 @@ MonoBehaviour:
     - rid: 8510292287580798981
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        SpawnWhenStomped:
+        SpawnPowerupWhenStomped:
           Id:
             Value: 0
         DontWalkOfLedges:
@@ -772,6 +772,11 @@ MonoBehaviour:
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        PreviousVelocity:
           X:
             RawValue: 0
           Y:
@@ -882,7 +887,7 @@ MonoBehaviour:
     - rid: 8884074765841596421
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        SpawnWhenStomped:
+        SpawnPowerupWhenStomped:
           Id:
             Value: 0
         DontWalkOfLedges:
@@ -908,6 +913,11 @@ MonoBehaviour:
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        PreviousVelocity:
           X:
             RawValue: 0
           Y:

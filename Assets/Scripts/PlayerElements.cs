@@ -23,7 +23,6 @@ public class PlayerElements : MonoBehaviour {
     //---Private Variables
     private PlayerRef player;
     private EntityRef entity;
-    private RenderTexture texture;
 
     public void OnValidate() {
         this.SetIfNull(ref image);
@@ -35,49 +34,21 @@ public class PlayerElements : MonoBehaviour {
 
     public void OnEnable() {
         AllPlayerElements.Add(this);
-        GlobalController.ResolutionChanged += OnResolutionChanged;
     }
 
     public void OnDisable() {
         AllPlayerElements.Remove(this);
-        GlobalController.ResolutionChanged -= OnResolutionChanged;
-    }
-
-    public void OnDestroy() {
-        RenderTexture.ReleaseTemporary(texture);
     }
 
     public void Initialize(PlayerRef player) {
         this.player = player;
         Camera.transform.SetParent(null);
         Camera.transform.localScale = Vector3.one;
-        OnResolutionChanged();
     }
 
     public void SetEntity(EntityRef entity) {
         this.entity = entity;
         uiUpdater.Target = entity;
         cameraAnimator.Target = entity;
-    }
-
-    private void OnResolutionChanged() {
-        if (texture) {
-            RenderTexture.ReleaseTemporary(texture);
-        }
-
-        texture = RenderTexture.GetTemporary(Screen.width, Screen.height);
-        image.texture = texture;
-        Camera.targetTexture = texture;
-
-        float aspect = ourCamera.aspect;
-        double size = (14 / 4f) /*+ SizeIncreaseCurrent*/;
-
-        // https://forum.unity.com/threads/how-to-calculate-horizontal-field-of-view.16114/#post-2961964
-        double aspectReciprocals = 1d / aspect;
-
-        foreach (var camera in GetComponentsInChildren<Camera>()) {
-            camera.targetTexture = texture;
-            camera.orthographicSize = Mathf.Min((float) size, (float) (size * (16d/9d) * aspectReciprocals));
-        }
     }
 }
