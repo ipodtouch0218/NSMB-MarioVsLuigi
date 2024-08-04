@@ -49,10 +49,10 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
             doBump = true;
             bumpOwner = f.Get<Holdable>(entity).PreviousHolder;
 
-        } /*else if (f.TryGet(entity, out Bobomb bobomb)) {
-             doBreak = breakableByBombs;
+        } else if (f.TryGet(entity, out Bobomb _)) {
+             doBreak = BreakingRules.HasFlag(BreakableBy.Bombs);
              doBump = false;
-        }*/
+        }
 
         var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
         if (doBreak) {

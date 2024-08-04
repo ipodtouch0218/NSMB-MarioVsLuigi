@@ -5,7 +5,7 @@ using static IInteractableTile;
 
 namespace Quantum {
 
-    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, ISignalOnGameStarting, ISignalOnPreTileCollide {
+    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, ISignalOnGameStarting, ISignalOnPreTileCollide, ISignalOnBobombExplodeEntity {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -286,6 +286,10 @@ namespace Quantum {
             if (!mario->WasTouchingGroundLastFrame && physicsObject->IsTouchingGround) {
                 // Landed Frame
                 mario->LandedFrame = f.Number;
+                if (mario->PreviousJumpState != JumpState.None && mario->PreviousJumpState == mario->JumpState) {
+                    mario->JumpState = JumpState.None;
+                }
+                mario->PreviousJumpState = mario->JumpState;
             }
 
             bool tryJump = mario->JumpBufferFrames > 0 && (physicsObject->IsTouchingGround || mario->IsWallsliding);
@@ -1320,14 +1324,18 @@ namespace Quantum {
                 direction = InteractionDirection.Left;
             }
 
-            Debug.Log($"pre tile collide {contact->TileX} {contact->TileY}");
-
             // Try to break this tile as mega mario...
             StageTileInstance tileInstance = stage.GetTileRelative(f, contact->TileX, contact->TileY);
             StageTile tile = f.FindAsset(tileInstance.Tile);
 
             if (tile is IInteractableTile it) {
                 *allowCollision = !it.Interact(f, entity, direction, new Vector2Int(contact->TileX, contact->TileY), tileInstance, out bool _);
+            }
+        }
+
+        public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                mario->Powerdown(f, entity, false);
             }
         }
     }

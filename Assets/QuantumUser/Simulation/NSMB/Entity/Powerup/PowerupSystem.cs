@@ -113,8 +113,10 @@ namespace Quantum {
                     powerup->AnimationCurveOrigin = filter.Transform->Position;
                     powerup->AnimationCurveTimer += FP._0_01;
                 } else {
-                    physicsObject->Velocity.Y = asset.BounceStrength;
                     physicsObject->Velocity.X = asset.Speed * (powerup->FacingRight ? 1 : -1);
+                    if (asset.BounceStrength > 0) {
+                        physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, asset.BounceStrength);
+                    }
                 }
 
                 /*

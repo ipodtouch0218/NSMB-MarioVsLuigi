@@ -1,34 +1,15 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe partial struct Koopa {
+    public unsafe partial struct Bobomb {
 
         public void Respawn(Frame f, EntityRef entity) {
             var holdable = f.Unsafe.GetPointer<Holdable>(entity);
 
-            IsInShell = false;
-            IsKicked = false;
-            Combo = 0;
-            CurrentSpeed = Speed;
+            CurrentDetonationFrames = 0;
             holdable->Holder = default;
             holdable->PreviousHolder = default;
-        }
-
-        public void EnterShell(Frame f, EntityRef entity, EntityRef initiator, bool flipped) {
-            var holdable = f.Unsafe.GetPointer<Holdable>(entity);
-            holdable->PreviousHolder = initiator;
-
-            if (!IsInShell || IsKicked) {
-                f.Events.KoopaEnteredShell(f, entity);
-            }
-
-            CurrentSpeed = 0;
-            Combo = 0;
-            IsInShell = true;
-            IsKicked = false;
-            IsFlipped |= flipped;
-
-            WakeupFrames = 15 * 60;
+            holdable->IgnoreOwnerFrames = 0;
         }
 
         public void Kick(Frame f, EntityRef entity, EntityRef initiator, FP speed) {
@@ -36,10 +17,11 @@ namespace Quantum {
             holdable->PreviousHolder = initiator;
             holdable->IgnoreOwnerFrames = 15;
 
-            IsKicked = true;
-            IsInShell = true;
-            Combo = 0;
-            CurrentSpeed = KickSpeed + speed;
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            physicsObject->Velocity = new(
+                FP.FromString("4.5") + speed,
+                FP.FromString("3.5")
+            );
 
             f.Events.PlayComboSound(f, entity, 0);
         }
@@ -47,14 +29,6 @@ namespace Quantum {
         public void Kill(Frame f, EntityRef entity, EntityRef killerEntity, bool special) {
             var enemy = f.Unsafe.GetPointer<Enemy>(entity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            var holdable = f.Unsafe.GetPointer<Holdable>(entity);
-
-            if (f.Exists(holdable->Holder)) {
-                f.Unsafe.GetPointer<MarioPlayer>(holdable->Holder)->HeldEntity = default;
-                holdable->PreviousHolder = holdable->Holder;
-                holdable->Holder = default;
-                holdable->IgnoreOwnerFrames = 15;
-            }
 
             // Spawn coin
             EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
@@ -64,10 +38,10 @@ namespace Quantum {
             coinPhysicsObject->Velocity.Y = f.RNG->Next(FP.FromString("4.5"), 5);
 
             // Fall off screen
-            var koopaTransform = f.Get<Transform2D>(entity);
+            var bobombTransform = f.Get<Transform2D>(entity);
             var killerTransform = f.Get<Transform2D>(killerEntity);
 
-            QuantumUtils.UnwrapWorldLocations(f, koopaTransform.Position, killerTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, bobombTransform.Position, killerTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
             enemy->FacingRight = ourPos.X > theirPos.X;
             physicsObject->DisableCollision = true;
             physicsObject->Velocity = new FPVector2(
@@ -87,10 +61,17 @@ namespace Quantum {
             f.Events.PlayComboSound(f, entity, combo);
 
             enemy->IsDead = true;
-            IsInShell = false;
-            IsKicked = false;
-            IsFlipped = false;
-            f.Events.EnemyKilled(f, entity, killerEntity, false);
+
+            // Holdable
+            var holdable = f.Unsafe.GetPointer<Holdable>(entity);
+            if (f.Exists(holdable->Holder)) {
+                var marioHolder = f.Unsafe.GetPointer<MarioPlayer>(holdable->Holder);
+                marioHolder->HeldEntity = default;
+                holdable->PreviousHolder = default;
+                holdable->Holder = default;
+            }
+
+            f.Events.EnemyKilled(f, entity, killerEntity, special);
         }
     }
 }

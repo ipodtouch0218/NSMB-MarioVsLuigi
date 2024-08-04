@@ -1,0 +1,19 @@
+component Bobomb {
+	FP ExplosionRadius;
+	FP Speed;
+	ushort DetonationFrames;
+
+	ushort CurrentDetonationFrames;
+}
+
+signal OnBobombExplodeEntity(entity_ref bobomb, entity_ref entity);
+
+event BobombLit {
+	Frame Frame;
+	EntityRef Entity;
+}
+
+event BobombExploded {
+	Frame Frame;
+	EntityRef Entity;
+}

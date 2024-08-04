@@ -108,6 +108,27 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Bobomb))]
+  public unsafe partial class BobombPrototype : ComponentPrototype<Quantum.Bobomb> {
+    public FP ExplosionRadius;
+    public FP Speed;
+    public UInt16 DetonationFrames;
+    public UInt16 CurrentDetonationFrames;
+    partial void MaterializeUser(Frame frame, ref Quantum.Bobomb result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Bobomb component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Bobomb result, in PrototypeMaterializationContext context = default) {
+        result.ExplosionRadius = this.ExplosionRadius;
+        result.Speed = this.Speed;
+        result.DetonationFrames = this.DetonationFrames;
+        result.CurrentDetonationFrames = this.CurrentDetonationFrames;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.CameraController))]
   public unsafe partial class CameraControllerPrototype : ComponentPrototype<Quantum.CameraController> {
     public FPVector2 CurrentPosition;
@@ -200,6 +221,7 @@ namespace Quantum.Prototypes {
   public unsafe class HoldablePrototype : ComponentPrototype<Quantum.Holdable> {
     public MapEntityId Holder;
     public MapEntityId PreviousHolder;
+    public Byte IgnoreOwnerFrames;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Holdable component = default;
         Materialize((Frame)f, ref component, in context);
@@ -208,6 +230,7 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.Holdable result, in PrototypeMaterializationContext context = default) {
         PrototypeValidator.FindMapEntity(this.Holder, in context, out result.Holder);
         PrototypeValidator.FindMapEntity(this.PreviousHolder, in context, out result.PreviousHolder);
+        result.IgnoreOwnerFrames = this.IgnoreOwnerFrames;
     }
   }
   [System.SerializableAttribute()]
@@ -250,7 +273,6 @@ namespace Quantum.Prototypes {
     public QBoolean IsFlipped;
     public QBoolean IsKicked;
     public UInt16 WakeupFrames;
-    public Byte IgnoreOwnerFrames;
     partial void MaterializeUser(Frame frame, ref Quantum.Koopa result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Koopa component = default;
@@ -269,7 +291,6 @@ namespace Quantum.Prototypes {
         result.IsFlipped = this.IsFlipped;
         result.IsKicked = this.IsKicked;
         result.WakeupFrames = this.WakeupFrames;
-        result.IgnoreOwnerFrames = this.IgnoreOwnerFrames;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -330,6 +351,7 @@ namespace Quantum.Prototypes {
     public Byte FastTurnaroundFrames;
     public Byte SlowTurnaroundFrames;
     public JumpState JumpState;
+    public JumpState PreviousJumpState;
     public Byte JumpLandingFrames;
     public Byte JumpBufferFrames;
     public Byte CoyoteTimeFrames;
@@ -404,6 +426,7 @@ namespace Quantum.Prototypes {
         result.FastTurnaroundFrames = this.FastTurnaroundFrames;
         result.SlowTurnaroundFrames = this.SlowTurnaroundFrames;
         result.JumpState = this.JumpState;
+        result.PreviousJumpState = this.PreviousJumpState;
         result.JumpLandingFrames = this.JumpLandingFrames;
         result.JumpBufferFrames = this.JumpBufferFrames;
         result.CoyoteTimeFrames = this.CoyoteTimeFrames;

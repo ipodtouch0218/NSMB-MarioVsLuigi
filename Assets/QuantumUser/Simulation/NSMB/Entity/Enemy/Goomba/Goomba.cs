@@ -2,7 +2,6 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe partial struct Goomba {
-
         public void Kill(Frame f, EntityRef entity, EntityRef killerEntity, bool special) {
             var enemy = f.Unsafe.GetPointer<Enemy>(entity);
             var goomba = f.Unsafe.GetPointer<Goomba>(entity);

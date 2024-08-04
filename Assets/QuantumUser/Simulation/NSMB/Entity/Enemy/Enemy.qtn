@@ -5,9 +5,9 @@ component Enemy {
 	bool FacingRight;
 }
 
-signal OnEnemyDespawned(entity_ref Entity);
-
-signal OnEnemyRespawned(entity_ref Entity);
+signal OnEnemyDespawned(entity_ref entity);
+signal OnEnemyRespawned(entity_ref entity);
+signal OnEnemyEnemyCollision(entity_ref a, entity_ref b);
 
 event EnemyDespawned {
 	nothashed Frame Frame;

@@ -48,6 +48,7 @@ component MarioPlayer {
 
 	// Jumping
 	JumpState JumpState;
+	JumpState PreviousJumpState;
     byte JumpLandingFrames;
 	byte JumpBufferFrames;
 	byte CoyoteTimeFrames;

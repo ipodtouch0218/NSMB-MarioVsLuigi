@@ -15,6 +15,7 @@ namespace Quantum {
                     new EnemySystem(),
                     new GoombaSystem(),
                     new KoopaSystem(),
+                    new BobombSystem(),
                     new MarioPlayerSystem(),
                     new ProjectileSystem(),
                     new PowerupSystem(),

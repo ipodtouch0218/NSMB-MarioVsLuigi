@@ -26,7 +26,7 @@ namespace Quantum {
                     }
 
                     physicsObject->Velocity = coin->PreviousVelocity;
-                    physicsObject->Velocity.Y *= -FP._0_75;
+                    physicsObject->Velocity.Y *= -FP._0_33 * 2;
 
                     if (physicsObject->Velocity.Y > FP._0_75) {
                         f.Events.CoinBounced(f, filter.Entity, *coin);
@@ -84,6 +84,10 @@ namespace Quantum {
                 }
 
                 marioEntity = holdable->PreviousHolder;
+            }
+
+            if (mario->IsDead) {
+                return;
             }
 
             if (coin->IsCurrentlyDotted) {

@@ -1,12 +1,11 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using Quantum.Physics2D;
 using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
 
-    public unsafe class KoopaSystem : SystemMainThreadFilterStage<KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped {
+    public unsafe class KoopaSystem : SystemMainThreadFilterStage<KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped, ISignalOnBobombExplodeEntity {
         public struct Filter {
             public EntityRef Entity;
             public Enemy* Enemy;
@@ -15,6 +14,13 @@ namespace Quantum {
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
             public Holdable* Holdable;
+        }
+
+        public override void OnInit(Frame f) {
+            EnemySystem.RegisterInteraction<Koopa, Goomba>(OnKoopaGoombaInteraction);
+            EnemySystem.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
+            EnemySystem.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
+            EnemySystem.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -28,7 +34,6 @@ namespace Quantum {
                 return;
             }
 
-            QuantumUtils.Decrement(ref koopa->IgnoreOwnerFrames);
             if (koopa->IsInShell && !koopa->IsKicked) {
                 if (QuantumUtils.Decrement(ref koopa->WakeupFrames)) {
                     koopa->IsInShell = false;
@@ -89,190 +94,190 @@ namespace Quantum {
             }
 
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
-                FPVector2 checkPosition = transform->Position + (FPVector2.Up * FP._0_05) + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
-                if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_50, out var hit)) {
+                FPVector2 checkPosition = transform->Position + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
+                if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_25, out var hit)) {
                     enemy->FacingRight = !enemy->FacingRight;
                 }
             }
+        }
 
-            // Collide
-            var hits = f.Physics2D.OverlapShape(*transform, filter.Collider->Shape);
-            for (int i = 0; i < hits.Count; i++) {
-                OnCollision(f, ref filter, hits[i], stage);
+        public void OnKoopaGoombaInteraction(Frame f, EntityRef koopaEntity, EntityRef goombaEntity) {
+            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
+            var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
+            bool beingHeld = f.Exists(f.Get<Holdable>(koopaEntity).Holder);
+
+            if (koopa->IsKicked || beingHeld) {
+                // Destroy them
+                goomba->Kill(f, goombaEntity, koopaEntity, true);
+                if (beingHeld) {
+                    koopa->Kill(f, koopaEntity, goombaEntity, true);
+                }
+            } else {
+                EnemySystem.EnemyBumpTurnaround(f, koopaEntity, goombaEntity);
             }
         }
 
-        public void OnCollision(Frame f, ref Filter filter, Hit hit, VersusStageData stage) {
-            if (hit.Entity == filter.Entity) {
+        public void OnKoopaKoopaInteraction(Frame f, EntityRef koopaEntityA, EntityRef koopaEntityB) {
+            var koopaA = f.Unsafe.GetPointer<Koopa>(koopaEntityA);
+            var koopaB = f.Unsafe.GetPointer<Koopa>(koopaEntityB);
+
+            bool eitherBeingHeld = f.Exists(f.Get<Holdable>(koopaEntityA).Holder) || f.Exists(f.Get<Holdable>(koopaEntityB).Holder);
+
+            bool turn = true;
+            if (koopaA->IsKicked || eitherBeingHeld) {
+                // Destroy them
+                koopaB->Kill(f, koopaEntityB, koopaEntityA, false);
+                turn = false;
+            }
+            if (koopaB->IsKicked || eitherBeingHeld) {
+                // Destroy ourselves
+                koopaA->Kill(f, koopaEntityA, koopaEntityB, false);
+                turn = false;
+            }
+
+            if (turn) {
+                EnemySystem.EnemyBumpTurnaround(f, koopaEntityA, koopaEntityB);
+            }
+        }
+
+        public void OnKoopaBobombInteraction(Frame f, EntityRef koopaEntity, EntityRef bobombEntity) {
+            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
+            var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
+
+            bool eitherBeingHeld = f.Exists(f.Get<Holdable>(koopaEntity).Holder) || f.Exists(f.Get<Holdable>(bobombEntity).Holder);
+
+            bool turn = true;
+            if (koopa->IsKicked || eitherBeingHeld) {
+                // Destroy them
+                bobomb->Kill(f, bobombEntity, koopaEntity, true);
+                turn = false;
+            }
+            var bobombPhysicsObject = f.Get<PhysicsObject>(bobombEntity);
+            if ((bobomb->CurrentDetonationFrames > 0 && koopa->IsKicked && FPMath.Abs(bobombPhysicsObject.Velocity.X) > 1) || eitherBeingHeld) {
+                // Destroy ourselves
+                koopa->Kill(f, koopaEntity, bobombEntity, true);
+                turn = false;
+            }
+
+            if (turn) {
+                EnemySystem.EnemyBumpTurnaround(f, koopaEntity, bobombEntity);
+            }
+        }
+
+        public void OnKoopaMarioInteraction(Frame f, EntityRef koopaEntity, EntityRef marioEntity) {
+            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
+            var koopaHoldable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            bool beingHeld = f.Exists(koopaHoldable->Holder);
+
+            if (beingHeld || (koopaHoldable->PreviousHolder == marioEntity && koopaHoldable->IgnoreOwnerFrames > 0)) {
                 return;
             }
-            var enemy = filter.Enemy;
-            var koopa = filter.Koopa;
-            var koopaTransform = filter.Transform;
-            var collider = filter.Collider;
-            var holdable = filter.Holdable;
 
-            if (holdable->Holder == hit.Entity || (holdable->PreviousHolder == hit.Entity && koopa->IgnoreOwnerFrames > 0)) {
+            var koopaEnemy = f.Unsafe.GetPointer<Enemy>(koopaEntity);
+            var koopaTransform = f.Get<Transform2D>(koopaEntity);
+            var koopaPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(koopaEntity);
+            var marioTransform = f.Get<Transform2D>(marioEntity);
+            var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+
+            // Mario touched an alive koopa.
+            QuantumUtils.UnwrapWorldLocations(f, koopaTransform.Position + FPVector2.Up * FP._0_10, marioTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            FPVector2 damageDirection = (theirPos - ourPos).Normalized;
+            bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
+
+            if (mario->InstakillsEnemies(*marioPhysicsObject)) {
+                koopa->Kill(f, koopaEntity, marioEntity, true);
                 return;
             }
 
-            bool beingHeld = f.Exists(holdable->Holder);
+            bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
+            if (groundpounded) {
+                if (koopa->SpawnPowerupWhenStomped.IsValid && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
+                    // Powerup (for blue koopa): give to mario immediately
+                    PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
+                    koopaEnemy->IsActive = false;
+                    koopaEnemy->IsDead = true;
 
-            if (f.Unsafe.TryGetPointer(hit.Entity, out MarioPlayer* mario)
-                && f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* marioTransform)
-                && f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* marioPhysicsObject)) {
-
-                if (mario->IsDead || beingHeld) {
-                    return;
-                }
-
-                // Mario touched an alive koopa.
-                QuantumUtils.UnwrapWorldLocations(stage, koopaTransform->Position + FPVector2.Up * FP._0_10, marioTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
-                FPVector2 damageDirection = (theirPos - ourPos).Normalized;
-                bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
-
-                if (mario->InstakillsEnemies(*marioPhysicsObject)) {
-                    koopa->Kill(f, filter.Entity, hit.Entity, true);
-                    return;
-                }
-
-                bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
-                if (groundpounded) {
-                    if (koopa->SpawnPowerupWhenStomped.IsValid && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
-                        // Powerup (for blue koopa): give to mario immediately
-                        PowerupSystem.CollectPowerup(f, hit.Entity, mario, marioPhysicsObject, powerup);
-                        enemy->IsActive = false;
-                        enemy->IsDead = true;
-
-                    } else if (!koopa->IsSpiny || koopa->IsInShell) {
-                        // Kick
-                        koopa->IsInShell = true;
-                        koopa->IsKicked = false;
-                        koopa->EnterShell(f, filter.Entity, hit.Entity, false);
-                        koopa->Kick(f, filter.Entity, hit.Entity, 3);
-                        filter.PhysicsObject->Velocity.Y = 2;
-                    } else {
-                        // Groundpounded a Spiny, damage player.
-                        if (mario->IsDamageable) {
-                            mario->Powerdown(f, hit.Entity, false);
-                            if (!koopa->IsInShell) {
-                                enemy->FacingRight = damageDirection.X > 0;
-                            }
+                } else if (!koopa->IsSpiny || koopa->IsInShell) {
+                    // Kick
+                    koopa->IsInShell = true;
+                    koopa->IsKicked = false;
+                    koopa->EnterShell(f, koopaEntity, marioEntity, false);
+                    koopa->Kick(f, koopaEntity, marioEntity, 3);
+                    koopaPhysicsObject->Velocity.Y = 2;
+                } else {
+                    // Groundpounded a Spiny, damage player.
+                    if (mario->IsDamageable) {
+                        mario->Powerdown(f, koopaEntity, false);
+                        if (!koopa->IsInShell) {
+                            koopaEnemy->FacingRight = damageDirection.X > 0;
                         }
                     }
-                } else if (koopa->IsKicked || !koopa->IsInShell) {
-                    // Moving (either in shell, or walking)
-                    if (attackedFromAbove) {
-                        if (koopa->IsInShell || !koopa->IsSpiny) {
-                            // Enter Shell
-                            if (koopa->SpawnPowerupWhenStomped.IsValid) {
-                                PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
-                                EntityRef powerupEntity = f.Create(powerupAsset.Prefab);
-                                var powerupTransform = f.Unsafe.GetPointer<Transform2D>(powerupEntity);
-                                var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
+                }
+            } else if (koopa->IsKicked || !koopa->IsInShell) {
+                // Moving (either in shell, or walking)
+                if (attackedFromAbove) {
+                    if (koopa->IsInShell || !koopa->IsSpiny) {
+                        // Enter Shell
+                        if (koopa->SpawnPowerupWhenStomped.IsValid) {
+                            PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
+                            EntityRef powerupEntity = f.Create(powerupAsset.Prefab);
+                            var powerupTransform = f.Unsafe.GetPointer<Transform2D>(powerupEntity);
+                            var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
 
-                                powerupTransform->Position = koopaTransform->Position + FPVector2.Down * FP._0_20;
-                                powerup->Initialize(15);
+                            powerupTransform->Position = koopaTransform.Position + FPVector2.Down * FP._0_20;
+                            powerup->Initialize(15);
 
-                                enemy->IsActive = false;
-                                enemy->IsDead = true;
-
-                            } else {
-                                koopa->EnterShell(f, filter.Entity, hit.Entity, false);
-                            }
-                            mario->DoEntityBounce = true;
-                            holdable->PreviousHolder = hit.Entity;
-                            koopa->IgnoreOwnerFrames = 5;
+                            koopaEnemy->IsActive = false;
+                            koopaEnemy->IsDead = true;
 
                         } else {
-                            // Landed on a Spiny, do damage.
-                            if (mario->IsCrouchedInShell) {
-                                mario->FacingRight = damageDirection.X < 0;
-                                marioPhysicsObject->Velocity.X = 0;
-
-                            } else if (mario->IsDamageable) {
-                                mario->Powerdown(f, hit.Entity, false);
-                                if (!koopa->IsInShell) {
-                                    enemy->FacingRight = damageDirection.X > 0;
-                                }
-                            }
+                            koopa->EnterShell(f, koopaEntity, marioEntity, false);
                         }
+                        mario->DoEntityBounce = true;
+                        koopaHoldable->PreviousHolder = marioEntity;
+                        koopaHoldable->IgnoreOwnerFrames = 5;
+
                     } else {
-                        // Damage
+                        // Landed on a Spiny, do damage.
                         if (mario->IsCrouchedInShell) {
                             mario->FacingRight = damageDirection.X < 0;
                             marioPhysicsObject->Velocity.X = 0;
 
                         } else if (mario->IsDamageable) {
-                            mario->Powerdown(f, hit.Entity, false);
+                            mario->Powerdown(f, marioEntity, false);
                             if (!koopa->IsInShell) {
-                                enemy->FacingRight = damageDirection.X > 0;
+                                koopaEnemy->FacingRight = damageDirection.X > 0;
                             }
                         }
                     }
                 } else {
-                    // Stationary in shell, always kick (if we cant pick it up)
-                    if (mario->CanPickupItem(f, hit.Entity)) {
-                        filter.Holdable->Pickup(f, filter.Entity, hit.Entity);
-                    } else {
-                        koopa->Kick(f, filter.Entity, hit.Entity, marioPhysicsObject->Velocity.X / 3);
-                        enemy->FacingRight = filter.Transform->Position.X > marioTransform->Position.X;
+                    // Damage
+                    if (mario->IsCrouchedInShell) {
+                        mario->FacingRight = damageDirection.X < 0;
+                        marioPhysicsObject->Velocity.X = 0;
+
+                    } else if (mario->IsDamageable) {
+                        mario->Powerdown(f, marioEntity, false);
+                        if (!koopa->IsInShell) {
+                            koopaEnemy->FacingRight = damageDirection.X > 0;
+                        }
                     }
                 }
-            } else if (f.Unsafe.TryGetPointer(hit.Entity, out Enemy* otherEnemy)) {
-                if (f.Unsafe.TryGetPointer(hit.Entity, out Koopa* otherKoopa)) {
-                    if (!otherEnemy->IsAlive) {
-                        return;
-                    }
-
-                    bool turn = true;
-                    if (koopa->IsKicked || beingHeld) {
-                        // Destroy them
-                        otherKoopa->Kill(f, hit.Entity, filter.Entity, false);
-                        turn = false;
-                    }
-                    if (otherKoopa->IsKicked || beingHeld || f.Exists(f.Get<Holdable>(hit.Entity).Holder)) {
-                        // Destroy ourselves
-                        otherKoopa->Kill(f, filter.Entity, hit.Entity, false);
-                        turn = false;
-                    }
-
-                    if (turn) {
-                        var transform = filter.Transform;
-                        var otherTransform = f.Unsafe.GetPointer<Transform2D>(hit.Entity);
-
-                        QuantumUtils.UnwrapWorldLocations(f, transform->Position, otherTransform->Position, out var ourPos, out var theirPos);
-                        bool right = ourPos.X > theirPos.X;
-                        enemy->FacingRight = right;
-                        otherEnemy->FacingRight = !right;
-                    }
-                } else if (f.Unsafe.TryGetPointer(hit.Entity, out Goomba* goomba)) {
-                    if (!otherEnemy->IsAlive) {
-                        return;
-                    }
-
-                    if (koopa->IsKicked || beingHeld) {
-                        // Destroy them
-                        goomba->Kill(f, hit.Entity, filter.Entity, true);
-                        if (beingHeld) {
-                            koopa->Kill(f, filter.Entity, hit.Entity, true);
-                        }
-
-                    } else {
-                        var transform = filter.Transform;
-                        var otherTransform = f.Unsafe.GetPointer<Transform2D>(hit.Entity);
-
-                        QuantumUtils.UnwrapWorldLocations(f, transform->Position, otherTransform->Position, out var ourPos, out var theirPos);
-                        bool right = ourPos.X > theirPos.X;
-                        enemy->FacingRight = right;
-                        otherEnemy->FacingRight = !right;
-                    }
+            } else {
+                // Stationary in shell, always kick (if we cant pick it up)
+                if (mario->CanPickupItem(f, marioEntity)) {
+                    koopaHoldable->Pickup(f, koopaEntity, marioEntity);
+                } else {
+                    koopa->Kick(f, koopaEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
+                    koopaEnemy->FacingRight = koopaTransform.Position.X > marioTransform.Position.X;
                 }
             }
         }
 
         public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching) {
             if (!f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
+                || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
                 || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
                 || !f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario)
@@ -290,7 +295,7 @@ namespace Quantum {
                 f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
             }
             enemy->FacingRight = mario->FacingRight;
-            koopa->IgnoreOwnerFrames = 15;
+            holdable->IgnoreOwnerFrames = 15;
         }
 
         public void OnEnemyRespawned(Frame f, EntityRef entity) {
@@ -305,7 +310,9 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
                 || !f.TryGet(entity, out Enemy enemy)
                 || !f.TryGet(blockBump, out Transform2D bumpTransform)
-                || !enemy.IsAlive) {
+                || !enemy.IsAlive
+                || !f.TryGet(entity, out Holdable holdable)
+                || f.Exists(holdable.Holder)) {
 
                 return;
             }
@@ -320,6 +327,12 @@ namespace Quantum {
                 FP.FromString("5.5")
             );
             physicsObject->IsTouchingGround = false;
+        }
+
+        public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Koopa* koopa)) {
+                koopa->Kill(f, entity, bobomb, true);
+            }
         }
     }
 }

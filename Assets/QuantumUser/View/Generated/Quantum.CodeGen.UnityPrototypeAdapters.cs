@@ -82,11 +82,13 @@ namespace Quantum.Prototypes.Unity {
   public unsafe partial class HoldablePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.HoldablePrototype> {
     public Quantum.QuantumEntityPrototype Holder;
     public Quantum.QuantumEntityPrototype PreviousHolder;
+    public Byte IgnoreOwnerFrames;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.HoldablePrototype prototype);
     public override Quantum.Prototypes.HoldablePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.HoldablePrototype();
       converter.Convert(this.Holder, out result.Holder);
       converter.Convert(this.PreviousHolder, out result.PreviousHolder);
+      converter.Convert(this.IgnoreOwnerFrames, out result.IgnoreOwnerFrames);
       ConvertUser(converter, ref result);
       return result;
     }
@@ -136,6 +138,7 @@ namespace Quantum.Prototypes.Unity {
     public Byte FastTurnaroundFrames;
     public Byte SlowTurnaroundFrames;
     public JumpState JumpState;
+    public JumpState PreviousJumpState;
     public Byte JumpLandingFrames;
     public Byte JumpBufferFrames;
     public Byte CoyoteTimeFrames;
@@ -207,6 +210,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.FastTurnaroundFrames, out result.FastTurnaroundFrames);
       converter.Convert(this.SlowTurnaroundFrames, out result.SlowTurnaroundFrames);
       converter.Convert(this.JumpState, out result.JumpState);
+      converter.Convert(this.PreviousJumpState, out result.PreviousJumpState);
       converter.Convert(this.JumpLandingFrames, out result.JumpLandingFrames);
       converter.Convert(this.JumpBufferFrames, out result.JumpBufferFrames);
       converter.Convert(this.CoyoteTimeFrames, out result.CoyoteTimeFrames);

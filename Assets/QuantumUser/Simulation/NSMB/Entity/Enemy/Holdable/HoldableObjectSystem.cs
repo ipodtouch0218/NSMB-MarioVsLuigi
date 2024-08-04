@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Quantum {
 
     public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter> {
@@ -11,8 +9,10 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter) {
-            var holdable = filter.Holdable;    
-            
+            var holdable = filter.Holdable;
+
+            QuantumUtils.Decrement(ref holdable->IgnoreOwnerFrames);
+
             if (!f.Exists(holdable->Holder)
                 || !f.TryGet(holdable->Holder, out Transform2D holderTransform)) {
                 
