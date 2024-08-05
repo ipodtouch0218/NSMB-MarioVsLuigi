@@ -403,7 +403,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5780648777663731097}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0008c51fe3af00b4da5d44f02d9b3dff, type: 3}
+  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BindBehaviour: 0
@@ -570,6 +570,11 @@ MonoBehaviour:
       Value: 0
     Lifetime: 480
     UncollectableFrames: 30
+    PreviousVelocity:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
     IsCollected:
       Value: 0
     IsCurrentlyDotted:
@@ -607,6 +612,11 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 376832
+    PreviousVelocity:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
     Gravity:
       X:
         RawValue: 0

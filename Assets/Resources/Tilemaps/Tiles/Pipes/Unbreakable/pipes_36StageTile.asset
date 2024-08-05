@@ -10,31 +10,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
-  m_Name: grass_0StageTile
+  m_Name: pipes_36StageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/Grass/grass_0StageTile
+    Path: Resources/Tilemaps/Tiles/Pipes/Unbreakable/pipes_36StageTile
     Guid:
-      Value: 393438471761372052
-  Tile: {fileID: 11400000, guid: 07b90ffcac5366a48bb24d14a10ddce9, type: 2}
+      Value: 310115220637214348
+  Tile: {fileID: 11400000, guid: 47b760870fdca634d924188c2bb8d0b2, type: 2}
   CollisionData:
     Shapes:
     - Vertices:
       - X:
+          RawValue: 32768
+        Y:
+          RawValue: 32768
+      - X:
+          RawValue: 32768
+        Y:
+          RawValue: -32768
+      - X:
           RawValue: -32768
         Y:
-          RawValue: 28672
+          RawValue: -32768
       - X:
           RawValue: -32768
         Y:
           RawValue: 32768
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: 32768
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: 28672
   IsSlipperyGround: 0
   IsSlideableGround: 0
+  FootstepSound: 31
+  FootstepParticle: 0

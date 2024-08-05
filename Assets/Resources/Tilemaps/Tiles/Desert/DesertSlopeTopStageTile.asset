@@ -38,3 +38,5 @@ MonoBehaviour:
           RawValue: -32768
   IsSlipperyGround: 0
   IsSlideableGround: 1
+  FootstepSound: 93
+  FootstepParticle: 1

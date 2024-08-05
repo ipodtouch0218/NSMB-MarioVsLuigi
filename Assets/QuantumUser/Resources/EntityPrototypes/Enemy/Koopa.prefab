@@ -1,37 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4069671321089268979
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2807488173691552591}
-  m_Layer: 0
-  m_Name: Rotator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2807488173691552591
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4069671321089268979}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8088900794427276647}
-  m_Father: {fileID: 8836298984178612587}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5700038489105066207
 GameObject:
   m_ObjectHideFlags: 0
@@ -63,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2807488173691552591}
+  m_Father: {fileID: 8836298984178612587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8133877121043965814
 SpriteRenderer:
@@ -177,7 +145,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2807488173691552591}
+  - {fileID: 8088900794427276647}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5060194760506389634
@@ -404,7 +372,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8836298984178612590}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0008c51fe3af00b4da5d44f02d9b3dff, type: 3}
+  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BindBehaviour: 0
@@ -442,9 +410,11 @@ MonoBehaviour:
   animator: {fileID: 3696720750550087088}
   sfx: {fileID: 3399800873378663516}
   sRenderer: {fileID: 8133877121043965814}
-  rotation: {fileID: 2807488173691552591}
+  rotation: {fileID: 8088900794427276647}
   deadSprite: {fileID: 5077748761105158669, guid: dbd41633b1a7b504aa8c1f606333f9cc,
     type: 3}
+  mirrorSprite: 0
+  dontFlip: 0
 --- !u!82 &3399800873378663516
 AudioSource:
   m_ObjectHideFlags: 0
@@ -582,10 +552,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    SpawnWhenStomped:
+    SpawnPowerupWhenStomped:
       Id:
         Value: 0
     DontWalkOfLedges:
+      Value: 0
+    IsSpiny:
       Value: 0
     Speed:
       RawValue: 57344
@@ -601,7 +573,6 @@ MonoBehaviour:
     IsKicked:
       Value: 0
     WakeupFrames: 0
-    IgnoreOwnerFrames: 0
 --- !u!114 &5456890200873101150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -617,6 +588,7 @@ MonoBehaviour:
   Prototype:
     Holder: {fileID: 0}
     PreviousHolder: {fileID: 0}
+    IgnoreOwnerFrames: 0
 --- !u!114 &8298405619030623519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -631,6 +603,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     Velocity:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    PreviousVelocity:
       X:
         RawValue: 0
       Y:

@@ -543,7 +543,7 @@ TextureImporter:
       213: 550735671041698171
     second: 0 Grassland_179
   externalObjects: {}
-  serializedVersion: 12
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -2285,11 +2285,7 @@ TextureImporter:
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
-      physicsShape:
-      - - {x: -8, y: 7}
-        - {x: -8, y: 8}
-        - {x: 8, y: 8}
-        - {x: 8, y: 7}
+      physicsShape: []
       tessellationDetail: 0
       bones: []
       spriteID: c3d526d77bdc33549acb9fa0d797d8e6

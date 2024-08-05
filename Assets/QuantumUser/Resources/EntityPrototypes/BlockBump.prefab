@@ -262,7 +262,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6769544900703878166}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0008c51fe3af00b4da5d44f02d9b3dff, type: 3}
+  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BindBehaviour: 0
@@ -518,3 +518,6 @@ MonoBehaviour:
         RawValue: 0
     TileX: 0
     TileY: 0
+    Owner: {fileID: 0}
+    HasBumped:
+      Value: 0

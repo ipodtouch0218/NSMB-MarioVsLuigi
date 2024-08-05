@@ -629,7 +629,7 @@ namespace Quantum {
             }
 
             bool wasCrouching = mario->IsCrouching;
-            mario->IsCrouching = ((physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding) || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !mario->IsInWater) || (mario->IsCrouching && ForceCrouchCheck(f, filter, physics, inputs))) && !mario->HeldEntity.IsValid;
+            mario->IsCrouching = ((physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding) || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !mario->IsInWater) || (mario->IsCrouching && ForceCrouchCheck(f, filter, physics, inputs))) && !mario->HeldEntity.IsValid && !mario->IsInShell;
 
             if (!wasCrouching && mario->IsCrouching) {
                 f.Events.MarioPlayerCrouched(f, filter.Entity, *mario);

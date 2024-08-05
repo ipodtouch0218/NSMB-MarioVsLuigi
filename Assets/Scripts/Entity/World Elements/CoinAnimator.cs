@@ -1,5 +1,4 @@
 using NSMB.Extensions;
-using Photon.Deterministic.Protocol;
 using Quantum;
 using UnityEngine;
 
@@ -19,7 +18,6 @@ public class CoinAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-
         QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType);
         QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected);
         QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced);
@@ -41,7 +39,10 @@ public class CoinAnimator : MonoBehaviour {
         }
 
         var coin = f.Get<Coin>(entity.EntityRef);
-        if (!coin.IsFloating) {
+        if (coin.IsFloating) {
+            // Bodge: OnCoinChangedCollected doesnt work when collecting a coin at the exact same time as a level reset 
+            sRenderer.enabled = !coin.IsCollected;
+        } else {
             float despawnTimeRemaining = coin.Lifetime / 60f;
             sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
         }
@@ -60,7 +61,7 @@ public class CoinAnimator : MonoBehaviour {
             return;
         }
 
-        sRenderer.enabled = !e.Coin.IsCollected;
+        sRenderer.enabled = !e.Collected;
     }
 
     private void OnCoinChangedType(EventCoinChangedType e) {

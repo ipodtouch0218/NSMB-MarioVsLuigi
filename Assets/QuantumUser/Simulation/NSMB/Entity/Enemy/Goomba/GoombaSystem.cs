@@ -64,7 +64,7 @@ namespace Quantum {
 
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (mario->InstakillsEnemies(*marioPhysicsObject) || groundpounded) {
-                goomba->Kill(f, goombaEntity, marioEntity, false);
+                goomba->Kill(f, goombaEntity, marioEntity, true);
                 mario->DoEntityBounce |= mario->IsDrilling;
                 return;
             }

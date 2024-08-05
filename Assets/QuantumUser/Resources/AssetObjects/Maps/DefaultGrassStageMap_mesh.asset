@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -263916522, guid: b156eeaae3f741b40af66649a4748430, type: 3}
-  m_Name: DefaultGrassLevelMap_mesh
+  m_Name: DefaultGrassStageMap_mesh
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Maps/DefaultGrassLevelMap_mesh
+    Path: QuantumUser/Resources/AssetObjects/Maps/DefaultGrassStageMap_mesh
     Guid:
       Value: 450287852055107002
   Data: 0000000000000000

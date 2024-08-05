@@ -22,6 +22,7 @@ public unsafe class VersusStageData : AssetObject {
     public Vector2Int TileOrigin;
     public FPVector2 TilemapWorldPosition;
     public bool IsWrappingLevel = true;
+    public bool ExtendCeilingHitboxes = true;
 
     [Header("-- Spawnpoint")]
     public FPVector2 Spawnpoint;
@@ -63,9 +64,8 @@ public unsafe class VersusStageData : AssetObject {
 
     public StageTileInstance GetTileRelative(Frame f, int x, int y) {
         int index = x + y * TileDimensions.x;
-
-        QList<StageTileInstance> stageLayout = f.ResolveList(f.Global->Stage);
-        if (index < 0 || index >= stageLayout.Count) {
+        StageTileInstance[] stageLayout = f.StageTiles;
+        if (index < 0 || index >= stageLayout.Length) {
             return default;
         }
 
@@ -82,9 +82,8 @@ public unsafe class VersusStageData : AssetObject {
 
     public void SetTileRelative(Frame f, int x, int y, StageTileInstance tile) {
         int index = x + y * TileDimensions.x;
-
-        QList<StageTileInstance> stageLayout = f.ResolveList(f.Global->Stage);
-        if (index < 0 || index >= stageLayout.Count) {
+        StageTileInstance[] stageLayout = f.StageTiles;
+        if (index < 0 || index >= stageLayout.Length) {
             return;
         }
 
@@ -93,26 +92,16 @@ public unsafe class VersusStageData : AssetObject {
     }
 
     public void ResetStage(Frame f, bool full) {
-        if (!f.TryResolveList(f.Global->Stage, out QList<StageTileInstance> stageData)) {
-            stageData = f.AllocateList<StageTileInstance>(TileData.Length);
-            f.Global->Stage = stageData;
-            for (int i = 0; i < TileData.Length; i++) {
-                stageData.Add(TileData[i]);
+        StageTileInstance[] stageData = f.StageTiles;
+
+        for (int i = 0; i < TileData.Length; i++) {
+            if (!stageData[i].Equals(TileData[i])) {
+                int x = i % TileDimensions.x + TileOrigin.x;
+                int y = i / TileDimensions.x + TileOrigin.y;
+                f.Events.TileChanged(f, x, y, TileData[i]);
             }
-        } else {
-            for (int i = 0; i < TileData.Length; i++) {
-                if (!stageData[i].Equals(TileData[i])) {
-                    int x = i % TileDimensions.x + TileOrigin.x;
-                    int y = i / TileDimensions.x + TileOrigin.y;
-                    f.Events.TileChanged(f, x, y, TileData[i]);
-                }
-                stageData[i] = TileData[i];
-            }
+            stageData[i] = TileData[i];
         }
         f.Signals.OnStageReset(full);
-    }
-
-    public static void BumpTile(Vector2Int position) {
-
     }
 }

@@ -38,6 +38,9 @@ public static unsafe class QuantumUtils {
         int x = unityTile.x - stage.TileOrigin.x;
         x = (x % stage.TileDimensions.x + stage.TileDimensions.x) % stage.TileDimensions.x; // Wrapping
         int y = unityTile.y - stage.TileOrigin.y;
+        if (stage.ExtendCeilingHitboxes) {
+            y = Mathf.Min(y, stage.TileDimensions.y - 1);
+        }
         return new Vector2Int(x, y);
     }
 

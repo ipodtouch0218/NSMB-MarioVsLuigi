@@ -12,9 +12,6 @@ public class GoombaAnimator : MonoBehaviour {
     [SerializeField] private LegacyAnimateSpriteRenderer legacyAnimation;
     [SerializeField] private AudioSource sfx;
 
-    //---Private Variables
-    private Quaternion previousRotation;
-
     public void OnValidate() {
         this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
@@ -45,10 +42,10 @@ public class GoombaAnimator : MonoBehaviour {
                 sRenderer.sprite = deadSprite;
             } else {
                 // Special killed
-                transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime));
+                transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
             }
         } else {
-            previousRotation = Quaternion.identity;
+            transform.rotation = Quaternion.identity;
         }
     }
 

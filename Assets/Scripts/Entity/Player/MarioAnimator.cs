@@ -96,6 +96,7 @@ namespace NSMB.Entities.Player {
         private PlayerColors skin;
         private bool doDeathUp;
         private float lastBumpSound;
+        private VersusStageData stage;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -145,6 +146,8 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject);
             QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart);
             QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd);
+
+            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
 
         public void Initialize(QuantumGame game) {
@@ -539,6 +542,7 @@ namespace NSMB.Entities.Player {
         public void Footstep() {
             Frame f = entity.Game.Frames.Predicted;
             var mario = f.Get<MarioPlayer>(entity.EntityRef);
+            var marioTransform = f.Get<Transform2D>(entity.EntityRef);
             var physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
             var physics = f.FindAsset(mario.PhysicsAsset);
             Input input = *f.GetPlayerInput(mario.PlayerRef);
@@ -568,6 +572,21 @@ namespace NSMB.Entities.Player {
             }
             */
             SoundEffect footstepSoundEffect = SoundEffect.Player_Walk_Grass;
+            ParticleEffect footstepParticleEffect = ParticleEffect.None;
+
+            foreach (var contact in f.ResolveList(physicsObject.Contacts)) {
+                if (FPVector2.Dot(contact.Normal, FPVector2.Up) > FP._0_33) {
+                    StageTileInstance tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTile tile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);
+
+                    if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
+                        footstepSoundEffect = tile.FootstepSound;
+                    }
+                    if (tile.FootstepParticle != ParticleEffect.None) {
+                        footstepParticleEffect = tile.FootstepParticle;
+                    }
+                }
+            } 
 
             if (/*!IsWaterWalking && */ FPMath.Abs(physicsObject.Velocity.X) < physics.WalkMaxVelocity[physics.WalkSpeedStage]) {
                 return;
@@ -577,6 +596,7 @@ namespace NSMB.Entities.Player {
                 variant: (byte) (footstepVariant ? 1 : 2),
                 volume: (FPMath.Abs(physicsObject.Velocity.X) / (physics.WalkMaxVelocity[physics.RunSpeedStage] + 4)).AsFloat
             );
+            SingleParticleManager.Instance.Play(footstepParticleEffect, marioTransform.Position.ToUnityVector3());
             footstepVariant = !footstepVariant;
         }
 

@@ -34,6 +34,7 @@ event CoinChangeCollected {
 	nothashed Frame Frame;
 	entity_ref Entity;
 	nothashed Coin Coin;
+	bool Collected;
 }
 
 event CoinBounced {

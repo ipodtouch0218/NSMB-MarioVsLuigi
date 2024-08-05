@@ -147,11 +147,12 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventCoinChangeCollected CoinChangeCollected(Frame Frame, EntityRef Entity, Coin Coin) {
+      public EventCoinChangeCollected CoinChangeCollected(Frame Frame, EntityRef Entity, Coin Coin, QBoolean Collected) {
         var ev = _f.Context.AcquireEvent<EventCoinChangeCollected>(EventCoinChangeCollected.ID);
         ev.Frame = Frame;
         ev.Entity = Entity;
         ev.Coin = Coin;
+        ev.Collected = Collected;
         _f.AddEvent(ev);
         return ev;
       }
@@ -571,6 +572,7 @@ namespace Quantum {
     public Frame Frame;
     public EntityRef Entity;
     public Coin Coin;
+    public QBoolean Collected;
     protected EventCoinChangeCollected(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -589,6 +591,7 @@ namespace Quantum {
       unchecked {
         var hash = 61;
         hash = hash * 31 + Entity.GetHashCode();
+        hash = hash * 31 + Collected.GetHashCode();
         return hash;
       }
     }

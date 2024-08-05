@@ -16,13 +16,11 @@ public class KoopaAnimator : MonoBehaviour {
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private Transform rotation;
-    [SerializeField] private Sprite deadSprite;
 
     [SerializeField] private bool mirrorSprite, dontFlip;
 
     //---Private Variables
     private float dampVelocity;
-    private Quaternion previousRotation;
 
     public void OnValidate() {
         this.SetIfNull(ref animator, GetComponentType.Children);
@@ -59,30 +57,35 @@ public class KoopaAnimator : MonoBehaviour {
         // "Flip" rotation
         float remainingWakeupTimer = koopa.WakeupFrames / 60f;
         if (enemy.IsDead) {
-            transform.rotation = (previousRotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime));
+            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
 
-        } else if (koopa.IsFlipped && !dontFlip) {
-            previousRotation = Quaternion.identity;
-            dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
-            rotation.eulerAngles = new Vector3(
-                rotation.eulerAngles.x,
-                rotation.eulerAngles.y,
-                Mathf.Lerp(rotation.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
+        } else if (koopa.IsInShell) {
+            if (koopa.IsFlipped && !dontFlip) {
+                dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
+                transform.eulerAngles = new Vector3(
+                    rotation.eulerAngles.x,
+                    rotation.eulerAngles.y,
+                    Mathf.Lerp(rotation.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
 
+            } else {
+                dampVelocity = 0;
+                transform.eulerAngles = new Vector3(
+                    rotation.eulerAngles.x,
+                    rotation.eulerAngles.y,
+                    remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
+            }
         } else {
-            previousRotation = Quaternion.identity;
-            dampVelocity = 0;
-            rotation.eulerAngles = new Vector3(
-                rotation.eulerAngles.x,
-                rotation.eulerAngles.y,
-                remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
+            transform.rotation = Quaternion.identity;
         }
 
         sRenderer.enabled = enemy.IsActive;
         sRenderer.flipX = enemy.FacingRight ^ mirrorSprite;
-        if (enemy.IsDead) {
-            sRenderer.sprite = deadSprite;
+
+        Vector3 modifiedZ = transform.position;
+        if (f.Exists(holdable.Holder)) {
+            modifiedZ.z = -6;
         }
+        transform.position = modifiedZ;
     }
 
     private void OnPlayBumpSound(EventPlayBumpSound e) {

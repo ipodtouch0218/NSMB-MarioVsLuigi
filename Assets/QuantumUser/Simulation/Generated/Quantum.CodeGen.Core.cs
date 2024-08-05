@@ -646,8 +646,6 @@ namespace Quantum {
     public GameState GameState;
     [FieldOffset(1204)]
     public UInt16 GameStartFrames;
-    [FieldOffset(1212)]
-    public QListPtr<StageTileInstance> Stage;
     [FieldOffset(1232)]
     public FP Timer;
     public FixedArray<Input> input {
@@ -676,13 +674,9 @@ namespace Quantum {
         hash = hash * 31 + UsedStarSpawnCount.GetHashCode();
         hash = hash * 31 + (byte)GameState;
         hash = hash * 31 + GameStartFrames.GetHashCode();
-        hash = hash * 31 + Stage.GetHashCode();
         hash = hash * 31 + Timer.GetHashCode();
         return hash;
       }
-    }
-    partial void ClearPointersPartial(FrameBase f, EntityRef entity) {
-      Stage = default;
     }
     static partial void SerializeCodeGen(void* ptr, FrameSerializer serializer) {
         var p = (_globals_*)ptr;
@@ -702,7 +696,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->BigStarSpawnTimer);
         serializer.Stream.Serialize(&p->GameStartFrames);
         serializer.Stream.Serialize(&p->UsedStarSpawnCount);
-        QList.Serialize(&p->Stage, serializer, Statics.SerializeStageTileInstance);
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);
         EntityRef.Serialize(&p->MainBigStar, serializer);
         FP.Serialize(&p->Timer, serializer);
@@ -1834,12 +1827,10 @@ namespace Quantum {
   public unsafe partial class Statics {
     public static FrameSerializer.Delegate SerializeEntityRef;
     public static FrameSerializer.Delegate SerializePhysicsContact;
-    public static FrameSerializer.Delegate SerializeStageTileInstance;
     public static FrameSerializer.Delegate SerializeInput;
     static partial void InitStaticDelegatesGen() {
       SerializeEntityRef = EntityRef.Serialize;
       SerializePhysicsContact = Quantum.PhysicsContact.Serialize;
-      SerializeStageTileInstance = Quantum.StageTileInstance.Serialize;
       SerializeInput = Quantum.Input.Serialize;
     }
     static partial void RegisterSimulationTypesGen(TypeRegistry typeRegistry) {

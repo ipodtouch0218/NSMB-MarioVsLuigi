@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter>, ISignalOnTrigger2D {
@@ -24,7 +25,7 @@ namespace Quantum {
 
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape)) {
-                    f.Destroy(filter.Entity);
+                    Destroy(f, filter.Entity, true);
                     return;
                 }
                 projectile->CheckedCollision = true;

@@ -9,6 +9,8 @@ public class StageTile : AssetObject {
     public TileBase Tile;
     public TileCollisionData CollisionData;
     public bool IsSlipperyGround, IsSlideableGround;
+    public SoundEffect FootstepSound = SoundEffect.Player_Walk_Grass;
+    public ParticleEffect FootstepParticle = ParticleEffect.None;
 
     [Serializable]
     public struct TileCollisionData {

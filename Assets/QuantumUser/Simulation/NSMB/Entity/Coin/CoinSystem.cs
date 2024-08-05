@@ -51,7 +51,7 @@ namespace Quantum {
                 }
 
                 coin->IsCollected = false;
-                f.Events.CoinChangeCollected(f, entity, *coin);
+                f.Events.CoinChangeCollected(f, entity, *coin, false);
 
                 if (coin->IsDotted && (!coin->IsCurrentlyDotted || full)) {
                     coin->IsCurrentlyDotted = true;
@@ -99,7 +99,7 @@ namespace Quantum {
 
             if (coin->IsFloating) {
                 coin->IsCollected = true;
-                f.Events.CoinChangeCollected(f, info.Other, *coin);
+                f.Events.CoinChangeCollected(f, info.Other, *coin, true);
             } else {
                  f.Destroy(info.Other);
             }
@@ -137,7 +137,7 @@ namespace Quantum {
 
                 if (coin->IsFloating) {
                     coin->IsCollected = true;
-                    f.Events.CoinChangeCollected(f, entity, *coin);
+                    f.Events.CoinChangeCollected(f, entity, *coin, true);
                 } else {
                     f.Destroy(entity);
                 }

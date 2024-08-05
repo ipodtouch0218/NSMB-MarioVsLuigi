@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1722638350, guid: b156eeaae3f741b40af66649a4748430, type: 3}
-  m_Name: DefaultGrassLevelMap
+  m_Name: DefaultGrassStage
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Maps/DefaultGrassLevelMap
+    Path: QuantumUser/Resources/AssetObjects/Maps/DefaultGrassStage
     Guid:
       Value: 438935048561577377
   UserAsset:
@@ -183,6 +183,11 @@ MonoBehaviour:
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        PreviousVelocity:
           X:
             RawValue: 0
           Y:
@@ -364,6 +369,11 @@ MonoBehaviour:
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        PreviousVelocity:
           X:
             RawValue: 0
           Y:
@@ -762,6 +772,11 @@ MonoBehaviour:
             RawValue: 0
           Y:
             RawValue: 0
+        PreviousVelocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
         Gravity:
           X:
             RawValue: 0
@@ -936,6 +951,7 @@ MonoBehaviour:
           SceneIndexPlusOne: 0
         PreviousHolder:
           SceneIndexPlusOne: 0
+        IgnoreOwnerFrames: 0
     - rid: 7515263985617207301
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -960,11 +976,15 @@ MonoBehaviour:
         IsKicked:
           Value: 0
         WakeupFrames: 0
-        IgnoreOwnerFrames: 0
     - rid: 7515263985617207302
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        PreviousVelocity:
           X:
             RawValue: 0
           Y:

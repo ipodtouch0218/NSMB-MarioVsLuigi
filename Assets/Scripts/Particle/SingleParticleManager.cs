@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SingleParticleManager : MonoBehaviour {
+public class SingleParticleManager : Singleton<SingleParticleManager> {
 
     [SerializeField] private ParticlePair[] serializedSystems;
-    private Dictionary<Enums.Particle, ParticleSystem> systems;
-    private Dictionary<Enums.Particle, ParticlePair> pairs;
+    private Dictionary<ParticleEffect, ParticleSystem> systems;
+    private Dictionary<ParticleEffect, ParticlePair> pairs;
 
     public void Start() {
+        Set(this, false);
         systems = serializedSystems.ToDictionary(pp => pp.particle, pp => pp.system);
         pairs = serializedSystems.ToDictionary(pp => pp.particle, pp => pp);
     }
 
-    public void Play(Enums.Particle particle, Vector3 position, Color? color = null, float rot = 0) {
-        if (!systems.ContainsKey(particle))
+    public void Play(ParticleEffect particle, Vector3 position, Color? color = null, float rot = 0) {
+        if (!systems.ContainsKey(particle)) {
             return;
+        }
 
         ParticleSystem system = systems[particle];
         ParticlePair pair = pairs[particle];
@@ -27,15 +29,16 @@ public class SingleParticleManager : MonoBehaviour {
             applyShapeToPosition = true,
         };
 
-        if (color.HasValue)
+        if (color.HasValue) {
             emitParams.startColor = color.Value;
+        }
 
         system.Emit(emitParams, UnityEngine.Random.Range(pair.particleMin, pair.particleMax + 1));
     }
 
     [Serializable]
     public struct ParticlePair {
-        public Enums.Particle particle;
+        public ParticleEffect particle;
         public ParticleSystem system;
         public int particleMin, particleMax;
     }

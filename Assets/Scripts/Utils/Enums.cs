@@ -35,18 +35,6 @@ public static class Enums {
         MegaMushroom = 1 << 1,
     }
 
-    public enum Particle : byte {
-        None = 0,
-
-        Entity_BrickBreak = 1,
-        Entity_Coin = 2,
-        Generic_Puff = 3,
-        Walk_Sand = 4,
-        Walk_Sand_Right = 5,
-        Walk_Snow = 6,
-        Walk_Snow_Right = 7,
-    }
-
     public enum PrefabParticle : byte {
         [PrefabParticleData("Prefabs/Particle/GreenPipe")] Pipe_Break_Green,
         [PrefabParticleData("Prefabs/Particle/GreenPipe-D")] Pipe_Break_Green_Broken,
