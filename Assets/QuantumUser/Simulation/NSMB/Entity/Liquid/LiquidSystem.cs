@@ -4,12 +4,6 @@ using Quantum.Collections;
 namespace Quantum {
     public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnComponentAdded<Liquid>, ISignalOnTrigger2D, ISignalOnTriggerExit2D {
 
-        public struct Filter {
-            public EntityRef Entity;
-            public Transform2D Transform;
-            public MarioPlayer* Mario;
-        }
-
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
             if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid) ||
                 !f.TryGet(info.Other, out Transform2D ourTransform) ||
@@ -54,9 +48,11 @@ namespace Quantum {
                             break;
                         case LiquidType.Lava:
                             // Kill, fire death
+                            mario->Death(f, info.Entity, true);
                             break;
                         case LiquidType.Poison:
                             // Kill, normal death
+                            mario->Death(f, info.Entity, false);
                             break;
                         }
                     }

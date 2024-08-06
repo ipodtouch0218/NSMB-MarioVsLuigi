@@ -9,6 +9,7 @@ global {
 }
 
 signal OnStageReset(bool full);
+signal OnTileChanged(int tileX, int tileY, StageTileInstance newTile);
 
 event TileChanged {
     nothashed Frame Frame;

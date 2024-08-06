@@ -909,12 +909,14 @@ namespace Quantum {
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(16)]
     public FPVector2 Spawnpoint;
-    [FieldOffset(4)]
-    public QBoolean IsActive;
     [FieldOffset(8)]
+    public QBoolean IsActive;
+    [FieldOffset(12)]
     public QBoolean IsDead;
-    [FieldOffset(0)]
+    [FieldOffset(4)]
     public QBoolean FacingRight;
+    [FieldOffset(0)]
+    public QBoolean ColliderDisabled;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 11071;
@@ -922,11 +924,13 @@ namespace Quantum {
         hash = hash * 31 + IsActive.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
+        hash = hash * 31 + ColliderDisabled.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Enemy*)ptr;
+        QBoolean.Serialize(&p->ColliderDisabled, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IsActive, serializer);
         QBoolean.Serialize(&p->IsDead, serializer);
@@ -1446,6 +1450,32 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct PiranhaPlant : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(1)]
+    public Byte WaitingFrames;
+    [FieldOffset(0)]
+    public Byte ChompFrames;
+    [FieldOffset(8)]
+    public FP PopupAnimationTime;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 19889;
+        hash = hash * 31 + WaitingFrames.GetHashCode();
+        hash = hash * 31 + ChompFrames.GetHashCode();
+        hash = hash * 31 + PopupAnimationTime.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (PiranhaPlant*)ptr;
+        serializer.Stream.Serialize(&p->ChompFrames);
+        serializer.Stream.Serialize(&p->WaitingFrames);
+        FP.Serialize(&p->PopupAnimationTime, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Powerup : Quantum.IComponent {
     public const Int32 SIZE = 96;
     public const Int32 ALIGNMENT = 8;
@@ -1599,6 +1629,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnStageReset : ISignal {
     void OnStageReset(Frame f, QBoolean full);
   }
+  public unsafe partial interface ISignalOnTileChanged : ISignal {
+    void OnTileChanged(Frame f, Int32 tileX, Int32 tileY, StageTileInstance newTile);
+  }
   public static unsafe partial class Constants {
     public const Int32 maxplayers = 10;
   }
@@ -1613,6 +1646,7 @@ namespace Quantum {
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
     private ISignalOnPreTileCollide[] _ISignalOnPreTileCollideSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
+    private ISignalOnTileChanged[] _ISignalOnTileChangedSystems;
     partial void AllocGen() {
       _globals = (_globals_*)Context.Allocator.AllocAndClear(sizeof(_globals_));
     }
@@ -1634,6 +1668,7 @@ namespace Quantum {
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
       _ISignalOnPreTileCollideSystems = BuildSignalsArray<ISignalOnPreTileCollide>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
+      _ISignalOnTileChangedSystems = BuildSignalsArray<ISignalOnTileChanged>();
       _ComponentSignalsOnAdded = new ComponentReactiveCallbackInvoker[ComponentTypeId.Type.Length];
       _ComponentSignalsOnRemoved = new ComponentReactiveCallbackInvoker[ComponentTypeId.Type.Length];
       BuildSignalsArrayOnComponentAdded<Quantum.BigStar>();
@@ -1690,6 +1725,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<PhysicsJoints3D>();
       BuildSignalsArrayOnComponentAdded<Quantum.PhysicsObject>();
       BuildSignalsArrayOnComponentRemoved<Quantum.PhysicsObject>();
+      BuildSignalsArrayOnComponentAdded<Quantum.PiranhaPlant>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.PiranhaPlant>();
       BuildSignalsArrayOnComponentAdded<Quantum.Powerup>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Powerup>();
       BuildSignalsArrayOnComponentAdded<Quantum.Projectile>();
@@ -1822,6 +1859,15 @@ namespace Quantum {
           }
         }
       }
+      public void OnTileChanged(Int32 tileX, Int32 tileY, StageTileInstance newTile) {
+        var array = _f._ISignalOnTileChangedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnTileChanged(_f, tileX, tileY, newTile);
+          }
+        }
+      }
     }
   }
   public unsafe partial class Statics {
@@ -1912,6 +1958,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.PhysicsObject), Quantum.PhysicsObject.SIZE);
       typeRegistry.Register(typeof(PhysicsQueryRef), PhysicsQueryRef.SIZE);
       typeRegistry.Register(typeof(PhysicsSceneSettings), PhysicsSceneSettings.SIZE);
+      typeRegistry.Register(typeof(Quantum.PiranhaPlant), Quantum.PiranhaPlant.SIZE);
       typeRegistry.Register(typeof(PlayerRef), PlayerRef.SIZE);
       typeRegistry.Register(typeof(Quantum.Powerup), Quantum.Powerup.SIZE);
       typeRegistry.Register(typeof(PowerupReserveResult), 1);
@@ -1934,7 +1981,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 15)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 16)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
@@ -1948,6 +1995,7 @@ namespace Quantum {
         .Add<Quantum.Liquid>(Quantum.Liquid.Serialize, null, Quantum.Liquid.OnRemoved, ComponentFlags.None)
         .Add<Quantum.MarioPlayer>(Quantum.MarioPlayer.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.PhysicsObject>(Quantum.PhysicsObject.Serialize, null, Quantum.PhysicsObject.OnRemoved, ComponentFlags.None)
+        .Add<Quantum.PiranhaPlant>(Quantum.PiranhaPlant.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Powerup>(Quantum.Powerup.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Projectile>(Quantum.Projectile.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.WrappingObject>(Quantum.WrappingObject.Serialize, null, null, ComponentFlags.None)

@@ -185,6 +185,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsActive;
     public QBoolean IsDead;
     public QBoolean FacingRight;
+    public QBoolean ColliderDisabled;
     partial void MaterializeUser(Frame frame, ref Quantum.Enemy result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Enemy component = default;
@@ -196,6 +197,7 @@ namespace Quantum.Prototypes {
         result.IsActive = this.IsActive;
         result.IsDead = this.IsDead;
         result.FacingRight = this.FacingRight;
+        result.ColliderDisabled = this.ColliderDisabled;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -540,6 +542,25 @@ namespace Quantum.Prototypes {
             list.Add(tmp);
           }
         }
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PiranhaPlant))]
+  public unsafe partial class PiranhaPlantPrototype : ComponentPrototype<Quantum.PiranhaPlant> {
+    public Byte WaitingFrames;
+    public Byte ChompFrames;
+    public FP PopupAnimationTime;
+    partial void MaterializeUser(Frame frame, ref Quantum.PiranhaPlant result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.PiranhaPlant component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.PiranhaPlant result, in PrototypeMaterializationContext context = default) {
+        result.WaitingFrames = this.WaitingFrames;
+        result.ChompFrames = this.ChompFrames;
+        result.PopupAnimationTime = this.PopupAnimationTime;
         MaterializeUser(frame, ref result, in context);
     }
   }

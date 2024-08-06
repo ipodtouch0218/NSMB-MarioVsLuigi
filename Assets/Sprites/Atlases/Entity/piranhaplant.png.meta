@@ -288,7 +288,7 @@ TextureImporter:
       213: -4187781556941618360
     second: piranhaplant_94
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -305,11 +305,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -332,7 +333,7 @@ TextureImporter:
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -348,6 +349,8 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -359,6 +362,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -371,6 +375,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -383,6 +388,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -395,6 +401,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -407,6 +414,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -419,6 +427,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -2430,104 +2439,103 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      piranhaplant_75: -8930845208152650847
-      piranhaplant_15: 8652691235578775594
-      piranhaplant_23: 3841628841177056728
+      piranhaplant_0: -4282782318066243585
+      piranhaplant_1: 1874883278162961809
+      piranhaplant_10: -1374198918016643177
+      piranhaplant_11: 2310206820326528415
+      piranhaplant_12: -5009487838004215352
       piranhaplant_13: -6741954151910461379
       piranhaplant_14: 6486225242714430172
-      piranhaplant_4: -2899382040462576973
-      piranhaplant_47: -4170564165897353592
-      piranhaplant_85: -7158853571646589886
-      piranhaplant_22: -5726796674763668253
-      piranhaplant_37: -215219820708098350
-      piranhaplant_61: -3472888023490545112
-      piranhaplant_46: 4140277683304235982
-      piranhaplant_30: 3127459086018854584
-      piranhaplant_86: 4579729016942545099
-      piranhaplant_2: -1571386788784873103
-      piranhaplant_1: 1874883278162961809
-      piranhaplant_12: -5009487838004215352
-      piranhaplant_44: -965393269404795424
-      piranhaplant_87: -8950189574262729048
-      piranhaplant_19: 4721257568645798970
-      piranhaplant_66: 2156753514671945283
+      piranhaplant_15: 8652691235578775594
+      piranhaplant_16: -4904527719246305709
       piranhaplant_17: -8287564028278256404
-      piranhaplant_9: -4617242106388109633
-      piranhaplant_78: -5214385567738610467
-      piranhaplant_82: 4786374828312190570
-      piranhaplant_21: 5513431825511149300
-      piranhaplant_58: 614650738584049826
-      piranhaplant_93: -6100441512890440907
-      piranhaplant_83: 5509353235587393859
-      piranhaplant_80: -8662926999163474803
-      piranhaplant_7: 3102115248508928702
-      piranhaplant_50: -6756535452535234964
-      piranhaplant_94: -4187781556941618360
-      piranhaplant_55: 8833249322845221007
-      piranhaplant_74: 5570650347807578932
-      piranhaplant_48: -1736266493687469510
-      piranhaplant_84: -8374652284765515359
-      piranhaplant_89: 4164678369630603432
-      piranhaplant_38: -2468376615000215068
-      piranhaplant_71: -4610526049594673912
-      piranhaplant_0: -4282782318066243585
-      piranhaplant_54: 5977573450294271342
-      piranhaplant_6: -3842879693280372402
       piranhaplant_18: 3714247932662998794
+      piranhaplant_19: 4721257568645798970
+      piranhaplant_2: -1571386788784873103
+      piranhaplant_20: -8891547460302715897
+      piranhaplant_21: 5513431825511149300
+      piranhaplant_22: -5726796674763668253
+      piranhaplant_23: 3841628841177056728
+      piranhaplant_24: -8429228821497934700
+      piranhaplant_25: -7311367288332419785
+      piranhaplant_26: -5699871281579739890
+      piranhaplant_27: 4487130698270638258
+      piranhaplant_28: -2987831675552872096
+      piranhaplant_29: 6579722672407058039
+      piranhaplant_3: -3232000338629043082
+      piranhaplant_30: 3127459086018854584
+      piranhaplant_31: -4601141662997454724
+      piranhaplant_32: 7923336129274993970
+      piranhaplant_33: 3131433547566954786
       piranhaplant_34: 3253928340546088077
-      piranhaplant_70: -1880101920363548745
-      piranhaplant_90: 8756391644431283961
-      piranhaplant_92: 3451347559288493581
+      piranhaplant_35: -2534753285917935432
+      piranhaplant_36: 6637346505620885744
+      piranhaplant_37: -215219820708098350
+      piranhaplant_38: -2468376615000215068
+      piranhaplant_39: 3089902453536835577
+      piranhaplant_4: -2899382040462576973
+      piranhaplant_40: 4366573063163296641
+      piranhaplant_41: 2413434192097388818
+      piranhaplant_42: -4697696027114251396
+      piranhaplant_43: 2673531126550257605
+      piranhaplant_44: -965393269404795424
+      piranhaplant_45: 739058764022454877
+      piranhaplant_46: 4140277683304235982
+      piranhaplant_47: -4170564165897353592
+      piranhaplant_48: -1736266493687469510
+      piranhaplant_49: -2781833278341471549
+      piranhaplant_5: -8170233533402714772
+      piranhaplant_50: -6756535452535234964
       piranhaplant_51: 6753949179333636019
       piranhaplant_52: 3876948676859866087
-      piranhaplant_8: 7996795249185144097
-      piranhaplant_10: -1374198918016643177
-      piranhaplant_29: 6579722672407058039
-      piranhaplant_33: 3131433547566954786
-      piranhaplant_62: -4542559731491263803
-      piranhaplant_69: -5262113927009650520
-      piranhaplant_16: -4904527719246305709
-      piranhaplant_11: 2310206820326528415
-      piranhaplant_68: 5901397015629521986
-      piranhaplant_28: -2987831675552872096
-      piranhaplant_31: -4601141662997454724
-      piranhaplant_35: -2534753285917935432
-      piranhaplant_65: -4051063731614952116
-      piranhaplant_24: -8429228821497934700
-      piranhaplant_77: 6496758801958608249
-      piranhaplant_32: 7923336129274993970
-      piranhaplant_36: 6637346505620885744
-      piranhaplant_63: 5435277750307012688
-      piranhaplant_25: -7311367288332419785
-      piranhaplant_5: -8170233533402714772
-      piranhaplant_81: -4734908172120023821
-      piranhaplant_67: 3170043902953334603
-      piranhaplant_79: -8272253846636045785
-      piranhaplant_73: 4446610885866771005
-      piranhaplant_91: 4302187137836087271
-      piranhaplant_3: -3232000338629043082
-      piranhaplant_42: -4697696027114251396
-      piranhaplant_45: 739058764022454877
-      piranhaplant_76: 2675286143121339491
-      piranhaplant_49: -2781833278341471549
-      piranhaplant_88: 3249682734732801491
       piranhaplant_53: -2707889521782793831
+      piranhaplant_54: 5977573450294271342
+      piranhaplant_55: 8833249322845221007
       piranhaplant_56: 4379797766792754959
-      piranhaplant_40: 4366573063163296641
-      piranhaplant_26: -5699871281579739890
-      piranhaplant_41: 2413434192097388818
-      piranhaplant_60: -4673158557244423047
-      piranhaplant_20: -8891547460302715897
-      piranhaplant_72: -7120024422659173774
-      piranhaplant_43: 2673531126550257605
-      piranhaplant_59: -5414490527629344597
-      piranhaplant_39: 3089902453536835577
-      piranhaplant_64: 2686662243247555591
-      piranhaplant_27: 4487130698270638258
       piranhaplant_57: -6860492118305740592
-  spritePackingTag: 
+      piranhaplant_58: 614650738584049826
+      piranhaplant_59: -5414490527629344597
+      piranhaplant_6: -3842879693280372402
+      piranhaplant_60: -4673158557244423047
+      piranhaplant_61: -3472888023490545112
+      piranhaplant_62: -4542559731491263803
+      piranhaplant_63: 5435277750307012688
+      piranhaplant_64: 2686662243247555591
+      piranhaplant_65: -4051063731614952116
+      piranhaplant_66: 2156753514671945283
+      piranhaplant_67: 3170043902953334603
+      piranhaplant_68: 5901397015629521986
+      piranhaplant_69: -5262113927009650520
+      piranhaplant_7: 3102115248508928702
+      piranhaplant_70: -1880101920363548745
+      piranhaplant_71: -4610526049594673912
+      piranhaplant_72: -7120024422659173774
+      piranhaplant_73: 4446610885866771005
+      piranhaplant_74: 5570650347807578932
+      piranhaplant_75: -8930845208152650847
+      piranhaplant_76: 2675286143121339491
+      piranhaplant_77: 6496758801958608249
+      piranhaplant_78: -5214385567738610467
+      piranhaplant_79: -8272253846636045785
+      piranhaplant_8: 7996795249185144097
+      piranhaplant_80: -8662926999163474803
+      piranhaplant_81: -4734908172120023821
+      piranhaplant_82: 4786374828312190570
+      piranhaplant_83: 5509353235587393859
+      piranhaplant_84: -8374652284765515359
+      piranhaplant_85: -7158853571646589886
+      piranhaplant_86: 4579729016942545099
+      piranhaplant_87: -8950189574262729048
+      piranhaplant_88: 3249682734732801491
+      piranhaplant_89: 4164678369630603432
+      piranhaplant_9: -4617242106388109633
+      piranhaplant_90: 8756391644431283961
+      piranhaplant_91: 4302187137836087271
+      piranhaplant_92: 3451347559288493581
+      piranhaplant_93: -6100441512890440907
+      piranhaplant_94: -4187781556941618360
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

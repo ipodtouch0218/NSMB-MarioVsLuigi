@@ -41,6 +41,9 @@ public class VersusStageGizmos : MonoBehaviour {
         Gizmos.color = Color.green;
         for (int x = 0; x < stage.TileDimensions.x; x++) {
             for (int y = 0; y < stage.TileDimensions.y; y++) {
+                if (stage.TileData.Length <= (x + y * stage.TileDimensions.x)) {
+                    break;
+                }
                 StageTileInstance ti = stage.TileData[x + y * stage.TileDimensions.x];
                 StageTile t = QuantumUnityDB.GetGlobalAsset(ti.Tile);
                 if (!t) {

@@ -971,6 +971,7 @@ namespace Quantum {
                 mario->CurrentVolley = 0;
             }
 
+            mario->UsedPropellerThisJump &= physicsObject->IsTouchingGround;
             mario->IsPropellerFlying &= !mario->IsInWater;
             if (mario->IsPropellerFlying) {
                 if (!QuantumUtils.Decrement(ref mario->PropellerLaunchFrames)) {

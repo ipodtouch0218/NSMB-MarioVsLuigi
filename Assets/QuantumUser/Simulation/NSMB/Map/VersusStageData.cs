@@ -88,6 +88,7 @@ public unsafe class VersusStageData : AssetObject {
         }
 
         stageLayout[index] = tile;
+        f.Signals.OnTileChanged(x, y, tile);
         f.Events.TileChanged(f, x + TileOrigin.x, y + TileOrigin.y, tile);
     }
 
@@ -95,12 +96,14 @@ public unsafe class VersusStageData : AssetObject {
         StageTileInstance[] stageData = f.StageTiles;
 
         for (int i = 0; i < TileData.Length; i++) {
-            if (!stageData[i].Equals(TileData[i])) {
+            StageTileInstance newTile = TileData[i];
+            if (!stageData[i].Equals(newTile)) {
                 int x = i % TileDimensions.x + TileOrigin.x;
                 int y = i / TileDimensions.x + TileOrigin.y;
-                f.Events.TileChanged(f, x, y, TileData[i]);
+                f.Signals.OnTileChanged(x, y, newTile);
+                f.Events.TileChanged(f, x, y, newTile);
             }
-            stageData[i] = TileData[i];
+            stageData[i] = newTile;
         }
         f.Signals.OnStageReset(full);
     }

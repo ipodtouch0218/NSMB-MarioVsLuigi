@@ -18,6 +18,7 @@ namespace Quantum {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
             mario->PlayerRef = player;
             var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
+            newTransform->Position = f.FindAsset<VersusStageData>(f.Map.UserAsset).Spawnpoint;
         }
 
         public void OnPlayerDisconnected(Frame f, PlayerRef player) {

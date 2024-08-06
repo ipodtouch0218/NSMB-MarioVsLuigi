@@ -42,7 +42,7 @@ namespace Quantum {
             }
 
             // Collide
-            if (enemy->IsAlive) {
+            if (enemy->IsAlive && !enemy->ColliderDisabled) {
                 var hits = f.Physics2D.OverlapShape(*transform, filter.Collider->Shape);
                 EntityRef entityA = filter.Entity;
                 for (int i = 0; i < hits.Count; i++) {
@@ -50,7 +50,7 @@ namespace Quantum {
                     var entities = (entityA, entityB);
                     if (entityA == entityB
                         || alreadyCollided.Contains(entities)
-                        || (f.TryGet(entityB, out Enemy entityBEnemy) && !entityBEnemy.IsAlive)
+                        || (f.TryGet(entityB, out Enemy entityBEnemy) && (!entityBEnemy.IsAlive || entityBEnemy.ColliderDisabled))
                         || (f.TryGet(entityB, out MarioPlayer entityBMario) && entityBMario.IsDead)) {
                         continue;
                     }

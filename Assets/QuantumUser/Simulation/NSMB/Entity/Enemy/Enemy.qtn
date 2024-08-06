@@ -3,6 +3,7 @@ component Enemy {
 	bool IsActive;
 	bool IsDead;
 	bool FacingRight;
+	bool ColliderDisabled;
 }
 
 signal OnEnemyDespawned(entity_ref entity);

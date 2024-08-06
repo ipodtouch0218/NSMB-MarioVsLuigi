@@ -1,0 +1,5 @@
+component PiranhaPlant {
+	byte WaitingFrames;
+	byte ChompFrames;
+	FP PopupAnimationTime;
+}

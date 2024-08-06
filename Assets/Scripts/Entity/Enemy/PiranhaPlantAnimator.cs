@@ -1,0 +1,41 @@
+using NSMB.Extensions;
+using Quantum;
+using UnityEngine;
+
+public class PiranhaPlantAnimator : MonoBehaviour {
+
+    //---Serialized Variables
+    [SerializeField] private QuantumEntityView entity;
+    [SerializeField] private AudioSource sfx;
+    [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] private Animator animator;
+
+    public void OnValidate() {
+        this.SetIfNull(ref entity);
+        this.SetIfNull(ref sfx);
+        this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
+        this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
+    }
+
+    public void Start() {
+        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+    }
+
+    public void OnUpdateView(CallbackUpdateView e) {
+        QuantumGame game = e.Game;
+        Frame f = game.Frames.Predicted;
+
+        if (!f.Exists(entity.EntityRef)) {
+            return;
+        }
+
+        PiranhaPlant piranhaPlant = f.Get<PiranhaPlant>(entity.EntityRef);
+        animator.SetBool("active", piranhaPlant.ChompFrames > 0);
+        animator.SetBool("chomping", piranhaPlant.PopupAnimationTime == 1);
+        sRenderer.enabled = piranhaPlant.PopupAnimationTime != 0;
+    }
+
+    public void PlayChompSound() {
+        sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Chomp);
+    }
+}
