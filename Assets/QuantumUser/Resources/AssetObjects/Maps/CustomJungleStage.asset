@@ -555,6 +555,8 @@ MonoBehaviour:
           Value: 0
         ColliderDisabled:
           Value: 0
+        IgnorePlayerWhenRespawning:
+          Value: 1
     - rid: 1987491028835237892
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -668,6 +670,8 @@ MonoBehaviour:
         FacingRight:
           Value: 0
         ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
           Value: 0
     - rid: 2646313237942894596
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -811,6 +815,8 @@ MonoBehaviour:
         FacingRight:
           Value: 0
         ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
           Value: 0
     - rid: 3804419343601631236
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1283,6 +1289,8 @@ MonoBehaviour:
         FacingRight:
           Value: 0
         ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
           Value: 0
     - rid: 8298140632090673156
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

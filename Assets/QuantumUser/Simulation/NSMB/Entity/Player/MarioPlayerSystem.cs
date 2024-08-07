@@ -5,7 +5,9 @@ using static IInteractableTile;
 
 namespace Quantum {
 
-    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, ISignalOnGameStarting, ISignalOnPreTileCollide, ISignalOnBobombExplodeEntity {
+    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
+        ISignalOnGameStarting, ISignalOnPreTileCollide, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash {
+
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -485,12 +487,10 @@ namespace Quantum {
 
             HandleWallslideStopChecks(filter, inputs, currentWallDirection);
 
-            if (mario->WallslideEndFrames > 0) {
-                if (--mario->WallslideEndFrames == 0) {
-                    mario->WallslideRight = false;
-                    mario->WallslideLeft = false;
-                    return;
-                }
+            if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
+                mario->WallslideRight = false;
+                mario->WallslideLeft = false;
+                return;
             }
 
             if (mario->IsWallsliding) {
@@ -560,7 +560,7 @@ namespace Quantum {
             // TODO bool floorCheck = !Runner.GetPhysicsScene2D().Raycast(body.Position, Vector2.down, 0.1f, Layers.MaskAnyGround);
             bool moveDownCheck = physicsObject->Velocity.Y < 0;
             // TODO bool heightLowerCheck = Runner.GetPhysicsScene2D().Raycast(body.Position + WallSlideLowerHeightOffset, wallDirection, MainHitbox.size.x * 2, Layers.MaskSolidGround);
-            if (/* !floorCheck || */ !moveDownCheck /* || !heightLowerCheck */) {
+            if (physicsObject->IsTouchingGround || !moveDownCheck /* || !heightLowerCheck */) {
                 mario->WallslideRight = false;
                 mario->WallslideLeft = false;
                 mario->WallslideEndFrames = 0;
@@ -1337,6 +1337,12 @@ namespace Quantum {
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
                 mario->Powerdown(f, entity, false);
+            }
+        }
+
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash) {
+            if (f.TryGet(entity, out MarioPlayer mario)) {
+                *doSplash = !mario.IsDead;
             }
         }
     }

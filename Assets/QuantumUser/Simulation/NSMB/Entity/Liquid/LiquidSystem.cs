@@ -23,7 +23,12 @@ namespace Quantum {
                 if (!underwater) {
                     // Exit splash
                     splashed.RemoveUnordered(info.Entity);
-                    f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), true);
+
+                    bool doSplash = true;
+                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
+                    if (doSplash) {
+                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), true);
+                    }
 
                     // Mario specific effects...
                     if (liquid->LiquidType == LiquidType.Water && f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
@@ -38,7 +43,12 @@ namespace Quantum {
                 if (underwater) {
                     // Enter splash
                     splashed.Add(info.Entity);
-                    f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), false);
+
+                    bool doSplash = true;
+                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
+                    if (doSplash) {
+                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), false);
+                    }
 
                     // Mario specific effects...
                     if (f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
@@ -78,7 +88,12 @@ namespace Quantum {
                 if (!underwater) {
                     // Exit splash
                     splashed.RemoveUnordered(info.Entity);
-                    f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), true);
+
+                    bool doSplash = true;
+                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
+                    if (doSplash) {
+                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), true);
+                    }
                 }
 
                 // Mario specific effects...

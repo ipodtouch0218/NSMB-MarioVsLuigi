@@ -5,6 +5,7 @@ namespace Quantum {
         public void Respawn(Frame f, EntityRef entity) {
             ChompFrames = 0;
             WaitingFrames = 216;
+            PopupAnimationTime = 0;
         }
 
         public void Kill(Frame f, EntityRef entity, EntityRef killerEntity, bool special) {
@@ -29,6 +30,8 @@ namespace Quantum {
             }
             f.Events.PlayComboSound(f, entity, combo);
 
+            ChompFrames = 0;
+            PopupAnimationTime = 0;
             enemy->IsDead = true;
             enemy->IsActive = false;
 

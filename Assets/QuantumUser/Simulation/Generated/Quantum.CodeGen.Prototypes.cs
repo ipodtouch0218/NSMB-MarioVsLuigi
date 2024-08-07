@@ -186,6 +186,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsDead;
     public QBoolean FacingRight;
     public QBoolean ColliderDisabled;
+    public QBoolean IgnorePlayerWhenRespawning;
     partial void MaterializeUser(Frame frame, ref Quantum.Enemy result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Enemy component = default;
@@ -198,6 +199,7 @@ namespace Quantum.Prototypes {
         result.IsDead = this.IsDead;
         result.FacingRight = this.FacingRight;
         result.ColliderDisabled = this.ColliderDisabled;
+        result.IgnorePlayerWhenRespawning = this.IgnorePlayerWhenRespawning;
         MaterializeUser(frame, ref result, in context);
     }
   }

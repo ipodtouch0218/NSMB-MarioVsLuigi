@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Quantum {
 
-    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset {
+    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash {
 
         public delegate void EnemyInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
         private static readonly Dictionary<(Type, Type), EnemyInteractor> interactors = new();
@@ -107,12 +107,22 @@ namespace Quantum {
 
             while (filter.NextUnsafe(out EntityRef entity, out Transform2D* transform, out Enemy* enemy)) {
                 if (!enemy->IsActive) {
-                    Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(*transform, shape, layerMask);
-                    if (playerHits.Count == 0) {
-                        enemy->Respawn(f, entity);
-                        f.Signals.OnEnemyRespawned(entity);
+                    if (!enemy->IgnorePlayerWhenRespawning) {
+                        Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(*transform, shape, layerMask);
+                        if (playerHits.Count > 0) {
+                            continue;
+                        }
                     }
+                    
+                    enemy->Respawn(f, entity);
+                    f.Signals.OnEnemyRespawned(entity);
                 }
+            }
+        }
+
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash) {
+            if (!f.TryGet(entity, out Enemy enemy)) {
+                *doSplash &= enemy.IsActive;
             }
         }
     }

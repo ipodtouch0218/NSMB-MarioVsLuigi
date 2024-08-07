@@ -8,6 +8,8 @@ component Liquid {
 	[FreeOnComponentRemoved] list<EntityRef> SplashedEntities;
 }
 
+signal OnTryLiquidSplash(EntityRef entity, EntityRef liquid, bool* doSplash);
+
 event LiquidSplashed {
 	entity_ref Entity;
 	nothashed FP Force;

@@ -3,13 +3,15 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe partial struct Powerup {
 
-        public void Initialize(byte spawnAnimationLength) {
+        public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength) {
             SpawnAnimationFrames = spawnAnimationLength;
             Lifetime += spawnAnimationLength;
+
+            f.Unsafe.GetPointer<PhysicsObject>(thisEntity)->DisableCollision = true;
         }
 
         public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength, FPVector2 spawnOrigin, FPVector2 spawnDestination, bool launch = false) {
-            Initialize(spawnAnimationLength);
+            Initialize(f, thisEntity, spawnAnimationLength);
 
             LaunchSpawn = launch;
             BlockSpawn = !launch;
@@ -29,7 +31,7 @@ namespace Quantum {
         }
 
         public void ParentToPlayer(Frame f, EntityRef thisEntity, EntityRef playerToFollow) {
-            Initialize(60);
+            Initialize(f, thisEntity, 60);
             ParentMarioPlayer = playerToFollow;
 
             var marioTransform = f.Get<Transform2D>(playerToFollow);

@@ -21,6 +21,7 @@ namespace Quantum {
             EnemySystem.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
             EnemySystem.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
             EnemySystem.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
+            EnemySystem.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -228,16 +229,15 @@ namespace Quantum {
                         // Enter Shell
                         if (koopa->SpawnPowerupWhenStomped.IsValid) {
                             PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
-                            EntityRef powerupEntity = f.Create(powerupAsset.Prefab);
-                            var powerupTransform = f.Unsafe.GetPointer<Transform2D>(powerupEntity);
-                            var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
+                            EntityRef newPowerup = f.Create(powerupAsset.Prefab);
+                            var powerupTransform = f.Unsafe.GetPointer<Transform2D>(newPowerup);
+                            var powerup = f.Unsafe.GetPointer<Powerup>(newPowerup);
 
                             powerupTransform->Position = koopaTransform.Position + FPVector2.Down * FP._0_20;
-                            powerup->Initialize(15);
+                            powerup->Initialize(f, newPowerup, 15);
 
                             koopaEnemy->IsActive = false;
                             koopaEnemy->IsDead = true;
-
                         } else {
                             koopa->EnterShell(f, koopaEntity, marioEntity, false);
                         }
@@ -266,6 +266,26 @@ namespace Quantum {
                         koopaEnemy->FacingRight = koopaTransform.Position.X > marioTransform.Position.X;
                     }
                 }
+            }
+        }
+
+        public void OnKoopaPiranhaPlantInteraction(Frame f, EntityRef koopaEntity, EntityRef piranhaPlantEntity) {
+            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
+            var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
+
+            bool beingHeld = f.Exists(holdable->Holder);
+            if (koopa->IsKicked || beingHeld) {
+                // Kill piranha plant
+                var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
+                piranhaPlant->Kill(f, piranhaPlantEntity, koopaEntity, true);
+
+                if (beingHeld) {
+                    // Kill self, too.
+                    koopa->Kill(f, koopaEntity, piranhaPlantEntity, true);
+                }
+            } else {
+                // Turn
+                EnemySystem.EnemyBumpTurnaround(f, koopaEntity, piranhaPlantEntity);
             }
         }
 

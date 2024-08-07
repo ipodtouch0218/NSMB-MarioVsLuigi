@@ -8,6 +8,7 @@ namespace Quantum {
             public Transform2D* Transform;
             public Powerup* Powerup;
             public PhysicsObject* PhysicsObject;
+            public PhysicsCollider2D* Collider;
         }
 
         public override void Update(Frame f, ref Filter filter) {
@@ -87,6 +88,13 @@ namespace Quantum {
                     asset.AnimationCurveY.Evaluate(FPMath.Clamp(powerup->AnimationCurveTimer, 0, asset.AnimationCurveY.EndTime - FP._0_10))
                 );
                 powerup->AnimationCurveTimer += f.DeltaTime;
+            }
+
+            if (powerup->SpawnAnimationFrames == 0 && physicsObject->DisableCollision) {
+                // Test that we're not in a wall anymore
+                if (!PhysicsObjectSystem.BoxInsideTile(f, transform->Position, filter.Collider->Shape)) {
+                    physicsObject->DisableCollision = false;
+                }
             }
 
             if (QuantumUtils.Decrement(ref powerup->Lifetime)) {

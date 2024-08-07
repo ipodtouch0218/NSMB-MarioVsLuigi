@@ -507,14 +507,12 @@ namespace Quantum {
             FPVector2 boxMin = origin - extents;
             FPVector2 boxMax = origin + extents;
 
-            /*
             FPVector2[] boxCorners = {
                 new(origin.X - extents.X, origin.Y + extents.Y),
                 boxMax,
                 new(origin.X + extents.X, origin.Y - extents.Y),
                 boxMin,
             };
-            */
 
             Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents);
             Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents);
@@ -524,13 +522,11 @@ namespace Quantum {
                     FPVector2[][] tilePolygons = stage.GetTileRelative(f, x, y).GetWorldPolygons(f, QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y)));
 
                     foreach (var polygon in tilePolygons) {
-                        /*
                         foreach (var corner in boxCorners) {
                             if (PointIsInsidePolygon(corner, polygon)) {
                                 return true;
                             }
                         }
-                        */
                         for (int i = 0; i < polygon.Length; i++) {
                             Draw.Line(polygon[i], polygon[(i+1)%polygon.Length], ColorRGBA.Red);
                             if (LineIntersectsBox(polygon[i], polygon[(i + 1) % polygon.Length], boxMin, boxMax)) {

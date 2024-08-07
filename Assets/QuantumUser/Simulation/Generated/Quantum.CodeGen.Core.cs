@@ -905,18 +905,20 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Enemy : Quantum.IComponent {
-    public const Int32 SIZE = 32;
+    public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(16)]
+    [FieldOffset(24)]
     public FPVector2 Spawnpoint;
-    [FieldOffset(8)]
-    public QBoolean IsActive;
     [FieldOffset(12)]
+    public QBoolean IsActive;
+    [FieldOffset(16)]
     public QBoolean IsDead;
     [FieldOffset(4)]
     public QBoolean FacingRight;
     [FieldOffset(0)]
     public QBoolean ColliderDisabled;
+    [FieldOffset(8)]
+    public QBoolean IgnorePlayerWhenRespawning;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 11071;
@@ -925,6 +927,7 @@ namespace Quantum {
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + ColliderDisabled.GetHashCode();
+        hash = hash * 31 + IgnorePlayerWhenRespawning.GetHashCode();
         return hash;
       }
     }
@@ -932,6 +935,7 @@ namespace Quantum {
         var p = (Enemy*)ptr;
         QBoolean.Serialize(&p->ColliderDisabled, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
+        QBoolean.Serialize(&p->IgnorePlayerWhenRespawning, serializer);
         QBoolean.Serialize(&p->IsActive, serializer);
         QBoolean.Serialize(&p->IsDead, serializer);
         FPVector2.Serialize(&p->Spawnpoint, serializer);
@@ -1623,6 +1627,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnThrowHoldable : ISignal {
     void OnThrowHoldable(Frame f, EntityRef entity, EntityRef mario, QBoolean crouching);
   }
+  public unsafe partial interface ISignalOnTryLiquidSplash : ISignal {
+    void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash);
+  }
   public unsafe partial interface ISignalOnPreTileCollide : ISignal {
     void OnPreTileCollide(Frame f, VersusStageData stage, EntityRef Entity, PhysicsContact* Contact, bool* AllowCollision);
   }
@@ -1644,6 +1651,7 @@ namespace Quantum {
     private ISignalOnEnemyEnemyCollision[] _ISignalOnEnemyEnemyCollisionSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
+    private ISignalOnTryLiquidSplash[] _ISignalOnTryLiquidSplashSystems;
     private ISignalOnPreTileCollide[] _ISignalOnPreTileCollideSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
     private ISignalOnTileChanged[] _ISignalOnTileChangedSystems;
@@ -1666,6 +1674,7 @@ namespace Quantum {
       _ISignalOnEnemyEnemyCollisionSystems = BuildSignalsArray<ISignalOnEnemyEnemyCollision>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
+      _ISignalOnTryLiquidSplashSystems = BuildSignalsArray<ISignalOnTryLiquidSplash>();
       _ISignalOnPreTileCollideSystems = BuildSignalsArray<ISignalOnPreTileCollide>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
       _ISignalOnTileChangedSystems = BuildSignalsArray<ISignalOnTileChanged>();
@@ -1838,6 +1847,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnThrowHoldable(_f, entity, mario, crouching);
+          }
+        }
+      }
+      public void OnTryLiquidSplash(EntityRef entity, EntityRef liquid, bool* doSplash) {
+        var array = _f._ISignalOnTryLiquidSplashSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnTryLiquidSplash(_f, entity, liquid, doSplash);
           }
         }
       }

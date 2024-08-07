@@ -4,6 +4,7 @@ component Enemy {
 	bool IsDead;
 	bool FacingRight;
 	bool ColliderDisabled;
+	bool IgnorePlayerWhenRespawning;
 }
 
 signal OnEnemyDespawned(entity_ref entity);

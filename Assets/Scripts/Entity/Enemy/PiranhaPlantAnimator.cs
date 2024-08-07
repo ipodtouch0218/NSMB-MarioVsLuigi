@@ -19,6 +19,7 @@ public class PiranhaPlantAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled);
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
@@ -37,5 +38,13 @@ public class PiranhaPlantAnimator : MonoBehaviour {
 
     public void PlayChompSound() {
         sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Chomp);
+    }
+
+    private void OnEnemyKilled(EventEnemyKilled e) {
+        if (e.Enemy != entity.EntityRef) {
+            return;
+        }
+
+        sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Death);
     }
 }
