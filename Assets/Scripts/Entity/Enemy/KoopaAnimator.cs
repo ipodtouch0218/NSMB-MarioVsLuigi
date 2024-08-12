@@ -83,7 +83,7 @@ public class KoopaAnimator : MonoBehaviour {
 
         Vector3 modifiedZ = transform.position;
         if (f.Exists(holdable.Holder)) {
-            modifiedZ.z = -6;
+            modifiedZ.z = -4.1f;
         }
         transform.position = modifiedZ;
     }

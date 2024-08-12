@@ -31,7 +31,7 @@ namespace NSMB.Loading {
 
         //---Private Variables
         private Coroutine flashRoutine;
-        private CharacterData data;
+        private CharacterAsset character;
 
         private IEnumerator DoGrowShrinkFlash() {
             float halfBlink = blinkSpeed * 0.5f;
@@ -44,17 +44,17 @@ namespace NSMB.Loading {
                 switch (scaleToDisplay) {
                 case 0: {
                     transform.localScale = Vector3.one;
-                    image.sprite = data.loadingSmallSprite;
+                    image.sprite = character.LoadingSmallSprite;
                     break;
                 }
                 case 1: {
                     transform.localScale = Vector3.one;
-                    image.sprite = data.loadingBigSprite;
+                    image.sprite = character.LoadingLargeSprite;
                     break;
                 }
                 case 2: {
                     transform.localScale = two;
-                    image.sprite = data.loadingBigSprite;
+                    image.sprite = character.LoadingLargeSprite;
                     break;
                 }
                 }
@@ -64,11 +64,11 @@ namespace NSMB.Loading {
             flashRoutine = null;
         }
 
-        public void Initialize() {
-            // TODO data = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
+        public void Initialize(CharacterAsset character) {
+            this.character = character;
             Scale = 0;
             previousScale = 0;
-            image.sprite = data.loadingSmallSprite;
+            image.sprite = character.LoadingSmallSprite;
 
             if (flashRoutine != null) {
                 StopCoroutine(flashRoutine);

@@ -58,7 +58,6 @@ namespace Quantum {
                 enemy->FacingRight = physicsObject->IsTouchingLeftWall;
 
                 if (koopa->IsKicked) {
-                    bool? playBumpSound = null;
                     QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
                     foreach (var contact in contacts) {
                         FP dot = FPVector2.Dot(contact.Normal, FPVector2.Right);
@@ -73,14 +72,10 @@ namespace Quantum {
                         if (tile is IInteractableTile it) {
                             it.Interact(f, filter.Entity, right ? InteractionDirection.Right : InteractionDirection.Left,
                                 new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
-
-                            playBumpSound &= (playBumpSound ?? true) & tempPlayBumpSound;
                         }
                     }
 
-                    if (playBumpSound ?? true) {
-                        f.Events.PlayBumpSound(f, filter.Entity);
-                    }
+                    f.Events.PlayBumpSound(f, filter.Entity);
                 }
             }
 

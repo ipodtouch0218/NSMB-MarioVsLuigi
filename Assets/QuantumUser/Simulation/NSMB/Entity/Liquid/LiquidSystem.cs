@@ -5,17 +5,17 @@ namespace Quantum {
     public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnComponentAdded<Liquid>, ISignalOnTrigger2D, ISignalOnTriggerExit2D {
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid) ||
-                !f.TryGet(info.Other, out Transform2D ourTransform) ||
-                !f.TryGet(info.Entity, out Transform2D entityTransform) ||
-                !f.TryGet(info.Entity, out PhysicsCollider2D collider) ||
-                !f.TryGet(info.Entity, out PhysicsObject physicsObject)) {
+            if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
+                || !f.TryGet(info.Other, out Transform2D ourTransform)
+                || !f.TryGet(info.Entity, out Transform2D entityTransform)
+                || !f.TryGet(info.Entity, out PhysicsCollider2D collider)
+                || !f.TryGet(info.Entity, out PhysicsObject physicsObject)) {
                 return;
             }
 
             FP surface = liquid->GetSurfaceHeight(ourTransform);
             FP checkHeight = entityTransform.Position.Y + collider.Shape.Centroid.Y;
-            bool underwater = checkHeight <= surface;
+            bool underwater = liquid->LiquidType != LiquidType.Water || checkHeight <= surface;
 
             QList<EntityRef> splashed = f.ResolveList(liquid->SplashedEntities);
             if (splashed.Contains(info.Entity)) {
@@ -71,17 +71,17 @@ namespace Quantum {
         }
 
         public void OnTriggerExit2D(Frame f, ExitInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid) ||
-                !f.TryGet(info.Other, out Transform2D ourTransform) ||
-                !f.TryGet(info.Entity, out Transform2D entityTransform) ||
-                !f.TryGet(info.Entity, out PhysicsCollider2D collider) ||
-                !f.TryGet(info.Entity, out PhysicsObject physicsObject)) {
+            if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
+                || !f.TryGet(info.Other, out Transform2D ourTransform)
+                || !f.TryGet(info.Entity, out Transform2D entityTransform)
+                || !f.TryGet(info.Entity, out PhysicsCollider2D collider)
+                || !f.TryGet(info.Entity, out PhysicsObject physicsObject)) {
                 return;
             }
 
             FP surface = liquid->GetSurfaceHeight(ourTransform);
             FP checkHeight = entityTransform.Position.Y + collider.Shape.Centroid.Y;
-            bool underwater = checkHeight <= surface;
+            bool underwater = liquid->LiquidType != LiquidType.Water || checkHeight <= surface;
 
             QList<EntityRef> splashed = f.ResolveList(liquid->SplashedEntities);
             if (splashed.Contains(info.Entity)) {

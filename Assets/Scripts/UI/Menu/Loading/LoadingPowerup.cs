@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using UnityEngine;
 
 namespace NSMB.Loading {
@@ -15,18 +16,18 @@ namespace NSMB.Loading {
         private float goombaTimer;
 
         public void OnValidate() {
-            if (!animator) animator = GetComponent<Animator>();
-            if (!rect) rect = GetComponent<RectTransform>();
+            this.SetIfNull(ref animator);
+            this.SetIfNull(ref rect);
         }
 
         public void OnEnable() {
-            mario.Initialize();
             TeleportToBeginning();
         }
 
         public void Update() {
-            if (goombaTimer > 0 && (goombaTimer -= Time.deltaTime) > 0)
+            if (goombaTimer > 0 && (goombaTimer -= Time.deltaTime) > 0) {
                 return;
+            }
 
             rect.localPosition += movementSpeed * Time.deltaTime;
 

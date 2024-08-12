@@ -58,6 +58,8 @@ public static class Enums {
     public enum NetEvents : byte {
         ChangeCountdownState = 100,
         StartGame = 101,
+        ChatMessage = 102,
+        ChatTyping = 103,
     }
 
     public static class NetRoomProperties {
@@ -67,9 +69,10 @@ public static class Enums {
     }
 
     public static class NetPlayerProperties {
-        public const int Ping = 1;
-        public const int Character = 2;
-        public const int Ready = 3;
+        public const string Ping = "P";
+        public const string Character = "C";
+        public const string Ready = "R";
+        public const string Spectator = "S";
     }
     #endregion
 }

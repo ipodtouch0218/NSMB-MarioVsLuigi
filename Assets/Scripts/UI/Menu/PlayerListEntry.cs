@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using NSMB.Utils;
+using Photon.Client;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu {
-    public class PlayerListEntry : MonoBehaviour {
+    public class PlayerListEntry : MonoBehaviour, IInRoomCallbacks {
 
         //---Public Variables
         public Player player;
@@ -28,6 +29,7 @@ namespace NSMB.UI.MainMenu {
         private NicknameColor NicknameColor => NicknameColor.White;
 
         public void OnEnable() {
+            NetworkHandler.Client.AddCallbackTarget(this);
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
             // TODO
             // player.OnInOptionsChangedEvent += OnInSettingsChanged;
@@ -36,6 +38,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisable() {
+            NetworkHandler.Client.RemoveCallbackTarget(this);
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
             // TODO
             // player.OnInOptionsChangedEvent -= OnInSettingsChanged;
@@ -65,10 +68,11 @@ namespace NSMB.UI.MainMenu {
                 chattingIcon.SetActive(false);
                 typingCounter = 0;
             }
+
+            UpdateText();
         }
 
         public void UpdateText() {
-
             colorStrip.color = Utils.Utils.GetPlayerColor(player);
 
             /*
@@ -79,11 +83,10 @@ namespace NSMB.UI.MainMenu {
             }
             */
 
-            int ping = player.CustomProperties[Enums.NetPlayerProperties.Ping] as int? ?? 0;
-            if (ping == 0) {
-                pingText.text = "";
+            if (player.CustomProperties.TryGetValue(Enums.NetPlayerProperties.Ping, out object ping) && ping is int pingInt) {
+                pingText.text = pingInt + " " + Utils.Utils.GetPingSymbol(pingInt);
             } else {
-                pingText.text = ping + " " + Utils.Utils.GetPingSymbol(ping);
+                pingText.text = "";
             }
 
             string permissionSymbol = "";
@@ -91,9 +94,11 @@ namespace NSMB.UI.MainMenu {
                 permissionSymbol += "<sprite name=room_host>";
             }
 
-            /*
-            string characterSymbol = player.GetCharacterData().uistring;
+            NetworkUtils.GetCustomProperty(player.CustomProperties, Enums.NetPlayerProperties.Character, out int characterIndex);
+            characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
+            string characterSymbol = GlobalController.Instance.config.CharacterDatas[characterIndex].UiString;
 
+            /*
             string teamSymbol;
             if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
                 Team team = ScriptableManager.Instance.teams[player.Team];
@@ -104,7 +109,7 @@ namespace NSMB.UI.MainMenu {
             */
             //nameText.text = permissionSymbol + characterSymbol + teamSymbol + player.GetNickname();
 
-            nameText.text = permissionSymbol + player.NickName.ToValidUsername();
+            nameText.text = permissionSymbol + characterSymbol + player.NickName.ToValidUsername();
 
             Transform parent = transform.parent;
             int childIndex = 0;
@@ -194,5 +199,19 @@ namespace NSMB.UI.MainMenu {
         private void OnIsReadyChanged(bool isReady) {
             readyIcon.SetActive(isReady);
         }
+
+        public void OnPlayerEnteredRoom(Player newPlayer) { }
+
+        public void OnPlayerLeftRoom(Player otherPlayer) { }
+
+        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) { }
+
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) {
+            if (player == targetPlayer) {
+                UpdateText();
+            }
+        }
+
+        public void OnMasterClientSwitched(Player newMasterClient) { }
     }
 }

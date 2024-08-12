@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: 23 Cubby Leafy
   m_EditorClassIdentifier: 
   colors:
-  - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
+  - character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
     shirtColor: {r: 0.4198113, g: 0.562814, b: 1, a: 1}
     overallsColor: {r: 0.57254905, g: 0.20784314, b: 0.20784314, a: 1}
     hatUsesOverallsColor: 0
-  - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
+  - character: {fileID: 11400000, guid: 20241e3c68674eb4dbb58f063d01cfd2, type: 2}
     shirtColor: {r: 0.9, g: 0.47239816, b: 0.25656107, a: 1}
     overallsColor: {r: 0.57254905, g: 0.20784314, b: 0.20784314, a: 1}
     hatUsesOverallsColor: 0

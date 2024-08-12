@@ -41,11 +41,11 @@ namespace NSMB.UI.MainMenu {
         private float lastSelectTime;
         private string selectedRoomCode;
 
-
-        public void Awake() {
+        public void Initialize() {
             NetworkHandler.Client.AddCallbackTarget(this);
             joinRoomButton.interactable = false;
         }
+
         public void OnDestroy() {
             NetworkHandler.Client?.RemoveCallbackTarget(this);
         }
@@ -111,9 +111,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnRoomListUpdate(List<RoomInfo> roomList) {
-
             foreach (RoomInfo newRoomInfo in roomList) {
-
                 string roomName = newRoomInfo.Name;
                 if (rooms.TryGetValue(roomName, out RoomIcon roomIcon)) {
                     // RoomIcon exists

@@ -136,13 +136,12 @@ namespace Quantum {
 
             if (mario->FastTurnaroundFrames > 0) {
                 physicsObject->Velocity.X = 0;
-                if (--mario->FastTurnaroundFrames == 0) {
+                if (QuantumUtils.Decrement(ref mario->FastTurnaroundFrames)) {
                     mario->IsTurnaround = true;
                 }
-
             } else if (mario->IsTurnaround) {
-                mario->IsTurnaround &= physicsObject->IsTouchingGround && !mario->IsCrouching && xVelAbs < physics.WalkMaxVelocity[1] && !physicsObject->IsTouchingLeftWall && !physicsObject->IsTouchingRightWall;
-                mario->IsSkidding &= mario->IsTurnaround;
+                mario->IsTurnaround = physicsObject->IsTouchingGround && !mario->IsCrouching && xVelAbs < physics.WalkMaxVelocity[1] && !physicsObject->IsTouchingLeftWall && !physicsObject->IsTouchingRightWall;
+                mario->IsSkidding = mario->IsTurnaround;
 
                 physicsObject->Velocity.X += (physics.FastTurnaroundAcceleration * (mario->FacingRight ? -1 : 1) * f.DeltaTime);
 

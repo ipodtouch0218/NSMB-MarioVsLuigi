@@ -1,16 +1,15 @@
-﻿using System;
+﻿using NSMB.Extensions;
+using NSMB.Loading;
+using NSMB.Translation;
+using NSMB.UI.Pause.Options;
+using Quantum;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
-
-//using Fusion;
-using NSMB.Extensions;
-using NSMB.Loading;
-using NSMB.Translation;
-using NSMB.UI.Pause.Options;
 
 public class GlobalController : Singleton<GlobalController> {
 
@@ -23,6 +22,7 @@ public class GlobalController : Singleton<GlobalController> {
     public DiscordController discordController;
     public RumbleManager rumbleManager;
     public Gradient rainbowGradient;
+    public SimulationConfig config;
 
     public PauseOptionMenuManager optionsManager;
 

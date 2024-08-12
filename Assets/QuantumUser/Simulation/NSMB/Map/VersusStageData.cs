@@ -22,7 +22,7 @@ public unsafe class VersusStageData : AssetObject {
     public Vector2Int TileOrigin;
     public FPVector2 TilemapWorldPosition;
     public bool IsWrappingLevel = true;
-    public bool ExtendCeilingHitboxes = true;
+    public bool ExtendCeilingHitboxes = false;
 
     [Header("-- Spawnpoint")]
     public FPVector2 Spawnpoint;

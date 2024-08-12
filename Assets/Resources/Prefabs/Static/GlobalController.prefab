@@ -15544,6 +15544,7 @@ GameObject:
   - component: {fileID: 4506347848550621655}
   - component: {fileID: 9067110928999375944}
   - component: {fileID: 6841901076153067735}
+  - component: {fileID: 5858149666679547523}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -15617,6 +15618,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
+  config: {fileID: -4363489268676355003, guid: 89b430ef207c0e04997f44798547dc4d, type: 2}
   optionsManager: {fileID: 6650708626366051462}
   outlineFeature: {fileID: 8738572190042607270, guid: 5f58d6b1c480f4b4f9c77b6264ddfa5b,
     type: 2}
@@ -15647,16 +15649,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3edd7125116ee9545a0159eb376163fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerups:
-  - {fileID: 11400000, guid: c46080c934b689f41943aef6ecaf61b4, type: 2}
-  - {fileID: 11400000, guid: 2e9e086e8aa59434a97c2f97210b2585, type: 2}
-  - {fileID: 11400000, guid: 3badcec6a2b1e674e8f728aa9c8e279f, type: 2}
-  - {fileID: 11400000, guid: ef97a693c40ceef42867ab6091a3a1c7, type: 2}
-  - {fileID: 11400000, guid: fb2d384f538256445be350e60f8473a4, type: 2}
-  - {fileID: 11400000, guid: b3cbb6a3699975d4fb0a2e641a09684c, type: 2}
-  - {fileID: 11400000, guid: a3c6d7fa6c939be4ead398f0d82b5eb9, type: 2}
-  - {fileID: 11400000, guid: 797462c66e600c04dbd7898d6d95bd38, type: 2}
-  - {fileID: 11400000, guid: c00c1b56106aee544b8facce85b9f455, type: 2}
   skins:
   - {fileID: 0}
   - {fileID: 11400000, guid: f63a082ed1de1ac46a4d175774638d5a, type: 2}
@@ -15682,9 +15674,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
   - {fileID: 11400000, guid: 080293b8f6a11c5438f0703a4c9a77b5, type: 2}
   - {fileID: 11400000, guid: 222d170caee45db4090ed4bb3fb53965, type: 2}
-  characters:
-  - {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
-  - {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
   teams:
   - {fileID: 11400000, guid: a8b2a85ce7190164ca6dc02934fad796, type: 2}
   - {fileID: 11400000, guid: 8b4850b40bd67b942a59fe821a95b76d, type: 2}
@@ -15897,6 +15886,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0698a7e52086b6a439d448874dcfc1bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!81 &5858149666679547523
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4938254683282774592}
+  m_Enabled: 1
 --- !u!1 &4947824015881995125
 GameObject:
   m_ObjectHideFlags: 0
@@ -17310,6 +17307,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioListener: {fileID: 0}
   audioSource: {fileID: 2604880723276919109}
+  mario: {fileID: 2335449052012428788}
   animator: {fileID: 3179808912045039180}
   loadingGroup: {fileID: 6581389812410081186}
   readyGroup: {fileID: 7245564593415694122}
@@ -26527,7 +26525,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.15
+  m_fontSize: 23
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

@@ -30,7 +30,7 @@ MonoBehaviour:
   TriangleMeshCellSize: 4
   StaticColliders3DTrianglesData:
     Id:
-      Value: 450287852055107002
+      Value: 362228757069171524
   SerializeTrianglesMetadata: 0
   GridSizeX: 64
   GridSizeY: 64
@@ -172,6 +172,10 @@ MonoBehaviour:
         IsDead:
           Value: 0
         FacingRight:
+          Value: 0
+        ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
           Value: 0
     - rid: 777974220477956100
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -358,6 +362,10 @@ MonoBehaviour:
         IsDead:
           Value: 0
         FacingRight:
+          Value: 0
+        ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
           Value: 0
     - rid: 1904270922169188356
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -758,6 +766,10 @@ MonoBehaviour:
           Value: 0
         FacingRight:
           Value: 0
+        ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
+          Value: 0
     - rid: 5636341017683689476
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -943,6 +955,10 @@ MonoBehaviour:
         IsDead:
           Value: 0
         FacingRight:
+          Value: 0
+        ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
           Value: 0
     - rid: 7515263985617207300
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

@@ -192,12 +192,12 @@ MonoBehaviour:
         X:
           RawValue: 9830
         Y:
-          RawValue: 16711
+          RawValue: 14746
       PositionOffset:
         X:
           RawValue: 0
         Y:
-          RawValue: 3932
+          RawValue: 1966
       RotationOffset:
         RawValue: 0
       UserTag: 0
@@ -253,12 +253,12 @@ MonoBehaviour:
         X:
           RawValue: 9830
         Y:
-          RawValue: 16711
+          RawValue: 14746
       PositionOffset:
         X:
           RawValue: 0
         Y:
-          RawValue: 3932
+          RawValue: 1966
       RotationOffset:
         RawValue: 0
       UserTag: 0
@@ -411,8 +411,6 @@ MonoBehaviour:
   sfx: {fileID: 3399800873378663516}
   sRenderer: {fileID: 8133877121043965814}
   rotation: {fileID: 8088900794427276647}
-  deadSprite: {fileID: 5077748761105158669, guid: dbd41633b1a7b504aa8c1f606333f9cc,
-    type: 3}
   mirrorSprite: 0
   dontFlip: 0
 --- !u!82 &3399800873378663516
@@ -675,4 +673,8 @@ MonoBehaviour:
     IsDead:
       Value: 0
     FacingRight:
+      Value: 0
+    ColliderDisabled:
+      Value: 0
+    IgnorePlayerWhenRespawning:
       Value: 0

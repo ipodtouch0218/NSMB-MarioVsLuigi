@@ -1,13 +1,15 @@
+#if UNITY_EDITOR
 using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using AssetObjectQuery = Quantum.AssetObjectQuery;
+using UnityEditor;
+
 
 [assembly: QuantumMapBakeAssembly]
 public class VersusStageBaker : MapDataBakerCallback {
@@ -18,6 +20,7 @@ public class VersusStageBaker : MapDataBakerCallback {
     }
 
     public override void OnBake(QuantumMapData data) {
+
         this.data = data;
         var stage = QuantumUnityDB.GetGlobalAssetEditorInstance<VersusStageData>(data.Asset.UserAsset);
         if (!stage) {
@@ -217,4 +220,6 @@ public class VersusStageBaker : MapDataBakerCallback {
             return x.name.CompareTo(y.name);
         }
     }
+
 }
+#endif 

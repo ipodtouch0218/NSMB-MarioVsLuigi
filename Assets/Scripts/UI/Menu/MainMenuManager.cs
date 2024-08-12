@@ -31,7 +31,7 @@ namespace NSMB.UI.MainMenu {
         public Toggle spectateToggle;
         public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
         public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
-        public byte currentSkin;
+        public int currentSkin;
 
         //---Serialized Fields
         [Header("Managers")]
@@ -60,9 +60,9 @@ namespace NSMB.UI.MainMenu {
 
         [Header("Misc")]
         [SerializeField] public List<MapData> maps;
-        [SerializeField] private SimulationConfig config;
 
         //---Private Variables
+        private CharacterAsset currentCharacter;
         private Coroutine quitCoroutine, fadeMusicCoroutine;
         private bool wasSettingsOpen, isCountdownStarted, isReady;
 
@@ -137,7 +137,10 @@ namespace NSMB.UI.MainMenu {
             UpdateNickname();
 
             // Discord RPC
-            // TODO GlobalController.Instance.discordController.UpdateActivity();
+            GlobalController.Instance.discordController.UpdateActivity();
+
+            // Set up room list
+            roomManager.Initialize();
 
 #if PLATFORM_WEBGL
             copyRoomIdCanvasGroup.interactable = false;
@@ -215,24 +218,26 @@ namespace NSMB.UI.MainMenu {
             // Fix the damned setting scroll menu
             StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
 
-
-            /* TODO
+            // Set the room settings
+            hostControlsGroup.interactable = NetworkHandler.Client.LocalPlayer.IsMasterClient;
+            roomSettingsCallbacks.UpdateAllSettings(NetworkHandler.Client.CurrentRoom, false);
 
             // Set the player settings
-            PlayerData data = Runner.GetLocalPlayerData();
-            characterDropdown.SetValueWithoutNotify(data.CharacterIndex);
-            SwapPlayerSkin(data.SkinIndex, false);
-            spectateToggle.isOn = data.IsManualSpectator;
+            PhotonHashtable properties = NetworkHandler.Client.LocalPlayer.CustomProperties;
+            int characterIndex = 0;
+            if (properties.TryGetValue(Enums.NetPlayerProperties.Character, out object character) && character is int) {
+                characterIndex = (int) character;
+            }
+            characterDropdown.SetValueWithoutNotify(characterIndex);
+            currentCharacter = GlobalController.Instance.config.CharacterDatas[characterIndex % GlobalController.Instance.config.CharacterDatas.Length];
+            colorManager.ChangeCharacter(currentCharacter);
 
-            // Set the room settings
-            hostControlsGroup.interactable = data.IsRoomOwner;
-            roomSettingsCallbacks.UpdateAllSettings(SessionData.Instance, false);
-
-
-            // Preview the current level
-            PreviewLevel(SessionData.Instance.Level);
-
-            */
+            SwapPlayerSkin(Settings.Instance.generalSkin, false);
+            bool spectate = false;
+            if (properties.TryGetValue(Enums.NetPlayerProperties.Spectator, out object spectator) && spectator is int spectatorInt) {
+                spectate = spectatorInt == 1;
+            }
+            spectateToggle.isOn = spectate;
 
             // Reset the "Game start" button counting down
             OnCountdownTick(-1);
@@ -241,7 +246,7 @@ namespace NSMB.UI.MainMenu {
             UpdateRoomHeader();
 
             // Discord RPC
-            // TODO GlobalController.Instance.discordController.UpdateActivity();
+            GlobalController.Instance.discordController.UpdateActivity();
 
             // Create player icons
             playerList.PopulatePlayerEntries();
@@ -424,7 +429,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         public async void StartCountdown() {
-            Debug.Log(NetworkHandler.Client);
             if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
 
                 /* TODO
@@ -440,38 +444,9 @@ namespace NSMB.UI.MainMenu {
                 ));
                 */
 
-                var sessionRunnerArguments = new SessionRunner.Arguments {
-                    RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
-                    GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
-                    ClientId = NetworkHandler.Client.UserId,
-                    RuntimeConfig = new RuntimeConfig() {
-                        SimulationConfig = config,
-                        Map = maps[0].mapAsset,
-                        Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
-                        StarsToWin = 10,
-                        CoinsForPowerup = 8,
-                        Lives = 0,
-                        TimerSeconds = 0,
-                        TeamsEnabled = false,
-                        CustomPowerupsEnabled = true,
-                        ExpectedPlayers = 1,
-                    },
-                    SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
-                    GameMode = DeterministicGameMode.Multiplayer,
-                    PlayerCount = 1,
-                    StartGameTimeoutInSeconds = 10,
-                    Communicator = new QuantumNetworkCommunicator(NetworkHandler.Client),
-                    RecordingFlags = RecordingFlags.All,
-                };
-
-                QuantumRunner runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
-                runner.Game.AddPlayer(new RuntimePlayer {
-                    CharacterIndex = 0,
-                    SkinIndex = 0,
-                    RequestedTeam = 0,
-                    PlayerNickname = "ipodtouch0218",
-                });
-                transform.parent.gameObject.SetActive(false);
+                NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.StartGame, null, new RaiseEventArgs {
+                    Receivers = ReceiverGroup.All,
+                }, SendOptions.SendReliable);
 
             } else {
                 isReady = !isReady;
@@ -571,20 +546,19 @@ namespace NSMB.UI.MainMenu {
         }
         */
 
-        /* TODO
         public void UI_CharacterDropdownChanged() {
-            byte value = (byte) characterDropdown.value;
+            int value = characterDropdown.value;
             SwapCharacter(value, true);
 
-            CharacterData data = ScriptableManager.Instance.characters[value];
-            sfx.PlayOneShot(Sounds.Player_Voice_Selected, data);
+            CharacterAsset data = GlobalController.Instance.config.CharacterDatas[value];
+            sfx.PlayOneShot(SoundEffect.Player_Voice_Selected, data);
         }
-        */
 
-        public void SwapCharacter(byte character, bool callback) {
-            /* TODO
-            if (callback) {
-                LocalData.Rpc_SetCharacterIndex(character);
+        public void SwapCharacter(int character, bool broadcast) {
+            if (broadcast) {
+                NetworkHandler.Client.LocalPlayer.SetCustomProperties(new PhotonHashtable {
+                    [Enums.NetPlayerProperties.Character] = character
+                });
             } else {
                 characterDropdown.SetValueWithoutNotify(character);
             }
@@ -592,26 +566,19 @@ namespace NSMB.UI.MainMenu {
             Settings.Instance.generalCharacter = character;
             Settings.Instance.SaveSettings();
 
-            CharacterData data = ScriptableManager.Instance.characters[character];
-            colorManager.ChangeCharacter(data);
-            SwapPlayerSkin(currentSkin, false, data);
-            */
+            currentCharacter = GlobalController.Instance.config.CharacterDatas[character];
+            colorManager.ChangeCharacter(currentCharacter);
+            SwapPlayerSkin(currentSkin, false);
         }
 
-        /* TODO
-        public void SwapPlayerSkin(byte index, bool callback, CharacterData character = null) {
-
-            if (!character) {
-                character = Runner.GetLocalPlayerData().GetCharacterData();
-            }
-
+        public void SwapPlayerSkin(int index, bool save) {
             bool disabled = index == 0;
 
             if (!disabled) {
                 playerColorDisabledIcon.SetActive(false);
                 playerColorPaletteIcon.SetActive(true);
                 PlayerColorSet set = ScriptableManager.Instance.skins[index];
-                PlayerColors colors = set.GetPlayerColors(character);
+                PlayerColors colors = set.GetPlayerColors(currentCharacter);
                 overallsColorImage.color = colors.overallsColor;
                 shirtColorImage.color = colors.shirtColor;
                 ColorName.GetComponent<TMP_Text>().text = set.Name;
@@ -620,15 +587,13 @@ namespace NSMB.UI.MainMenu {
             playerColorDisabledIcon.SetActive(disabled);
             playerColorPaletteIcon.SetActive(!disabled);
 
-            if (callback) {
-                LocalData.Rpc_SetSkinIndex(index);
+            if (save) {
                 Settings.Instance.generalSkin = index;
                 Settings.Instance.SaveSettings();
             }
 
             currentSkin = index;
         }
-        */
 
         private void UpdateNickname() {
             bool validUsername = Settings.Instance.generalNickname.IsValidUsername();
@@ -789,9 +754,9 @@ namespace NSMB.UI.MainMenu {
                 break;
             }
 
-            roomListCanvasGroup.interactable = newState == ClientState.ConnectedToMasterServer;
+            roomListCanvasGroup.interactable = newState == ClientState.JoinedLobby;
             reconnectBtn.gameObject.SetActive(newState == ClientState.Disconnected);
-            joinPrivateRoomBtn.gameObject.SetActive(newState == ClientState.ConnectedToMasterServer);
+            joinPrivateRoomBtn.gameObject.SetActive(newState == ClientState.JoinedLobby);
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
@@ -800,16 +765,16 @@ namespace NSMB.UI.MainMenu {
             levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
             levelDropdown.SetValueWithoutNotify(selectedLevel);
 
-            /* TODO
             int selectedCharacter = characterDropdown.value;
             characterDropdown.ClearOptions();
-            foreach (CharacterData character in ScriptableManager.Instance.characters) {
-                string characterName = tm.GetTranslation(character.translationString);
-                characterDropdown.options.Add(new TMP_Dropdown.OptionData(characterName, character.readySprite));
+            foreach (CharacterAsset character in GlobalController.Instance.config.CharacterDatas) {
+                string characterName = tm.GetTranslation(character.TranslationString);
+                characterDropdown.options.Add(new TMP_Dropdown.OptionData(characterName, character.ReadySprite));
             }
             characterDropdown.SetValueWithoutNotify(selectedCharacter);
             characterDropdown.RefreshShownValue();
 
+            /* TODO
             if (SessionData.Instance && SessionData.Instance.Object) {
                 UpdateRoomHeader();
                 OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
@@ -840,13 +805,11 @@ namespace NSMB.UI.MainMenu {
         */
 
         private void OnPause(InputAction.CallbackContext context) {
-            /* TODO
-            if (NetworkHandler.Runner.SessionInfo.IsValid && !wasSettingsOpen) {
+            if (isActiveAndEnabled && (NetworkHandler.Client?.InRoom ?? false) && !wasSettingsOpen) {
                 // Open the settings menu if we're inside a room (so we dont have to leave)
-                ConfirmSound();
+                // ConfirmSound();
                 OpenOptions();
             }
-            */
         }
 
         private void OnSceneLoadStart() {
@@ -858,13 +821,17 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEvent(EventData photonEvent) {
+            if (photonEvent.Code == (byte) Enums.NetEvents.StartGame) {
+                GlobalController.Instance.loadingCanvas.Initialize();
+                transform.parent.gameObject.SetActive(false);
+            }
             /*
             if (photonEvent.Code == (byte) Enums.NetEvents.ChangeCountdownState) {
                 isCountdownStarted = (bool) photonEvent.CustomData;
                 sfx.PlayOneShot(isCountdownStarted ? SoundEffect.UI_Back : SoundEffect.UI_StartGame);
             }
             */
-            //Debug.Log(photonEvent.Code + " - " + photonEvent.CustomData);
+                // Debug.Log(photonEvent.Code + " - " + photonEvent.CustomData);
         }
 
         //---Debug

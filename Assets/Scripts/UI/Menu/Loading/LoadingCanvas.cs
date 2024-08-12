@@ -1,3 +1,6 @@
+using NSMB.Extensions;
+using NSMB.Utils;
+using Quantum;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +11,7 @@ namespace NSMB.Loading {
         //---Serialized Variables
         [SerializeField] private AudioListener audioListener;
         [SerializeField] private AudioSource audioSource;
+        [SerializeField] private MarioLoader mario;
 
         [SerializeField] private Animator animator;
         [SerializeField] private CanvasGroup loadingGroup, readyGroup;
@@ -17,20 +21,20 @@ namespace NSMB.Loading {
         private bool initialized;
         private Coroutine fadeCoroutine;
 
-        public void Awake() {
-            // TODO GameManager.OnAllPlayersLoaded += EndLoading;
+        public void OnValidate() {
+            this.SetIfNull(ref mario, UnityExtensions.GetComponentType.Children);
         }
 
-        public void OnDestroy() {
-            // TODO GameManager.OnAllPlayersLoaded -= EndLoading;
+        public void Awake() {
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
         public void Initialize() {
-            if (initialized) {
-                return;
-            }
-
             initialized = true;
+
+            NetworkUtils.GetCustomProperty(NetworkHandler.Client.LocalPlayer.CustomProperties, Enums.NetPlayerProperties.Character, out int characterIndex);
+            var characters = GlobalController.Instance.config.CharacterDatas;
+            mario.Initialize(characters[characterIndex % characters.Length]);
 
             readyGroup.gameObject.SetActive(false);
             gameObject.SetActive(true);
@@ -51,6 +55,12 @@ namespace NSMB.Loading {
             fadeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
 
             //audioListener.enabled = true;
+        }
+
+        private void OnGameStateChanged(EventGameStateChanged e) {
+            if (e.NewState == GameState.Starting) {
+                EndLoading();
+            }
         }
 
         public void EndLoading() {

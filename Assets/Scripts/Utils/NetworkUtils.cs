@@ -1,7 +1,13 @@
+using Photon.Client;
 using System.Collections.Generic;
 
 namespace NSMB.Utils {
     public static class NetworkUtils {
+
+        public static PhotonHashtable DefaultRoomProperties => new() {
+            [Enums.NetRoomProperties.IntProperties] = (int) IntegerProperties.Default,
+            [Enums.NetRoomProperties.BoolProperties] = (int) BooleanProperties.Default,
+        };
 
         public static Dictionary<short, string> DisconnectMessages = new() {
             [32758] = "ui.error.joinnotfound",
@@ -37,7 +43,12 @@ namespace NSMB.Utils {
         };
             */
 
-        public class IntegerProperties {
+        public struct IntegerProperties {
+            public static readonly IntegerProperties Default = new() {
+                CoinRequirement = 8,
+                StarRequirement = 10
+            };
+
             // Level :: Value ranges from 0-63: 6 bits
             // Timer :: Value ranges from 0-99: 7 bits
             // Lives :: Value ranges from 1-25: 5 bits
@@ -46,90 +57,77 @@ namespace NSMB.Utils {
             // MaxPlayers :: Value ranges from 1-10: 4 bits
 
             // 31....26   25.....19   18...14   13...9   8...4   3..0
-            // Level      Timer       Lives     Coins    Stars   Players
-
-            public int level = 0, timer = 0, lives = 0, coinRequirement = 8, starRequirement = 10, maxPlayers = 10;
+            // Level      Timer       Lives     Coins    Stars   Unused
+            public int Level, Timer, Lives, CoinRequirement, StarRequirement;
 
             public static implicit operator int(IntegerProperties props) {
                 int value = 0;
 
-                value |= (props.level & 0b111111) << 26;
-                value |= (props.timer & 0b1111111) << 19;
-                value |= (props.lives & 0b11111) << 14;
-                value |= (props.coinRequirement & 0b11111) << 9;
-                value |= (props.starRequirement & 0b11111) << 4;
-                value |= (props.maxPlayers & 0b1111) << 0;
+                value |= (props.Level & 0b111111) << 26;
+                value |= (props.Timer & 0b1111111) << 19;
+                value |= (props.Lives & 0b11111) << 14;
+                value |= (props.CoinRequirement & 0b11111) << 9;
+                value |= (props.StarRequirement & 0b11111) << 4;
+                // value |= (props.MaxPlayers & 0b1111) << 0;
 
                 return value;
             }
 
-            public static explicit operator IntegerProperties(int bits) {
+            public static implicit operator IntegerProperties(int bits) {
                 IntegerProperties ret = new() {
-                    level = (bits >> 26) & 0b111111,
-                    timer = (bits >> 19) & 0b1111111,
-                    lives = (bits >> 14) & 0b11111,
-                    coinRequirement = (bits >> 9) & 0b11111,
-                    starRequirement = (bits >> 4) & 0b11111,
-                    maxPlayers = (bits >> 0) & 0b1111,
+                    Level = (bits >> 26) & 0b111111,
+                    Timer = (bits >> 19) & 0b1111111,
+                    Lives = (bits >> 14) & 0b11111,
+                    CoinRequirement = (bits >> 9) & 0b11111,
+                    StarRequirement = (bits >> 4) & 0b11111,
+                    // MaxPlayers = (bits >> 0) & 0b1111,
                 };
                 return ret;
             }
-
-            public override string ToString() {
-                return $"Level: {level}, Timer: {timer}, Lives: {lives}, CoinRequirement: {coinRequirement}, StarRequirement: {starRequirement}, MaxPlayers: {maxPlayers}";
-            }
         };
 
-        public class BooleanProperties {
+        public struct BooleanProperties {
+            public static readonly BooleanProperties Default = new() {
+                CustomPowerups = true
+            };
 
-            public bool gameStarted = false, customPowerups = true, teams = false;
+            public bool CustomPowerups, Teams, DrawOnTimeUp;
 
             public static implicit operator int(BooleanProperties props) {
                 int value = 0;
 
-                Utils.BitSet(ref value, 0, props.gameStarted);
-                Utils.BitSet(ref value, 1, props.customPowerups);
-                Utils.BitSet(ref value, 2, props.teams);
+                Utils.BitSet(ref value, 0, props.CustomPowerups);
+                Utils.BitSet(ref value, 1, props.Teams);
+                Utils.BitSet(ref value, 2, props.DrawOnTimeUp);
 
                 return value;
             }
 
-            public static explicit operator BooleanProperties(int bits) {
+            public static implicit operator BooleanProperties(int bits) {
                 return new() {
-                    gameStarted = Utils.BitTest(bits, 0),
-                    customPowerups = Utils.BitTest(bits, 1),
-                    teams = Utils.BitTest(bits, 2),
+                    CustomPowerups = Utils.BitTest(bits, 0),
+                    Teams = Utils.BitTest(bits, 1),
+                    DrawOnTimeUp = Utils.BitTest(bits, 2),
                 };
             }
         };
 
-        /*
-        public static bool GetSessionProperty(SessionInfo session, string key, out int value) {
-            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
-                value = property;
+        public static bool GetCustomProperty<T>(PhotonHashtable table, string key, out T value) {
+            if (table.TryGetValue(key, out object objValue)) {
+                value = (T) objValue;
                 return true;
             }
             value = default;
             return false;
         }
 
-        public static bool GetSessionProperty(SessionInfo session, string key, out string value) {
-            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
-                value = property;
+        public static bool GetCustomProperty(PhotonHashtable table, string key, out bool value) {
+            if (table.TryGetValue(key, out object objValue)) {
+                value = (int) objValue == 1;
                 return true;
             }
             value = default;
             return false;
         }
-
-        public static bool GetSessionProperty(SessionInfo session, string key, out bool value) {
-            if (session.Properties != null && session.Properties.TryGetValue(key, out SessionProperty property)) {
-                value = property == 1;
-                return true;
-            }
-            value = default;
-            return false;
-        }
-        */
     }
 }

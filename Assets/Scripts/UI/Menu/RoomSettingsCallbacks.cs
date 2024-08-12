@@ -1,9 +1,13 @@
+using NSMB.Translation;
+using Photon.Client;
+using Photon.Realtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using static NSMB.Utils.NetworkUtils;
 
 namespace NSMB.UI.MainMenu {
-    public class RoomSettingsCallbacks : MonoBehaviour {
+    public class RoomSettingsCallbacks : MonoBehaviour, IInRoomCallbacks {
 
         //---Serailized Variables
         [SerializeField] private TMP_Dropdown levelDropdown;
@@ -13,7 +17,6 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle;
         [SerializeField] private TeamChooser teamSelectorButton;
 
-        /* TODO
 
         //---Properties
 
@@ -22,58 +25,60 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            NetworkHandler.Client.AddCallbackTarget(this);
         }
 
         public void OnDisable() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            NetworkHandler.Client.RemoveCallbackTarget(this);
         }
 
-        public void UpdateAllSettings(SessionData roomData, bool level) {
-            if (!roomData.Object) {
-                return;
-            }
+        public void UpdateAllSettings(Room roomData, bool level) {
+            GetCustomProperty(roomData.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties intProperties = v;
 
-            ChangePrivate(roomData.PrivateRoom);
+            ChangePrivate(!roomData.IsVisible);
             ChangeMaxPlayers(roomData.MaxPlayers);
-            ChangeLevelIndex(roomData.Level, level);
-            ChangeStarRequirement(roomData.StarRequirement);
-            ChangeCoinRequirement(roomData.CoinRequirement);
-            ChangeTeams(roomData.Teams);
-            ChangeLives(roomData.Lives);
-            ChangeTime(roomData.Timer);
-            ChangeDrawOnTimeUp(roomData.DrawOnTimeUp);
-            ChangeCustomPowerups(roomData.CustomPowerups);
+            ChangeLevelIndex(intProperties.Level, level);
+            ChangeStarRequirement(intProperties.StarRequirement);
+            ChangeCoinRequirement(intProperties.CoinRequirement);
+            ChangeLives(intProperties.Lives);
+            ChangeTime(intProperties.Timer);
+            // ChangeTeams(roomData.Teams);
+            // ChangeDrawOnTimeUp(roomData.DrawOnTimeUp);
+            // ChangeCustomPowerups(roomData.CustomPowerups);
             SetRoomIdVisibility(isRoomCodeVisible);
 
             if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
                 MainMenuManager.Instance.UpdateStartGameButton();
             }
-
-            if (Runner.IsServer && Runner.Tick != 0) {
-                Runner.PushHostMigrationSnapshot();
-            }
         }
 
         #region Level Index
         public void SetLevelIndex() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties properties = v;
 
-            int oldValue = Room.Level;
+            int oldValue = properties.Level;
             int newValue = levelDropdown.value;
             if (newValue == oldValue || newValue < 0) {
                 ChangeLevelIndex(oldValue, false);
                 return;
             }
 
-            Room.SetLevel((byte) newValue);
+            properties.Level = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            });
         }
         private void ChangeLevelIndex(int index, bool changed) {
             levelDropdown.SetValueWithoutNotify(index);
-            if (changed && MainMenuManager.Instance is MainMenuManager mm) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.map", ChatManager.Red, "map", mm.maps[index].translationKey);
+            if (levelDropdown.value != index && MainMenuManager.Instance is MainMenuManager mm) {
+                if (changed) {
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.map", ChatManager.Red, "map", mm.maps[index].translationKey);
+                }
                 mm.PreviewLevel(index);
             }
         }
@@ -81,11 +86,11 @@ namespace NSMB.UI.MainMenu {
 
         #region Stars
         public void SetStarRequirement() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties properties = v;
 
-            int oldValue = Room.StarRequirement;
+            int oldValue = properties.StarRequirement;
             if (!int.TryParse(starsInputField.text, out int newValue)) {
                 return;
             }
@@ -97,7 +102,10 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            Room.SetStarRequirement((sbyte) newValue);
+            properties.StarRequirement = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            });
         }
         private void ChangeStarRequirement(int stars) {
             starsInputField.SetTextWithoutNotify(stars.ToString());
@@ -106,11 +114,11 @@ namespace NSMB.UI.MainMenu {
 
         #region Coins
         public void SetCoinRequirement() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties properties = v;
 
-            int oldValue = Room.CoinRequirement;
+            int oldValue = properties.CoinRequirement;
             if (!int.TryParse(coinsInputField.text, out int newValue)) {
                 return;
             }
@@ -122,7 +130,10 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            Room.SetCoinRequirement((byte) newValue);
+            properties.CoinRequirement = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            });
         }
         private void ChangeCoinRequirement(int coins) {
             coinsInputField.SetTextWithoutNotify(coins.ToString());
@@ -131,11 +142,11 @@ namespace NSMB.UI.MainMenu {
 
         #region Lives
         public void SetLives() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties properties = v;
 
-            int oldValue = Room.Lives;
+            int oldValue = properties.Lives;
             if (!int.TryParse(livesInputField.text, out int newValue)) {
                 return;
             }
@@ -147,17 +158,23 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            Room.SetLives((byte) newValue);
+            properties.Lives = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            });
         }
 
         public void EnableLives() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties properties = v;
 
             int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : 0;
 
-            Room.SetLives((byte) newValue);
+            properties.Lives = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            });
         }
 
         private void ChangeLives(int lives) {
@@ -173,11 +190,11 @@ namespace NSMB.UI.MainMenu {
 
         #region Timer
         public void SetTime() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties properties = v;
 
-            int oldValue = Room.Timer;
+            int oldValue = properties.Timer;
             if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
                 return;
             }
@@ -189,13 +206,16 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            Room.SetTimer((byte) newValue);
+            properties.Timer = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            });
         }
 
         public void EnableTime() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
+            IntegerProperties properties = v;
 
             if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
                 return;
@@ -203,7 +223,10 @@ namespace NSMB.UI.MainMenu {
 
             newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : 0;
 
-            Room.SetTimer((byte) newValue);
+            properties.Timer = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            });
         }
 
         private void ChangeTime(int time) {
@@ -221,13 +244,16 @@ namespace NSMB.UI.MainMenu {
 
         #region DrawOnTimeUp
         public void SetDrawOnTimeUp() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int v);
+            BooleanProperties properties = v;
 
             bool newValue = drawEnabledToggle.isOn;
 
-            Room.SetDrawOnTimeUp(newValue);
+            properties.DrawOnTimeUp = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.BoolProperties] = (int) properties
+            });
         }
         private void ChangeDrawOnTimeUp(bool value) {
             drawEnabledToggle.SetIsOnWithoutNotify(value);
@@ -236,13 +262,16 @@ namespace NSMB.UI.MainMenu {
 
         #region Teams
         public void SetTeams() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int v);
+            BooleanProperties properties = v;
 
             bool newValue = teamsEnabledToggle.isOn;
 
-            Room.SetTeams(newValue);
+            properties.Teams = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.BoolProperties] = (int) properties
+            });
 
             if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
@@ -260,13 +289,16 @@ namespace NSMB.UI.MainMenu {
 
         #region Custom Powerups
         public void SetCustomPowerups() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int v);
+            BooleanProperties properties = v;
 
             bool newValue = customPowerupsEnabledToggle.isOn;
 
-            Room.SetCustomPowerups(newValue);
+            properties.CustomPowerups = newValue;
+            room.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.BoolProperties] = (int) properties
+            });
         }
         private void ChangeCustomPowerups(bool value) {
             customPowerupsEnabledToggle.SetIsOnWithoutNotify(value);
@@ -275,21 +307,19 @@ namespace NSMB.UI.MainMenu {
 
         #region Players
         public void SetMaxPlayers() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
+            Room room = NetworkHandler.Client.CurrentRoom;
 
-            int oldValue = Room.MaxPlayers;
+            int oldValue = room.MaxPlayers;
             int newValue = (int) playersSlider.value;
 
-            newValue = Mathf.Clamp(newValue, Mathf.Max(2, Runner.SessionInfo.PlayerCount), 10);
+            newValue = Mathf.Clamp(newValue, Mathf.Max(2, room.PlayerCount), 10);
 
             if (newValue == oldValue) {
                 ChangeMaxPlayers(oldValue);
                 return;
             }
 
-            Room.SetMaxPlayers((byte) newValue);
+            room.MaxPlayers = (byte) newValue;
             ChangeMaxPlayers(newValue);
         }
         private void ChangeMaxPlayers(int value) {
@@ -298,6 +328,7 @@ namespace NSMB.UI.MainMenu {
         }
         #endregion
 
+        /*
         #region Win Counter
         public void ClearWinCounters() {
             if (!Room.HasStateAuthority) {
@@ -308,25 +339,20 @@ namespace NSMB.UI.MainMenu {
                 data.Wins = 0;
             }
         }
-
         #endregion
+        */
 
         #region Private
         public void SetPrivate() {
-            if (!Room.HasStateAuthority) {
-                return;
-            }
-
             bool newValue = privateEnabledToggle.isOn;
-
-            Room.SetPrivateRoom(newValue);
+            NetworkHandler.Client.CurrentRoom.IsVisible = !newValue;
         }
         private void ChangePrivate(bool value) {
             privateEnabledToggle.SetIsOnWithoutNotify(value);
         }
         public void CopyRoomCode() {
             TextEditor te = new() {
-                text = Runner.SessionInfo.Name
+                text = NetworkHandler.Client.CurrentRoom.Name
             };
             te.SelectAll();
             te.Copy();
@@ -341,7 +367,7 @@ namespace NSMB.UI.MainMenu {
         public void SetRoomIdVisibility(bool newValue) {
             isRoomCodeVisible = newValue;
             roomIdToggleButtonText.text = GlobalController.Instance.translationManager.GetTranslation(isRoomCodeVisible ? "ui.generic.hide" : "ui.generic.show");
-            roomIdText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.inroom.settings.room.roomid", "id", isRoomCodeVisible ? Runner.SessionInfo.Name : "ui.inroom.settings.room.roomidhidden");
+            roomIdText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.inroom.settings.room.roomid", "id", isRoomCodeVisible ? NetworkHandler.Client.CurrentRoom.Name : "ui.inroom.settings.room.roomidhidden");
         }
         #endregion
 
@@ -351,6 +377,16 @@ namespace NSMB.UI.MainMenu {
             roomIdText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
-        */
+        public void OnPlayerEnteredRoom(Player newPlayer) { }
+
+        public void OnPlayerLeftRoom(Player otherPlayer) { }
+
+        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) {
+            UpdateAllSettings(NetworkHandler.Client.CurrentRoom, true);
+        }
+
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) { }
+
+        public void OnMasterClientSwitched(Player newMasterClient) { }
     }
 }

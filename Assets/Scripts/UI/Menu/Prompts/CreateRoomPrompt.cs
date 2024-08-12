@@ -29,7 +29,7 @@ namespace NSMB.UI.Prompts {
                 RoomOptions = new RoomOptions() {
                     MaxPlayers = maxPlayers,
                     IsVisible = !privateRoomToggle.isOn,
-                    IsOpen = true
+                    IsOpen = true,
                 },
             });
             if (result != 0) {

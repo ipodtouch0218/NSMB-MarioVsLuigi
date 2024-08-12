@@ -5,6 +5,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 using NSMB.Translation;
+using NSMB.Extensions;
+using Photon.Realtime;
+using Photon.Client;
 
 namespace NSMB.UI.MainMenu {
 
@@ -22,25 +25,25 @@ namespace NSMB.UI.MainMenu {
         private int previousTextLength;
 
         public void OnEnable() {
-            // TODO ChatManager.OnChatMessage += OnChatMessage;
+            ChatManager.OnChatMessage += OnChatMessage;
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            NetworkHandler.Client.EventReceived += OnEvent;
 
             OnDisableChatChanged();
         }
 
         public void OnDisable() {
-            // TODO ChatManager.OnChatMessage -= OnChatMessage;
+            ChatManager.OnChatMessage -= OnChatMessage;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            NetworkHandler.Client.EventReceived -= OnEvent;
         }
 
         public void ReplayChatMessages() {
-            /* TODO
             foreach (ChatMessage.ChatMessageData message in ChatManager.Instance.chatHistory) {
                 OnChatMessage(message);
             }
-            */
             Canvas.ForceUpdateCanvases();
         }
 
@@ -50,46 +53,30 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        /* TODO
-        public void SetTypingIndicator(PlayerRef player) {
-            if (!MainMenuManager.Instance) {
-                return;
-            }
-
-            PlayerData data = player.GetPlayerData();
-            if (data && data.IsMuted) {
-                return;
-            }
-
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player);
-            if (ple) {
-                ple.typingCounter = 4;
-            }
-        }
-
         public void SendChat() {
+            /* TODO
             NetworkRunner runner = NetworkHandler.Runner;
             PlayerData data = runner.GetLocalPlayerData();
             if (data.MessageCooldownTimer.IsActive(runner)) {
                 // Can't send a message yet.
                 return;
             }
+            */
 
             string text = chatbox.text.Replace("\n", " ").Trim();
             if (string.IsNullOrWhiteSpace(text)) {
                 return;
             }
 
-            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Chat_Send);
+            MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_Send);
 
             if (text.StartsWith('/')) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.command", ChatManager.Red);
             } else {
-                SessionData.Instance.Rpc_ChatIncomingMessage(text);
+                ChatManager.Instance.SendChatMessage(text);
             }
             StartCoroutine(SelectTextboxNextFrame());
         }
-        */
 
         public void ClearChat() {
             foreach (ChatMessage message in chatMessages) {
@@ -114,46 +101,32 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisableChatChanged() {
-            /* TODO
-            if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData data)) {
-                return;
-            }
-
             foreach (ChatMessage msg in chatMessages) {
                 msg.UpdateVisibleState(!Settings.Instance.GeneralDisableChat);
             }
 
-            sendBtn.interactable = chatbox.interactable = !Settings.Instance.GeneralDisableChat && !data.IsMuted;
+            sendBtn.interactable = chatbox.interactable = !Settings.Instance.GeneralDisableChat;
 
             if (!chatbox.interactable) {
                 chatbox.text = "";
             }
 
             OnLanguageChanged(GlobalController.Instance.translationManager);
-            */
         }
 
         public void OnLanguageChanged(TranslationManager tm) {
-            /* TODO
-            if (!NetworkHandler.Runner.TryGetLocalPlayerData(out PlayerData data)) {
-                return;
-            }
             string key;
 
             if (Settings.Instance.GeneralDisableChat) {
                 key = "ui.inroom.chat.disabled";
-            } else if (data.IsMuted) {
-                key = "ui.inroom.chat.muted";
             } else {
                 key = "ui.inroom.chat.prompt";
             }
 
             chatPrompt.text = tm.GetTranslation(key);
-            */
         }
 
         public void OnTextboxChanged() {
-            /* TODO
             if (!MainMenuManager.Instance) {
                 return;
             }
@@ -165,13 +138,24 @@ namespace NSMB.UI.MainMenu {
 
             previousTextLength = size;
 
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(NetworkHandler.Runner.LocalPlayer);
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(NetworkHandler.Client.LocalPlayer.ActorNumber);
             if (!ple || ple.typingCounter > 2) {
                 return;
             }
 
-            SessionData.Instance.Rpc_UpdateTypingCounter();
-            */
+            NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.ChatTyping, null, new RaiseEventArgs {
+                Receivers = ReceiverGroup.All,
+            }, SendOptions.SendUnreliable);
+        }
+
+        private void OnEvent(EventData photonEvent) {
+            if (photonEvent.Code == (byte) Enums.NetEvents.ChatTyping) {
+                Player player = NetworkHandler.Client.CurrentRoom.Players[photonEvent.Sender];
+                PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player.ActorNumber);
+                if (ple) {
+                    ple.typingCounter = 4;
+                }
+            }
         }
     }
 }

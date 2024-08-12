@@ -132,13 +132,9 @@ namespace NSMB.UI.MainMenu {
             RemovePlayerEntry(otherPlayer);
         }
 
-        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) {
-            Debug.Log("room properties changed!! " + string.Join(',', propertiesThatChanged));
-        }
+        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) { }
 
-        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) {
-            Debug.Log("player properties changed!! " + string.Join(',', changedProps));
-        }
+        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) { }
 
         public void OnMasterClientSwitched(Player newMasterClient) { }
     }

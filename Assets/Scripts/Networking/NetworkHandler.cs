@@ -1,3 +1,5 @@
+using NSMB.Utils;
+using NSMB.UI.MainMenu;
 using Photon.Client;
 using Photon.Realtime;
 using System.Text;
@@ -9,8 +11,12 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Photon.Deterministic;
 using Quantum;
+using static NSMB.Utils.NetworkUtils;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IOnEventCallback {
+
+    //---Events
+    public static event Action OnLocalPlayerConfirmed;
 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
@@ -21,6 +27,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static QuantumRunner Runner { get; private set; }
     public static List<Region> Regions => Client.RegionHandler.EnabledRegions;
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
+    public static readonly HashSet<CallbackLocalPlayerAddConfirmed> localPlayerConfirmations = new();
 
     //---Private
     private RealtimeClient realtimeClient;
@@ -31,11 +38,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         realtimeClient = new();
         realtimeClient.StateChanged += OnClientStateChanged;
         realtimeClient.AddCallbackTarget(this);
+
+        QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, CallbackOnLocalPlayerConfirmed);
     }
 
     public void Update() {
         if (Client.IsConnectedAndReady) {
-            Client.SendOutgoingCommands();
+            Client.Service();
         }
     }
 
@@ -55,6 +64,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
                 or ClientState.DisconnectingFromNameServer
                 or ClientState.DisconnectingFromMasterServer
                 or ClientState.DisconnectingFromGameServer
+                or ClientState.ConnectedToMasterServer // We always join a lobby, so...
                 or ClientState.Joining
                 or ClientState.JoiningLobby
                 or ClientState.Leaving
@@ -65,17 +75,15 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public IEnumerator PingUpdateCoroutine() {
         WaitForSeconds seconds = new(1);
         while (true) {
-            /*
             realtimeClient.LocalPlayer.SetCustomProperties(new PhotonHashtable() {
-                [Enums.NetPlayerProperties.Ping] = realtimeClient.RealtimePeer.Stats.RoundtripTime
+                [Enums.NetPlayerProperties.Ping] = (int) realtimeClient.RealtimePeer.Stats.RoundtripTime
             });
-            */
             yield return seconds;
         }
     }
 
     public static async Task<bool> ConnectToRegion(string region) {
-        //region ??= Instance.lastRegion;
+        region ??= Instance.lastRegion;
         Instance.lastRegion = region;
         Client.AuthValues = await AuthenticationHandler.Authenticate();
 
@@ -96,6 +104,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
                 AuthMode = AuthModeOption.Auth,
                 FixedRegion = region,
             });
+            await Client.JoinLobbyAsync(TypedLobby.Default);
             Instance.lastRegion = Client.CurrentRegion;
             return true;
         } catch {
@@ -127,6 +136,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
         }
 
+        args.RoomName = idBuilder.ToString();
+        args.Lobby = TypedLobby.Default;
+        args.RoomOptions.PublishUserId = true;
+        args.RoomOptions.CustomRoomProperties = DefaultRoomProperties;
+        args.RoomOptions.CustomRoomProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname;
+        args.RoomOptions.CustomRoomPropertiesForLobby = new object[] {
+            Enums.NetRoomProperties.HostName,
+            Enums.NetRoomProperties.IntProperties,
+            Enums.NetRoomProperties.BoolProperties
+        };
+
         Debug.Log($"[Network] Creating a game in {Region} with the ID {idBuilder}");
         return await Client.CreateAndJoinRoomAsync(args, false);
     }
@@ -142,12 +162,18 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public void OnFriendListUpdate(List<FriendInfo> friendList) { }
 
     public void OnCreatedRoom() {
+        if (pingUpdateCoroutine != null) {
+            StopCoroutine(pingUpdateCoroutine);
+        }
         pingUpdateCoroutine = StartCoroutine(PingUpdateCoroutine());
     }
 
     public void OnCreateRoomFailed(short returnCode, string message) { }
 
     public void OnJoinedRoom() {
+        if (pingUpdateCoroutine != null) {
+            StopCoroutine(pingUpdateCoroutine);
+        }
         pingUpdateCoroutine = StartCoroutine(PingUpdateCoroutine());
     }
 
@@ -164,21 +190,56 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     public async void OnEvent(EventData photonEvent) {
         if (photonEvent.Code == (byte) Enums.NetEvents.StartGame) {
-            Debug.Log("Start game!");
+
+            int players = 0;
+            foreach ((_, Player player) in Client.CurrentRoom.Players) {
+                if (GetCustomProperty(player.CustomProperties, Enums.NetPlayerProperties.Spectator, out int spectator) && spectator == 1) {
+                    continue;
+                }
+                players++;
+            }
+
+            GetCustomProperty(Client.CurrentRoom.CustomProperties, Enums.NetRoomProperties.IntProperties, out int rawIntProperties);
+            GetCustomProperty(Client.CurrentRoom.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int rawBoolProperties);
+            IntegerProperties intProperties = rawIntProperties;
+            BooleanProperties boolProperties = rawBoolProperties;
 
             var sessionRunnerArguments = new SessionRunner.Arguments {
                 RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
                 GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
                 ClientId = Client.UserId,
-                RuntimeConfig = null,
+                RuntimeConfig = new RuntimeConfig {
+                    SimulationConfig = GlobalController.Instance.config,
+                    Map = MainMenuManager.Instance.maps[intProperties.Level].mapAsset,
+                    Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+                    StarsToWin = (byte) intProperties.StarRequirement,
+                    CoinsForPowerup = (byte) intProperties.CoinRequirement,
+                    Lives = (byte) intProperties.Lives,
+                    TimerSeconds = intProperties.Timer,
+                    TeamsEnabled = boolProperties.Teams,
+                    CustomPowerupsEnabled = boolProperties.CustomPowerups,
+                    ExpectedPlayers = (byte) players,
+                },
                 SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
                 GameMode = DeterministicGameMode.Multiplayer,
-                PlayerCount = 1,
+                PlayerCount = players,
                 StartGameTimeoutInSeconds = 10,
                 Communicator = new QuantumNetworkCommunicator(Client),
+                RecordingFlags = RecordingFlags.All,
             };
 
             Runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
+            Runner.Game.AddPlayer(new RuntimePlayer {
+                CharacterIndex = 0,
+                SkinIndex = 0,
+                RequestedTeam = 0,
+                PlayerNickname = Settings.Instance.generalNickname,
+            });
         }
+    }
+
+    private void CallbackOnLocalPlayerConfirmed(CallbackLocalPlayerAddConfirmed e) {
+        localPlayerConfirmations.Add(e);
+        OnLocalPlayerConfirmed?.Invoke();
     }
 }

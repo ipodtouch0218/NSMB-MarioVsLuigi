@@ -43,6 +43,7 @@ public class BobombAnimator : MonoBehaviour {
 
         Bobomb bobomb = f.Get<Bobomb>(entity.EntityRef);
         Enemy enemy = f.Get<Enemy>(entity.EntityRef);
+        Holdable holdable = f.Get<Holdable>(entity.EntityRef);
 
         bool lit = bobomb.CurrentDetonationFrames > 0;
         animator.SetBool(ParamLit, lit);
@@ -63,6 +64,12 @@ public class BobombAnimator : MonoBehaviour {
         sRenderer.SetPropertyBlock(mpb);
         sRenderer.enabled = enemy.IsActive;
         sRenderer.flipX = !enemy.FacingRight;
+
+        Vector3 modifiedZ = transform.position;
+        if (f.Exists(holdable.Holder)) {
+            modifiedZ.z = -4.1f;
+        }
+        transform.position = modifiedZ;
     }
 
     private void OnBobombExploded(EventBobombExploded e) {

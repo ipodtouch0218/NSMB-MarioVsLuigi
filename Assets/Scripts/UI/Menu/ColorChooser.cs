@@ -20,9 +20,9 @@ namespace NSMB.UI.MainMenu {
         private List<Navigation> navigations;
         private GameObject blocker;
         private int selected;
+        private bool initialized;
 
-        public void Start() {
-            content.SetActive(false);
+        public void Initialize() {
             buttons = new();
             navigations = new();
 
@@ -66,14 +66,13 @@ namespace NSMB.UI.MainMenu {
             for (int i = 0; i < buttons.Count; i++) {
                 buttons[i].navigation = navigations[i];
             }
-
-            /* TODO
-            CharacterData character = NetworkHandler.Runner.GetLocalPlayerData().GetCharacterData();
-            ChangeCharacter(character);
-            */
+            initialized = true;
         }
 
         public void ChangeCharacter(CharacterAsset data) {
+            if (!initialized) {
+                Initialize();
+            }
             foreach (ColorButton b in colorButtons) {
                 b.Instantiate(data);
             }
@@ -81,7 +80,7 @@ namespace NSMB.UI.MainMenu {
 
         public void SelectColor(Button button) {
             selected = buttons.IndexOf(button);
-            // TODO MainMenuManager.Instance.SwapPlayerSkin((byte) buttons.IndexOf(button), true);
+            MainMenuManager.Instance.SwapPlayerSkin(buttons.IndexOf(button), true);
             Close(false);
 
             if (MainMenuManager.Instance) {

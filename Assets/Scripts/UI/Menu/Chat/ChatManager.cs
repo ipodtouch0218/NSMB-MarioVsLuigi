@@ -4,8 +4,9 @@ using UnityEngine;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
 using Photon.Realtime;
+using Photon.Client;
 
-public class ChatManager : MonoBehaviour {
+public class ChatManager : MonoBehaviour, IOnEventCallback {
 
     //---Static Variables
     public static readonly Color32 Red = new Color32(219, 107, 107, 255);
@@ -22,23 +23,16 @@ public class ChatManager : MonoBehaviour {
     }
 
     public void OnEnable() {
-        /*
-        NetworkHandler.OnPlayerLeft += OnPlayerLeft;
-        PlayerData.OnPlayerDataReady += OnPlayerDataReady;
-        */
+        NetworkHandler.Client.AddCallbackTarget(this);
         OnChatMessage += OnChatMessageCallback;
     }
 
     public void OnDisable() {
-        /*
-        NetworkHandler.OnPlayerLeft -= OnPlayerLeft;
-        PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
-        */
+        NetworkHandler.Client.RemoveCallbackTarget(this);
         OnChatMessage -= OnChatMessageCallback;
     }
 
     public void AddChatMessage(string message, int player, Color? color = null, bool filter = false) {
-
         if (filter) {
             message = message.Filter();
         }
@@ -65,38 +59,13 @@ public class ChatManager : MonoBehaviour {
         OnChatMessage?.Invoke(data);
     }
 
-    /* TODO
-    public void DisplayPlayerMessage(string message, int source) {
-        // What
-        if (!source.IsRealPlayer) {
-            return;
-        }
-
-        if (!source.TryGetPlayerData(out PlayerData data)) {
-            return;
-        }
-
-        if (data.IsMuted) {
-            return;
-        }
-
-        // Format message, in case we can't trust the host to do it for us.
-        message = message[..Mathf.Min(128, message.Length)];
-        message = message.Replace("\n", " ").Trim();
-
-        // Add username
-        message = data.GetNickname() + ": " + message.Filter();
-
-        AddChatMessage(message, source);
-
-        if (MainMenuManager.Instance) {
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(source);
-            if (ple) {
-                ple.typingCounter = 0;
-            }
-        }
+    public void SendChatMessage(string text) {
+        NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.ChatMessage, text, new RaiseEventArgs {
+            Receivers = ReceiverGroup.All
+        }, SendOptions.SendReliable);
     }
 
+    /* TODO
     public void IncomingPlayerMessage(string message, RpcInfo info) {
         NetworkRunner runner = NetworkHandler.Runner;
         PlayerRef player = info.Source;
@@ -162,6 +131,37 @@ public class ChatManager : MonoBehaviour {
         } else {
             Player player = NetworkHandler.Client.CurrentRoom.Players[data.playerNumber];
             Debug.Log($"[Chat] ({player.UserId}) {data.message}");
+        }
+    }
+
+    public void OnEvent(EventData photonEvent) {
+        if (photonEvent.Code == (byte) Enums.NetEvents.ChatMessage) {
+            if (!NetworkHandler.Client.CurrentRoom.Players.TryGetValue(photonEvent.Sender, out Player sender)) {
+                return;
+            }
+
+            /* TODO
+            if (data.IsMuted) {
+                return;
+            }
+            */
+
+            // Format message, in case we can't trust the host to do it for us.
+            string message = (string) photonEvent.CustomData;
+            message = message[..Mathf.Min(128, message.Length)];
+            message = message.Replace("\n", " ").Trim();
+
+            // Add username
+            message = sender.NickName.ToValidUsername() + ": " + message.Filter();
+
+            AddChatMessage(message, sender.ActorNumber);
+
+            if (MainMenuManager.Instance) {
+                PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(sender.ActorNumber);
+                if (ple) {
+                    ple.typingCounter = 0;
+                }
+            }
         }
     }
 }

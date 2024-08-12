@@ -3,6 +3,8 @@ using UnityEngine;
 using NSMB.Utils;
 using Photon.Deterministic;
 using Quantum;
+using NSMB.Extensions;
+using System.Linq;
 
 public class VolumeWithDistance : MonoBehaviour {
 
@@ -16,15 +18,14 @@ public class VolumeWithDistance : MonoBehaviour {
     //---Private Variables
     private float soundRangeInverse;
     private float[] originalVolumes;
+    private VersusStageData stage;
 
     public void OnValidate() {
         if (audioSources?.Length <= 0) {
             audioSources = GetComponentsInChildren<AudioSource>();
         }
 
-        if (!soundOrigin) {
-            soundOrigin = transform;
-        }
+        this.SetIfNull(ref soundOrigin);
     }
 
     public void Awake() {
@@ -34,15 +35,30 @@ public class VolumeWithDistance : MonoBehaviour {
         for (int i = 0; i < audioSources.Length; i++) {
             originalVolumes[i] = audioSources[i].volume;
         }
+
+        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
-    public void LateUpdate() {
-        Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+    public void OnUpdateView(CallbackUpdateView e) {
+        /*
+        bool anyPlaying = false;
+        foreach (var item in audioSources) {
+            if (item.isPlaying) {
+                anyPlaying = true;
+                break;
+            }
+        }
+
+        if (!anyPlaying) {
+            return;
+        }
+        */
 
         float minDistance = float.MaxValue;
         FP xDifference = 0;
         foreach (var pe in PlayerElements.AllPlayerElements) {
-            float distance = QuantumUtils.WrappedDistance(f, pe.Camera.transform.position.ToFPVector2(), soundOrigin.position.ToFPVector2(), out FP tempXDifference).AsFloat;
+            float distance = QuantumUtils.WrappedDistance(stage, pe.Camera.transform.position.ToFPVector2(), soundOrigin.position.ToFPVector2(), out FP tempXDifference).AsFloat;
             if (distance < minDistance) {
                 minDistance = distance;
                 xDifference = tempXDifference;

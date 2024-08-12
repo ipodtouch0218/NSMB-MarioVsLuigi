@@ -22,7 +22,7 @@ namespace Quantum {
                 var shape = f.Get<PhysicsCollider2D>(HeldEntity).Shape;
                 return new FPVector2(
                     (FacingRight ? 1 : -1) * FP._0_25,
-                    (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : FP._0_10) + (shape.Box.Extents.Y - shape.Centroid.Y)
+                    (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : FP.FromString("0.09")) + (shape.Box.Extents.Y - shape.Centroid.Y)
                 );
             }
         }

@@ -736,6 +736,10 @@ MonoBehaviour:
           Value: 0
         FacingRight:
           Value: 0
+        ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
+          Value: 0
     - rid: 8510292287580798980
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -876,6 +880,10 @@ MonoBehaviour:
         IsDead:
           Value: 0
         FacingRight:
+          Value: 0
+        ColliderDisabled:
+          Value: 0
+        IgnorePlayerWhenRespawning:
           Value: 0
     - rid: 8884074765841596420
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

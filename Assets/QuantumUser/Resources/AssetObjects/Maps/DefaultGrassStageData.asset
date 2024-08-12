@@ -29,6 +29,7 @@ MonoBehaviour:
     Y:
       RawValue: 327680
   IsWrappingLevel: 1
+  ExtendCeilingHitboxes: 0
   Spawnpoint:
     X:
       RawValue: -1474560

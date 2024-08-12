@@ -4,6 +4,8 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using static NSMB.Utils.NetworkUtils;
+using NSMB.Extensions;
 
 namespace NSMB.UI.MainMenu {
     public class RoomIcon : MonoBehaviour {
@@ -14,12 +16,13 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         [SerializeField] private Color defaultColor, highlightColor, selectedColor;
         [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText;
+        [SerializeField] private Image icon;
 
-        //---Private Variables
-        private Image icon;
+        public void OnValidate() {
+            this.SetIfNull(ref icon);
+        }
 
         public void Start() {
-            icon = GetComponent<Image>();
             Unselect();
         }
 
@@ -28,43 +31,40 @@ namespace NSMB.UI.MainMenu {
 
             TranslationManager tm = GlobalController.Instance.translationManager;
 
-            string host = newRoomInfo.CustomProperties[Enums.NetRoomProperties.HostName] as string;
-            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", host.ToValidUsername());
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.HostName, out string hostname);
+            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
 
-            /*
-            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string hostname);
-            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.IntProperties, out int packedIntProperties);
-            NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int packedIntProperties);
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
 
-            NetworkUtils.IntegerProperties intProperties = (NetworkUtils.IntegerProperties) packedIntProperties;
-            NetworkUtils.BooleanProperties boolProperties = (NetworkUtils.BooleanProperties) packedBoolProperties;
+            IntegerProperties intProperties = (IntegerProperties) packedIntProperties;
+            BooleanProperties boolProperties = (BooleanProperties) packedBoolProperties;
 
-            playersText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.players", "players", session.PlayerCount.ToString(), "maxplayers", intProperties.maxPlayers.ToString());
-            inProgressText.text = boolProperties.gameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
+            playersText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.players", "players", room.PlayerCount.ToString(), "maxplayers", room.MaxPlayers.ToString());
+            // inProgressText.text = boolProperties.GameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
 
             string symbols = "";
 
-            if (boolProperties.customPowerups) {
+            if (boolProperties.CustomPowerups) {
                 symbols += "<sprite name=room_powerups>";
             }
 
-            if (boolProperties.teams) {
+            if (boolProperties.Teams) {
                 symbols += "<sprite name=room_teams>";
             }
 
-            if (intProperties.timer > 0) {
-                symbols += "<sprite name=room_timer>" + Utils.Utils.GetSymbolString(intProperties.timer.ToString(), Utils.Utils.smallSymbols);
+            if (intProperties.Timer > 0) {
+                symbols += "<sprite name=room_timer>" + Utils.Utils.GetSymbolString(intProperties.Timer.ToString(), Utils.Utils.smallSymbols);
             }
 
-            if (intProperties.lives > 0) {
-                symbols += "<sprite name=room_lives>" + Utils.Utils.GetSymbolString(intProperties.lives.ToString(), Utils.Utils.smallSymbols);
+            if (intProperties.Lives > 0) {
+                symbols += "<sprite name=room_lives>" + Utils.Utils.GetSymbolString(intProperties.Lives.ToString(), Utils.Utils.smallSymbols);
             }
 
-            symbols += "<sprite name=room_stars>" + Utils.Utils.GetSymbolString(intProperties.starRequirement.ToString(), Utils.Utils.smallSymbols);
-            symbols += "<sprite name=room_coins>" + Utils.Utils.GetSymbolString(intProperties.coinRequirement.ToString(), Utils.Utils.smallSymbols);
+            symbols += "<sprite name=room_stars>" + Utils.Utils.GetSymbolString(intProperties.StarRequirement.ToString(), Utils.Utils.smallSymbols);
+            symbols += "<sprite name=room_coins>" + Utils.Utils.GetSymbolString(intProperties.CoinRequirement.ToString(), Utils.Utils.smallSymbols);
 
             symbolsText.text = symbols;
-            */
         }
 
         public void Select() {
