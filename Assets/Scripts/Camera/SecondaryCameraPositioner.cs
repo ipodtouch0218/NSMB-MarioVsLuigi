@@ -6,14 +6,14 @@ public class SecondaryCameraPositioner : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private Camera secondaryCamera;
+    [SerializeField] private Camera ourCamera;
 
     //---Private Variables
     private bool destroyed;
     private VersusStageData stage;
 
     public void OnValidate() {
-        this.SetIfNull(ref secondaryCamera);
+        this.SetIfNull(ref ourCamera);
     }
 
     public void Start() {
@@ -35,7 +35,8 @@ public class SecondaryCameraPositioner : MonoBehaviour {
             mainCamera.transform.position.x > stage.StageWorldMin.X.AsFloat - 1 && mainCamera.transform.position.x < stage.StageWorldMax.X.AsFloat + 7
             || mainCamera.transform.position.x < stage.StageWorldMax.X.AsFloat + 1 && mainCamera.transform.position.x > stage.StageWorldMax.X.AsFloat - 7;
 
-        secondaryCamera.enabled = enable;
+        ourCamera.enabled = enable;
+        ourCamera.orthographicSize = mainCamera.orthographicSize;
 
         if (enable) {
             float middle = stage.StageWorldMin.X.AsFloat + stage.TileDimensions.x * 0.25f;

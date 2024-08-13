@@ -56,12 +56,13 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
         var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
         if (doBreak) {
+            BlockBumpSystem.Bump(f, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition), bumpOwner);
             f.Events.TileBroken(f, entity, tilePosition.x, tilePosition.y, tileInstance);
             stage.SetTileRelative(f, tilePosition.x, tilePosition.y, default);
-            BlockBumpSystem.Bump(f, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition), bumpOwner);
 
         } else if (BumpIfNotBroken && doBump) {
             Bump(f, stage, tilePosition, tileInstance, direction == InteractionDirection.Down, bumpOwner);
+
         } else {
             playBumpSound = true;
         }

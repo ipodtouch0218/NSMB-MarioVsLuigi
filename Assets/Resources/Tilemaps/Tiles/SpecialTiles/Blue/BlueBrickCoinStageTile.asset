@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c8a2a7c3b3c8694a83f3b72e87ca64a, type: 3}
-  m_Name: BlueBrickStageTile
+  m_Script: {fileID: 11500000, guid: 445236dd458722a4fb9d9111c0fd8acd, type: 3}
+  m_Name: BlueBrickCoinStageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/SpecialTiles/BlueBrickStageTile
+    Path: Resources/Tilemaps/Tiles/SpecialTiles/Blue/BlueBrickCoinStageTile
     Guid:
-      Value: 492425210941159355
-  Tile: {fileID: 11400000, guid: 394c2dc20a88f7a46a1e78b8d7ec6e7f, type: 2}
+      Value: 517106687263014972
+  Tile: {fileID: 11400000, guid: afecf4e09999be742a2be651a9501b43, type: 2}
   CollisionData:
     Shapes:
     - Vertices:
@@ -40,6 +40,17 @@ MonoBehaviour:
   IsSlideableGround: 0
   FootstepSound: 31
   FootstepParticle: 0
-  ParticleColor: {r: 0.29411766, g: 0.6901961, b: 0.86274517, a: 1}
-  BreakingRules: 508
-  BumpIfNotBroken: 1
+  ParticleColor: {r: 0.29411766, g: 0.6901961, b: 0.8627451, a: 1}
+  BreakingRules: 320
+  BumpIfNotBroken: 0
+  resultTile:
+    Tile:
+      Id:
+        Value: 407138680637916208
+    Rotation:
+      RawValue: 0
+    Scale:
+      X:
+        RawValue: 65536
+      Y:
+        RawValue: 65536

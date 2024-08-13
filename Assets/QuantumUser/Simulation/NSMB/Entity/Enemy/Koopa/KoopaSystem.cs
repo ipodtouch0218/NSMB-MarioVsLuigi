@@ -209,6 +209,7 @@ namespace Quantum {
                         PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
                         koopaEnemy->IsActive = false;
                         koopaEnemy->IsDead = true;
+                        koopaPhysicsObject->IsFrozen = true;
 
                     } else {
                         // Kick
@@ -227,12 +228,15 @@ namespace Quantum {
                             EntityRef newPowerup = f.Create(powerupAsset.Prefab);
                             var powerupTransform = f.Unsafe.GetPointer<Transform2D>(newPowerup);
                             var powerup = f.Unsafe.GetPointer<Powerup>(newPowerup);
+                            var powerupPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newPowerup);
 
                             powerupTransform->Position = koopaTransform.Position + FPVector2.Down * FP._0_20;
                             powerup->Initialize(f, newPowerup, 15);
+                            powerupPhysicsObject->DisableCollision = false;
 
                             koopaEnemy->IsActive = false;
                             koopaEnemy->IsDead = true;
+                            koopaPhysicsObject->IsFrozen = true;
                         } else {
                             koopa->EnterShell(f, koopaEntity, marioEntity, false);
                         }
@@ -313,12 +317,11 @@ namespace Quantum {
             }
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
                 || !f.TryGet(entity, out Enemy enemy)
-                || !f.TryGet(blockBump, out Transform2D bumpTransform)
                 || !enemy.IsAlive
                 || !f.TryGet(entity, out Holdable holdable)
                 || f.Exists(holdable.Holder)) {
@@ -327,10 +330,10 @@ namespace Quantum {
             }
 
             koopa->IsInShell = true; // Force sound effect off
-            koopa->EnterShell(f, entity, blockBump, true);
+            koopa->EnterShell(f, entity, bumpOwner, true);
             f.Events.PlayComboSound(f, entity, 0);
 
-            QuantumUtils.UnwrapWorldLocations(f, transform->Position, bumpTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
                 ourPos.X > theirPos.X ? 1 : -1,
                 FP.FromString("5.5")

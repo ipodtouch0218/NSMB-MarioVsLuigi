@@ -628,14 +628,14 @@ namespace Quantum {
             }
 
             bool wasCrouching = mario->IsCrouching;
-            mario->IsCrouching = ((physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding) || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !mario->IsInWater) || (mario->IsCrouching && ForceCrouchCheck(f, filter, physics, inputs))) && !mario->HeldEntity.IsValid && !mario->IsInShell;
+            mario->IsCrouching = ((physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding) || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !mario->IsInWater) || (mario->IsCrouching && ForceCrouchCheck(f, filter, physics))) && !mario->HeldEntity.IsValid && !mario->IsInShell;
 
             if (!wasCrouching && mario->IsCrouching) {
                 f.Events.MarioPlayerCrouched(f, filter.Entity, *mario);
             }
         }
 
-        public bool ForceCrouchCheck(Frame f, Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        public static bool ForceCrouchCheck(Frame f, Filter filter, MarioPlayerPhysicsInfo physics) {
             /* TODO
             // Janky fortress ceiling check, mate
             if (mario->CurrentPowerupState == PowerupState.BlueShell && mario->IsOnGround && SceneManager.GetActiveScene().buildIndex != 4) {
@@ -830,7 +830,6 @@ namespace Quantum {
             }
             
             if (mario->IsInShell && (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall)) {
-                bool? playBumpSound = null;
                 QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
                 foreach (var contact in contacts) {
                     FP dot = FPVector2.Dot(contact.Normal, FPVector2.Right);
@@ -844,15 +843,11 @@ namespace Quantum {
                     if (tile is IInteractableTile it) {
                         it.Interact(f, filter.Entity, dot > 0 ? InteractionDirection.Right : InteractionDirection.Left,
                             new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
-
-                        playBumpSound &= (playBumpSound ?? true) & tempPlayBumpSound;
                     }
                 }
                 
                 mario->FacingRight = physicsObject->IsTouchingLeftWall;
-                if (playBumpSound ?? true) {
-                    f.Events.PlayBumpSound(f, filter.Entity);
-                }
+                f.Events.PlayBumpSound(f, filter.Entity);
             }
 
             physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));

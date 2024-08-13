@@ -129,6 +129,50 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BulletBill))]
+  public unsafe class BulletBillPrototype : ComponentPrototype<Quantum.BulletBill> {
+    public FP Speed;
+    public FP DespawnRadius;
+    public Byte DespawnFrames;
+    public MapEntityId Owner;
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.BulletBill component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.BulletBill result, in PrototypeMaterializationContext context = default) {
+        result.Speed = this.Speed;
+        result.DespawnRadius = this.DespawnRadius;
+        result.DespawnFrames = this.DespawnFrames;
+        PrototypeValidator.FindMapEntity(this.Owner, in context, out result.Owner);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BulletBillLauncher))]
+  public unsafe partial class BulletBillLauncherPrototype : ComponentPrototype<Quantum.BulletBillLauncher> {
+    public AssetRef<EntityPrototype> BulletBillPrototype;
+    public UInt16 TimeToShoot;
+    public FP MinimumShootRadius;
+    public FP MaximumShootRadius;
+    public Byte BulletBillCount;
+    public UInt16 TimeToShootFrames;
+    partial void MaterializeUser(Frame frame, ref Quantum.BulletBillLauncher result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.BulletBillLauncher component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.BulletBillLauncher result, in PrototypeMaterializationContext context = default) {
+        result.BulletBillPrototype = this.BulletBillPrototype;
+        result.TimeToShoot = this.TimeToShoot;
+        result.MinimumShootRadius = this.MinimumShootRadius;
+        result.MaximumShootRadius = this.MaximumShootRadius;
+        result.BulletBillCount = this.BulletBillCount;
+        result.TimeToShootFrames = this.TimeToShootFrames;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.CameraController))]
   public unsafe partial class CameraControllerPrototype : ComponentPrototype<Quantum.CameraController> {
     public FPVector2 CurrentPosition;
@@ -332,6 +376,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.MarioPlayer))]
   public unsafe class MarioPlayerPrototype : ComponentPrototype<Quantum.MarioPlayer> {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+    public AssetRef<CharacterAsset> CharacterAsset;
     public PlayerRef PlayerRef;
     public Byte SpawnpointIndex;
     public Byte Team;
@@ -407,6 +452,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.MarioPlayer result, in PrototypeMaterializationContext context = default) {
         result.PhysicsAsset = this.PhysicsAsset;
+        result.CharacterAsset = this.CharacterAsset;
         result.PlayerRef = this.PlayerRef;
         result.SpawnpointIndex = this.SpawnpointIndex;
         result.Team = this.Team;

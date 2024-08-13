@@ -48,8 +48,8 @@ namespace Quantum {
             }
 
             // Floor Smoothing
-            QuantumUtils.SmoothDamp(camera->CurrentPosition, newCameraPosition, ref camera->SmoothDampVelocity,
-                FP._0_50, FP.UseableMax, f.DeltaTime);
+            newCameraPosition = QuantumUtils.SmoothDamp(camera->CurrentPosition, newCameraPosition, ref camera->SmoothDampVelocity,
+                FP._0_33, FP.UseableMax, f.DeltaTime);
 
             // Bottom camera clip
             FP cameraBottom = newCameraPosition.Y - vOrtho;

@@ -184,7 +184,7 @@ public class UIUpdater : QuantumCallbacks {
     public void OnTimerExpired(EventTimerExpired e) {
         CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
         cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
-        timerMaterial.SetColor("_Color", new Color32(255, 0, 0, 255));
+        timerMaterial.SetColor("_Color", Color.red);
     }
 
     private unsafe void UpdateTextUI(MarioPlayer mario) {
@@ -198,6 +198,8 @@ public class UIUpdater : QuantumCallbacks {
             //teamManager?.GetTeamStars(teamIndex, out teamStars);
             Team team = ScriptableManager.Instance.teams[teamIndex];
             uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + starRequirement);
+        } else {
+            teamsParent.SetActive(false);
         }
         if (mario.Stars != cachedStars) {
             cachedStars = mario.Stars;
@@ -216,7 +218,7 @@ public class UIUpdater : QuantumCallbacks {
         if (config.LivesEnabled) {
             if (mario.Lives != cachedLives) {
                 cachedLives = mario.Lives;
-                // uiLives.text = mario.Data.GetCharacterData().uistring + Utils.GetSymbolString("x" + cachedLives);
+                uiLives.text = QuantumUnityDB.GetGlobalAsset(mario.CharacterAsset).UiString + Utils.GetSymbolString("x" + cachedLives);
             }
         } else {
             livesParent.SetActive(false);

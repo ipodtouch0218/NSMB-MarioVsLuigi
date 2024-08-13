@@ -196,12 +196,11 @@ namespace Quantum {
             f.Events.BobombExploded(f, filter.Entity);
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
                 || !f.TryGet(entity, out Enemy enemy)
-                || !f.TryGet(blockBump, out Transform2D bumpTransform)
                 || !enemy.IsAlive
                 || !f.TryGet(entity, out Holdable holdable)
                 || f.Exists(holdable.Holder)) {
@@ -210,7 +209,7 @@ namespace Quantum {
             }
 
             Light(f, entity, bobomb);
-            QuantumUtils.UnwrapWorldLocations(f, transform->Position, bumpTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
                 ourPos.X > theirPos.X ? 1 : -1,
                 FP.FromString("5.5")

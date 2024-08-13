@@ -12,4 +12,4 @@ component BlockBump {
 	bool HasBumped;
 }
 
-signal OnEntityBumped(entity_ref entity, entity_ref blockBump);
+signal OnEntityBumped(entity_ref entity, FPVector2 tileWorldPosition, entity_ref blockBump);

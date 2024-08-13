@@ -192,6 +192,8 @@ namespace Quantum {
 
             PowerupState newState = newPowerup.State;
             var currentPowerup = QuantumUtils.FindPowerupAsset(f, mario->CurrentPowerupState);
+            var transform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
+            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioEntity);
 
             // Reserve if it's the same item
             if (mario->CurrentPowerupState == newState) {
@@ -199,13 +201,11 @@ namespace Quantum {
             }
 
             if (mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsTouchingGround) {
-                var transform = f.Get<Transform2D>(marioEntity);
-                var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioEntity);
                 Shape2D shape = collider->Shape;
                 shape.Box.Extents *= 2;
                 shape.Centroid.Y = shape.Box.Extents.Y / 2;
 
-                if (PhysicsObjectSystem.BoxInsideTile(f, transform.Position, shape)) {
+                if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, shape)) {
                     return PowerupReserveResult.ReserveNewPowerup;
                 }
             }
@@ -227,7 +227,13 @@ namespace Quantum {
             mario->PreviousPowerupState = mario->CurrentPowerupState;
             mario->CurrentPowerupState = newState;
             //mario->powerupFlash = 2;
-            //mario->IsCrouching |= mario->ForceCrouchCheck();
+            mario->IsCrouching |= MarioPlayerSystem.ForceCrouchCheck(f, new() {
+                Entity = marioEntity,
+                MarioPlayer = mario,
+                PhysicsObject = physicsObject,
+                Transform = transform,
+                PhysicsCollider = collider
+            }, f.FindAsset(mario->PhysicsAsset));
             mario->IsPropellerFlying = false;
             mario->UsedPropellerThisJump = false;
             mario->IsDrilling &= mario->IsSpinnerFlying;
@@ -242,17 +248,16 @@ namespace Quantum {
             return PowerupReserveResult.ReserveOldPowerup;
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
-                || powerup->SpawnAnimationFrames > 0
-                || !f.TryGet(blockBump, out Transform2D bumpTransform)) {
+                || powerup->SpawnAnimationFrames > 0) {
 
                 return;
             }
 
-            QuantumUtils.UnwrapWorldLocations(f, transform->Position, bumpTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
                 f.FindAsset(powerup->Scriptable).Speed * (ourPos.X > theirPos.X ? 1 : -1),
                 FP.FromString("5.5")

@@ -10974,6 +10974,9 @@ MonoBehaviour:
     PhysicsAsset:
       Id:
         Value: 429607978212108660
+    CharacterAsset:
+      Id:
+        Value: 532063855470386108
     PlayerRef:
       _index: 0
     SpawnpointIndex: 0

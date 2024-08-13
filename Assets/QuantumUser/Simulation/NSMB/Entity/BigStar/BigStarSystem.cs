@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum.Physics2D;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class BigStarSystem : SystemMainThread, ISignalOnTrigger2D {

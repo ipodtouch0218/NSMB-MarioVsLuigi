@@ -828,6 +828,74 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct BulletBill : Quantum.IComponent {
+    public const Int32 SIZE = 32;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(24)]
+    public FP Speed;
+    [FieldOffset(16)]
+    public FP DespawnRadius;
+    [FieldOffset(0)]
+    public Byte DespawnFrames;
+    [FieldOffset(8)]
+    public EntityRef Owner;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 6047;
+        hash = hash * 31 + Speed.GetHashCode();
+        hash = hash * 31 + DespawnRadius.GetHashCode();
+        hash = hash * 31 + DespawnFrames.GetHashCode();
+        hash = hash * 31 + Owner.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (BulletBill*)ptr;
+        serializer.Stream.Serialize(&p->DespawnFrames);
+        EntityRef.Serialize(&p->Owner, serializer);
+        FP.Serialize(&p->DespawnRadius, serializer);
+        FP.Serialize(&p->Speed, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct BulletBillLauncher : Quantum.IComponent {
+    public const Int32 SIZE = 32;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(8)]
+    public AssetRef<EntityPrototype> BulletBillPrototype;
+    [FieldOffset(2)]
+    public UInt16 TimeToShoot;
+    [FieldOffset(24)]
+    public FP MinimumShootRadius;
+    [FieldOffset(16)]
+    public FP MaximumShootRadius;
+    [FieldOffset(0)]
+    public Byte BulletBillCount;
+    [FieldOffset(4)]
+    public UInt16 TimeToShootFrames;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 14549;
+        hash = hash * 31 + BulletBillPrototype.GetHashCode();
+        hash = hash * 31 + TimeToShoot.GetHashCode();
+        hash = hash * 31 + MinimumShootRadius.GetHashCode();
+        hash = hash * 31 + MaximumShootRadius.GetHashCode();
+        hash = hash * 31 + BulletBillCount.GetHashCode();
+        hash = hash * 31 + TimeToShootFrames.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (BulletBillLauncher*)ptr;
+        serializer.Stream.Serialize(&p->BulletBillCount);
+        serializer.Stream.Serialize(&p->TimeToShoot);
+        serializer.Stream.Serialize(&p->TimeToShootFrames);
+        AssetRef.Serialize(&p->BulletBillPrototype, serializer);
+        FP.Serialize(&p->MaximumShootRadius, serializer);
+        FP.Serialize(&p->MinimumShootRadius, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct CameraController : Quantum.IComponent {
     public const Int32 SIZE = 56;
     public const Int32 ALIGNMENT = 8;
@@ -1087,10 +1155,12 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 192;
+    public const Int32 SIZE = 200;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(160)]
+    [FieldOffset(168)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+    [FieldOffset(160)]
+    public AssetRef<CharacterAsset> CharacterAsset;
     [FieldOffset(56)]
     public PlayerRef PlayerRef;
     [FieldOffset(26)]
@@ -1101,7 +1171,7 @@ namespace Quantum {
     public PowerupState CurrentPowerupState;
     [FieldOffset(44)]
     public PowerupState PreviousPowerupState;
-    [FieldOffset(168)]
+    [FieldOffset(176)]
     public AssetRef<PowerupAsset> ReserveItem;
     [FieldOffset(27)]
     public Byte Stars;
@@ -1223,14 +1293,15 @@ namespace Quantum {
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(20)]
     public Byte PropellerDrillCooldown;
-    [FieldOffset(184)]
+    [FieldOffset(192)]
     public EntityRef HeldEntity;
-    [FieldOffset(176)]
+    [FieldOffset(184)]
     public EntityRef CurrentPipe;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 5503;
         hash = hash * 31 + PhysicsAsset.GetHashCode();
+        hash = hash * 31 + CharacterAsset.GetHashCode();
         hash = hash * 31 + PlayerRef.GetHashCode();
         hash = hash * 31 + SpawnpointIndex.GetHashCode();
         hash = hash * 31 + Team.GetHashCode();
@@ -1369,6 +1440,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->WallslideLeft, serializer);
         QBoolean.Serialize(&p->WallslideRight, serializer);
         QBoolean.Serialize(&p->WasTouchingGroundLastFrame, serializer);
+        AssetRef.Serialize(&p->CharacterAsset, serializer);
         AssetRef.Serialize(&p->PhysicsAsset, serializer);
         AssetRef.Serialize(&p->ReserveItem, serializer);
         EntityRef.Serialize(&p->CurrentPipe, serializer);
@@ -1604,7 +1676,7 @@ namespace Quantum {
     }
   }
   public unsafe partial interface ISignalOnEntityBumped : ISignal {
-    void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump);
+    void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump);
   }
   public unsafe partial interface ISignalOnBobombExplodeEntity : ISignal {
     void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity);
@@ -1686,6 +1758,10 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.BlockBump>();
       BuildSignalsArrayOnComponentAdded<Quantum.Bobomb>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Bobomb>();
+      BuildSignalsArrayOnComponentAdded<Quantum.BulletBill>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.BulletBill>();
+      BuildSignalsArrayOnComponentAdded<Quantum.BulletBillLauncher>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.BulletBillLauncher>();
       BuildSignalsArrayOnComponentAdded<Quantum.CameraController>();
       BuildSignalsArrayOnComponentRemoved<Quantum.CameraController>();
       BuildSignalsArrayOnComponentAdded<CharacterController2D>();
@@ -1778,12 +1854,12 @@ namespace Quantum {
       Physics3D.Init(_globals->PhysicsState3D.MapStaticCollidersState.TrackedMap);
     }
     public unsafe partial struct FrameSignals {
-      public void OnEntityBumped(EntityRef entity, EntityRef blockBump) {
+      public void OnEntityBumped(EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump) {
         var array = _f._ISignalOnEntityBumpedSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnEntityBumped(_f, entity, blockBump);
+            s.OnEntityBumped(_f, entity, tileWorldPosition, blockBump);
           }
         }
       }
@@ -1911,6 +1987,8 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.BitSet64), Quantum.BitSet64.SIZE);
       typeRegistry.Register(typeof(Quantum.BlockBump), Quantum.BlockBump.SIZE);
       typeRegistry.Register(typeof(Quantum.Bobomb), Quantum.Bobomb.SIZE);
+      typeRegistry.Register(typeof(Quantum.BulletBill), Quantum.BulletBill.SIZE);
+      typeRegistry.Register(typeof(Quantum.BulletBillLauncher), Quantum.BulletBillLauncher.SIZE);
       typeRegistry.Register(typeof(Button), Button.SIZE);
       typeRegistry.Register(typeof(Quantum.CameraController), Quantum.CameraController.SIZE);
       typeRegistry.Register(typeof(CharacterController2D), CharacterController2D.SIZE);
@@ -1999,11 +2077,13 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 16)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 18)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Bobomb>(Quantum.Bobomb.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.BulletBill>(Quantum.BulletBill.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.BulletBillLauncher>(Quantum.BulletBillLauncher.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Coin>(Quantum.Coin.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Enemy>(Quantum.Enemy.Serialize, null, null, ComponentFlags.None)

@@ -267,47 +267,41 @@ public static unsafe class QuantumUtils {
 
     public static FPVector2 SmoothDamp(FPVector2 current, FPVector2 target, ref FPVector2 currentVelocity, FP smoothTime, FP maxSpeed, FP deltaTime) {
         smoothTime = FPMath.Max(FP.FromString("0.0001"), smoothTime);
-        FP twoOverSmoothTime = 2 / smoothTime;
-        FP twoOverDelta = twoOverSmoothTime * deltaTime;
-
-        FP magicPolynomial = 1 / ((1 + twoOverDelta) + (FP.FromString("0.48") * twoOverDelta * twoOverDelta)) + (FP.FromString("0.235") * twoOverDelta * twoOverDelta * twoOverDelta);
-
-        FPVector2 diff = current - target;
-        FP xDiff = current.X - target.X;
-        FP yDiff = current.Y - target.Y;
-        FPVector2 originalTarget = target;
-        FP maxDistance = maxSpeed * smoothTime;
-
-        if (diff.SqrMagnitude > maxDistance * maxDistance) {
-            FP magnitude = diff.Magnitude;
-            xDiff = xDiff / magnitude * maxDistance;
-            yDiff = yDiff / magnitude * maxDistance;
+        FP num = 2 / smoothTime;
+        FP num2 = num * deltaTime;
+        FP num3 = (FP) 1 / (1 + num2 + FP.FromString("0.48") * num2 * num2 + FP.FromString("0.235") * num2 * num2 * num2);
+        FP num4 = current.X - target.X;
+        FP num5 = current.Y - target.Y;
+        FPVector2 vector = target;
+        FP num6 = maxSpeed * smoothTime;
+        FP num7 = num6 * num6;
+        FP num8 = num4 * num4 + num5 * num5;
+        if (num8 > num7) {
+            FP num9 = FPMath.Sqrt(num8);
+            num4 = num4 / num9 * num6;
+            num5 = num5 / num9 * num6;
         }
 
-        target.X = current.Y - xDiff;
-        target.X = current.Y - yDiff;
-
-        FP num9 = (currentVelocity.X + twoOverSmoothTime * xDiff) * deltaTime;
-        FP num10 = (currentVelocity.Y + twoOverSmoothTime * yDiff) * deltaTime;
-
-        currentVelocity.X = (currentVelocity.X - twoOverSmoothTime * num9) * magicPolynomial;
-        currentVelocity.Y = (currentVelocity.Y - twoOverSmoothTime * num10) * magicPolynomial;
-
-        FP x = target.X + (xDiff + num9) * magicPolynomial;
-        FP y = target.Y + (yDiff + num10) * magicPolynomial;
-
-        FP xDiffNeg = originalTarget.X - current.X;
-        FP yDiffNeg = originalTarget.Y - current.Y;
-        FP xDist = x - originalTarget.X;
-        FP yDist = y - originalTarget.Y;
-
-        if ((xDiffNeg * xDist) + (yDiffNeg * yDist) > 0) {
-            x = originalTarget.X;
-            y = originalTarget.Y;
-            currentVelocity.X = (x - originalTarget.X) / deltaTime;
-            currentVelocity.X = (y - originalTarget.Y) / deltaTime;
+        target.X = current.X - num4;
+        target.Y = current.Y - num5;
+        FP num10 = (currentVelocity.X + num * num4) * deltaTime;
+        FP num11 = (currentVelocity.Y + num * num5) * deltaTime;
+        currentVelocity.X = (currentVelocity.X - num * num10) * num3;
+        currentVelocity.Y = (currentVelocity.Y - num * num11) * num3;
+        FP num12 = target.X + (num4 + num10) * num3;
+        FP num13 = target.Y + (num5 + num11) * num3;
+        FP num14 = vector.X - current.X;
+        FP num15 = vector.Y - current.Y;
+        FP num16 = num12 - vector.X;
+        FP num17 = num13 - vector.Y;
+        if (num14 * num16 + num15 * num17 > 0) {
+            num12 = vector.X;
+            num13 = vector.Y;
+            currentVelocity.X = (num12 - vector.X) / deltaTime;
+            currentVelocity.Y = (num13 - vector.Y) / deltaTime;
         }
-        return new FPVector2(x, y);
+
+        return new FPVector2(num12, num13);
     }
 
     public static int WrappedDirectionSign(Frame f, FPVector2 a, FPVector2 b) {

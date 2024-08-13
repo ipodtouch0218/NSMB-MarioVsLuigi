@@ -119,11 +119,10 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedCoin(f, marioEntity, *mario, newCoins, item, worldLocation, fromBlock, downwards);
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Coin* coin)
                 || !f.TryGet(entity, out Transform2D transform)
-                || coin->IsCollected
-                || !f.TryGet(blockBump, out BlockBump block)) {
+                || coin->IsCollected) {
                 return;
             }
 
@@ -132,8 +131,8 @@ namespace Quantum {
                     coin->DottedChangeFrames = 30;
                 }
                 return;
-            } else if (!coin->IsCollected && f.Unsafe.TryGetPointer(block.Owner, out MarioPlayer* mario)) {
-                f.Signals.OnMarioPlayerCollectedCoin(block.Owner, mario, transform.Position, false, false);
+            } else if (!coin->IsCollected && f.Unsafe.TryGetPointer(bumpOwner, out MarioPlayer* mario)) {
+                f.Signals.OnMarioPlayerCollectedCoin(bumpOwner, mario, transform.Position, false, false);
 
                 if (coin->IsFloating) {
                     coin->IsCollected = true;

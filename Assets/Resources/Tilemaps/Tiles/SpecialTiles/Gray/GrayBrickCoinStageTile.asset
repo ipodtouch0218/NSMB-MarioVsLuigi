@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 445236dd458722a4fb9d9111c0fd8acd, type: 3}
-  m_Name: BlueBrickCoinStageTile
+  m_Name: GrayBrickCoinStageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/SpecialTiles/BlueBrickCoinStageTile
+    Path: Resources/Tilemaps/Tiles/SpecialTiles/Gray/GrayBrickCoinStageTile
     Guid:
-      Value: 517106687263014972
-  Tile: {fileID: 11400000, guid: afecf4e09999be742a2be651a9501b43, type: 2}
+      Value: 499840510013771970
+  Tile: {fileID: 11400000, guid: 909184f65d75b8249b3fbdc2a5bb9e3f, type: 2}
   CollisionData:
     Shapes:
     - Vertices:
@@ -40,13 +40,13 @@ MonoBehaviour:
   IsSlideableGround: 0
   FootstepSound: 31
   FootstepParticle: 0
-  ParticleColor: {r: 0.29411766, g: 0.6901961, b: 0.8627451, a: 1}
+  ParticleColor: {r: 0.42745098, g: 0.42745098, b: 0.42745098, a: 1}
   BreakingRules: 320
   BumpIfNotBroken: 0
   resultTile:
     Tile:
       Id:
-        Value: 407138680637916208
+        Value: 347647099802172926
     Rotation:
       RawValue: 0
     Scale:

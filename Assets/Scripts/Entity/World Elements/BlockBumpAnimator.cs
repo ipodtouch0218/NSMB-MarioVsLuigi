@@ -1,11 +1,8 @@
+using NSMB.Extensions;
 using NSMB.Tiles;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Quantum;
-using NSMB.Extensions;
-using static Unity.Collections.Unicode;
-using System.Drawing;
-using Photon.Deterministic;
 
 public class BlockBumpAnimator : QuantumCallbacks {
 

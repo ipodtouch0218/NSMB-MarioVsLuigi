@@ -1,0 +1,15 @@
+component BulletBill {
+	FP Speed;
+	FP DespawnRadius;
+	byte DespawnFrames;
+	entity_ref Owner;
+}
+
+component BulletBillLauncher {
+	asset_ref<EntityPrototype> BulletBillPrototype;
+	ushort TimeToShoot;
+	FP MinimumShootRadius;
+	FP MaximumShootRadius;
+	byte BulletBillCount;
+	ushort TimeToShootFrames;
+}

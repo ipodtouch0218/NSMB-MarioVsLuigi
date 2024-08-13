@@ -18,6 +18,7 @@ input {
 
 component MarioPlayer {
     asset_ref<MarioPlayerPhysicsInfo> PhysicsAsset;
+	asset_ref<CharacterAsset> CharacterAsset;
 	PlayerRef PlayerRef;
 	byte SpawnpointIndex;
 	byte Team;

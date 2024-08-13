@@ -21,6 +21,8 @@ public class CameraAnimator : QuantumCallbacks {
 
     public void Start() {
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+        GlobalController.ResolutionChanged += AdjustCamera;
+        AdjustCamera();
     }
 
     public override void OnUpdateView(QuantumGame game) {
@@ -38,7 +40,7 @@ public class CameraAnimator : QuantumCallbacks {
         if (distance > 10) {
             // Wrapped the level
             //difference.X *= -1;
-            FP width = stage.TileDimensions.x / FP._2;
+            FP width = stage.TileDimensions.x / (FP) 2;
             difference.X += (difference.X < 0) ? width : -width;
             target = origin + difference;
         }
@@ -50,20 +52,34 @@ public class CameraAnimator : QuantumCallbacks {
             BackgroundLoop.Instance.Reposition(camera);
         }
 
-        if (camera.orthographicSize < 14/4f - 0.05f) {
-            // Offset to always put the player in the center for extremely long aspect ratios
-            var targetTransformPrevious = game.Frames.PredictedPrevious.Get<Transform2D>(Target);
-            var targetTransformCurrent = game.Frames.Predicted.Get<Transform2D>(Target);
-            var targetCollider = game.Frames.Predicted.Get<PhysicsCollider2D>(Target);
+        var targetTransformPrevious = game.Frames.PredictedPrevious.Get<Transform2D>(Target);
+        var targetTransformCurrent = game.Frames.Predicted.Get<Transform2D>(Target);
+        var targetCollider = game.Frames.Predicted.Get<PhysicsCollider2D>(Target);
+        var targetMario = game.Frames.Predicted.Get<MarioPlayer>(Target);
 
+        // Offset to always put the player in the center for extremely long aspect ratios
+        if (!targetMario.IsDead) {
             float cameraFocusY = Mathf.Lerp(targetTransformPrevious.Position.Y.AsFloat, targetTransformCurrent.Position.Y.AsFloat, game.InterpolationFactor) + targetCollider.Shape.Centroid.Y.AsFloat;
-            Vector3 offsetPosition = camera.transform.position;
-            offsetPosition.y -= offsetPosition.y - cameraFocusY;
-            offsetPosition.y = Mathf.Clamp(offsetPosition.y, stage.CameraMinPosition.Y.AsFloat + camera.orthographicSize, Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - camera.orthographicSize);
-            camera.transform.position = offsetPosition;
+            float cameraHalfHeight = camera.orthographicSize;
+            newPosition.y = Mathf.Clamp(newPosition.y, cameraFocusY - cameraHalfHeight, cameraFocusY + cameraHalfHeight);        
         }
 
+        // Clamp
+        float cameraMinY = stage.CameraMinPosition.Y.AsFloat + camera.orthographicSize;
+        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - camera.orthographicSize;
+        newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
+        
+        camera.transform.position = newPosition;
         secondaryPositioners.RemoveAll(scp => !scp);
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());
+    }
+
+    private void AdjustCamera() {
+        float aspect = camera.aspect;
+        double size = (14f / 4f)/* + SizeIncreaseCurrent*/;
+
+        // https://forum.unity.com/threads/how-to-calculate-horizontal-field-of-view.16114/#post-2961964
+        double aspectReciprocals = 1d / aspect;
+        camera.orthographicSize = Mathf.Min((float) size, (float) (size * (16d/9d) * aspectReciprocals));
     }
 }

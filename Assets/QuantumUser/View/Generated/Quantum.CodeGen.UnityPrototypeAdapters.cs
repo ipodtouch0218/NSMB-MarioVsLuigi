@@ -79,6 +79,23 @@ namespace Quantum.Prototypes.Unity {
     }
   }
   [System.SerializableAttribute()]
+  public unsafe partial class BulletBillPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BulletBillPrototype> {
+    public FP Speed;
+    public FP DespawnRadius;
+    public Byte DespawnFrames;
+    public Quantum.QuantumEntityPrototype Owner;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BulletBillPrototype prototype);
+    public override Quantum.Prototypes.BulletBillPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.BulletBillPrototype();
+      converter.Convert(this.Speed, out result.Speed);
+      converter.Convert(this.DespawnRadius, out result.DespawnRadius);
+      converter.Convert(this.DespawnFrames, out result.DespawnFrames);
+      converter.Convert(this.Owner, out result.Owner);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
   public unsafe partial class HoldablePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.HoldablePrototype> {
     public Quantum.QuantumEntityPrototype Holder;
     public Quantum.QuantumEntityPrototype PreviousHolder;
@@ -115,6 +132,7 @@ namespace Quantum.Prototypes.Unity {
   [System.SerializableAttribute()]
   public unsafe partial class MarioPlayerPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.MarioPlayerPrototype> {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+    public AssetRef<CharacterAsset> CharacterAsset;
     public PlayerRef PlayerRef;
     public Byte SpawnpointIndex;
     public Byte Team;
@@ -187,6 +205,7 @@ namespace Quantum.Prototypes.Unity {
     public override Quantum.Prototypes.MarioPlayerPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.MarioPlayerPrototype();
       converter.Convert(this.PhysicsAsset, out result.PhysicsAsset);
+      converter.Convert(this.CharacterAsset, out result.CharacterAsset);
       converter.Convert(this.PlayerRef, out result.PlayerRef);
       converter.Convert(this.SpawnpointIndex, out result.SpawnpointIndex);
       converter.Convert(this.Team, out result.Team);

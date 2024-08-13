@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8963c1eb6bcbe445abee72055f6918d, type: 3}
-  m_Name: BluePowerupStageTile
+  m_Script: {fileID: 11500000, guid: 445236dd458722a4fb9d9111c0fd8acd, type: 3}
+  m_Name: BlueCoinStageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/SpecialTiles/BluePowerupStageTile
+    Path: Resources/Tilemaps/Tiles/SpecialTiles/Blue/BlueCoinStageTile
     Guid:
-      Value: 300455806277301968
-  Tile: {fileID: 11400000, guid: 435964e6679ad794995ec38a55c58d07, type: 2}
+      Value: 399916292252467074
+  Tile: {fileID: 11400000, guid: 752af9edb1ffc7643bbe1731e1881c0f, type: 2}
   CollisionData:
     Shapes:
     - Vertices:
@@ -54,5 +54,3 @@ MonoBehaviour:
         RawValue: 65536
       Y:
         RawValue: 65536
-  smallPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
-  largePowerup: {fileID: 11400000, guid: 96d0e671b1aa9184889fe00ea87ee1cf, type: 2}

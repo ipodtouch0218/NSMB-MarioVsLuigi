@@ -101,14 +101,14 @@ namespace Quantum {
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
-            var filter = f.Filter<Transform2D, Enemy>();
+            var filter = f.Filter<Enemy>();
             var shape = Shape2D.CreateCircle(2);
             var layerMask = f.Layers.GetLayerMask("Player");
 
-            while (filter.NextUnsafe(out EntityRef entity, out Transform2D* transform, out Enemy* enemy)) {
+            while (filter.NextUnsafe(out EntityRef entity, out Enemy* enemy)) {
                 if (!enemy->IsActive) {
                     if (!enemy->IgnorePlayerWhenRespawning) {
-                        Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(*transform, shape, layerMask);
+                        Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(enemy->Spawnpoint, 0, shape, layerMask);
                         if (playerHits.Count > 0) {
                             continue;
                         }

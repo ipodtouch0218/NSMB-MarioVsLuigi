@@ -97,6 +97,8 @@ public class GlobalController : Singleton<GlobalController> {
         int newWindowHeight = Screen.height;
 
         if (windowWidth != newWindowWidth || windowHeight != newWindowHeight) {
+            windowWidth = newWindowWidth;
+            windowHeight = newWindowHeight;
             ResolutionChanged?.Invoke();
         }
 
@@ -132,9 +134,6 @@ public class GlobalController : Singleton<GlobalController> {
             // Update discord every second for now
             discordController.UpdateActivity();
         }
-
-        windowWidth = newWindowWidth;
-        windowHeight = newWindowHeight;
     }
 
 #if UNITY_WEBGL

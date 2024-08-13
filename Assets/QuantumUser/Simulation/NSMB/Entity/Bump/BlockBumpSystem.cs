@@ -26,8 +26,8 @@ namespace Quantum {
             collider->Shape.Box.Extents = new FPVector2(FP._0_25 + size, FP._0_25 + size);
             transform->Position = blockBump->Origin + new FPVector2(0, size * (blockBump->IsDownwards ? -1 : 1));
 
-            if (!blockBump->IsDownwards && !blockBump->HasBumped) {
-                Bump(f, transform->Position, filter.Entity);
+            if (!blockBump->HasBumped) {
+                Bump(f, transform->Position, blockBump->Owner);
                 blockBump->HasBumped = true;
             }
 
@@ -96,7 +96,11 @@ namespace Quantum {
             var hits = f.Physics2D.OverlapShape(transform, Shape2D.CreateBox(extents, FPVector2.Up * (extents.Y + FP._0_25)));
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits[i];
-                f.Signals.OnEntityBumped(hit.Entity, bumpee);
+                if (bumpee == hit.Entity) {
+                    continue;
+                }
+
+                f.Signals.OnEntityBumped(hit.Entity, position, bumpee);
             }
         }
     }

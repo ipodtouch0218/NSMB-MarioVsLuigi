@@ -93,15 +93,14 @@ namespace Quantum {
             }
         }
 
-
-        public void OnEntityBumped(Frame f, EntityRef entity, EntityRef blockBump) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Goomba* goomba)
                 || !f.TryGet(entity, out Enemy enemy)
                 || !enemy.IsAlive) {
                 return;
             }
 
-            goomba->Kill(f, entity, blockBump, true);
+            goomba->Kill(f, entity, bumpOwner, true);
         }
 
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {

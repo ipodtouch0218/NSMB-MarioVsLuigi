@@ -55,6 +55,11 @@ public class VersusStageGizmos : MonoBehaviour {
                 foreach (FPVector2[] polygon in polygons) {
                     Gizmos.DrawLineStrip(polygon.Select(point => point.ToUnityVector3()).ToArray(), true);
                 }
+                if (t is CoinTile) {
+                    Gizmos.DrawIcon(worldPos.ToUnityVector3(), "Coin");
+                } else if (t is PowerupTile) {
+                    Gizmos.DrawIcon(worldPos.ToUnityVector3(), "Powerup");
+                }
             }
         }
 

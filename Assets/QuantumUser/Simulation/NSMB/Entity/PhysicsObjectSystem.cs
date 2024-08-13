@@ -528,7 +528,6 @@ namespace Quantum {
                             }
                         }
                         for (int i = 0; i < polygon.Length; i++) {
-                            Draw.Line(polygon[i], polygon[(i+1)%polygon.Length], ColorRGBA.Red);
                             if (LineIntersectsBox(polygon[i], polygon[(i + 1) % polygon.Length], boxMin, boxMax)) {
                                 return true;
                             }
