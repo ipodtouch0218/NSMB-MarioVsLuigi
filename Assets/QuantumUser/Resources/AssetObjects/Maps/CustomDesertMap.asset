@@ -88,7 +88,6 @@ MonoBehaviour:
     - rid: 8884074765841596420
     - rid: 8884074765841596421
     - rid: 8884074765841596422
-    - rid: 8884074765841596423
   - Components:
     - rid: 8510292287580798976
     - rid: 8510292287580798977
@@ -97,7 +96,6 @@ MonoBehaviour:
     - rid: 8510292287580798980
     - rid: 8510292287580798981
     - rid: 8510292287580798982
-    - rid: 8510292287580798983
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -723,24 +721,6 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 8510292287580798979
-      type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Spawnpoint:
-          X:
-            RawValue: 32768
-          Y:
-            RawValue: 340787
-        IsActive:
-          Value: 0
-        IsDead:
-          Value: 0
-        FacingRight:
-          Value: 0
-        ColliderDisabled:
-          Value: 0
-        IgnorePlayerWhenRespawning:
-          Value: 0
-    - rid: 8510292287580798980
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Holder:
@@ -748,7 +728,7 @@ MonoBehaviour:
         PreviousHolder:
           SceneIndexPlusOne: 0
         IgnoreOwnerFrames: 0
-    - rid: 8510292287580798981
+    - rid: 8510292287580798980
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         SpawnPowerupWhenStomped:
@@ -772,7 +752,7 @@ MonoBehaviour:
         IsKicked:
           Value: 0
         WakeupFrames: 0
-    - rid: 8510292287580798982
+    - rid: 8510292287580798981
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
@@ -811,7 +791,7 @@ MonoBehaviour:
         IsOnSlideableGround:
           Value: 0
         Contacts: []
-    - rid: 8510292287580798983
+    - rid: 8510292287580798982
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
@@ -846,12 +826,12 @@ MonoBehaviour:
             X:
               RawValue: 9830
             Y:
-              RawValue: 16711
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 3932
+              RawValue: 1966
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -868,24 +848,6 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 8884074765841596419
-      type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Spawnpoint:
-          X:
-            RawValue: 573440
-          Y:
-            RawValue: 275251
-        IsActive:
-          Value: 0
-        IsDead:
-          Value: 0
-        FacingRight:
-          Value: 0
-        ColliderDisabled:
-          Value: 0
-        IgnorePlayerWhenRespawning:
-          Value: 0
-    - rid: 8884074765841596420
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Holder:
@@ -893,7 +855,7 @@ MonoBehaviour:
         PreviousHolder:
           SceneIndexPlusOne: 0
         IgnoreOwnerFrames: 0
-    - rid: 8884074765841596421
+    - rid: 8884074765841596420
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         SpawnPowerupWhenStomped:
@@ -917,7 +879,7 @@ MonoBehaviour:
         IsKicked:
           Value: 0
         WakeupFrames: 0
-    - rid: 8884074765841596422
+    - rid: 8884074765841596421
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
@@ -956,7 +918,7 @@ MonoBehaviour:
         IsOnSlideableGround:
           Value: 0
         Contacts: []
-    - rid: 8884074765841596423
+    - rid: 8884074765841596422
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0

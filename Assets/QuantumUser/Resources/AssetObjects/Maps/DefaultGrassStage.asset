@@ -78,7 +78,6 @@ MonoBehaviour:
     - rid: 7515263985617207300
     - rid: 7515263985617207301
     - rid: 7515263985617207302
-    - rid: 7515263985617207303
   - Components:
     - rid: 777974220477956096
     - rid: 777974220477956097
@@ -86,7 +85,6 @@ MonoBehaviour:
     - rid: 777974220477956099
     - rid: 777974220477956100
     - rid: 777974220477956101
-    - rid: 777974220477956102
   - Components:
     - rid: 1904270922169188352
     - rid: 1904270922169188353
@@ -94,7 +92,6 @@ MonoBehaviour:
     - rid: 1904270922169188355
     - rid: 1904270922169188356
     - rid: 1904270922169188357
-    - rid: 1904270922169188358
   - Components:
     - rid: 5636341017683689472
     - rid: 5636341017683689473
@@ -102,7 +99,6 @@ MonoBehaviour:
     - rid: 5636341017683689475
     - rid: 5636341017683689476
     - rid: 5636341017683689477
-    - rid: 5636341017683689478
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -160,30 +156,12 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 777974220477956099
-      type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Spawnpoint:
-          X:
-            RawValue: -180224
-          Y:
-            RawValue: 294912
-        IsActive:
-          Value: 0
-        IsDead:
-          Value: 0
-        FacingRight:
-          Value: 0
-        ColliderDisabled:
-          Value: 0
-        IgnorePlayerWhenRespawning:
-          Value: 0
-    - rid: 777974220477956100
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         DeathAnimationFrames: 0
         Speed:
           RawValue: 57344
-    - rid: 777974220477956101
+    - rid: 777974220477956100
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
@@ -222,7 +200,7 @@ MonoBehaviour:
         IsOnSlideableGround:
           Value: 0
         Contacts: []
-    - rid: 777974220477956102
+    - rid: 777974220477956101
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
@@ -350,30 +328,12 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 1904270922169188355
-      type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Spawnpoint:
-          X:
-            RawValue: -868352
-          Y:
-            RawValue: 32768
-        IsActive:
-          Value: 0
-        IsDead:
-          Value: 0
-        FacingRight:
-          Value: 0
-        ColliderDisabled:
-          Value: 0
-        IgnorePlayerWhenRespawning:
-          Value: 0
-    - rid: 1904270922169188356
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         DeathAnimationFrames: 0
         Speed:
           RawValue: 57344
-    - rid: 1904270922169188357
+    - rid: 1904270922169188356
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
@@ -412,7 +372,7 @@ MonoBehaviour:
         IsOnSlideableGround:
           Value: 0
         Contacts: []
-    - rid: 1904270922169188358
+    - rid: 1904270922169188357
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
@@ -753,30 +713,12 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 5636341017683689475
-      type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Spawnpoint:
-          X:
-            RawValue: -1130496
-          Y:
-            RawValue: 32768
-        IsActive:
-          Value: 0
-        IsDead:
-          Value: 0
-        FacingRight:
-          Value: 0
-        ColliderDisabled:
-          Value: 0
-        IgnorePlayerWhenRespawning:
-          Value: 0
-    - rid: 5636341017683689476
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         DeathAnimationFrames: 0
         Speed:
           RawValue: 57344
-    - rid: 5636341017683689477
+    - rid: 5636341017683689476
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
@@ -815,7 +757,7 @@ MonoBehaviour:
         IsOnSlideableGround:
           Value: 0
         Contacts: []
-    - rid: 5636341017683689478
+    - rid: 5636341017683689477
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
@@ -921,12 +863,12 @@ MonoBehaviour:
             X:
               RawValue: 9830
             Y:
-              RawValue: 16711
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 3932
+              RawValue: 1966
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -943,24 +885,6 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 7515263985617207299
-      type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Spawnpoint:
-          X:
-            RawValue: -180224
-          Y:
-            RawValue: 45875
-        IsActive:
-          Value: 0
-        IsDead:
-          Value: 0
-        FacingRight:
-          Value: 0
-        ColliderDisabled:
-          Value: 0
-        IgnorePlayerWhenRespawning:
-          Value: 0
-    - rid: 7515263985617207300
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Holder:
@@ -968,7 +892,7 @@ MonoBehaviour:
         PreviousHolder:
           SceneIndexPlusOne: 0
         IgnoreOwnerFrames: 0
-    - rid: 7515263985617207301
+    - rid: 7515263985617207300
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         SpawnPowerupWhenStomped:
@@ -992,7 +916,7 @@ MonoBehaviour:
         IsKicked:
           Value: 0
         WakeupFrames: 0
-    - rid: 7515263985617207302
+    - rid: 7515263985617207301
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Velocity:
@@ -1031,7 +955,7 @@ MonoBehaviour:
         IsOnSlideableGround:
           Value: 0
         Contacts: []
-    - rid: 7515263985617207303
+    - rid: 7515263985617207302
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0

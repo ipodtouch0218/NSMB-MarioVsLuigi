@@ -255,7 +255,6 @@ public static unsafe class QuantumUtils {
     }
 
     public static FP WrappedDistance(VersusStageData stage, FPVector2 a, FPVector2 b, out FP xDifference) {
-        FPVector2 a2 = a;
         FP width = stage.TileDimensions.x * FP._0_50;
         if (stage.IsWrappingLevel && FPMath.Abs(a.X - b.X) > width * FP._0_50) {
             a.X -= width * FPMath.Sign(a.X - b.X);

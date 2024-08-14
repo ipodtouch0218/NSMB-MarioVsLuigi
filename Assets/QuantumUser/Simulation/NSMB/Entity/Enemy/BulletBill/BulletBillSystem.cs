@@ -25,11 +25,11 @@ namespace Quantum {
                 FP absDistance = 0;
                 FP minDistance = FP.MaxValue;
                 while (allPlayers.Next(out _, out _, out Transform2D marioTransform)) {
-                    QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform.Position, out FP xDifference);
-                    FP abs = FPMath.Abs(xDifference);
+                    QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform.Position, out FP distance);
+                    FP abs = FPMath.Abs(distance);
                     if (abs >= launcher->MinimumShootRadius && abs < minDistance) {
                         absDistance = abs;
-                        minDistance = xDifference;
+                        minDistance = distance;
                     }
                 }
 
@@ -38,6 +38,15 @@ namespace Quantum {
                 }
 
                 // Attempt a shot
+                bool right = minDistance < 0;
+
+                EntityRef newBillEntity = f.Create(launcher->BulletBillPrototype);
+                var newBill = f.Unsafe.GetPointer<BulletBill>(newBillEntity);
+                var newBillTransform = f.Unsafe.GetPointer<Transform2D>(newBillEntity);
+                newBill->Initialize(f, newBillEntity, entity, right);
+                newBillTransform->Position = transform->Position;
+
+                launcher->BulletBillCount++;
             }
 
             var bulletBills = f.Filter<BulletBill, Transform2D, Enemy, PhysicsObject>();
@@ -63,8 +72,8 @@ namespace Quantum {
         public void DespawnCheck(Frame f, EntityRef entity, Transform2D* transform, BulletBill* bulletBill, VersusStageData stage) {
             var allPlayers = f.Filter<MarioPlayer, Transform2D>();
             while (allPlayers.Next(out _, out _, out Transform2D marioTransform)) {
-                FP distance = QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform.Position);
-                if (distance < bulletBill->DespawnRadius) {
+                QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform.Position, out FP distance);
+                if (FPMath.Abs(distance) < bulletBill->DespawnRadius) {
                     return;
                 }
             }
@@ -74,7 +83,7 @@ namespace Quantum {
         }
 
         public void OnBulletBillMarioInteraction(Frame f, EntityRef bulletBillEntity, EntityRef marioEntity) {
-            var bulletBill = f.Unsafe.GetPointer<Goomba>(bulletBillEntity);
+            var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
             var bulletBillTransform = f.Get<Transform2D>(bulletBillEntity);
             var bulletBillEnemy = f.Unsafe.GetPointer<Enemy>(bulletBillEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
@@ -83,7 +92,7 @@ namespace Quantum {
 
             QuantumUtils.UnwrapWorldLocations(f, bulletBillTransform.Position + FPVector2.Up * FP._0_10, marioTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
-            bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
+            bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > 0;
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             
             if (mario->InstakillsEnemies(*marioPhysicsObject) || groundpounded) {

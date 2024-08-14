@@ -146,6 +146,12 @@ MonoBehaviour:
     - rid: 8409687370923769858
     - rid: 8409687370923769859
   - Components:
+    - rid: 1129043281737416704
+    - rid: 1129043281737416705
+  - Components:
+    - rid: 1649462287150350336
+    - rid: 1649462287150350337
+  - Components:
     - rid: 4372145401587826688
     - rid: 4372145401587826689
     - rid: 4372145401587826690
@@ -380,6 +386,52 @@ MonoBehaviour:
         IsCurrentlyDotted:
           Value: 0
         DottedChangeFrames: 0
+    - rid: 1129043281737416704
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -606208
+          Y:
+            RawValue: 245760
+        Rotation:
+          RawValue: 0
+    - rid: 1129043281737416705
+      type: {class: BulletBillLauncherPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        BulletBillPrototype:
+          Id:
+            Value: 1440373003412769203
+        TimeToShoot: 300
+        MinimumShootRadius:
+          RawValue: 26214
+        MaximumShootRadius:
+          RawValue: 458752
+        BulletBillCount: 0
+        TimeToShootFrames: 0
+    - rid: 1649462287150350336
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 475136
+          Y:
+            RawValue: 278528
+        Rotation:
+          RawValue: 0
+    - rid: 1649462287150350337
+      type: {class: BulletBillLauncherPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        BulletBillPrototype:
+          Id:
+            Value: 1440373003412769203
+        TimeToShoot: 300
+        MinimumShootRadius:
+          RawValue: 26214
+        MaximumShootRadius:
+          RawValue: 458752
+        BulletBillCount: 0
+        TimeToShootFrames: 0
     - rid: 1759927271897956352
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:

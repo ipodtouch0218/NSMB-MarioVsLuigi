@@ -263,10 +263,10 @@ MonoBehaviour:
   Prototype:
     BulletBillPrototype:
       Id:
-        Value: 0
-    TimeToShoot: 5
+        Value: 1440373003412769203
+    TimeToShoot: 300
     MinimumShootRadius:
-      RawValue: 32768
+      RawValue: 26214
     MaximumShootRadius:
       RawValue: 458752
     BulletBillCount: 0

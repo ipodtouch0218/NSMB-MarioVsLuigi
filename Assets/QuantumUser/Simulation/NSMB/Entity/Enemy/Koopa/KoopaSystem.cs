@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using UnityEngine;
 using static IInteractableTile;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
 
@@ -237,6 +238,7 @@ namespace Quantum {
                             koopaEnemy->IsActive = false;
                             koopaEnemy->IsDead = true;
                             koopaPhysicsObject->IsFrozen = true;
+                            f.Events.KoopaEnteredShell(f, koopaEntity);
                         } else {
                             koopa->EnterShell(f, koopaEntity, marioEntity, false);
                         }

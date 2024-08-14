@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ public class CameraAnimator : QuantumCallbacks {
             target = origin + difference;
         }
 
-        Vector3 newPosition = QuantumUtils.WrapWorld(game.Frames.Predicted, FPVector2.Lerp(origin, target, game.InterpolationFactor.ToFP()), out _).ToUnityVector3();
+        Vector3 newPosition = QuantumUtils.WrapWorld(stage, FPVector2.Lerp(origin, target, game.InterpolationFactor.ToFP()), out _).ToUnityVector3();
         newPosition.z = -10;
         camera.transform.position = newPosition;
         if (BackgroundLoop.Instance) {
@@ -54,13 +55,18 @@ public class CameraAnimator : QuantumCallbacks {
 
         var targetTransformPrevious = game.Frames.PredictedPrevious.Get<Transform2D>(Target);
         var targetTransformCurrent = game.Frames.Predicted.Get<Transform2D>(Target);
-        var targetCollider = game.Frames.Predicted.Get<PhysicsCollider2D>(Target);
         var targetMario = game.Frames.Predicted.Get<MarioPlayer>(Target);
+
+        float playerHeight = targetMario.CurrentPowerupState switch {
+            PowerupState.MegaMushroom => 3.5f,
+            > PowerupState.Mushroom => 1f,
+            _ => 0.5f,
+        };
 
         // Offset to always put the player in the center for extremely long aspect ratios
         if (!targetMario.IsDead) {
-            float cameraFocusY = Mathf.Lerp(targetTransformPrevious.Position.Y.AsFloat, targetTransformCurrent.Position.Y.AsFloat, game.InterpolationFactor) + targetCollider.Shape.Centroid.Y.AsFloat;
-            float cameraHalfHeight = camera.orthographicSize;
+            float cameraFocusY = Mathf.Lerp(targetTransformPrevious.Position.Y.AsFloat, targetTransformCurrent.Position.Y.AsFloat, game.InterpolationFactor) + (playerHeight * 0.5f);
+            float cameraHalfHeight = camera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
             newPosition.y = Mathf.Clamp(newPosition.y, cameraFocusY - cameraHalfHeight, cameraFocusY + cameraHalfHeight);        
         }
 
