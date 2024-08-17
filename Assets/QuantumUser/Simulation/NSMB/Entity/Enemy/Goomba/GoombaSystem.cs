@@ -13,6 +13,7 @@ namespace Quantum {
 
         public override void OnInit(Frame f) {
             EnemySystem.RegisterInteraction<Goomba, Goomba>(OnGoombaGoombaInteraction);
+            EnemySystem.RegisterInteraction<Goomba, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
             EnemySystem.RegisterInteraction<Goomba, MarioPlayer>(OnGoombaMarioInteraction);
         }
 
@@ -63,7 +64,7 @@ namespace Quantum {
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
-            if (mario->InstakillsEnemies(*marioPhysicsObject) || groundpounded) {
+            if (mario->InstakillsEnemies(*marioPhysicsObject, true) || groundpounded) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
                 mario->DoEntityBounce |= mario->IsDrilling;
                 return;

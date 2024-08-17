@@ -1,0 +1,9 @@
+component Boo {
+	EntityRef CurrentTarget;
+	byte UnscaredFrames;
+}
+
+event BooBecomeActive {
+	nothashed Frame Frame;
+	EntityRef Entity;
+}

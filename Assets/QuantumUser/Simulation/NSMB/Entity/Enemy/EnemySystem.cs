@@ -79,6 +79,14 @@ namespace Quantum {
         }
 
         public static void EnemyBumpTurnaround(Frame f, EntityRef entityA, EntityRef entityB) {
+            EnemyBumpTurnaround(f, entityA, entityB, true);
+        }
+
+        public static void EnemyBumpTurnaroundOnlyFirst(Frame f, EntityRef entityA, EntityRef entityB) {
+            EnemyBumpTurnaround(f, entityA, entityB, false);
+        }
+
+        public static void EnemyBumpTurnaround(Frame f, EntityRef entityA, EntityRef entityB, bool turnBoth) {
             var enemyA = f.Unsafe.GetPointer<Enemy>(entityA);
             var enemyB = f.Unsafe.GetPointer<Enemy>(entityB);
             var transformA = f.Get<Transform2D>(entityA);
@@ -87,7 +95,9 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, transformA.Position, transformB.Position, out var ourPos, out var theirPos);
             bool right = ourPos.X > theirPos.X;
             enemyA->FacingRight = right;
-            enemyB->FacingRight = !right;
+            if (turnBoth) {
+                enemyB->FacingRight = !right;
+            }
         }
 
         public static void RegisterInteraction<X, Y>(EnemyInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {

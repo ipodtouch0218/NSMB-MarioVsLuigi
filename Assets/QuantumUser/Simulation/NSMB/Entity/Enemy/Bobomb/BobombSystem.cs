@@ -16,6 +16,8 @@ namespace Quantum {
 
         public override void OnInit(Frame f) {
             EnemySystem.RegisterInteraction<Bobomb, Bobomb>(OnBobombBobombInteraction);
+            EnemySystem.RegisterInteraction<Bobomb, Goomba>(EnemySystem.EnemyBumpTurnaround);
+            EnemySystem.RegisterInteraction<Bobomb, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
             EnemySystem.RegisterInteraction<Bobomb, MarioPlayer>(OnBobombMarioInteraction);
         }
 
@@ -80,7 +82,7 @@ namespace Quantum {
             var marioTransform = f.Get<Transform2D>(marioEntity);
 
             // Special insta-kill cases
-            if (mario->InstakillsEnemies(*marioPhysicsObject)) {
+            if (mario->InstakillsEnemies(*marioPhysicsObject, true)) {
                 bobomb->Kill(f, bobombEntity, marioEntity, true);    
                 return;
             }

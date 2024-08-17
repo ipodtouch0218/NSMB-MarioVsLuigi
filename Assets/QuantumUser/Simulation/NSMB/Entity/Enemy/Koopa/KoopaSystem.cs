@@ -23,6 +23,7 @@ namespace Quantum {
             EnemySystem.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
             EnemySystem.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
             EnemySystem.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
+            EnemySystem.RegisterInteraction<Koopa, Boo>(OnKoopaBooInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -183,7 +184,7 @@ namespace Quantum {
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
-            if (mario->InstakillsEnemies(*marioPhysicsObject)) {
+            if (mario->InstakillsEnemies(*marioPhysicsObject, true)) {
                 koopa->Kill(f, koopaEntity, marioEntity, true);
                 return;
             }
@@ -270,6 +271,17 @@ namespace Quantum {
             }
         }
 
+        public void OnKoopaBooInteraction(Frame f, EntityRef koopaEntity, EntityRef booEntity) {
+            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
+            var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
+
+            if (koopa->IsKicked) {
+                // Kill boo
+                var boo = f.Unsafe.GetPointer<Boo>(booEntity);
+                boo->Kill(f, booEntity, koopaEntity, true);
+            }
+        }
+
         public void OnKoopaPiranhaPlantInteraction(Frame f, EntityRef koopaEntity, EntityRef piranhaPlantEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
@@ -286,7 +298,7 @@ namespace Quantum {
                 }
             } else {
                 // Turn
-                EnemySystem.EnemyBumpTurnaround(f, koopaEntity, piranhaPlantEntity);
+                EnemySystem.EnemyBumpTurnaround(f, koopaEntity, piranhaPlantEntity, false);
             }
         }
 

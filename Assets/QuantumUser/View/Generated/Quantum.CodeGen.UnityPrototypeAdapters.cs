@@ -79,6 +79,19 @@ namespace Quantum.Prototypes.Unity {
     }
   }
   [System.SerializableAttribute()]
+  public unsafe partial class BooPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BooPrototype> {
+    public Quantum.QuantumEntityPrototype CurrentTarget;
+    public Byte UnscaredFrames;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BooPrototype prototype);
+    public override Quantum.Prototypes.BooPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.BooPrototype();
+      converter.Convert(this.CurrentTarget, out result.CurrentTarget);
+      converter.Convert(this.UnscaredFrames, out result.UnscaredFrames);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
   public unsafe partial class BulletBillPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BulletBillPrototype> {
     public FP Speed;
     public FP DespawnRadius;

@@ -828,6 +828,28 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct Boo : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(8)]
+    public EntityRef CurrentTarget;
+    [FieldOffset(0)]
+    public Byte UnscaredFrames;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 383;
+        hash = hash * 31 + CurrentTarget.GetHashCode();
+        hash = hash * 31 + UnscaredFrames.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (Boo*)ptr;
+        serializer.Stream.Serialize(&p->UnscaredFrames);
+        EntityRef.Serialize(&p->CurrentTarget, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BulletBill : Quantum.IComponent {
     public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
@@ -1758,6 +1780,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.BlockBump>();
       BuildSignalsArrayOnComponentAdded<Quantum.Bobomb>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Bobomb>();
+      BuildSignalsArrayOnComponentAdded<Quantum.Boo>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.Boo>();
       BuildSignalsArrayOnComponentAdded<Quantum.BulletBill>();
       BuildSignalsArrayOnComponentRemoved<Quantum.BulletBill>();
       BuildSignalsArrayOnComponentAdded<Quantum.BulletBillLauncher>();
@@ -1987,6 +2011,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.BitSet64), Quantum.BitSet64.SIZE);
       typeRegistry.Register(typeof(Quantum.BlockBump), Quantum.BlockBump.SIZE);
       typeRegistry.Register(typeof(Quantum.Bobomb), Quantum.Bobomb.SIZE);
+      typeRegistry.Register(typeof(Quantum.Boo), Quantum.Boo.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBill), Quantum.BulletBill.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBillLauncher), Quantum.BulletBillLauncher.SIZE);
       typeRegistry.Register(typeof(Button), Button.SIZE);
@@ -2077,11 +2102,12 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 18)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 19)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Bobomb>(Quantum.Bobomb.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.Boo>(Quantum.Boo.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BulletBill>(Quantum.BulletBill.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BulletBillLauncher>(Quantum.BulletBillLauncher.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)

@@ -35,8 +35,8 @@ namespace Quantum {
             return !f.Exists(HeldEntity) && CanHoldItem(f, mario);
         }
 
-        public bool InstakillsEnemies(PhysicsObject physicsObject) {
-            return CurrentPowerupState == PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (IsSliding && FPMath.Abs(physicsObject.Velocity.X) > FP._0_10);
+        public bool InstakillsEnemies(PhysicsObject physicsObject, bool includeSliding) {
+            return CurrentPowerupState == PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (includeSliding && IsSliding && FPMath.Abs(physicsObject.Velocity.X) > FP._0_10);
         }
 
         public int GetSpeedStage(PhysicsObject physicsObject, MarioPlayerPhysicsInfo physicsInfo) {

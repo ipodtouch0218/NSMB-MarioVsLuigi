@@ -1,32 +1,31 @@
 using Photon.Deterministic;
 using Quantum;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraAnimator : QuantumCallbacks {
+public class CameraAnimator : ResizingCamera {
 
     //---Properties
     public EntityRef Target { get; set; }
 
     //---Serialized Variables
-    [SerializeField] private Camera camera;
     [SerializeField] private List<SecondaryCameraPositioner> secondaryPositioners;
 
     //---Private Variables
     private VersusStageData stage;
 
-    public void OnValidate() {
+    public override void OnValidate() {
+        base.OnValidate();
         GetComponentsInChildren(secondaryPositioners); 
     }
 
-    public void Start() {
+    public override void Start() {
+        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-        GlobalController.ResolutionChanged += AdjustCamera;
-        AdjustCamera();
     }
 
-    public override void OnUpdateView(QuantumGame game) {
+    public void OnUpdateView(CallbackUpdateView e) {
+        QuantumGame game = e.Game;
         if (!Target.IsValid || !game.Frames.Predicted.Exists(Target) || !game.Frames.PredictedPrevious.Exists(Target)) {
             return;
         }
@@ -78,14 +77,5 @@ public class CameraAnimator : QuantumCallbacks {
         camera.transform.position = newPosition;
         secondaryPositioners.RemoveAll(scp => !scp);
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());
-    }
-
-    private void AdjustCamera() {
-        float aspect = camera.aspect;
-        double size = (14f / 4f)/* + SizeIncreaseCurrent*/;
-
-        // https://forum.unity.com/threads/how-to-calculate-horizontal-field-of-view.16114/#post-2961964
-        double aspectReciprocals = 1d / aspect;
-        camera.orthographicSize = Mathf.Min((float) size, (float) (size * (16d/9d) * aspectReciprocals));
     }
 }

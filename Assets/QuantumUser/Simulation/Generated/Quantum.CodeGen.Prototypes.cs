@@ -129,6 +129,21 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Boo))]
+  public unsafe class BooPrototype : ComponentPrototype<Quantum.Boo> {
+    public MapEntityId CurrentTarget;
+    public Byte UnscaredFrames;
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Boo component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Boo result, in PrototypeMaterializationContext context = default) {
+        PrototypeValidator.FindMapEntity(this.CurrentTarget, in context, out result.CurrentTarget);
+        result.UnscaredFrames = this.UnscaredFrames;
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BulletBill))]
   public unsafe class BulletBillPrototype : ComponentPrototype<Quantum.BulletBill> {
     public FP Speed;

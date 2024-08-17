@@ -303,6 +303,33 @@ public static unsafe class QuantumUtils {
         return new FPVector2(num12, num13);
     }
 
+    public static FP DeltaAngle(FP current, FP target) {
+        FP num = FPMath.Repeat(target - current, 360);
+        if (num > 180) {
+            num -= 360;
+        }
+
+        return num;
+    }
+
+    public static FP MoveTowards(FP current, FP target, FP maxDelta) {
+        if (FPMath.Abs(target - current) <= maxDelta) {
+            return target;
+        }
+
+        return current + FPMath.Sign(target - current) * maxDelta;
+    }
+
+    public static FP MoveTowardsAngle(FP current, FP target, FP maxDelta) {
+        FP num = DeltaAngle(current, target);
+        if (0 - maxDelta < num && num < maxDelta) {
+            return target;
+        }
+
+        target = current + num;
+        return MoveTowards(current, target, maxDelta);
+    }
+
     public static int WrappedDirectionSign(Frame f, FPVector2 a, FPVector2 b) {
         return WrappedDirectionSign(f.FindAsset<VersusStageData>(f.Map.UserAsset), a, b);
     }
