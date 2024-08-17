@@ -494,6 +494,7 @@ namespace Quantum {
 
             if (mario->IsWallsliding) {
                 // Walljump check
+                physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
                 mario->FacingRight = mario->WallslideLeft;
                 if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
                     // Perform walljump

@@ -190,8 +190,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
-    Layer: 0
+    LayerSource: 1
+    Layer: 9
     CallbackFlags:
       Value: 4095
   PhysicsBody:
@@ -305,7 +305,6 @@ MonoBehaviour:
   sfx: {fileID: 5072740182388110993}
   sRenderer: {fileID: 5045576353537437192}
   rotation: {fileID: 7237572828892493257}
-  deadSprite: {fileID: -350336500, guid: c912823ed57acf143ba74ac38426ff31, type: 3}
   mirrorSprite: 1
   dontFlip: 1
 --- !u!82 &5072740182388110993
@@ -489,6 +488,10 @@ MonoBehaviour:
     IsDead:
       Value: 0
     FacingRight:
+      Value: 0
+    ColliderDisabled:
+      Value: 0
+    IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &8889607602468363306
 MonoBehaviour:

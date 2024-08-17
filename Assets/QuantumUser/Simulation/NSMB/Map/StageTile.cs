@@ -8,7 +8,7 @@ public class StageTile : AssetObject {
 
     public TileBase Tile;
     public TileCollisionData CollisionData;
-    public bool IsSlipperyGround, IsSlideableGround;
+    public bool IsSlipperyGround, IsSlideableGround, IsPolygon = true;
     public SoundEffect FootstepSound = SoundEffect.Player_Walk_Grass;
     public ParticleEffect FootstepParticle = ParticleEffect.None;
 

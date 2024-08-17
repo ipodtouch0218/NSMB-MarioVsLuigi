@@ -222,7 +222,7 @@ event MarioPlayerThrewObject {
 	entity_ref OtherEntity;
 }
 
-event MarioPlayerMegaStart {
+synced event MarioPlayerMegaStart {
 	nothashed Frame Frame;
 	entity_ref Entity;
 }

@@ -5,8 +5,8 @@ namespace Quantum {
     [Serializable]
     public unsafe partial struct StageTileInstance {
 
-        public FPVector2[][] GetWorldPolygons(Frame f, FPVector2? worldPos = null) {
-            return GetWorldPolygons(f.FindAsset(Tile), worldPos ?? FPVector2.Zero);
+        public FPVector2[][] GetWorldPolygons(Frame f, out StageTile tile, FPVector2? worldPos = null) {
+            return GetWorldPolygons(tile = f.FindAsset(Tile), worldPos ?? FPVector2.Zero);
         }
 
         public FPVector2[][] GetWorldPolygons(StageTile stageTile, FPVector2? worldPos = null) {

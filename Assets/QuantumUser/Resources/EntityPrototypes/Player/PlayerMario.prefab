@@ -10553,8 +10553,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
-    Layer: 6
+    LayerSource: 1
+    Layer: 9
     CallbackFlags:
       Value: 4095
   PhysicsBody:

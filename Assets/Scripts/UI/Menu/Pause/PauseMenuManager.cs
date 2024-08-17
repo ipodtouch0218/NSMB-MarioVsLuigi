@@ -1,4 +1,5 @@
 using NSMB.Translation;
+using NSMB.UI.Pause.Options;
 using Quantum;
 using System;
 using TMPro;
@@ -34,6 +35,8 @@ namespace NSMB.UI.Pause {
         private bool isInConfirmationForQuitting;
         private string originalNoText, originalYesText;
 
+        private float unpauseTime;
+
         public void Start() {
             ControlSystem.controls.UI.Pause.performed += OnPause;
         }
@@ -43,11 +46,11 @@ namespace NSMB.UI.Pause {
         }
 
         private void OnPause(InputAction.CallbackContext context) {
-            if (isPaused) {
-                Unpause(true);
-            } else {
-                Pause(true);
+            if (isPaused || unpauseTime == Time.time) {
+                return;
             }
+
+            Pause(true);
         }
 
         public void Pause(bool playSound) {
@@ -91,6 +94,7 @@ namespace NSMB.UI.Pause {
             if (playSound) {
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Pause);
             }
+            unpauseTime = Time.time;
         }
 
         public void OnNavigate(InputAction.CallbackContext context) {
@@ -129,6 +133,7 @@ namespace NSMB.UI.Pause {
             if (!isPaused) {
                 return;
             }
+
             if (GlobalController.Instance.optionsManager.gameObject.activeSelf) {
                 return;
             }
@@ -146,14 +151,16 @@ namespace NSMB.UI.Pause {
         }
 
         public void OnCancel(InputAction.CallbackContext context) {
-            if (!isPaused) {
-                return;
-            }
             if (GlobalController.Instance.optionsManager.gameObject.activeSelf) {
                 return;
             }
-
-            // GameManager.Instance.Pause(false);
+            if (isPaused) {
+                if (selected == 0) {
+                    Unpause(true);
+                } else {
+                    SelectOption(0);
+                }
+            }
         }
 
         public void SelectConfirmYes(bool sound) {
@@ -191,6 +198,11 @@ namespace NSMB.UI.Pause {
             GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
         }
 
+        public void OpenSettings() {
+            GlobalController.Instance.optionsManager.OpenMenu();
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+        }
+        
         public void OpenConfirmationMenu(bool quit) {
             isInConfirmation = true;
             isInConfirmationForQuitting = quit;

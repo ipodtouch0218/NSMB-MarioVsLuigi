@@ -296,8 +296,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
-    Layer: 0
+    LayerSource: 1
+    Layer: 9
     CallbackFlags:
       Value: 4095
   PhysicsBody:
@@ -643,6 +643,10 @@ MonoBehaviour:
     IsDead:
       Value: 0
     FacingRight:
+      Value: 0
+    ColliderDisabled:
+      Value: 0
+    IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &724652125925019376
 MonoBehaviour:

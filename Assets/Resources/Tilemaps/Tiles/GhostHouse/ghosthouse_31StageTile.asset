@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
+  m_Name: ghosthouse_31StageTile
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: Resources/Tilemaps/Tiles/GhostHouse/ghosthouse_31StageTile
+    Guid:
+      Value: 331069652727526723
+  Tile: {fileID: 11400000, guid: 2c6f9f54855ac4343a8e83188c269d7e, type: 2}
+  CollisionData:
+    Shapes: []
+  IsSlipperyGround: 0
+  IsSlideableGround: 0
+  FootstepSound: 31
+  FootstepParticle: 0

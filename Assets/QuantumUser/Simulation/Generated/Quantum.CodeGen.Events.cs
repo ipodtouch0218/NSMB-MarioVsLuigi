@@ -368,6 +368,7 @@ namespace Quantum {
         return ev;
       }
       public EventMarioPlayerMegaStart MarioPlayerMegaStart(Frame Frame, EntityRef Entity) {
+        if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventMarioPlayerMegaStart>(EventMarioPlayerMegaStart.ID);
         ev.Frame = Frame;
         ev.Entity = Entity;
@@ -1304,7 +1305,7 @@ namespace Quantum {
         base(id, flags) {
     }
     public EventMarioPlayerMegaStart() : 
-        base(32, EventFlags.Server|EventFlags.Client) {
+        base(32, EventFlags.Server|EventFlags.Client|EventFlags.Synced) {
     }
     public new QuantumGame Game {
       get {

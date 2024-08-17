@@ -187,8 +187,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
-    Layer: 0
+    LayerSource: 1
+    Layer: 9
     CallbackFlags:
       Value: 0
   PhysicsBody:
@@ -403,8 +403,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 696e3c9fa3fa38e428793f77ee0f16a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bobber: {fileID: 0}
-  sRenderer: {fileID: 0}
+  bobber: {fileID: 6722881607104163502}
+  sRenderer: {fileID: 8876538276984424454}
+  entity: {fileID: 8659307129223830223}
+  animator: {fileID: 4326104160039452375}
+  sfx: {fileID: 3241501505551194881}
   sinSpeed: 1
   sinAmplitude: 0.0875
 --- !u!1 &7589329121707926406

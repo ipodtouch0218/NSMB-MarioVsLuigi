@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
@@ -577,13 +578,13 @@ namespace NSMB.Entities.Player {
             foreach (var contact in f.ResolveList(physicsObject.Contacts)) {
                 if (FPVector2.Dot(contact.Normal, FPVector2.Up) > FP._0_33) {
                     StageTileInstance tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
-                    StageTile tile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);
-
-                    if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
-                        footstepSoundEffect = tile.FootstepSound;
-                    }
-                    if (tile.FootstepParticle != ParticleEffect.None) {
-                        footstepParticleEffect = tile.FootstepParticle;
+                    if (QuantumUnityDB.TryGetGlobalAsset(tileInstance.Tile, out StageTile tile)) {
+                        if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
+                            footstepSoundEffect = tile.FootstepSound;
+                        }
+                        if (tile.FootstepParticle != ParticleEffect.None) {
+                            footstepParticleEffect = tile.FootstepParticle;
+                        }
                     }
                 }
             } 

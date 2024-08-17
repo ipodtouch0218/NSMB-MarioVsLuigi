@@ -1150,7 +1150,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 7396989138894499337}
           m_TargetAssemblyTypeName: UIUpdater, Assembly-CSharp
           m_MethodName: OnReserveItemIconClicked
           m_Mode: 1
@@ -3037,7 +3037,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 92.3
+  m_fontSize: 94.2
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3242,7 +3242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 9216439077095524751}
-  secondaryCamera: {fileID: 3031707850400707342}
+  ourCamera: {fileID: 3031707850400707342}
 --- !u!1 &4413053123625377219
 GameObject:
   m_ObjectHideFlags: 0
@@ -4147,9 +4147,9 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-          m_MethodName: PauseOpenOptions
+        - m_Target: {fileID: 6913355771123443145}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
+          m_MethodName: OpenSettings
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -4157,13 +4157,13 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 0
+            m_BoolArgument: 1
           m_CallState: 2
   - eventID: 0
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6913355771123443145}
           m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
           m_MethodName: SelectOption
           m_Mode: 2
@@ -4462,7 +4462,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6913355771123443145}
           m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
           m_MethodName: OpenConfirmationMenu
           m_Mode: 6
@@ -4478,7 +4478,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6913355771123443145}
           m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
           m_MethodName: SelectOption
           m_Mode: 2
@@ -5250,9 +5250,9 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-          m_MethodName: Pause
+        - m_Target: {fileID: 6913355771123443145}
+          m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
+          m_MethodName: Unpause
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -5260,13 +5260,13 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 0
+            m_BoolArgument: 1
           m_CallState: 2
   - eventID: 0
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6913355771123443145}
           m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
           m_MethodName: SelectOption
           m_Mode: 2
@@ -5843,7 +5843,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6913355771123443145}
           m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
           m_MethodName: OpenConfirmationMenu
           m_Mode: 6
@@ -5859,7 +5859,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6913355771123443145}
           m_TargetAssemblyTypeName: NSMB.UI.Pause.PauseMenuManager, Assembly-CSharp
           m_MethodName: SelectOption
           m_Mode: 2

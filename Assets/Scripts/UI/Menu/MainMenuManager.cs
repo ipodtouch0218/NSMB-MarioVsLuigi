@@ -13,7 +13,6 @@ using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
 using Photon.Client;
-using Photon.Deterministic;
 using Photon.Realtime;
 using Quantum;
 using System.Threading.Tasks;
