@@ -28,7 +28,10 @@ MonoBehaviour:
     Y:
       RawValue: -1414398
   DestroyOnSecondBounce: 1
+  DestroyOnHit: 1
   LockTo45Degrees: 1
   InheritShooterVelocity: 1
+  HasCollision: 1
   DoesntEffectBlueShell: 1
   BlueShellSlowdownFrames: 40
+  DestroyParticleEffect: 6

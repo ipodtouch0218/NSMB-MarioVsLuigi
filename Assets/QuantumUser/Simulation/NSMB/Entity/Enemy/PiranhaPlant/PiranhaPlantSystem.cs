@@ -9,10 +9,12 @@ namespace Quantum {
             public PiranhaPlant* PiranhaPlant;
             public Enemy* Enemy;
             public PhysicsCollider2D* Collider;
+            public Interactable* Interactable;
         }
 
         public override void OnInit(Frame f) {
-            EnemySystem.RegisterInteraction<PiranhaPlant, MarioPlayer>(OnPiranhaPlantMarioInteraction);
+            InteractionSystem.RegisterInteraction<PiranhaPlant, MarioPlayer>(OnPiranhaPlantMarioInteraction);
+            InteractionSystem.RegisterInteraction<PiranhaPlant, Projectile>(OnPiranhaPlantProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -46,8 +48,27 @@ namespace Quantum {
 
             FP change = 2 * f.DeltaTime * (chomping ? 1 : -1);
             piranhaPlant->PopupAnimationTime = FPMath.Clamp01(piranhaPlant->PopupAnimationTime + change);
-            enemy->ColliderDisabled = piranhaPlant->PopupAnimationTime == 0;
+            filter.Interactable->ColliderDisabled = piranhaPlant->PopupAnimationTime == 0;
             transform->Position = enemy->Spawnpoint + FPVector2.Up * (FP._0_25 + (piranhaPlant->PopupAnimationTime - 1) * FP._0_75);
+        }
+
+        public void OnPiranhaPlantProjectileInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef projectileEntity) {
+            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+
+            switch (projectileAsset.Effect) {
+            case ProjectileEffectType.Knockback: {
+                f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity)->Kill(f, piranhaPlantEntity, projectileEntity, true);
+                break;
+            }
+            case ProjectileEffectType.Freeze: {
+                // TODO
+                break;
+            }
+            }
+
+            if (projectileAsset.DestroyOnHit) {
+                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+            }
         }
 
         public void OnPiranhaPlantMarioInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef marioEntity) {

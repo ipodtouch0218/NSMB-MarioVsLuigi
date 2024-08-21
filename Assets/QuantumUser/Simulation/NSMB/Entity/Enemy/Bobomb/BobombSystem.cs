@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace Quantum {
@@ -15,10 +16,11 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            EnemySystem.RegisterInteraction<Bobomb, Bobomb>(OnBobombBobombInteraction);
-            EnemySystem.RegisterInteraction<Bobomb, Goomba>(EnemySystem.EnemyBumpTurnaround);
-            EnemySystem.RegisterInteraction<Bobomb, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
-            EnemySystem.RegisterInteraction<Bobomb, MarioPlayer>(OnBobombMarioInteraction);
+            InteractionSystem.RegisterInteraction<Bobomb, Bobomb>(EnemySystem.EnemyBumpTurnaround);
+            InteractionSystem.RegisterInteraction<Bobomb, Goomba>(EnemySystem.EnemyBumpTurnaround);
+            InteractionSystem.RegisterInteraction<Bobomb, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
+            InteractionSystem.RegisterInteraction<Bobomb, MarioPlayer>(OnBobombMarioInteraction);
+            InteractionSystem.RegisterInteraction<Bobomb, Projectile>(OnBobombProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {
@@ -60,10 +62,6 @@ namespace Quantum {
             if (!lit) {
                 physicsObject->Velocity.X = bobomb->Speed * (enemy->FacingRight ? 1 : -1);
             }
-        }
-
-        public void OnBobombBobombInteraction(Frame f, EntityRef bobombEntityA, EntityRef bobombEntityB) {
-            EnemySystem.EnemyBumpTurnaround(f, bobombEntityA, bobombEntityB);
         }
 
         public void OnBobombMarioInteraction(Frame f, EntityRef bobombEntity, EntityRef marioEntity) {
@@ -132,6 +130,30 @@ namespace Quantum {
                     bobombEnemy->FacingRight = damageDirection.X > 0;
                 }
             } 
+        }
+
+        public void OnBobombProjectileInteraction(Frame f, EntityRef bobombEntity, EntityRef projectileEntity) {
+            var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
+            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+
+            switch (projectileAsset.Effect) {
+            case ProjectileEffectType.Knockback: {
+                if (bobomb->CurrentDetonationFrames > 0) {
+                    bobomb->Kick(f, bobombEntity, projectileEntity, 0);
+                } else {
+                    Light(f, bobombEntity, bobomb);
+                }
+                break;
+            }
+            case ProjectileEffectType.Freeze: {
+                //
+                break;
+            }
+            }
+
+            if (projectileAsset.DestroyOnHit) {
+                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+            }
         }
 
         private static void Light(Frame f, EntityRef entity, Bobomb* bobomb) {

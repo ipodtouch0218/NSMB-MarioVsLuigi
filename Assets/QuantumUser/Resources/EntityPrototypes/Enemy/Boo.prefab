@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5623453289331559766}
   - component: {fileID: 583447005726554375}
   - component: {fileID: 4429105053950663285}
+  - component: {fileID: -6652070002619640731}
   m_Layer: 0
   m_Name: Boo
   m_TagString: Untagged
@@ -324,8 +325,6 @@ MonoBehaviour:
       Value: 0
     FacingRight:
       Value: 0
-    ColliderDisabled:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &5623453289331559766
@@ -410,6 +409,21 @@ MonoBehaviour:
   sfx: {fileID: 3241501505551194881}
   sinSpeed: 1
   sinAmplitude: 0.0875
+--- !u!114 &-6652070002619640731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3813481168314615756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0
 --- !u!1 &7589329121707926406
 GameObject:
   m_ObjectHideFlags: 0

@@ -446,6 +446,7 @@ namespace Quantum {
                 terminalVelocity = physics.TerminalVelocityWallslide;
             } else if (mario->IsGroundpounding) {
                 terminalVelocity = physics.TerminalVelocityGroundpound;
+                physicsObject->Velocity.X = 0;
             } else {
                 FP terminalVelocityModifier = mario->CurrentPowerupState switch {
                     PowerupState.MiniMushroom => physics.TerminalVelocityMiniMultiplier,

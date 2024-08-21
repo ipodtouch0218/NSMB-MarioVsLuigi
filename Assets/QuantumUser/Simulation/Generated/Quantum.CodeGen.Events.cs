@@ -390,11 +390,12 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventProjectileDestroyed ProjectileDestroyed(Frame Frame, EntityRef Entity, QBoolean PlayEffect) {
+      public EventProjectileDestroyed ProjectileDestroyed(Frame Frame, EntityRef Entity, ParticleEffect Particle, FPVector2 Position) {
         var ev = _f.Context.AcquireEvent<EventProjectileDestroyed>(EventProjectileDestroyed.ID);
         ev.Frame = Frame;
         ev.Entity = Entity;
-        ev.PlayEffect = PlayEffect;
+        ev.Particle = Particle;
+        ev.Position = Position;
         _f.AddEvent(ev);
         return ev;
       }
@@ -1382,7 +1383,8 @@ namespace Quantum {
     public new const Int32 ID = 35;
     public Frame Frame;
     public EntityRef Entity;
-    public QBoolean PlayEffect;
+    public ParticleEffect Particle;
+    public FPVector2 Position;
     protected EventProjectileDestroyed(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -1400,9 +1402,8 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 211;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + PlayEffect.GetHashCode();
+        hash = hash * 31 + Particle.GetHashCode();
         return hash;
       }
     }

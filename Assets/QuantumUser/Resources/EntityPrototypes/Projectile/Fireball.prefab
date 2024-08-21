@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3718871867754987808}
   - component: {fileID: 3977285621181604314}
   - component: {fileID: -8827579426703279798}
-  - component: {fileID: 1285969274022344112}
+  - component: {fileID: 5432761528888521127}
   m_Layer: 9
   m_Name: Fireball
   m_TagString: Untagged
@@ -374,7 +374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     _empty_prototype_dummy_field_: 0
---- !u!114 &1285969274022344112
+--- !u!114 &5432761528888521127
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -383,12 +383,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6307920351473437675}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ce72b3d95718d74cb7a6396c288da24, type: 3}
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 7359433677201013330}
-  destroyParticlePrefab: {fileID: 5903185039186744869, guid: d5777f79309ac1e428227e6c2ade9525,
-    type: 3}
+  Prototype:
+    ColliderDisabled:
+      Value: 0
 --- !u!1 &6817442949190414024
 GameObject:
   m_ObjectHideFlags: 0

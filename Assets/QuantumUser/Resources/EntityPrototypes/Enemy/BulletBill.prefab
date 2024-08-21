@@ -4993,6 +4993,7 @@ GameObject:
   - component: {fileID: 1099637356932663032}
   - component: {fileID: 808433351997747540}
   - component: {fileID: -2707382414775849669}
+  - component: {fileID: 9160283603330728788}
   m_Layer: 0
   m_Name: BulletBill
   m_TagString: Untagged
@@ -5503,8 +5504,6 @@ MonoBehaviour:
       Value: 0
     FacingRight:
       Value: 0
-    ColliderDisabled:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &-2707382414775849669
@@ -5521,6 +5520,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     _empty_prototype_dummy_field_: 0
+--- !u!114 &9160283603330728788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627485830306083579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

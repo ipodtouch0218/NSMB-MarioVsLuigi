@@ -7,8 +7,8 @@ using UnityEngine;
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
 
-        private static readonly FP RaycastSkin = FP.FromString("0.05");
-        private static readonly FP Skin = FP.FromString("0.001");
+        public static readonly FP RaycastSkin = FP.FromString("0.05");
+        public static readonly FP Skin = FP.FromString("0.001");
         private static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
         private static int mask;
 
@@ -37,20 +37,27 @@ namespace Quantum {
             if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
                 contacts = f.AllocateList(out physicsObject->Contacts);
             }
-            contacts.Clear();
-
+            MoveWithPlatform(f, ref filter, contacts);
+            for (int i = 0; i < contacts.Count; i++) {
+                var contact = contacts[i];
+                if (contact.Frame < f.Number) {
+                    contacts.RemoveAtUnordered(i);
+                    i--;
+                }
+            }
             physicsObject->IsOnSlideableGround = false;
             physicsObject->IsOnSlipperyGround = false;
-            MoveVertically(f, filter, stage, contacts);
-            MoveHorizontally(f, filter, stage, contacts);
-            ResolveContacts(filter.PhysicsObject, contacts);
+
+            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y * 2, filter.Entity, stage, contacts);
+            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, filter.Entity, stage, contacts);
+            ResolveContacts(physicsObject, contacts);
+            // physicsObject->Velocity -= physicsObject->ParentVelocity;
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
                 FPVector2 previousPosition = filter.Transform->Position;
-                physicsObject->Velocity.Y = -FP._0_20 / f.DeltaTime;
 
-                MoveVertically(f, filter, stage, contacts);
+                MoveVertically(f, -FP._0_20 / f.DeltaTime, filter.Entity, stage, contacts);
                 ResolveContacts(filter.PhysicsObject, contacts);
                 if (!physicsObject->IsTouchingGround) {
                     physicsObject->Velocity.Y = 0;
@@ -66,24 +73,64 @@ namespace Quantum {
 #endif
         }
 
-        private void MoveVertically(Frame f, Filter filter, VersusStageData stage, QList<PhysicsContact> contacts) {
+        private void MoveWithPlatform(Frame f, ref Filter filter, QList<PhysicsContact> contacts) {
             var physicsObject = filter.PhysicsObject;
 
-            FP velocityY = physicsObject->Velocity.Y * f.DeltaTime;
-            if (velocityY == 0) {
+            FP maxDot = -2;
+            FPVector2? maxVelocity = null;
+            foreach (var contact in contacts) {
+                if (FPVector2.Dot(contact.Normal, -physicsObject->Gravity.Normalized) < FP._0_33
+                    || !f.Unsafe.TryGetPointer(contact.Entity, out MovingPlatform* platform)) {
+                    continue;
+                }
+
+                FPVector2 vel = platform->Velocity;
+                FP dot = FPVector2.Dot(vel.Normalized, -physicsObject->Gravity.Normalized);
+                if (dot > maxDot || (dot == maxDot && maxVelocity.Value.SqrMagnitude > vel.SqrMagnitude)) {
+                    maxDot = dot;
+                    maxVelocity = vel;
+                }
+            }
+
+            if (!maxVelocity.HasValue) {
+                physicsObject->Velocity += physicsObject->ParentVelocity;
+                physicsObject->ParentVelocity = FPVector2.Zero;
                 return;
             }
+
+            physicsObject->Velocity -= (maxVelocity.Value - physicsObject->ParentVelocity);
+            physicsObject->ParentVelocity = maxVelocity.Value;
+        }
+
+        public static FPVector2 MoveVertically(Frame f, FP relativeVelocityY, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = default) {
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+
+            FP velocityY = relativeVelocityY * f.DeltaTime;
+            if (velocityY == 0) {
+                return physicsObject->Velocity;
+            }
+
+            if (!contacts.HasValue) {
+                if (f.TryResolveList(physicsObject->Contacts, out var tempContacts)) {
+                    contacts = tempContacts;
+                } else {
+                    contacts = f.AllocateList(out physicsObject->Contacts);
+                }
+            }
+
+            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var collider = f.Get<PhysicsCollider2D>(entity);
 
             FPVector2 directionVector = velocityY > 0 ? FPVector2.Up : FPVector2.Down;
 
             if (!physicsObject->DisableCollision) {
-                FPVector2 position = filter.Transform->Position;
-                Shape2D collisionShape = filter.Collider->Shape;
+                FPVector2 position = transform->Position;
+                Shape2D collisionShape = collider.Shape;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(0, velocityY) + (directionVector * RaycastSkin), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(0, velocityY) + (directionVector * RaycastSkin), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
                 physicsHits.Sort(position);
 
-                position += filter.Collider->Shape.Centroid;
+                position += collisionShape.Centroid;
                 FP checkPointY = position.Y + collisionShape.Box.Extents.Y * (velocityY > 0 ? 1 : -1);
                 FPVector2 leftWorldCheckPoint = new(position.X - collisionShape.Box.Extents.X, checkPointY);
                 FPVector2 rightWorldCheckPoint = new(position.X + collisionShape.Box.Extents.X, checkPointY);
@@ -111,6 +158,7 @@ namespace Quantum {
 
                             foreach (var contact in polygonContacts) {
                                 PhysicsContact newContact = contact;
+                                newContact.Frame = f.Number;
                                 newContact.TileX = tilePos.x;
                                 newContact.TileY = tilePos.y;
 
@@ -126,12 +174,14 @@ namespace Quantum {
                             continue;
                         }
 
-                        potentialContacts.Add(new() {
+                        potentialContacts.Add(new PhysicsContact {
                             Distance = FPMath.Abs(hit.Point.Y - checkPointY),
                             Normal = hit.Normal,
                             Position = hit.Point,
+                            Frame = f.Number,
                             TileX = -1,
                             TileY = -1,
+                            Entity = hit.Entity,
                         });
                     }
 
@@ -157,9 +207,9 @@ namespace Quantum {
                         }
                         
                         bool keepContact = true;
-                        f.Signals.OnPreTileCollide(stage, filter.Entity, &contact, &keepContact);
+                        f.Signals.OnPreTileCollide(stage, entity, &contact, &keepContact);
                         if (keepContact) {
-                            contacts.Add(contact);
+                            contacts.Value.Add(contact);
                             min ??= contact.Distance;
                             avgNormal += contact.Normal;
                             contactCount++;
@@ -181,46 +231,56 @@ namespace Quantum {
                     avgNormal /= contactCount;
 
                     // Snap to point.
-                    filter.Transform->Position += directionVector * (min.Value - Skin);
+                    transform->Position += directionVector * (min.Value - Skin);
 
                     // Readjust the remaining velocity
-                    FP remainingVelocity = filter.PhysicsObject->Velocity.Magnitude - min.Value;
+                    min -= physicsObject->ParentVelocity.Y;
+                    FP remainingVelocity = physicsObject->Velocity.Magnitude - min.Value;
                     FPVector2 newDirection = new(-avgNormal.Y, avgNormal.X);
 
                     // Only care about the Y aspect to not slide up/down hills via gravity
-                    physicsObject->Velocity.Y =
-                        Project(filter.PhysicsObject->Velocity.Normalized * remainingVelocity, newDirection).Y;
+                    FPVector2 newVelocity = physicsObject->Velocity;
+                    newVelocity.Y = Project(physicsObject->Velocity.Normalized * remainingVelocity, newDirection).Y;
 
-                    return;
+                    return newVelocity;
                 }
             }
 
             // Good to move
-            filter.Transform->Position += directionVector * FPMath.Abs(velocityY);
+            transform->Position += directionVector * FPMath.Abs(velocityY);
             physicsObject->FloorAngle = 0;
+            return physicsObject->Velocity;
         }
 
-        private void MoveHorizontally(Frame f, Filter filter, VersusStageData stage, QList<PhysicsContact> contacts) {
-            var physicsObject = filter.PhysicsObject;
+        public static FPVector2 MoveHorizontally(Frame f, FP velocityX, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = null) {
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
 
-            physicsObject->IsTouchingLeftWall = false;
-            physicsObject->IsTouchingRightWall = false;
-
-            FP velocityX = physicsObject->Velocity.X * f.DeltaTime;
+            velocityX *= f.DeltaTime;
             if (velocityX == 0) {
-                return;
+                return physicsObject->Velocity;
             }
+
+            if (!contacts.HasValue) {
+                if (f.TryResolveList(physicsObject->Contacts, out var tempContacts)) {
+                    contacts = tempContacts;
+                } else {
+                    contacts = f.AllocateList(out physicsObject->Contacts);
+                }
+            }
+
+            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var collider = f.Get<PhysicsCollider2D>(entity);
 
             FPVector2 directionVector = velocityX > 0 ? FPVector2.Right : FPVector2.Left;
 
             if (!physicsObject->DisableCollision) {
-                FPVector2 position = filter.Transform->Position;
-                Shape2D collisionShape = filter.Collider->Shape;
+                FPVector2 position = transform->Position;
+                Shape2D collisionShape = collider.Shape;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(velocityX, 0) + (directionVector * RaycastSkin), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(velocityX, 0) + (directionVector * RaycastSkin), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
                 physicsHits.Sort(position);
 
-                position += filter.Collider->Shape.Centroid;
+                position += collisionShape.Centroid;
                 FP checkPointX = position.X + collisionShape.Box.Extents.X * (velocityX > 0 ? 1 : -1);
                 FPVector2 bottomWorldCheckPoint = new(checkPointX, position.Y - collisionShape.Box.Extents.Y);
                 FPVector2 topWorldCheckPoint = new(checkPointX, position.Y + collisionShape.Box.Extents.Y);
@@ -261,12 +321,14 @@ namespace Quantum {
                             continue;
                         }
 
-                        potentialContacts.Add(new() {
+                        potentialContacts.Add(new PhysicsContact {
                             Distance = FPMath.Abs(hit.Point.X - checkPointX),
                             Normal = hit.Normal,
                             Position = hit.Point,
+                            Frame = f.Number,
                             TileX = -1,
                             TileY = -1,
+                            Entity = hit.Entity,
                         });
                     }
 
@@ -292,10 +354,10 @@ namespace Quantum {
                         }
 
                         bool keepContact = true;
-                        f.Signals.OnPreTileCollide(stage, filter.Entity, &contact, &keepContact);
+                        f.Signals.OnPreTileCollide(stage, entity, &contact, &keepContact);
 
                         if (keepContact) {
-                            contacts.Add(contact);
+                            contacts.Value.Add(contact);
                             min ??= contact.Distance;
                             avgNormal += contact.Normal;
                             contactCount++;
@@ -317,22 +379,23 @@ namespace Quantum {
                     avgNormal /= contactCount;
 
                     // Snap to point.
-                    filter.Transform->Position += directionVector * (min.Value - Skin);
+                    transform->Position += directionVector * (min.Value - Skin);
 
                     // Readjust the remaining velocity
                     FP remainingVelocity = physicsObject->Velocity.Magnitude - min.Value;
                     FPVector2 newDirection = new(-avgNormal.Y, avgNormal.X);
-                    
-                    physicsObject->Velocity = Project(physicsObject->Velocity.Normalized * remainingVelocity, newDirection);
-                    if (FPMath.Abs(FPVector2.Dot(newDirection, FPVector2.Right)) > FP._0_33) {
-                        physicsObject->Velocity.X = velocityX / f.DeltaTime;
+
+                    FPVector2 newVelocity = Project(physicsObject->Velocity.Normalized * remainingVelocity, newDirection);
+                    if (FPMath.Abs(FPVector2.Dot(newDirection, FPVector2.Right)) > GroundMaxAngle) {
+                        newVelocity.X = velocityX / f.DeltaTime;
                     }
-                    return;
+                    return newVelocity;
                 }
             }
 
             // Good to move
-            filter.Transform->Position += directionVector * FPMath.Abs(velocityX);
+            transform->Position += directionVector * FPMath.Abs(velocityX);
+            return physicsObject->Velocity;
         }
 
         private void ResolveContacts(PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
@@ -426,12 +489,14 @@ namespace Quantum {
                 var hit = nullableHit.Value;
                 FP hitDistance = hit.CastDistanceNormalized * maxDistance;
                 if (hitDistance < contact.Distance || contact.Distance == 0) {
-                    contact = new() {
+                    contact = new PhysicsContact {
                         Distance = distance,
                         Normal = hit.Normal,
                         Position = hit.Point,
                         TileX = -1,
                         TileY = -1,
+                        Entity = hit.Entity,
+                        Frame = f.Number,
                     };
                 }
             }
@@ -558,6 +623,22 @@ namespace Quantum {
 
         private static FPVector2 Project(FPVector2 a, FPVector2 b) {
             return b * (FPVector2.Dot(a, b) / b.Magnitude);
+        }
+
+        public static bool PointIsInsideBox(FPVector2 boxOrigin, Shape2D box, FPVector2 testPosition) {
+            FPVector2 extents = box.Box.Extents;
+            FPVector2 origin = boxOrigin + box.Centroid;
+            FPVector2 boxMin = origin - extents;
+            FPVector2 boxMax = origin + extents;
+
+            FPVector2[] boxCorners = {
+                new(origin.X - extents.X, origin.Y + extents.Y),
+                boxMax,
+                new(origin.X + extents.X, origin.Y - extents.Y),
+                boxMin,
+            };
+
+            return PointIsInsidePolygon(testPosition, boxCorners);
         }
 
         public static bool BoxInsideTile(Frame f, FPVector2 position, Shape2D shape) {

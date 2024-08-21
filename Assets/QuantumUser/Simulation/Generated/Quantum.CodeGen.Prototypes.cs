@@ -244,7 +244,6 @@ namespace Quantum.Prototypes {
     public QBoolean IsActive;
     public QBoolean IsDead;
     public QBoolean FacingRight;
-    public QBoolean ColliderDisabled;
     public QBoolean IgnorePlayerWhenRespawning;
     partial void MaterializeUser(Frame frame, ref Quantum.Enemy result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
@@ -257,7 +256,6 @@ namespace Quantum.Prototypes {
         result.IsActive = this.IsActive;
         result.IsDead = this.IsDead;
         result.FacingRight = this.FacingRight;
-        result.ColliderDisabled = this.ColliderDisabled;
         result.IgnorePlayerWhenRespawning = this.IgnorePlayerWhenRespawning;
         MaterializeUser(frame, ref result, in context);
     }
@@ -319,6 +317,21 @@ namespace Quantum.Prototypes {
         result.PowerupAction = this.PowerupAction;
         result.FireballPowerupAction = this.FireballPowerupAction;
         result.PropellerPowerupAction = this.PropellerPowerupAction;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Interactable))]
+  public unsafe partial class InteractablePrototype : ComponentPrototype<Quantum.Interactable> {
+    public QBoolean ColliderDisabled;
+    partial void MaterializeUser(Frame frame, ref Quantum.Interactable result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Interactable component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Interactable result, in PrototypeMaterializationContext context = default) {
+        result.ColliderDisabled = this.ColliderDisabled;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -539,43 +552,74 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
-  [Quantum.Prototypes.Prototype(typeof(Quantum.PhysicsContact))]
-  public unsafe partial class PhysicsContactPrototype : StructPrototype {
-    public FPVector2 Position;
-    public FPVector2 Normal;
-    public FP Distance;
-    public Int32 TileX;
-    public Int32 TileY;
-    partial void MaterializeUser(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context);
-    public void Materialize(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context = default) {
-        result.Position = this.Position;
-        result.Normal = this.Normal;
-        result.Distance = this.Distance;
-        result.TileX = this.TileX;
-        result.TileY = this.TileY;
+  [Quantum.Prototypes.Prototype(typeof(Quantum.MovingPlatform))]
+  public unsafe partial class MovingPlatformPrototype : ComponentPrototype<Quantum.MovingPlatform> {
+    public FPVector2 Velocity;
+    public FPVector2 Origin;
+    public Int32 StartTick;
+    partial void MaterializeUser(Frame frame, ref Quantum.MovingPlatform result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.MovingPlatform component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.MovingPlatform result, in PrototypeMaterializationContext context = default) {
+        result.Velocity = this.Velocity;
+        result.Origin = this.Origin;
+        result.StartTick = this.StartTick;
         MaterializeUser(frame, ref result, in context);
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PhysicsContact))]
+  public unsafe class PhysicsContactPrototype : StructPrototype {
+    public FPVector2 Position;
+    public FPVector2 Normal;
+    public FP Distance;
+    public Int32 Frame;
+    public Int32 TileX;
+    public Int32 TileY;
+    public MapEntityId Entity;
+    public void Materialize(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context = default) {
+        result.Position = this.Position;
+        result.Normal = this.Normal;
+        result.Distance = this.Distance;
+        result.Frame = this.Frame;
+        result.TileX = this.TileX;
+        result.TileY = this.TileY;
+        PrototypeValidator.FindMapEntity(this.Entity, in context, out result.Entity);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.PhysicsObject))]
-  public unsafe partial class PhysicsObjectPrototype : ComponentPrototype<Quantum.PhysicsObject> {
+  public unsafe class PhysicsObjectPrototype : ComponentPrototype<Quantum.PhysicsObject> {
+    [HideInInspector()]
     public FPVector2 Velocity;
+    [HideInInspector()]
+    public FPVector2 ParentVelocity;
+    [HideInInspector()]
     public FPVector2 PreviousVelocity;
     public FPVector2 Gravity;
     public FP TerminalVelocity;
     public QBoolean IsFrozen;
     public QBoolean DisableCollision;
+    [HideInInspector()]
     public QBoolean IsTouchingLeftWall;
+    [HideInInspector()]
     public QBoolean IsTouchingRightWall;
+    [HideInInspector()]
     public QBoolean IsTouchingCeiling;
+    [HideInInspector()]
     public QBoolean IsTouchingGround;
+    [HideInInspector()]
     public FP FloorAngle;
+    [HideInInspector()]
     public QBoolean IsOnSlipperyGround;
+    [HideInInspector()]
     public QBoolean IsOnSlideableGround;
     [FreeOnComponentRemoved()]
     [DynamicCollectionAttribute()]
     public Quantum.Prototypes.PhysicsContactPrototype[] Contacts = {};
-    partial void MaterializeUser(Frame frame, ref Quantum.PhysicsObject result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.PhysicsObject component = default;
         Materialize((Frame)f, ref component, in context);
@@ -583,6 +627,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.PhysicsObject result, in PrototypeMaterializationContext context = default) {
         result.Velocity = this.Velocity;
+        result.ParentVelocity = this.ParentVelocity;
         result.PreviousVelocity = this.PreviousVelocity;
         result.Gravity = this.Gravity;
         result.TerminalVelocity = this.TerminalVelocity;
@@ -605,7 +650,6 @@ namespace Quantum.Prototypes {
             list.Add(tmp);
           }
         }
-        MaterializeUser(frame, ref result, in context);
     }
   }
   [System.SerializableAttribute()]

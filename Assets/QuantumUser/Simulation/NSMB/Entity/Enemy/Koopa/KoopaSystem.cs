@@ -18,12 +18,13 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            EnemySystem.RegisterInteraction<Koopa, Goomba>(OnKoopaGoombaInteraction);
-            EnemySystem.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
-            EnemySystem.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
-            EnemySystem.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
-            EnemySystem.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
-            EnemySystem.RegisterInteraction<Koopa, Boo>(OnKoopaBooInteraction);
+            InteractionSystem.RegisterInteraction<Koopa, Goomba>(OnKoopaGoombaInteraction);
+            InteractionSystem.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
+            InteractionSystem.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
+            InteractionSystem.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
+            InteractionSystem.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
+            InteractionSystem.RegisterInteraction<Koopa, Boo>(OnKoopaBooInteraction);
+            InteractionSystem.RegisterInteraction<Koopa, Projectile>(OnKoopaProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -268,6 +269,25 @@ namespace Quantum {
                         koopaEnemy->FacingRight = koopaTransform.Position.X > marioTransform.Position.X;
                     }
                 }
+            }
+        }
+
+        public void OnKoopaProjectileInteraction(Frame f, EntityRef koopaEntity, EntityRef projectileEntity) {
+            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+
+            switch (projectileAsset.Effect) {
+            case ProjectileEffectType.Knockback: {
+                f.Unsafe.GetPointer<Koopa>(koopaEntity)->Kill(f, koopaEntity, projectileEntity, true);
+                break;
+            }
+            case ProjectileEffectType.Freeze: {
+                // TODO
+                break;
+            }
+            }
+
+            if (projectileAsset.DestroyOnHit) {
+                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
         }
 

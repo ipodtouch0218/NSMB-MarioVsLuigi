@@ -12,9 +12,10 @@ namespace Quantum {
 		}
 
         public override void OnInit(Frame f) {
-            EnemySystem.RegisterInteraction<Goomba, Goomba>(OnGoombaGoombaInteraction);
-            EnemySystem.RegisterInteraction<Goomba, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
-            EnemySystem.RegisterInteraction<Goomba, MarioPlayer>(OnGoombaMarioInteraction);
+            InteractionSystem.RegisterInteraction<Goomba, Goomba>(OnGoombaGoombaInteraction);
+            InteractionSystem.RegisterInteraction<Goomba, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
+            InteractionSystem.RegisterInteraction<Goomba, MarioPlayer>(OnGoombaMarioInteraction);
+            InteractionSystem.RegisterInteraction<Goomba, Projectile>(OnGoombaProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -91,6 +92,25 @@ namespace Quantum {
             } else if (mario->IsDamageable) {
                 mario->Powerdown(f, marioEntity, false);
                 goombaEnemy->FacingRight = damageDirection.X > 0;
+            }
+        }
+
+        public void OnGoombaProjectileInteraction(Frame f, EntityRef goombaEntity, EntityRef projectileEntity) {
+            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+
+            switch (projectileAsset.Effect) {
+            case ProjectileEffectType.Knockback: {
+                f.Unsafe.GetPointer<Goomba>(goombaEntity)->Kill(f, goombaEntity, projectileEntity, true);
+                break;
+            }
+            case ProjectileEffectType.Freeze: {
+                // TODO
+                break;
+            }
+            }
+
+            if (projectileAsset.DestroyOnHit) {
+                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
         }
 

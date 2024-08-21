@@ -252,6 +252,7 @@ GameObject:
   - component: {fileID: 8006284552651083082}
   - component: {fileID: 3502500067357238800}
   - component: {fileID: 1515450150619802232}
+  - component: {fileID: -805149708868906492}
   m_Layer: 0
   m_Name: PiranhaPlant
   m_TagString: Untagged
@@ -562,8 +563,6 @@ MonoBehaviour:
       Value: 0
     FacingRight:
       Value: 0
-    ColliderDisabled:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 1
 --- !u!114 &3502500067357238800
@@ -631,3 +630,18 @@ MonoBehaviour:
   sfx: {fileID: 7558042822839980312}
   sRenderer: {fileID: 5652721323520962159}
   animator: {fileID: 863355600414429673}
+--- !u!114 &-805149708868906492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6254190274066690703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0
