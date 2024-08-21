@@ -1,8 +1,7 @@
 using Photon.Deterministic;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
-    public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter>, ISignalOnTrigger2D {
+    public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter> {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -17,21 +16,21 @@ namespace Quantum {
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
 
+            var asset = f.FindAsset(projectile->Asset);
+
             if (filter.Transform->Position.Y + collider->Shape.Centroid.Y + collider->Shape.Box.Extents.Y < stage.StageWorldMin.Y) {
-                Destroy(f, filter.Entity, false);
+                Destroy(f, filter.Entity, ParticleEffect.None);
                 return;
             }
 
-
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape)) {
-                    Destroy(f, filter.Entity, true);
+                    Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                     return;
                 }
                 projectile->CheckedCollision = true;
             }
 
-            var asset = f.FindAsset(projectile->Asset);
             HandleTileCollision(f, filter, asset);
 
             physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
@@ -49,9 +48,10 @@ namespace Quantum {
             if (physicsObject->IsTouchingLeftWall
                 || physicsObject->IsTouchingRightWall
                 || physicsObject->IsTouchingCeiling
-                || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))) {
+                || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
+                || PhysicsObjectSystem.BoxInsideTile(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
 
-                Destroy(f, filter.Entity, true);
+                Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                 return;
             }
 
@@ -65,60 +65,6 @@ namespace Quantum {
                 physicsObject->Velocity.Y = asset.BounceStrength + boost;
                 projectile->HasBounced = true;
             }
-
-
-            /* TODO
-            if (Utils.Utils.IsTileSolidAtWorldLocation(body.Position)) {
-                DespawnEntity();
-            }
-            */
-        }
-
-        public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (f.DestroyPending(info.Other)) {
-                return;
-            }
-
-            if (TryDamagePlayer(f, info)
-                || TryDamageEnemy(f, info)) {
-
-                Destroy(f, info.Other, true);
-            }
-        }
-
-        private bool TryDamageEnemy(Frame f, TriggerInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Other, out Projectile* projectile)
-                || !f.Unsafe.TryGetPointer(info.Entity, out Enemy* enemy)
-                || !enemy->IsAlive) {
-                return false;
-            }
-
-            
-
-            if (f.Unsafe.TryGetPointer(info.Entity, out Goomba* goomba)) {
-                var asset = f.FindAsset(projectile->Asset);
-                switch (asset.Effect) {
-                case ProjectileEffectType.Knockback: {
-                    goomba->Kill(f, info.Entity, info.Other, true);
-                    break;
-                }
-                }
-
-                return true;
-
-            } else if (f.Unsafe.TryGetPointer(info.Entity, out Koopa* koopa)) {
-                var asset = f.FindAsset(projectile->Asset);
-                switch (asset.Effect) {
-                case ProjectileEffectType.Knockback: {
-                    koopa->Kill(f, info.Entity, info.Other, true);
-                    break;
-                }
-                }
-
-                return true;
-            }
-
-            return false;
         }
 
         private bool TryDamagePlayer(Frame f, TriggerInfo2D info) {
@@ -142,7 +88,9 @@ namespace Quantum {
 
             var asset = f.FindAsset(projectile->Asset);
 
-            if (mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->IsStarmanInvincible || (asset.Effect == ProjectileEffectType.Freeze && mario->IsInKnockback)) {
+            if (mario->CurrentPowerupState == PowerupState.MegaMushroom
+                || mario->IsStarmanInvincible
+                || (asset.Effect == ProjectileEffectType.Freeze && mario->IsInKnockback)) {
                 return true;
             }
 
@@ -152,7 +100,7 @@ namespace Quantum {
             switch (mario->CurrentPowerupState) {
             case PowerupState.MiniMushroom:
                 if (dropStars) {
-                    // player.Death(false, false);
+                    mario->Death(f, info.Entity, false);
                 } else {
                     // player.DoKnockback(!FacingRight, 0, true, Object);
                 }
@@ -165,7 +113,7 @@ namespace Quantum {
                 break;
             }
 
-            // Collision is a GO
+            // Normal collision is a GO
 
             switch (asset.Effect) {
             case ProjectileEffectType.Knockback:
@@ -183,9 +131,9 @@ namespace Quantum {
             return true;
         }
 
-        private void Destroy(Frame f, EntityRef entity, bool playEffect) {
+        public static void Destroy(Frame f, EntityRef entity, ParticleEffect particle) {
+            f.Events.ProjectileDestroyed(f, entity, particle, f.Get<Transform2D>(entity).Position);
             f.Destroy(entity);
-            f.Events.ProjectileDestroyed(f, entity, playEffect);
         }
     }
 }

@@ -13,3 +13,8 @@ component BlockBump {
 }
 
 signal OnEntityBumped(entity_ref entity, FPVector2 tileWorldPosition, entity_ref blockBump);
+
+event EntityBlockBumped {
+	nothashed Frame Frame;
+	EntityRef Entity;
+}

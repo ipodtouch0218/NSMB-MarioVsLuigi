@@ -30,6 +30,8 @@ public class BobombAnimator : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventBobombExploded>(this, OnBobombExploded);
         QuantumEvent.Subscribe<EventBobombLit>(this, OnBobombLit);
+        QuantumEvent.Subscribe<EventEntityBlockBumped>(this, OnEntityBlockBumped);
+        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound);
 
         sRenderer.GetPropertyBlock(mpb = new());
     }
@@ -72,6 +74,22 @@ public class BobombAnimator : MonoBehaviour {
         transform.position = modifiedZ;
     }
 
+    private void OnPlayComboSound(EventPlayComboSound e) {
+        if (e.Entity != entity.EntityRef) {
+            return;
+        }
+
+        sfx.PlayOneShot(QuantumUtils.GetComboSoundEffect(e.Combo));
+    }
+
+    private void OnEntityBlockBumped(EventEntityBlockBumped e) {
+        if (e.Entity != entity.EntityRef) {
+            return;
+        }
+
+        sfx.PlayOneShot(SoundEffect.Enemy_Shell_Kick);
+    }
+
     private void OnBobombExploded(EventBobombExploded e) {
         if (e.Entity != entity.EntityRef) {
             return;
@@ -88,5 +106,9 @@ public class BobombAnimator : MonoBehaviour {
 
         sfx.clip = SoundEffect.Enemy_Bobomb_Fuse.GetClip();
         sfx.Play();
+
+        if (e.Stomped) {
+            sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
+        }
     }
 }

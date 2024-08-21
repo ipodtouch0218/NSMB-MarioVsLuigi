@@ -1,3 +1,5 @@
+import enum ParticleEffect(byte);
+
 component Projectile {
 	asset_ref<ProjectileAsset> Asset;
 	FP Speed;
@@ -9,7 +11,8 @@ component Projectile {
 }
 
 event ProjectileDestroyed {
-	Frame Frame;
+	nothashed Frame Frame;
 	EntityRef Entity;
-	bool PlayEffect;
+	ParticleEffect Particle;
+	nothashed FPVector2 Position;
 }

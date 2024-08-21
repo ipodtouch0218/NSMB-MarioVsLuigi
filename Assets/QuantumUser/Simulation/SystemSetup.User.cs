@@ -10,9 +10,13 @@ namespace Quantum {
             systems.Add(new PlayerConnectedSystem());
             systems.Add(new ClientSystem());
             systems.Add(new GameLogicSystem());
+
+            systems.Add(new PhysicsSystem2D());
             systems.Add(
                 new GameplaySystemGroup(
+                    new MovingPlatformSystem(),
                     new EnemySystem(),
+                    new InteractionSystem(),
                     new GoombaSystem(),
                     new KoopaSystem(),
                     new BobombSystem(),

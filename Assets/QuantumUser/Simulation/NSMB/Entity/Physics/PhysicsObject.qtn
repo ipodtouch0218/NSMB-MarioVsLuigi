@@ -1,0 +1,31 @@
+component PhysicsObject {
+    [HideInInspector] FPVector2 Velocity;
+    [HideInInspector] FPVector2 ParentVelocity;
+    [HideInInspector] FPVector2 PreviousVelocity;
+    FPVector2 Gravity;
+    FP TerminalVelocity;
+    bool IsFrozen;
+    bool DisableCollision;
+
+    [HideInInspector] bool IsTouchingLeftWall;
+    [HideInInspector] bool IsTouchingRightWall;
+    [HideInInspector] bool IsTouchingCeiling;
+    [HideInInspector] bool IsTouchingGround;
+    [HideInInspector] FP FloorAngle;
+    [HideInInspector] bool IsOnSlipperyGround;
+    [HideInInspector] bool IsOnSlideableGround;
+
+    [FreeOnComponentRemoved] list<PhysicsContact> Contacts;
+}
+
+struct PhysicsContact {
+    FPVector2 Position;
+    FPVector2 Normal;
+    FP Distance;
+    int Frame;
+    int TileX;
+    int TileY;
+    EntityRef Entity;
+}
+
+signal OnPreTileCollide(VersusStageData stage, entity_ref Entity, PhysicsContact* Contact, bool* AllowCollision);

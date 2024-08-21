@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace Quantum {
@@ -15,10 +16,11 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            EnemySystem.RegisterInteraction<Bobomb, Bobomb>(OnBobombBobombInteraction);
-            EnemySystem.RegisterInteraction<Bobomb, Goomba>(EnemySystem.EnemyBumpTurnaround);
-            EnemySystem.RegisterInteraction<Bobomb, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
-            EnemySystem.RegisterInteraction<Bobomb, MarioPlayer>(OnBobombMarioInteraction);
+            InteractionSystem.RegisterInteraction<Bobomb, Bobomb>(EnemySystem.EnemyBumpTurnaround);
+            InteractionSystem.RegisterInteraction<Bobomb, Goomba>(EnemySystem.EnemyBumpTurnaround);
+            InteractionSystem.RegisterInteraction<Bobomb, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
+            InteractionSystem.RegisterInteraction<Bobomb, MarioPlayer>(OnBobombMarioInteraction);
+            InteractionSystem.RegisterInteraction<Bobomb, Projectile>(OnBobombProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {
@@ -47,7 +49,6 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 enemy->FacingRight = physicsObject->IsTouchingLeftWall;
-
                 physicsObject->Velocity.X = (lit ? FPMath.Abs(physicsObject->PreviousVelocity.X) : bobomb->Speed) * (enemy->FacingRight ? 1 : -1);
             }
 
@@ -60,10 +61,6 @@ namespace Quantum {
             if (!lit) {
                 physicsObject->Velocity.X = bobomb->Speed * (enemy->FacingRight ? 1 : -1);
             }
-        }
-
-        public void OnBobombBobombInteraction(Frame f, EntityRef bobombEntityA, EntityRef bobombEntityB) {
-            EnemySystem.EnemyBumpTurnaround(f, bobombEntityA, bobombEntityB);
         }
 
         public void OnBobombMarioInteraction(Frame f, EntityRef bobombEntity, EntityRef marioEntity) {
@@ -107,7 +104,7 @@ namespace Quantum {
                     // Light
                     bool mini = mario->CurrentPowerupState == PowerupState.MiniMushroom;
                     if (!mini || mario->IsGroundpoundActive) {
-                        Light(f, bobombEntity, bobomb);
+                        Light(f, bobombEntity, bobomb, mini || !mario->IsGroundpoundActive);
                     }
 
                     if (!mini && mario->IsGroundpoundActive) {
@@ -134,7 +131,31 @@ namespace Quantum {
             } 
         }
 
-        private static void Light(Frame f, EntityRef entity, Bobomb* bobomb) {
+        public void OnBobombProjectileInteraction(Frame f, EntityRef bobombEntity, EntityRef projectileEntity) {
+            var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
+            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+
+            switch (projectileAsset.Effect) {
+            case ProjectileEffectType.Knockback: {
+                if (bobomb->CurrentDetonationFrames > 0) {
+                    bobomb->Kick(f, bobombEntity, projectileEntity, 0);
+                } else {
+                    Light(f, bobombEntity, bobomb, false);
+                }
+                break;
+            }
+            case ProjectileEffectType.Freeze: {
+                //
+                break;
+            }
+            }
+
+            if (projectileAsset.DestroyOnHit) {
+                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
+            }
+        }
+
+        private static void Light(Frame f, EntityRef entity, Bobomb* bobomb, bool stomp) {
             if (bobomb->CurrentDetonationFrames > 0) {
                 return;
             }
@@ -142,7 +163,7 @@ namespace Quantum {
             bobomb->CurrentDetonationFrames = bobomb->DetonationFrames;
             f.Unsafe.GetPointer<PhysicsObject>(entity)->Velocity.X = 0;
 
-            f.Events.BobombLit(f, entity);
+            f.Events.BobombLit(f, entity, stomp);
         }
 
         private static void Explode(Frame f, Filter filter) {
@@ -210,13 +231,15 @@ namespace Quantum {
                 return;
             }
 
-            Light(f, entity, bobomb);
+            Light(f, entity, bobomb, true);
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
                 ourPos.X > theirPos.X ? 1 : -1,
                 FP.FromString("5.5")
             );
             physicsObject->IsTouchingGround = false;
+
+            f.Events.EntityBlockBumped(f, entity);
         }
 
         public void OnEnemyRespawned(Frame f, EntityRef entity) {
@@ -234,7 +257,7 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(marioEntity, out PhysicsObject* marioPhysics)) {
                 return;
             }
-
+            
             physicsObject->Velocity.Y = 0;
             if (crouching) {
                 physicsObject->Velocity.X = mario->FacingRight ? 1 : -1;

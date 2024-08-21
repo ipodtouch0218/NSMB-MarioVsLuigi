@@ -292,6 +292,80 @@ namespace Quantum.Prototypes.Unity {
     }
   }
   [System.SerializableAttribute()]
+  public unsafe partial class PhysicsContactPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PhysicsContactPrototype> {
+    public FPVector2 Position;
+    public FPVector2 Normal;
+    public FP Distance;
+    public Int32 Frame;
+    public Int32 TileX;
+    public Int32 TileY;
+    public Quantum.QuantumEntityPrototype Entity;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PhysicsContactPrototype prototype);
+    public override Quantum.Prototypes.PhysicsContactPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.PhysicsContactPrototype();
+      converter.Convert(this.Position, out result.Position);
+      converter.Convert(this.Normal, out result.Normal);
+      converter.Convert(this.Distance, out result.Distance);
+      converter.Convert(this.Frame, out result.Frame);
+      converter.Convert(this.TileX, out result.TileX);
+      converter.Convert(this.TileY, out result.TileY);
+      converter.Convert(this.Entity, out result.Entity);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
+  public unsafe partial class PhysicsObjectPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PhysicsObjectPrototype> {
+    [HideInInspector()]
+    public FPVector2 Velocity;
+    [HideInInspector()]
+    public FPVector2 ParentVelocity;
+    [HideInInspector()]
+    public FPVector2 PreviousVelocity;
+    public FPVector2 Gravity;
+    public FP TerminalVelocity;
+    public QBoolean IsFrozen;
+    public QBoolean DisableCollision;
+    [HideInInspector()]
+    public QBoolean IsTouchingLeftWall;
+    [HideInInspector()]
+    public QBoolean IsTouchingRightWall;
+    [HideInInspector()]
+    public QBoolean IsTouchingCeiling;
+    [HideInInspector()]
+    public QBoolean IsTouchingGround;
+    [HideInInspector()]
+    public FP FloorAngle;
+    [HideInInspector()]
+    public QBoolean IsOnSlipperyGround;
+    [HideInInspector()]
+    public QBoolean IsOnSlideableGround;
+    [FreeOnComponentRemoved()]
+    [DynamicCollectionAttribute()]
+    public Quantum.Prototypes.Unity.PhysicsContactPrototype[] Contacts = {};
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PhysicsObjectPrototype prototype);
+    public override Quantum.Prototypes.PhysicsObjectPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.PhysicsObjectPrototype();
+      converter.Convert(this.Velocity, out result.Velocity);
+      converter.Convert(this.ParentVelocity, out result.ParentVelocity);
+      converter.Convert(this.PreviousVelocity, out result.PreviousVelocity);
+      converter.Convert(this.Gravity, out result.Gravity);
+      converter.Convert(this.TerminalVelocity, out result.TerminalVelocity);
+      converter.Convert(this.IsFrozen, out result.IsFrozen);
+      converter.Convert(this.DisableCollision, out result.DisableCollision);
+      converter.Convert(this.IsTouchingLeftWall, out result.IsTouchingLeftWall);
+      converter.Convert(this.IsTouchingRightWall, out result.IsTouchingRightWall);
+      converter.Convert(this.IsTouchingCeiling, out result.IsTouchingCeiling);
+      converter.Convert(this.IsTouchingGround, out result.IsTouchingGround);
+      converter.Convert(this.FloorAngle, out result.FloorAngle);
+      converter.Convert(this.IsOnSlipperyGround, out result.IsOnSlipperyGround);
+      converter.Convert(this.IsOnSlideableGround, out result.IsOnSlideableGround);
+      converter.Convert(this.Contacts, out result.Contacts);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
   public unsafe partial class PowerupPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PowerupPrototype> {
     public AssetRef<PowerupAsset> Scriptable;
     public QBoolean FacingRight;

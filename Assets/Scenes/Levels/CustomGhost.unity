@@ -456,6 +456,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7625224819000450171, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: audioSources.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: Asset
@@ -465,7 +470,7 @@ PrefabInstance:
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.size
-      value: 16
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
@@ -546,13 +551,27 @@ PrefabInstance:
         type: 3}
       propertyPath: MapEntityReferences.Array.data[15]
       value: 
-      objectReference: {fileID: 1922080208}
+      objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.data[16]
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: MapEntityReferences.Array.data[17]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: MapEntityReferences.Array.data[18]
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 2833826708827202206, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}
+    - {fileID: 7625224819000450171, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}
+    - {fileID: 3267513942057105976, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}
+    - {fileID: 7194906589534897373, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -12678,6 +12697,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boo
       objectReference: {fileID: 0}
+    - target: {fileID: 3813481168314615756, guid: 85abc82ae8d902a4db8901f38cec75eb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7332006103014348897, guid: 85abc82ae8d902a4db8901f38cec75eb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
@@ -12748,18 +12772,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85abc82ae8d902a4db8901f38cec75eb, type: 3}
---- !u!114 &1922080208 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8659307129223830223, guid: 85abc82ae8d902a4db8901f38cec75eb,
-    type: 3}
-  m_PrefabInstance: {fileID: 1922080207}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1981730599
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -125,6 +125,7 @@ GameObject:
   - component: {fileID: 3976207421601548572}
   - component: {fileID: 6973860988952587205}
   - component: {fileID: 724652125925019376}
+  - component: {fileID: -7630330329796668258}
   m_Layer: 0
   m_Name: Bobomb
   m_TagString: Untagged
@@ -644,8 +645,6 @@ MonoBehaviour:
       Value: 0
     FacingRight:
       Value: 0
-    ColliderDisabled:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &724652125925019376
@@ -662,3 +661,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     _empty_prototype_dummy_field_: 0
+--- !u!114 &-7630330329796668258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3286581577125373952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0

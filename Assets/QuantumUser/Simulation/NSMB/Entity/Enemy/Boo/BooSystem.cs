@@ -13,7 +13,8 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            EnemySystem.RegisterInteraction<Boo, MarioPlayer>(OnBooMarioPlayerInteraction);
+            InteractionSystem.RegisterInteraction<Boo, MarioPlayer>(OnBooMarioPlayerInteraction);
+            InteractionSystem.RegisterInteraction<Boo, Projectile>(OnBooProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -123,6 +124,14 @@ namespace Quantum {
                 boo->Kill(f, booEntity, marioEntity, true);
             } else {
                 mario->Powerdown(f, marioEntity, false);
+            }
+        }
+
+        public void OnBooProjectileInteraction(Frame f, EntityRef booEntity, EntityRef projectileEntity) {
+            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+
+            if (projectileAsset.DestroyOnHit) {
+                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
         }
 

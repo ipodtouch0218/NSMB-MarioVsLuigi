@@ -4,7 +4,8 @@ namespace Quantum {
     public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill> {
 
         public override void OnInit(Frame f) {
-            EnemySystem.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
+            InteractionSystem.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
+            InteractionSystem.RegisterInteraction<BulletBill, Projectile>(OnBulletBillProjectileInteraction);
         }
 
         public override void Update(Frame f) {
@@ -117,6 +118,18 @@ namespace Quantum {
 
             } else if (!mario->IsCrouchedInShell && mario->IsDamageable) {
                 mario->Powerdown(f, marioEntity, false);
+            }
+        }
+
+        public void OnBulletBillProjectileInteraction(Frame f, EntityRef bulletBillEntity, EntityRef projectileEntity) {
+            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+
+            if (projectileAsset.Effect == ProjectileEffectType.Freeze) {
+                // TODO
+            }
+
+            if (projectileAsset.DestroyOnHit) {
+                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
         }
 

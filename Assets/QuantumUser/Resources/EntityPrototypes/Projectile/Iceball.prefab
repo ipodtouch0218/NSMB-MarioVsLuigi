@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3718871867754987808}
   - component: {fileID: 3977285621181604314}
   - component: {fileID: -2054149978793598197}
-  - component: {fileID: -239267762163146982}
+  - component: {fileID: 5152219214808162071}
   m_Layer: 9
   m_Name: Iceball
   m_TagString: Untagged
@@ -374,7 +374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     _empty_prototype_dummy_field_: 0
---- !u!114 &-239267762163146982
+--- !u!114 &5152219214808162071
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -383,12 +383,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6307920351473437675}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ce72b3d95718d74cb7a6396c288da24, type: 3}
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 7359433677201013330}
-  destroyParticlePrefab: {fileID: 7364277850527789973, guid: 9b9c3330adc60884780fd1c9be0e9ad1,
-    type: 3}
+  Prototype:
+    ColliderDisabled:
+      Value: 0
 --- !u!1 &6313951447176480054
 GameObject:
   m_ObjectHideFlags: 0

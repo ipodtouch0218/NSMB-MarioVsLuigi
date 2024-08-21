@@ -3,17 +3,18 @@ component Bobomb {
 	FP Speed;
 	ushort DetonationFrames;
 
-	ushort CurrentDetonationFrames;
+	[ExcludeFromPrototype] ushort CurrentDetonationFrames;
 }
 
 signal OnBobombExplodeEntity(entity_ref bobomb, entity_ref entity);
 
 event BobombLit {
-	Frame Frame;
+	nothashed Frame Frame;
 	EntityRef Entity;
+	bool Stomped;
 }
 
 event BobombExploded {
-	Frame Frame;
+	nothashed Frame Frame;
 	EntityRef Entity;
 }
