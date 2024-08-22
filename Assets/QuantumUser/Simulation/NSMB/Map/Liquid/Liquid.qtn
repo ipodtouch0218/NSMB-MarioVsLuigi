@@ -5,7 +5,7 @@ component Liquid {
 	int WidthTiles;
 	FP HeightTiles;
 
-	[FreeOnComponentRemoved] list<EntityRef> SplashedEntities;
+	[ExcludeFromPrototype, FreeOnComponentRemoved] list<EntityRef> SplashedEntities;
 }
 
 signal OnTryLiquidSplash(EntityRef entity, EntityRef liquid, bool* doSplash);

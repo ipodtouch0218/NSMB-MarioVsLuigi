@@ -72,6 +72,12 @@ public class BobombAnimator : MonoBehaviour {
             modifiedZ.z = -4.1f;
         }
         transform.position = modifiedZ;
+        
+        if (enemy.IsDead) {
+            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
+        } else {
+            transform.rotation = Quaternion.identity;
+        }
     }
 
     private void OnPlayComboSound(EventPlayComboSound e) {

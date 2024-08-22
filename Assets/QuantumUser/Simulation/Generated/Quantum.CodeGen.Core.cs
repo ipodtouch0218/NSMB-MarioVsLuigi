@@ -648,10 +648,12 @@ namespace Quantum {
     public EntityRef MainBigStar;
     [FieldOffset(1216)]
     public BitSet64 UsedStarSpawns;
-    [FieldOffset(1208)]
+    [FieldOffset(1212)]
     public Int32 UsedStarSpawnCount;
     [FieldOffset(1200)]
     public GameState GameState;
+    [FieldOffset(1208)]
+    public Int32 StartFrame;
     [FieldOffset(1204)]
     public UInt16 GameStartFrames;
     [FieldOffset(1232)]
@@ -681,6 +683,7 @@ namespace Quantum {
         hash = hash * 31 + UsedStarSpawns.GetHashCode();
         hash = hash * 31 + UsedStarSpawnCount.GetHashCode();
         hash = hash * 31 + (byte)GameState;
+        hash = hash * 31 + StartFrame.GetHashCode();
         hash = hash * 31 + GameStartFrames.GetHashCode();
         hash = hash * 31 + Timer.GetHashCode();
         return hash;
@@ -703,6 +706,7 @@ namespace Quantum {
         serializer.Stream.Serialize((byte*)&p->GameState);
         serializer.Stream.Serialize(&p->BigStarSpawnTimer);
         serializer.Stream.Serialize(&p->GameStartFrames);
+        serializer.Stream.Serialize(&p->StartFrame);
         serializer.Stream.Serialize(&p->UsedStarSpawnCount);
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);
         EntityRef.Serialize(&p->MainBigStar, serializer);
@@ -726,6 +730,7 @@ namespace Quantum {
     [FieldOffset(16)]
     public FP BounceForce;
     [FieldOffset(4)]
+    [ExcludeFromPrototype()]
     public QBoolean FacingRight;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -761,19 +766,25 @@ namespace Quantum {
     public AssetRef<StageTile> StartTile;
     [FieldOffset(64)]
     public StageTileInstance ResultTile;
-    [FieldOffset(16)]
-    public QBoolean IsDownwards;
     [FieldOffset(24)]
     public AssetRef<EntityPrototype> Powerup;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsDownwards;
     [FieldOffset(48)]
+    [ExcludeFromPrototype()]
     public FPVector2 Origin;
     [FieldOffset(4)]
+    [ExcludeFromPrototype()]
     public Int32 TileX;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public Int32 TileY;
     [FieldOffset(40)]
+    [ExcludeFromPrototype()]
     public EntityRef Owner;
     [FieldOffset(12)]
+    [ExcludeFromPrototype()]
     public QBoolean HasBumped;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -781,8 +792,8 @@ namespace Quantum {
         hash = hash * 31 + Lifetime.GetHashCode();
         hash = hash * 31 + StartTile.GetHashCode();
         hash = hash * 31 + ResultTile.GetHashCode();
-        hash = hash * 31 + IsDownwards.GetHashCode();
         hash = hash * 31 + Powerup.GetHashCode();
+        hash = hash * 31 + IsDownwards.GetHashCode();
         hash = hash * 31 + Origin.GetHashCode();
         hash = hash * 31 + TileX.GetHashCode();
         hash = hash * 31 + TileY.GetHashCode();
@@ -841,8 +852,10 @@ namespace Quantum {
     public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public EntityRef CurrentTarget;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte UnscaredFrames;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -867,8 +880,10 @@ namespace Quantum {
     [FieldOffset(16)]
     public FP DespawnRadius;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte DespawnFrames;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public EntityRef Owner;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -931,12 +946,16 @@ namespace Quantum {
     public const Int32 SIZE = 56;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public FPVector2 CurrentPosition;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public FP LastFloorHeight;
     [FieldOffset(24)]
+    [ExcludeFromPrototype()]
     public FPVector2 LastPlayerPosition;
     [FieldOffset(40)]
+    [ExcludeFromPrototype()]
     public FPVector2 SmoothDampVelocity;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -958,8 +977,8 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Coin : Quantum.IComponent {
-    public const Int32 SIZE = 40;
-    public const Int32 ALIGNMENT = 8;
+    public const Int32 SIZE = 20;
+    public const Int32 ALIGNMENT = 4;
     [FieldOffset(16)]
     public QBoolean IsFloating;
     [FieldOffset(12)]
@@ -967,14 +986,16 @@ namespace Quantum {
     [FieldOffset(2)]
     public UInt16 Lifetime;
     [FieldOffset(1)]
+    [ExcludeFromPrototype()]
     public Byte UncollectableFrames;
-    [FieldOffset(24)]
-    public FPVector2 PreviousVelocity;
     [FieldOffset(4)]
+    [ExcludeFromPrototype()]
     public QBoolean IsCollected;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public QBoolean IsCurrentlyDotted;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte DottedChangeFrames;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -983,7 +1004,6 @@ namespace Quantum {
         hash = hash * 31 + IsDotted.GetHashCode();
         hash = hash * 31 + Lifetime.GetHashCode();
         hash = hash * 31 + UncollectableFrames.GetHashCode();
-        hash = hash * 31 + PreviousVelocity.GetHashCode();
         hash = hash * 31 + IsCollected.GetHashCode();
         hash = hash * 31 + IsCurrentlyDotted.GetHashCode();
         hash = hash * 31 + DottedChangeFrames.GetHashCode();
@@ -999,7 +1019,6 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsCurrentlyDotted, serializer);
         QBoolean.Serialize(&p->IsDotted, serializer);
         QBoolean.Serialize(&p->IsFloating, serializer);
-        FPVector2.Serialize(&p->PreviousVelocity, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1008,22 +1027,25 @@ namespace Quantum {
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(16)]
     public FPVector2 Spawnpoint;
-    [FieldOffset(8)]
-    public QBoolean IsActive;
-    [FieldOffset(12)]
-    public QBoolean IsDead;
-    [FieldOffset(0)]
-    public QBoolean FacingRight;
     [FieldOffset(4)]
     public QBoolean IgnorePlayerWhenRespawning;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsActive;
+    [FieldOffset(12)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsDead;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public QBoolean FacingRight;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 11071;
         hash = hash * 31 + Spawnpoint.GetHashCode();
+        hash = hash * 31 + IgnorePlayerWhenRespawning.GetHashCode();
         hash = hash * 31 + IsActive.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
-        hash = hash * 31 + IgnorePlayerWhenRespawning.GetHashCode();
         return hash;
       }
     }
@@ -1034,6 +1056,24 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsActive, serializer);
         QBoolean.Serialize(&p->IsDead, serializer);
         FPVector2.Serialize(&p->Spawnpoint, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct GenericMover : Quantum.IComponent {
+    public const Int32 SIZE = 8;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(0)]
+    public AssetRef<GenericMoverAsset> MoverAsset;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 1901;
+        hash = hash * 31 + MoverAsset.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (GenericMover*)ptr;
+        AssetRef.Serialize(&p->MoverAsset, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1063,10 +1103,13 @@ namespace Quantum {
     public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public EntityRef Holder;
     [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public EntityRef PreviousHolder;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte IgnoreOwnerFrames;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -1117,16 +1160,22 @@ namespace Quantum {
     [FieldOffset(40)]
     public FP KickSpeed;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte Combo;
     [FieldOffset(32)]
+    [ExcludeFromPrototype()]
     public FP CurrentSpeed;
     [FieldOffset(12)]
+    [ExcludeFromPrototype()]
     public QBoolean IsInShell;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public QBoolean IsFlipped;
     [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public QBoolean IsKicked;
     [FieldOffset(2)]
+    [ExcludeFromPrototype()]
     public UInt16 WakeupFrames;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -1171,6 +1220,7 @@ namespace Quantum {
     [FieldOffset(16)]
     public FP HeightTiles;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     [FreeOnComponentRemoved()]
     public QListPtr<EntityRef> SplashedEntities;
     public override Int32 GetHashCode() {
@@ -1494,27 +1544,19 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MovingPlatform : Quantum.IComponent {
-    public const Int32 SIZE = 40;
+    public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(24)]
-    public FPVector2 Velocity;
-    [FieldOffset(8)]
-    public FPVector2 Origin;
     [FieldOffset(0)]
-    public Int32 StartTick;
+    public FPVector2 Velocity;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 19727;
         hash = hash * 31 + Velocity.GetHashCode();
-        hash = hash * 31 + Origin.GetHashCode();
-        hash = hash * 31 + StartTick.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (MovingPlatform*)ptr;
-        serializer.Stream.Serialize(&p->StartTick);
-        FPVector2.Serialize(&p->Origin, serializer);
         FPVector2.Serialize(&p->Velocity, serializer);
     }
   }
@@ -1523,13 +1565,13 @@ namespace Quantum {
     public const Int32 SIZE = 120;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(104)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public FPVector2 Velocity;
     [FieldOffset(72)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public FPVector2 ParentVelocity;
     [FieldOffset(88)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public FPVector2 PreviousVelocity;
     [FieldOffset(56)]
     public FPVector2 Gravity;
@@ -1540,27 +1582,28 @@ namespace Quantum {
     [FieldOffset(0)]
     public QBoolean DisableCollision;
     [FieldOffset(24)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public QBoolean IsTouchingLeftWall;
     [FieldOffset(28)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public QBoolean IsTouchingRightWall;
     [FieldOffset(16)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public QBoolean IsTouchingCeiling;
     [FieldOffset(20)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public QBoolean IsTouchingGround;
     [FieldOffset(40)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public FP FloorAngle;
     [FieldOffset(12)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public QBoolean IsOnSlipperyGround;
     [FieldOffset(8)]
-    [HideInInspector()]
+    [ExcludeFromPrototype()]
     public QBoolean IsOnSlideableGround;
     [FieldOffset(32)]
+    [ExcludeFromPrototype()]
     [FreeOnComponentRemoved()]
     public QListPtr<PhysicsContact> Contacts;
     public override Int32 GetHashCode() {
@@ -1646,32 +1689,42 @@ namespace Quantum {
     public QBoolean FacingRight;
     [FieldOffset(4)]
     public Int32 Lifetime;
-    [FieldOffset(8)]
-    public QBoolean BlockSpawn;
-    [FieldOffset(16)]
-    public QBoolean LaunchSpawn;
-    [FieldOffset(80)]
-    public FPVector2 BlockSpawnOrigin;
-    [FieldOffset(64)]
-    public FPVector2 BlockSpawnDestination;
-    [FieldOffset(0)]
-    public Byte BlockSpawnAnimationLength;
-    [FieldOffset(2)]
-    public Byte SpawnAnimationFrames;
-    [FieldOffset(1)]
-    public Byte IgnorePlayerFrames;
-    [FieldOffset(32)]
-    public EntityRef ParentMarioPlayer;
     [FieldOffset(48)]
     public FPVector2 AnimationCurveOrigin;
     [FieldOffset(40)]
     public FP AnimationCurveTimer;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public QBoolean BlockSpawn;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
+    public QBoolean LaunchSpawn;
+    [FieldOffset(80)]
+    [ExcludeFromPrototype()]
+    public FPVector2 BlockSpawnOrigin;
+    [FieldOffset(64)]
+    [ExcludeFromPrototype()]
+    public FPVector2 BlockSpawnDestination;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public Byte BlockSpawnAnimationLength;
+    [FieldOffset(2)]
+    [ExcludeFromPrototype()]
+    public Byte SpawnAnimationFrames;
+    [FieldOffset(1)]
+    [ExcludeFromPrototype()]
+    public Byte IgnorePlayerFrames;
+    [FieldOffset(32)]
+    [ExcludeFromPrototype()]
+    public EntityRef ParentMarioPlayer;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 17891;
         hash = hash * 31 + Scriptable.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + Lifetime.GetHashCode();
+        hash = hash * 31 + AnimationCurveOrigin.GetHashCode();
+        hash = hash * 31 + AnimationCurveTimer.GetHashCode();
         hash = hash * 31 + BlockSpawn.GetHashCode();
         hash = hash * 31 + LaunchSpawn.GetHashCode();
         hash = hash * 31 + BlockSpawnOrigin.GetHashCode();
@@ -1680,8 +1733,6 @@ namespace Quantum {
         hash = hash * 31 + SpawnAnimationFrames.GetHashCode();
         hash = hash * 31 + IgnorePlayerFrames.GetHashCode();
         hash = hash * 31 + ParentMarioPlayer.GetHashCode();
-        hash = hash * 31 + AnimationCurveOrigin.GetHashCode();
-        hash = hash * 31 + AnimationCurveTimer.GetHashCode();
         return hash;
       }
     }
@@ -1711,14 +1762,16 @@ namespace Quantum {
     [FieldOffset(32)]
     public FP Speed;
     [FieldOffset(24)]
+    [ExcludeFromPrototype()]
     public EntityRef Owner;
     [FieldOffset(4)]
+    [ExcludeFromPrototype()]
     public QBoolean FacingRight;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public QBoolean HasBounced;
-    [FieldOffset(12)]
-    public QBoolean PlayDestroySound;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public QBoolean CheckedCollision;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -1728,7 +1781,6 @@ namespace Quantum {
         hash = hash * 31 + Owner.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + HasBounced.GetHashCode();
-        hash = hash * 31 + PlayDestroySound.GetHashCode();
         hash = hash * 31 + CheckedCollision.GetHashCode();
         return hash;
       }
@@ -1738,7 +1790,6 @@ namespace Quantum {
         QBoolean.Serialize(&p->CheckedCollision, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->HasBounced, serializer);
-        QBoolean.Serialize(&p->PlayDestroySound, serializer);
         AssetRef.Serialize(&p->Asset, serializer);
         EntityRef.Serialize(&p->Owner, serializer);
         FP.Serialize(&p->Speed, serializer);
@@ -1859,6 +1910,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Coin>();
       BuildSignalsArrayOnComponentAdded<Quantum.Enemy>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Enemy>();
+      BuildSignalsArrayOnComponentAdded<Quantum.GenericMover>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.GenericMover>();
       BuildSignalsArrayOnComponentAdded<Quantum.Goomba>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Goomba>();
       BuildSignalsArrayOnComponentAdded<Quantum.Holdable>();
@@ -2106,6 +2159,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(FrameMetaData), FrameMetaData.SIZE);
       typeRegistry.Register(typeof(FrameTimer), FrameTimer.SIZE);
       typeRegistry.Register(typeof(GameState), 1);
+      typeRegistry.Register(typeof(Quantum.GenericMover), Quantum.GenericMover.SIZE);
       typeRegistry.Register(typeof(Quantum.Goomba), Quantum.Goomba.SIZE);
       typeRegistry.Register(typeof(HingeJoint), HingeJoint.SIZE);
       typeRegistry.Register(typeof(HingeJoint3D), HingeJoint3D.SIZE);
@@ -2172,7 +2226,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 21)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 22)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
@@ -2183,6 +2237,7 @@ namespace Quantum {
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Coin>(Quantum.Coin.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Enemy>(Quantum.Enemy.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.GenericMover>(Quantum.GenericMover.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Goomba>(Quantum.Goomba.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Interactable>(Quantum.Interactable.Serialize, null, null, ComponentFlags.None)

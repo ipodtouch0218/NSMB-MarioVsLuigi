@@ -1,7 +1,7 @@
 component Holdable {
-	entity_ref Holder;
-	entity_ref PreviousHolder;
-	byte IgnoreOwnerFrames;
+	[ExcludeFromPrototype] entity_ref Holder;
+	[ExcludeFromPrototype] entity_ref PreviousHolder;
+	[ExcludeFromPrototype] byte IgnoreOwnerFrames;
 }
 
 signal OnThrowHoldable(EntityRef entity, EntityRef mario, bool crouching);

@@ -1,8 +1,8 @@
 component BulletBill {
 	FP Speed;
 	FP DespawnRadius;
-	byte DespawnFrames;
-	entity_ref Owner;
+	[ExcludeFromPrototype] byte DespawnFrames;
+	[ExcludeFromPrototype] entity_ref Owner;
 }
 
 component BulletBillLauncher {

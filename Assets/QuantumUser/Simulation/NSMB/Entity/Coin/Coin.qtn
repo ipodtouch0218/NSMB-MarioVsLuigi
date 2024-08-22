@@ -2,12 +2,11 @@ component Coin {
 	bool IsFloating;
 	bool IsDotted;
 	ushort Lifetime;
-	byte UncollectableFrames;
-	FPVector2 PreviousVelocity;
-
-	bool IsCollected;
-	bool IsCurrentlyDotted;
-	byte DottedChangeFrames;
+	
+	[ExcludeFromPrototype] byte UncollectableFrames;
+	[ExcludeFromPrototype] bool IsCollected;
+	[ExcludeFromPrototype] bool IsCurrentlyDotted;
+	[ExcludeFromPrototype] byte DottedChangeFrames;
 }
 
 signal OnMarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, bool fromBlock, bool downwards);

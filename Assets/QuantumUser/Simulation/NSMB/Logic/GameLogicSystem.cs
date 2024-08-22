@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread {
         public override void Update(Frame f) {
@@ -17,7 +15,9 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                     // Now playing
                     f.Global->GameState = GameState.Playing;
+                    f.Global->StartFrame = f.Number;
                     f.Events.GameStateChanged(f, GameState.Playing);
+
                 } else if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
                     f.SystemEnable<GameplaySystemGroup>();

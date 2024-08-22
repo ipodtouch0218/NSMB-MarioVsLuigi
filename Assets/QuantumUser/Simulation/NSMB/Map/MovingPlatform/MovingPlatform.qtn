@@ -1,6 +1,3 @@
 component MovingPlatform {
 	FPVector2 Velocity;
-
-	FPVector2 Origin;
-	int StartTick;
 }

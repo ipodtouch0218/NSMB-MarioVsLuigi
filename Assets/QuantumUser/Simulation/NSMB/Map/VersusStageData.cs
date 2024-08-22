@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum;
-using Quantum.Collections;
 using UnityEngine;
 
 public unsafe class VersusStageData : AssetObject {

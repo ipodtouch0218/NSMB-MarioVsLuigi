@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using AssetObjectQuery = Quantum.AssetObjectQuery;
 using UnityEditor;
+using System.Runtime.InteropServices;
 
 
 [assembly: QuantumMapBakeAssembly]

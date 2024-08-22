@@ -1,0 +1,3 @@
+component GenericMover {
+	asset_ref<GenericMoverAsset> MoverAsset;
+}

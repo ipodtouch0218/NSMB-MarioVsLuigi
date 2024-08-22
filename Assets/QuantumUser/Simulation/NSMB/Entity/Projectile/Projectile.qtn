@@ -3,11 +3,10 @@ import enum ParticleEffect(byte);
 component Projectile {
 	asset_ref<ProjectileAsset> Asset;
 	FP Speed;
-	EntityRef Owner;
-	bool FacingRight;
-	bool HasBounced;
-	bool PlayDestroySound;
-	bool CheckedCollision;
+	[ExcludeFromPrototype] EntityRef Owner;
+	[ExcludeFromPrototype] bool FacingRight;
+	[ExcludeFromPrototype] bool HasBounced;
+	[ExcludeFromPrototype] bool CheckedCollision;
 }
 
 event ProjectileDestroyed {

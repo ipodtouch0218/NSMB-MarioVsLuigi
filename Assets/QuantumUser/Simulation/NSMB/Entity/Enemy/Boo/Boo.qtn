@@ -1,6 +1,6 @@
 component Boo {
-	EntityRef CurrentTarget;
-	byte UnscaredFrames;
+	[ExcludeFromPrototype] EntityRef CurrentTarget;
+	[ExcludeFromPrototype] byte UnscaredFrames;
 }
 
 event BooBecomeActive {

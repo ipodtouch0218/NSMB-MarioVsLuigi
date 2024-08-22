@@ -14,6 +14,7 @@ namespace Quantum {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var transform = f.Get<Transform2D>(entity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            var enemy = f.Unsafe.GetPointer<Enemy>(entity);
 
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = true;

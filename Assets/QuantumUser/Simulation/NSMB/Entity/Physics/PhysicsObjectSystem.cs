@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
 
-        public static readonly FP RaycastSkin = FP.FromString("0.05");
+        public static readonly FP RaycastSkin = FP.FromString("0.1");
         public static readonly FP Skin = FP.FromString("0.001");
         private static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
         private static int mask;

@@ -1,21 +1,21 @@
 component PhysicsObject {
-    [HideInInspector] FPVector2 Velocity;
-    [HideInInspector] FPVector2 ParentVelocity;
-    [HideInInspector] FPVector2 PreviousVelocity;
+    [ExcludeFromPrototype]  FPVector2 Velocity;
+    [ExcludeFromPrototype]  FPVector2 ParentVelocity;
+    [ExcludeFromPrototype]  FPVector2 PreviousVelocity;
     FPVector2 Gravity;
     FP TerminalVelocity;
     bool IsFrozen;
     bool DisableCollision;
 
-    [HideInInspector] bool IsTouchingLeftWall;
-    [HideInInspector] bool IsTouchingRightWall;
-    [HideInInspector] bool IsTouchingCeiling;
-    [HideInInspector] bool IsTouchingGround;
-    [HideInInspector] FP FloorAngle;
-    [HideInInspector] bool IsOnSlipperyGround;
-    [HideInInspector] bool IsOnSlideableGround;
+    [ExcludeFromPrototype] bool IsTouchingLeftWall;
+    [ExcludeFromPrototype] bool IsTouchingRightWall;
+    [ExcludeFromPrototype] bool IsTouchingCeiling;
+    [ExcludeFromPrototype] bool IsTouchingGround;
+    [ExcludeFromPrototype] FP FloorAngle;
+    [ExcludeFromPrototype] bool IsOnSlipperyGround;
+    [ExcludeFromPrototype] bool IsOnSlideableGround;
 
-    [FreeOnComponentRemoved] list<PhysicsContact> Contacts;
+    [ExcludeFromPrototype, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
 }
 
 struct PhysicsContact {

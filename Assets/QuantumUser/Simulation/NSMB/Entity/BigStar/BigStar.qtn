@@ -12,7 +12,8 @@ component BigStar {
 	byte UncollectableFrames;
 	FP Speed;
 	FP BounceForce;
-	bool FacingRight;
+	
+	[ExcludeFromPrototype] bool FacingRight;
 }
 
 synced event MarioPlayerCollectedStar {

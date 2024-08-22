@@ -474,7 +474,6 @@ MonoBehaviour:
     WidthTiles: 4
     HeightTiles:
       RawValue: 131072
-    SplashedEntities: []
 --- !u!114 &8317685059518623307
 MonoBehaviour:
   m_ObjectHideFlags: 0

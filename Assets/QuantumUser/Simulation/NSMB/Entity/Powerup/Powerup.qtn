@@ -3,18 +3,18 @@ component Powerup {
 	bool FacingRight;
 	int Lifetime;
 
-	bool BlockSpawn;
-	bool LaunchSpawn;
-	FPVector2 BlockSpawnOrigin;
-	FPVector2 BlockSpawnDestination;
-	byte BlockSpawnAnimationLength;
-
-	byte SpawnAnimationFrames;
-	byte IgnorePlayerFrames;
-	EntityRef ParentMarioPlayer;
-
 	FPVector2 AnimationCurveOrigin;
 	FP AnimationCurveTimer;
+
+	[ExcludeFromPrototype] bool BlockSpawn;
+	[ExcludeFromPrototype] bool LaunchSpawn;
+	[ExcludeFromPrototype] FPVector2 BlockSpawnOrigin;
+	[ExcludeFromPrototype] FPVector2 BlockSpawnDestination;
+	[ExcludeFromPrototype] byte BlockSpawnAnimationLength;
+
+	[ExcludeFromPrototype] byte SpawnAnimationFrames;
+	[ExcludeFromPrototype] byte IgnorePlayerFrames;
+	[ExcludeFromPrototype] EntityRef ParentMarioPlayer;
 }
 
 event PowerupBecameActive {

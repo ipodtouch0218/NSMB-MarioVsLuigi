@@ -40,9 +40,11 @@ namespace Quantum {
                         f.Global->MainBigStar = newEntity;
                         var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
                         var newStar = f.Unsafe.GetPointer<BigStar>(newEntity);
+                        var newStarPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newEntity);
 
                         newStarTransform->Position = position;
                         newStar->IsStationary = true;
+                        newStarPhysicsObject->DisableCollision = true;
                         break;
                     }
                 }

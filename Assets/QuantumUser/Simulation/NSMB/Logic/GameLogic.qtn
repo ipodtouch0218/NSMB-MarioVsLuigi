@@ -2,6 +2,7 @@ import enum GameState(byte);
 
 global {
 	GameState GameState;
+	int StartFrame;
 	ushort GameStartFrames;
 }
 

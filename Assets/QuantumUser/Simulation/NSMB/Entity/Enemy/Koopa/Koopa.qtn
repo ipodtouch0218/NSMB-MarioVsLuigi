@@ -5,12 +5,12 @@ component Koopa {
 	FP Speed;
 	FP KickSpeed;
 	
-	byte Combo;
-	FP CurrentSpeed;
-	bool IsInShell;
-	bool IsFlipped;
-	bool IsKicked;
-	ushort WakeupFrames;
+	[ExcludeFromPrototype] byte Combo;
+	[ExcludeFromPrototype] FP CurrentSpeed;
+	[ExcludeFromPrototype] bool IsInShell;
+	[ExcludeFromPrototype] bool IsFlipped;
+	[ExcludeFromPrototype] bool IsKicked;
+	[ExcludeFromPrototype] ushort WakeupFrames;
 }
 
 event KoopaEnteredShell {

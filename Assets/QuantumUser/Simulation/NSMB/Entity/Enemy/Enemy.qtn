@@ -1,9 +1,10 @@
 component Enemy {
 	FPVector2 Spawnpoint;
-	bool IsActive;
-	bool IsDead;
-	bool FacingRight;
 	bool IgnorePlayerWhenRespawning;
+
+	[ExcludeFromPrototype] bool IsActive;
+	[ExcludeFromPrototype] bool IsDead;
+	[ExcludeFromPrototype] bool FacingRight;
 }
 
 signal OnEnemyDespawned(entity_ref entity);

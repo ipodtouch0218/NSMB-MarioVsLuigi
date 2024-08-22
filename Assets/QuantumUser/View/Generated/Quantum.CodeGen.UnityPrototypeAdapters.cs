@@ -50,99 +50,6 @@ namespace Quantum.Prototypes.Unity {
   #endif //;
   
   [System.SerializableAttribute()]
-  public unsafe partial class BlockBumpPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BlockBumpPrototype> {
-    public Byte Lifetime;
-    public AssetRef<StageTile> StartTile;
-    public Quantum.Prototypes.StageTileInstancePrototype ResultTile;
-    public QBoolean IsDownwards;
-    public AssetRef<EntityPrototype> Powerup;
-    public FPVector2 Origin;
-    public Int32 TileX;
-    public Int32 TileY;
-    public Quantum.QuantumEntityPrototype Owner;
-    public QBoolean HasBumped;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BlockBumpPrototype prototype);
-    public override Quantum.Prototypes.BlockBumpPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.BlockBumpPrototype();
-      converter.Convert(this.Lifetime, out result.Lifetime);
-      converter.Convert(this.StartTile, out result.StartTile);
-      converter.Convert(this.ResultTile, out result.ResultTile);
-      converter.Convert(this.IsDownwards, out result.IsDownwards);
-      converter.Convert(this.Powerup, out result.Powerup);
-      converter.Convert(this.Origin, out result.Origin);
-      converter.Convert(this.TileX, out result.TileX);
-      converter.Convert(this.TileY, out result.TileY);
-      converter.Convert(this.Owner, out result.Owner);
-      converter.Convert(this.HasBumped, out result.HasBumped);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
-  public unsafe partial class BooPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BooPrototype> {
-    public Quantum.QuantumEntityPrototype CurrentTarget;
-    public Byte UnscaredFrames;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BooPrototype prototype);
-    public override Quantum.Prototypes.BooPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.BooPrototype();
-      converter.Convert(this.CurrentTarget, out result.CurrentTarget);
-      converter.Convert(this.UnscaredFrames, out result.UnscaredFrames);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
-  public unsafe partial class BulletBillPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BulletBillPrototype> {
-    public FP Speed;
-    public FP DespawnRadius;
-    public Byte DespawnFrames;
-    public Quantum.QuantumEntityPrototype Owner;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BulletBillPrototype prototype);
-    public override Quantum.Prototypes.BulletBillPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.BulletBillPrototype();
-      converter.Convert(this.Speed, out result.Speed);
-      converter.Convert(this.DespawnRadius, out result.DespawnRadius);
-      converter.Convert(this.DespawnFrames, out result.DespawnFrames);
-      converter.Convert(this.Owner, out result.Owner);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
-  public unsafe partial class HoldablePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.HoldablePrototype> {
-    public Quantum.QuantumEntityPrototype Holder;
-    public Quantum.QuantumEntityPrototype PreviousHolder;
-    public Byte IgnoreOwnerFrames;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.HoldablePrototype prototype);
-    public override Quantum.Prototypes.HoldablePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.HoldablePrototype();
-      converter.Convert(this.Holder, out result.Holder);
-      converter.Convert(this.PreviousHolder, out result.PreviousHolder);
-      converter.Convert(this.IgnoreOwnerFrames, out result.IgnoreOwnerFrames);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
-  public unsafe partial class LiquidPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.LiquidPrototype> {
-    public LiquidType LiquidType;
-    public Int32 WidthTiles;
-    public FP HeightTiles;
-    [FreeOnComponentRemoved()]
-    [DynamicCollectionAttribute()]
-    public Quantum.QuantumEntityPrototype[] SplashedEntities = {};
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.LiquidPrototype prototype);
-    public override Quantum.Prototypes.LiquidPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.LiquidPrototype();
-      converter.Convert(this.LiquidType, out result.LiquidType);
-      converter.Convert(this.WidthTiles, out result.WidthTiles);
-      converter.Convert(this.HeightTiles, out result.HeightTiles);
-      converter.Convert(this.SplashedEntities, out result.SplashedEntities);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
   public unsafe partial class MarioPlayerPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.MarioPlayerPrototype> {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     public AssetRef<CharacterAsset> CharacterAsset;
@@ -316,109 +223,17 @@ namespace Quantum.Prototypes.Unity {
   }
   [System.SerializableAttribute()]
   public unsafe partial class PhysicsObjectPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PhysicsObjectPrototype> {
-    [HideInInspector()]
-    public FPVector2 Velocity;
-    [HideInInspector()]
-    public FPVector2 ParentVelocity;
-    [HideInInspector()]
-    public FPVector2 PreviousVelocity;
     public FPVector2 Gravity;
     public FP TerminalVelocity;
     public QBoolean IsFrozen;
     public QBoolean DisableCollision;
-    [HideInInspector()]
-    public QBoolean IsTouchingLeftWall;
-    [HideInInspector()]
-    public QBoolean IsTouchingRightWall;
-    [HideInInspector()]
-    public QBoolean IsTouchingCeiling;
-    [HideInInspector()]
-    public QBoolean IsTouchingGround;
-    [HideInInspector()]
-    public FP FloorAngle;
-    [HideInInspector()]
-    public QBoolean IsOnSlipperyGround;
-    [HideInInspector()]
-    public QBoolean IsOnSlideableGround;
-    [FreeOnComponentRemoved()]
-    [DynamicCollectionAttribute()]
-    public Quantum.Prototypes.Unity.PhysicsContactPrototype[] Contacts = {};
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PhysicsObjectPrototype prototype);
     public override Quantum.Prototypes.PhysicsObjectPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.PhysicsObjectPrototype();
-      converter.Convert(this.Velocity, out result.Velocity);
-      converter.Convert(this.ParentVelocity, out result.ParentVelocity);
-      converter.Convert(this.PreviousVelocity, out result.PreviousVelocity);
       converter.Convert(this.Gravity, out result.Gravity);
       converter.Convert(this.TerminalVelocity, out result.TerminalVelocity);
       converter.Convert(this.IsFrozen, out result.IsFrozen);
       converter.Convert(this.DisableCollision, out result.DisableCollision);
-      converter.Convert(this.IsTouchingLeftWall, out result.IsTouchingLeftWall);
-      converter.Convert(this.IsTouchingRightWall, out result.IsTouchingRightWall);
-      converter.Convert(this.IsTouchingCeiling, out result.IsTouchingCeiling);
-      converter.Convert(this.IsTouchingGround, out result.IsTouchingGround);
-      converter.Convert(this.FloorAngle, out result.FloorAngle);
-      converter.Convert(this.IsOnSlipperyGround, out result.IsOnSlipperyGround);
-      converter.Convert(this.IsOnSlideableGround, out result.IsOnSlideableGround);
-      converter.Convert(this.Contacts, out result.Contacts);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
-  public unsafe partial class PowerupPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PowerupPrototype> {
-    public AssetRef<PowerupAsset> Scriptable;
-    public QBoolean FacingRight;
-    public Int32 Lifetime;
-    public QBoolean BlockSpawn;
-    public QBoolean LaunchSpawn;
-    public FPVector2 BlockSpawnOrigin;
-    public FPVector2 BlockSpawnDestination;
-    public Byte BlockSpawnAnimationLength;
-    public Byte SpawnAnimationFrames;
-    public Byte IgnorePlayerFrames;
-    public Quantum.QuantumEntityPrototype ParentMarioPlayer;
-    public FPVector2 AnimationCurveOrigin;
-    public FP AnimationCurveTimer;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PowerupPrototype prototype);
-    public override Quantum.Prototypes.PowerupPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.PowerupPrototype();
-      converter.Convert(this.Scriptable, out result.Scriptable);
-      converter.Convert(this.FacingRight, out result.FacingRight);
-      converter.Convert(this.Lifetime, out result.Lifetime);
-      converter.Convert(this.BlockSpawn, out result.BlockSpawn);
-      converter.Convert(this.LaunchSpawn, out result.LaunchSpawn);
-      converter.Convert(this.BlockSpawnOrigin, out result.BlockSpawnOrigin);
-      converter.Convert(this.BlockSpawnDestination, out result.BlockSpawnDestination);
-      converter.Convert(this.BlockSpawnAnimationLength, out result.BlockSpawnAnimationLength);
-      converter.Convert(this.SpawnAnimationFrames, out result.SpawnAnimationFrames);
-      converter.Convert(this.IgnorePlayerFrames, out result.IgnorePlayerFrames);
-      converter.Convert(this.ParentMarioPlayer, out result.ParentMarioPlayer);
-      converter.Convert(this.AnimationCurveOrigin, out result.AnimationCurveOrigin);
-      converter.Convert(this.AnimationCurveTimer, out result.AnimationCurveTimer);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
-  public unsafe partial class ProjectilePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.ProjectilePrototype> {
-    public AssetRef<ProjectileAsset> Asset;
-    public FP Speed;
-    public Quantum.QuantumEntityPrototype Owner;
-    public QBoolean FacingRight;
-    public QBoolean HasBounced;
-    public QBoolean PlayDestroySound;
-    public QBoolean CheckedCollision;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.ProjectilePrototype prototype);
-    public override Quantum.Prototypes.ProjectilePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.ProjectilePrototype();
-      converter.Convert(this.Asset, out result.Asset);
-      converter.Convert(this.Speed, out result.Speed);
-      converter.Convert(this.Owner, out result.Owner);
-      converter.Convert(this.FacingRight, out result.FacingRight);
-      converter.Convert(this.HasBounced, out result.HasBounced);
-      converter.Convert(this.PlayDestroySound, out result.PlayDestroySound);
-      converter.Convert(this.CheckedCollision, out result.CheckedCollision);
       ConvertUser(converter, ref result);
       return result;
     }

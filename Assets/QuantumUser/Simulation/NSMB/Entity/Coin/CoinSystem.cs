@@ -25,15 +25,13 @@ namespace Quantum {
                         continue;
                     }
 
-                    physicsObject->Velocity = coin->PreviousVelocity;
+                    physicsObject->Velocity = physicsObject->PreviousVelocity;
                     physicsObject->Velocity.Y *= -FP._0_33 * 2;
 
                     if (physicsObject->Velocity.Y > FP._0_75) {
                         f.Events.CoinBounced(f, filter.Entity, *coin);
                     }
                 }
-
-                coin->PreviousVelocity = physicsObject->Velocity;
             }
 
             if (coin->DottedChangeFrames > 0 && QuantumUtils.Decrement(ref coin->DottedChangeFrames)) {
