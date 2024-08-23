@@ -31,7 +31,7 @@ namespace Quantum {
                 for (int i = 0; i < shapeCount; i++) {
                     RaycastVertically(f, ref filter, shapes[i], stage);
                 }
-            } else if (shape.Type == Shape2DType.Box) {
+            } else {
                 RaycastVertically(f, ref filter, shape, stage);
             }
 
@@ -42,22 +42,27 @@ namespace Quantum {
             var platform = filter.Platform;
             var transform = filter.Transform;
             var collider = filter.Collider;
-
-            FPVector2 yExtents = shape.Box.Extents;
-            yExtents.Y -= PhysicsObjectSystem.RaycastSkin;
-            shape.Box.Extents = yExtents;
-
+            
             FPVector2 yMovement = new(0, platform->Velocity.Y * f.DeltaTime);
-            if (yMovement.Y > 0) {
-                yMovement.Y += PhysicsObjectSystem.RaycastSkin;
+            yMovement.Y += PhysicsObjectSystem.RaycastSkin * (yMovement.Y > 0 ? 1 : -1);
+
+            FPVector2 position = transform->Position;
+            if (shape.Type == Shape2DType.Box) {
+                FPVector2 yExtents = shape.Box.Extents;
+                yExtents.Y -= PhysicsObjectSystem.RaycastSkin;
+                shape.Box.Extents = yExtents;
+            } else if (shape.Type == Shape2DType.Edge) {
+                position.Y -= PhysicsObjectSystem.RaycastSkin * (yMovement.Y > 0 ? 1 : -1);
             } else {
-                yMovement.Y -= PhysicsObjectSystem.RaycastSkin;
+                return;
             }
-            var vertical = f.Physics2D.ShapeCastAll(transform->Position, 0, &shape, yMovement, EntityMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+
+            var vertical = f.Physics2D.ShapeCastAll(position, 0, &shape, yMovement, EntityMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
             for (int i = 0; i < vertical.Count; i++) {
                 var hit = vertical[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
+                    || ((FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y)) && (FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
                     continue;
                 }
@@ -94,7 +99,7 @@ namespace Quantum {
                 for (int i = 0; i < shapeCount; i++) {
                     RaycastHorizontally(f, ref filter, shapes[i], stage);
                 }
-            } else if (shape.Type == Shape2DType.Box) {
+            } else {
                 RaycastHorizontally(f, ref filter, shape, stage);
             }
 
@@ -106,21 +111,26 @@ namespace Quantum {
             var transform = filter.Transform;
             var collider = filter.Collider;
 
-            FPVector2 xExtents = shape.Box.Extents;
-            xExtents.X -= PhysicsObjectSystem.RaycastSkin;
-            shape.Box.Extents = xExtents;
-
             FPVector2 xMovement = new(platform->Velocity.X * f.DeltaTime, 0);
-            if (xMovement.X > 0) {
-                xMovement.X += PhysicsObjectSystem.RaycastSkin;
+            xMovement.X += PhysicsObjectSystem.RaycastSkin * (xMovement.X > 0 ? 1 : -1);
+
+            FPVector2 position = transform->Position;
+            if (shape.Type == Shape2DType.Box) {
+                FPVector2 xExtents = shape.Box.Extents;
+                xExtents.X -= PhysicsObjectSystem.RaycastSkin;
+                shape.Box.Extents = xExtents;
+            } else if (shape.Type == Shape2DType.Edge) {
+                position.Y -= PhysicsObjectSystem.RaycastSkin * (xMovement.X > 0 ? 1 : -1);
             } else {
-                xMovement.X -= PhysicsObjectSystem.RaycastSkin;
+                return;
             }
-            var horizontal = f.Physics2D.ShapeCastAll(transform->Position, 0, &shape, xMovement, EntityMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+
+            var horizontal = f.Physics2D.ShapeCastAll(position, 0, &shape, xMovement, EntityMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
             for (int i = 0; i < horizontal.Count; i++) {
                 var hit = horizontal[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
+                    || ((FPMath.Sign(hitPhysicsObject->Velocity.X) == FPMath.Sign(xMovement.X)) && (FPMath.Abs(hitPhysicsObject->Velocity.X) > FPMath.Abs(xMovement.X)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
                     continue;
                 }

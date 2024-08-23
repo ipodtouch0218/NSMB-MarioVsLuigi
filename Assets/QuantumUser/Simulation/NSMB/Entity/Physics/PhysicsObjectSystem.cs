@@ -127,7 +127,7 @@ namespace Quantum {
                 FPVector2 position = transform->Position;
                 Shape2D collisionShape = collider.Shape;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(0, velocityY) + (directionVector * RaycastSkin), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(0, velocityY) + (directionVector * (RaycastSkin + Skin)), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
                 physicsHits.Sort(position);
 
                 position += collisionShape.Centroid;
@@ -172,6 +172,14 @@ namespace Quantum {
                         if (hit.Point.Y < y || hit.Point.Y > y + FP._0_50) {
                             // Not a valid hit
                             continue;
+                        }
+                        if (hit.IsDynamic && hit.TryGetShape(f, out Shape2D* hitShape)) {
+                            FPVector2 upDirection = FPVector2.Rotate(FPVector2.Up, hitShape->LocalTransform.Rotation * FP.Deg2Rad);
+                            Debug.Log("Dot: " + FPVector2.Dot(hit.Normal, upDirection));
+                            if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= 0) {
+                                // Not a valid hit (semisolid)
+                                continue;
+                            }
                         }
 
                         potentialContacts.Add(new PhysicsContact {
@@ -277,7 +285,7 @@ namespace Quantum {
                 FPVector2 position = transform->Position;
                 Shape2D collisionShape = collider.Shape;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(velocityX, 0) + (directionVector * RaycastSkin), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(velocityX, 0) + (directionVector * (RaycastSkin + Skin)), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
                 physicsHits.Sort(position);
 
                 position += collisionShape.Centroid;
@@ -319,6 +327,14 @@ namespace Quantum {
                         if (hit.Point.X < x || hit.Point.X > x + FP._0_50) {
                             // Not a valid hit
                             continue;
+                        }
+                        if (hit.IsDynamic && hit.TryGetShape(f, out Shape2D* hitShape)) {
+                            FPVector2 upDirection = FPVector2.Rotate(FPVector2.Up, hitShape->LocalTransform.Rotation * FP.Deg2Rad);
+                            Debug.Log("Dot: " + FPVector2.Dot(hit.Normal, upDirection));
+                            if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= 0) {
+                                // Not a valid hit (semisolid)
+                                continue;
+                            }
                         }
 
                         potentialContacts.Add(new PhysicsContact {

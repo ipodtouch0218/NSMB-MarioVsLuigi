@@ -1060,20 +1060,24 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GenericMover : Quantum.IComponent {
-    public const Int32 SIZE = 8;
+    public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<GenericMoverAsset> MoverAsset;
+    [FieldOffset(8)]
+    public FP StartOffset;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 1901;
         hash = hash * 31 + MoverAsset.GetHashCode();
+        hash = hash * 31 + StartOffset.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GenericMover*)ptr;
         AssetRef.Serialize(&p->MoverAsset, serializer);
+        FP.Serialize(&p->StartOffset, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]

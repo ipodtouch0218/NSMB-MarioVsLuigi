@@ -226,6 +226,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.GenericMover))]
   public unsafe partial class GenericMoverPrototype : ComponentPrototype<Quantum.GenericMover> {
     public AssetRef<GenericMoverAsset> MoverAsset;
+    public FP StartOffset;
     partial void MaterializeUser(Frame frame, ref Quantum.GenericMover result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.GenericMover component = default;
@@ -234,6 +235,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.GenericMover result, in PrototypeMaterializationContext context = default) {
         result.MoverAsset = this.MoverAsset;
+        result.StartOffset = this.StartOffset;
         MaterializeUser(frame, ref result, in context);
     }
   }

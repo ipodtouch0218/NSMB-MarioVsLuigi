@@ -1,0 +1,156 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e9c5479bb850b640b3d5d2032677f8c, type: 3}
+  m_Name: BricksPlatformMover
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/World/BricksPlatformMover
+    Guid:
+      Value: 514613043730600723
+  CurveX:
+    Samples:
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    - RawValue: 0
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys:
+    - Time:
+        RawValue: 0
+      Value:
+        RawValue: 0
+      InTangent:
+        RawValue: 0
+      OutTangent:
+        RawValue: 0
+      TangentMode: 0
+      TangentModeLeft: 4
+      TangentModeRight: 4
+      WeightedMode: 0
+    - Time:
+        RawValue: 65536
+      Value:
+        RawValue: 0
+      InTangent:
+        RawValue: 0
+      OutTangent:
+        RawValue: 0
+      TangentMode: 0
+      TangentModeLeft: 4
+      TangentModeRight: 4
+      WeightedMode: 0
+  CurveY:
+    Samples:
+    - RawValue: 0
+    - RawValue: 21504
+    - RawValue: 43008
+    - RawValue: 64512
+    - RawValue: 86016
+    - RawValue: 107520
+    - RawValue: 129024
+    - RawValue: 150528
+    - RawValue: 172032
+    - RawValue: 193536
+    - RawValue: 215040
+    - RawValue: 236544
+    - RawValue: 258048
+    - RawValue: 279552
+    - RawValue: 301056
+    - RawValue: 322560
+    - RawValue: 344064
+    - RawValue: 365568
+    - RawValue: 387072
+    - RawValue: 408576
+    - RawValue: 430080
+    - RawValue: 451584
+    - RawValue: 473088
+    - RawValue: 494592
+    - RawValue: 516096
+    - RawValue: 537600
+    - RawValue: 559104
+    - RawValue: 580608
+    - RawValue: 602112
+    - RawValue: 623616
+    - RawValue: 645120
+    - RawValue: 666624
+    - RawValue: 0
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 688128
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys:
+    - Time:
+        RawValue: 0
+      Value:
+        RawValue: 0
+      InTangent:
+        RawValue: 0
+      OutTangent:
+        RawValue: 65536
+      TangentMode: 0
+      TangentModeLeft: 2
+      TangentModeRight: 2
+      WeightedMode: 0
+    - Time:
+        RawValue: 688128
+      Value:
+        RawValue: 688128
+      InTangent:
+        RawValue: 65536
+      OutTangent:
+        RawValue: 0
+      TangentMode: 0
+      TangentModeLeft: 2
+      TangentModeRight: 2
+      WeightedMode: 0
