@@ -44,6 +44,9 @@ namespace Quantum {
             var collider = filter.Collider;
             
             FPVector2 yMovement = new(0, platform->Velocity.Y * f.DeltaTime);
+            if (yMovement.Y == 0) {
+                return;
+            }
             yMovement.Y += PhysicsObjectSystem.RaycastSkin * (yMovement.Y > 0 ? 1 : -1);
 
             FPVector2 position = transform->Position;
@@ -74,14 +77,15 @@ namespace Quantum {
                     movement -= PhysicsObjectSystem.Skin;
                 }
                 PhysicsObjectSystem.MoveVertically(f, movement * f.UpdateRate, hit.Entity, stage);
-                //hitTransform->Position.Y += movement;
+                hitPhysicsObject->Velocity.Y = 0;
 
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
                     hitContacts = f.AllocateList(out hitPhysicsObject->Contacts);
                 }
                 hitContacts.Add(new PhysicsContact {
-                    Distance = movement,
+                    Distance = (yMovement.Y * hit.CastDistanceNormalized) - PhysicsObjectSystem.RaycastSkin,
                     Normal = yMovement.Normalized,
+                    Position = hit.Point,
                     TileX = -1,
                     TileY = -1,
                     Entity = filter.Entity,
@@ -112,6 +116,10 @@ namespace Quantum {
             var collider = filter.Collider;
 
             FPVector2 xMovement = new(platform->Velocity.X * f.DeltaTime, 0);
+            if (xMovement.X == 0) {
+                return;
+            }
+
             xMovement.X += PhysicsObjectSystem.RaycastSkin * (xMovement.X > 0 ? 1 : -1);
 
             FPVector2 position = transform->Position;
@@ -141,7 +149,9 @@ namespace Quantum {
                 } else {
                     movement -= PhysicsObjectSystem.Skin;
                 }
+                Debug.Log("Agh");
                 PhysicsObjectSystem.MoveHorizontally(f, movement * f.UpdateRate, hit.Entity, stage);
+                hitPhysicsObject->Velocity.X = 0;
 
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
                     hitContacts = f.AllocateList(out hitPhysicsObject->Contacts);
@@ -149,6 +159,7 @@ namespace Quantum {
                 hitContacts.Add(new PhysicsContact {
                     Distance = movement,
                     Normal = xMovement.Normalized,
+                    Position = hit.Point,
                     TileX = -1,
                     TileY = -1,
                     Entity = filter.Entity,

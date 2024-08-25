@@ -68,7 +68,7 @@ public class GoombaAnimator : MonoBehaviour {
             }
         } else {
             // Play death sound effect
-            sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
+            // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
         }
     }
 }

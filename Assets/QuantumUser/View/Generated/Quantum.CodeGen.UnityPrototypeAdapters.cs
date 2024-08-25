@@ -97,6 +97,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean IsInKnockback;
     public QBoolean IsInWeakKnockback;
     public QBoolean KnockbackWasOriginallyFacingRight;
+    public Int32 KnockbackTick;
     public Byte DamageInvincibilityFrames;
     public QBoolean IsCrouching;
     public QBoolean IsSliding;
@@ -170,6 +171,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.IsInKnockback, out result.IsInKnockback);
       converter.Convert(this.IsInWeakKnockback, out result.IsInWeakKnockback);
       converter.Convert(this.KnockbackWasOriginallyFacingRight, out result.KnockbackWasOriginallyFacingRight);
+      converter.Convert(this.KnockbackTick, out result.KnockbackTick);
       converter.Convert(this.DamageInvincibilityFrames, out result.DamageInvincibilityFrames);
       converter.Convert(this.IsCrouching, out result.IsCrouching);
       converter.Convert(this.IsSliding, out result.IsSliding);

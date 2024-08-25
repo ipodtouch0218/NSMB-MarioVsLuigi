@@ -107,10 +107,206 @@ MonoBehaviour:
     - rid: 3620598001065525250
     - rid: 3620598001065525251
     - rid: 3620598001065525252
+  - Components:
+    - rid: 700918824253259776
+    - rid: 700918824253259777
+    - rid: 700918824253259778
+    - rid: 700918824253259779
+    - rid: 700918824253259780
+    - rid: 700918824253259781
+    - rid: 700918824253259782
+    - rid: 700918824253259783
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
     RefIds:
+    - rid: 700918824253259776
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -155320
+          Y:
+            RawValue: 154664
+        Rotation:
+          RawValue: 0
+    - rid: 700918824253259777
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 11468
+            Y:
+              RawValue: 13763
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 13763
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 9
+        IsTrigger: 0
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 700918824253259778
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 4095
+    - rid: 700918824253259779
+      type: {class: CameraControllerPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
+    - rid: 700918824253259780
+      type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        ColliderDisabled:
+          Value: 0
+    - rid: 700918824253259781
+      type: {class: MarioPlayerPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        PhysicsAsset:
+          Id:
+            Value: 429607978212108660
+        CharacterAsset:
+          Id:
+            Value: 532063855470386108
+        PlayerRef:
+          _index: 0
+        SpawnpointIndex: 0
+        Team: 255
+        CurrentPowerupState: 0
+        PreviousPowerupState: 0
+        ReserveItem:
+          Id:
+            Value: 0
+        Stars: 0
+        Coins: 0
+        Lives: 0
+        Disconnected:
+          Value: 0
+        IsDead:
+          Value: 0
+        FireDeath:
+          Value: 0
+        IsRespawning:
+          Value: 0
+        DeathAnimationFrames: 0
+        PreRespawnFrames: 0
+        RespawnFrames: 0
+        NoLivesStarDirection: 0
+        FacingRight:
+          Value: 0
+        IsSkidding:
+          Value: 0
+        IsTurnaround:
+          Value: 0
+        FastTurnaroundFrames: 0
+        SlowTurnaroundFrames: 0
+        JumpState: 0
+        PreviousJumpState: 0
+        JumpLandingFrames: 0
+        JumpBufferFrames: 0
+        CoyoteTimeFrames: 0
+        LandedFrame: 0
+        WasTouchingGroundLastFrame:
+          Value: 0
+        DoEntityBounce:
+          Value: 0
+        WallslideLeft:
+          Value: 0
+        WallslideRight:
+          Value: 0
+        WallslideEndFrames: 0
+        WalljumpFrames: 0
+        IsGroundpounding:
+          Value: 0
+        IsGroundpoundActive:
+          Value: 0
+        GroundpoundStartFrames: 0
+        GroundpoundCooldownFrames: 0
+        GroundpoundStandFrames: 0
+        WaterColliderCount: 0
+        SwimExitForceJump:
+          Value: 0
+        IsInKnockback:
+          Value: 0
+        IsInWeakKnockback:
+          Value: 0
+        KnockbackWasOriginallyFacingRight:
+          Value: 0
+        KnockbackTick: 0
+        DamageInvincibilityFrames: 0
+        IsCrouching:
+          Value: 0
+        IsSliding:
+          Value: 0
+        IsSpinnerFlying:
+          Value: 0
+        IsDrilling:
+          Value: 0
+        Combo: 0
+        InvincibilityFrames: 0
+        MegaMushroomStartFrames: 0
+        MegaMushroomFrames: 0
+        MegaMushroomEndFrames: 0
+        MegaMushroomStationaryEnd:
+          Value: 0
+        ProjectileDelayFrames: 0
+        ProjectileVolleyFrames: 0
+        CurrentProjectiles: 0
+        CurrentVolley: 0
+        IsInShell:
+          Value: 0
+        ShellSlowdownFrames: 0
+        IsPropellerFlying:
+          Value: 0
+        PropellerLaunchFrames: 0
+        PropellerSpinFrames: 0
+        UsedPropellerThisJump:
+          Value: 0
+        PropellerDrillCooldown: 0
+        HeldEntity:
+          SceneIndexPlusOne: 0
+        CurrentPipe:
+          SceneIndexPlusOne: 0
+    - rid: 700918824253259782
+      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Gravity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        TerminalVelocity:
+          RawValue: 0
+        IsFrozen:
+          Value: 0
+        DisableCollision:
+          Value: 0
+    - rid: 700918824253259783
+      type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
     - rid: 1971040655551496192
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -969,14 +1165,14 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: 9830
+              RawValue: 9829
             Y:
-              RawValue: 12451
+              RawValue: 12450
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 13762
+              RawValue: 13761
           RotationOffset:
             RawValue: 0
           UserTag: 0

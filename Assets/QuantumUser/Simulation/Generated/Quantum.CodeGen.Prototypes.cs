@@ -403,6 +403,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsInKnockback;
     public QBoolean IsInWeakKnockback;
     public QBoolean KnockbackWasOriginallyFacingRight;
+    public Int32 KnockbackTick;
     public Byte DamageInvincibilityFrames;
     public QBoolean IsCrouching;
     public QBoolean IsSliding;
@@ -479,6 +480,7 @@ namespace Quantum.Prototypes {
         result.IsInKnockback = this.IsInKnockback;
         result.IsInWeakKnockback = this.IsInWeakKnockback;
         result.KnockbackWasOriginallyFacingRight = this.KnockbackWasOriginallyFacingRight;
+        result.KnockbackTick = this.KnockbackTick;
         result.DamageInvincibilityFrames = this.DamageInvincibilityFrames;
         result.IsCrouching = this.IsCrouching;
         result.IsSliding = this.IsSliding;

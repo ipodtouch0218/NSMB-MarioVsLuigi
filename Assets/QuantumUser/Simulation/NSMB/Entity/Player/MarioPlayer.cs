@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -28,7 +29,7 @@ namespace Quantum {
         }
 
         public bool CanHoldItem(Frame f, EntityRef mario) {
-            return f.GetPlayerInput(PlayerRef)->Sprint.IsDown && /*!IsFrozen &&*/ CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (f.Get<PhysicsObject>(mario).IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && f.GetPlayerInput(PlayerRef)->Jump.IsDown);
+            return PlayerRef.IsValid && f.GetPlayerInput(PlayerRef)->Sprint.IsDown && /*!IsFrozen &&*/ CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (f.Get<PhysicsObject>(mario).IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && f.GetPlayerInput(PlayerRef)->Jump.IsDown);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario) {
@@ -316,6 +317,86 @@ namespace Quantum {
             physicsObject->DisableCollision = false;
 
             f.Events.MarioPlayerRespawned(f, entity, this);
+        }
+
+        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker) {
+            if (IsInWater) {
+                weak = false;
+            }
+
+            if (IsInKnockback && ((IsInWeakKnockback && weak) || !IsInWeakKnockback)) {
+                return;
+            }
+            
+            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || /*IsFrozen ||*/ IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
+                return;
+            }
+
+            if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
+                SpawnStars(f, entity, starsToDrop - 1);
+                Powerdown(f, entity, false);
+                return;
+            }
+
+            if (IsInKnockback || IsInWeakKnockback) {
+                starsToDrop = Mathf.Min(1, starsToDrop);
+            }
+
+            IsInKnockback = true;
+            IsInWeakKnockback = weak;
+            KnockbackWasOriginallyFacingRight = FacingRight;
+            KnockbackTick = f.Number;
+
+            //IsInForwardsKnockback = FacingRight != fromRight;
+            //KnockbackAttacker = attacker;
+
+            // Don't go into walls
+            // Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
+            // TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
+            // if (!weak && tile) {
+            //     fromRight = !fromRight;
+            // }
+
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            physicsObject->Velocity = new FPVector2(
+                (fromRight ? -1 : 1) *
+                    ((starsToDrop + 1) * FP._0_50) *
+                    4 *
+                    (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
+                    (CurrentPowerupState == PowerupState.MiniMushroom ? FP.FromString("2.5") : 1) *
+                    (weak ? FP._0_50 : 1),
+
+                // Don't go upwards if we got hit by a fireball
+                f.Has<Projectile>(attacker) ? 0 : FP.FromString("4.5")
+            );
+
+            //IsOnGround = false;
+            //PreviousTickIsOnGround = false;
+            IsInShell = false;
+            IsGroundpounding = false;
+            IsSpinnerFlying = false;
+            IsPropellerFlying = false;
+            PropellerLaunchFrames = 0;
+            PropellerSpinFrames = 0;
+            IsSliding = false;
+            IsDrilling = false;
+            WallslideLeft = WallslideRight = false;
+
+            SpawnStars(f, entity, starsToDrop);
+            //HandleLayerState();
+            f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, weak);
+        }
+
+        public void ResetKnockback(Frame f, EntityRef entity) {
+            DamageInvincibilityFrames = 60;
+            ////DoEntityBounce = false;
+            IsInKnockback = false;
+            IsInWeakKnockback = false;
+            //IsForwardsKnockback = false;
+            FacingRight = KnockbackWasOriginallyFacingRight;
+
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            physicsObject->Velocity.X = 0;
         }
     }
 }

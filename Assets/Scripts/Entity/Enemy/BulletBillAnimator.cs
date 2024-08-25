@@ -72,7 +72,7 @@ public class BulletBillAnimator : MonoBehaviour {
         if (e.IsSpecialKill) {
             Instantiate(specialKillParticles, transform.position, Quaternion.identity);
         } else {
-            sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
+            // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
         }
     }
 

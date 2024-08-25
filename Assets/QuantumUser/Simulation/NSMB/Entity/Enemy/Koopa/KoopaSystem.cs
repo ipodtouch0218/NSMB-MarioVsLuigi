@@ -332,6 +332,7 @@ namespace Quantum {
                 return;
             }
 
+            koopa->WakeupFrames = 15 * 60;
             physicsObject->Velocity.Y = 0;
             if (crouching) {
                 physicsObject->Velocity.X = mario->FacingRight ? 1 : -1;
@@ -358,7 +359,8 @@ namespace Quantum {
                 || !f.TryGet(entity, out Enemy enemy)
                 || !enemy.IsAlive
                 || !f.TryGet(entity, out Holdable holdable)
-                || f.Exists(holdable.Holder)) {
+                || f.Exists(holdable.Holder)
+                || holdable.IgnoreOwnerFrames > 0) {
 
                 return;
             }

@@ -147,6 +147,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject);
             QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart);
             QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd);
+            QuantumEvent.Subscribe<EventMarioPlayerReceivedKnockback>(this, OnMarioPlayerReceivedKnockback);
 
             stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
@@ -190,7 +191,10 @@ namespace NSMB.Entities.Player {
             Frame f = game.Frames.Predicted;
             MarioPlayer mario = f.Get<MarioPlayer>(entity.EntityRef);
             PhysicsObject physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
-            Input inputs = *f.GetPlayerInput(mario.PlayerRef);
+            Input inputs = default;
+            if (mario.PlayerRef.IsValid) {
+                inputs = *f.GetPlayerInput(mario.PlayerRef);
+            }
 
             UpdateAnimatorVariables(f, mario, physicsObject, inputs);
             HandleAnimations(f, mario, physicsObject);
@@ -632,6 +636,24 @@ namespace NSMB.Entities.Player {
         }
         */
 
+        private void OnMarioPlayerReceivedKnockback(EventMarioPlayerReceivedKnockback e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            if (e.Frame.TryGet(e.Attacker, out Transform2D attackerTransform)) {
+                SpawnParticle("Prefabs/Particle/PlayerBounce", attackerTransform.Position.ToUnityVector3());
+            }
+
+            PlaySound(e.Weak ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+
+            /*
+            if (cameraController.IsControllingCamera) {
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, e.Weak ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
+            }
+            */
+        }
+
         private void OnMarioPlayerMegaEnd(EventMarioPlayerMegaEnd e) {
             if (e.Entity != entity.EntityRef) {
                 return;
@@ -765,6 +787,10 @@ namespace NSMB.Entities.Player {
         }
 
         private void OnMarioPlayerWalljumped(EventMarioPlayerWalljumped e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
             var hitbox = e.Frame.Get<PhysicsCollider2D>(e.Entity);
 
             Vector2 particleOffset = hitbox.Shape.Box.Extents.ToUnityVector2();
@@ -932,19 +958,16 @@ namespace NSMB.Entities.Player {
                 break;
             }
 
-            /*
-            if (BounceJump) {
-                PlaySound(Sounds.Enemy_Generic_Stomp);
+            // Jump SFX
+            if (e.WasBounce) {
+                PlaySound(SoundEffect.Enemy_Generic_Stomp);
 
+                /*
                 if (cameraController.IsControllingCamera) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.4f, 0.15f, RumbleManager.RumbleSetting.Low);
                 }
-                return;
-            }
-            */
-
-            // Jump SFX
-            if (!e.WasBounce) {
+                */
+            } else {
                 SoundEffect soundEffect = mario.CurrentPowerupState switch {
                     PowerupState.MiniMushroom => SoundEffect.Powerup_MiniMushroom_Jump,
                     PowerupState.MegaMushroom => SoundEffect.Powerup_MegaMushroom_Jump,

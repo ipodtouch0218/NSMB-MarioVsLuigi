@@ -1,7 +1,3 @@
-
-
-using UnityEngine;
-
 namespace Quantum {
     public unsafe partial struct Holdable {
         public void Pickup(Frame f, EntityRef entity, EntityRef mario) {

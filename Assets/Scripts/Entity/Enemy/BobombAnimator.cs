@@ -113,8 +113,10 @@ public class BobombAnimator : MonoBehaviour {
         sfx.clip = SoundEffect.Enemy_Bobomb_Fuse.GetClip();
         sfx.Play();
 
+        /*
         if (e.Stomped) {
             sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
         }
+        */
     }
 }

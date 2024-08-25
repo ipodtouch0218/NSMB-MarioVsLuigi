@@ -3,6 +3,7 @@ using Quantum.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
@@ -50,10 +51,9 @@ namespace Quantum {
             physicsObject->IsOnSlideableGround = false;
             physicsObject->IsOnSlipperyGround = false;
 
-            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y * 2, filter.Entity, stage, contacts);
+            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, filter.Entity, stage, contacts);
             physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, filter.Entity, stage, contacts);
             ResolveContacts(physicsObject, contacts);
-            // physicsObject->Velocity -= physicsObject->ParentVelocity;
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
@@ -95,6 +95,10 @@ namespace Quantum {
             if (!maxVelocity.HasValue) {
                 physicsObject->Velocity += physicsObject->ParentVelocity;
                 physicsObject->ParentVelocity = FPVector2.Zero;
+
+                if (f.TryGet(filter.Entity, out MarioPlayer mario) && mario.Team == 0)
+                    Debug.Log("a");
+
                 return;
             }
 
@@ -175,8 +179,7 @@ namespace Quantum {
                         }
                         if (hit.IsDynamic && hit.TryGetShape(f, out Shape2D* hitShape)) {
                             FPVector2 upDirection = FPVector2.Rotate(FPVector2.Up, hitShape->LocalTransform.Rotation * FP.Deg2Rad);
-                            Debug.Log("Dot: " + FPVector2.Dot(hit.Normal, upDirection));
-                            if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= 0) {
+                            if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= GroundMaxAngle) {
                                 // Not a valid hit (semisolid)
                                 continue;
                             }
@@ -330,8 +333,7 @@ namespace Quantum {
                         }
                         if (hit.IsDynamic && hit.TryGetShape(f, out Shape2D* hitShape)) {
                             FPVector2 upDirection = FPVector2.Rotate(FPVector2.Up, hitShape->LocalTransform.Rotation * FP.Deg2Rad);
-                            Debug.Log("Dot: " + FPVector2.Dot(hit.Normal, upDirection));
-                            if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= 0) {
+                            if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= GroundMaxAngle) {
                                 // Not a valid hit (semisolid)
                                 continue;
                             }

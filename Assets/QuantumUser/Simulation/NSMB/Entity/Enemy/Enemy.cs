@@ -11,7 +11,7 @@ namespace Quantum {
             IsActive = true;
             IsDead = false;
             FacingRight = false;
-            transform->Position = Spawnpoint;
+            transform->Teleport(f, Spawnpoint);
             physicsObject->IsFrozen = false;
             physicsObject->Velocity = FPVector2.Zero;
             physicsObject->DisableCollision = false;

@@ -115,6 +115,6 @@ public class KoopaAnimator : MonoBehaviour {
             return;
         }
 
-        sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
+        // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
     }
 }

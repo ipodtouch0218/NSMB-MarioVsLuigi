@@ -86,6 +86,16 @@ public class VersusStageBaker : MapDataBakerCallback {
         }
         LogInfo($"Baked {enemies.Length} enemies");
 
+        // --- Bake Generic Movers(' origins)
+        /*
+        QPrototypeGenericMover[] movers = GameObject.FindObjectsByType<QPrototypeGenericMover>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var mover in movers) {
+            mover.Prototype.Origin = mover.transform.position.ToFPVector2();
+            EditorUtility.SetDirty(mover);
+        }
+        LogInfo($"Baked {movers.Length} Generic Movers");
+        */
+
         EditorUtility.SetDirty(stage);
     }
 

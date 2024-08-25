@@ -163,7 +163,9 @@ public static unsafe class QuantumUtils {
 
         var allPlayers = f.Filter<MarioPlayer>();
         while (allPlayers.Next(out _, out MarioPlayer mario)) {
-            teamStars[mario.Team] += mario.Stars;
+            if (mario.Team < teamStars.Length) {
+                teamStars[mario.Team] += mario.Stars;
+            }
         }
 
         int max = 0;
@@ -262,6 +264,18 @@ public static unsafe class QuantumUtils {
 
         xDifference = a.X - b.X;
         return FPVector2.Distance(a, b);
+    }
+
+    public static FP EaseInOut(FP x) {
+        return x < FP._0_50 ? 2 * x * x : 1 - ((-2 * x + 2) * (-2 * x + 2) / 2);
+    }
+
+    public static FP EaseIn(FP x) {
+        return x * x;
+    }
+
+    public static FP EaseOut(FP x) {
+        return 1 - (1 - x) * (1 - x);
     }
 
     public static FPVector2 SmoothDamp(FPVector2 current, FPVector2 target, ref FPVector2 currentVelocity, FP smoothTime, FP maxSpeed, FP deltaTime) {
