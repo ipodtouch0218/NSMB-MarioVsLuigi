@@ -17,10 +17,10 @@ namespace Quantum {
 
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = true;
-            physicsObject->Velocity = new FPVector2 {
-                X = Speed * (FacingRight ? 1 : -1),
-                Y = FP.FromString("8.5"),
-            };
+            physicsObject->Velocity = new FPVector2(
+                Speed * (FacingRight ? 1 : -1),
+                FP.FromString("8.5")
+            );
 
             if (transform.Position.Y <= stage.StageWorldMin.Y + 1) {
                 // Death boost

@@ -10,32 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
-  m_Name: SkyGrassStageTile
+  m_Name: sky-mushroom_33StageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/Sky/SkyGrassStageTile
+    Path: Resources/Tilemaps/Tiles/Sky/sky-mushroom_33StageTile
     Guid:
-      Value: 495296165798827834
-  Tile: {fileID: 11400000, guid: 98f3b43db248ba44d8eb090aaa3d144a, type: 2}
+      Value: 462723172965729652
+  Tile: {fileID: 11400000, guid: 34649e8fbdc0acc47bb554b0efea3e1e, type: 2}
   CollisionData:
-    Shapes:
-    - Vertices:
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: 32768
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: -32768
-      - X:
-          RawValue: -32768
-        Y:
-          RawValue: -32768
-      - X:
-          RawValue: -32768
-        Y:
-          RawValue: 32768
+    Shapes: []
   IsSlipperyGround: 0
   IsSlideableGround: 0
   IsPolygon: 1

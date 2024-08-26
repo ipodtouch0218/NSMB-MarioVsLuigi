@@ -54,7 +54,7 @@ namespace Quantum {
 
             // Friction
             if (physicsObject->IsTouchingGround && lit) {
-                physicsObject->Velocity *= FP.FromString("0.95");
+                physicsObject->Velocity.X *= FP.FromString("0.95");
             }
 
             // Walking

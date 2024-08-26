@@ -149,7 +149,6 @@ namespace Quantum {
                 } else {
                     movement -= PhysicsObjectSystem.Skin;
                 }
-                Debug.Log("Agh");
                 PhysicsObjectSystem.MoveHorizontally(f, movement * f.UpdateRate, hit.Entity, stage);
                 hitPhysicsObject->Velocity.X = 0;
 

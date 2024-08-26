@@ -620,7 +620,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             if (mario->WasTouchingGroundLastFrame && !physicsObject->IsTouchingGround) {
-                physicsObject->Velocity.Y = mario->IsCrouching ? physics.CrouchOffEdgeVelocity : 0;
+                physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, mario->IsCrouching ? physics.CrouchOffEdgeVelocity : 0);
             }
 
             // Can't crouch while sliding, flying, or mega.

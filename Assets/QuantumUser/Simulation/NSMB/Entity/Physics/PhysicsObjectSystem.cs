@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
@@ -30,8 +31,7 @@ namespace Quantum {
                 return;
             }
 
-            // TODO: removing the velocity == check might fix the rising platform snap stuff
-            bool wasOnGround = physicsObject->IsTouchingGround && physicsObject->Velocity.Y == physicsObject->PreviousVelocity.Y;
+            bool wasOnGround = physicsObject->IsTouchingGround;
             physicsObject->PreviousVelocity = physicsObject->Velocity;
 
             physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
@@ -53,15 +53,17 @@ namespace Quantum {
 
             physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, filter.Entity, stage, contacts);
             physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, filter.Entity, stage, contacts);
+
             ResolveContacts(physicsObject, contacts);
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
+                Debug.Log("snap");
                 FPVector2 previousPosition = filter.Transform->Position;
-
-                MoveVertically(f, -FP._0_20 / f.DeltaTime, filter.Entity, stage, contacts);
+                MoveVertically(f, -FP._0_33 * f.DeltaTime, filter.Entity, stage, contacts);
                 ResolveContacts(filter.PhysicsObject, contacts);
                 if (!physicsObject->IsTouchingGround) {
+                    Debug.Log("failed snap");
                     physicsObject->Velocity.Y = 0;
                     filter.Transform->Position = previousPosition;
                 }
@@ -95,10 +97,6 @@ namespace Quantum {
             if (!maxVelocity.HasValue) {
                 physicsObject->Velocity += physicsObject->ParentVelocity;
                 physicsObject->ParentVelocity = FPVector2.Zero;
-
-                if (f.TryGet(filter.Entity, out MarioPlayer mario) && mario.Team == 0)
-                    Debug.Log("a");
-
                 return;
             }
 
@@ -535,11 +533,15 @@ namespace Quantum {
 
             // Raycast in the direction for both a and b first
             if (TryRayPolygonIntersection(a, direction, polygon, isPolygon, out var contact)) {
-                possibleContacts.Add(contact);
+                if (FPVector2.Dot(contact.Normal, (b - contact.Position).Normalized) > 0) {
+                    possibleContacts.Add(contact);
+                }
             }
 
             if (TryRayPolygonIntersection(b, direction, polygon, isPolygon, out contact)) {
-                possibleContacts.Add(contact);
+                if (FPVector2.Dot(contact.Normal, (a - contact.Position).Normalized) > 0) {
+                    possibleContacts.Add(contact);
+                }
             }
 
             // Then raycast in the opposite direction for all polygon vertices
@@ -552,11 +554,13 @@ namespace Quantum {
 
                 bool valid = false;
                 if ((length == 2 || !isPolygon) && (i == 0 || i == length - 1)) {
+                    /*
                     if (i == 0) {
                         valid = FPVector2.Dot(GetNormal(polygon[i], polygon[i + 1]), direction) < 0;
                     } else {
                         valid = FPVector2.Dot(GetNormal(polygon[i - 1], polygon[i]), direction) < 0;
                     }
+                    */
                 } else {
                     valid |= FPVector2.Dot(GetNormal(point, polygon[(i + 1) % polygon.Length]), direction) < 0;
                     valid |= FPVector2.Dot(GetNormal(polygon[(i - 1 + polygon.Length) % polygon.Length], point), direction) < 0;

@@ -155,7 +155,9 @@ namespace Quantum {
                 holdable->Drop(f, HeldEntity);
             }
 
-            f.Unsafe.GetPointer<PhysicsObject>(entity)->IsFrozen = true;
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            physicsObject->IsFrozen = true;
+            physicsObject->DisableCollision = true;
             f.Events.MarioPlayerDied(f, entity, this);
         }
 

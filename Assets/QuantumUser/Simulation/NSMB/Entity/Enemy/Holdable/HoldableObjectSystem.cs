@@ -1,3 +1,5 @@
+using Photon.Deterministic;
+
 namespace Quantum {
 
     public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter> {
@@ -16,7 +18,7 @@ namespace Quantum {
             if (!f.Exists(holdable->Holder)
                 || !f.TryGet(holdable->Holder, out Transform2D holderTransform)) {
                 
-                holdable->Holder = default;
+                holdable->Holder = EntityRef.None;
                 return;
             }
 
@@ -27,7 +29,7 @@ namespace Quantum {
                 return;
             }
 
-            filter.PhysicsObject->Velocity = default;
+            filter.PhysicsObject->Velocity = FPVector2.Zero;
             filter.Transform->Position = holderTransform.Position + mario->GetHeldItemOffset(f);
         }
     }

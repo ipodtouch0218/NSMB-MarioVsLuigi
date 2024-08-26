@@ -37,7 +37,7 @@ namespace Quantum {
 
         private static FPVector2 SamplePosition(GenericMoverAsset.PathNode[] positions, FP sample, GenericMoverAsset.LoopingMode loopMode) {
             FP totalDuration = 0;
-            for (int i = 0; i < positions.Length - 1; i++) {
+            for (int i = 0; i < positions.Length; i++) {
                 totalDuration += positions[i].TravelDuration;
             }
 
@@ -52,22 +52,22 @@ namespace Quantum {
                 }
             }
 
-            for (int i = 1; i < positions.Length; i++) {
-                GenericMoverAsset.PathNode previous = positions[i - 1];
+            for (int i = 0; i < positions.Length; i++) {
                 GenericMoverAsset.PathNode current = positions[i];
+                GenericMoverAsset.PathNode next = positions[(i + 1) % positions.Length];
 
-                if (sample > previous.TravelDuration) {
-                    sample -= previous.TravelDuration;
+                if (sample > current.TravelDuration) {
+                    sample -= current.TravelDuration;
                 } else {
-                    FP alpha = sample / previous.TravelDuration;
-                    if (current.EaseIn && current.EaseOut) {
+                    FP alpha = sample / current.TravelDuration;
+                    if (next.EaseIn && next.EaseOut) {
                         alpha = QuantumUtils.EaseInOut(alpha);
-                    } else if (current.EaseIn) {
+                    } else if (next.EaseIn) {
                         alpha = QuantumUtils.EaseIn(alpha);
-                    } else if (current.EaseOut) {
+                    } else if (next.EaseOut) {
                         alpha = QuantumUtils.EaseOut(alpha);
                     }
-                    return FPVector2.Lerp(previous.Position, current.Position, alpha);
+                    return FPVector2.Lerp(current.Position, next.Position, alpha);
                 }
             }
 

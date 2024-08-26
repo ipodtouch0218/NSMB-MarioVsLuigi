@@ -222,7 +222,7 @@ namespace NSMB.Entities.Player {
             // Particles
             SetParticleEmission(drillParticle, !mario.IsDead && mario.IsDrilling);
             SetParticleEmission(sparkles, !mario.IsDead && mario.IsStarmanInvincible);
-            SetParticleEmission(dust, !mario.IsDead && (mario.IsWallsliding || (physicsObject.IsTouchingGround && (mario.IsSkidding || (mario.IsCrouching && physicsObject.Velocity.SqrMagnitude.AsFloat > 0.25f))) || (((mario.IsSliding && physicsObject.Velocity.SqrMagnitude.AsFloat > 0.25f) || mario.IsInShell) && physicsObject.IsTouchingGround)) && !mario.CurrentPipe.IsValid);
+            SetParticleEmission(dust, !mario.IsDead && (mario.IsWallsliding || (physicsObject.IsTouchingGround && (mario.IsSkidding || (mario.IsCrouching && physicsObject.Velocity.SqrMagnitude.AsFloat > 0.25f))) || (((mario.IsSliding && physicsObject.Velocity.X.AsFloat > 0.25f) || mario.IsInShell) && physicsObject.IsTouchingGround)) && !mario.CurrentPipe.IsValid);
             //SetParticleEmission(giantParticle, !mario.IsDead && mario.CurrentPowerupState == PowerupState.MegaMushroom && controller.MegaStartTimer.ExpiredOrNotRunning(Runner));
             SetParticleEmission(fireParticle, mario.IsDead && !mario.IsRespawning && mario.FireDeath && !physicsObject.IsFrozen);
             SetParticleEmission(bubblesParticle, mario.IsInWater);
@@ -397,7 +397,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamFireballKnockback, mario.IsInWeakKnockback);
             //animator.SetBool(ParamKnockforwards, mario.IsInForwardsKnockback);
 
-            float animatedVelocity = physicsObject.IsTouchingGround ? Mathf.Abs(physicsObject.Velocity.X.AsFloat) : physicsObject.Velocity.Magnitude.AsFloat;
+            float animatedVelocity = physicsObject.IsTouchingGround ? physicsObject.Velocity.Magnitude.AsFloat : Mathf.Abs(physicsObject.Velocity.X.AsFloat);
             /*
             if (controller.IsStuckInBlock) {
                 animatedVelocity = 0;
