@@ -124,6 +124,7 @@ namespace Quantum {
                     physicsObject->Velocity.X = asset.Speed * (powerup->FacingRight ? 1 : -1);
                     if (asset.BounceStrength > 0) {
                         physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, asset.BounceStrength);
+                        physicsObject->IsTouchingGround = false;
                     }
                 }
 
@@ -183,7 +184,7 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedPowerup(f, info.Entity, *mario, result, newScriptable);
         }
 
-        public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* physicsObject, PowerupAsset newPowerup) {
+        public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {
             
             if (newPowerup.Type == PowerupType.Starman) {
                 mario->InvincibilityFrames = 600;
@@ -200,7 +201,7 @@ namespace Quantum {
                 return PowerupReserveResult.ReserveNewPowerup;
             }
 
-            if (mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsTouchingGround) {
+            if (mario->CurrentPowerupState == PowerupState.MiniMushroom && marioPhysicsObject->IsTouchingGround) {
                 Shape2D shape = collider->Shape;
                 shape.Box.Extents *= 2;
                 shape.Centroid.Y = shape.Box.Extents.Y / 2;
@@ -220,8 +221,12 @@ namespace Quantum {
 
             if (newState == PowerupState.MegaMushroom) {
                 mario->MegaMushroomStartFrames = 90;
-                physicsObject->IsFrozen = true;
-                physicsObject->Velocity = FPVector2.Zero;
+                mario->IsSliding = false;
+                if (marioPhysicsObject->IsTouchingGround) {
+                    mario->JumpState = JumpState.None;
+                }
+                marioPhysicsObject->IsFrozen = true;
+                marioPhysicsObject->Velocity = FPVector2.Zero;
             }
 
             mario->PreviousPowerupState = mario->CurrentPowerupState;
@@ -230,7 +235,7 @@ namespace Quantum {
             mario->IsCrouching |= MarioPlayerSystem.ForceCrouchCheck(f, new() {
                 Entity = marioEntity,
                 MarioPlayer = mario,
-                PhysicsObject = physicsObject,
+                PhysicsObject = marioPhysicsObject,
                 Transform = transform,
                 PhysicsCollider = collider
             }, f.FindAsset(mario->PhysicsAsset));

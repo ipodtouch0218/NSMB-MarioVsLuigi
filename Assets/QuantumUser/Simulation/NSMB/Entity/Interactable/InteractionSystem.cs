@@ -74,11 +74,10 @@ namespace Quantum {
             var key = (typeof(X), typeof(Y));
 
             if (interactors.ContainsKey(key)) {
-                Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}");
+                //Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}.");
             } else {
                 interactors[key] = interactor;
             }
         }
-
     }
 }

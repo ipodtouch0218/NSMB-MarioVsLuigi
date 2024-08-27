@@ -1,0 +1,15 @@
+component BreakablePipe {
+	FP OriginalHeight;
+	FP MinimumHeight;
+
+	[ExcludeFromPrototype] FP CurrentHeight;
+	[ExcludeFromPrototype] bool IsBroken;
+}
+
+synced event BreakablePipeBroken {
+	nothashed Frame Frame;
+	EntityRef Entity;
+	EntityRef Cause;
+	nothashed FPVector2 LaunchDirection;
+	FP Height;
+}

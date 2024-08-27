@@ -6,7 +6,7 @@ using static IInteractableTile;
 namespace Quantum {
 
     public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
-        ISignalOnGameStarting, ISignalOnPreTileCollide, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped {
+        ISignalOnGameStarting, ISignalOnBeforePhysicsCollision, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped {
 
         public struct Filter {
             public EntityRef Entity;
@@ -1303,7 +1303,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var reserveItem = f.FindAsset(mario->ReserveItem);
 
-            if (!reserveItem || mario->IsDead /*|| MegaStartTimer.IsActive(Runner) || (IsStationaryMegaShrink && MegaEndTimer.IsActive(Runner))*/) {
+            if (!reserveItem || mario->IsDead || mario->MegaMushroomStartFrames > 0 || (mario->MegaMushroomStationaryEnd && mario->MegaMushroomEndFrames > 0)) {
                 f.Events.MarioPlayerUsedReserveItem(f, filter.Entity, *mario, false);
                 return;
             }
@@ -1328,7 +1328,7 @@ namespace Quantum {
             }
         }
 
-        public void OnPreTileCollide(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
+        public void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
             if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
                 || mario->CurrentPowerupState != PowerupState.MegaMushroom) {
                 return;

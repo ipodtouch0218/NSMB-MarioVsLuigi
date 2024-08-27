@@ -270,7 +270,7 @@ namespace Quantum {
 
             FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.RuntimeConfig.ExpectedPlayers);
             transform->Position = spawnpoint;
-            f.Unsafe.GetPointer<CameraController>(entity)->Recenter(spawnpoint);
+            f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
             
             IsDead = true;
             // IsFrozen = false;

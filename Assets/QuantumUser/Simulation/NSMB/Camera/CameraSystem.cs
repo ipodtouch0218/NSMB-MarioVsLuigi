@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class CameraSystem : SystemMainThreadFilter<CameraSystem.Filter> {
@@ -87,21 +88,34 @@ namespace Quantum {
                 newCameraPosition.X += (FP._0_25 - xDifference - FP._0_01) * (right ? 1 : -1);
             }
 
+            FPVector2 cameraMin = stage.CameraMinPosition;
+            FPVector2 cameraMax = stage.CameraMaxPosition;
+            FP heightY = cameraMax.Y - cameraMin.Y;
+            FP maxY = heightY < vOrtho * 2 ? (cameraMin.Y + vOrtho) : (cameraMin.Y + heightY - vOrtho);
+            if (newCameraPosition.Y >= maxY) {
+                camera->SmoothDampVelocity = FPVector2.Zero;
+            }
+
+            newCameraPosition = Clamp(stage, newCameraPosition);
+
+            return newCameraPosition;
+        }
+
+        public static FPVector2 Clamp(VersusStageData stage, FPVector2 position) {
+            FP vOrtho = FP.FromString("3.5");
+            FP xOrtho = vOrtho * FP.FromString("1.777777");
+
             // Clamping to within level bounds
             FPVector2 cameraMin = stage.CameraMinPosition;
             FPVector2 cameraMax = stage.CameraMaxPosition;
             FP heightY = cameraMax.Y - cameraMin.Y;
 
             FP maxY = heightY < vOrtho * 2 ? (cameraMin.Y + vOrtho) : (cameraMin.Y + heightY - vOrtho);
-            if (newCameraPosition.Y > maxY) {
-                camera->SmoothDampVelocity = FPVector2.Zero;
-            }
 
-            newCameraPosition.X = FPMath.Clamp(newCameraPosition.X, cameraMin.X + xOrtho, cameraMax.X - xOrtho);
-            newCameraPosition.Y = FPMath.Clamp(newCameraPosition.Y, cameraMin.Y + vOrtho, maxY);
+            position.X = FPMath.Clamp(position.X, cameraMin.X + xOrtho, cameraMax.X - xOrtho);
+            position.Y = FPMath.Clamp(position.Y, cameraMin.Y + vOrtho, maxY);
 
-            return newCameraPosition;
+            return position;
         }
-
     }
 }

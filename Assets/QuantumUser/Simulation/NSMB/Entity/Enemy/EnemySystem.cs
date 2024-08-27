@@ -46,6 +46,9 @@ namespace Quantum {
 
             QuantumUtils.UnwrapWorldLocations(f, transformA.Position, transformB.Position, out var ourPos, out var theirPos);
             bool right = ourPos.X > theirPos.X;
+            if (ourPos.X == theirPos.X) {
+                right = ourPos.Y < theirPos.Y;
+            }
             enemyA->FacingRight = right;
             if (turnBoth) {
                 enemyB->FacingRight = !right;

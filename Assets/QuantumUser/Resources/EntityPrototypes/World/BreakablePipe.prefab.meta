@@ -1,7 +1,8 @@
 fileFormatVersion: 2
-guid: b7770fdc62dd6894980b03834c69fc30
-folderAsset: yes
-DefaultImporter:
+guid: 63263ccdbb1edfc4a9696176d24e7692
+labels:
+- QuantumAsset
+PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 

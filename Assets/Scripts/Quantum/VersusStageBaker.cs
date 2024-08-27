@@ -86,15 +86,17 @@ public class VersusStageBaker : MapDataBakerCallback {
         }
         LogInfo($"Baked {enemies.Length} enemies");
 
-        // --- Bake Generic Movers(' origins)
-        /*
-        QPrototypeGenericMover[] movers = GameObject.FindObjectsByType<QPrototypeGenericMover>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (var mover in movers) {
-            mover.Prototype.Origin = mover.transform.position.ToFPVector2();
-            EditorUtility.SetDirty(mover);
+        // --- Bake Breakable Pipes
+        QPrototypeBreakablePipe[] pipes = GameObject.FindObjectsByType<QPrototypeBreakablePipe>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var pipe in pipes) {
+            var shape = pipe.GetComponent<QuantumEntityPrototype>().PhysicsCollider.Shape2D;
+            shape.PositionOffset = FPVector2.Up * (pipe.Prototype.OriginalHeight / 2);
+            shape.BoxExtents.Y = (pipe.Prototype.OriginalHeight / 2);
+
+            pipe.GetComponent<SpriteRenderer>().size = new Vector2(2, pipe.Prototype.OriginalHeight.AsFloat);
+            EditorUtility.SetDirty(pipe);
         }
-        LogInfo($"Baked {movers.Length} Generic Movers");
-        */
+        LogInfo($"Baked {pipes.Length} breakable pipes");
 
         EditorUtility.SetDirty(stage);
     }

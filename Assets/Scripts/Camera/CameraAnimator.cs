@@ -63,17 +63,17 @@ public class CameraAnimator : ResizingCamera {
         };
 
         // Offset to always put the player in the center for extremely long aspect ratios
-        if (!targetMario.IsDead) {
+        if (!targetMario.IsDead || targetMario.IsRespawning) {
             float cameraFocusY = Mathf.Lerp(targetTransformPrevious.Position.Y.AsFloat, targetTransformCurrent.Position.Y.AsFloat, game.InterpolationFactor) + (playerHeight * 0.5f);
             float cameraHalfHeight = camera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
-            newPosition.y = Mathf.Clamp(newPosition.y, cameraFocusY - cameraHalfHeight, cameraFocusY + cameraHalfHeight);        
+            newPosition.y = Mathf.Clamp(newPosition.y, cameraFocusY - cameraHalfHeight, cameraFocusY + cameraHalfHeight);
         }
 
         // Clamp
         float cameraMinY = stage.CameraMinPosition.Y.AsFloat + camera.orthographicSize;
         float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - camera.orthographicSize;
         newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
-        
+
         camera.transform.position = newPosition;
         secondaryPositioners.RemoveAll(scp => !scp);
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());

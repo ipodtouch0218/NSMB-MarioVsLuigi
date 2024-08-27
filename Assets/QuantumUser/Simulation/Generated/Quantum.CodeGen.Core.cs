@@ -872,6 +872,38 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct BreakablePipe : Quantum.IComponent {
+    public const Int32 SIZE = 32;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(24)]
+    public FP OriginalHeight;
+    [FieldOffset(16)]
+    public FP MinimumHeight;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public FP CurrentHeight;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsBroken;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 13499;
+        hash = hash * 31 + OriginalHeight.GetHashCode();
+        hash = hash * 31 + MinimumHeight.GetHashCode();
+        hash = hash * 31 + CurrentHeight.GetHashCode();
+        hash = hash * 31 + IsBroken.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (BreakablePipe*)ptr;
+        QBoolean.Serialize(&p->IsBroken, serializer);
+        FP.Serialize(&p->CurrentHeight, serializer);
+        FP.Serialize(&p->MinimumHeight, serializer);
+        FP.Serialize(&p->OriginalHeight, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BulletBill : Quantum.IComponent {
     public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
@@ -1846,8 +1878,8 @@ namespace Quantum {
   public unsafe partial interface ISignalOnTryLiquidSplash : ISignal {
     void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash);
   }
-  public unsafe partial interface ISignalOnPreTileCollide : ISignal {
-    void OnPreTileCollide(Frame f, VersusStageData stage, EntityRef Entity, PhysicsContact* Contact, bool* AllowCollision);
+  public unsafe partial interface ISignalOnBeforePhysicsCollision : ISignal {
+    void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision);
   }
   public unsafe partial interface ISignalOnStageReset : ISignal {
     void OnStageReset(Frame f, QBoolean full);
@@ -1868,7 +1900,7 @@ namespace Quantum {
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
     private ISignalOnTryLiquidSplash[] _ISignalOnTryLiquidSplashSystems;
-    private ISignalOnPreTileCollide[] _ISignalOnPreTileCollideSystems;
+    private ISignalOnBeforePhysicsCollision[] _ISignalOnBeforePhysicsCollisionSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
     private ISignalOnTileChanged[] _ISignalOnTileChangedSystems;
     partial void AllocGen() {
@@ -1891,7 +1923,7 @@ namespace Quantum {
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
       _ISignalOnTryLiquidSplashSystems = BuildSignalsArray<ISignalOnTryLiquidSplash>();
-      _ISignalOnPreTileCollideSystems = BuildSignalsArray<ISignalOnPreTileCollide>();
+      _ISignalOnBeforePhysicsCollisionSystems = BuildSignalsArray<ISignalOnBeforePhysicsCollision>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
       _ISignalOnTileChangedSystems = BuildSignalsArray<ISignalOnTileChanged>();
       _ComponentSignalsOnAdded = new ComponentReactiveCallbackInvoker[ComponentTypeId.Type.Length];
@@ -1904,6 +1936,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Bobomb>();
       BuildSignalsArrayOnComponentAdded<Quantum.Boo>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Boo>();
+      BuildSignalsArrayOnComponentAdded<Quantum.BreakablePipe>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.BreakablePipe>();
       BuildSignalsArrayOnComponentAdded<Quantum.BulletBill>();
       BuildSignalsArrayOnComponentRemoved<Quantum.BulletBill>();
       BuildSignalsArrayOnComponentAdded<Quantum.BulletBillLauncher>();
@@ -2087,12 +2121,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnPreTileCollide(VersusStageData stage, EntityRef Entity, PhysicsContact* Contact, bool* AllowCollision) {
-        var array = _f._ISignalOnPreTileCollideSystems;
+      public void OnBeforePhysicsCollision(VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
+        var array = _f._ISignalOnBeforePhysicsCollisionSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnPreTileCollide(_f, stage, Entity, Contact, AllowCollision);
+            s.OnBeforePhysicsCollision(_f, stage, entity, contact, allowCollision);
           }
         }
       }
@@ -2140,6 +2174,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.BlockBump), Quantum.BlockBump.SIZE);
       typeRegistry.Register(typeof(Quantum.Bobomb), Quantum.Bobomb.SIZE);
       typeRegistry.Register(typeof(Quantum.Boo), Quantum.Boo.SIZE);
+      typeRegistry.Register(typeof(Quantum.BreakablePipe), Quantum.BreakablePipe.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBill), Quantum.BulletBill.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBillLauncher), Quantum.BulletBillLauncher.SIZE);
       typeRegistry.Register(typeof(Button), Button.SIZE);
@@ -2234,12 +2269,13 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 22)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 23)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Bobomb>(Quantum.Bobomb.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Boo>(Quantum.Boo.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.BreakablePipe>(Quantum.BreakablePipe.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BulletBill>(Quantum.BulletBill.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BulletBillLauncher>(Quantum.BulletBillLauncher.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)

@@ -2,16 +2,14 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
 
         public static readonly FP RaycastSkin = FP.FromString("0.1");
         public static readonly FP Skin = FP.FromString("0.001");
-        private static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
+        public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
         private static int mask;
 
         public struct Filter {
@@ -216,15 +214,16 @@ namespace Quantum {
                         }
                         
                         bool keepContact = true;
-                        f.Signals.OnPreTileCollide(stage, entity, &contact, &keepContact);
+                        f.Signals.OnBeforePhysicsCollision(stage, entity, &contact, &keepContact);
                         if (keepContact) {
                             contacts.Value.Add(contact);
                             min ??= contact.Distance;
                             avgNormal += contact.Normal;
                             contactCount++;
 
-                            if (contact.TileX != -1 && contact.TileY != -1) {
-                                StageTile tile = f.FindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile);
+                            if (contact.TileX != -1 && contact.TileY != -1
+                                && f.TryFindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile, out StageTile tile)) {
+
                                 physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
                                 physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
                             }
@@ -370,19 +369,13 @@ namespace Quantum {
                         }
 
                         bool keepContact = true;
-                        f.Signals.OnPreTileCollide(stage, entity, &contact, &keepContact);
+                        f.Signals.OnBeforePhysicsCollision(stage, entity, &contact, &keepContact);
 
                         if (keepContact) {
                             contacts.Value.Add(contact);
                             min ??= contact.Distance;
                             avgNormal += contact.Normal;
                             contactCount++;
-
-                            if (contact.TileX != -1 && contact.TileY != -1) {
-                                StageTile tile = f.FindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile);
-                                physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
-                                physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
-                            }
                         } else {
                             removedContacts.Add(contact);
                         }
@@ -396,6 +389,7 @@ namespace Quantum {
 
                     // Snap to point.
                     transform->Position += directionVector * (min.Value - Skin);
+                    Debug.Log("adjust by " + (min.Value - Skin));
 
                     // Readjust the remaining velocity
                     FP remainingVelocity = physicsObject->Velocity.Magnitude - min.Value;

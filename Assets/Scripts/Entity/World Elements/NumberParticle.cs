@@ -45,6 +45,7 @@ public class NumberParticle : MonoBehaviour {
 
         spawnTime = Time.time;
         Destroy(gameObject.transform.parent.gameObject, final ? 1.42f : 0.666f);
+        Update();
     }
 
     public void Update() {
