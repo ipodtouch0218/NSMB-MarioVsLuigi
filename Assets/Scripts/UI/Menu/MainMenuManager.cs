@@ -79,7 +79,7 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnConnectFailed += OnConnectFailed;
             //NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
-            NetworkHandler.Client.StateChanged += OnClientStateChanged;
+            NetworkHandler.StateChanged += OnClientStateChanged;
             NetworkHandler.Client.AddCallbackTarget(this);
 
             ControlSystem.controls.UI.Pause.performed += OnPause;
@@ -97,7 +97,7 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnConnectFailed -= OnConnectFailed;
             //NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
-            NetworkHandler.Client.StateChanged -= OnClientStateChanged;
+            NetworkHandler.StateChanged -= OnClientStateChanged;
             NetworkHandler.Client.RemoveCallbackTarget(this);
 
             ControlSystem.controls.UI.Pause.performed -= OnPause;
@@ -365,8 +365,8 @@ namespace NSMB.UI.MainMenu {
              OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
         }
 
-        public void OpenErrorBox(string key) {
-            errorPrompt.OpenWithText(key);
+        public void OpenErrorBox(string key, params string[] replacements) {
+            errorPrompt.OpenWithText(key, replacements);
             nonNetworkShutdown = false;
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
@@ -421,13 +421,10 @@ namespace NSMB.UI.MainMenu {
         public void QuitRoom() {
             OpenRoomListMenu();
             _ = Reconnect();
-
-            /* TODO
             GlobalController.Instance.discordController.UpdateActivity();
-            */
         }
 
-        public async void StartCountdown() {
+        public void StartCountdown() {
             if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
 
                 /* TODO
@@ -606,7 +603,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             nicknameField.colors = colors;
-            joinStartButtonCanvasGroup.interactable = validUsername;
+            joinStartButtonCanvasGroup.interactable = validUsername && NetworkHandler.Client.IsConnectedAndReady;
             NetworkHandler.Client.NickName = Settings.Instance.generalNickname;
         }
 
@@ -753,9 +750,10 @@ namespace NSMB.UI.MainMenu {
                 break;
             }
 
-            roomListCanvasGroup.interactable = newState == ClientState.JoinedLobby;
+            roomListCanvasGroup.interactable = newState == ClientState.JoinedLobby || newState == ClientState.Disconnected;
             reconnectBtn.gameObject.SetActive(newState == ClientState.Disconnected);
             joinPrivateRoomBtn.gameObject.SetActive(newState == ClientState.JoinedLobby);
+            UpdateNickname();
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

@@ -20,7 +20,7 @@ public class BigStarAnimator : QuantumCallbacks {
     [SerializeField] public QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private BoxCollider2D worldCollider;
-    [SerializeField] private Animation animation;
+    [SerializeField] private Animation legacyAnimation;
     [SerializeField] private AudioSource sfx, sfx2;
     [SerializeField] private Color uncollectableColor = new Color(1, 1, 1, 0.5f);
 
@@ -31,7 +31,7 @@ public class BigStarAnimator : QuantumCallbacks {
     public void OnValidate() {
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref worldCollider);
-        this.SetIfNull(ref animation);
+        this.SetIfNull(ref legacyAnimation);
         this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
     }
@@ -45,7 +45,7 @@ public class BigStarAnimator : QuantumCallbacks {
             sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
         }
         if (stationary) {
-            animation.Play();
+            legacyAnimation.Play();
         }
 
         BigStarInitialized?.Invoke(f, this);

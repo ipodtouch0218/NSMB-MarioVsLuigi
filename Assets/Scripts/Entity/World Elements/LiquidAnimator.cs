@@ -3,12 +3,7 @@ using Quantum;
 using UnityEngine;
 
 namespace NSMB.Entities.World {
-
-    //[RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
-    public class WaterAnimator : MonoBehaviour {
-
-        //---Static Variables
-        private static readonly Collider2D[] CollisionBuffer = new Collider2D[32];
+    public class LiquidAnimator : MonoBehaviour {
 
         //---Serialized Variables
         [SerializeField] private GameObject splashPrefab, splashExitPrefab;
@@ -32,7 +27,7 @@ namespace NSMB.Entities.World {
 
         public void OnValidate() {
             ValidationUtility.SafeOnValidate(() => {
-                if (this == null) {
+                if (!this) {
                     return;
                 }
                 QPrototypeLiquid liquid = GetComponent<QPrototypeLiquid>();
@@ -85,6 +80,11 @@ namespace NSMB.Entities.World {
             spriteRenderer.SetPropertyBlock(properties);
         }
 
+        public void Update() {
+            animTimer += animationSpeed * Time.deltaTime;
+            animTimer %= 8;
+        }
+
         public void FixedUpdate() {
             // TODO: move to a compute shader?
             if (!initialized) {
@@ -120,8 +120,6 @@ namespace NSMB.Entities.World {
                 heightTex.Apply(false);
             }
 
-            animTimer += animationSpeed * Time.fixedDeltaTime;
-            animTimer %= 8;
             properties.SetFloat("TextureIndex", animTimer);
             spriteRenderer.SetPropertyBlock(properties);
         }

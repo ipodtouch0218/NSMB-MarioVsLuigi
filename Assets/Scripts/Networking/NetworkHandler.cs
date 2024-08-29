@@ -1,4 +1,3 @@
-using NSMB.Utils;
 using NSMB.UI.MainMenu;
 using Photon.Client;
 using Photon.Realtime;
@@ -12,11 +11,13 @@ using UnityEngine;
 using Photon.Deterministic;
 using Quantum;
 using static NSMB.Utils.NetworkUtils;
+using static UnityEngine.CullingGroup;
 
-public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IOnEventCallback {
+public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IOnEventCallback, IConnectionCallbacks {
 
     //---Events
     public static event Action OnLocalPlayerConfirmed;
+    public static event Action<ClientState, ClientState> StateChanged;
 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
@@ -35,8 +36,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     private Coroutine pingUpdateCoroutine;
 
     public void Awake() {
+        StateChanged += OnClientStateChanged;
+
         realtimeClient = new();
-        realtimeClient.StateChanged += OnClientStateChanged;
+        realtimeClient.StateChanged += (ClientState oldState, ClientState newState) => {
+            StateChanged?.Invoke(oldState, newState);
+        };
         realtimeClient.AddCallbackTarget(this);
 
         QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, CallbackOnLocalPlayerConfirmed);
@@ -86,6 +91,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         region ??= Instance.lastRegion;
         Instance.lastRegion = region;
         Client.AuthValues = await AuthenticationHandler.Authenticate();
+
+        if (Client.AuthValues == null) {
+            StateChanged?.Invoke(ClientState.ConnectingToMasterServer, ClientState.Disconnected);
+            return false;
+        }
 
         if (Client.IsConnected) {
             await Client.DisconnectAsync();
@@ -242,4 +252,44 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         localPlayerConfirmations.Add(e);
         OnLocalPlayerConfirmed?.Invoke();
     }
+
+    public void OnConnected() { }
+
+    public void OnConnectedToMaster() { }
+
+    public void OnDisconnected(DisconnectCause cause) { }
+
+    public void OnRegionListReceived(RegionHandler regionHandler) { }
+
+    public void OnCustomAuthenticationResponse(Dictionary<string, object> data) {
+
+        PlayerPrefs.SetString("id", Client.AuthValues.UserId);
+
+        if (data.TryGetValue("Token", out object token) && token is string tokenString) {
+            PlayerPrefs.SetString("token", tokenString);
+        }
+
+        PlayerPrefs.Save();
+
+        /*
+        if (data.TryGetValue("SignedData", out object value)) {
+            SignedResultData signedData = JsonConvert.DeserializeObject<SignedResultData>((string) value);
+            ConnectionToken connectionToken = new() {
+                signedData = signedData,
+                signature = (string) data["Signature"],
+            };
+            if (connectionToken.HasValidSignature()) {
+                // Good to go :)
+                Debug.Log($"[Network] Authenication successful ({signedData.UserId}), server signature verified");
+                GlobalController.Instance.connectionToken = connectionToken;
+            } else {
+                Debug.LogWarning("[Network] Authentication server responded with signed data, but it had an invalid signature. Possible server spoofing?");
+            }
+        } else {
+            Debug.LogWarning("[Network] Authentication server did not respond with any signed data, ID Spoofing is possible");
+        }
+        */
+    }
+
+    public void OnCustomAuthenticationFailed(string debugMessage) { }
 }
