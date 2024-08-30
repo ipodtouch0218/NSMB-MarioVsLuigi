@@ -66,7 +66,7 @@ namespace Quantum {
           case EventBobombLit.ID: result = typeof(EventBobombLit); return;
           case EventBobombExploded.ID: result = typeof(EventBobombExploded); return;
           case EventBooBecomeActive.ID: result = typeof(EventBooBecomeActive); return;
-          case EventBreakablePipeBroken.ID: result = typeof(EventBreakablePipeBroken); return;
+          case EventBreakableObjectBroken.ID: result = typeof(EventBreakableObjectBroken); return;
           case EventMarioPlayerCollectedCoin.ID: result = typeof(EventMarioPlayerCollectedCoin); return;
           case EventCoinChangedType.ID: result = typeof(EventCoinChangedType); return;
           case EventCoinChangeCollected.ID: result = typeof(EventCoinChangeCollected); return;
@@ -144,9 +144,9 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventBreakablePipeBroken BreakablePipeBroken(Frame Frame, EntityRef Entity, EntityRef Cause, FPVector2 LaunchDirection, FP Height) {
+      public EventBreakableObjectBroken BreakableObjectBroken(Frame Frame, EntityRef Entity, EntityRef Cause, FPVector2 LaunchDirection, FP Height) {
         if (_f.IsPredicted) return null;
-        var ev = _f.Context.AcquireEvent<EventBreakablePipeBroken>(EventBreakablePipeBroken.ID);
+        var ev = _f.Context.AcquireEvent<EventBreakableObjectBroken>(EventBreakableObjectBroken.ID);
         ev.Frame = Frame;
         ev.Entity = Entity;
         ev.Cause = Cause;
@@ -594,17 +594,17 @@ namespace Quantum {
       }
     }
   }
-  public unsafe partial class EventBreakablePipeBroken : EventBase {
+  public unsafe partial class EventBreakableObjectBroken : EventBase {
     public new const Int32 ID = 6;
     public Frame Frame;
     public EntityRef Entity;
     public EntityRef Cause;
     public FPVector2 LaunchDirection;
     public FP Height;
-    protected EventBreakablePipeBroken(Int32 id, EventFlags flags) : 
+    protected EventBreakableObjectBroken(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
-    public EventBreakablePipeBroken() : 
+    public EventBreakableObjectBroken() : 
         base(6, EventFlags.Server|EventFlags.Client|EventFlags.Synced) {
     }
     public new QuantumGame Game {

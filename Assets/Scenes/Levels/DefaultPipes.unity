@@ -131,6 +131,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -159,7 +164,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -210,6 +215,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 589824
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -415,6 +425,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -443,7 +458,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -494,6 +509,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 524288
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -557,6 +577,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -585,7 +610,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -636,6 +661,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 786432
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -714,6 +744,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -742,7 +777,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -793,6 +828,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 393216
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -853,7 +893,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -1145,7 +1185,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -1256,7 +1296,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -1339,6 +1379,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -1367,7 +1412,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -1418,6 +1463,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 983040
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1926,6 +1976,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -1949,12 +2004,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 163840
+      value: 327680
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 163840
+      value: 327680
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2016,6 +2071,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 655360
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2047,6 +2112,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -2070,12 +2140,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 81920
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 81920
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2137,6 +2207,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 327680
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2168,6 +2248,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -2191,12 +2276,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2258,6 +2343,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2289,6 +2384,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -2317,7 +2417,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2369,6 +2469,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 655360
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2400,6 +2505,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -2423,12 +2533,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2489,6 +2599,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 262144
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2785,6 +2905,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -2808,12 +2933,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2875,6 +3000,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2906,6 +3041,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -2929,12 +3069,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 81920
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 81920
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2995,6 +3135,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 327680
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3378,6 +3528,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -3401,12 +3556,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 163840
+      value: 327680
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 163840
+      value: 327680
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -3467,6 +3622,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 655360
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3614,7 +3779,7 @@ PrefabInstance:
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.size
-      value: 60
+      value: 61
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
@@ -3916,6 +4081,11 @@ PrefabInstance:
       propertyPath: MapEntityReferences.Array.data[59]
       value: 
       objectReference: {fileID: 1979777552}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: MapEntityReferences.Array.data[60]
+      value: 
+      objectReference: {fileID: 967189007}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3929,6 +4099,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -3957,7 +4132,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4009,6 +4184,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 720896
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4032,6 +4212,86 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 958289985}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &967189006
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -16.903765
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.1261888
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932868, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1930655606418932876, guid: f6c07caac997a364c832cfaa038eb9d2,
+        type: 3}
+      propertyPath: m_Name
+      value: Mega Mushroom
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f6c07caac997a364c832cfaa038eb9d2, type: 3}
+--- !u!114 &967189007 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7650191124202020380, guid: f6c07caac997a364c832cfaa038eb9d2,
+    type: 3}
+  m_PrefabInstance: {fileID: 967189006}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1012061036 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8995129457460367436, guid: a3e7cb13a940dcc41a13d1d3c91396d1,
@@ -4161,6 +4421,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -4184,12 +4449,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4250,6 +4515,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4491,6 +4766,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -4519,7 +4799,12 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4571,6 +4856,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 524288
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4620,6 +4910,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -4643,12 +4938,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4710,6 +5005,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4741,6 +5046,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -4769,7 +5079,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4821,6 +5131,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 393216
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4852,6 +5167,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -4880,7 +5200,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4932,6 +5252,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 327680
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4963,6 +5288,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -4991,7 +5321,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -5042,6 +5372,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 720896
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5102,7 +5437,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -5216,6 +5551,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -5244,7 +5584,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -5295,6 +5635,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 524288
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5477,6 +5822,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -5505,7 +5855,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -5556,6 +5906,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 524288
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5804,6 +6159,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -5832,7 +6192,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -5884,6 +6244,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 327680
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5915,6 +6280,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -5943,7 +6313,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -5994,6 +6364,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 393216
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6290,6 +6665,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -6318,7 +6698,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -6369,6 +6749,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 655360
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6429,7 +6814,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -6512,6 +6897,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -6535,12 +6925,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -6601,6 +6991,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 262144
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6717,6 +7117,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -6740,12 +7145,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -6806,6 +7211,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6964,6 +7379,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7098,6 +7518,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -7121,12 +7546,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 180224
+      value: 360448
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 180224
+      value: 360448
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -7188,6 +7613,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 720896
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7219,6 +7654,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -7242,12 +7682,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 81920
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 81920
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -7309,6 +7749,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 327680
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7340,6 +7790,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -7363,12 +7818,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 131072
+      value: 262144
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 131072
+      value: 262144
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -7429,6 +7884,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 524288
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7725,6 +8190,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -7748,12 +8218,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -7815,6 +8285,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7846,6 +8326,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -7869,12 +8354,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -7935,6 +8420,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 262144
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8231,6 +8726,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -8254,12 +8754,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 49152
+      value: 98304
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -8320,6 +8820,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11011,6 +11521,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -11034,12 +11549,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 229376
+      value: 458752
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 229376
+      value: 458752
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -11101,6 +11616,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 917504
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11132,6 +11657,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 860736463}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -11155,12 +11685,12 @@ PrefabInstance:
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
-      value: 65536
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -11222,6 +11752,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.MinimumHeight.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 262144
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11253,6 +11793,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -11281,7 +11826,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -11332,6 +11877,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 262144
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11395,6 +11945,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -11423,7 +11978,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -11474,6 +12029,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 983040
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11539,6 +12099,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -11567,7 +12132,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -11618,6 +12183,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 524288
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11684,6 +12254,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625527920}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -11712,7 +12287,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -11763,6 +12338,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 655360
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12026,3 +12606,4 @@ SceneRoots:
   - {fileID: 644985562}
   - {fileID: 2110129131}
   - {fileID: 119551482}
+  - {fileID: 967189006}

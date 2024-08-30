@@ -39,7 +39,7 @@ namespace Quantum {
             // Signals only... can't be in a group.
             systems.Add(new StageSystem());
             systems.Add(new LiquidSystem());
-            systems.Add(new BreakablePipeSystem());
+            systems.Add(new BreakableObjectSystem());
         }
     }
 }

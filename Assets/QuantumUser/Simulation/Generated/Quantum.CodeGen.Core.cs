@@ -872,32 +872,41 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
-  public unsafe partial struct BreakablePipe : Quantum.IComponent {
-    public const Int32 SIZE = 32;
+  public unsafe partial struct BreakableObject : Quantum.IComponent {
+    public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(24)]
+    [FieldOffset(32)]
     public FP OriginalHeight;
-    [FieldOffset(16)]
+    [FieldOffset(24)]
     public FP MinimumHeight;
     [FieldOffset(8)]
+    public QBoolean IsStompable;
+    [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public FP CurrentHeight;
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public QBoolean IsBroken;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsDestroyed;
     public override Int32 GetHashCode() {
       unchecked { 
-        var hash = 13499;
+        var hash = 20347;
         hash = hash * 31 + OriginalHeight.GetHashCode();
         hash = hash * 31 + MinimumHeight.GetHashCode();
+        hash = hash * 31 + IsStompable.GetHashCode();
         hash = hash * 31 + CurrentHeight.GetHashCode();
         hash = hash * 31 + IsBroken.GetHashCode();
+        hash = hash * 31 + IsDestroyed.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
-        var p = (BreakablePipe*)ptr;
+        var p = (BreakableObject*)ptr;
         QBoolean.Serialize(&p->IsBroken, serializer);
+        QBoolean.Serialize(&p->IsDestroyed, serializer);
+        QBoolean.Serialize(&p->IsStompable, serializer);
         FP.Serialize(&p->CurrentHeight, serializer);
         FP.Serialize(&p->MinimumHeight, serializer);
         FP.Serialize(&p->OriginalHeight, serializer);
@@ -1936,8 +1945,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Bobomb>();
       BuildSignalsArrayOnComponentAdded<Quantum.Boo>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Boo>();
-      BuildSignalsArrayOnComponentAdded<Quantum.BreakablePipe>();
-      BuildSignalsArrayOnComponentRemoved<Quantum.BreakablePipe>();
+      BuildSignalsArrayOnComponentAdded<Quantum.BreakableObject>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.BreakableObject>();
       BuildSignalsArrayOnComponentAdded<Quantum.BulletBill>();
       BuildSignalsArrayOnComponentRemoved<Quantum.BulletBill>();
       BuildSignalsArrayOnComponentAdded<Quantum.BulletBillLauncher>();
@@ -2174,7 +2183,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.BlockBump), Quantum.BlockBump.SIZE);
       typeRegistry.Register(typeof(Quantum.Bobomb), Quantum.Bobomb.SIZE);
       typeRegistry.Register(typeof(Quantum.Boo), Quantum.Boo.SIZE);
-      typeRegistry.Register(typeof(Quantum.BreakablePipe), Quantum.BreakablePipe.SIZE);
+      typeRegistry.Register(typeof(Quantum.BreakableObject), Quantum.BreakableObject.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBill), Quantum.BulletBill.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBillLauncher), Quantum.BulletBillLauncher.SIZE);
       typeRegistry.Register(typeof(Button), Button.SIZE);
@@ -2275,7 +2284,7 @@ namespace Quantum {
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Bobomb>(Quantum.Bobomb.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Boo>(Quantum.Boo.Serialize, null, null, ComponentFlags.None)
-        .Add<Quantum.BreakablePipe>(Quantum.BreakablePipe.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.BreakableObject>(Quantum.BreakableObject.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BulletBill>(Quantum.BulletBill.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BulletBillLauncher>(Quantum.BulletBillLauncher.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)

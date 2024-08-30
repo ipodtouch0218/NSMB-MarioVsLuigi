@@ -389,7 +389,6 @@ namespace Quantum {
 
                     // Snap to point.
                     transform->Position += directionVector * (min.Value - Skin);
-                    Debug.Log("adjust by " + (min.Value - Skin));
 
                     // Readjust the remaining velocity
                     FP remainingVelocity = physicsObject->Velocity.Magnitude - min.Value;

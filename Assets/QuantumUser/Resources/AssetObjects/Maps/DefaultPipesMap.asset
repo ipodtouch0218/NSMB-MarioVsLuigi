@@ -346,6 +346,13 @@ MonoBehaviour:
     - rid: 1192386234660421633
     - rid: 1192386234660421634
     - rid: 1192386234660421635
+  - Components:
+    - rid: 1841682414611464192
+    - rid: 1841682414611464193
+    - rid: 1841682414611464194
+    - rid: 1841682414611464195
+    - rid: 1841682414611464196
+    - rid: 1841682414611464197
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -403,12 +410,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 374308643966812163
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 393216
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 389142146747203584
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -462,12 +471,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 389142146747203587
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 262144
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 409887328413155328
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -521,12 +532,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 409887328413155331
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 420654708345012224
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -580,12 +593,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 420654708345012227
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 429906956958826496
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -639,12 +654,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 429906956958826499
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 327680
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 692988744814297088
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -786,12 +803,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 749857818370113539
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 825980437892431872
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -845,12 +864,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 825980437892431875
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 262144
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 1135518133914697728
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -904,12 +925,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 1135518133914697731
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 327680
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 1192386234660421632
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -963,12 +986,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 1192386234660421635
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 262144
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 1228244940237045760
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1082,12 +1107,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 1361145799051837443
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 1422455712025411584
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1141,12 +1168,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 1422455712025411587
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 1490357482822828032
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1260,12 +1289,100 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 1722277255721254915
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
+    - rid: 1841682414611464192
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -1107805
+          Y:
+            RawValue: 270413
+        Rotation:
+          RawValue: 0
+    - rid: 1841682414611464193
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 23592
+            Y:
+              RawValue: 23592
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 23592
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 9
+        IsTrigger: 1
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 1841682414611464194
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 1841682414611464195
+      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Gravity:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: -1414398
+        TerminalVelocity:
+          RawValue: -524288
+        IsFrozen:
+          Value: 0
+        DisableCollision:
+          Value: 0
+    - rid: 1841682414611464196
+      type: {class: PowerupPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Scriptable:
+          Id:
+            Value: 269903407669338010
+        FacingRight:
+          Value: 1
+        Lifetime: 900
+        AnimationCurveOrigin:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        AnimationCurveTimer:
+          RawValue: 0
+    - rid: 1841682414611464197
+      type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
     - rid: 1910432561708924928
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1319,12 +1436,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 1910432561708924931
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 2009316639589269504
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1378,12 +1497,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 2009316639589269507
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 2243537600130318336
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1437,12 +1558,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 2243537600130318339
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 917504
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 2276309212063596544
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1496,12 +1619,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 2276309212063596547
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 2408951176692236288
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1615,12 +1740,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 2894210914100183043
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 2895018973542219776
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1674,12 +1801,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 2895018973542219779
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 720896
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 2953695388663545856
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1733,12 +1862,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 2953695388663545859
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 786432
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 3046290891393204224
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1852,12 +1983,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 3285224403868057603
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 3406413241201459200
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1911,12 +2044,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 3406413241201459203
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 720896
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 3461140427451662336
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1970,12 +2105,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 3461140427451662339
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 3507943869339664384
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2029,12 +2166,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 3507943869339664387
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 3713860177208803328
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2088,12 +2227,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 3713860177208803331
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 3739821661080256512
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2147,12 +2288,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 3739821661080256515
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 327680
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 4003763992878120960
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2206,12 +2349,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 4003763992878120963
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 4191205161768583168
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2265,12 +2410,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 4191205161768583171
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 4387051102768463872
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2324,12 +2471,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 4387051102768463875
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 589824
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 4425783480768528384
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2443,12 +2592,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 4470508785550491651
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 4536070920158052352
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2628,12 +2779,12 @@ MonoBehaviour:
             X:
               RawValue: -32768
             Y:
-              RawValue: 245760
+              RawValue: 229376
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 245760
+              RawValue: 229376
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -2650,12 +2801,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 4696208758609543171
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 983040
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 5056653011921666048
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2889,12 +3042,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 5412905645588348931
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 5500624500716208128
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2948,12 +3103,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 5500624500716208131
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 5579036601947783168
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3007,12 +3164,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 5579036601947783171
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 5835907156276150272
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3066,12 +3225,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 5835907156276150275
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 327680
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 6079776462347436032
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3245,12 +3406,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 6379392607822282755
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 6552250507316953088
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3304,12 +3467,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 6552250507316953091
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 720896
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 6795082026882957312
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3363,12 +3528,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 6795082026882957315
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 6941135995408482304
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3422,12 +3589,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 6941135995408482307
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 327680
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 7264635249278058496
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3481,12 +3650,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 7264635249278058499
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 262144
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 7569613850400522240
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3600,12 +3771,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 7657564706776809475
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 393216
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 7739604852782661632
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3659,12 +3832,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 7739604852782661635
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 8164861996542459904
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3718,12 +3893,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 8164861996542459907
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 393216
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 8390350474674438144
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3777,12 +3954,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 8390350474674438147
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 262144
         MinimumHeight:
           RawValue: 131072
+        IsStompable:
+          Value: 1
     - rid: 8514637143069425664
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3896,12 +4075,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 8826982300299296771
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 9128653750834036736
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3955,9 +4136,11 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 9128653750834036739
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 983040
         MinimumHeight:
-          RawValue: 65536
+          RawValue: 0
+        IsStompable:
+          Value: 1

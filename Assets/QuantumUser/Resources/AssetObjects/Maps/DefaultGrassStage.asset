@@ -910,7 +910,7 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 7960537994111221763
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
@@ -969,7 +969,7 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 8862042412541804547
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 262144
