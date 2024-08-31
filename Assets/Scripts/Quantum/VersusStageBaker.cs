@@ -86,17 +86,20 @@ public class VersusStageBaker : MapDataBakerCallback {
         }
         LogInfo($"Baked {enemies.Length} enemies");
 
-        // --- Bake Breakable Pipes
-        QPrototypeBreakablePipe[] pipes = GameObject.FindObjectsByType<QPrototypeBreakablePipe>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (var pipe in pipes) {
-            var shape = pipe.GetComponent<QuantumEntityPrototype>().PhysicsCollider.Shape2D;
-            shape.PositionOffset = FPVector2.Up * (pipe.Prototype.OriginalHeight / 2);
-            shape.BoxExtents.Y = (pipe.Prototype.OriginalHeight / 2);
+        // --- Bake Breakable Objects
+        QPrototypeBreakableObject[] breakables = GameObject.FindObjectsByType<QPrototypeBreakableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var breakable in breakables) {
+            var prototype = breakable.GetComponent<QuantumEntityPrototype>();
+            var shape = prototype.PhysicsCollider.Shape2D;
+            shape.PositionOffset = FPVector2.Up * (breakable.Prototype.OriginalHeight / 4);
+            shape.BoxExtents.Y = (breakable.Prototype.OriginalHeight / 4);
 
-            pipe.GetComponent<SpriteRenderer>().size = new Vector2(2, pipe.Prototype.OriginalHeight.AsFloat);
-            EditorUtility.SetDirty(pipe);
+            SpriteRenderer sRenderer = breakable.GetComponentInChildren<SpriteRenderer>();
+            sRenderer.size = new Vector2(sRenderer.size.x, breakable.Prototype.OriginalHeight.AsFloat);
+            EditorUtility.SetDirty(breakable);
+            EditorUtility.SetDirty(prototype);
         }
-        LogInfo($"Baked {pipes.Length} breakable pipes");
+        LogInfo($"Baked {breakables.Length} breakable objects");
 
         EditorUtility.SetDirty(stage);
     }
@@ -114,6 +117,7 @@ public class VersusStageBaker : MapDataBakerCallback {
             return default;
         }
 
+        Debug.Log(tile.name);
         StageTile existingTile = QuantumUnityDB.FindGlobalAssetGuids(new AssetObjectQuery(typeof(StageTile)))
             .Select(guid => new AssetRef<StageTile>(guid))
             .Select(QuantumUnityDB.GetGlobalAssetEditorInstance)

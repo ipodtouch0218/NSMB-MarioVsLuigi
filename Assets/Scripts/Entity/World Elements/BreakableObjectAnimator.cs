@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class BreakablePipeAnimator : MonoBehaviour {
+public class BreakableObjectAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -15,7 +15,7 @@ public class BreakablePipeAnimator : MonoBehaviour {
         this.SetIfNull(ref sRenderer);
 
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventBreakablePipeBroken>(this, OnBreakablePipeBroken);
+        QuantumEvent.Subscribe<EventBreakableObjectBroken>(this, OnBreakableObjectBroken);
     }
 
     public unsafe void OnUpdateView(CallbackUpdateView e) {
@@ -26,23 +26,23 @@ public class BreakablePipeAnimator : MonoBehaviour {
             return;
         }
 
-        var pipe = f.Get<BreakablePipe>(entity.EntityRef);
-        sRenderer.size = new Vector2(2, pipe.CurrentHeight.AsFloat);
-        sRenderer.sprite = pipe.IsBroken ? brokenSprite : unbrokenSprite;
+        var breakable = f.Get<BreakableObject>(entity.EntityRef);
+        sRenderer.size = new Vector2(sRenderer.size.x, breakable.CurrentHeight.AsFloat);
+        sRenderer.sprite = breakable.IsBroken ? brokenSprite : unbrokenSprite;
     }
 
-    private void OnBreakablePipeBroken(EventBreakablePipeBroken e) {
+    private void OnBreakableObjectBroken(EventBreakableObjectBroken e) {
         if (e.Entity != entity.EntityRef) {
             return;
         }
 
-        var pipe = e.Frame.Get<BreakablePipe>(e.Entity);
+        var pipe = e.Frame.Get<BreakableObject>(e.Entity);
 
         SimplePhysicsMover particle = Instantiate(breakPrefab, transform.position, transform.rotation);
-        particle.transform.localScale = transform.localScale;
+        //particle.transform.localScale = transform.localScale;
         particle.transform.position += particle.transform.up * ((pipe.MinimumHeight + (e.Height / 2)) / 2).AsFloat;
         SpriteRenderer sRenderer = particle.GetComponentInChildren<SpriteRenderer>();
-        sRenderer.size = new Vector2(2, e.Height.AsFloat);
+        sRenderer.size = new Vector2(sRenderer.size.x, e.Height.AsFloat);
         sRenderer.transform.localPosition = new Vector2(0, -(e.Height / 2).AsFloat);
 
         particle.velocity = (e.LaunchDirection.ToUnityVector2() * 9.5f) + (Vector2.up * 3.5f);
@@ -51,5 +51,19 @@ public class BreakablePipeAnimator : MonoBehaviour {
         Vector2 b = transform.up;
         float angularVelocity = (a.x * b.y) - (b.x * a.y);
         particle.angularVelocity = angularVelocity * -(400f/5);
+
+        Destroy(particle.gameObject, 10f);
     }
+
+#if UNITY_EDITOR
+    public void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        var breakable = GetComponent<QPrototypeBreakableObject>().Prototype;
+        var extents = GetComponent<QuantumEntityPrototype>().PhysicsCollider.Shape2D.BoxExtents;
+        Gizmos.DrawLine(
+            transform.position + (transform.rotation * new Vector3(-extents.X.AsFloat, breakable.MinimumHeight.AsFloat * 0.5f)), 
+            transform.position + (transform.rotation * new Vector3(extents.X.AsFloat, breakable.MinimumHeight.AsFloat * 0.5f))
+        );
+    }
+#endif
 }

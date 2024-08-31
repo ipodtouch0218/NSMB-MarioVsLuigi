@@ -25,15 +25,13 @@ namespace Quantum {
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var physicsObject = filter.PhysicsObject;
+            var transform = filter.Transform;
             if (physicsObject->IsFrozen) {
                 return;
             }
 
             bool wasOnGround = physicsObject->IsTouchingGround;
             physicsObject->PreviousVelocity = physicsObject->Velocity;
-
-            physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
-            physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
 
             if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
                 contacts = f.AllocateList(out physicsObject->Contacts);
@@ -49,21 +47,21 @@ namespace Quantum {
             physicsObject->IsOnSlideableGround = false;
             physicsObject->IsOnSlipperyGround = false;
 
-            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, filter.Entity, stage, contacts);
+            FP previousY = transform->Position.Y;
             physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, filter.Entity, stage, contacts);
-
+            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, filter.Entity, stage, contacts);
             ResolveContacts(physicsObject, contacts);
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
-                Debug.Log("snap");
                 FPVector2 previousPosition = filter.Transform->Position;
-                MoveVertically(f, -FP._0_33 * f.DeltaTime, filter.Entity, stage, contacts);
-                ResolveContacts(filter.PhysicsObject, contacts);
+                MoveVertically(f, -FP._0_33, filter.Entity, stage, contacts);
+                ResolveContacts(physicsObject, contacts);
                 if (!physicsObject->IsTouchingGround) {
-                    Debug.Log("failed snap");
-                    physicsObject->Velocity.Y = 0;
                     filter.Transform->Position = previousPosition;
+                    physicsObject->Velocity.Y = 0;
+                    physicsObject->HoverFrames = 2;
+                    transform->Position.Y = previousY;
                 }
             }
 #if DEBUG
@@ -71,6 +69,11 @@ namespace Quantum {
                 Draw.Ray(contact.Position, contact.Normal, ColorRGBA.Red);
             }
 #endif
+
+            if (QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
+                physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
+            }
+            physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
         }
 
         private void MoveWithPlatform(Frame f, ref Filter filter, QList<PhysicsContact> contacts) {
@@ -389,7 +392,6 @@ namespace Quantum {
 
                     // Snap to point.
                     transform->Position += directionVector * (min.Value - Skin);
-                    Debug.Log("adjust by " + (min.Value - Skin));
 
                     // Readjust the remaining velocity
                     FP remainingVelocity = physicsObject->Velocity.Magnitude - min.Value;

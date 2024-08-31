@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8a2a7c3b3c8694a83f3b72e87ca64a, type: 3}
+  m_Name: YellowHardBlockStageTile
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: Resources/Tilemaps/Tiles/Volcano/Yellow/YellowHardBlockStageTile
+    Guid:
+      Value: 498471512992116307
+  Tile: {fileID: 11400000, guid: 13a278822cbca0a4f9bd84db4b16019f, type: 2}
+  CollisionData:
+    Shapes:
+    - Vertices:
+      - X:
+          RawValue: -32768
+        Y:
+          RawValue: 32768
+      - X:
+          RawValue: 32768
+        Y:
+          RawValue: 32768
+      - X:
+          RawValue: 32768
+        Y:
+          RawValue: -32768
+      - X:
+          RawValue: -32768
+        Y:
+          RawValue: -32768
+  IsSlipperyGround: 0
+  IsSlideableGround: 0
+  IsPolygon: 1
+  FootstepSound: 31
+  FootstepParticle: 0
+  ParticleColor: {r: 0.5568628, g: 0.37647063, b: 0.3529412, a: 1}
+  BreakingRules: 320
+  BumpIfNotBroken: 0

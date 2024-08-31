@@ -1,5 +1,6 @@
 component PiranhaPlant {
-	byte WaitingFrames;
-	byte ChompFrames;
-	FP PopupAnimationTime;
+	entity_ref Pipe;
+	[ExcludeFromPrototype] byte WaitingFrames;
+	[ExcludeFromPrototype] byte ChompFrames;
+	[ExcludeFromPrototype] FP PopupAnimationTime;
 }

@@ -1,12 +1,16 @@
-component BreakablePipe {
+component BreakableObject {
 	FP OriginalHeight;
 	FP MinimumHeight;
+	bool IsStompable;
 
 	[ExcludeFromPrototype] FP CurrentHeight;
 	[ExcludeFromPrototype] bool IsBroken;
+	[ExcludeFromPrototype] bool IsDestroyed;
 }
 
-synced event BreakablePipeBroken {
+signal OnBreakableObjectChangedHeight(EntityRef breakable, FP newHeight);
+
+synced event BreakableObjectBroken {
 	nothashed Frame Frame;
 	EntityRef Entity;
 	EntityRef Cause;

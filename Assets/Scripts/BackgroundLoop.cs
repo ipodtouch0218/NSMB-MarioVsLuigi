@@ -1,10 +1,8 @@
 using System;
-using UnityEngine;
-
-using NSMB.Extensions;
+using System.Collections.Generic;
 using Photon.Deterministic;
 using Quantum;
-using System.Collections.Generic;
+using UnityEngine;
 
 public class BackgroundLoop : QuantumCallbacks {
 
@@ -40,10 +38,6 @@ public class BackgroundLoop : QuantumCallbacks {
         }
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-    }
-
-    public void OnWillRenderObject() {
-        Reposition(Camera.current);
     }
 
     public void Reposition(Camera camera) {
@@ -89,11 +83,10 @@ public class BackgroundLoop : QuantumCallbacks {
             c.name = obj.name + i;
         }
         Destroy(clone);
-        if (obj.GetComponent<LegacyAnimateSpriteRenderer>() is LegacyAnimateSpriteRenderer anim) {
+        if (obj.TryGetComponent(out LegacyAnimateSpriteRenderer anim)) {
             Destroy(anim);
         }
-
-        if (obj.GetComponent<SpriteRenderer>() is SpriteRenderer sRenderer) {
+        if (obj.TryGetComponent(out SpriteRenderer sRenderer)) {
             Destroy(sRenderer);
         }
     }

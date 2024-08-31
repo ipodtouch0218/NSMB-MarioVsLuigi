@@ -77,8 +77,12 @@ MonoBehaviour:
     RawValue: 259200
   SlowTurnaroundIceAcceleration:
     RawValue: 172800
+  SmallHitboxHeight:
+    RawValue: 27525
+  LargeHitboxHeight:
+    RawValue: 53739
   JumpBufferFrames: 12
-  CoyoteTimeFrames: 3
+  CoyoteTimeFrames: 5
   JumpVelocity:
     RawValue: 433920
   JumpSpeedBonusVelocity:
@@ -153,6 +157,7 @@ MonoBehaviour:
     RawValue: -98304
   TerminalVelocityGroundpound:
     RawValue: -737280
+  PipeEnterDuration: 60
   SwimJumpVelocity:
     RawValue: 148320
   SwimMaxVerticalVelocity:
@@ -216,3 +221,7 @@ MonoBehaviour:
   ProjectileVolleyFrames: 75
   ProjectileDelayFrames: 6
   MaxProjecitles: 6
+  PropellerSpinFrames: 30
+  PropellerLaunchVelocity:
+    RawValue: 393216
+  PropellerLaunchFrames: 60

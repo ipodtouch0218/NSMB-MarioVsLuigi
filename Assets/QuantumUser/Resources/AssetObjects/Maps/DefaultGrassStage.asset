@@ -910,12 +910,14 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 7960537994111221763
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 196608
         MinimumHeight:
           RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 8862042412541804544
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -969,9 +971,11 @@ MonoBehaviour:
         CallbackFlags:
           Value: 0
     - rid: 8862042412541804547
-      type: {class: BreakablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
           RawValue: 262144
         MinimumHeight:
           RawValue: 0
+        IsStompable:
+          Value: 1

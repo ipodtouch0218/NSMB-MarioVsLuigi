@@ -11,22 +11,25 @@ namespace Quantum {
         public override void Update(Frame f) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            var launchers = f.Filter<BulletBillLauncher, Transform2D>();
-            while (launchers.NextUnsafe(out EntityRef entity, out BulletBillLauncher* launcher, out Transform2D* transform)) {
+            var launchers = f.Filter<BulletBillLauncher, BreakableObject, PhysicsCollider2D, Transform2D>();
+            while (launchers.NextUnsafe(out EntityRef entity, out BulletBillLauncher* launcher, out BreakableObject* breakable, out PhysicsCollider2D* collider, out Transform2D* transform)) {
+                if (breakable->IsBroken) {
+                    continue;
+                }
                 if (launcher->BulletBillCount >= 3) {
                     continue;
                 }
-
                 if (!QuantumUtils.Decrement(ref launcher->TimeToShootFrames)) {
                     continue;
                 }
                 launcher->TimeToShootFrames = launcher->TimeToShoot;
 
+                FPVector2 spawnpoint = transform->Position + FPVector2.Up * (collider->Shape.Box.Extents.Y * 2) + (FPVector2.Down * FP.FromString("0.45"));
                 var allPlayers = f.Filter<MarioPlayer, Transform2D>();
                 FP absDistance = 0;
                 FP minDistance = FP.MaxValue;
                 while (allPlayers.Next(out _, out _, out Transform2D marioTransform)) {
-                    QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform.Position, out FP distance);
+                    QuantumUtils.WrappedDistance(stage, spawnpoint, marioTransform.Position, out FP distance);
                     FP abs = FPMath.Abs(distance);
                     if (abs >= launcher->MinimumShootRadius && abs < minDistance) {
                         absDistance = abs;
@@ -45,7 +48,7 @@ namespace Quantum {
                 var newBill = f.Unsafe.GetPointer<BulletBill>(newBillEntity);
                 var newBillTransform = f.Unsafe.GetPointer<Transform2D>(newBillEntity);
                 newBill->Initialize(f, newBillEntity, entity, right);
-                newBillTransform->Position = transform->Position;
+                newBillTransform->Position = spawnpoint;
 
                 launcher->BulletBillCount++;
             }

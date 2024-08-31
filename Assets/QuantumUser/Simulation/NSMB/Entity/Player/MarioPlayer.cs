@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System.IO.Pipes;
 using UnityEngine;
 
 namespace Quantum {
@@ -399,6 +400,41 @@ namespace Quantum {
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             physicsObject->Velocity.X = 0;
+        }
+
+        public void EnterPipe(Frame f, EntityRef mario, EntityRef pipe) {
+            if (f.Exists(CurrentPipe)
+                || PipeCooldownFrames > 0) {
+                return;
+            }
+
+            var physics = f.FindAsset(f.Unsafe.GetPointer<MarioPlayer>(mario)->PhysicsAsset);
+            PipeFrames = physics.PipeEnterDuration;
+
+            CurrentPipe = pipe;
+
+            var pipeComponent = f.Get<EnterablePipe>(pipe);
+            PipeDirection = pipeComponent.IsCeilingPipe ? FPVector2.Up : FPVector2.Down;
+
+            var pipeTransform = f.Get<Transform2D>(pipe);
+            var marioTransform = f.Unsafe.GetPointer<Transform2D>(mario);
+            marioTransform->Position.X = pipeTransform.Position.X;
+
+            IsCrouching = false;
+            IsSliding = false;
+            IsPropellerFlying = false;
+            UsedPropellerThisJump = false;
+            PropellerLaunchFrames = 0;
+            PropellerSpinFrames = 0;
+            IsSpinnerFlying = false;
+            IsInShell = false;
+            PipeEntering = true;
+
+            if (InvincibilityFrames > 0) {
+                InvincibilityFrames += (ushort) (PipeFrames * 2);
+            }
+
+            f.Events.MarioPlayerEnteredPipe(f, mario, CurrentPipe);
         }
     }
 }

@@ -593,6 +593,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -602,6 +607,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: BreakablePipe (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.BoxExtents.Y.RawValue
+      value: 65536
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
+      value: 65536
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
+      value: 65536
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -657,6 +682,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 262144
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4435,6 +4465,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1945689523339116197, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Size.y
@@ -4444,6 +4479,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: BreakablePipe
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.BoxExtents.Y.RawValue
+      value: 49152
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
+      value: 49152
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.ScaledShape2D.BoxExtents.Y.RawValue
+      value: 49152
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: PhysicsCollider.ScaledShape2D.PositionOffset.Y.RawValue
+      value: 49152
       objectReference: {fileID: 0}
     - target: {fileID: 6190074760509590282, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4499,6 +4554,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: Prototype.OriginalHeight.RawValue
+      value: 196608
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

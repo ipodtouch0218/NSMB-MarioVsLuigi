@@ -13,6 +13,7 @@ public class CameraAnimator : ResizingCamera {
 
     //---Private Variables
     private VersusStageData stage;
+    private float scroll;
 
     public override void OnValidate() {
         base.OnValidate();
@@ -47,10 +48,6 @@ public class CameraAnimator : ResizingCamera {
 
         Vector3 newPosition = QuantumUtils.WrapWorld(stage, FPVector2.Lerp(origin, target, game.InterpolationFactor.ToFP()), out _).ToUnityVector3();
         newPosition.z = -10;
-        camera.transform.position = newPosition;
-        if (BackgroundLoop.Instance) {
-            BackgroundLoop.Instance.Reposition(camera);
-        }
 
         var targetTransformPrevious = game.Frames.PredictedPrevious.Get<Transform2D>(Target);
         var targetTransformCurrent = game.Frames.Predicted.Get<Transform2D>(Target);
@@ -63,13 +60,19 @@ public class CameraAnimator : ResizingCamera {
         };
 
         // Offset to always put the player in the center for extremely long aspect ratios
+        Vector2 cameraFocus = Vector2.Lerp(targetTransformPrevious.Position.ToUnityVector2(), targetTransformCurrent.Position.ToUnityVector2(), game.InterpolationFactor);
+        cameraFocus.y += playerHeight * 0.5f;
+
         if (!targetMario.IsDead || targetMario.IsRespawning) {
-            float cameraFocusY = Mathf.Lerp(targetTransformPrevious.Position.Y.AsFloat, targetTransformCurrent.Position.Y.AsFloat, game.InterpolationFactor) + (playerHeight * 0.5f);
             float cameraHalfHeight = camera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
-            newPosition.y = Mathf.Clamp(newPosition.y, cameraFocusY - cameraHalfHeight, cameraFocusY + cameraHalfHeight);
+            newPosition.y = Mathf.Clamp(newPosition.y, cameraFocus.y - cameraHalfHeight, cameraFocus.y + cameraHalfHeight);
         }
 
         // Clamp
+        float cameraMinX = stage.CameraMinPosition.X.AsFloat - (camera.orthographicSize * camera.aspect);
+        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat + (camera.orthographicSize * camera.aspect);
+        newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
+
         float cameraMinY = stage.CameraMinPosition.Y.AsFloat + camera.orthographicSize;
         float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - camera.orthographicSize;
         newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
@@ -77,5 +80,9 @@ public class CameraAnimator : ResizingCamera {
         camera.transform.position = newPosition;
         secondaryPositioners.RemoveAll(scp => !scp);
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());
+
+        if (BackgroundLoop.Instance) {
+            BackgroundLoop.Instance.Reposition(camera);
+        }
     }
 }

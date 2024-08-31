@@ -14,19 +14,21 @@ namespace Quantum {
   using UnityEngine;
   
   [UnityEngine.DisallowMultipleComponent()]
-  public unsafe partial class QPrototypeBreakablePipe : QuantumUnityComponentPrototype<Quantum.Prototypes.BreakablePipePrototype>, IQuantumUnityPrototypeWrapperForComponent<Quantum.BreakablePipe> {
-    partial void CreatePrototypeUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BreakablePipePrototype prototype);
+  public unsafe partial class QPrototypeEnterablePipe : QuantumUnityComponentPrototype<Quantum.Prototypes.EnterablePipePrototype>, IQuantumUnityPrototypeWrapperForComponent<Quantum.EnterablePipe> {
+    partial void CreatePrototypeUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.EnterablePipePrototype prototype);
     [DrawInline()]
     [ReadOnly(InEditMode = false)]
-    public Quantum.Prototypes.BreakablePipePrototype Prototype;
+    public Quantum.Prototypes.Unity.EnterablePipePrototype Prototype;
     public override System.Type ComponentType {
       get {
-        return typeof(Quantum.BreakablePipe);
+        return typeof(Quantum.EnterablePipe);
       }
     }
     public override ComponentPrototype CreatePrototype(Quantum.QuantumEntityPrototypeConverter converter) {
-      CreatePrototypeUser(converter, ref Prototype);
-      return Prototype;
+      Quantum.Prototypes.EnterablePipePrototype result;
+      converter.Convert(Prototype, out result);
+      CreatePrototypeUser(converter, ref result);
+      return result;
     }
   }
 }
