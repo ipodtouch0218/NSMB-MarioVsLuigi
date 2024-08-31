@@ -9,6 +9,10 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter) {
+            if (f.DestroyPending(filter.Entity)) {
+                return;
+            }
+
             var coin = filter.Coin;
 
             QuantumUtils.Decrement(ref coin->UncollectableFrames);

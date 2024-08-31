@@ -23,7 +23,7 @@ namespace Quantum {
             bool kill = QuantumUtils.Decrement(ref blockBump->Lifetime);
             FP size = FPMath.Sin(((FP) blockBump->Lifetime / 60 / bumpDuration) * FP.Pi) * bumpScale;
 
-            collider->Shape.Box.Extents = new FPVector2(FP._0_25 + size, FP._0_25 + size);
+            collider->Shape.Box.Extents = new FPVector2(FP._0_25 + (size / 3), FP._0_25 + (size / 3));
             transform->Position = blockBump->Origin + new FPVector2(0, size * (blockBump->IsDownwards ? -1 : 1));
 
             if (!blockBump->HasBumped) {

@@ -40,6 +40,8 @@ namespace Quantum {
             systems.Add(new StageSystem());
             systems.Add(new LiquidSystem());
             systems.Add(new BreakableObjectSystem());
+            systems.Add(new MarioBrosPlatformSystem());
+            systems.Add(new EnterablePipeSystem());
         }
     }
 }

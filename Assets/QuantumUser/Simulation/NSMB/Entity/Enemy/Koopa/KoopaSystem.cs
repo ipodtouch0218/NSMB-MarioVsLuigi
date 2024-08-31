@@ -209,10 +209,11 @@ namespace Quantum {
                 if (groundpounded) {
                     if (koopa->SpawnPowerupWhenStomped.IsValid && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
                         // Powerup (for blue koopa): give to mario immediately
-                        PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
+                        PowerupReserveResult reserve = PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
                         koopaEnemy->IsActive = false;
                         koopaEnemy->IsDead = true;
                         koopaPhysicsObject->IsFrozen = true;
+                        f.Events.MarioPlayerCollectedPowerup(f, koopaEntity, *mario, reserve, powerup);
 
                     } else {
                         // Kick

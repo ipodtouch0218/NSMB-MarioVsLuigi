@@ -916,6 +916,8 @@ MonoBehaviour:
           RawValue: 196608
         MinimumHeight:
           RawValue: 0
+        IsStompable:
+          Value: 1
     - rid: 8862042412541804544
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -975,3 +977,5 @@ MonoBehaviour:
           RawValue: 262144
         MinimumHeight:
           RawValue: 0
+        IsStompable:
+          Value: 1

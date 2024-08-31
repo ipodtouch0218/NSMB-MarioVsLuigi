@@ -50,6 +50,21 @@ namespace Quantum.Prototypes.Unity {
   #endif //;
   
   [System.SerializableAttribute()]
+  public unsafe partial class EnterablePipePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.EnterablePipePrototype> {
+    public Quantum.QuantumEntityPrototype OtherPipe;
+    public QBoolean IsEnterable;
+    public QBoolean IsCeilingPipe;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.EnterablePipePrototype prototype);
+    public override Quantum.Prototypes.EnterablePipePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.EnterablePipePrototype();
+      converter.Convert(this.OtherPipe, out result.OtherPipe);
+      converter.Convert(this.IsEnterable, out result.IsEnterable);
+      converter.Convert(this.IsCeilingPipe, out result.IsCeilingPipe);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
   public unsafe partial class MarioPlayerPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.MarioPlayerPrototype> {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     public AssetRef<CharacterAsset> CharacterAsset;
@@ -122,6 +137,10 @@ namespace Quantum.Prototypes.Unity {
     public Byte PropellerDrillCooldown;
     public Quantum.QuantumEntityPrototype HeldEntity;
     public Quantum.QuantumEntityPrototype CurrentPipe;
+    public FPVector2 PipeDirection;
+    public QBoolean PipeEntering;
+    public Byte PipeFrames;
+    public Byte PipeCooldownFrames;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.MarioPlayerPrototype prototype);
     public override Quantum.Prototypes.MarioPlayerPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.MarioPlayerPrototype();
@@ -196,6 +215,10 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.PropellerDrillCooldown, out result.PropellerDrillCooldown);
       converter.Convert(this.HeldEntity, out result.HeldEntity);
       converter.Convert(this.CurrentPipe, out result.CurrentPipe);
+      converter.Convert(this.PipeDirection, out result.PipeDirection);
+      converter.Convert(this.PipeEntering, out result.PipeEntering);
+      converter.Convert(this.PipeFrames, out result.PipeFrames);
+      converter.Convert(this.PipeCooldownFrames, out result.PipeCooldownFrames);
       ConvertUser(converter, ref result);
       return result;
     }
@@ -236,6 +259,17 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.TerminalVelocity, out result.TerminalVelocity);
       converter.Convert(this.IsFrozen, out result.IsFrozen);
       converter.Convert(this.DisableCollision, out result.DisableCollision);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
+  [System.SerializableAttribute()]
+  public unsafe partial class PiranhaPlantPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.PiranhaPlantPrototype> {
+    public Quantum.QuantumEntityPrototype Pipe;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PiranhaPlantPrototype prototype);
+    public override Quantum.Prototypes.PiranhaPlantPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.PiranhaPlantPrototype();
+      converter.Convert(this.Pipe, out result.Pipe);
       ConvertUser(converter, ref result);
       return result;
     }

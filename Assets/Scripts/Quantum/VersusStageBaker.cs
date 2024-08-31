@@ -89,13 +89,15 @@ public class VersusStageBaker : MapDataBakerCallback {
         // --- Bake Breakable Objects
         QPrototypeBreakableObject[] breakables = GameObject.FindObjectsByType<QPrototypeBreakableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var breakable in breakables) {
-            var shape = breakable.GetComponent<QuantumEntityPrototype>().PhysicsCollider.Shape2D;
+            var prototype = breakable.GetComponent<QuantumEntityPrototype>();
+            var shape = prototype.PhysicsCollider.Shape2D;
             shape.PositionOffset = FPVector2.Up * (breakable.Prototype.OriginalHeight / 4);
             shape.BoxExtents.Y = (breakable.Prototype.OriginalHeight / 4);
 
             SpriteRenderer sRenderer = breakable.GetComponentInChildren<SpriteRenderer>();
             sRenderer.size = new Vector2(sRenderer.size.x, breakable.Prototype.OriginalHeight.AsFloat);
             EditorUtility.SetDirty(breakable);
+            EditorUtility.SetDirty(prototype);
         }
         LogInfo($"Baked {breakables.Length} breakable objects");
 
@@ -115,6 +117,7 @@ public class VersusStageBaker : MapDataBakerCallback {
             return default;
         }
 
+        Debug.Log(tile.name);
         StageTile existingTile = QuantumUnityDB.FindGlobalAssetGuids(new AssetObjectQuery(typeof(StageTile)))
             .Select(guid => new AssetRef<StageTile>(guid))
             .Select(QuantumUnityDB.GetGlobalAssetEditorInstance)

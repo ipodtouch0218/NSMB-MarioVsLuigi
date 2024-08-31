@@ -3037,7 +3037,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 94.2
+  m_fontSize: 96.55
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3112,6 +3112,7 @@ GameObject:
   - component: {fileID: 3031707850400707342}
   - component: {fileID: 5715402199269950654}
   - component: {fileID: 8612998918432236764}
+  - component: {fileID: 5131758903237112814}
   m_Layer: 0
   m_Name: ScrollCamera
   m_TagString: Untagged
@@ -3243,6 +3244,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 9216439077095524751}
   ourCamera: {fileID: 3031707850400707342}
+--- !u!114 &5131758903237112814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4215158175538826346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b6ab4a4268ca614d8b22b90fc545198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 3031707850400707342}
 --- !u!1 &4413053123625377219
 GameObject:
   m_ObjectHideFlags: 0
@@ -6790,6 +6804,7 @@ GameObject:
   - component: {fileID: 1913174037885271057}
   - component: {fileID: 9216439077095524751}
   - component: {fileID: 2314288458202261034}
+  - component: {fileID: 7991437046831688306}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -6909,6 +6924,19 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &7991437046831688306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8707103255182115499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b6ab4a4268ca614d8b22b90fc545198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 9216439077095524751}
 --- !u!1 &8734547387843468283
 GameObject:
   m_ObjectHideFlags: 0

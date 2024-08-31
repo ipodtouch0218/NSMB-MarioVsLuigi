@@ -1,5 +1,4 @@
 namespace Quantum {
-
     public unsafe abstract class SystemMainThreadFilterStage<T> : SystemMainThread where T : unmanaged {
         public override void Update(Frame f) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);

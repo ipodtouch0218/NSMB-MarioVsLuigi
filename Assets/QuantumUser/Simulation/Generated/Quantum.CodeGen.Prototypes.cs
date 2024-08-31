@@ -242,6 +242,23 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.EnterablePipe))]
+  public unsafe class EnterablePipePrototype : ComponentPrototype<Quantum.EnterablePipe> {
+    public MapEntityId OtherPipe;
+    public QBoolean IsEnterable;
+    public QBoolean IsCeilingPipe;
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.EnterablePipe component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.EnterablePipe result, in PrototypeMaterializationContext context = default) {
+        PrototypeValidator.FindMapEntity(this.OtherPipe, in context, out result.OtherPipe);
+        result.IsEnterable = this.IsEnterable;
+        result.IsCeilingPipe = this.IsCeilingPipe;
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.GenericMover))]
   public unsafe partial class GenericMoverPrototype : ComponentPrototype<Quantum.GenericMover> {
     public AssetRef<GenericMoverAsset> MoverAsset;
@@ -374,6 +391,21 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.MarioBrosPlatform))]
+  public unsafe partial class MarioBrosPlatformPrototype : ComponentPrototype<Quantum.MarioBrosPlatform> {
+    [HideInInspector()]
+    public Int32 _empty_prototype_dummy_field_;
+    partial void MaterializeUser(Frame frame, ref Quantum.MarioBrosPlatform result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.MarioBrosPlatform component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.MarioBrosPlatform result, in PrototypeMaterializationContext context = default) {
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.MarioPlayer))]
   public unsafe class MarioPlayerPrototype : ComponentPrototype<Quantum.MarioPlayer> {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
@@ -447,6 +479,10 @@ namespace Quantum.Prototypes {
     public Byte PropellerDrillCooldown;
     public MapEntityId HeldEntity;
     public MapEntityId CurrentPipe;
+    public FPVector2 PipeDirection;
+    public QBoolean PipeEntering;
+    public Byte PipeFrames;
+    public Byte PipeCooldownFrames;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.MarioPlayer component = default;
         Materialize((Frame)f, ref component, in context);
@@ -524,6 +560,10 @@ namespace Quantum.Prototypes {
         result.PropellerDrillCooldown = this.PropellerDrillCooldown;
         PrototypeValidator.FindMapEntity(this.HeldEntity, in context, out result.HeldEntity);
         PrototypeValidator.FindMapEntity(this.CurrentPipe, in context, out result.CurrentPipe);
+        result.PipeDirection = this.PipeDirection;
+        result.PipeEntering = this.PipeEntering;
+        result.PipeFrames = this.PipeFrames;
+        result.PipeCooldownFrames = this.PipeCooldownFrames;
     }
   }
   [System.SerializableAttribute()]
@@ -582,21 +622,15 @@ namespace Quantum.Prototypes {
   }
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.PiranhaPlant))]
-  public unsafe partial class PiranhaPlantPrototype : ComponentPrototype<Quantum.PiranhaPlant> {
-    public Byte WaitingFrames;
-    public Byte ChompFrames;
-    public FP PopupAnimationTime;
-    partial void MaterializeUser(Frame frame, ref Quantum.PiranhaPlant result, in PrototypeMaterializationContext context);
+  public unsafe class PiranhaPlantPrototype : ComponentPrototype<Quantum.PiranhaPlant> {
+    public MapEntityId Pipe;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.PiranhaPlant component = default;
         Materialize((Frame)f, ref component, in context);
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.PiranhaPlant result, in PrototypeMaterializationContext context = default) {
-        result.WaitingFrames = this.WaitingFrames;
-        result.ChompFrames = this.ChompFrames;
-        result.PopupAnimationTime = this.PopupAnimationTime;
-        MaterializeUser(frame, ref result, in context);
+        PrototypeValidator.FindMapEntity(this.Pipe, in context, out result.Pipe);
     }
   }
   [System.SerializableAttribute()]

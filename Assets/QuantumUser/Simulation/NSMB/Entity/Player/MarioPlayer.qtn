@@ -112,9 +112,13 @@ component MarioPlayer {
 	bool UsedPropellerThisJump;
 	byte PropellerDrillCooldown;
 
-	// Objects
     entity_ref HeldEntity;
+
     entity_ref CurrentPipe;
+	FPVector2 PipeDirection;
+	bool PipeEntering;
+	byte PipeFrames;
+	byte PipeCooldownFrames;
 }
 
 event MarioPlayerJumped {
@@ -239,4 +243,10 @@ event MarioPlayerReceivedKnockback {
 	entity_ref Entity;
 	entity_ref Attacker;
 	bool Weak;
+}
+
+event MarioPlayerEnteredPipe {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	entity_ref Pipe;
 }

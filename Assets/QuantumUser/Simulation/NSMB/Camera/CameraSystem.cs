@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class CameraSystem : SystemMainThreadFilter<CameraSystem.Filter> {

@@ -8,6 +8,8 @@ component BreakableObject {
 	[ExcludeFromPrototype] bool IsDestroyed;
 }
 
+signal OnBreakableObjectChangedHeight(EntityRef breakable, FP newHeight);
+
 synced event BreakableObjectBroken {
 	nothashed Frame Frame;
 	EntityRef Entity;

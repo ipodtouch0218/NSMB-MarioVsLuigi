@@ -1,0 +1,5 @@
+component EnterablePipe {
+	entity_ref OtherPipe;
+	bool IsEnterable;
+	bool IsCeilingPipe;
+}

@@ -1100,6 +1100,32 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct EnterablePipe : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(8)]
+    public EntityRef OtherPipe;
+    [FieldOffset(4)]
+    public QBoolean IsEnterable;
+    [FieldOffset(0)]
+    public QBoolean IsCeilingPipe;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 47;
+        hash = hash * 31 + OtherPipe.GetHashCode();
+        hash = hash * 31 + IsEnterable.GetHashCode();
+        hash = hash * 31 + IsCeilingPipe.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (EnterablePipe*)ptr;
+        QBoolean.Serialize(&p->IsCeilingPipe, serializer);
+        QBoolean.Serialize(&p->IsEnterable, serializer);
+        EntityRef.Serialize(&p->OtherPipe, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GenericMover : Quantum.IComponent {
     public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
@@ -1294,60 +1320,76 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct MarioBrosPlatform : Quantum.IComponent {
+    public const Int32 SIZE = 4;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(0)]
+    private fixed Byte _alignment_padding_[4];
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 9103;
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (MarioBrosPlatform*)ptr;
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 208;
+    public const Int32 SIZE = 232;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(176)]
-    public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
-    [FieldOffset(168)]
-    public AssetRef<CharacterAsset> CharacterAsset;
-    [FieldOffset(60)]
-    public PlayerRef PlayerRef;
-    [FieldOffset(26)]
-    public Byte SpawnpointIndex;
-    [FieldOffset(28)]
-    public Byte Team;
-    [FieldOffset(40)]
-    public PowerupState CurrentPowerupState;
-    [FieldOffset(44)]
-    public PowerupState PreviousPowerupState;
     [FieldOffset(184)]
+    public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+    [FieldOffset(176)]
+    public AssetRef<CharacterAsset> CharacterAsset;
+    [FieldOffset(64)]
+    public PlayerRef PlayerRef;
+    [FieldOffset(28)]
+    public Byte SpawnpointIndex;
+    [FieldOffset(30)]
+    public Byte Team;
+    [FieldOffset(44)]
+    public PowerupState CurrentPowerupState;
+    [FieldOffset(48)]
+    public PowerupState PreviousPowerupState;
+    [FieldOffset(192)]
     public AssetRef<PowerupAsset> ReserveItem;
-    [FieldOffset(27)]
+    [FieldOffset(29)]
     public Byte Stars;
     [FieldOffset(0)]
     public Byte Coins;
     [FieldOffset(13)]
     public Byte Lives;
-    [FieldOffset(64)]
+    [FieldOffset(68)]
     public QBoolean Disconnected;
-    [FieldOffset(84)]
+    [FieldOffset(88)]
     public QBoolean IsDead;
-    [FieldOffset(76)]
+    [FieldOffset(80)]
     public QBoolean FireDeath;
-    [FieldOffset(116)]
+    [FieldOffset(120)]
     public QBoolean IsRespawning;
     [FieldOffset(6)]
     public Byte DeathAnimationFrames;
-    [FieldOffset(17)]
+    [FieldOffset(19)]
     public Byte PreRespawnFrames;
-    [FieldOffset(23)]
+    [FieldOffset(25)]
     public Byte RespawnFrames;
     [FieldOffset(16)]
     public Byte NoLivesStarDirection;
-    [FieldOffset(72)]
+    [FieldOffset(76)]
     public QBoolean FacingRight;
-    [FieldOffset(120)]
+    [FieldOffset(124)]
     public QBoolean IsSkidding;
-    [FieldOffset(132)]
+    [FieldOffset(136)]
     public QBoolean IsTurnaround;
     [FieldOffset(7)]
     public Byte FastTurnaroundFrames;
-    [FieldOffset(25)]
+    [FieldOffset(27)]
     public Byte SlowTurnaroundFrames;
-    [FieldOffset(32)]
-    public JumpState JumpState;
     [FieldOffset(36)]
+    public JumpState JumpState;
+    [FieldOffset(40)]
     public JumpState PreviousJumpState;
     [FieldOffset(12)]
     public Byte JumpLandingFrames;
@@ -1355,23 +1397,23 @@ namespace Quantum {
     public Byte JumpBufferFrames;
     [FieldOffset(2)]
     public Byte CoyoteTimeFrames;
-    [FieldOffset(56)]
+    [FieldOffset(60)]
     public Int32 LandedFrame;
-    [FieldOffset(160)]
+    [FieldOffset(168)]
     public QBoolean WasTouchingGroundLastFrame;
-    [FieldOffset(68)]
+    [FieldOffset(72)]
     public QBoolean DoEntityBounce;
-    [FieldOffset(152)]
+    [FieldOffset(160)]
     public QBoolean WallslideLeft;
-    [FieldOffset(156)]
+    [FieldOffset(164)]
     public QBoolean WallslideRight;
-    [FieldOffset(30)]
+    [FieldOffset(32)]
     public Byte WallslideEndFrames;
-    [FieldOffset(29)]
+    [FieldOffset(31)]
     public Byte WalljumpFrames;
-    [FieldOffset(96)]
+    [FieldOffset(100)]
     public QBoolean IsGroundpounding;
-    [FieldOffset(92)]
+    [FieldOffset(96)]
     public QBoolean IsGroundpoundActive;
     [FieldOffset(10)]
     public Byte GroundpoundStartFrames;
@@ -1379,66 +1421,74 @@ namespace Quantum {
     public Byte GroundpoundCooldownFrames;
     [FieldOffset(9)]
     public Byte GroundpoundStandFrames;
-    [FieldOffset(31)]
+    [FieldOffset(33)]
     public Byte WaterColliderCount;
-    [FieldOffset(144)]
+    [FieldOffset(152)]
     public QBoolean SwimExitForceJump;
-    [FieldOffset(100)]
+    [FieldOffset(104)]
     public QBoolean IsInKnockback;
-    [FieldOffset(108)]
+    [FieldOffset(112)]
     public QBoolean IsInWeakKnockback;
-    [FieldOffset(136)]
+    [FieldOffset(140)]
     public QBoolean KnockbackWasOriginallyFacingRight;
-    [FieldOffset(52)]
+    [FieldOffset(56)]
     public Int32 KnockbackTick;
     [FieldOffset(5)]
     public Byte DamageInvincibilityFrames;
-    [FieldOffset(80)]
+    [FieldOffset(84)]
     public QBoolean IsCrouching;
-    [FieldOffset(124)]
-    public QBoolean IsSliding;
     [FieldOffset(128)]
+    public QBoolean IsSliding;
+    [FieldOffset(132)]
     public QBoolean IsSpinnerFlying;
-    [FieldOffset(88)]
+    [FieldOffset(92)]
     public QBoolean IsDrilling;
     [FieldOffset(1)]
     public Byte Combo;
-    [FieldOffset(46)]
+    [FieldOffset(50)]
     public UInt16 InvincibilityFrames;
     [FieldOffset(15)]
     public Byte MegaMushroomStartFrames;
-    [FieldOffset(48)]
+    [FieldOffset(52)]
     public UInt16 MegaMushroomFrames;
     [FieldOffset(14)]
     public Byte MegaMushroomEndFrames;
-    [FieldOffset(140)]
+    [FieldOffset(144)]
     public QBoolean MegaMushroomStationaryEnd;
-    [FieldOffset(18)]
+    [FieldOffset(20)]
     public Byte ProjectileDelayFrames;
-    [FieldOffset(19)]
+    [FieldOffset(21)]
     public Byte ProjectileVolleyFrames;
     [FieldOffset(3)]
     public Byte CurrentProjectiles;
     [FieldOffset(4)]
     public Byte CurrentVolley;
-    [FieldOffset(104)]
+    [FieldOffset(108)]
     public QBoolean IsInShell;
-    [FieldOffset(24)]
+    [FieldOffset(26)]
     public Byte ShellSlowdownFrames;
-    [FieldOffset(112)]
+    [FieldOffset(116)]
     public QBoolean IsPropellerFlying;
-    [FieldOffset(21)]
+    [FieldOffset(23)]
     public Byte PropellerLaunchFrames;
-    [FieldOffset(22)]
+    [FieldOffset(24)]
     public Byte PropellerSpinFrames;
-    [FieldOffset(148)]
+    [FieldOffset(156)]
     public QBoolean UsedPropellerThisJump;
-    [FieldOffset(20)]
+    [FieldOffset(22)]
     public Byte PropellerDrillCooldown;
-    [FieldOffset(200)]
+    [FieldOffset(208)]
     public EntityRef HeldEntity;
-    [FieldOffset(192)]
+    [FieldOffset(200)]
     public EntityRef CurrentPipe;
+    [FieldOffset(216)]
+    public FPVector2 PipeDirection;
+    [FieldOffset(148)]
+    public QBoolean PipeEntering;
+    [FieldOffset(18)]
+    public Byte PipeFrames;
+    [FieldOffset(17)]
+    public Byte PipeCooldownFrames;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 5503;
@@ -1513,6 +1563,10 @@ namespace Quantum {
         hash = hash * 31 + PropellerDrillCooldown.GetHashCode();
         hash = hash * 31 + HeldEntity.GetHashCode();
         hash = hash * 31 + CurrentPipe.GetHashCode();
+        hash = hash * 31 + PipeDirection.GetHashCode();
+        hash = hash * 31 + PipeEntering.GetHashCode();
+        hash = hash * 31 + PipeFrames.GetHashCode();
+        hash = hash * 31 + PipeCooldownFrames.GetHashCode();
         return hash;
       }
     }
@@ -1535,6 +1589,8 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->MegaMushroomEndFrames);
         serializer.Stream.Serialize(&p->MegaMushroomStartFrames);
         serializer.Stream.Serialize(&p->NoLivesStarDirection);
+        serializer.Stream.Serialize(&p->PipeCooldownFrames);
+        serializer.Stream.Serialize(&p->PipeFrames);
         serializer.Stream.Serialize(&p->PreRespawnFrames);
         serializer.Stream.Serialize(&p->ProjectileDelayFrames);
         serializer.Stream.Serialize(&p->ProjectileVolleyFrames);
@@ -1579,6 +1635,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsTurnaround, serializer);
         QBoolean.Serialize(&p->KnockbackWasOriginallyFacingRight, serializer);
         QBoolean.Serialize(&p->MegaMushroomStationaryEnd, serializer);
+        QBoolean.Serialize(&p->PipeEntering, serializer);
         QBoolean.Serialize(&p->SwimExitForceJump, serializer);
         QBoolean.Serialize(&p->UsedPropellerThisJump, serializer);
         QBoolean.Serialize(&p->WallslideLeft, serializer);
@@ -1589,6 +1646,7 @@ namespace Quantum {
         AssetRef.Serialize(&p->ReserveItem, serializer);
         EntityRef.Serialize(&p->CurrentPipe, serializer);
         EntityRef.Serialize(&p->HeldEntity, serializer);
+        FPVector2.Serialize(&p->PipeDirection, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1613,6 +1671,14 @@ namespace Quantum {
   public unsafe partial struct PhysicsObject : Quantum.IComponent {
     public const Int32 SIZE = 120;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(56)]
+    public FPVector2 Gravity;
+    [FieldOffset(48)]
+    public FP TerminalVelocity;
+    [FieldOffset(8)]
+    public QBoolean IsFrozen;
+    [FieldOffset(4)]
+    public QBoolean DisableCollision;
     [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public FPVector2 Velocity;
@@ -1622,49 +1688,45 @@ namespace Quantum {
     [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public FPVector2 PreviousVelocity;
-    [FieldOffset(56)]
-    public FPVector2 Gravity;
-    [FieldOffset(48)]
-    public FP TerminalVelocity;
-    [FieldOffset(4)]
-    public QBoolean IsFrozen;
     [FieldOffset(0)]
-    public QBoolean DisableCollision;
-    [FieldOffset(24)]
     [ExcludeFromPrototype()]
-    public QBoolean IsTouchingLeftWall;
+    public Byte HoverFrames;
     [FieldOffset(28)]
     [ExcludeFromPrototype()]
+    public QBoolean IsTouchingLeftWall;
+    [FieldOffset(32)]
+    [ExcludeFromPrototype()]
     public QBoolean IsTouchingRightWall;
-    [FieldOffset(16)]
+    [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public QBoolean IsTouchingCeiling;
-    [FieldOffset(20)]
+    [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public QBoolean IsTouchingGround;
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public FP FloorAngle;
-    [FieldOffset(12)]
+    [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public QBoolean IsOnSlipperyGround;
-    [FieldOffset(8)]
+    [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsOnSlideableGround;
-    [FieldOffset(32)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     [FreeOnComponentRemoved()]
     public QListPtr<PhysicsContact> Contacts;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 8311;
-        hash = hash * 31 + Velocity.GetHashCode();
-        hash = hash * 31 + ParentVelocity.GetHashCode();
-        hash = hash * 31 + PreviousVelocity.GetHashCode();
         hash = hash * 31 + Gravity.GetHashCode();
         hash = hash * 31 + TerminalVelocity.GetHashCode();
         hash = hash * 31 + IsFrozen.GetHashCode();
         hash = hash * 31 + DisableCollision.GetHashCode();
+        hash = hash * 31 + Velocity.GetHashCode();
+        hash = hash * 31 + ParentVelocity.GetHashCode();
+        hash = hash * 31 + PreviousVelocity.GetHashCode();
+        hash = hash * 31 + HoverFrames.GetHashCode();
         hash = hash * 31 + IsTouchingLeftWall.GetHashCode();
         hash = hash * 31 + IsTouchingRightWall.GetHashCode();
         hash = hash * 31 + IsTouchingCeiling.GetHashCode();
@@ -1685,6 +1747,7 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (PhysicsObject*)ptr;
+        serializer.Stream.Serialize(&p->HoverFrames);
         QBoolean.Serialize(&p->DisableCollision, serializer);
         QBoolean.Serialize(&p->IsFrozen, serializer);
         QBoolean.Serialize(&p->IsOnSlideableGround, serializer);
@@ -1704,17 +1767,23 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PiranhaPlant : Quantum.IComponent {
-    public const Int32 SIZE = 16;
+    public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(8)]
+    public EntityRef Pipe;
     [FieldOffset(1)]
+    [ExcludeFromPrototype()]
     public Byte WaitingFrames;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte ChompFrames;
-    [FieldOffset(8)]
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public FP PopupAnimationTime;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 19889;
+        hash = hash * 31 + Pipe.GetHashCode();
         hash = hash * 31 + WaitingFrames.GetHashCode();
         hash = hash * 31 + ChompFrames.GetHashCode();
         hash = hash * 31 + PopupAnimationTime.GetHashCode();
@@ -1725,6 +1794,7 @@ namespace Quantum {
         var p = (PiranhaPlant*)ptr;
         serializer.Stream.Serialize(&p->ChompFrames);
         serializer.Stream.Serialize(&p->WaitingFrames);
+        EntityRef.Serialize(&p->Pipe, serializer);
         FP.Serialize(&p->PopupAnimationTime, serializer);
     }
   }
@@ -1866,6 +1936,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnBobombExplodeEntity : ISignal {
     void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity);
   }
+  public unsafe partial interface ISignalOnBreakableObjectChangedHeight : ISignal {
+    void OnBreakableObjectChangedHeight(Frame f, EntityRef breakable, FP newHeight);
+  }
   public unsafe partial interface ISignalOnMarioPlayerCollectedCoin : ISignal {
     void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards);
   }
@@ -1902,6 +1975,7 @@ namespace Quantum {
   public unsafe partial class Frame {
     private ISignalOnEntityBumped[] _ISignalOnEntityBumpedSystems;
     private ISignalOnBobombExplodeEntity[] _ISignalOnBobombExplodeEntitySystems;
+    private ISignalOnBreakableObjectChangedHeight[] _ISignalOnBreakableObjectChangedHeightSystems;
     private ISignalOnMarioPlayerCollectedCoin[] _ISignalOnMarioPlayerCollectedCoinSystems;
     private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
     private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
@@ -1925,6 +1999,7 @@ namespace Quantum {
       Initialize(this, this.SimulationConfig.Entities, 256);
       _ISignalOnEntityBumpedSystems = BuildSignalsArray<ISignalOnEntityBumped>();
       _ISignalOnBobombExplodeEntitySystems = BuildSignalsArray<ISignalOnBobombExplodeEntity>();
+      _ISignalOnBreakableObjectChangedHeightSystems = BuildSignalsArray<ISignalOnBreakableObjectChangedHeight>();
       _ISignalOnMarioPlayerCollectedCoinSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedCoin>();
       _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
       _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
@@ -1961,6 +2036,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Coin>();
       BuildSignalsArrayOnComponentAdded<Quantum.Enemy>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Enemy>();
+      BuildSignalsArrayOnComponentAdded<Quantum.EnterablePipe>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.EnterablePipe>();
       BuildSignalsArrayOnComponentAdded<Quantum.GenericMover>();
       BuildSignalsArrayOnComponentRemoved<Quantum.GenericMover>();
       BuildSignalsArrayOnComponentAdded<Quantum.Goomba>();
@@ -1975,6 +2052,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Liquid>();
       BuildSignalsArrayOnComponentAdded<MapEntityLink>();
       BuildSignalsArrayOnComponentRemoved<MapEntityLink>();
+      BuildSignalsArrayOnComponentAdded<Quantum.MarioBrosPlatform>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.MarioBrosPlatform>();
       BuildSignalsArrayOnComponentAdded<Quantum.MarioPlayer>();
       BuildSignalsArrayOnComponentRemoved<Quantum.MarioPlayer>();
       BuildSignalsArrayOnComponentAdded<Quantum.MovingPlatform>();
@@ -2064,6 +2143,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnBobombExplodeEntity(_f, bobomb, entity);
+          }
+        }
+      }
+      public void OnBreakableObjectChangedHeight(EntityRef breakable, FP newHeight) {
+        var array = _f._ISignalOnBreakableObjectChangedHeightSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnBreakableObjectChangedHeight(_f, breakable, newHeight);
           }
         }
       }
@@ -2197,6 +2285,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(DistanceJoint), DistanceJoint.SIZE);
       typeRegistry.Register(typeof(DistanceJoint3D), DistanceJoint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.Enemy), Quantum.Enemy.SIZE);
+      typeRegistry.Register(typeof(Quantum.EnterablePipe), Quantum.EnterablePipe.SIZE);
       typeRegistry.Register(typeof(EntityPrototypeRef), EntityPrototypeRef.SIZE);
       typeRegistry.Register(typeof(EntityRef), EntityRef.SIZE);
       typeRegistry.Register(typeof(FP), FP.SIZE);
@@ -2230,6 +2319,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(LiquidType), 1);
       typeRegistry.Register(typeof(MapEntityId), MapEntityId.SIZE);
       typeRegistry.Register(typeof(MapEntityLink), MapEntityLink.SIZE);
+      typeRegistry.Register(typeof(Quantum.MarioBrosPlatform), Quantum.MarioBrosPlatform.SIZE);
       typeRegistry.Register(typeof(Quantum.MarioPlayer), Quantum.MarioPlayer.SIZE);
       typeRegistry.Register(typeof(Quantum.MovingPlatform), Quantum.MovingPlatform.SIZE);
       typeRegistry.Register(typeof(NavMeshAvoidanceAgent), NavMeshAvoidanceAgent.SIZE);
@@ -2278,7 +2368,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 23)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 25)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
@@ -2290,12 +2380,14 @@ namespace Quantum {
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Coin>(Quantum.Coin.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Enemy>(Quantum.Enemy.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.EnterablePipe>(Quantum.EnterablePipe.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.GenericMover>(Quantum.GenericMover.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Goomba>(Quantum.Goomba.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Interactable>(Quantum.Interactable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Koopa>(Quantum.Koopa.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Liquid>(Quantum.Liquid.Serialize, null, Quantum.Liquid.OnRemoved, ComponentFlags.None)
+        .Add<Quantum.MarioBrosPlatform>(Quantum.MarioBrosPlatform.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.MarioPlayer>(Quantum.MarioPlayer.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.MovingPlatform>(Quantum.MovingPlatform.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.PhysicsObject>(Quantum.PhysicsObject.Serialize, null, Quantum.PhysicsObject.OnRemoved, ComponentFlags.None)

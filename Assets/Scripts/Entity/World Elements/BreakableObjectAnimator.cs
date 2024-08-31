@@ -51,5 +51,19 @@ public class BreakableObjectAnimator : MonoBehaviour {
         Vector2 b = transform.up;
         float angularVelocity = (a.x * b.y) - (b.x * a.y);
         particle.angularVelocity = angularVelocity * -(400f/5);
+
+        Destroy(particle.gameObject, 10f);
     }
+
+#if UNITY_EDITOR
+    public void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        var breakable = GetComponent<QPrototypeBreakableObject>().Prototype;
+        var extents = GetComponent<QuantumEntityPrototype>().PhysicsCollider.Shape2D.BoxExtents;
+        Gizmos.DrawLine(
+            transform.position + (transform.rotation * new Vector3(-extents.X.AsFloat, breakable.MinimumHeight.AsFloat * 0.5f)), 
+            transform.position + (transform.rotation * new Vector3(extents.X.AsFloat, breakable.MinimumHeight.AsFloat * 0.5f))
+        );
+    }
+#endif
 }

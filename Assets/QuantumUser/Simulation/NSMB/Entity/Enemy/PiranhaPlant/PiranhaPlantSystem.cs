@@ -2,7 +2,7 @@ using Photon.Deterministic;
 using UnityEngine;
 
 namespace Quantum {
-    public unsafe class PiranhaPlantSystem : SystemMainThreadFilterStage<PiranhaPlantSystem.Filter>, ISignalOnTileChanged, ISignalOnEnemyRespawned {
+    public unsafe class PiranhaPlantSystem : SystemMainThreadFilterStage<PiranhaPlantSystem.Filter>, ISignalOnTileChanged, ISignalOnEnemyRespawned, ISignalOnBreakableObjectChangedHeight {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -35,7 +35,7 @@ namespace Quantum {
             } else {
                 // Not chomping, run the countdown timer.
                 if (QuantumUtils.Decrement(ref piranhaPlant->WaitingFrames)) {
-                    var playerOverlapShape = Shape2D.CreateCircle(FP._0_50);
+                    var playerOverlapShape = Shape2D.CreateCircle(FP._0_50, FPVector2.Up);
                     var playerOverlapMask = f.Layers.GetLayerMask("Player");
 
                     Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(*transform, playerOverlapShape, playerOverlapMask);
@@ -102,6 +102,19 @@ namespace Quantum {
         public void OnEnemyRespawned(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out PiranhaPlant* piranhaPlant)) {
                 piranhaPlant->Respawn(f, entity);
+            }
+        }
+
+        public void OnBreakableObjectChangedHeight(Frame f, EntityRef breakableEntity, FP newHeight) {
+            var filter = f.Filter<Enemy, PiranhaPlant>();
+            while (filter.NextUnsafe(out EntityRef piranhaPlantEntity, out Enemy* enemy, out PiranhaPlant* piranhaPlant)) {
+                if (!enemy->IsAlive) {
+                    continue;
+                }
+                var breakable = f.Get<BreakableObject>(breakableEntity);
+                if (piranhaPlant->Pipe == breakableEntity && newHeight != breakable.OriginalHeight) {
+                    piranhaPlant->Kill(f, piranhaPlantEntity, EntityRef.None, true);
+                }
             }
         }
     }

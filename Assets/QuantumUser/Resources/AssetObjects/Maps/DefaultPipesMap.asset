@@ -122,6 +122,30 @@ MonoBehaviour:
     - rid: 4642328894244913157
     - rid: 4642328894244913158
   - Components:
+    - rid: 7089375187459637248
+    - rid: 7089375187459637249
+    - rid: 7089375187459637250
+    - rid: 7089375187459637251
+    - rid: 7089375187459637252
+  - Components:
+    - rid: 448232034075148288
+    - rid: 448232034075148289
+    - rid: 448232034075148290
+    - rid: 448232034075148291
+    - rid: 448232034075148292
+  - Components:
+    - rid: 710687458932555776
+    - rid: 710687458932555777
+    - rid: 710687458932555778
+    - rid: 710687458932555779
+    - rid: 710687458932555780
+  - Components:
+    - rid: 4673924657949179904
+    - rid: 4673924657949179905
+    - rid: 4673924657949179906
+    - rid: 4673924657949179907
+    - rid: 4673924657949179908
+  - Components:
     - rid: 1722277255721254912
     - rid: 1722277255721254913
     - rid: 1722277255721254914
@@ -346,13 +370,6 @@ MonoBehaviour:
     - rid: 1192386234660421633
     - rid: 1192386234660421634
     - rid: 1192386234660421635
-  - Components:
-    - rid: 1841682414611464192
-    - rid: 1841682414611464193
-    - rid: 1841682414611464194
-    - rid: 1841682414611464195
-    - rid: 1841682414611464196
-    - rid: 1841682414611464197
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -364,7 +381,7 @@ MonoBehaviour:
           X:
             RawValue: 326240
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 374308643966812161
@@ -386,7 +403,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 98304
           PositionOffset:
@@ -415,7 +432,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 393216
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 389142146747203584
@@ -547,7 +564,7 @@ MonoBehaviour:
           X:
             RawValue: -198048
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 420654708345012225
@@ -569,7 +586,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 114688
           PositionOffset:
@@ -598,7 +615,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 429906956958826496
@@ -662,6 +679,72 @@ MonoBehaviour:
           RawValue: 131072
         IsStompable:
           Value: 1
+    - rid: 448232034075148288
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 65536
+          Y:
+            RawValue: 262144
+        Rotation:
+          RawValue: 0
+    - rid: 448232034075148289
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 13107
+            Y:
+              RawValue: 6554
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 0
+        IsTrigger: 1
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 448232034075148290
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 448232034075148291
+      type: {class: EnterablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        OtherPipe:
+          SceneIndexPlusOne: 16
+        IsEnterable:
+          Value: 1
+        IsCeilingPipe:
+          Value: 1
+    - rid: 448232034075148292
+      type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        ColliderDisabled:
+          Value: 0
     - rid: 692988744814297088
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -746,10 +829,74 @@ MonoBehaviour:
     - rid: 692988744814297094
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        WaitingFrames: 0
-        ChompFrames: 0
-        PopupAnimationTime:
+        Pipe:
+          SceneIndexPlusOne: 30
+    - rid: 710687458932555776
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: -1179648
+          Y:
+            RawValue: 131072
+        Rotation:
           RawValue: 0
+    - rid: 710687458932555777
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 13107
+            Y:
+              RawValue: 6554
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 0
+        IsTrigger: 1
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 710687458932555778
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 710687458932555779
+      type: {class: EnterablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        OtherPipe:
+          SceneIndexPlusOne: 19
+        IsEnterable:
+          Value: 1
+        IsCeilingPipe:
+          Value: 0
+    - rid: 710687458932555780
+      type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        ColliderDisabled:
+          Value: 0
     - rid: 749857818370113536
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -757,7 +904,7 @@ MonoBehaviour:
           X:
             RawValue: -1050016
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 749857818370113537
@@ -779,7 +926,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 114688
           PositionOffset:
@@ -808,7 +955,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 825980437892431872
@@ -940,7 +1087,7 @@ MonoBehaviour:
           X:
             RawValue: 260704
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 1192386234660421633
@@ -962,7 +1109,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 65536
           PositionOffset:
@@ -991,7 +1138,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 262144
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 1228244940237045760
@@ -1297,92 +1444,6 @@ MonoBehaviour:
           RawValue: 131072
         IsStompable:
           Value: 1
-    - rid: 1841682414611464192
-      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        Position:
-          X:
-            RawValue: -1107805
-          Y:
-            RawValue: 270413
-        Rotation:
-          RawValue: 0
-    - rid: 1841682414611464193
-      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        ShapeConfig:
-          ShapeType: 4
-          PolygonCollider:
-            Id:
-              Value: 0
-          CircleRadius:
-            RawValue: 0
-          CapsuleSize:
-            X:
-              RawValue: 0
-            Y:
-              RawValue: 0
-          EdgeExtent:
-            RawValue: 0
-          BoxExtents:
-            X:
-              RawValue: 23592
-            Y:
-              RawValue: 23592
-          PositionOffset:
-            X:
-              RawValue: 0
-            Y:
-              RawValue: 23592
-          RotationOffset:
-            RawValue: 0
-          UserTag: 0
-          IsPersistent: 1
-          CompoundShapes: []
-        Layer: 9
-        IsTrigger: 1
-        PhysicsMaterial:
-          Id:
-            Value: 0
-    - rid: 1841682414611464194
-      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
-      data:
-        CallbackFlags:
-          Value: 0
-    - rid: 1841682414611464195
-      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Gravity:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: -1414398
-        TerminalVelocity:
-          RawValue: -524288
-        IsFrozen:
-          Value: 0
-        DisableCollision:
-          Value: 0
-    - rid: 1841682414611464196
-      type: {class: PowerupPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Scriptable:
-          Id:
-            Value: 269903407669338010
-        FacingRight:
-          Value: 1
-        Lifetime: 900
-        AnimationCurveOrigin:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        AnimationCurveTimer:
-          RawValue: 0
-    - rid: 1841682414611464197
-      type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        _empty_prototype_dummy_field_: 0
     - rid: 1910432561708924928
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -1573,7 +1634,7 @@ MonoBehaviour:
           X:
             RawValue: -1115552
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 2276309212063596545
@@ -1595,7 +1656,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 131072
           PositionOffset:
@@ -1624,7 +1685,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 2408951176692236288
@@ -1755,7 +1816,7 @@ MonoBehaviour:
           X:
             RawValue: -1440
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 2895018973542219777
@@ -1777,7 +1838,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 180224
           PositionOffset:
@@ -1806,7 +1867,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 720896
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 2953695388663545856
@@ -1816,7 +1877,7 @@ MonoBehaviour:
           X:
             RawValue: -787872
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 2953695388663545857
@@ -1838,7 +1899,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 196608
           PositionOffset:
@@ -1867,7 +1928,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 786432
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 3046290891393204224
@@ -1937,7 +1998,7 @@ MonoBehaviour:
           X:
             RawValue: -984480
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 3285224403868057601
@@ -1959,7 +2020,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 114688
           PositionOffset:
@@ -1988,7 +2049,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 3406413241201459200
@@ -1998,7 +2059,7 @@ MonoBehaviour:
           X:
             RawValue: 522848
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 3406413241201459201
@@ -2020,7 +2081,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 180224
           PositionOffset:
@@ -2049,7 +2110,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 720896
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 3461140427451662336
@@ -2059,7 +2120,7 @@ MonoBehaviour:
           X:
             RawValue: -591264
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 3461140427451662337
@@ -2081,7 +2142,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 114688
           PositionOffset:
@@ -2110,7 +2171,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 3507943869339664384
@@ -2364,7 +2425,7 @@ MonoBehaviour:
           X:
             RawValue: -66976
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 4191205161768583169
@@ -2386,7 +2447,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 131072
           PositionOffset:
@@ -2415,7 +2476,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 4387051102768463872
@@ -2425,7 +2486,7 @@ MonoBehaviour:
           X:
             RawValue: 391776
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 4387051102768463873
@@ -2447,7 +2508,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 147456
           PositionOffset:
@@ -2476,7 +2537,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 589824
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 4425783480768528384
@@ -2546,7 +2607,7 @@ MonoBehaviour:
           X:
             RawValue: -132512
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 4470508785550491649
@@ -2568,7 +2629,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 131072
           PositionOffset:
@@ -2597,7 +2658,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 4536070920158052352
@@ -2744,10 +2805,74 @@ MonoBehaviour:
     - rid: 4642328894244913158
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        WaitingFrames: 0
-        ChompFrames: 0
-        PopupAnimationTime:
+        Pipe:
+          SceneIndexPlusOne: 39
+    - rid: 4673924657949179904
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 720896
+          Y:
+            RawValue: 131072
+        Rotation:
           RawValue: 0
+    - rid: 4673924657949179905
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 13107
+            Y:
+              RawValue: 6554
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 0
+        IsTrigger: 1
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 4673924657949179906
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 4673924657949179907
+      type: {class: EnterablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        OtherPipe:
+          SceneIndexPlusOne: 18
+        IsEnterable:
+          Value: 1
+        IsCeilingPipe:
+          Value: 0
+    - rid: 4673924657949179908
+      type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        ColliderDisabled:
+          Value: 0
     - rid: 4696208758609543168
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -2755,7 +2880,7 @@ MonoBehaviour:
           X:
             RawValue: -722336
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 4696208758609543169
@@ -2777,14 +2902,14 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
-              RawValue: 229376
+              RawValue: 245760
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 229376
+              RawValue: 245760
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -2806,7 +2931,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 983040
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 5056653011921666048
@@ -2996,7 +3121,7 @@ MonoBehaviour:
           X:
             RawValue: -394656
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 5412905645588348929
@@ -3018,7 +3143,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 114688
           PositionOffset:
@@ -3047,7 +3172,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 458752
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 5500624500716208128
@@ -3057,7 +3182,7 @@ MonoBehaviour:
           X:
             RawValue: 457312
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 5500624500716208129
@@ -3079,7 +3204,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 163840
           PositionOffset:
@@ -3108,7 +3233,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 5579036601947783168
@@ -3118,7 +3243,7 @@ MonoBehaviour:
           X:
             RawValue: -918944
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 5579036601947783169
@@ -3140,7 +3265,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 163840
           PositionOffset:
@@ -3169,7 +3294,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 5835907156276150272
@@ -3179,7 +3304,7 @@ MonoBehaviour:
           X:
             RawValue: 653920
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 5835907156276150273
@@ -3201,7 +3326,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 81920
           PositionOffset:
@@ -3230,7 +3355,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 327680
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 6079776462347436032
@@ -3482,7 +3607,7 @@ MonoBehaviour:
           X:
             RawValue: -460192
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 6795082026882957313
@@ -3504,7 +3629,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 131072
           PositionOffset:
@@ -3533,7 +3658,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 6941135995408482304
@@ -3543,7 +3668,7 @@ MonoBehaviour:
           X:
             RawValue: -329120
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 6941135995408482305
@@ -3565,7 +3690,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 81920
           PositionOffset:
@@ -3594,9 +3719,75 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 327680
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
+    - rid: 7089375187459637248
+      type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        Position:
+          X:
+            RawValue: 65536
+          Y:
+            RawValue: 524288
+        Rotation:
+          RawValue: 0
+    - rid: 7089375187459637249
+      type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        ShapeConfig:
+          ShapeType: 4
+          PolygonCollider:
+            Id:
+              Value: 0
+          CircleRadius:
+            RawValue: 0
+          CapsuleSize:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          EdgeExtent:
+            RawValue: 0
+          BoxExtents:
+            X:
+              RawValue: 13107
+            Y:
+              RawValue: 6554
+          PositionOffset:
+            X:
+              RawValue: 0
+            Y:
+              RawValue: 0
+          RotationOffset:
+            RawValue: 0
+          UserTag: 0
+          IsPersistent: 1
+          CompoundShapes: []
+        Layer: 0
+        IsTrigger: 1
+        PhysicsMaterial:
+          Id:
+            Value: 0
+    - rid: 7089375187459637250
+      type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
+      data:
+        CallbackFlags:
+          Value: 0
+    - rid: 7089375187459637251
+      type: {class: EnterablePipePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        OtherPipe:
+          SceneIndexPlusOne: 17
+        IsEnterable:
+          Value: 1
+        IsCeilingPipe:
+          Value: 0
+    - rid: 7089375187459637252
+      type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        ColliderDisabled:
+          Value: 0
     - rid: 7264635249278058496
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
@@ -3725,7 +3916,7 @@ MonoBehaviour:
           X:
             RawValue: -525728
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 7657564706776809473
@@ -3747,7 +3938,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 98304
           PositionOffset:
@@ -3776,7 +3967,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 393216
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 7739604852782661632
@@ -3786,7 +3977,7 @@ MonoBehaviour:
           X:
             RawValue: -853408
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 7739604852782661633
@@ -3808,7 +3999,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 163840
           PositionOffset:
@@ -3837,7 +4028,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 655360
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 8164861996542459904
@@ -3847,7 +4038,7 @@ MonoBehaviour:
           X:
             RawValue: 588384
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 8164861996542459905
@@ -3869,7 +4060,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 98304
           PositionOffset:
@@ -3898,7 +4089,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 393216
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 8390350474674438144
@@ -4029,7 +4220,7 @@ MonoBehaviour:
           X:
             RawValue: -656800
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 8826982300299296769
@@ -4051,7 +4242,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 131072
           PositionOffset:
@@ -4080,7 +4271,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 524288
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 9128653750834036736
@@ -4090,7 +4281,7 @@ MonoBehaviour:
           X:
             RawValue: -263584
           Y:
-            RawValue: 689065
+            RawValue: 688128
         Rotation:
           RawValue: 11796480
     - rid: 9128653750834036737
@@ -4112,7 +4303,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: -32768
+              RawValue: 32768
             Y:
               RawValue: 245760
           PositionOffset:
@@ -4141,6 +4332,6 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 983040
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1

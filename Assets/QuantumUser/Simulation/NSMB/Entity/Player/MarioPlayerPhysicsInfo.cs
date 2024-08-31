@@ -76,6 +76,9 @@ public class MarioPlayerPhysicsInfo : AssetObject {
     public FP TerminalVelocityPropellerSpin = FF(-1.5f);
     public FP TerminalVelocityGroundpound = FF(-11.25f);
 
+    // --- Pipes
+    public byte PipeEnterDuration = 90;
+
     // --- Swimming
     public FP SwimJumpVelocity = FF(2.26318359375f);
     public FP SwimMaxVerticalVelocity = FF(4.833984375f);

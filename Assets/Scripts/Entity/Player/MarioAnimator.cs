@@ -148,6 +148,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart);
             QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd);
             QuantumEvent.Subscribe<EventMarioPlayerReceivedKnockback>(this, OnMarioPlayerReceivedKnockback);
+            QuantumEvent.Subscribe<EventMarioPlayerEnteredPipe>(this, OnMarioPlayerEnteredPipe);
 
             stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
@@ -975,6 +976,14 @@ namespace NSMB.Entities.Player {
                 };
                 PlaySound(soundEffect);
             }
+        }
+
+        private void OnMarioPlayerEnteredPipe(EventMarioPlayerEnteredPipe e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            sfx.PlayOneShot(SoundEffect.Player_Sound_Powerdown);
         }
     }
 }
