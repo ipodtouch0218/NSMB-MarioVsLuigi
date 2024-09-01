@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.UI;
 using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
@@ -83,7 +82,6 @@ namespace NSMB.Entities.Player {
 
         //---Components
         private readonly List<Renderer> renderers = new();
-        private MaterialPropertyBlock materialBlock;
 
         //---Properties
         public Color GlowColor { get; private set; }
@@ -93,10 +91,11 @@ namespace NSMB.Entities.Player {
         private float propellerVelocity;
         private Vector3 modelRotationTarget;
         private bool modelRotateInstantly, footstepVariant;
-        private Coroutine blinkRoutine;
         private PlayerColors skin;
         private bool doDeathUp;
         private float lastBumpSound;
+        private MaterialPropertyBlock materialBlock;
+
         private VersusStageData stage;
 
         public void OnValidate() {
@@ -122,9 +121,7 @@ namespace NSMB.Entities.Player {
 
             modelRotationTarget = models.transform.rotation.eulerAngles;
 
-            if (blinkRoutine == null) {
-                blinkRoutine = StartCoroutine(BlinkRoutine());
-            }
+            StartCoroutine(BlinkRoutine());
 
             QuantumEvent.Subscribe<EventMarioPlayerJumped>(this, OnMarioPlayerJumped);
             QuantumEvent.Subscribe<EventMarioPlayerGroundpounded>(this, OnMarioPlayerGroundpounded);

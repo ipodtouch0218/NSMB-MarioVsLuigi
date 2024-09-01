@@ -14,6 +14,7 @@ namespace Quantum {
             if (dot > PhysicsObjectSystem.GroundMaxAngle) {
                 // Hit the ground
                 BlockBumpSystem.Bump(f, contact->Position - (contact->Normal / 2), entity);
+                f.Events.MarioBrosPlatformBumped(f, contact->Entity, contact->Position);
             }
         }
     }
