@@ -48,22 +48,22 @@ namespace Quantum {
                     f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
                     if (doSplash) {
                         f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), false);
-                    }
 
-                    // Mario specific effects...
-                    if (f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
-                        switch (liquid->LiquidType) {
-                        case LiquidType.Water:
-                            mario->WaterColliderCount++;
-                            break;
-                        case LiquidType.Lava:
-                            // Kill, fire death
-                            mario->Death(f, info.Entity, true);
-                            break;
-                        case LiquidType.Poison:
-                            // Kill, normal death
-                            mario->Death(f, info.Entity, false);
-                            break;
+                        // Mario specific effects...
+                        if (f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
+                            switch (liquid->LiquidType) {
+                            case LiquidType.Water:
+                                mario->WaterColliderCount++;
+                                break;
+                            case LiquidType.Lava:
+                                // Kill, fire death
+                                mario->Death(f, info.Entity, true);
+                                break;
+                            case LiquidType.Poison:
+                                // Kill, normal death
+                                mario->Death(f, info.Entity, false);
+                                break;
+                            }
                         }
                     }
                 }
@@ -84,23 +84,21 @@ namespace Quantum {
             bool underwater = liquid->LiquidType != LiquidType.Water || checkHeight <= surface;
 
             QList<EntityRef> splashed = f.ResolveList(liquid->SplashedEntities);
-            if (splashed.Contains(info.Entity)) {
+            if (splashed.RemoveUnordered(info.Entity)) {
                 if (!underwater) {
                     // Exit splash
-                    splashed.RemoveUnordered(info.Entity);
-
                     bool doSplash = true;
                     f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
                     if (doSplash) {
                         f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), true);
-                    }
-                }
-
-                // Mario specific effects...
-                if (liquid->LiquidType == LiquidType.Water && f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
-                    if (QuantumUtils.Decrement(ref mario->WaterColliderCount) && !underwater) {
-                        // Jump
-                        mario->SwimExitForceJump = true;
+                        
+                        // Mario specific effects...
+                        if (liquid->LiquidType == LiquidType.Water && f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
+                            if (QuantumUtils.Decrement(ref mario->WaterColliderCount) && !underwater) {
+                                // Jump
+                                mario->SwimExitForceJump = true;
+                            }
+                        }
                     }
                 }
             }
@@ -109,7 +107,7 @@ namespace Quantum {
         public void OnAdded(Frame f, EntityRef entity, Liquid* component) {
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
             collider->Shape.Centroid = new(0, component->HeightTiles * FP._0_25 - FP._0_10);
-            collider->Shape.Box.Extents = new((FP) component->WidthTiles / 4, component->HeightTiles / 4);
+            collider->Shape.Box.Extents = new(component->WidthTiles * FP._0_25, component->HeightTiles * FP._0_25);
             f.AllocateList(out component->SplashedEntities);
         }
     }

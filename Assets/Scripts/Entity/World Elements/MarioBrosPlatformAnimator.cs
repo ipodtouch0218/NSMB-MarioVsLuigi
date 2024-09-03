@@ -20,7 +20,7 @@ public class MarioBrosPlatformAnimator : MonoBehaviour {
     [SerializeField] private float bumpDuration = 0.4f;
 
     //---Misc Variables
-    private int platformWidth;
+    private float platformWidth;
     private Color32[] pixels;
     private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
@@ -43,12 +43,12 @@ public class MarioBrosPlatformAnimator : MonoBehaviour {
         Frame f = game.Frames.Predicted;
         var collider = f.Get<PhysicsCollider2D>(entity.EntityRef);
 
-        platformWidth = (collider.Shape.Box.Extents.X * 2).AsInt;
+        platformWidth = collider.Shape.Box.Extents.X.AsFloat * 2f;
 
         sRenderer.size = new Vector2(platformWidth, sRenderer.size.y);
 
-        displacementMap = new(platformWidth * samplesPerTile, 1);
-        pixels = new Color32[platformWidth * samplesPerTile];
+        displacementMap = new((int) (platformWidth * samplesPerTile), 1);
+        pixels = new Color32[(int) (platformWidth * samplesPerTile)];
 
         sRenderer.GetPropertyBlock(mpb = new());
         mpb.SetFloat(ParamPlatformWidth, platformWidth);

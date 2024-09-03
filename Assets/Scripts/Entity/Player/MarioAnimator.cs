@@ -194,11 +194,11 @@ namespace NSMB.Entities.Player {
                 inputs = *f.GetPlayerInput(mario.PlayerRef);
             }
 
-            UpdateAnimatorVariables(f, mario, physicsObject, inputs);
             HandleAnimations(f, mario, physicsObject);
             SetFacingDirection(f, mario, physicsObject);
             InterpolateFacingDirection(mario);
             HandleMiscStates(mario);
+            UpdateAnimatorVariables(f, mario, physicsObject, inputs);
         }
 
         public void HandleAnimations(Frame f, MarioPlayer mario, PhysicsObject physicsObject) {
@@ -221,7 +221,7 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(drillParticle, !mario.IsDead && mario.IsDrilling);
             SetParticleEmission(sparkles, !mario.IsDead && mario.IsStarmanInvincible);
             SetParticleEmission(dust, !mario.IsDead && (mario.IsWallsliding || (physicsObject.IsTouchingGround && (mario.IsSkidding || (mario.IsCrouching && physicsObject.Velocity.SqrMagnitude.AsFloat > 0.25f))) || (((mario.IsSliding && Mathf.Abs(physicsObject.Velocity.X.AsFloat) > 0.25f) || mario.IsInShell) && physicsObject.IsTouchingGround)) && !mario.CurrentPipe.IsValid);
-            //SetParticleEmission(giantParticle, !mario.IsDead && mario.CurrentPowerupState == PowerupState.MegaMushroom && controller.MegaStartTimer.ExpiredOrNotRunning(Runner));
+            SetParticleEmission(giantParticle, !mario.IsDead && mario.CurrentPowerupState == PowerupState.MegaMushroom && mario.MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario.IsDead && !mario.IsRespawning && mario.FireDeath && !physicsObject.IsFrozen);
             SetParticleEmission(bubblesParticle, mario.IsInWater);
 
@@ -476,27 +476,31 @@ namespace NSMB.Entities.Player {
             propellerHelmet.SetActive(mario.CurrentPowerupState == PowerupState.PropellerMushroom);
 
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;
-            if (animator.avatar != targetAvatar) {
+            bool changedAvatar = animator.avatar != targetAvatar;
+
+            if (changedAvatar) {
                 // Preserve Animations
                 AnimatorStateInfo[] layerInfo = new AnimatorStateInfo[animator.layerCount];
                 for (int i = 0; i < animator.layerCount; i++) {
                     layerInfo[i] = animator.GetCurrentAnimatorStateInfo(i);
-                    Debug.Log(layerInfo[i].fullPathHash);
+                    Debug.Log(i + " - " + layerInfo[i].fullPathHash);
                 }
 
                 animator.avatar = targetAvatar;
+                animator.runtimeAnimatorController = large ? character.LargeOverrides : character.SmallOverrides;
 
-                // Push back state
+                // Push back state 
                 animator.Update(0);
 
                 for (int i = 0; i < animator.layerCount; i++) {
                     animator.Play(layerInfo[i].fullPathHash, i, layerInfo[i].normalizedTime);
                     animator.Update(0);
-                    Debug.Log(animator.GetCurrentAnimatorStateInfo(i).fullPathHash);
+                    Debug.Log(i + " -" + animator.GetCurrentAnimatorStateInfo(i).fullPathHash);
                 }
+
+                animator.Update(0);
             }
 
-            animator.runtimeAnimatorController = large ? character.LargeOverrides : character.SmallOverrides;
 
             float newZ = -4;
             if (mario.IsDead) {
@@ -903,9 +907,9 @@ namespace NSMB.Entities.Player {
                 PlaySound(SoundEffect.Powerup_MegaMushroom_Groundpound);
 
                 SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform.Position.ToUnityVector2());
-                /* TODO
-                CameraController.ScreenShake = 0.35f;
+                CameraAnimator.TriggerScreenshake(0.35f);
 
+                /* TODO
                 if (cameraController.IsControllingCamera) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f,
                         RumbleManager.RumbleSetting.Low);

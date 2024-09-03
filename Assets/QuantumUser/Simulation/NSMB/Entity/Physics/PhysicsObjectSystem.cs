@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
 
-        public static readonly FP RaycastSkin = FP.FromString("0.1");
+        public static readonly FP RaycastSkin = FP.FromString("0.15");
         public static readonly FP Skin = FP.FromString("0.001");
         public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
         private static int mask;
@@ -30,7 +30,7 @@ namespace Quantum {
                 return;
             }
 
-            bool wasOnGround = physicsObject->IsTouchingGround;
+            bool wasOnGround = physicsObject->IsTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousVelocity.Y;
             physicsObject->PreviousVelocity = physicsObject->Velocity;
 
             if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
@@ -47,9 +47,8 @@ namespace Quantum {
             physicsObject->IsOnSlideableGround = false;
             physicsObject->IsOnSlipperyGround = false;
 
-            FP previousY = transform->Position.Y;
-            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, filter.Entity, stage, contacts);
             physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, filter.Entity, stage, contacts);
+            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, filter.Entity, stage, contacts);
             ResolveContacts(physicsObject, contacts);
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
@@ -61,7 +60,6 @@ namespace Quantum {
                     filter.Transform->Position = previousPosition;
                     physicsObject->Velocity.Y = 0;
                     physicsObject->HoverFrames = 2;
-                    transform->Position.Y = previousY;
                 }
             }
 #if DEBUG
@@ -130,7 +128,7 @@ namespace Quantum {
                 FPVector2 position = transform->Position;
                 Shape2D collisionShape = collider.Shape;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(0, velocityY) + (directionVector * (RaycastSkin + Skin)), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(0, velocityY) + (directionVector * (RaycastSkin * 2 + Skin)), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
                 physicsHits.Sort(position);
 
                 position += collisionShape.Centroid;
@@ -184,6 +182,7 @@ namespace Quantum {
                             }
                         }
 
+                        Draw.Ray(hit.Point, FPVector2.Right, ColorRGBA.Cyan);
                         potentialContacts.Add(new PhysicsContact {
                             Distance = FPMath.Abs(hit.Point.Y - checkPointY),
                             Normal = hit.Normal,
@@ -288,7 +287,7 @@ namespace Quantum {
                 FPVector2 position = transform->Position;
                 Shape2D collisionShape = collider.Shape;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(velocityX, 0) + (directionVector * (RaycastSkin + Skin)), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+                var physicsHits = f.Physics2D.ShapeCastAll(position - (directionVector * RaycastSkin), 0, collisionShape, new FPVector2(velocityX, 0) + (directionVector * (RaycastSkin * 2 + Skin)), mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
                 physicsHits.Sort(position);
 
                 position += collisionShape.Centroid;
@@ -339,6 +338,7 @@ namespace Quantum {
                             }
                         }
 
+                        Draw.Ray(hit.Point, FPVector2.Right, ColorRGBA.Cyan);
                         potentialContacts.Add(new PhysicsContact {
                             Distance = FPMath.Abs(hit.Point.X - checkPointX),
                             Normal = hit.Normal,
@@ -443,6 +443,8 @@ namespace Quantum {
         }
 
         public static bool Raycast(Frame f, VersusStageData stage, FPVector2 position, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
+
+            Draw.Ray(position, direction.Normalized * maxDistance);
             contact = default;
             FPVector2 stepSize = new(
                 direction.X == 0 ? 0 : FPMath.Sqrt(1 + (direction.Y / direction.X) * (direction.Y / direction.X)),

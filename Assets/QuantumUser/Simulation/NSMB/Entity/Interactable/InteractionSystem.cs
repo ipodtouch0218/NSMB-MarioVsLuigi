@@ -27,7 +27,7 @@ namespace Quantum {
             }
 
             if ((f.TryGet(entity, out Enemy enemy) && !enemy.IsAlive)
-                || (f.TryGet(entity, out MarioPlayer mario) && mario.IsDead)) {
+                || (f.TryGet(entity, out MarioPlayer mario) && mario.IsDead && !f.Exists(mario.CurrentPipe))) {
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace Quantum {
                     || alreadyCollided.Contains(entities)
                     || (f.TryGet(entityB, out Interactable entityBInteractable) && entityBInteractable.ColliderDisabled)
                     || (f.TryGet(entityB, out Enemy entityBEnemy) && !entityBEnemy.IsAlive)
-                    || (f.TryGet(entityB, out MarioPlayer entityBMario) && entityBMario.IsDead)) {
+                    || (f.TryGet(entityB, out MarioPlayer entityBMario) && entityBMario.IsDead && !f.Exists(entityBMario.CurrentPipe))) {
                     continue;
                 }
 

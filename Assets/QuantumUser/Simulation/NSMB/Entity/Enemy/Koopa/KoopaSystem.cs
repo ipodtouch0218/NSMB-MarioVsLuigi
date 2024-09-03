@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using UnityEngine;
 using static IInteractableTile;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
 
@@ -93,7 +92,7 @@ namespace Quantum {
             }
 
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
-                FPVector2 checkPosition = transform->Position + (FPVector2.Up * FP._0_10) + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
+                FPVector2 checkPosition = transform->Position + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
                 if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_33, out var hit)) {
                     enemy->FacingRight = !enemy->FacingRight;
                 }
@@ -207,7 +206,8 @@ namespace Quantum {
             } else {
                 // Normal collision rules
                 if (groundpounded) {
-                    if (koopa->SpawnPowerupWhenStomped.IsValid && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
+                    if (koopa->SpawnPowerupWhenStomped.IsValid
+                        && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
                         // Powerup (for blue koopa): give to mario immediately
                         PowerupReserveResult reserve = PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
                         koopaEnemy->IsActive = false;
@@ -242,7 +242,7 @@ namespace Quantum {
                             koopaEnemy->IsDead = true;
                             koopaPhysicsObject->IsFrozen = true;
                             f.Events.KoopaEnteredShell(f, koopaEntity);
-                        } else {
+                        } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->IsGroundpoundActive) {
                             koopa->EnterShell(f, koopaEntity, marioEntity, false);
                         }
                         mario->DoEntityBounce = true;

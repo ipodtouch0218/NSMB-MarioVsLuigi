@@ -1,9 +1,14 @@
 using Photon.Deterministic;
 using Quantum;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraAnimator : ResizingCamera {
+
+    //---Static
+    private static event Action<float> OnScreenshake;
+    public static void TriggerScreenshake(float duration) => OnScreenshake?.Invoke(duration);
 
     //---Properties
     public EntityRef Target { get; set; }
@@ -13,7 +18,7 @@ public class CameraAnimator : ResizingCamera {
 
     //---Private Variables
     private VersusStageData stage;
-    private float scroll;
+    private float screenshakeTimer;
 
     public override void OnValidate() {
         base.OnValidate();
@@ -21,8 +26,16 @@ public class CameraAnimator : ResizingCamera {
     }
 
     public override void Start() {
+        base.Start();
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+
+        OnScreenshake += OnScreenshakeCallback;
+    }
+
+    public override void OnDestroy() {
+        base.OnDestroy();
+        OnScreenshake -= OnScreenshakeCallback;
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
@@ -64,25 +77,41 @@ public class CameraAnimator : ResizingCamera {
         cameraFocus.y += playerHeight * 0.5f;
 
         if (!targetMario.IsDead || targetMario.IsRespawning) {
-            float cameraHalfHeight = camera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
+            float cameraHalfHeight = ourCamera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
             newPosition.y = Mathf.Clamp(newPosition.y, cameraFocus.y - cameraHalfHeight, cameraFocus.y + cameraHalfHeight);
         }
 
         // Clamp
-        float cameraMinX = stage.CameraMinPosition.X.AsFloat - (camera.orthographicSize * camera.aspect);
-        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat + (camera.orthographicSize * camera.aspect);
+        float cameraMinX = stage.CameraMinPosition.X.AsFloat - (ourCamera.orthographicSize * ourCamera.aspect);
+        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat + (ourCamera.orthographicSize * ourCamera.aspect);
         newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
 
-        float cameraMinY = stage.CameraMinPosition.Y.AsFloat + camera.orthographicSize;
-        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - camera.orthographicSize;
+        float cameraMinY = stage.CameraMinPosition.Y.AsFloat + ourCamera.orthographicSize;
+        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - ourCamera.orthographicSize;
         newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
 
-        camera.transform.position = newPosition;
+        // Screenshake (ignores clamping)
+        if ((screenshakeTimer -= Time.deltaTime) > 0) {
+            newPosition += new Vector3((UnityEngine.Random.value - 0.5f) * screenshakeTimer, (UnityEngine.Random.value - 0.5f) * screenshakeTimer);
+        }
+
+        ourCamera.transform.position = newPosition;
         secondaryPositioners.RemoveAll(scp => !scp);
         secondaryPositioners.ForEach(scp => scp.UpdatePosition());
 
         if (BackgroundLoop.Instance) {
-            BackgroundLoop.Instance.Reposition(camera);
+            BackgroundLoop.Instance.Reposition(ourCamera);
+        }
+
+    }
+
+    private void OnScreenshakeCallback(float screenshake) {
+        Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+
+        if (f.TryGet(Target, out PhysicsObject physicsObject)
+            && physicsObject.IsTouchingGround) {
+
+            screenshakeTimer += screenshake;
         }
     }
 }

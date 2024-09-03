@@ -12,6 +12,10 @@ namespace Quantum {
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            if (pipe.IsMiniOnly && mario->CurrentPowerupState != PowerupState.MiniMushroom) {
+                return;
+            }
+
             if (mario->IsCrouchedInShell) {
                 return;
             }

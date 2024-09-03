@@ -247,6 +247,7 @@ namespace Quantum.Prototypes {
     public MapEntityId OtherPipe;
     public QBoolean IsEnterable;
     public QBoolean IsCeilingPipe;
+    public QBoolean IsMiniOnly;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.EnterablePipe component = default;
         Materialize((Frame)f, ref component, in context);
@@ -256,6 +257,7 @@ namespace Quantum.Prototypes {
         PrototypeValidator.FindMapEntity(this.OtherPipe, in context, out result.OtherPipe);
         result.IsEnterable = this.IsEnterable;
         result.IsCeilingPipe = this.IsCeilingPipe;
+        result.IsMiniOnly = this.IsMiniOnly;
     }
   }
   [System.SerializableAttribute()]

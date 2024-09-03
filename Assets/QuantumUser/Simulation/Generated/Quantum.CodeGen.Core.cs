@@ -1101,20 +1101,23 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct EnterablePipe : Quantum.IComponent {
-    public const Int32 SIZE = 16;
+    public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(8)]
+    [FieldOffset(16)]
     public EntityRef OtherPipe;
     [FieldOffset(4)]
     public QBoolean IsEnterable;
     [FieldOffset(0)]
     public QBoolean IsCeilingPipe;
+    [FieldOffset(8)]
+    public QBoolean IsMiniOnly;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 47;
         hash = hash * 31 + OtherPipe.GetHashCode();
         hash = hash * 31 + IsEnterable.GetHashCode();
         hash = hash * 31 + IsCeilingPipe.GetHashCode();
+        hash = hash * 31 + IsMiniOnly.GetHashCode();
         return hash;
       }
     }
@@ -1122,6 +1125,7 @@ namespace Quantum {
         var p = (EnterablePipe*)ptr;
         QBoolean.Serialize(&p->IsCeilingPipe, serializer);
         QBoolean.Serialize(&p->IsEnterable, serializer);
+        QBoolean.Serialize(&p->IsMiniOnly, serializer);
         EntityRef.Serialize(&p->OtherPipe, serializer);
     }
   }

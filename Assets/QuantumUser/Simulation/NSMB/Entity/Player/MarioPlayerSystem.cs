@@ -164,7 +164,7 @@ namespace Quantum {
 
                 // Check that we're not going above our limit
                 FP max = maxArray[maxStage] + CalculateSlopeMaxSpeedOffset(FPMath.Abs(physicsObject->FloorAngle) * (uphill ? 1 : -1));
-                FP maxAcceleration = FPMath.Abs(max - xVelAbs) * (1 / f.DeltaTime);
+                FP maxAcceleration = FPMath.Abs(max - xVelAbs) * f.UpdateRate;
                 acc = FPMath.Clamp(acc, -maxAcceleration, maxAcceleration);
                 if (xVelAbs > max) {
                     acc = -acc;
@@ -248,7 +248,7 @@ namespace Quantum {
                 }
 
                 FP newX = xVel + acc * f.DeltaTime * sign;
-                FP target = (angle > 30 && physicsObject->IsOnSlideableGround) ? FPMath.Sign(physicsObject->FloorAngle) * -physics.WalkMaxVelocity[0] : 0;
+                FP target = (angle > 30 && physicsObject->IsOnSlideableGround) ? FPMath.Sign(physicsObject->FloorAngle) * physics.WalkMaxVelocity[0] : 0;
                 if ((sign == -1) ^ (newX <= target)) {
                     newX = target;
                 }
@@ -351,6 +351,7 @@ namespace Quantum {
             mario->IsPropellerFlying &= mario->DoEntityBounce;
             mario->SwimExitForceJump = false;
             mario->JumpBufferFrames = 0;
+            mario->WasTouchingGroundLastFrame = false;
             physicsObject->IsTouchingGround = false;
 
             // Disable koyote time
@@ -622,7 +623,7 @@ namespace Quantum {
 
             if (mario->WasTouchingGroundLastFrame && !physicsObject->IsTouchingGround) {
                 if (physicsObject->Velocity.Y < FP._0_10) {
-                    physicsObject->Velocity.Y = mario->IsCrouching ? physics.CrouchOffEdgeVelocity : 0;
+                     physicsObject->Velocity.Y = mario->IsCrouching ? physics.CrouchOffEdgeVelocity : 0;
                 }
             }
 
@@ -1429,7 +1430,7 @@ namespace Quantum {
 
         public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash) {
             if (f.TryGet(entity, out MarioPlayer mario)) {
-                *doSplash = !mario.IsDead;
+                *doSplash = !mario.IsDead && !f.Exists(mario.CurrentPipe);
             }
         }
 
