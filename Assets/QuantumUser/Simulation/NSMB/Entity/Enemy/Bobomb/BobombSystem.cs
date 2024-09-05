@@ -21,6 +21,7 @@ namespace Quantum {
             InteractionSystem.RegisterInteraction<Bobomb, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
             InteractionSystem.RegisterInteraction<Bobomb, MarioPlayer>(OnBobombMarioInteraction);
             InteractionSystem.RegisterInteraction<Bobomb, Projectile>(OnBobombProjectileInteraction);
+            InteractionSystem.RegisterInteraction<Bobomb, FrozenCube>(OnBobombFrozenCubeInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {
@@ -153,6 +154,10 @@ namespace Quantum {
             if (projectileAsset.DestroyOnHit) {
                 ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
+        }
+
+        public void OnBobombFrozenCubeInteraction(Frame f, EntityRef bobombEntity, EntityRef frozenCubeEntity) {
+
         }
 
         private static void Light(Frame f, EntityRef entity, Bobomb* bobomb, bool stomp) {

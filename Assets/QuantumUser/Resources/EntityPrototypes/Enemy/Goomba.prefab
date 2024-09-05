@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 269757506607064473}
   - component: {fileID: 148468707364900969}
   - component: {fileID: 4848679844973023050}
+  - component: {fileID: -2967928457836996957}
   m_Layer: 0
   m_Name: Goomba
   m_TagString: Untagged
@@ -558,16 +559,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -579,21 +570,6 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &6536869809639107625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,12 +618,6 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
-    IsActive:
-      Value: 0
-    IsDead:
-      Value: 0
-    FacingRight:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &4848679844973023050
@@ -665,3 +635,17 @@ MonoBehaviour:
   Prototype:
     ColliderDisabled:
       Value: 0
+--- !u!114 &-2967928457836996957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7523289063499453450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f09a56673702987429020c58e2d51615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    _empty_prototype_dummy_field_: 0

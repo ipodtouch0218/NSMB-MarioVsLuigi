@@ -1130,6 +1130,69 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct Freezable : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsFrozen;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public EntityRef FrozenCubeEntity;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 15227;
+        hash = hash * 31 + IsFrozen.GetHashCode();
+        hash = hash * 31 + FrozenCubeEntity.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (Freezable*)ptr;
+        QBoolean.Serialize(&p->IsFrozen, serializer);
+        EntityRef.Serialize(&p->FrozenCubeEntity, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct FrozenCube : Quantum.IComponent {
+    public const Int32 SIZE = 40;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
+    public EntityRef Entity;
+    [FieldOffset(24)]
+    [ExcludeFromPrototype()]
+    public FPVector2 Size;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsFlying;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsSliding;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public QBoolean FacingRight;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 20431;
+        hash = hash * 31 + Entity.GetHashCode();
+        hash = hash * 31 + Size.GetHashCode();
+        hash = hash * 31 + IsFlying.GetHashCode();
+        hash = hash * 31 + IsSliding.GetHashCode();
+        hash = hash * 31 + FacingRight.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (FrozenCube*)ptr;
+        QBoolean.Serialize(&p->FacingRight, serializer);
+        QBoolean.Serialize(&p->IsFlying, serializer);
+        QBoolean.Serialize(&p->IsSliding, serializer);
+        EntityRef.Serialize(&p->Entity, serializer);
+        FPVector2.Serialize(&p->Size, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GenericMover : Quantum.IComponent {
     public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
@@ -1177,6 +1240,8 @@ namespace Quantum {
   public unsafe partial struct Holdable : Quantum.IComponent {
     public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(4)]
+    public QBoolean HoldAboveHead;
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public EntityRef Holder;
@@ -1189,6 +1254,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 6131;
+        hash = hash * 31 + HoldAboveHead.GetHashCode();
         hash = hash * 31 + Holder.GetHashCode();
         hash = hash * 31 + PreviousHolder.GetHashCode();
         hash = hash * 31 + IgnoreOwnerFrames.GetHashCode();
@@ -1198,6 +1264,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Holdable*)ptr;
         serializer.Stream.Serialize(&p->IgnoreOwnerFrames);
+        QBoolean.Serialize(&p->HoldAboveHead, serializer);
         EntityRef.Serialize(&p->Holder, serializer);
         EntityRef.Serialize(&p->PreviousHolder, serializer);
     }
@@ -1955,6 +2022,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnEnemyEnemyCollision : ISignal {
     void OnEnemyEnemyCollision(Frame f, EntityRef a, EntityRef b);
   }
+  public unsafe partial interface ISignalOnFrozenCubeBroken : ISignal {
+    void OnFrozenCubeBroken(Frame f, EntityRef brokenCube, FrozenCubeBreakReason breakReason);
+  }
   public unsafe partial interface ISignalOnGameStarting : ISignal {
     void OnGameStarting(Frame f);
   }
@@ -1984,6 +2054,7 @@ namespace Quantum {
     private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
     private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
     private ISignalOnEnemyEnemyCollision[] _ISignalOnEnemyEnemyCollisionSystems;
+    private ISignalOnFrozenCubeBroken[] _ISignalOnFrozenCubeBrokenSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
     private ISignalOnTryLiquidSplash[] _ISignalOnTryLiquidSplashSystems;
@@ -2008,6 +2079,7 @@ namespace Quantum {
       _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
       _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
       _ISignalOnEnemyEnemyCollisionSystems = BuildSignalsArray<ISignalOnEnemyEnemyCollision>();
+      _ISignalOnFrozenCubeBrokenSystems = BuildSignalsArray<ISignalOnFrozenCubeBroken>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
       _ISignalOnTryLiquidSplashSystems = BuildSignalsArray<ISignalOnTryLiquidSplash>();
@@ -2042,6 +2114,10 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Enemy>();
       BuildSignalsArrayOnComponentAdded<Quantum.EnterablePipe>();
       BuildSignalsArrayOnComponentRemoved<Quantum.EnterablePipe>();
+      BuildSignalsArrayOnComponentAdded<Quantum.Freezable>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.Freezable>();
+      BuildSignalsArrayOnComponentAdded<Quantum.FrozenCube>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.FrozenCube>();
       BuildSignalsArrayOnComponentAdded<Quantum.GenericMover>();
       BuildSignalsArrayOnComponentRemoved<Quantum.GenericMover>();
       BuildSignalsArrayOnComponentAdded<Quantum.Goomba>();
@@ -2195,6 +2271,15 @@ namespace Quantum {
           }
         }
       }
+      public void OnFrozenCubeBroken(EntityRef brokenCube, FrozenCubeBreakReason breakReason) {
+        var array = _f._ISignalOnFrozenCubeBrokenSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnFrozenCubeBroken(_f, brokenCube, breakReason);
+          }
+        }
+      }
       public void OnGameStarting() {
         var array = _f._ISignalOnGameStartingSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
@@ -2303,6 +2388,9 @@ namespace Quantum {
       typeRegistry.Register(typeof(FPVector3), FPVector3.SIZE);
       typeRegistry.Register(typeof(FrameMetaData), FrameMetaData.SIZE);
       typeRegistry.Register(typeof(FrameTimer), FrameTimer.SIZE);
+      typeRegistry.Register(typeof(Quantum.Freezable), Quantum.Freezable.SIZE);
+      typeRegistry.Register(typeof(Quantum.FrozenCube), Quantum.FrozenCube.SIZE);
+      typeRegistry.Register(typeof(FrozenCubeBreakReason), 1);
       typeRegistry.Register(typeof(GameState), 1);
       typeRegistry.Register(typeof(Quantum.GenericMover), Quantum.GenericMover.SIZE);
       typeRegistry.Register(typeof(Quantum.Goomba), Quantum.Goomba.SIZE);
@@ -2372,7 +2460,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 25)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 27)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
@@ -2385,6 +2473,8 @@ namespace Quantum {
         .Add<Quantum.Coin>(Quantum.Coin.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Enemy>(Quantum.Enemy.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.EnterablePipe>(Quantum.EnterablePipe.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.Freezable>(Quantum.Freezable.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.FrozenCube>(Quantum.FrozenCube.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.GenericMover>(Quantum.GenericMover.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Goomba>(Quantum.Goomba.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
@@ -2404,6 +2494,7 @@ namespace Quantum {
     [Preserve()]
     public static void EnsureNotStrippedGen() {
       FramePrinter.EnsureNotStripped();
+      FramePrinter.EnsurePrimitiveNotStripped<FrozenCubeBreakReason>();
       FramePrinter.EnsurePrimitiveNotStripped<GameState>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InputButtons>();
       FramePrinter.EnsurePrimitiveNotStripped<JumpState>();

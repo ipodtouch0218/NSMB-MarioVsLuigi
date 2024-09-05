@@ -7,7 +7,6 @@ using UnityEngine;
 public class MarioBrosPlatformAnimator : MonoBehaviour {
 
     //---Static Variables
-    private static readonly Vector2 BumpOffset = new(-0.25f, -0.5f);
     private static readonly Color BlankColor = new(0, 0, 0, 255);
     private static readonly int ParamPlatformWidth = Shader.PropertyToID("PlatformWidth");
     private static readonly int ParamPointsPerTile = Shader.PropertyToID("PointsPerTile");
@@ -31,7 +30,6 @@ public class MarioBrosPlatformAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumEvent.Subscribe<EventMarioBrosPlatformBumped>(this, OnMarioBrosPlatformBumped);
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
     public void OnValidate() {
@@ -54,6 +52,7 @@ public class MarioBrosPlatformAnimator : MonoBehaviour {
         mpb.SetFloat(ParamPlatformWidth, platformWidth);
         mpb.SetFloat(ParamPointsPerTile, samplesPerTile);
 
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         initialized = true;
     }
 

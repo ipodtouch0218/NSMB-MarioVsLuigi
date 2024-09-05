@@ -1,0 +1,13 @@
+import enum FrozenCubeBreakReason(byte);
+
+component FrozenCube {
+
+	[ExcludeFromPrototype] entity_ref Entity;
+	[ExcludeFromPrototype] FPVector2 Size;
+	[ExcludeFromPrototype] bool IsFlying;
+	[ExcludeFromPrototype] bool IsSliding;
+	[ExcludeFromPrototype] bool FacingRight;
+
+}
+
+signal OnFrozenCubeBroken(EntityRef brokenCube, FrozenCubeBreakReason breakReason);

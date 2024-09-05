@@ -15,12 +15,15 @@ namespace Quantum {
                 return default;
             }
 
-            /*
-             * if (f.TryGet(HeldEntity, out IceBlock ice)) {
-                float time = Mathf.Clamp01(((renderTime ? Runner.LocalRenderTime : Runner.SimulationTime) - HoldStartTime) / pickupTime);
-                HeldEntity.holderOffset = new(0, MainHitbox.size.y * (1f - Utils.Utils.QuadraticEaseOut(1f - time)), -2);
-            } else */{
-                var shape = f.Get<PhysicsCollider2D>(HeldEntity).Shape;
+            var holdable = f.Unsafe.GetPointer<Holdable>(HeldEntity);
+
+            if (holdable->HoldAboveHead) {
+                return default;
+                // float time = Mathf.Clamp01(((renderTime ? Runner.LocalRenderTime : Runner.SimulationTime) - HoldStartTime) / pickupTime);
+                // HeldEntity.holderOffset = new(0, MainHitbox.size.y * (1f - Utils.Utils.QuadraticEaseOut(1f - time)), -2);
+
+            } else {
+                var shape = f.Unsafe.GetPointer<PhysicsCollider2D>(HeldEntity)->Shape;
                 return new FPVector2(
                     (FacingRight ? 1 : -1) * FP._0_25,
                     (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : FP.FromString("0.09")) + (shape.Box.Extents.Y - shape.Centroid.Y)
@@ -29,7 +32,14 @@ namespace Quantum {
         }
 
         public bool CanHoldItem(Frame f, EntityRef mario) {
-            return PlayerRef.IsValid && f.GetPlayerInput(PlayerRef)->Sprint.IsDown && /*!IsFrozen &&*/ CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (f.Get<PhysicsObject>(mario).IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && f.GetPlayerInput(PlayerRef)->Jump.IsDown);
+            Input input = default;
+            if (PlayerRef.IsValid) {
+                input = *f.GetPlayerInput(PlayerRef);
+            }
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(mario);
+            var freezable = f.Unsafe.GetPointer<Freezable>(mario);
+
+            return input.Sprint.IsDown && !freezable->IsFrozen && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario) {
