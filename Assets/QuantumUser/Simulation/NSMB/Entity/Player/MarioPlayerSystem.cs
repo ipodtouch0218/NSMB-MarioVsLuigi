@@ -6,7 +6,8 @@ using static IInteractableTile;
 namespace Quantum {
 
     public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
-        ISignalOnGameStarting, ISignalOnBeforePhysicsCollision, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped {
+        ISignalOnGameStarting, ISignalOnBeforePhysicsCollision, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped,
+        ISignalOnBeforeInteraction {
 
         public struct Filter {
             public EntityRef Entity;
@@ -1495,26 +1496,7 @@ namespace Quantum {
             var marioA = f.Unsafe.GetPointer<MarioPlayer>(marioAEntity);
             var marioB = f.Unsafe.GetPointer<MarioPlayer>(marioBEntity);
 
-            /*
-            // Don't interact with ghosts
-            if (IsDead || other.IsDead) {
-                return;
-            }
-            */
-
-            // Or players in pipes
-            if (f.Exists(marioA->CurrentPipe) || f.Exists(marioB->CurrentPipe)) {
-                return;
-            }
-
-            /* TODO
-            // Or frozen players (we interact with the frozencube)
-            if (IsFrozen || other.IsFrozen) {
-                return;
-            }
-            */
-
-            // Or players with I-Frames
+            // Don't damage players with I-Frames
             if (marioA->DamageInvincibilityFrames > 0 || marioB->DamageInvincibilityFrames > 0) {
                 return;
             }
@@ -1777,6 +1759,10 @@ namespace Quantum {
                     defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, false, attacker);
                 }
             }
+        }
+
+        public void OnBeforeInteraction(Frame f, EntityRef entity, bool* allowInteraction) {
+            *allowInteraction &= !f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario) || !(mario->IsDead || f.Exists(mario->CurrentPipe));
         }
     }
 }

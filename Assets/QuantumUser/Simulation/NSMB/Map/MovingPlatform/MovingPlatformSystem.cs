@@ -18,6 +18,10 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
+                filter.Platform->Velocity = physicsObject->Velocity;
+            }
+
             MoveVertically(f, ref filter, stage);
             MoveHorizontally(f, ref filter, stage);
         }
@@ -35,7 +39,9 @@ namespace Quantum {
                 RaycastVertically(f, ref filter, shape, stage);
             }
 
-            transform->Position.Y += platform->Velocity.Y * f.DeltaTime;
+            if (!filter.Platform->IgnoreMovement) {
+                transform->Position.Y += platform->Velocity.Y * f.DeltaTime;
+            }
         }
 
         private void RaycastVertically(Frame f, ref Filter filter, Shape2D shape, VersusStageData stage) {
@@ -67,6 +73,23 @@ namespace Quantum {
                     || hitPhysicsObject->DisableCollision
                     || ((FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y)) && (FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
+                    continue;
+                }
+
+                bool allowCollision = true;
+                PhysicsContact contact = new PhysicsContact {
+                    Frame = f.Number,
+                    Distance = hit.CastDistanceNormalized * FPMath.Abs(yMovement.Y) - PhysicsObjectSystem.RaycastSkin,
+                    Entity = filter.Entity,
+                    Normal = hit.Normal,
+                    Position = hit.Point,
+                    TileX = -1,
+                    TileY = -1
+                };
+                Debug.Log("onbeforecollision");
+                f.Signals.OnBeforePhysicsCollision(stage, hit.Entity, &contact, &allowCollision);
+                if (!allowCollision) {
+                    Debug.Log("cancel;");
                     continue;
                 }
 
@@ -107,7 +130,9 @@ namespace Quantum {
                 RaycastHorizontally(f, ref filter, shape, stage);
             }
 
-            transform->Position.X += platform->Velocity.X * f.DeltaTime;
+            if (!filter.Platform->IgnoreMovement) {
+                transform->Position.X += platform->Velocity.X * f.DeltaTime;
+            }
         }
 
         private void RaycastHorizontally(Frame f, ref Filter filter, Shape2D shape, VersusStageData stage) {
@@ -140,6 +165,23 @@ namespace Quantum {
                     || hitPhysicsObject->DisableCollision
                     || ((FPMath.Sign(hitPhysicsObject->Velocity.X) == FPMath.Sign(xMovement.X)) && (FPMath.Abs(hitPhysicsObject->Velocity.X) > FPMath.Abs(xMovement.X)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
+                    continue;
+                }
+
+                bool allowCollision = true;
+                PhysicsContact contact = new PhysicsContact {
+                    Frame = f.Number,
+                    Distance = hit.CastDistanceNormalized * FPMath.Abs(xMovement.X) - PhysicsObjectSystem.RaycastSkin,
+                    Entity = filter.Entity,
+                    Normal = hit.Normal,
+                    Position = hit.Point,
+                    TileX = -1,
+                    TileY = -1
+                };
+                Debug.Log("onbeforecollision");
+                f.Signals.OnBeforePhysicsCollision(stage, hit.Entity, &contact, &allowCollision);
+                if (!allowCollision) {
+                    Debug.Log("cancel;");
                     continue;
                 }
 

@@ -5,7 +5,9 @@ using static IInteractableTile;
 
 namespace Quantum {
 
-    public unsafe class KoopaSystem : SystemMainThreadFilterStage<KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped, ISignalOnBobombExplodeEntity {
+    public unsafe class KoopaSystem : SystemMainThreadFilterStage<KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
+        ISignalOnBobombExplodeEntity {
+       
         public struct Filter {
             public EntityRef Entity;
             public Enemy* Enemy;

@@ -1,10 +1,13 @@
 namespace Quantum {
     public unsafe partial struct Holdable {
-        public void Pickup(Frame f, EntityRef entity, EntityRef mario) {
-            Holder = mario;
-            PreviousHolder = mario;
+        public void Pickup(Frame f, EntityRef entity, EntityRef marioEntity) {
+            Holder = marioEntity;
+            PreviousHolder = marioEntity;
 
-            f.Unsafe.GetPointer<MarioPlayer>(mario)->HeldEntity = entity;
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            mario->HeldEntity = entity;
+            mario->HoldStartFrame = f.Number;
+            f.Events.MarioPlayerPickedUpObject(f, marioEntity, mario, entity);
         }
 
         public void Drop(Frame f, EntityRef entity) {

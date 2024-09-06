@@ -138,6 +138,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean UsedPropellerThisJump;
     public Byte PropellerDrillCooldown;
     public Quantum.QuantumEntityPrototype HeldEntity;
+    public Int32 HoldStartFrame;
     public Quantum.QuantumEntityPrototype CurrentPipe;
     public FPVector2 PipeDirection;
     public QBoolean PipeEntering;
@@ -216,6 +217,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.UsedPropellerThisJump, out result.UsedPropellerThisJump);
       converter.Convert(this.PropellerDrillCooldown, out result.PropellerDrillCooldown);
       converter.Convert(this.HeldEntity, out result.HeldEntity);
+      converter.Convert(this.HoldStartFrame, out result.HoldStartFrame);
       converter.Convert(this.CurrentPipe, out result.CurrentPipe);
       converter.Convert(this.PipeDirection, out result.PipeDirection);
       converter.Convert(this.PipeEntering, out result.PipeEntering);

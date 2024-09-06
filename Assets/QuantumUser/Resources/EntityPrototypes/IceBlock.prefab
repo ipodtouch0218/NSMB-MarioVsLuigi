@@ -14,11 +14,13 @@ GameObject:
   - component: {fileID: 5602955539102130327}
   - component: {fileID: -4211955845073762521}
   - component: {fileID: 886428514376071190}
-  - component: {fileID: 3428755926392794263}
   - component: {fileID: 1322364620185426663}
   - component: {fileID: 8312176800940008094}
+  - component: {fileID: 6061536990872593317}
+  - component: {fileID: 5466463427177246889}
+  - component: {fileID: 3123853808942919971}
   m_Layer: 0
-  m_Name: FrozenCube
+  m_Name: IceBlock
   m_TagString: frozencube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -297,7 +299,19 @@ MonoBehaviour:
         m_CallState: 2
   OnEntityDestroyed:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5602955539102130327}
+        m_TargetAssemblyTypeName: IceBlockAnimator, Assembly-CSharp
+        m_MethodName: Destroyed
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &5602955539102130327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,6 +327,8 @@ MonoBehaviour:
   entity: {fileID: 6562383333162367074}
   sfx: {fileID: -4211955845073762521}
   sRenderer: {fileID: 5772244049117569476}
+  breakPrefab: {fileID: 6779589790155936114, guid: 18ec030fd34201b4c90cac2de9b22a2d,
+    type: 3}
 --- !u!82 &-4211955845073762521
 AudioSource:
   m_ObjectHideFlags: 0
@@ -437,20 +453,6 @@ MonoBehaviour:
   soundRange: 12
   maxPanning: 0.8
   useDistanceToCamera: 0
---- !u!114 &3428755926392794263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4465303805189439310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d711ab62de13714e8412e9c5c101536, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prototype:
-    _empty_prototype_dummy_field_: 0
 --- !u!114 &1322364620185426663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -465,7 +467,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     HoldAboveHead:
-      Value: 0
+      Value: 1
 --- !u!114 &8312176800940008094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483,13 +485,62 @@ MonoBehaviour:
       X:
         RawValue: 0
       Y:
-        RawValue: 0
+        RawValue: -1409024
     TerminalVelocity:
-      RawValue: 0
+      RawValue: -524288
     IsFrozen:
       Value: 0
     DisableCollision:
       Value: 0
+--- !u!114 &6061536990872593317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465303805189439310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a114caed4f59570418ac85644139b494, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    _empty_prototype_dummy_field_: 0
+--- !u!114 &5466463427177246889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465303805189439310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0
+--- !u!114 &3123853808942919971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465303805189439310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb8b4489d4860b2429b2badcd175e5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    Velocity:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    IgnoreMovement:
+      Value: 1
 --- !u!1 &5906585881545024381
 GameObject:
   m_ObjectHideFlags: 0

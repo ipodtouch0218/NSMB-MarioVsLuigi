@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe partial struct FrozenCube {
+    public unsafe partial struct IceBlock {
         public void Initialize(Frame f, EntityRef cubeEntity, EntityRef frozenEntity) {
             var transform = f.Unsafe.GetPointer<Transform2D>(cubeEntity);
             var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(cubeEntity);
@@ -11,7 +11,6 @@ namespace Quantum {
 
             Entity = frozenEntity;
             child->FrozenCubeEntity = cubeEntity;
-            child->IsFrozen = true;
 
             // Set location
             FP bottom = childTransform->Position.Y + childPhysicsCollider->Shape.Centroid.Y - childPhysicsCollider->Shape.Box.Extents.Y;

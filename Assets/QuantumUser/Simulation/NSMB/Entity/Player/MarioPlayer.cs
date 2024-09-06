@@ -3,30 +3,35 @@ using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
-
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsInWater => WaterColliderCount > 0;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
        
-        public FPVector2 GetHeldItemOffset(Frame f) {
+        public FPVector2 GetHeldItemOffset(Frame f, EntityRef mario) {
             if (!f.Exists(HeldEntity)) {
                 return default;
             }
 
             var holdable = f.Unsafe.GetPointer<Holdable>(HeldEntity);
+            var holdableShape = f.Unsafe.GetPointer<PhysicsCollider2D>(HeldEntity)->Shape;
+
+            FP holdableYOffset = (holdableShape.Box.Extents.Y - holdableShape.Centroid.Y);
 
             if (holdable->HoldAboveHead) {
-                return default;
-                // float time = Mathf.Clamp01(((renderTime ? Runner.LocalRenderTime : Runner.SimulationTime) - HoldStartTime) / pickupTime);
-                // HeldEntity.holderOffset = new(0, MainHitbox.size.y * (1f - Utils.Utils.QuadraticEaseOut(1f - time)), -2);
-
+                var marioShape = f.Unsafe.GetPointer<PhysicsCollider2D>(mario)->Shape;
+                FP pickupFrames = 27;
+                FP time = FPMath.Clamp01((f.Number - HoldStartFrame) / pickupFrames);
+                FP alpha = 1 - QuantumUtils.EaseOut(1 - time);
+                return new FPVector2(
+                    0,
+                    (marioShape.Box.Extents.Y * 2 * alpha) + holdableYOffset
+                );
             } else {
-                var shape = f.Unsafe.GetPointer<PhysicsCollider2D>(HeldEntity)->Shape;
                 return new FPVector2(
                     (FacingRight ? 1 : -1) * FP._0_25,
-                    (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : FP.FromString("0.09")) + (shape.Box.Extents.Y - shape.Centroid.Y)
+                    (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : FP.FromString("0.09")) + holdableYOffset
                 );
             }
         }
@@ -39,7 +44,7 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(mario);
             var freezable = f.Unsafe.GetPointer<Freezable>(mario);
 
-            return input.Sprint.IsDown && !freezable->IsFrozen && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
+            return input.Sprint.IsDown && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario) {

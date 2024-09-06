@@ -276,21 +276,6 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
-  [Quantum.Prototypes.Prototype(typeof(Quantum.FrozenCube))]
-  public unsafe partial class FrozenCubePrototype : ComponentPrototype<Quantum.FrozenCube> {
-    [HideInInspector()]
-    public Int32 _empty_prototype_dummy_field_;
-    partial void MaterializeUser(Frame frame, ref Quantum.FrozenCube result, in PrototypeMaterializationContext context);
-    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
-        Quantum.FrozenCube component = default;
-        Materialize((Frame)f, ref component, in context);
-        return f.Set(entity, component) == SetResult.ComponentAdded;
-    }
-    public void Materialize(Frame frame, ref Quantum.FrozenCube result, in PrototypeMaterializationContext context = default) {
-        MaterializeUser(frame, ref result, in context);
-    }
-  }
-  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.GenericMover))]
   public unsafe partial class GenericMoverPrototype : ComponentPrototype<Quantum.GenericMover> {
     public AssetRef<GenericMoverAsset> MoverAsset;
@@ -336,6 +321,21 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.Holdable result, in PrototypeMaterializationContext context = default) {
         result.HoldAboveHead = this.HoldAboveHead;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.IceBlock))]
+  public unsafe partial class IceBlockPrototype : ComponentPrototype<Quantum.IceBlock> {
+    [HideInInspector()]
+    public Int32 _empty_prototype_dummy_field_;
+    partial void MaterializeUser(Frame frame, ref Quantum.IceBlock result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.IceBlock component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.IceBlock result, in PrototypeMaterializationContext context = default) {
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -510,6 +510,7 @@ namespace Quantum.Prototypes {
     public QBoolean UsedPropellerThisJump;
     public Byte PropellerDrillCooldown;
     public MapEntityId HeldEntity;
+    public Int32 HoldStartFrame;
     public MapEntityId CurrentPipe;
     public FPVector2 PipeDirection;
     public QBoolean PipeEntering;
@@ -591,6 +592,7 @@ namespace Quantum.Prototypes {
         result.UsedPropellerThisJump = this.UsedPropellerThisJump;
         result.PropellerDrillCooldown = this.PropellerDrillCooldown;
         PrototypeValidator.FindMapEntity(this.HeldEntity, in context, out result.HeldEntity);
+        result.HoldStartFrame = this.HoldStartFrame;
         PrototypeValidator.FindMapEntity(this.CurrentPipe, in context, out result.CurrentPipe);
         result.PipeDirection = this.PipeDirection;
         result.PipeEntering = this.PipeEntering;
@@ -602,6 +604,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.MovingPlatform))]
   public unsafe partial class MovingPlatformPrototype : ComponentPrototype<Quantum.MovingPlatform> {
     public FPVector2 Velocity;
+    public QBoolean IgnoreMovement;
     partial void MaterializeUser(Frame frame, ref Quantum.MovingPlatform result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.MovingPlatform component = default;
@@ -610,6 +613,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.MovingPlatform result, in PrototypeMaterializationContext context = default) {
         result.Velocity = this.Velocity;
+        result.IgnoreMovement = this.IgnoreMovement;
         MaterializeUser(frame, ref result, in context);
     }
   }

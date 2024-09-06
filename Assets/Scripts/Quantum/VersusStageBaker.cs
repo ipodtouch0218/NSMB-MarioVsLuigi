@@ -117,7 +117,6 @@ public class VersusStageBaker : MapDataBakerCallback {
             return default;
         }
 
-        Debug.Log(tile.name);
         StageTile existingTile = QuantumUnityDB.FindGlobalAssetGuids(new AssetObjectQuery(typeof(StageTile)))
             .Select(guid => new AssetRef<StageTile>(guid))
             .Select(QuantumUnityDB.GetGlobalAssetEditorInstance)

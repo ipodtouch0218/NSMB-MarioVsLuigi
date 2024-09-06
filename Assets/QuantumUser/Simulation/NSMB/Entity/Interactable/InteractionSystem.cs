@@ -1,3 +1,4 @@
+using Quantum.Collections;
 using System;
 using System.Collections.Generic;
 
@@ -10,8 +11,11 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
-        public delegate void EnemyInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
-        private static readonly Dictionary<(Type, Type), EnemyInteractor> interactors = new();
+        public delegate void HitboxInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
+        public delegate void PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
+
+        private static readonly Dictionary<(Type, Type), HitboxInteractor> hitboxInteractors = new();
+        private static readonly Dictionary<(Type, Type), PlatformInteractor> platformInteractors = new();
         private static readonly HashSet<(EntityRef, EntityRef)> alreadyCollided = new(new UnorderedTupleEqualityComparer<EntityRef>());
 
         public override void BeforeUpdate(Frame f, VersusStageData stage) {
@@ -26,59 +30,130 @@ namespace Quantum {
                 return;
             }
 
-            if ((f.TryGet(entity, out Enemy enemy) && !enemy.IsAlive)
-                || (f.TryGet(entity, out MarioPlayer mario) && mario.IsDead && !f.Exists(mario.CurrentPipe))
-                || f.TryGet(entity, out Freezable freezable) && freezable.IsFrozen) {
+            bool allowInteraction = true;
+            f.Signals.OnBeforeInteraction(entity, &allowInteraction);
+            if (!allowInteraction) {
                 return;
             }
 
             var shape = filter.Collider->Shape;
             var transform = filter.Transform;
 
-            // Collide
+            // Collide with hitboxes
             var hits = f.Physics2D.OverlapShape(*transform, shape);
-            EntityRef entityA = filter.Entity;
             for (int i = 0; i < hits.Count; i++) {
-                EntityRef entityB = hits[i].Entity;
-                var entities = (entityA, entityB);
-                if (entityA == entityB
-                    || alreadyCollided.Contains(entities)
-                    || (f.TryGet(entityB, out Interactable entityBInteractable) && entityBInteractable.ColliderDisabled)
-                    || (f.TryGet(entityB, out Enemy entityBEnemy) && !entityBEnemy.IsAlive)
-                    || (f.TryGet(entityB, out MarioPlayer entityBMario) && entityBMario.IsDead && !f.Exists(entityBMario.CurrentPipe))
-                    || (f.TryGet(entityB, out Freezable entityBFreezable) && entityBFreezable.IsFrozen)) {
-                    continue;
-                }
+                TryCollideWithEntity(f, entity, hits[i].Entity);
+            }
 
-                foreach ((var key, var interactor) in interactors) {
-                    int componentIdA = ComponentTypeId.GetComponentIndex(key.Item1);
-                    int componentIdB = ComponentTypeId.GetComponentIndex(key.Item2);
+            // Collide with physical objects
+            if (f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                && f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
 
-                    if (f.Has(entityA, componentIdA)
-                        && f.Has(entityB, componentIdB)) {
-
-                        interactor(f, entityA, entityB);
-                        alreadyCollided.Add(entities);
-                        break;
-
-                    } else if (f.Has(entityB, componentIdA)
-                        && f.Has(entityA, componentIdB)) {
-
-                        interactor(f, entityB, entityA);
-                        alreadyCollided.Add(entities);
-                        break;
+                foreach (var contact in contacts) {
+                    if (!f.Exists(contact.Entity)) {
+                        continue;
                     }
+
+                    TryCollideWithEntity(f, entity, contact.Entity, contact);
                 }
             }
         }
 
-        public static void RegisterInteraction<X, Y>(EnemyInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+        private void TryCollideWithEntity(Frame f, EntityRef entityA, EntityRef entityB) {
+            var entities = (entityA, entityB);
+            if (entityA == entityB
+                || alreadyCollided.Contains(entities)) {
+                return;
+            }
+
+            if (f.Unsafe.TryGetPointer(entityB, out Interactable* entityBInteractable)
+                && entityBInteractable->ColliderDisabled) {
+                return;
+            }
+
+            bool allowInteraction = true;
+            f.Signals.OnBeforeInteraction(entityB, &allowInteraction);
+            if (!allowInteraction) {
+                return;
+            }
+
+            foreach ((var key, var interactor) in hitboxInteractors) {
+                int componentIdA = ComponentTypeId.GetComponentIndex(key.Item1);
+                int componentIdB = ComponentTypeId.GetComponentIndex(key.Item2);
+
+                if (f.Has(entityA, componentIdA)
+                    && f.Has(entityB, componentIdB)) {
+
+                    interactor(f, entityA, entityB);
+                    alreadyCollided.Add(entities);
+                    break;
+
+                } else if (f.Has(entityB, componentIdA)
+                    && f.Has(entityA, componentIdB)) {
+
+                    interactor(f, entityB, entityA);
+                    alreadyCollided.Add(entities);
+                    break;
+                }
+            }
+        }
+
+        private void TryCollideWithEntity(Frame f, EntityRef entityA, EntityRef entityB, PhysicsContact contact) {
+            var entities = (entityA, entityB);
+            if (entityA == entityB
+                || alreadyCollided.Contains(entities)) {
+                return;
+            }
+
+            if (f.Unsafe.TryGetPointer(entityB, out Interactable* entityBInteractable)
+                && entityBInteractable->ColliderDisabled) {
+                return;
+            }
+
+            bool allowInteraction = true;
+            f.Signals.OnBeforeInteraction(entityB, &allowInteraction);
+            if (!allowInteraction) {
+                return;
+            }
+
+            foreach ((var key, var interactor) in platformInteractors) {
+                int componentIdA = ComponentTypeId.GetComponentIndex(key.Item1);
+                int componentIdB = ComponentTypeId.GetComponentIndex(key.Item2);
+
+                if (f.Has(entityA, componentIdA)
+                    && f.Has(entityB, componentIdB)) {
+
+                    interactor(f, entityA, entityB, contact);
+                    alreadyCollided.Add(entities);
+                    break;
+
+                } else if (f.Has(entityB, componentIdA)
+                    && f.Has(entityA, componentIdB)) {
+
+                    interactor(f, entityB, entityA, contact);
+                    alreadyCollided.Add(entities);
+                    break;
+                }
+            }
+        }
+
+        public static void RegisterInteraction<X, Y>(HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
             var key = (typeof(X), typeof(Y));
 
-            if (interactors.ContainsKey(key)) {
+            if (hitboxInteractors.ContainsKey(key)) {
                 //Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}.");
             } else {
-                interactors[key] = interactor;
+                hitboxInteractors[key] = interactor;
+            }
+        }
+
+        public static void RegisterInteraction<X, Y>(PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+            var key = (typeof(X), typeof(Y));
+
+            if (platformInteractors.ContainsKey(key)) {
+                //Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}.");
+            } else {
+                platformInteractors[key] = interactor;
             }
         }
     }

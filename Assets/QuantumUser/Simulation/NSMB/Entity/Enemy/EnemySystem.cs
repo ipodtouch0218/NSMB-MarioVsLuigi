@@ -1,6 +1,6 @@
 namespace Quantum {
 
-    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash {
+    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -79,6 +79,10 @@ namespace Quantum {
             if (!f.TryGet(entity, out Enemy enemy)) {
                 *doSplash &= enemy.IsActive;
             }
+        }
+
+        public void OnBeforeInteraction(Frame f, EntityRef entity, bool* allowInteraction) {
+            *allowInteraction &= !f.Unsafe.TryGetPointer(entity, out Enemy* enemy) || enemy->IsAlive;
         }
     }
 }

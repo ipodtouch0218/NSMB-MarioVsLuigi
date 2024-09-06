@@ -2,12 +2,14 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class FrozenCubeAnimator : MonoBehaviour {
+public class IceBlockAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
+
+    [SerializeField] private GameObject breakPrefab;
 
     public void OnValidate() {
         this.SetIfNull(ref entity);
@@ -17,9 +19,13 @@ public class FrozenCubeAnimator : MonoBehaviour {
 
     public void Initialize(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        var cube = f.Get<FrozenCube>(entity.EntityRef);
+        var cube = f.Get<IceBlock>(entity.EntityRef);
 
         sfx.PlayOneShot(SoundEffect.Enemy_Generic_Freeze);
         sRenderer.size = cube.Size.ToUnityVector2() * 2;
+    }
+
+    public void Destroyed(QuantumGame game) {
+        Instantiate(breakPrefab, transform.position, Quaternion.identity);
     }
 }

@@ -1,6 +1,6 @@
-import enum FrozenCubeBreakReason(byte);
+import enum IceBlockBreakReason(byte);
 
-component FrozenCube {
+component IceBlock {
 
 	[ExcludeFromPrototype] entity_ref Entity;
 	[ExcludeFromPrototype] FPVector2 Size;
@@ -10,4 +10,4 @@ component FrozenCube {
 
 }
 
-signal OnFrozenCubeBroken(EntityRef brokenCube, FrozenCubeBreakReason breakReason);
+signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason);

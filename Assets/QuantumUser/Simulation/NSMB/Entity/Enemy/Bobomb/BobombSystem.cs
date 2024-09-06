@@ -1,10 +1,11 @@
 using Photon.Deterministic;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace Quantum {
 
-    public unsafe class BobombSystem : SystemMainThreadFilter<BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, ISignalOnBobombExplodeEntity {
+    public unsafe class BobombSystem : SystemMainThreadFilter<BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
+        ISignalOnBobombExplodeEntity {
+        
         public struct Filter {
             public EntityRef Entity;
             public Bobomb* Bobomb;
@@ -21,7 +22,7 @@ namespace Quantum {
             InteractionSystem.RegisterInteraction<Bobomb, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
             InteractionSystem.RegisterInteraction<Bobomb, MarioPlayer>(OnBobombMarioInteraction);
             InteractionSystem.RegisterInteraction<Bobomb, Projectile>(OnBobombProjectileInteraction);
-            InteractionSystem.RegisterInteraction<Bobomb, FrozenCube>(OnBobombFrozenCubeInteraction);
+            InteractionSystem.RegisterInteraction<Bobomb, IceBlock>(OnBobombIceBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {
@@ -156,7 +157,7 @@ namespace Quantum {
             }
         }
 
-        public void OnBobombFrozenCubeInteraction(Frame f, EntityRef bobombEntity, EntityRef frozenCubeEntity) {
+        public void OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity) {
 
         }
 

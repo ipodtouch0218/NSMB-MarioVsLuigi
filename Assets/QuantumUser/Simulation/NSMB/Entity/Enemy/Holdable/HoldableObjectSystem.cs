@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter> {
+    public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter>, ISignalOnBeforePhysicsCollision, ISignalOnComponentRemoved<Holdable> {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -30,7 +30,22 @@ namespace Quantum {
             }
 
             filter.PhysicsObject->Velocity = FPVector2.Zero;
-            filter.Transform->Position = holderTransform.Position + mario->GetHeldItemOffset(f);
+            filter.Transform->Position = holderTransform.Position + mario->GetHeldItemOffset(f, holdable->Holder);
+        }
+
+        public void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
+            if (contact->Entity != EntityRef.None
+                && f.Unsafe.TryGetPointer(contact->Entity, out Holdable* holdable)
+                && (entity == holdable->Holder || (entity == holdable->PreviousHolder && holdable->IgnoreOwnerFrames > 0))) {
+
+                *allowCollision = false;
+            }
+        }
+
+        public void OnRemoved(Frame f, EntityRef entity, Holdable* component) {
+            if (f.Unsafe.TryGetPointer(component->Holder, out MarioPlayer* mario)) {
+                mario->HeldEntity = EntityRef.None;
+            }
         }
     }
 }

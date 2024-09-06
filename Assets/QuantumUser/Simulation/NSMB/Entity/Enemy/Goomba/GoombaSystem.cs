@@ -104,7 +104,7 @@ namespace Quantum {
                 break;
             }
             case ProjectileEffectType.Freeze: {
-                FrozenCubeSystem.Freeze(f, goombaEntity);
+                IceBlockSystem.Freeze(f, goombaEntity);
                 break;
             }
             }

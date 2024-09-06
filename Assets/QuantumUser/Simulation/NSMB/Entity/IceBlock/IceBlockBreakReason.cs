@@ -1,4 +1,4 @@
-public enum FrozenCubeBreakReason : byte {
+public enum IceBlockBreakReason : byte {
     None,
     Timer,
     Groundpounded,

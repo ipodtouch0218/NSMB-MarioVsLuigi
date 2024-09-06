@@ -1,0 +1,3 @@
+component Freezable {
+	[ExcludeFromPrototype] EntityRef FrozenCubeEntity;
+}

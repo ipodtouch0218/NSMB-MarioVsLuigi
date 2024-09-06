@@ -382,7 +382,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamDoubleJump, mario.JumpState == JumpState.DoubleJump);
             animator.SetBool(ParamTripleJump, mario.JumpState == JumpState.TripleJump);
             animator.SetBool(ParamHolding, mario.HeldEntity.IsValid);
-            //animator.SetBool(ParamHeadCarry, mario.HeldEntity.IsValid && controller.HeldEntity is FrozenCube);
+            animator.SetBool(ParamHeadCarry, mario.HeldEntity.IsValid && f.Get<Holdable>(mario.HeldEntity).HoldAboveHead);
             //animator.SetBool(ParamCarryStart, mario.HeldEntity.IsValid && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);
             animator.SetBool(ParamPipe, mario.CurrentPipe.IsValid);
             animator.SetBool(ParamBlueShell, mario.CurrentPowerupState == PowerupState.BlueShell);
@@ -688,13 +688,11 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            /*
-            if (HeldEntity is FrozenCube) {
+            if (e.Frame.Get<Holdable>(e.OtherEntity).HoldAboveHead) {
                 animator.Play("head-pickup");
                 animator.ResetTrigger("fireball");
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);
             }
-            */
 
             animator.ResetTrigger("throw");
         }

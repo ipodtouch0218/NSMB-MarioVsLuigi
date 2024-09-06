@@ -1,3 +1,5 @@
 component Interactable {
 	bool ColliderDisabled;
 }
+
+signal OnBeforeInteraction(EntityRef entity, bool* allowInteraction);

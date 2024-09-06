@@ -229,7 +229,7 @@ MonoBehaviour:
   LooseCoinPrototype:
     Id:
       Value: 1464681621458001613
-  FrozenCubePrototype:
+  IceBlockPrototype:
     Id:
       Value: 1386525317044462577
 --- !u!114 &-100545808229499591

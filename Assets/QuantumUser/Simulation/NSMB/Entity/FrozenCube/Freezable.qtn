@@ -1,4 +1,0 @@
-component Freezable {
-	[ExcludeFromPrototype] bool IsFrozen;
-	[ExcludeFromPrototype] entity_ref FrozenCubeEntity;
-}

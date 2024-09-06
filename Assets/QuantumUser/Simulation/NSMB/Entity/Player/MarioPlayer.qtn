@@ -113,6 +113,7 @@ component MarioPlayer {
 	byte PropellerDrillCooldown;
 
     entity_ref HeldEntity;
+	int HoldStartFrame;
 
     entity_ref CurrentPipe;
 	FPVector2 PipeDirection;
