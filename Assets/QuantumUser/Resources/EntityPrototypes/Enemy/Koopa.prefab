@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 715936171356774739}
   - component: {fileID: -8052371499079056490}
   - component: {fileID: -2274893890168952915}
+  - component: {fileID: 6785230435006475844}
   m_Layer: 0
   m_Name: Koopa
   m_TagString: Untagged
@@ -562,16 +563,16 @@ MonoBehaviour:
       RawValue: 57344
     KickSpeed:
       RawValue: 327680
-    Combo: 0
-    CurrentSpeed:
-      RawValue: 0
-    IsInShell:
-      Value: 0
-    IsFlipped:
-      Value: 0
-    IsKicked:
-      Value: 0
-    WakeupFrames: 0
+    IceBlockInShellSize:
+      X:
+        RawValue: 39322
+      Y:
+        RawValue: 39322
+    IceBlockOutShellSize:
+      X:
+        RawValue: 39322
+      Y:
+        RawValue: 65536
 --- !u!114 &5456890200873101150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -585,9 +586,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Holder: {fileID: 0}
-    PreviousHolder: {fileID: 0}
-    IgnoreOwnerFrames: 0
+    HoldAboveHead:
+      Value: 0
 --- !u!114 &8298405619030623519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,16 +601,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -622,21 +612,6 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &715936171356774739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -669,12 +644,6 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
-    IsActive:
-      Value: 0
-    IsDead:
-      Value: 0
-    FacingRight:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &-2274893890168952915
@@ -691,4 +660,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     ColliderDisabled:
+      Value: 0
+--- !u!114 &6785230435006475844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8836298984178612590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f09a56673702987429020c58e2d51615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    IceBlockSize:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    IsCarryable:
       Value: 0

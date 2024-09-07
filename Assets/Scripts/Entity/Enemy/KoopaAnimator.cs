@@ -48,8 +48,10 @@ public class KoopaAnimator : MonoBehaviour {
         var koopa = f.Get<Koopa>(entity.EntityRef);
         var holdable = f.Get<Holdable>(entity.EntityRef);
         var physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
-        
+        var freezable = f.Get<Freezable>(entity.EntityRef);
+
         // Animation
+        animator.speed = freezable.IsFrozen(f) ? 0 : 1;
         animator.SetBool(ParamShell, koopa.IsInShell || holdable.Holder.IsValid);
         animator.SetFloat(ParamXVel, (koopa.IsInShell && !koopa.IsKicked) ? 0 : Mathf.Abs(physicsObject.Velocity.X.AsFloat));
         animator.SetBool(ParamDead, enemy.IsDead);
@@ -60,19 +62,21 @@ public class KoopaAnimator : MonoBehaviour {
             transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
 
         } else if (koopa.IsInShell) {
-            if (koopa.IsFlipped && !dontFlip) {
-                dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
-                transform.eulerAngles = new Vector3(
-                    rotation.eulerAngles.x,
-                    rotation.eulerAngles.y,
-                    Mathf.Lerp(rotation.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
+            if (!freezable.IsFrozen(f)) {
+                if (koopa.IsFlipped && !dontFlip) {
+                    dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
+                    transform.eulerAngles = new Vector3(
+                        rotation.eulerAngles.x,
+                        rotation.eulerAngles.y,
+                        Mathf.Lerp(rotation.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
 
-            } else {
-                dampVelocity = 0;
-                transform.eulerAngles = new Vector3(
-                    rotation.eulerAngles.x,
-                    rotation.eulerAngles.y,
-                    remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
+                } else {
+                    dampVelocity = 0;
+                    transform.eulerAngles = new Vector3(
+                        rotation.eulerAngles.x,
+                        rotation.eulerAngles.y,
+                        remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
+                }
             }
         } else {
             transform.rotation = Quaternion.identity;

@@ -1,13 +1,13 @@
 import enum IceBlockBreakReason(byte);
 
 component IceBlock {
-
+	FP SlidingSpeed;
 	[ExcludeFromPrototype] entity_ref Entity;
 	[ExcludeFromPrototype] FPVector2 Size;
+	[ExcludeFromPrototype] FP ChildOffset;
 	[ExcludeFromPrototype] bool IsFlying;
 	[ExcludeFromPrototype] bool IsSliding;
 	[ExcludeFromPrototype] bool FacingRight;
-
 }
 
 signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason);

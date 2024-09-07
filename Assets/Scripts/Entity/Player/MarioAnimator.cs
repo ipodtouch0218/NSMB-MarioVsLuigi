@@ -146,6 +146,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd);
             QuantumEvent.Subscribe<EventMarioPlayerReceivedKnockback>(this, OnMarioPlayerReceivedKnockback);
             QuantumEvent.Subscribe<EventMarioPlayerEnteredPipe>(this, OnMarioPlayerEnteredPipe);
+            QuantumEvent.Subscribe<EventMarioPlayerStoppedSliding>(this, OnMarioPlayerStoppedSliding);
 
             stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
@@ -187,21 +188,31 @@ namespace NSMB.Entities.Player {
             */
 
             Frame f = game.Frames.Predicted;
-            MarioPlayer mario = f.Get<MarioPlayer>(entity.EntityRef);
-            PhysicsObject physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
+
+            var mario = f.Get<MarioPlayer>(entity.EntityRef);
+            var freezable = f.Get<Freezable>(entity.EntityRef);
+            HandleMiscStates(f, ref mario, ref freezable);
+
+            if (freezable.IsFrozen(f)) {
+                animator.speed = 0;
+                return;
+            } else {
+                animator.speed = 1;
+            }
+
+            var physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
             Input inputs = default;
             if (mario.PlayerRef.IsValid) {
                 inputs = *f.GetPlayerInput(mario.PlayerRef);
             }
 
-            HandleAnimations(f, mario, physicsObject);
-            SetFacingDirection(f, mario, physicsObject);
-            InterpolateFacingDirection(mario);
-            HandleMiscStates(mario);
-            UpdateAnimatorVariables(f, mario, physicsObject, inputs);
+            HandleAnimations(f, ref mario, ref physicsObject);
+            SetFacingDirection(f, ref mario, ref physicsObject);
+            InterpolateFacingDirection(ref mario);
+            UpdateAnimatorVariables(f, ref mario, ref physicsObject, ref inputs);
         }
 
-        public void HandleAnimations(Frame f, MarioPlayer mario, PhysicsObject physicsObject) {
+        public void HandleAnimations(Frame f, ref MarioPlayer mario, ref PhysicsObject physicsObject) {
             /*
             if (GameManager.Instance.GameEnded) {
                 models.SetActive(true);
@@ -261,7 +272,7 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        private void SetFacingDirection(Frame f, MarioPlayer mario, PhysicsObject physicsObject) {
+        private void SetFacingDirection(Frame f, ref MarioPlayer mario, ref PhysicsObject physicsObject) {
             //TODO: refactor
             /*
             if (GameManager.Instance.GameEnded) {
@@ -322,7 +333,7 @@ namespace NSMB.Entities.Player {
             wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
         }
 
-        private void InterpolateFacingDirection(MarioPlayer mario) {
+        private void InterpolateFacingDirection(ref MarioPlayer mario) {
 
             if (modelRotateInstantly || wasTurnaround) {
                 models.transform.rotation = Quaternion.Euler(modelRotationTarget);
@@ -358,7 +369,7 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        public void UpdateAnimatorVariables(Frame f, MarioPlayer mario, PhysicsObject physicsObject, Input inputs) {
+        public void UpdateAnimatorVariables(Frame f, ref MarioPlayer mario, ref PhysicsObject physicsObject, ref Input inputs) {
 
             bool right = inputs.Right.IsDown;
             bool left = inputs.Left.IsDown;
@@ -383,7 +394,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamTripleJump, mario.JumpState == JumpState.TripleJump);
             animator.SetBool(ParamHolding, mario.HeldEntity.IsValid);
             animator.SetBool(ParamHeadCarry, mario.HeldEntity.IsValid && f.Get<Holdable>(mario.HeldEntity).HoldAboveHead);
-            //animator.SetBool(ParamCarryStart, mario.HeldEntity.IsValid && controller.HeldEntity is FrozenCube && (Runner.SimulationTime - controller.HoldStartTime) < controller.pickupTime);
+            animator.SetBool(ParamCarryStart, mario.HeldEntity.IsValid && f.Get<Holdable>(mario.HeldEntity).HoldAboveHead && (f.Number - mario.HoldStartFrame) < 27);
             animator.SetBool(ParamPipe, mario.CurrentPipe.IsValid);
             animator.SetBool(ParamBlueShell, mario.CurrentPowerupState == PowerupState.BlueShell);
             animator.SetBool(ParamMini, mario.CurrentPowerupState == PowerupState.MiniMushroom);
@@ -416,7 +427,7 @@ namespace NSMB.Entities.Player {
             animator.SetFloat(ParamVelocityY, physicsObject.Velocity.Y.AsFloat);
         }
 
-        private void HandleMiscStates(MarioPlayer mario) {
+        private void HandleMiscStates(Frame f, ref MarioPlayer mario, ref Freezable freezable) {
             // Scale
             Vector3 scale;
             if (mario.MegaMushroomEndFrames > 0) {
@@ -505,9 +516,9 @@ namespace NSMB.Entities.Player {
             float newZ = -4;
             if (mario.IsDead) {
                 newZ = -6;
-            } /*else if (controller.IsFrozen) {
+            } else if (freezable.IsFrozen(f)) {
                 newZ = -2;
-            }*/ else if (mario.CurrentPipe.IsValid) {
+            } else if (mario.CurrentPipe.IsValid) {
                 newZ = 1;
             }
 
@@ -702,7 +713,8 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (Time.time - lastBumpSound < 0.25f) {
+            var mario = e.Frame.Get<MarioPlayer>(e.Entity);
+            if (mario.PropellerLaunchFrames > 0 && (Time.time - lastBumpSound < 0.25f)) {
                 return;
             }
 
@@ -983,6 +995,16 @@ namespace NSMB.Entities.Player {
             }
 
             sfx.PlayOneShot(SoundEffect.Player_Sound_Powerdown);
+        }
+
+        private void OnMarioPlayerStoppedSliding(EventMarioPlayerStoppedSliding e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            if (e.IsStationary) {
+                sfx.PlayOneShot(SoundEffect.Player_Sound_SlideEnd);
+            }
         }
     }
 }

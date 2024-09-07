@@ -8,18 +8,19 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
 
             if (special) {
+                var goombaTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+
                 // Spawn coin
                 EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
                 var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
                 var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
-                coinTransform->Position = f.Get<Transform2D>(entity).Position;
+                coinTransform->Position = goombaTransform->Position;
                 coinPhysicsObject->Velocity.Y = f.RNG->Next(FP.FromString("4.5"), 5);
 
                 // Fall off screen
-                var goombaTransform = f.Get<Transform2D>(entity);
-                var killerTransform = f.Get<Transform2D>(killerEntity);
+                var killerTransform = f.Unsafe.GetPointer<Transform2D>(killerEntity);
 
-                QuantumUtils.UnwrapWorldLocations(f, goombaTransform.Position, killerTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+                QuantumUtils.UnwrapWorldLocations(f, goombaTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
                 enemy->FacingRight = ourPos.X > theirPos.X;
                 physicsObject->DisableCollision = true;
                 physicsObject->Velocity = new FPVector2(

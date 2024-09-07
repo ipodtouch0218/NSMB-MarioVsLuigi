@@ -37,7 +37,7 @@ namespace Quantum {
 
             if (lit) {
                 if (QuantumUtils.Decrement(ref bobomb->CurrentDetonationFrames)) {
-                    Explode(f, filter);
+                    Explode(f, ref filter);
                     return;
                 }
             }
@@ -76,17 +76,17 @@ namespace Quantum {
             }
             
             var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
-            var bobombTransform = f.Get<Transform2D>(bobombEntity);
+            var bobombTransform = f.Unsafe.GetPointer<Transform2D>(bobombEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            var marioTransform = f.Get<Transform2D>(marioEntity);
+            var marioTransform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
 
             // Special insta-kill cases
-            if (mario->InstakillsEnemies(*marioPhysicsObject, true)) {
+            if (mario->InstakillsEnemies(marioPhysicsObject, true)) {
                 bobomb->Kill(f, bobombEntity, marioEntity, true);    
                 return;
             }
 
-            QuantumUtils.UnwrapWorldLocations(f, bobombTransform.Position + FPVector2.Up * FP._0_10, marioTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, bobombTransform->Position + FPVector2.Up * FP._0_10, marioTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             bool fromRight = ourPos.X < theirPos.X;
 
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
@@ -135,7 +135,7 @@ namespace Quantum {
 
         public void OnBobombProjectileInteraction(Frame f, EntityRef bobombEntity, EntityRef projectileEntity) {
             var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
-            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+            var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.Knockback: {
@@ -172,7 +172,7 @@ namespace Quantum {
             f.Events.BobombLit(f, entity, stomp);
         }
 
-        private static void Explode(Frame f, Filter filter) {
+        private static void Explode(Frame f, ref Filter filter) {
             var enemy = filter.Enemy;
             var bobomb = filter.Bobomb;
             var transform = filter.Transform;

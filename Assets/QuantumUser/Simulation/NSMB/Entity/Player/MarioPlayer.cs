@@ -43,23 +43,31 @@ namespace Quantum {
             }
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(mario);
             var freezable = f.Unsafe.GetPointer<Freezable>(mario);
+            bool forceHold = false;
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
+                forceHold = holdable->HoldAboveHead && (f.Number - HoldStartFrame) < 25;
+            }
 
-            return input.Sprint.IsDown && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !WallslideLeft && !WallslideRight && (physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump) && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
+            return (input.Sprint.IsDown || forceHold) 
+                && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
+                && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !IsInShell 
+                && !WallslideLeft && !WallslideRight && (physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
+                && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario) {
             return !f.Exists(HeldEntity) && CanHoldItem(f, mario);
         }
 
-        public bool InstakillsEnemies(PhysicsObject physicsObject, bool includeSliding) {
-            return CurrentPowerupState == PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (includeSliding && IsSliding && FPMath.Abs(physicsObject.Velocity.X) > FP._0_10);
+        public bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {
+            return CurrentPowerupState == PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (includeSliding && IsSliding && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
         }
 
-        public int GetSpeedStage(PhysicsObject physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
-            FP xVel = FPMath.Abs(physicsObject.Velocity.X) - FP._0_01;
+        public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
+            FP xVel = FPMath.Abs(physicsObject->Velocity.X) - FP._0_01;
             FP[] arr;
             if (IsInWater) {
-                if (physicsObject.IsTouchingGround) {
+                if (physicsObject->IsTouchingGround) {
                     arr = CurrentPowerupState == PowerupState.BlueShell ? physicsInfo.SwimWalkShellMaxVelocity : physicsInfo.SwimWalkMaxVelocity;
                 } else {
                     arr = physicsInfo.SwimMaxVelocity;
@@ -220,15 +228,15 @@ namespace Quantum {
 
         public void SpawnStars(Frame f, EntityRef entity, int amount) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            var transform = f.Get<Transform2D>(entity);
+            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             bool fastStars = amount > 2 && Stars > 2;
             int starDirection = FacingRight ? 1 : 2;
 
             // If the level doesn't loop, don't have stars go towards the edges of the map
             if (!stage.IsWrappingLevel) {
-                if (transform.Position.X > stage.StageWorldMin.X - 3) {
+                if (transform->Position.X > stage.StageWorldMin.X - 3) {
                     starDirection = 1;
-                } else if (transform.Position.X < stage.StageWorldMax.X + 3) {
+                } else if (transform->Position.X < stage.StageWorldMax.X + 3) {
                     starDirection = 2;
                 }
             }
@@ -261,7 +269,7 @@ namespace Quantum {
                 EntityRef newStarEntity = f.Create(f.SimulationConfig.BigStarPrototype);
                 var newStar = f.Unsafe.GetPointer<BigStar>(newStarEntity);
                 var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newStarEntity);
-                newStarTransform->Position = transform.Position;
+                newStarTransform->Position = transform->Position;
 
                 newStar->InitializeMovingStar(f, newStarEntity, starDirection);
 
@@ -427,12 +435,12 @@ namespace Quantum {
 
             CurrentPipe = pipe;
 
-            var pipeComponent = f.Get<EnterablePipe>(pipe);
-            PipeDirection = pipeComponent.IsCeilingPipe ? FPVector2.Up : FPVector2.Down;
+            var pipeComponent = f.Unsafe.GetPointer<EnterablePipe>(pipe);
+            PipeDirection = pipeComponent->IsCeilingPipe ? FPVector2.Up : FPVector2.Down;
 
-            var pipeTransform = f.Get<Transform2D>(pipe);
+            var pipeTransform = f.Unsafe.GetPointer<Transform2D>(pipe);
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(mario);
-            marioTransform->Position.X = pipeTransform.Position.X;
+            marioTransform->Position.X = pipeTransform->Position.X;
 
             IsCrouching = false;
             IsSliding = false;

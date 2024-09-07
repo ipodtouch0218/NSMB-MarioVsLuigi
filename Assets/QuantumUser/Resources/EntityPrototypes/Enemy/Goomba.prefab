@@ -648,4 +648,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    _empty_prototype_dummy_field_: 0
+    IceBlockSize:
+      X:
+        RawValue: 39322
+      Y:
+        RawValue: 39322
+    IsCarryable:
+      Value: 1

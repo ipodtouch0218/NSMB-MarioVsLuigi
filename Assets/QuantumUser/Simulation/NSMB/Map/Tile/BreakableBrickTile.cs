@@ -18,38 +18,38 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         playBumpSound = false;
 
         EntityRef bumpOwner = default;
-        if (f.TryGet(entity, out MarioPlayer mario)) {
+        if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
             // Mario interacting with the block
-            if (mario.CurrentPowerupState < PowerupState.Mushroom) {
+            if (mario->CurrentPowerupState < PowerupState.Mushroom) {
                 doBreak = direction switch {
                     // Small Mario
-                    InteractionDirection.Down when mario.IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.SmallMarioGroundpound),
-                    InteractionDirection.Down when mario.IsDrilling => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
+                    InteractionDirection.Down when mario->IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.SmallMarioGroundpound),
+                    InteractionDirection.Down when mario->IsDrilling => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
                     InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.SmallMario),
                     _ => false
                 };
-            } else if (mario.CurrentPowerupState == PowerupState.MegaMushroom) {
+            } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 // Mega Mario
                 doBreak = BreakingRules.HasFlag(BreakableBy.MegaMario);
-            } else if (mario.IsInShell) {
+            } else if (mario->IsInShell) {
                 // Blue Shell
                 doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
             } else {
                 doBreak = direction switch {
                     // Large Mario
-                    InteractionDirection.Down when mario.IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.LargeMarioGroundpound),
-                    InteractionDirection.Down when mario.IsDrilling => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
+                    InteractionDirection.Down when mario->IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.LargeMarioGroundpound),
+                    InteractionDirection.Down when mario->IsDrilling => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
                     InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.LargeMario),
                     _ => false
                 };
             }
             bumpOwner = entity;
-        } else if (f.TryGet(entity, out Koopa koopa) && koopa.IsKicked) {
+        } else if (f.Unsafe.TryGetPointer(entity, out Koopa* koopa) && koopa->IsKicked) {
             doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
             doBump = true;
-            bumpOwner = f.Get<Holdable>(entity).PreviousHolder;
+            bumpOwner = f.Unsafe.GetPointer<Holdable>(entity)->PreviousHolder;
 
-        } else if (f.TryGet(entity, out Bobomb _)) {
+        } else if (f.Has<Bobomb>(entity)) {
              doBreak = BreakingRules.HasFlag(BreakableBy.Bombs);
              doBump = false;
         }
@@ -70,23 +70,28 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         return doBreak;
     }
 
-    public void Bump(Frame f, VersusStageData stage, Vector2Int tile, StageTileInstance result, bool downwards, EntityRef owner, AssetRef<EntityPrototype> powerup = default) {
+    public static void Bump(Frame f, VersusStageData stage, Vector2Int tilePosition, StageTileInstance result, bool downwards, EntityRef owner, AssetRef<EntityPrototype> powerup = default) {
+        stage = stage ? stage : f.FindAsset<VersusStageData>(f.Map.UserAsset);
+        Bump(f, stage, tilePosition, stage.GetTileRelative(f, tilePosition.x, tilePosition.y).Tile, result, downwards, owner, powerup);
+    }
+
+    public static void Bump(Frame f, VersusStageData stage, Vector2Int tilePosition, AssetRef<StageTile> tile, StageTileInstance result, bool downwards, EntityRef owner, AssetRef<EntityPrototype> powerup = default) {
         stage = stage ? stage : f.FindAsset<VersusStageData>(f.Map.UserAsset);
         EntityRef newEntity = f.Create(f.SimulationConfig.BlockBumpPrototype);
         var blockBump = f.Unsafe.GetPointer<BlockBump>(newEntity);
         var transform = f.Unsafe.GetPointer<Transform2D>(newEntity);
 
-        transform->Position = QuantumUtils.RelativeTileToWorld(f, tile) + FPVector2.One * FP._0_25;
+        transform->Position = QuantumUtils.RelativeTileToWorld(f, tilePosition) + FPVector2.One * FP._0_25;
         blockBump->Origin = transform->Position;
-        blockBump->StartTile = stage.GetTileRelative(f, tile.x, tile.y).Tile;
+        blockBump->StartTile = tile;
         blockBump->ResultTile = result;
         blockBump->Powerup = powerup;
         blockBump->IsDownwards = downwards;
-        blockBump->TileX = tile.x;
-        blockBump->TileY = tile.y;
+        blockBump->TileX = tilePosition.x;
+        blockBump->TileY = tilePosition.y;
         blockBump->Owner = owner;
 
-        stage.SetTileRelative(f, tile.x, tile.y, new StageTileInstance {
+        stage.SetTileRelative(f, tilePosition.x, tilePosition.y, new StageTileInstance {
             Tile = f.SimulationConfig.InvisibleSolidTile,
             Rotation = 0,
             Scale = FPVector2.One,

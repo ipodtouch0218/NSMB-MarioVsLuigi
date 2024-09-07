@@ -53,7 +53,7 @@ namespace Quantum {
         }
 
         public void OnPiranhaPlantProjectileInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef projectileEntity) {
-            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+            var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.Knockback: {
@@ -73,7 +73,7 @@ namespace Quantum {
 
         public void OnPiranhaPlantMarioInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef marioEntity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            var marioPhysicsObject = f.Get<PhysicsObject>(marioEntity);
+            var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
 
             if (mario->InstakillsEnemies(marioPhysicsObject, false)) {
                 var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
@@ -111,8 +111,8 @@ namespace Quantum {
                 if (!enemy->IsAlive) {
                     continue;
                 }
-                var breakable = f.Get<BreakableObject>(breakableEntity);
-                if (piranhaPlant->Pipe == breakableEntity && newHeight != breakable.OriginalHeight) {
+                var breakable = f.Unsafe.GetPointer<BreakableObject>(breakableEntity);
+                if (piranhaPlant->Pipe == breakableEntity && newHeight != breakable->OriginalHeight) {
                     piranhaPlant->Kill(f, piranhaPlantEntity, EntityRef.None, true);
                 }
             }

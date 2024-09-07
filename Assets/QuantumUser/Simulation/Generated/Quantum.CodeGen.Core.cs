@@ -1027,7 +1027,6 @@ namespace Quantum {
     [FieldOffset(2)]
     public UInt16 Lifetime;
     [FieldOffset(1)]
-    [ExcludeFromPrototype()]
     public Byte UncollectableFrames;
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
@@ -1131,21 +1130,29 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Freezable : Quantum.IComponent {
-    public const Int32 SIZE = 8;
+    public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(16)]
+    public FPVector2 IceBlockSize;
     [FieldOffset(0)]
+    public QBoolean IsCarryable;
+    [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public EntityRef FrozenCubeEntity;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 15227;
+        hash = hash * 31 + IceBlockSize.GetHashCode();
+        hash = hash * 31 + IsCarryable.GetHashCode();
         hash = hash * 31 + FrozenCubeEntity.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Freezable*)ptr;
+        QBoolean.Serialize(&p->IsCarryable, serializer);
         EntityRef.Serialize(&p->FrozenCubeEntity, serializer);
+        FPVector2.Serialize(&p->IceBlockSize, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1227,14 +1234,19 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct IceBlock : Quantum.IComponent {
-    public const Int32 SIZE = 40;
+    public const Int32 SIZE = 56;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(32)]
+    public FP SlidingSpeed;
     [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public EntityRef Entity;
-    [FieldOffset(24)]
+    [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public FPVector2 Size;
+    [FieldOffset(24)]
+    [ExcludeFromPrototype()]
+    public FP ChildOffset;
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public QBoolean IsFlying;
@@ -1247,8 +1259,10 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 15017;
+        hash = hash * 31 + SlidingSpeed.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
         hash = hash * 31 + Size.GetHashCode();
+        hash = hash * 31 + ChildOffset.GetHashCode();
         hash = hash * 31 + IsFlying.GetHashCode();
         hash = hash * 31 + IsSliding.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
@@ -1261,6 +1275,8 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsFlying, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);
         EntityRef.Serialize(&p->Entity, serializer);
+        FP.Serialize(&p->ChildOffset, serializer);
+        FP.Serialize(&p->SlidingSpeed, serializer);
         FPVector2.Serialize(&p->Size, serializer);
     }
   }
@@ -1283,8 +1299,30 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct InvisibleBlock : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(0)]
+    public AssetRef<StageTile> BumpTile;
+    [FieldOffset(8)]
+    public AssetRef<StageTile> Tile;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 17449;
+        hash = hash * 31 + BumpTile.GetHashCode();
+        hash = hash * 31 + Tile.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (InvisibleBlock*)ptr;
+        AssetRef.Serialize(&p->BumpTile, serializer);
+        AssetRef.Serialize(&p->Tile, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Koopa : Quantum.IComponent {
-    public const Int32 SIZE = 56;
+    public const Int32 SIZE = 88;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(24)]
     public AssetRef<PowerupAsset> SpawnPowerupWhenStomped;
@@ -1296,6 +1334,10 @@ namespace Quantum {
     public FP Speed;
     [FieldOffset(40)]
     public FP KickSpeed;
+    [FieldOffset(56)]
+    public FPVector2 IceBlockInShellSize;
+    [FieldOffset(72)]
+    public FPVector2 IceBlockOutShellSize;
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte Combo;
@@ -1322,6 +1364,8 @@ namespace Quantum {
         hash = hash * 31 + IsSpiny.GetHashCode();
         hash = hash * 31 + Speed.GetHashCode();
         hash = hash * 31 + KickSpeed.GetHashCode();
+        hash = hash * 31 + IceBlockInShellSize.GetHashCode();
+        hash = hash * 31 + IceBlockOutShellSize.GetHashCode();
         hash = hash * 31 + Combo.GetHashCode();
         hash = hash * 31 + CurrentSpeed.GetHashCode();
         hash = hash * 31 + IsInShell.GetHashCode();
@@ -1344,6 +1388,8 @@ namespace Quantum {
         FP.Serialize(&p->CurrentSpeed, serializer);
         FP.Serialize(&p->KickSpeed, serializer);
         FP.Serialize(&p->Speed, serializer);
+        FPVector2.Serialize(&p->IceBlockInShellSize, serializer);
+        FPVector2.Serialize(&p->IceBlockOutShellSize, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -2134,6 +2180,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.IceBlock>();
       BuildSignalsArrayOnComponentAdded<Quantum.Interactable>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Interactable>();
+      BuildSignalsArrayOnComponentAdded<Quantum.InvisibleBlock>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.InvisibleBlock>();
       BuildSignalsArrayOnComponentAdded<Quantum.Koopa>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Koopa>();
       BuildSignalsArrayOnComponentAdded<Quantum.Liquid>();
@@ -2419,6 +2467,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.Input), Quantum.Input.SIZE);
       typeRegistry.Register(typeof(Quantum.InputButtons), 4);
       typeRegistry.Register(typeof(Quantum.Interactable), Quantum.Interactable.SIZE);
+      typeRegistry.Register(typeof(Quantum.InvisibleBlock), Quantum.InvisibleBlock.SIZE);
       typeRegistry.Register(typeof(Joint), Joint.SIZE);
       typeRegistry.Register(typeof(Joint3D), Joint3D.SIZE);
       typeRegistry.Register(typeof(JumpState), 1);
@@ -2477,7 +2526,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 27)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 28)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
@@ -2496,6 +2545,7 @@ namespace Quantum {
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.IceBlock>(Quantum.IceBlock.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Interactable>(Quantum.Interactable.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.InvisibleBlock>(Quantum.InvisibleBlock.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Koopa>(Quantum.Koopa.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Liquid>(Quantum.Liquid.Serialize, null, Quantum.Liquid.OnRemoved, ComponentFlags.None)
         .Add<Quantum.MarioBrosPlatform>(Quantum.MarioBrosPlatform.Serialize, null, null, ComponentFlags.None)

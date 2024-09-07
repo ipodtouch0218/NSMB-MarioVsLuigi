@@ -2,8 +2,8 @@ component Coin {
 	bool IsFloating;
 	bool IsDotted;
 	ushort Lifetime;
+	byte UncollectableFrames;
 	
-	[ExcludeFromPrototype] byte UncollectableFrames;
 	[ExcludeFromPrototype] bool IsCollected;
 	[ExcludeFromPrototype] bool IsCurrentlyDotted;
 	[ExcludeFromPrototype] byte DottedChangeFrames;

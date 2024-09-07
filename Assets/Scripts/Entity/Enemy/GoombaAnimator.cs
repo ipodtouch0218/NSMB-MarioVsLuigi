@@ -31,9 +31,10 @@ public class GoombaAnimator : MonoBehaviour {
 
         var enemy = f.Get<Enemy>(entity.EntityRef);
         var goomba = f.Get<Goomba>(entity.EntityRef);
+        var freezable = f.Get<Freezable>(entity.EntityRef);
 
         sRenderer.enabled = enemy.IsActive;
-        legacyAnimation.enabled = enemy.IsAlive;
+        legacyAnimation.enabled = enemy.IsAlive && !freezable.IsFrozen(f);
         sRenderer.flipX = enemy.FacingRight;
 
         if (enemy.IsDead) {

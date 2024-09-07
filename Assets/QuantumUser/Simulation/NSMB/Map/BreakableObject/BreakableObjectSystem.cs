@@ -12,8 +12,8 @@ namespace Quantum {
             }
 
             var breakableCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(contact->Entity);
-            var breakableTransform = f.Get<Transform2D>(contact->Entity);
-            FPVector2 breakableUp = FPVector2.Rotate(FPVector2.Up, breakableTransform.Rotation);
+            var breakableTransform = f.Unsafe.GetPointer<Transform2D>(contact->Entity);
+            FPVector2 breakableUp = FPVector2.Rotate(FPVector2.Up, breakableTransform->Rotation);
 
             FP dot = FPVector2.Dot(contact->Normal, breakableUp);
             if (dot > PhysicsObjectSystem.GroundMaxAngle) {

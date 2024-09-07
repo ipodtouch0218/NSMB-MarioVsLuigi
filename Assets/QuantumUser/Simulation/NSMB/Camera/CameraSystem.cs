@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class CameraSystem : SystemMainThreadFilter<CameraSystem.Filter> {
+    public unsafe class CameraSystem : SystemMainThreadFilterStage<CameraSystem.Filter> {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -11,21 +11,20 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             if (!filter.Mario->IsDead) {
-                filter.Camera->CurrentPosition = CalculateNewPosition(f, filter);
+                filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, stage);
             }
         }
 
-        private FPVector2 CalculateNewPosition(Frame f, Filter filter) {
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+        private FPVector2 CalculateNewPosition(Frame f, ref Filter filter, VersusStageData stage) {
             var camera = filter.Camera;
-            var mario = *filter.Mario;
-            var transform = *filter.Transform;
+            var mario = filter.Mario;
+            var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
 
-            if (!mario.IsDead && !mario.IsRespawning) {
-                camera->LastPlayerPosition = transform.Position;
+            if (!mario->IsDead && !mario->IsRespawning) {
+                camera->LastPlayerPosition = transform->Position;
             }
 
             FP vOrtho = FP.FromString("3.5");
@@ -35,10 +34,10 @@ namespace Quantum {
             // Lagging camera movements
             bool validFloor;
             if (physicsObject->IsTouchingGround) {
-                camera->LastFloorHeight = transform.Position.Y;
+                camera->LastFloorHeight = transform->Position.Y;
                 validFloor = true;
             } else {
-                validFloor = camera->LastFloorHeight < transform.Position.Y;
+                validFloor = camera->LastFloorHeight < transform->Position.Y;
             }
 
             // Floor height

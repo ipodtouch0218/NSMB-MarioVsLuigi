@@ -13,10 +13,10 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
 
             // Fall off screen
-            var booTransform = f.Get<Transform2D>(entity);
-            var killerTransform = f.Get<Transform2D>(killerEntity);
+            var booTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var killerTransform = f.Unsafe.GetPointer<Transform2D>(killerEntity);
 
-            QuantumUtils.UnwrapWorldLocations(f, booTransform.Position, killerTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, booTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             enemy->FacingRight = ourPos.X > theirPos.X;
             physicsObject->DisableCollision = true;
             physicsObject->Velocity = new FPVector2(

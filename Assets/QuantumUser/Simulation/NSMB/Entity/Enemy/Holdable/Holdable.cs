@@ -25,11 +25,11 @@ namespace Quantum {
             mario->ProjectileDelayFrames = 15;
 
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            var collider = f.Get<PhysicsCollider2D>(entity);
+            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
 
-            if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider.Shape)) {
-                var marioTransform = f.Get<Transform2D>(Holder);
-                transform->Position.X = marioTransform.Position.X;
+            if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape)) {
+                var marioTransform = f.Unsafe.GetPointer<Transform2D>(Holder);
+                transform->Position.X = marioTransform->Position.X;
             }
 
             PreviousHolder = Holder;

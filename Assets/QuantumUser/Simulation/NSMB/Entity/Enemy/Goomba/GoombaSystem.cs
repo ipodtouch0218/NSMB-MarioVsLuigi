@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class GoombaSystem : SystemMainThreadFilterStage<GoombaSystem.Filter>, ISignalOnEntityBumped, ISignalOnBobombExplodeEntity {
+    public unsafe class GoombaSystem : SystemMainThreadFilterStage<GoombaSystem.Filter>, ISignalOnEntityBumped, ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken {
         public struct Filter {
 			public EntityRef Entity;
 			public Transform2D* Transform;
@@ -9,6 +9,7 @@ namespace Quantum {
 			public Goomba* Goomba;
 			public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
+            public Freezable* Freezable;
 		}
 
         public override void OnInit(Frame f) {
@@ -16,6 +17,7 @@ namespace Quantum {
             InteractionSystem.RegisterInteraction<Goomba, PiranhaPlant>(EnemySystem.EnemyBumpTurnaroundOnlyFirst);
             InteractionSystem.RegisterInteraction<Goomba, MarioPlayer>(OnGoombaMarioInteraction);
             InteractionSystem.RegisterInteraction<Goomba, Projectile>(OnGoombaProjectileInteraction);
+            InteractionSystem.RegisterInteraction<Goomba, IceBlock>(OnGoombaIceBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -34,11 +36,12 @@ namespace Quantum {
                 return;
             }
 
-            // Inactive check
-            if (!enemy->IsAlive) {
+            // Inactive check 
+            if (!enemy->IsAlive
+                || filter.Freezable->IsFrozen(f)) {
                 return;
             }
-            
+
             // Turn around when hitting a wall.
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 enemy->FacingRight = physicsObject->IsTouchingLeftWall;
@@ -54,18 +57,18 @@ namespace Quantum {
 
         public void OnGoombaMarioInteraction(Frame f, EntityRef goombaEntity, EntityRef marioEntity) {
             var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
-            var goombaTransform = f.Get<Transform2D>(goombaEntity);
+            var goombaTransform = f.Unsafe.GetPointer<Transform2D>(goombaEntity);
             var goombaEnemy = f.Unsafe.GetPointer<Enemy>(goombaEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            var marioTransform = f.Get<Transform2D>(marioEntity);
+            var marioTransform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
             var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
 
-            QuantumUtils.UnwrapWorldLocations(f, goombaTransform.Position + FPVector2.Up * FP._0_10, marioTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, goombaTransform->Position + FPVector2.Up * FP._0_10, marioTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
-            if (mario->InstakillsEnemies(*marioPhysicsObject, true) || groundpounded) {
+            if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
                 mario->DoEntityBounce |= mario->IsDrilling;
                 return;
@@ -95,8 +98,21 @@ namespace Quantum {
             }
         }
 
+        public void OnGoombaIceBlockInteraction(Frame f, EntityRef goombaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+            var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+
+            FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
+            if (iceBlock->IsSliding
+                && upDot < PhysicsObjectSystem.GroundMaxAngle
+                && upDot > -PhysicsObjectSystem.GroundMaxAngle) {
+
+                goomba->Kill(f, goombaEntity, iceBlockEntity, true);
+            }
+        }
+
         public void OnGoombaProjectileInteraction(Frame f, EntityRef goombaEntity, EntityRef projectileEntity) {
-            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+            var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.Knockback: {
@@ -127,6 +143,13 @@ namespace Quantum {
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Goomba* goomba)) {
                 goomba->Kill(f, entity, bobomb, true);
+            }
+        }
+
+        public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
+            if (f.Unsafe.TryGetPointer(iceBlock->Entity, out Goomba* koopa)) {
+                koopa->Kill(f, iceBlock->Entity, brokenIceBlock, true);
             }
         }
     }

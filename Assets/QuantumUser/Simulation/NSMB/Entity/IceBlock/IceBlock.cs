@@ -13,12 +13,12 @@ namespace Quantum {
             child->FrozenCubeEntity = cubeEntity;
 
             // Set location
-            FP bottom = childTransform->Position.Y + childPhysicsCollider->Shape.Centroid.Y - childPhysicsCollider->Shape.Box.Extents.Y;
+            ChildOffset = (childPhysicsCollider->Shape.Box.Extents.Y - childPhysicsCollider->Shape.Centroid.Y);
+            FP bottom = childTransform->Position.Y - ChildOffset;
             transform->Position = new FPVector2(childTransform->Position.X, bottom);
 
             // Set size
-            FPVector2 extents = childPhysicsCollider->Shape.Box.Extents;
-            // ...
+            FPVector2 extents = child->IceBlockSize / 2;
             physicsCollider->Shape.Box.Extents = extents;
             physicsCollider->Shape.Centroid.Y = extents.Y;
             Size = extents;

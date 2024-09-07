@@ -21,6 +21,12 @@ namespace Quantum {
             if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
                 filter.Platform->Velocity = physicsObject->Velocity;
             }
+            if (f.Unsafe.TryGetPointer(filter.Entity, out Holdable* holdable)
+                && f.Exists(holdable->Holder)
+                && f.Unsafe.TryGetPointer(holdable->Holder, out PhysicsObject* holderPhysicsObject)) {
+
+                filter.Platform->Velocity = holderPhysicsObject->Velocity + holderPhysicsObject->ParentVelocity;
+            }
 
             MoveVertically(f, ref filter, stage);
             MoveHorizontally(f, ref filter, stage);
@@ -71,7 +77,7 @@ namespace Quantum {
                 var hit = vertical[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
-                    || ((FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y)) && (FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)))
+                    //|| ((FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y)) && (FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
                     continue;
                 }
@@ -86,10 +92,8 @@ namespace Quantum {
                     TileX = -1,
                     TileY = -1
                 };
-                Debug.Log("onbeforecollision");
                 f.Signals.OnBeforePhysicsCollision(stage, hit.Entity, &contact, &allowCollision);
                 if (!allowCollision) {
-                    Debug.Log("cancel;");
                     continue;
                 }
 
@@ -163,7 +167,7 @@ namespace Quantum {
                 var hit = horizontal[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
-                    || ((FPMath.Sign(hitPhysicsObject->Velocity.X) == FPMath.Sign(xMovement.X)) && (FPMath.Abs(hitPhysicsObject->Velocity.X) > FPMath.Abs(xMovement.X)))
+                    //|| ((FPMath.Sign(hitPhysicsObject->Velocity.X) == FPMath.Sign(xMovement.X)) && (FPMath.Abs(hitPhysicsObject->Velocity.X) > FPMath.Abs(xMovement.X)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
                     continue;
                 }
@@ -178,10 +182,8 @@ namespace Quantum {
                     TileX = -1,
                     TileY = -1
                 };
-                Debug.Log("onbeforecollision");
                 f.Signals.OnBeforePhysicsCollision(stage, hit.Entity, &contact, &allowCollision);
                 if (!allowCollision) {
-                    Debug.Log("cancel;");
                     continue;
                 }
 

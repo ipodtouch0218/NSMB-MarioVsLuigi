@@ -12,7 +12,7 @@ namespace Quantum {
             UncollectableFrames = 30;
 
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            var transform = f.Get<Transform2D>(entity);
+            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
 
             physicsObject->IsFrozen = false;
@@ -22,7 +22,7 @@ namespace Quantum {
                 FP.FromString("8.5")
             );
 
-            if (transform.Position.Y <= stage.StageWorldMin.Y + 1) {
+            if (transform->Position.Y <= stage.StageWorldMin.Y + 1) {
                 // Death boost
                 physicsObject->Velocity.Y += 3;
             }

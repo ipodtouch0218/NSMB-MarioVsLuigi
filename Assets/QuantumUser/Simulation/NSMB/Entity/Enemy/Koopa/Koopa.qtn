@@ -4,7 +4,9 @@ component Koopa {
 	bool IsSpiny;
 	FP Speed;
 	FP KickSpeed;
-	
+	FPVector2 IceBlockInShellSize;
+	FPVector2 IceBlockOutShellSize;
+
 	[ExcludeFromPrototype] byte Combo;
 	[ExcludeFromPrototype] FP CurrentSpeed;
 	[ExcludeFromPrototype] bool IsInShell;

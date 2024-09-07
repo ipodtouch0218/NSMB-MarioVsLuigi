@@ -1,3 +1,4 @@
+using Photon.Deterministic;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,21 @@ namespace Quantum {
 
             // Collide with hitboxes
             var hits = f.Physics2D.OverlapShape(*transform, shape);
+
+            FP center = transform->Position.X + shape.Centroid.X;
+            if (center - shape.Box.Extents.X < stage.StageWorldMin.X) {
+                // Left edge
+                Transform2D transformCopy = *transform;
+                transformCopy.Position.X += stage.TileDimensions.x / (FP) 2;
+                f.Physics2D.OverlapShape(&hits, transformCopy, shape);
+
+            } else if (center + shape.Box.Extents.X > stage.StageWorldMax.X) {
+                // Right edge
+                Transform2D transformCopy = *transform;
+                transformCopy.Position.X -= stage.TileDimensions.x / (FP) 2;
+                f.Physics2D.OverlapShape(&hits, transformCopy, shape);
+            }
+
             for (int i = 0; i < hits.Count; i++) {
                 TryCollideWithEntity(f, entity, hits[i].Entity);
             }

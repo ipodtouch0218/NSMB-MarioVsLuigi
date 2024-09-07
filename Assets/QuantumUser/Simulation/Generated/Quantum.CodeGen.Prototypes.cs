@@ -211,6 +211,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsFloating;
     public QBoolean IsDotted;
     public UInt16 Lifetime;
+    public Byte UncollectableFrames;
     partial void MaterializeUser(Frame frame, ref Quantum.Coin result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Coin component = default;
@@ -221,6 +222,7 @@ namespace Quantum.Prototypes {
         result.IsFloating = this.IsFloating;
         result.IsDotted = this.IsDotted;
         result.Lifetime = this.Lifetime;
+        result.UncollectableFrames = this.UncollectableFrames;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -263,8 +265,8 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Freezable))]
   public unsafe partial class FreezablePrototype : ComponentPrototype<Quantum.Freezable> {
-    [HideInInspector()]
-    public Int32 _empty_prototype_dummy_field_;
+    public FPVector2 IceBlockSize;
+    public QBoolean IsCarryable;
     partial void MaterializeUser(Frame frame, ref Quantum.Freezable result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Freezable component = default;
@@ -272,6 +274,8 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.Freezable result, in PrototypeMaterializationContext context = default) {
+        result.IceBlockSize = this.IceBlockSize;
+        result.IsCarryable = this.IsCarryable;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -327,8 +331,7 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.IceBlock))]
   public unsafe partial class IceBlockPrototype : ComponentPrototype<Quantum.IceBlock> {
-    [HideInInspector()]
-    public Int32 _empty_prototype_dummy_field_;
+    public FP SlidingSpeed;
     partial void MaterializeUser(Frame frame, ref Quantum.IceBlock result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.IceBlock component = default;
@@ -336,6 +339,7 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.IceBlock result, in PrototypeMaterializationContext context = default) {
+        result.SlidingSpeed = this.SlidingSpeed;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -381,6 +385,23 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.InvisibleBlock))]
+  public unsafe partial class InvisibleBlockPrototype : ComponentPrototype<Quantum.InvisibleBlock> {
+    public AssetRef<StageTile> BumpTile;
+    public AssetRef<StageTile> Tile;
+    partial void MaterializeUser(Frame frame, ref Quantum.InvisibleBlock result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.InvisibleBlock component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.InvisibleBlock result, in PrototypeMaterializationContext context = default) {
+        result.BumpTile = this.BumpTile;
+        result.Tile = this.Tile;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Koopa))]
   public unsafe partial class KoopaPrototype : ComponentPrototype<Quantum.Koopa> {
     public AssetRef<PowerupAsset> SpawnPowerupWhenStomped;
@@ -388,6 +409,8 @@ namespace Quantum.Prototypes {
     public QBoolean IsSpiny;
     public FP Speed;
     public FP KickSpeed;
+    public FPVector2 IceBlockInShellSize;
+    public FPVector2 IceBlockOutShellSize;
     partial void MaterializeUser(Frame frame, ref Quantum.Koopa result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Koopa component = default;
@@ -400,6 +423,8 @@ namespace Quantum.Prototypes {
         result.IsSpiny = this.IsSpiny;
         result.Speed = this.Speed;
         result.KickSpeed = this.KickSpeed;
+        result.IceBlockInShellSize = this.IceBlockInShellSize;
+        result.IceBlockOutShellSize = this.IceBlockOutShellSize;
         MaterializeUser(frame, ref result, in context);
     }
   }

@@ -117,7 +117,7 @@ namespace Quantum {
 
         public void OnBooMarioPlayerInteraction(Frame f, EntityRef booEntity, EntityRef marioEntity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            var marioPhysicsObject = f.Get<PhysicsObject>(marioEntity);
+            var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
 
             if (mario->InstakillsEnemies(marioPhysicsObject, false)) {
                 var boo = f.Unsafe.GetPointer<Boo>(booEntity);
@@ -128,7 +128,7 @@ namespace Quantum {
         }
 
         public void OnBooProjectileInteraction(Frame f, EntityRef booEntity, EntityRef projectileEntity) {
-            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+            var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             if (projectileAsset.DestroyOnHit) {
                 ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);

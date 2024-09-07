@@ -41,10 +41,10 @@ namespace Quantum {
         public static void EnemyBumpTurnaround(Frame f, EntityRef entityA, EntityRef entityB, bool turnBoth) {
             var enemyA = f.Unsafe.GetPointer<Enemy>(entityA);
             var enemyB = f.Unsafe.GetPointer<Enemy>(entityB);
-            var transformA = f.Get<Transform2D>(entityA);
-            var transformB = f.Get<Transform2D>(entityB);
+            var transformA = f.Unsafe.GetPointer<Transform2D>(entityA);
+            var transformB = f.Unsafe.GetPointer<Transform2D>(entityB);
 
-            QuantumUtils.UnwrapWorldLocations(f, transformA.Position, transformB.Position, out var ourPos, out var theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, transformA->Position, transformB->Position, out var ourPos, out var theirPos);
             bool right = ourPos.X > theirPos.X;
             if (ourPos.X == theirPos.X) {
                 right = ourPos.Y < theirPos.Y;

@@ -18,11 +18,11 @@ namespace Quantum {
 
             if (powerup->ParentMarioPlayer.IsValid) {
                 // Attached to a player. Don't interact, and follow the player.
-                var marioTransform = f.Get<Transform2D>(powerup->ParentMarioPlayer);
-                var marioCamera = f.Get<CameraController>(powerup->ParentMarioPlayer);
+                var marioTransform = f.Unsafe.GetPointer<Transform2D>(powerup->ParentMarioPlayer);
+                var marioCamera = f.Unsafe.GetPointer<CameraController>(powerup->ParentMarioPlayer);
 
                 // TODO magic value
-                transform->Position = new FPVector2(marioTransform.Position.X, marioCamera.CurrentPosition.Y + FP.FromString("1.68"));
+                transform->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + FP.FromString("1.68"));
 
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                     powerup->ParentMarioPlayer = EntityRef.None;
@@ -229,16 +229,18 @@ namespace Quantum {
                 marioPhysicsObject->Velocity = FPVector2.Zero;
             }
 
-            mario->PreviousPowerupState = mario->CurrentPowerupState;
-            mario->CurrentPowerupState = newState;
-            //mario->powerupFlash = 2;
-            mario->IsCrouching |= MarioPlayerSystem.ForceCrouchCheck(f, new() {
+            MarioPlayerSystem.Filter fakeFilter = new() {
                 Entity = marioEntity,
                 MarioPlayer = mario,
                 PhysicsObject = marioPhysicsObject,
                 Transform = transform,
                 PhysicsCollider = collider
-            }, f.FindAsset(mario->PhysicsAsset));
+            };
+
+            mario->PreviousPowerupState = mario->CurrentPowerupState;
+            mario->CurrentPowerupState = newState;
+            //mario->powerupFlash = 2;
+            mario->IsCrouching |= MarioPlayerSystem.ForceCrouchCheck(f, ref fakeFilter, f.FindAsset(mario->PhysicsAsset));
             mario->IsPropellerFlying = false;
             mario->UsedPropellerThisJump = false;
             mario->IsDrilling &= mario->IsSpinnerFlying;
@@ -246,7 +248,8 @@ namespace Quantum {
             mario->IsInShell = false;
 
             // Don't give us an extra mushroom
-            if (mario->PreviousPowerupState == PowerupState.NoPowerup || (mario->PreviousPowerupState == PowerupState.Mushroom && newState != PowerupState.Mushroom)) {
+            if (mario->PreviousPowerupState == PowerupState.NoPowerup
+                || (mario->PreviousPowerupState == PowerupState.Mushroom && newState != PowerupState.Mushroom)) {
                 return PowerupReserveResult.NoneButPlaySound;
             }
 

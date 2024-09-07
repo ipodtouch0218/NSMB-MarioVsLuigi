@@ -32,11 +32,11 @@ namespace Quantum {
             }
 
             if (kill) {
-                Kill(f, filter);
+                Kill(f, ref filter);
             }
         }
 
-        public void Kill(Frame f, Filter filter) {
+        public void Kill(Frame f, ref Filter filter) {
             var blockBump = filter.BlockBump;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
@@ -49,7 +49,7 @@ namespace Quantum {
                     StageTileInstance tileInstance = stage.GetTileRelative(f, blockBump->TileX, blockBump->TileY - 1);
                     bool launch = blockBump->IsDownwards && tileInstance.GetWorldPolygons(f, out _).Length != 0;
 
-                    FP height = f.Get<PhysicsCollider2D>(newPowerup).Shape.Box.Extents.Y * 2;
+                    FP height = f.Unsafe.GetPointer<PhysicsCollider2D>(newPowerup)->Shape.Box.Extents.Y * 2;
                     FPVector2 origin = filter.Transform->Position + FPVector2.Down * FP._0_25;
 
                     var powerupScriptable = f.FindAsset(powerup->Scriptable);

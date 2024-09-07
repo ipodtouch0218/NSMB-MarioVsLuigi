@@ -16,7 +16,7 @@ namespace Quantum {
             EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
             var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
             var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
-            coinTransform->Position = f.Get<Transform2D>(entity).Position;
+            coinTransform->Position = f.Unsafe.GetPointer<Transform2D>(entity)->Position;
             coinPhysicsObject->Velocity.Y = f.RNG->Next(FP.FromString("4.5"), 5);
 
             // Combo sound

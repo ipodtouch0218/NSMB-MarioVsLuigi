@@ -251,3 +251,9 @@ event MarioPlayerEnteredPipe {
 	entity_ref Entity;
 	entity_ref Pipe;
 }
+
+event MarioPlayerStoppedSliding {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	bool IsStationary;
+}

@@ -34,11 +34,11 @@ namespace Quantum {
             Initialize(f, thisEntity, 60);
             ParentMarioPlayer = playerToFollow;
 
-            var marioTransform = f.Get<Transform2D>(playerToFollow);
-            var marioCamera = f.Get<CameraController>(playerToFollow);
+            var marioTransform = f.Unsafe.GetPointer<Transform2D>(playerToFollow);
+            var marioCamera = f.Unsafe.GetPointer<CameraController>(playerToFollow);
 
             // TODO magic value
-            f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = new FPVector2(marioTransform.Position.X, marioCamera.CurrentPosition.Y + FP.FromString("1.68"));
+            f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + FP.FromString("1.68"));
             f.Unsafe.GetPointer<PhysicsObject>(thisEntity)->IsFrozen = true;
         }
     }

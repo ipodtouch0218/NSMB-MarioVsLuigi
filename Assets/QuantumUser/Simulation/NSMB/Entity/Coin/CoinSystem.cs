@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class CoinSystem : SystemMainThreadFilter<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnTrigger2D, ISignalOnMarioPlayerCollectedCoin, ISignalOnEntityBumped {
+    public unsafe class CoinSystem : SystemMainThreadFilter<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin, ISignalOnEntityBumped {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -62,33 +62,11 @@ namespace Quantum {
             }
         }
 
-        public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            // Collecting a coin
-            if (!f.Unsafe.TryGetPointer(info.Other, out Coin* coin)
+        public static void TryCollectCoin(Frame f, EntityRef coinEntity, EntityRef marioEntity) {
+            if (!f.Unsafe.TryGetPointer(coinEntity, out Coin* coin)
                 || coin->IsCollected
                 || coin->UncollectableFrames > 0
-                || !f.TryGet(info.Other, out Transform2D coinTransform)
-                || !f.TryGet(info.Other, out PhysicsCollider2D coinCollider)
-                || f.DestroyPending(info.Other)) {
-
-                return;
-            }
-
-            EntityRef marioEntity = info.Entity;
-
-            if (!f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
-                // Try to see if a moving koopa has a previous mario holder
-                if (!f.Unsafe.TryGetPointer(info.Entity, out Koopa* koopa) 
-                    || !koopa->IsKicked
-                    || !f.Unsafe.TryGetPointer(info.Entity, out Holdable* holdable)
-                    || !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out mario)) {
-                    return;
-                }
-
-                marioEntity = holdable->PreviousHolder;
-            }
-
-            if (mario->IsDead) {
+                || f.DestroyPending(coinEntity)) {
                 return;
             }
 
@@ -99,13 +77,16 @@ namespace Quantum {
                 return;
             }
 
+            var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
+            var coinCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(coinEntity);
+            f.Signals.OnMarioPlayerCollectedCoin(marioEntity, f.Unsafe.GetPointer<MarioPlayer>(marioEntity), coinTransform->Position + coinCollider->Shape.Centroid, false, false);
+
             if (coin->IsFloating) {
                 coin->IsCollected = true;
-                f.Events.CoinChangeCollected(f, info.Other, *coin, true);
+                f.Events.CoinChangeCollected(f, coinEntity, *coin, true);
             } else {
-                 f.Destroy(info.Other);
+                f.Destroy(coinEntity);
             }
-            f.Signals.OnMarioPlayerCollectedCoin(marioEntity, mario, coinTransform.Position + coinCollider.Shape.Centroid, false, false);
         }
 
         public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {

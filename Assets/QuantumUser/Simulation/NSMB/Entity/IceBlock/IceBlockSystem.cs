@@ -9,17 +9,31 @@ namespace Quantum {
             public EntityRef Entity;
             public Transform2D* Transform;
             public IceBlock* IceBlock;
+            public PhysicsObject* PhysicsObject;
         }
 
         public override void OnInit(Frame f) {
             InteractionSystem.RegisterInteraction<IceBlock, Projectile>(OnIceBlockProjectileInteraction);
             InteractionSystem.RegisterInteraction<IceBlock, MarioPlayer>(OnIceBlockMarioInteraction);
+            InteractionSystem.RegisterInteraction<IceBlock, Coin>(OnIceBlockCoinInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {
             var childTransform = f.Unsafe.GetPointer<Transform2D>(filter.IceBlock->Entity);
 
-            childTransform->Position = filter.Transform->Position; // + offset
+            childTransform->Position = filter.Transform->Position + FPVector2.Up * (filter.IceBlock->ChildOffset + FP._0_05);
+
+            var iceBlock = filter.IceBlock;
+            var physicsObject = filter.PhysicsObject;
+
+            if (iceBlock->IsSliding) {
+                physicsObject->Velocity.X = iceBlock->SlidingSpeed * (iceBlock->FacingRight ? 1 : -1);
+
+                if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
+                    Destroy(f, filter.Entity, IceBlockBreakReason.HitWall);
+                    return;
+                }
+            }
         }
 
         public void OnIceBlockMarioInteraction(Frame f, EntityRef iceBlockEntity, EntityRef marioEntity, PhysicsContact contact) {
@@ -49,19 +63,34 @@ namespace Quantum {
                 }
             }
 
-            // Attempt pickup (assuming it isn't already picked up)
             if (!iceBlock->IsSliding) {
+                // Attempt pickup (assuming it isn't already picked up)
                 var holdable2 = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
                 if (!f.Exists(holdable2->Holder)
                     && mario->CanPickupItem(f, marioEntity)) {
                     // Pickup successful
                     holdable2->Pickup(f, iceBlockEntity, marioEntity);
+
+                    //var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(iceBlockEntity);
+                    //collider->Enabled = false;
                 }
             }
         }
 
+        public void OnIceBlockCoinInteraction(Frame f, EntityRef iceBlockEntity, EntityRef coinEntity) {
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+            var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
+
+            if (!iceBlock->IsSliding
+                || !f.Exists(holdable->PreviousHolder)) {
+                return;
+            }
+
+            CoinSystem.TryCollectCoin(f, coinEntity, holdable->PreviousHolder);
+        }
+
         public void OnIceBlockProjectileInteraction(Frame f, EntityRef frozenCubeEntity, EntityRef projectileEntity, PhysicsContact contact) {
-            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+            var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             if (projectileAsset.Effect == ProjectileEffectType.Knockback) {
                 // Fireball: destroy
@@ -73,7 +102,7 @@ namespace Quantum {
             }
         }
 
-        public static void Freeze(Frame f, EntityRef entityToFreeze) {
+        public static void Freeze(Frame f, EntityRef entityToFreeze, bool flying = false) {
             if (!f.Has<Freezable>(entityToFreeze)) {
                 return;
             }
@@ -81,9 +110,10 @@ namespace Quantum {
             EntityRef frozenCubeEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
             var frozenCube = f.Unsafe.GetPointer<IceBlock>(frozenCubeEntity);
             frozenCube->Initialize(f, frozenCubeEntity, entityToFreeze);
+            frozenCube->IsFlying = flying;
         }
 
-        public void Destroy(Frame f, EntityRef frozenCube, IceBlockBreakReason breakReason) {
+        public static void Destroy(Frame f, EntityRef frozenCube, IceBlockBreakReason breakReason) {
             f.Signals.OnIceBlockBroken(frozenCube, breakReason);
             f.Destroy(frozenCube);
         }
@@ -92,13 +122,19 @@ namespace Quantum {
             if (!f.Unsafe.TryGetPointer(entity, out IceBlock* ice)
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
-                || !f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario)) {
+                || !f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario) 
+                || !f.Unsafe.TryGetPointer(marioEntity, out PhysicsObject* marioPhysicsObject)) {
                 return;
             }
 
             ice->IsSliding = true;
             ice->IsFlying = false;
             ice->FacingRight = mario->FacingRight;
+            FP bonusSpeed = FPMath.Abs(marioPhysicsObject->Velocity.X / 3);
+            if (FPMath.Sign(marioPhysicsObject->Velocity.X) != (mario->FacingRight ? 1 : -1)) {
+                bonusSpeed *= -1;
+            }
+            ice->SlidingSpeed += bonusSpeed;
             physicsObject->Velocity.Y = 0;
             holdable->IgnoreOwnerFrames = 15;
 

@@ -8,6 +8,7 @@ namespace Quantum {
 
             IsInShell = false;
             IsKicked = false;
+            IsFlipped = false;
             Combo = 0;
             CurrentSpeed = Speed;
             holdable->Holder = default;
@@ -56,18 +57,19 @@ namespace Quantum {
                 holdable->IgnoreOwnerFrames = 15;
             }
 
+            var koopaTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+
             // Spawn coin
             EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
             var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
             var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
-            coinTransform->Position = f.Get<Transform2D>(entity).Position;
+            coinTransform->Position = koopaTransform->Position;
             coinPhysicsObject->Velocity.Y = f.RNG->Next(FP.FromString("4.5"), 5);
 
             // Fall off screen
-            var koopaTransform = f.Get<Transform2D>(entity);
-            var killerTransform = f.Get<Transform2D>(killerEntity);
+            var killerTransform = f.Unsafe.GetPointer<Transform2D>(killerEntity);
 
-            QuantumUtils.UnwrapWorldLocations(f, koopaTransform.Position, killerTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, koopaTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             enemy->FacingRight = ourPos.X > theirPos.X;
             physicsObject->DisableCollision = true;
             physicsObject->Velocity = new FPVector2(

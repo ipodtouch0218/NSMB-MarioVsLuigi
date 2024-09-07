@@ -23,6 +23,10 @@ public class IceBlockAnimator : MonoBehaviour {
 
         sfx.PlayOneShot(SoundEffect.Enemy_Generic_Freeze);
         sRenderer.size = cube.Size.ToUnityVector2() * 2;
+
+        Vector3 position = transform.position;
+        position.z = -4.25f;
+        transform.position = position;
     }
 
     public void Destroyed(QuantumGame game) {

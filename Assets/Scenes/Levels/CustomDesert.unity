@@ -3609,6 +3609,11 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
+      propertyPath: MapEntityReferences.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
       propertyPath: MapEntityReferences.Array.data[0]
       value: 
       objectReference: {fileID: 1810019336}
@@ -3657,6 +3662,11 @@ PrefabInstance:
       propertyPath: MapEntityReferences.Array.data[9]
       value: 
       objectReference: {fileID: 600973054}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: MapEntityReferences.Array.data[10]
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

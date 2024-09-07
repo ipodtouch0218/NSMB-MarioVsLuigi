@@ -1,3 +1,5 @@
 component Freezable {
+	FPVector2 IceBlockSize;
+	bool IsCarryable;
 	[ExcludeFromPrototype] EntityRef FrozenCubeEntity;
 }

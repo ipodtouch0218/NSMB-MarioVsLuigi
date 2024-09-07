@@ -6,13 +6,13 @@ namespace Quantum {
         }
 
         public static void OnPipeMarioInteraction(Frame f, EntityRef pipeEntity, EntityRef marioEntity) {
-            var pipe = f.Get<EnterablePipe>(pipeEntity);
-            if (!pipe.IsEnterable) {
+            var pipe = f.Unsafe.GetPointer<EnterablePipe>(pipeEntity);
+            if (!pipe->IsEnterable) {
                 return;
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            if (pipe.IsMiniOnly && mario->CurrentPowerupState != PowerupState.MiniMushroom) {
+            if (pipe->IsMiniOnly && mario->CurrentPowerupState != PowerupState.MiniMushroom) {
                 return;
             }
 
@@ -26,7 +26,7 @@ namespace Quantum {
                 input = *f.GetPlayerInput(mario->PlayerRef);
             }
 
-            if (pipe.IsCeilingPipe) {
+            if (pipe->IsCeilingPipe) {
                 if (!marioPhysicsObject->IsTouchingCeiling || !input.Up.IsDown) {
                     return;
                 }

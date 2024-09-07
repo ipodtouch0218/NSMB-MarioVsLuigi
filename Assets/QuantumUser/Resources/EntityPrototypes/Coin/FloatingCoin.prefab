@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 388009723025345444}
   - component: {fileID: 6153461050534851498}
   - component: {fileID: 1541163589079276198}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,7 +154,8 @@ GameObject:
   - component: {fileID: 6321124393289553252}
   - component: {fileID: 9053290319332969542}
   - component: {fileID: 2115189598253090278}
-  m_Layer: 10
+  - component: {fileID: -4892106406039443480}
+  m_Layer: 0
   m_Name: FloatingCoin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -326,7 +327,7 @@ MonoBehaviour:
       IsPersistent: 1
       CompoundShapes: []
     LayerSource: 0
-    Layer: 10
+    Layer: 0
     CallbackFlags:
       Value: 0
   PhysicsBody:
@@ -567,17 +568,6 @@ MonoBehaviour:
     IsDotted:
       Value: 0
     Lifetime: 0
-    UncollectableFrames: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    IsCollected:
-      Value: 0
-    IsCurrentlyDotted:
-      Value: 0
-    DottedChangeFrames: 0
 --- !u!114 &2115189598253090278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,3 +586,18 @@ MonoBehaviour:
   soundRange: 12
   maxPanning: 0.8
   useDistanceToCamera: 0
+--- !u!114 &-4892106406039443480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780648777663731097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0

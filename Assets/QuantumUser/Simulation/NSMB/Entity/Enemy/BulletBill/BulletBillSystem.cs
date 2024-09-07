@@ -88,18 +88,18 @@ namespace Quantum {
 
         public void OnBulletBillMarioInteraction(Frame f, EntityRef bulletBillEntity, EntityRef marioEntity) {
             var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
-            var bulletBillTransform = f.Get<Transform2D>(bulletBillEntity);
+            var bulletBillTransform = f.Unsafe.GetPointer<Transform2D>(bulletBillEntity);
             var bulletBillEnemy = f.Unsafe.GetPointer<Enemy>(bulletBillEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            var marioTransform = f.Get<Transform2D>(marioEntity);
+            var marioTransform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
             var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
 
-            QuantumUtils.UnwrapWorldLocations(f, bulletBillTransform.Position + FPVector2.Up * FP._0_10, marioTransform.Position, out FPVector2 ourPos, out FPVector2 theirPos);
+            QuantumUtils.UnwrapWorldLocations(f, bulletBillTransform->Position + FPVector2.Up * FP._0_10, marioTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > 0;
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             
-            if (mario->InstakillsEnemies(*marioPhysicsObject, true) || groundpounded) {
+            if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 bulletBill->Kill(f, bulletBillEntity, marioEntity, true);
                 mario->DoEntityBounce |= mario->IsDrilling;
                 return;
@@ -125,10 +125,10 @@ namespace Quantum {
         }
 
         public void OnBulletBillProjectileInteraction(Frame f, EntityRef bulletBillEntity, EntityRef projectileEntity) {
-            var projectileAsset = f.FindAsset(f.Get<Projectile>(projectileEntity).Asset);
+            var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             if (projectileAsset.Effect == ProjectileEffectType.Freeze) {
-                // TODO
+                IceBlockSystem.Freeze(f, bulletBillEntity, true);
             }
 
             if (projectileAsset.DestroyOnHit) {

@@ -156,6 +156,7 @@ GameObject:
   - component: {fileID: 1173340272915162886}
   - component: {fileID: 1728249163796113136}
   - component: {fileID: 2115189598253090278}
+  - component: {fileID: -2618363333227520774}
   m_Layer: 0
   m_Name: LooseCoin
   m_TagString: Untagged
@@ -570,16 +571,6 @@ MonoBehaviour:
       Value: 0
     Lifetime: 480
     UncollectableFrames: 30
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    IsCollected:
-      Value: 0
-    IsCurrentlyDotted:
-      Value: 0
-    DottedChangeFrames: 0
 --- !u!114 &1173340272915162886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -607,16 +598,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 376832
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -628,21 +609,6 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &2115189598253090278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -661,3 +627,18 @@ MonoBehaviour:
   soundRange: 12
   maxPanning: 0.8
   useDistanceToCamera: 0
+--- !u!114 &-2618363333227520774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780648777663731097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0
