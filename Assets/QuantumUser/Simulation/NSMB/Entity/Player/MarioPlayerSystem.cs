@@ -1161,8 +1161,10 @@ namespace Quantum {
             bool validFloorAngle = FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle;
 
             if (physicsObject->IsOnSlideableGround 
+                && validFloorAngle
+                && !f.Exists(mario->HeldEntity)
                 && (!((mario->FacingRight && physicsObject->IsTouchingRightWall) || (!mario->FacingRight && physicsObject->IsTouchingLeftWall))
-                && (mario->IsCrouching || inputs.Down.IsDown) && validFloorAngle
+                && (mario->IsCrouching || inputs.Down.IsDown)
                 && !mario->IsInShell /* && mario->CurrentPowerupState != PowerupState.MegaMushroom*/)) {
 
                 mario->IsSliding = true;
@@ -1181,9 +1183,10 @@ namespace Quantum {
                 //= new FPVector2(newX, newY);
             }
 
-            bool stationary = FPMath.Abs(physicsObject->Velocity.X) < FP._0_01;
+            bool stationary = FPMath.Abs(physicsObject->Velocity.X) < FP._0_01 && physicsObject->IsTouchingGround;
             if (mario->IsSliding) {
-                if (inputs.Up.IsDown || ((inputs.Left.IsDown ^ inputs.Right.IsDown) && !inputs.Down.IsDown)
+                if (inputs.Up.IsDown
+                    || ((inputs.Left.IsDown ^ inputs.Right.IsDown) && !inputs.Down.IsDown)
                     || (/*physicsObject->IsOnSlideableGround && FPMath.Abs(physicsObject->FloorAngle) < physics.SlideMinimumAngle && */physicsObject->IsTouchingGround && stationary && !inputs.Down.IsDown)
                     || (mario->FacingRight && physicsObject->IsTouchingRightWall)
                     || (!mario->FacingRight && physicsObject->IsTouchingLeftWall)) {

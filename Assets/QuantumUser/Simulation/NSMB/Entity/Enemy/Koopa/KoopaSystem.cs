@@ -130,13 +130,16 @@ namespace Quantum {
 
             bool eitherBeingHeld = f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityA)->Holder) || f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityB)->Holder);
 
+            bool koopaAKicked = koopaA->IsKicked;
+            bool koopaBKicked = koopaB->IsKicked;
+
             bool turn = true;
-            if (koopaA->IsKicked || eitherBeingHeld) {
+            if (eitherBeingHeld || koopaAKicked) {
                 // Destroy them
                 koopaB->Kill(f, koopaEntityB, koopaEntityA, false);
                 turn = false;
             }
-            if (koopaB->IsKicked || eitherBeingHeld) {
+            if (eitherBeingHeld || koopaBKicked) {
                 // Destroy ourselves
                 koopaA->Kill(f, koopaEntityA, koopaEntityB, false);
                 turn = false;
