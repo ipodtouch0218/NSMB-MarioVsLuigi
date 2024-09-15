@@ -147,7 +147,7 @@ namespace Quantum {
                 break;
             }
             case ProjectileEffectType.Freeze: {
-                //
+                IceBlockSystem.Freeze(f, bobombEntity);
                 break;
             }
             }
@@ -157,8 +157,16 @@ namespace Quantum {
             }
         }
 
-        public void OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity) {
+        public void OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+            var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
+            FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
+            if (iceBlock->IsSliding
+                && upDot < PhysicsObjectSystem.GroundMaxAngle) {
+
+                bobomb->Kill(f, bobombEntity, iceBlockEntity, true);
+            }
         }
 
         private static void Light(Frame f, EntityRef entity, Bobomb* bobomb, bool stomp) {
@@ -254,7 +262,7 @@ namespace Quantum {
             }
         }
 
-        public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching) {
+        public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching, QBoolean dropped) {
             if (!f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
                 || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
@@ -265,7 +273,9 @@ namespace Quantum {
             }
             
             physicsObject->Velocity.Y = 0;
-            if (crouching) {
+            if (dropped) {
+                physicsObject->Velocity.X = 0;
+            } else if (crouching) {
                 physicsObject->Velocity.X = mario->FacingRight ? 1 : -1;
             } else {
                 physicsObject->Velocity.X = (FP.FromString("4.5") + FPMath.Abs(marioPhysics->Velocity.X / 3)) * (mario->FacingRight ? 1 : -1);

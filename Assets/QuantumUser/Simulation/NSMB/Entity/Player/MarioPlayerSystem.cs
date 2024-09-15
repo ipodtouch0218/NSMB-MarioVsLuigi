@@ -1046,14 +1046,16 @@ namespace Quantum {
                 return;
             }
 
-            if (mario->IsDead || /*mario->IsFrozen || */ mario->IsGroundpounding || mario->IsInKnockback || mario->CurrentPipe.IsValid || mario->HeldEntity.IsValid || mario->IsCrouching || mario->IsSliding) {
+            if (mario->IsDead || /*mario->IsFrozen || */ mario->IsGroundpounding || mario->IsInKnockback || f.Exists(mario->CurrentPipe)
+                || mario->HeldEntity.IsValid || mario->IsCrouching || mario->IsSliding) {
                 return;
             }
 
             switch (mario->CurrentPowerupState) {
             case PowerupState.IceFlower:
             case PowerupState.FireFlower: {
-                if (!fireballReady || mario->IsWallsliding || mario->JumpState == JumpState.TripleJump || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsSkidding || mario->IsTurnaround) {
+                if (!fireballReady || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
+                    || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsSkidding || mario->IsTurnaround) {
                     return;
                 }
 

@@ -104,8 +104,7 @@ namespace Quantum {
 
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
             if (iceBlock->IsSliding
-                && upDot < PhysicsObjectSystem.GroundMaxAngle
-                && upDot > -PhysicsObjectSystem.GroundMaxAngle) {
+                && upDot < PhysicsObjectSystem.GroundMaxAngle) {
 
                 goomba->Kill(f, goombaEntity, iceBlockEntity, true);
             }

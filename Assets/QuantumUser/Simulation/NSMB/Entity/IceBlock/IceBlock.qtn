@@ -1,4 +1,5 @@
 import enum IceBlockBreakReason(byte);
+import enum LiquidType(byte);
 
 component IceBlock {
 	FP SlidingSpeed;
@@ -10,7 +11,7 @@ component IceBlock {
 	[ExcludeFromPrototype] bool FacingRight;
 	[ExcludeFromPrototype] byte AutoBreakFrames;
 	[ExcludeFromPrototype] byte WaterColliderCount;
-	[ExcludeFromPrototype] bool IsInPoison;
+	[ExcludeFromPrototype] LiquidType InLiquidType;
 }
 
 signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason);

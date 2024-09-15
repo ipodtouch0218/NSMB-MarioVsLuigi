@@ -10,13 +10,13 @@ namespace Quantum {
             f.Events.MarioPlayerPickedUpObject(f, marioEntity, mario, entity);
         }
 
-        public void Drop(Frame f, EntityRef entity) {
+        public void DropWithoutThrowing(Frame f, EntityRef entity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(Holder);
             mario->HeldEntity = default;
             PreviousHolder = Holder;
             Holder = default;
 
-            f.Signals.OnThrowHoldable(entity, PreviousHolder, true);
+            f.Signals.OnThrowHoldable(entity, PreviousHolder, true, true);
         }
 
         public void Throw(Frame f, EntityRef entity) {
@@ -34,7 +34,7 @@ namespace Quantum {
 
             PreviousHolder = Holder;
             Holder = default;
-            f.Signals.OnThrowHoldable(entity, PreviousHolder, f.GetPlayerInput(mario->PlayerRef)->Down.IsDown);
+            f.Signals.OnThrowHoldable(entity, PreviousHolder, f.GetPlayerInput(mario->PlayerRef)->Down.IsDown, false);
         }
     }
 }

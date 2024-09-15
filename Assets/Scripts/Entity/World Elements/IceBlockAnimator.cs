@@ -47,7 +47,8 @@ public class IceBlockAnimator : MonoBehaviour {
             && cube.TimerEnabled(f, entity.EntityRef)) {
 
             Vector3 position = transform.position;
-            position.x += Mathf.Sin(cube.AutoBreakFrames / 60f * shakeSpeed) * shakeAmount;
+            float time = (cube.AutoBreakFrames - e.Game.InterpolationFactor) / 60f;
+            position.x += Mathf.Sin(time * shakeSpeed) * shakeAmount;
             transform.position = position;
         }
     }

@@ -6,6 +6,7 @@ namespace Quantum {
         public override void OnInit(Frame f) {
             InteractionSystem.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
             InteractionSystem.RegisterInteraction<BulletBill, Projectile>(OnBulletBillProjectileInteraction);
+            InteractionSystem.RegisterInteraction<BulletBill, IceBlock>(OnBulletBillIceBlockInteraction);
         }
 
         public override void Update(Frame f) {
@@ -121,6 +122,18 @@ namespace Quantum {
 
             } else if (!mario->IsCrouchedInShell && mario->IsDamageable) {
                 mario->Powerdown(f, marioEntity, false);
+            }
+        }
+
+        public void OnBulletBillIceBlockInteraction(Frame f, EntityRef bulletBillEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+            var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+
+            FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
+            if (iceBlock->IsSliding
+                && upDot < PhysicsObjectSystem.GroundMaxAngle) {
+
+                bulletBill->Kill(f, bulletBillEntity, iceBlockEntity, true);
             }
         }
 
