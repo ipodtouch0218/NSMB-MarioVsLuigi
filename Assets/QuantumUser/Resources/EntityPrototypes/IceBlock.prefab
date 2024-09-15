@@ -194,7 +194,7 @@ MonoBehaviour:
     LayerSource: 0
     Layer: 0
     CallbackFlags:
-      Value: 0
+      Value: 4095
   PhysicsBody:
     IsEnabled: 0
     Config2D: 116
@@ -330,6 +330,8 @@ MonoBehaviour:
   sRenderer: {fileID: 5772244049117569476}
   breakPrefab: {fileID: 6779589790155936114, guid: 18ec030fd34201b4c90cac2de9b22a2d,
     type: 3}
+  shakeSpeed: 120
+  shakeAmount: 0.03
 --- !u!82 &-4211955845073762521
 AudioSource:
   m_ObjectHideFlags: 0
@@ -507,8 +509,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     SlidingSpeed:
-      RawValue: 475136
-    AutoBreakFrames: 180
+      RawValue: 344064
 --- !u!114 &5466463427177246889
 MonoBehaviour:
   m_ObjectHideFlags: 0

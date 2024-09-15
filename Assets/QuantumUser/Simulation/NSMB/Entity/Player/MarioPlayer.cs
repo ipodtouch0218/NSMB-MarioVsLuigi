@@ -51,7 +51,7 @@ namespace Quantum {
             return (input.Sprint.IsDown || forceHold) 
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
                 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !IsInShell 
-                && !WallslideLeft && !WallslideRight && (physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
+                && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
                 && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
         }
 
@@ -175,7 +175,7 @@ namespace Quantum {
             */
 
             if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
-                holdable->Drop(f, HeldEntity);
+                holdable->DropWithoutThrowing(f, HeldEntity);
             }
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);

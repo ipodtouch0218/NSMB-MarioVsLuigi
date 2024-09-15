@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
@@ -39,24 +40,23 @@ namespace Quantum {
                 }
             }
 
-            if (iceBlock->IsInPoison) {
+            if (iceBlock->WaterColliderCount > 0) {
                 iceBlock->IsSliding = false;
+                if (iceBlock->InLiquidType != LiquidType.Water) {
+                    physicsObject->Velocity.X *= FP.FromString(".85");
+                    physicsObject->Velocity.Y = FPMath.Max(-FP._0_50, physicsObject->Velocity.Y);
 
-                physicsObject->Velocity.X *= FP.FromString(".85");
-                physicsObject->Velocity.Y = FPMath.Min(-FP._0_50, physicsObject->Velocity.Y);
+                } else {
+                    FP newVelocity = physicsObject->Velocity.Y;
+                    if (newVelocity < 0) {
+                        newVelocity *= FP._0_99;
+                    }
+                    newVelocity += (25 * f.DeltaTime);
+                    newVelocity = FPMath.Min(1, newVelocity);
 
-            } else if (iceBlock->WaterColliderCount > 0) {
-                iceBlock->IsSliding = false;
-
-                FP newVelocity = physicsObject->Velocity.Y;
-                if (newVelocity < 0) {
-                    newVelocity *= FP._0_99;
+                    physicsObject->Velocity.X *= FP.FromString(".85");
+                    physicsObject->Velocity.Y = newVelocity;
                 }
-                newVelocity += (25 * f.DeltaTime);
-                newVelocity = FPMath.Min(1, newVelocity);
-
-                physicsObject->Velocity.X *= FP.FromString(".85");
-                physicsObject->Velocity.Y = newVelocity;
             }
 
             if (iceBlock->AutoBreakFrames > 0 && iceBlock->TimerEnabled(f, entity)) {
@@ -160,16 +160,16 @@ namespace Quantum {
             f.Destroy(frozenCube);
         }
 
-        public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching) {
+        public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching, QBoolean dropped) {
             if (!f.Unsafe.TryGetPointer(entity, out IceBlock* ice)
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
-                || !f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario) 
+                || !f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario)
                 || !f.Unsafe.TryGetPointer(marioEntity, out PhysicsObject* marioPhysicsObject)) {
                 return;
             }
 
-            ice->IsSliding = true;
+            ice->IsSliding = !dropped;
             ice->IsFlying = false;
             ice->FacingRight = mario->FacingRight;
             FP bonusSpeed = FPMath.Abs(marioPhysicsObject->Velocity.X / 3);
@@ -180,7 +180,9 @@ namespace Quantum {
             physicsObject->Velocity.Y = 0;
             holdable->IgnoreOwnerFrames = 15;
 
-            f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
+            if (!dropped) {
+                f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
+            }
         }
 
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump) {
@@ -198,27 +200,22 @@ namespace Quantum {
                 Destroy(f, entity, IceBlockBreakReason.None);
             }
         }
+
         public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
-            if (!f.Unsafe.TryGetPointer(entity, out IceBlock* iceBlock)) {
-                return;
-            }
+            if (f.Unsafe.TryGetPointer(entity, out IceBlock* iceBlock)) {
+                *doSplash = true;
 
-            *doSplash = true;
+                if (exit) {
+                    iceBlock->WaterColliderCount--;
+                } else {
+                    iceBlock->WaterColliderCount++;
+                }
 
-            if (exit) {
-                iceBlock->WaterColliderCount--;
-            } else {
-                iceBlock->WaterColliderCount++;
-            }
+                var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
+                iceBlock->InLiquidType = liquid->LiquidType;
 
-            var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
-            switch (liquid->LiquidType) {
-            case LiquidType.Poison:
-                iceBlock->IsInPoison = true;
-                break;
-            case LiquidType.Lava:
-                Destroy(f, entity, IceBlockBreakReason.None);
-                break;
+            } else if (f.Unsafe.TryGetPointer(entity, out Freezable* freezable)) {
+                *doSplash &= !freezable->IsFrozen(f);
             }
         }
     }

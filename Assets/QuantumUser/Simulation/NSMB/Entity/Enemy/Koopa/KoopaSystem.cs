@@ -366,7 +366,7 @@ namespace Quantum {
             }
         }
 
-        public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching) {
+        public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching, QBoolean dropped) {
             if (!f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
                 || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
@@ -378,7 +378,10 @@ namespace Quantum {
 
             koopa->WakeupFrames = 15 * 60;
             physicsObject->Velocity.Y = 0;
-            if (crouching) {
+            if (dropped) {
+                physicsObject->Velocity.X = 0;
+                koopa->CurrentSpeed = 0;
+            } else if (crouching) {
                 physicsObject->Velocity.X = mario->FacingRight ? 1 : -1;
                 koopa->CurrentSpeed = 0;
             } else {

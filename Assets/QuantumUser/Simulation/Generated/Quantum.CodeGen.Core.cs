@@ -1267,13 +1267,13 @@ namespace Quantum {
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public FPVector2 ChildOffset;
-    [FieldOffset(8)]
+    [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsFlying;
     [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public QBoolean IsSliding;
-    [FieldOffset(4)]
+    [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
     [FieldOffset(0)]
@@ -1282,9 +1282,9 @@ namespace Quantum {
     [FieldOffset(1)]
     [ExcludeFromPrototype()]
     public Byte WaterColliderCount;
-    [FieldOffset(12)]
+    [FieldOffset(4)]
     [ExcludeFromPrototype()]
-    public QBoolean IsInPoison;
+    public LiquidType InLiquidType;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 15017;
@@ -1297,7 +1297,7 @@ namespace Quantum {
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + AutoBreakFrames.GetHashCode();
         hash = hash * 31 + WaterColliderCount.GetHashCode();
-        hash = hash * 31 + IsInPoison.GetHashCode();
+        hash = hash * 31 + (byte)InLiquidType;
         return hash;
       }
     }
@@ -1305,9 +1305,9 @@ namespace Quantum {
         var p = (IceBlock*)ptr;
         serializer.Stream.Serialize(&p->AutoBreakFrames);
         serializer.Stream.Serialize(&p->WaterColliderCount);
+        serializer.Stream.Serialize((byte*)&p->InLiquidType);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IsFlying, serializer);
-        QBoolean.Serialize(&p->IsInPoison, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);
         EntityRef.Serialize(&p->Entity, serializer);
         FP.Serialize(&p->SlidingSpeed, serializer);
@@ -2110,7 +2110,7 @@ namespace Quantum {
     void OnGameStarting(Frame f);
   }
   public unsafe partial interface ISignalOnThrowHoldable : ISignal {
-    void OnThrowHoldable(Frame f, EntityRef entity, EntityRef mario, QBoolean crouching);
+    void OnThrowHoldable(Frame f, EntityRef entity, EntityRef mario, QBoolean crouching, QBoolean dropped);
   }
   public unsafe partial interface ISignalOnIceBlockBroken : ISignal {
     void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason);
@@ -2371,12 +2371,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnThrowHoldable(EntityRef entity, EntityRef mario, QBoolean crouching) {
+      public void OnThrowHoldable(EntityRef entity, EntityRef mario, QBoolean crouching, QBoolean dropped) {
         var array = _f._ISignalOnThrowHoldableSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnThrowHoldable(_f, entity, mario, crouching);
+            s.OnThrowHoldable(_f, entity, mario, crouching, dropped);
           }
         }
       }
