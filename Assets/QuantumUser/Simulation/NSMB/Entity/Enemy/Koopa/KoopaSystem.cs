@@ -400,11 +400,11 @@ namespace Quantum {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
-                || !f.TryGet(entity, out Enemy enemy)
-                || !enemy.IsAlive
-                || !f.TryGet(entity, out Holdable holdable)
-                || f.Exists(holdable.Holder)
-                || holdable.IgnoreOwnerFrames > 0) {
+                || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
+                || !enemy->IsAlive
+                || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
+                || f.Exists(holdable->Holder)
+                || holdable->IgnoreOwnerFrames > 0) {
 
                 return;
             }

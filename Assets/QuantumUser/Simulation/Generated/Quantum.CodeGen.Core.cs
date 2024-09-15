@@ -1130,29 +1130,49 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Freezable : Quantum.IComponent {
-    public const Int32 SIZE = 32;
+    public const Int32 SIZE = 56;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(16)]
+    [FieldOffset(24)]
     public FPVector2 IceBlockSize;
     [FieldOffset(0)]
-    public QBoolean IsCarryable;
+    public Byte AutoBreakFrames;
+    [FieldOffset(1)]
+    public Byte AutoBreakGrabAdditionalFrames;
+    [FieldOffset(4)]
+    public QBoolean AutoBreakWhileHeld;
+    [FieldOffset(40)]
+    public FPVector2 Offset;
     [FieldOffset(8)]
+    public QBoolean IsCarryable;
+    [FieldOffset(12)]
+    public QBoolean IsFlying;
+    [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public EntityRef FrozenCubeEntity;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 15227;
         hash = hash * 31 + IceBlockSize.GetHashCode();
+        hash = hash * 31 + AutoBreakFrames.GetHashCode();
+        hash = hash * 31 + AutoBreakGrabAdditionalFrames.GetHashCode();
+        hash = hash * 31 + AutoBreakWhileHeld.GetHashCode();
+        hash = hash * 31 + Offset.GetHashCode();
         hash = hash * 31 + IsCarryable.GetHashCode();
+        hash = hash * 31 + IsFlying.GetHashCode();
         hash = hash * 31 + FrozenCubeEntity.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Freezable*)ptr;
+        serializer.Stream.Serialize(&p->AutoBreakFrames);
+        serializer.Stream.Serialize(&p->AutoBreakGrabAdditionalFrames);
+        QBoolean.Serialize(&p->AutoBreakWhileHeld, serializer);
         QBoolean.Serialize(&p->IsCarryable, serializer);
+        QBoolean.Serialize(&p->IsFlying, serializer);
         EntityRef.Serialize(&p->FrozenCubeEntity, serializer);
         FPVector2.Serialize(&p->IceBlockSize, serializer);
+        FPVector2.Serialize(&p->Offset, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1234,28 +1254,37 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct IceBlock : Quantum.IComponent {
-    public const Int32 SIZE = 56;
+    public const Int32 SIZE = 72;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(32)]
     public FP SlidingSpeed;
-    [FieldOffset(16)]
-    [ExcludeFromPrototype()]
-    public EntityRef Entity;
-    [FieldOffset(40)]
-    [ExcludeFromPrototype()]
-    public FPVector2 Size;
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
-    public FP ChildOffset;
-    [FieldOffset(4)]
+    public EntityRef Entity;
+    [FieldOffset(56)]
     [ExcludeFromPrototype()]
-    public QBoolean IsFlying;
+    public FPVector2 Size;
+    [FieldOffset(40)]
+    [ExcludeFromPrototype()]
+    public FPVector2 ChildOffset;
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
+    public QBoolean IsFlying;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public QBoolean IsSliding;
-    [FieldOffset(0)]
+    [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public Byte AutoBreakFrames;
+    [FieldOffset(1)]
+    [ExcludeFromPrototype()]
+    public Byte WaterColliderCount;
+    [FieldOffset(12)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsInPoison;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 15017;
@@ -1266,17 +1295,23 @@ namespace Quantum {
         hash = hash * 31 + IsFlying.GetHashCode();
         hash = hash * 31 + IsSliding.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
+        hash = hash * 31 + AutoBreakFrames.GetHashCode();
+        hash = hash * 31 + WaterColliderCount.GetHashCode();
+        hash = hash * 31 + IsInPoison.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (IceBlock*)ptr;
+        serializer.Stream.Serialize(&p->AutoBreakFrames);
+        serializer.Stream.Serialize(&p->WaterColliderCount);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IsFlying, serializer);
+        QBoolean.Serialize(&p->IsInPoison, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);
         EntityRef.Serialize(&p->Entity, serializer);
-        FP.Serialize(&p->ChildOffset, serializer);
         FP.Serialize(&p->SlidingSpeed, serializer);
+        FPVector2.Serialize(&p->ChildOffset, serializer);
         FPVector2.Serialize(&p->Size, serializer);
     }
   }
@@ -2084,7 +2119,7 @@ namespace Quantum {
     void OnBeforeInteraction(Frame f, EntityRef entity, bool* allowInteraction);
   }
   public unsafe partial interface ISignalOnTryLiquidSplash : ISignal {
-    void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash);
+    void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, QBoolean exit, bool* doSplash);
   }
   public unsafe partial interface ISignalOnBeforePhysicsCollision : ISignal {
     void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision);
@@ -2363,12 +2398,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnTryLiquidSplash(EntityRef entity, EntityRef liquid, bool* doSplash) {
+      public void OnTryLiquidSplash(EntityRef entity, EntityRef liquid, QBoolean exit, bool* doSplash) {
         var array = _f._ISignalOnTryLiquidSplashSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnTryLiquidSplash(_f, entity, liquid, doSplash);
+            s.OnTryLiquidSplash(_f, entity, liquid, exit, doSplash);
           }
         }
       }

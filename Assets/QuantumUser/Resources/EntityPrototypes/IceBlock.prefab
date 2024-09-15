@@ -508,6 +508,7 @@ MonoBehaviour:
   Prototype:
     SlidingSpeed:
       RawValue: 475136
+    AutoBreakFrames: 180
 --- !u!114 &5466463427177246889
 MonoBehaviour:
   m_ObjectHideFlags: 0

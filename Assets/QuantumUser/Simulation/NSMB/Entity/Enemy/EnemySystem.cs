@@ -75,14 +75,16 @@ namespace Quantum {
             }
         }
 
-        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash) {
-            if (!f.TryGet(entity, out Enemy enemy)) {
-                *doSplash &= enemy.IsActive;
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, QBoolean exit, bool* doSplash) {
+            if (f.Unsafe.TryGetPointer(entity, out Enemy* enemy)) {
+                *doSplash &= enemy->IsActive;
             }
         }
 
         public void OnBeforeInteraction(Frame f, EntityRef entity, bool* allowInteraction) {
-            *allowInteraction &= !f.Unsafe.TryGetPointer(entity, out Enemy* enemy) || enemy->IsAlive;
+            if (f.Unsafe.TryGetPointer(entity, out Enemy* enemy)) {
+                *allowInteraction &= enemy->IsAlive;
+            }
         }
     }
 }

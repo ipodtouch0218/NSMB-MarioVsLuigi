@@ -653,5 +653,12 @@ MonoBehaviour:
         RawValue: 39322
       Y:
         RawValue: 39322
+    AutoBreakFrames: 180
+    AutoBreakGrabAdditionalFrames: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
     IsCarryable:
       Value: 1

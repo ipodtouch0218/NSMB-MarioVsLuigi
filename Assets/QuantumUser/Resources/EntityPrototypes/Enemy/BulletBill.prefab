@@ -4994,6 +4994,7 @@ GameObject:
   - component: {fileID: 808433351997747540}
   - component: {fileID: -2707382414775849669}
   - component: {fileID: 9160283603330728788}
+  - component: {fileID: -9012748332886022531}
   m_Layer: 0
   m_Name: BulletBill
   m_TagString: Untagged
@@ -5429,8 +5430,6 @@ MonoBehaviour:
       RawValue: 98304
     DespawnRadius:
       RawValue: 524288
-    DespawnFrames: 0
-    Owner: {fileID: 0}
 --- !u!114 &1099637356932663032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5444,16 +5443,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -5465,21 +5454,6 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 1
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &808433351997747540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5498,12 +5472,6 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
-    IsActive:
-      Value: 0
-    IsDead:
-      Value: 0
-    FacingRight:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &-2707382414775849669
@@ -5535,6 +5503,35 @@ MonoBehaviour:
   Prototype:
     ColliderDisabled:
       Value: 0
+--- !u!114 &-9012748332886022531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627485830306083579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f09a56673702987429020c58e2d51615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    IceBlockSize:
+      X:
+        RawValue: 34079
+      Y:
+        RawValue: 27525
+    AutoBreakFrames: 180
+    AutoBreakGrabAdditionalFrames: 0
+    AutoBreakWhileHeld:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    IsCarryable:
+      Value: 1
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

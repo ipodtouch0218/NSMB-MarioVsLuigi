@@ -6,15 +6,15 @@ namespace Quantum {
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
             if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
-                || !f.TryGet(info.Other, out Transform2D ourTransform)
-                || !f.TryGet(info.Entity, out Transform2D entityTransform)
-                || !f.TryGet(info.Entity, out PhysicsCollider2D collider)
-                || !f.TryGet(info.Entity, out PhysicsObject physicsObject)) {
+                || !f.Unsafe.TryGetPointer(info.Other, out Transform2D* ourTransform)
+                || !f.Unsafe.TryGetPointer(info.Entity, out Transform2D* entityTransform)
+                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsCollider2D* collider)
+                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* physicsObject)) {
                 return;
             }
 
             FP surface = liquid->GetSurfaceHeight(ourTransform);
-            FP checkHeight = entityTransform.Position.Y + collider.Shape.Centroid.Y;
+            FP checkHeight = entityTransform->Position.Y + collider->Shape.Centroid.Y;
             bool underwater = liquid->LiquidType != LiquidType.Water || checkHeight <= surface;
 
             QList<EntityRef> splashed = f.ResolveList(liquid->SplashedEntities);
@@ -25,17 +25,9 @@ namespace Quantum {
                     splashed.RemoveUnordered(info.Entity);
 
                     bool doSplash = true;
-                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
+                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, true, &doSplash);
                     if (doSplash) {
-                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), true);
-                    }
-
-                    // Mario specific effects...
-                    if (liquid->LiquidType == LiquidType.Water && f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
-                        if (QuantumUtils.Decrement(ref mario->WaterColliderCount)) {
-                            // Jump
-                            mario->SwimExitForceJump = true;
-                        }
+                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
                     }
                 }
             } else {
@@ -45,26 +37,9 @@ namespace Quantum {
                     splashed.Add(info.Entity);
 
                     bool doSplash = true;
-                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
+                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, false, &doSplash);
                     if (doSplash) {
-                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), false);
-
-                        // Mario specific effects...
-                        if (f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
-                            switch (liquid->LiquidType) {
-                            case LiquidType.Water:
-                                mario->WaterColliderCount++;
-                                break;
-                            case LiquidType.Lava:
-                                // Kill, fire death
-                                mario->Death(f, info.Entity, true);
-                                break;
-                            case LiquidType.Poison:
-                                // Kill, normal death
-                                mario->Death(f, info.Entity, false);
-                                break;
-                            }
-                        }
+                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), false);
                     }
                 }
             }
@@ -72,34 +47,24 @@ namespace Quantum {
 
         public void OnTriggerExit2D(Frame f, ExitInfo2D info) {
             if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
-                || !f.TryGet(info.Other, out Transform2D ourTransform)
-                || !f.TryGet(info.Entity, out Transform2D entityTransform)
-                || !f.TryGet(info.Entity, out PhysicsCollider2D collider)
-                || !f.TryGet(info.Entity, out PhysicsObject physicsObject)) {
+                || !f.Unsafe.TryGetPointer(info.Other, out Transform2D* ourTransform)
+                || !f.Unsafe.TryGetPointer(info.Entity, out Transform2D* entityTransform)
+                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsCollider2D* collider)
+                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* physicsObject)) {
                 return;
             }
 
             FP surface = liquid->GetSurfaceHeight(ourTransform);
-            FP checkHeight = entityTransform.Position.Y + collider.Shape.Centroid.Y;
-            bool underwater = liquid->LiquidType != LiquidType.Water || checkHeight <= surface;
+            FP checkHeight = entityTransform->Position.Y + collider->Shape.Centroid.Y;
+            bool underwater = checkHeight <= surface;
 
             QList<EntityRef> splashed = f.ResolveList(liquid->SplashedEntities);
-            if (splashed.RemoveUnordered(info.Entity)) {
-                if (!underwater) {
-                    // Exit splash
-                    bool doSplash = true;
-                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, &doSplash);
-                    if (doSplash) {
-                        f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject.Velocity.Y), new FPVector2(entityTransform.Position.X, surface), true);
-                        
-                        // Mario specific effects...
-                        if (liquid->LiquidType == LiquidType.Water && f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)) {
-                            if (QuantumUtils.Decrement(ref mario->WaterColliderCount) && !underwater) {
-                                // Jump
-                                mario->SwimExitForceJump = true;
-                            }
-                        }
-                    }
+            if (splashed.RemoveUnordered(info.Entity) && !underwater) {
+                // Exit splash
+                bool doSplash = true;
+                f.Signals.OnTryLiquidSplash(info.Entity, info.Other, true, &doSplash);
+                if (doSplash) {
+                    f.Events.LiquidSplashed(info.Entity, FPMath.Abs(physicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
                 }
             }
         }

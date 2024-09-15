@@ -16,7 +16,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref holdable->IgnoreOwnerFrames);
 
             if (!f.Exists(holdable->Holder)
-                || !f.TryGet(holdable->Holder, out Transform2D holderTransform)) {
+                || !f.Unsafe.TryGetPointer(holdable->Holder, out Transform2D* holderTransform)) {
                 
                 holdable->Holder = EntityRef.None;
                 return;
@@ -30,7 +30,7 @@ namespace Quantum {
             }
 
             filter.PhysicsObject->Velocity = FPVector2.Zero;
-            filter.Transform->Position = holderTransform.Position + mario->GetHeldItemOffset(f, holdable->Holder);
+            filter.Transform->Position = holderTransform->Position + mario->GetHeldItemOffset(f, holdable->Holder);
         }
 
         public void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {

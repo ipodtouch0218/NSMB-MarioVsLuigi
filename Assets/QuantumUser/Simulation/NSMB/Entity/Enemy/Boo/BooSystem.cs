@@ -33,18 +33,18 @@ namespace Quantum {
             }
 
             // Don't move if we don't have a target.
-            if (!f.TryGet(boo->CurrentTarget, out MarioPlayer targetMario)
-                || !f.TryGet(boo->CurrentTarget, out Transform2D targetMarioTransform)
-                || !f.TryGet(boo->CurrentTarget, out PhysicsCollider2D targetMarioCollider)) {
+            if (!f.Unsafe.TryGetPointer(boo->CurrentTarget, out MarioPlayer* targetMario)
+                || !f.Unsafe.TryGetPointer(boo->CurrentTarget, out Transform2D* targetMarioTransform)
+                || !f.Unsafe.TryGetPointer(boo->CurrentTarget, out PhysicsCollider2D* targetMarioCollider)) {
                 boo->UnscaredFrames = BooUnscaredFrames;
                 physicsObject->Velocity = FPVector2.Zero;
                 return;
             }
 
             // Check if we're gonna become scared
-            QuantumUtils.UnwrapWorldLocations(stage, filter.Transform->Position, targetMarioTransform.Position + targetMarioCollider.Shape.Centroid, out FPVector2 ourPosition, out FPVector2 marioPosition);
+            QuantumUtils.UnwrapWorldLocations(stage, filter.Transform->Position, targetMarioTransform->Position + targetMarioCollider->Shape.Centroid, out FPVector2 ourPosition, out FPVector2 marioPosition);
             bool targetOnRight = ourPosition.X < marioPosition.X;
-            bool beingLookedAt = targetMario.FacingRight != targetOnRight;
+            bool beingLookedAt = targetMario->FacingRight != targetOnRight;
 
             if (beingLookedAt) {
                 // Become scared

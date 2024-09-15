@@ -2,26 +2,39 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe partial struct IceBlock {
-        public void Initialize(Frame f, EntityRef cubeEntity, EntityRef frozenEntity) {
-            var transform = f.Unsafe.GetPointer<Transform2D>(cubeEntity);
-            var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(cubeEntity);
-            var child = f.Unsafe.GetPointer<Freezable>(frozenEntity);
-            var childTransform = f.Unsafe.GetPointer<Transform2D>(frozenEntity);
-            var childPhysicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(frozenEntity);
+        public bool TimerEnabled(Frame f, EntityRef iceBlockEntity) {
+            var childFreezable = f.Unsafe.GetPointer<Freezable>(Entity);
+            var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
+            return childFreezable->AutoBreakWhileHeld || (!IsInPoison && !IsSliding && !f.Exists(holdable->Holder));
+        }
 
-            Entity = frozenEntity;
-            child->FrozenCubeEntity = cubeEntity;
+        public void Initialize(Frame f, EntityRef iceBlockEntity, EntityRef childEntity) {
+            var transform = f.Unsafe.GetPointer<Transform2D>(iceBlockEntity);
+            var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(iceBlockEntity);
+            var child = f.Unsafe.GetPointer<Freezable>(childEntity);
+            var childTransform = f.Unsafe.GetPointer<Transform2D>(childEntity);
+            var childPhysicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(childEntity);
+
+            Entity = childEntity;
+            child->FrozenCubeEntity = iceBlockEntity;
+            IsFlying = child->IsFlying;
+            if (IsFlying) {
+                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(iceBlockEntity);
+                physicsObject->IsFrozen = true;
+            }
 
             // Set location
-            ChildOffset = (childPhysicsCollider->Shape.Box.Extents.Y - childPhysicsCollider->Shape.Centroid.Y);
-            FP bottom = childTransform->Position.Y - ChildOffset;
-            transform->Position = new FPVector2(childTransform->Position.X, bottom);
+            ChildOffset = new FPVector2(0, childPhysicsCollider->Shape.Centroid.Y - childPhysicsCollider->Shape.Box.Extents.Y - FP._0_05);
+            transform->Position = childTransform->Position + ChildOffset + child->Offset + (FPVector2.Up * FP._0_05);
 
             // Set size
             FPVector2 extents = child->IceBlockSize / 2;
             physicsCollider->Shape.Box.Extents = extents;
             physicsCollider->Shape.Centroid.Y = extents.Y;
             Size = extents;
+
+            // Set timer
+            AutoBreakFrames = child->AutoBreakFrames;
         }
     }
 }

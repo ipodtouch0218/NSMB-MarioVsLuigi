@@ -3,7 +3,7 @@ using Photon.Deterministic;
 namespace Quantum {
 
     public unsafe class IceBlockSystem : SystemMainThreadFilter<IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
-        ISignalOnBobombExplodeEntity {
+        ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash {
 
         public struct Filter {
             public EntityRef Entity;
@@ -19,19 +19,56 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter) {
-            var childTransform = f.Unsafe.GetPointer<Transform2D>(filter.IceBlock->Entity);
-
-            childTransform->Position = filter.Transform->Position + FPVector2.Up * (filter.IceBlock->ChildOffset + FP._0_05);
-
+            var entity = filter.Entity;
             var iceBlock = filter.IceBlock;
+            var transform = filter.Transform;
+            var childFreezable = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
             var physicsObject = filter.PhysicsObject;
+
+            if (childFreezable->IsCarryable) {
+                var childTransform = f.Unsafe.GetPointer<Transform2D>(iceBlock->Entity);
+                childTransform->Position = transform->Position - iceBlock->ChildOffset;
+            }
 
             if (iceBlock->IsSliding) {
                 physicsObject->Velocity.X = iceBlock->SlidingSpeed * (iceBlock->FacingRight ? 1 : -1);
 
                 if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                    Destroy(f, filter.Entity, IceBlockBreakReason.HitWall);
+                    Destroy(f, entity, IceBlockBreakReason.HitWall);
                     return;
+                }
+            }
+
+            if (iceBlock->IsInPoison) {
+                iceBlock->IsSliding = false;
+
+                physicsObject->Velocity.X *= FP.FromString(".85");
+                physicsObject->Velocity.Y = FPMath.Min(-FP._0_50, physicsObject->Velocity.Y);
+
+            } else if (iceBlock->WaterColliderCount > 0) {
+                iceBlock->IsSliding = false;
+
+                FP newVelocity = physicsObject->Velocity.Y;
+                if (newVelocity < 0) {
+                    newVelocity *= FP._0_99;
+                }
+                newVelocity += (25 * f.DeltaTime);
+                newVelocity = FPMath.Min(1, newVelocity);
+
+                physicsObject->Velocity.X *= FP.FromString(".85");
+                physicsObject->Velocity.Y = newVelocity;
+            }
+
+            if (iceBlock->AutoBreakFrames > 0 && iceBlock->TimerEnabled(f, entity)) {
+                if (QuantumUtils.Decrement(ref iceBlock->AutoBreakFrames)) {
+                    if (iceBlock->IsFlying && !physicsObject->IsTouchingGround) {
+                        physicsObject->IsFrozen = false;
+                        iceBlock->AutoBreakFrames = 1;
+
+                    } else {
+                        Destroy(f, entity, IceBlockBreakReason.Timer);
+                        return;
+                    }
                 }
             }
         }
@@ -66,13 +103,17 @@ namespace Quantum {
             if (!iceBlock->IsSliding) {
                 // Attempt pickup (assuming it isn't already picked up)
                 var holdable2 = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
+                var child = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
+
                 if (!f.Exists(holdable2->Holder)
+                    && child->IsCarryable
                     && mario->CanPickupItem(f, marioEntity)) {
+
                     // Pickup successful
                     holdable2->Pickup(f, iceBlockEntity, marioEntity);
 
-                    //var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(iceBlockEntity);
-                    //collider->Enabled = false;
+                    // Don't allow overflow
+                    iceBlock->AutoBreakFrames = (byte) FPMath.Clamp(iceBlock->AutoBreakFrames + child->AutoBreakGrabAdditionalFrames, 0, byte.MaxValue);
                 }
             }
         }
@@ -102,15 +143,16 @@ namespace Quantum {
             }
         }
 
-        public static void Freeze(Frame f, EntityRef entityToFreeze, bool flying = false) {
+        public static EntityRef Freeze(Frame f, EntityRef entityToFreeze, bool flying = false) {
             if (!f.Has<Freezable>(entityToFreeze)) {
-                return;
+                return default;
             }
 
             EntityRef frozenCubeEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
             var frozenCube = f.Unsafe.GetPointer<IceBlock>(frozenCubeEntity);
             frozenCube->Initialize(f, frozenCubeEntity, entityToFreeze);
             frozenCube->IsFlying = flying;
+            return frozenCubeEntity;
         }
 
         public static void Destroy(Frame f, EntityRef frozenCube, IceBlockBreakReason breakReason) {
@@ -154,6 +196,29 @@ namespace Quantum {
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Has<IceBlock>(entity)) {
                 Destroy(f, entity, IceBlockBreakReason.None);
+            }
+        }
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
+            if (!f.Unsafe.TryGetPointer(entity, out IceBlock* iceBlock)) {
+                return;
+            }
+
+            *doSplash = true;
+
+            if (exit) {
+                iceBlock->WaterColliderCount--;
+            } else {
+                iceBlock->WaterColliderCount++;
+            }
+
+            var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
+            switch (liquid->LiquidType) {
+            case LiquidType.Poison:
+                iceBlock->IsInPoison = true;
+                break;
+            case LiquidType.Lava:
+                Destroy(f, entity, IceBlockBreakReason.None);
+                break;
             }
         }
     }

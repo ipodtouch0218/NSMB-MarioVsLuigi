@@ -132,8 +132,8 @@ namespace Quantum {
 
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Goomba* goomba)
-                || !f.TryGet(entity, out Enemy enemy)
-                || !enemy.IsAlive) {
+                || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
+                || !enemy->IsAlive) {
                 return;
             }
 

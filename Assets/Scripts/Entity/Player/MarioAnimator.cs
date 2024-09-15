@@ -406,7 +406,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamFireballKnockback, mario.IsInWeakKnockback);
             //animator.SetBool(ParamKnockforwards, mario.IsInForwardsKnockback);
 
-            float animatedVelocity = physicsObject.IsTouchingGround ? physicsObject.Velocity.Magnitude.AsFloat : Mathf.Abs(physicsObject.Velocity.X.AsFloat);
+            float animatedVelocity = /* physicsObject.IsTouchingGround ? physicsObject.Velocity.Magnitude.AsFloat : */ Mathf.Abs(physicsObject.Velocity.X.AsFloat);
             /*
             if (controller.IsStuckInBlock) {
                 animatedVelocity = 0;

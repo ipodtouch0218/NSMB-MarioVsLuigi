@@ -266,7 +266,12 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.Freezable))]
   public unsafe partial class FreezablePrototype : ComponentPrototype<Quantum.Freezable> {
     public FPVector2 IceBlockSize;
+    public Byte AutoBreakFrames;
+    public Byte AutoBreakGrabAdditionalFrames;
+    public QBoolean AutoBreakWhileHeld;
+    public FPVector2 Offset;
     public QBoolean IsCarryable;
+    public QBoolean IsFlying;
     partial void MaterializeUser(Frame frame, ref Quantum.Freezable result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Freezable component = default;
@@ -275,7 +280,12 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.Freezable result, in PrototypeMaterializationContext context = default) {
         result.IceBlockSize = this.IceBlockSize;
+        result.AutoBreakFrames = this.AutoBreakFrames;
+        result.AutoBreakGrabAdditionalFrames = this.AutoBreakGrabAdditionalFrames;
+        result.AutoBreakWhileHeld = this.AutoBreakWhileHeld;
+        result.Offset = this.Offset;
         result.IsCarryable = this.IsCarryable;
+        result.IsFlying = this.IsFlying;
         MaterializeUser(frame, ref result, in context);
     }
   }

@@ -2,7 +2,9 @@ using Photon.Deterministic;
 using UnityEngine;
 
 namespace Quantum {
-    public unsafe class PiranhaPlantSystem : SystemMainThreadFilterStage<PiranhaPlantSystem.Filter>, ISignalOnTileChanged, ISignalOnEnemyRespawned, ISignalOnBreakableObjectChangedHeight {
+    public unsafe class PiranhaPlantSystem : SystemMainThreadFilterStage<PiranhaPlantSystem.Filter>, ISignalOnTileChanged, ISignalOnEnemyRespawned,
+        ISignalOnBreakableObjectChangedHeight, ISignalOnIceBlockBroken {
+        
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -10,19 +12,23 @@ namespace Quantum {
             public Enemy* Enemy;
             public PhysicsCollider2D* Collider;
             public Interactable* Interactable;
+            public Freezable* Freezable;
         }
 
         public override void OnInit(Frame f) {
             InteractionSystem.RegisterInteraction<PiranhaPlant, MarioPlayer>(OnPiranhaPlantMarioInteraction);
             InteractionSystem.RegisterInteraction<PiranhaPlant, Projectile>(OnPiranhaPlantProjectileInteraction);
+            InteractionSystem.RegisterInteraction<PiranhaPlant, IceBlock>(OnPiranhaPlantIceBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var piranhaPlant = filter.PiranhaPlant;
             var transform = filter.Transform;
             var enemy = filter.Enemy;
+            var freezable = filter.Freezable;
 
-            if (!enemy->IsAlive) {
+            if (!enemy->IsAlive
+                || freezable->IsFrozen(f)) {
                 return;
             }
 
@@ -46,22 +52,36 @@ namespace Quantum {
                 }
             }
 
+
             FP change = 2 * f.DeltaTime * (chomping ? 1 : -1);
             piranhaPlant->PopupAnimationTime = FPMath.Clamp01(piranhaPlant->PopupAnimationTime + change);
-            filter.Interactable->ColliderDisabled = piranhaPlant->PopupAnimationTime == 0;
-            transform->Position = enemy->Spawnpoint + FPVector2.Up * (FP._0_25 + (piranhaPlant->PopupAnimationTime - 1) * FP._0_75);
+            filter.Interactable->ColliderDisabled = piranhaPlant->PopupAnimationTime < FP._0_10;
+            FPVector2 offset = FPVector2.Up * (FP._0_25 + (piranhaPlant->PopupAnimationTime - 1) * FP._0_75);
+            transform->Position = enemy->Spawnpoint + offset;
+
+            freezable->IceBlockSize.Y = FP.FromString("1.1") * piranhaPlant->PopupAnimationTime; 
+        }
+
+        public void OnPiranhaPlantIceBlockInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef iceBlockEntity) {
+            var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+
+            piranhaPlant->Kill(f, piranhaPlantEntity, iceBlockEntity, true);
         }
 
         public void OnPiranhaPlantProjectileInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef projectileEntity) {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
+            var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.Knockback: {
-                f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity)->Kill(f, piranhaPlantEntity, projectileEntity, true);
+                piranhaPlant->Kill(f, piranhaPlantEntity, projectileEntity, true);
                 break;
             }
             case ProjectileEffectType.Freeze: {
-                // TODO
+                EntityRef newIceBlock = IceBlockSystem.Freeze(f, piranhaPlantEntity);
+                var newIceBlockTransform = f.Unsafe.GetPointer<Transform2D>(newIceBlock);
+                newIceBlockTransform->Position.Y += (1 - piranhaPlant->PopupAnimationTime) * FP._0_75;
                 break;
             }
             }
@@ -115,6 +135,14 @@ namespace Quantum {
                 if (piranhaPlant->Pipe == breakableEntity && newHeight != breakable->OriginalHeight) {
                     piranhaPlant->Kill(f, piranhaPlantEntity, EntityRef.None, true);
                 }
+            }
+        }
+
+
+        public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
+            if (f.Unsafe.TryGetPointer(iceBlock->Entity, out PiranhaPlant* piranhaPlant)) {
+                piranhaPlant->Kill(f, iceBlock->Entity, brokenIceBlock, true);
             }
         }
     }

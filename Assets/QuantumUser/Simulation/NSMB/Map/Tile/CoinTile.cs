@@ -13,11 +13,15 @@ public unsafe class CoinTile : BreakableBrickTile {
             return true;
         }
 
-        if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario) && f.TryGet(entity, out Koopa koopa) && f.TryGet(entity, out Holdable holdable)) {
-            if (koopa.IsKicked && holdable.PreviousHolder.IsValid) {
-                f.Unsafe.TryGetPointer(holdable.PreviousHolder, out mario);
-                entity = holdable.PreviousHolder;
-            }
+        if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario) 
+            && f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
+            && koopa->IsKicked
+            && f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
+            && f.Exists(holdable->PreviousHolder)) {
+
+            // Talk to my dad, his name is mario :)
+            f.Unsafe.TryGetPointer(holdable->PreviousHolder, out mario);
+            entity = holdable->PreviousHolder;
         }
 
         if (mario == null) {

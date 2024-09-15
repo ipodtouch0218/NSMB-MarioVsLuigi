@@ -253,6 +253,7 @@ GameObject:
   - component: {fileID: 3502500067357238800}
   - component: {fileID: 1515450150619802232}
   - component: {fileID: -805149708868906492}
+  - component: {fileID: 8366835173838899577}
   m_Layer: 0
   m_Name: PiranhaPlant
   m_TagString: Untagged
@@ -535,10 +536,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    WaitingFrames: 0
-    ChompFrames: 0
-    PopupAnimationTime:
-      RawValue: 0
+    Pipe: {fileID: 0}
 --- !u!114 &8006284552651083082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -557,12 +555,6 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
-    IsActive:
-      Value: 0
-    IsDead:
-      Value: 0
-    FacingRight:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 1
 --- !u!114 &3502500067357238800
@@ -578,16 +570,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -599,21 +581,6 @@ MonoBehaviour:
       Value: 1
     DisableCollision:
       Value: 0
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &1515450150619802232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -644,4 +611,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     ColliderDisabled:
+      Value: 0
+--- !u!114 &8366835173838899577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6254190274066690703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f09a56673702987429020c58e2d51615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    IceBlockSize:
+      X:
+        RawValue: 49152
+      Y:
+        RawValue: 88474
+    AutoBreakFrames: 180
+    AutoBreakGrabAdditionalFrames: 0
+    AutoBreakWhileHeld:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    IsCarryable:
       Value: 0

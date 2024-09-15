@@ -4,10 +4,13 @@ component IceBlock {
 	FP SlidingSpeed;
 	[ExcludeFromPrototype] entity_ref Entity;
 	[ExcludeFromPrototype] FPVector2 Size;
-	[ExcludeFromPrototype] FP ChildOffset;
+	[ExcludeFromPrototype] FPVector2 ChildOffset;
 	[ExcludeFromPrototype] bool IsFlying;
 	[ExcludeFromPrototype] bool IsSliding;
 	[ExcludeFromPrototype] bool FacingRight;
+	[ExcludeFromPrototype] byte AutoBreakFrames;
+	[ExcludeFromPrototype] byte WaterColliderCount;
+	[ExcludeFromPrototype] bool IsInPoison;
 }
 
 signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason);

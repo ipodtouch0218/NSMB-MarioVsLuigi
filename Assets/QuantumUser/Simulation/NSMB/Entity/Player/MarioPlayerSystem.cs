@@ -1210,6 +1210,8 @@ namespace Quantum {
             var interactable = f.Unsafe.GetPointer<Interactable>(filter.Entity);
             var currentPipe = f.Unsafe.GetPointer<EnterablePipe>(mario->CurrentPipe);
 
+            mario->IsGroundpounding = false;
+            mario->IsGroundpoundActive = false;
             interactable->ColliderDisabled = true;
             physicsObject->Velocity = mario->PipeDirection;
             physicsObject->DisableCollision = true;
@@ -1476,9 +1478,41 @@ namespace Quantum {
             }
         }
 
-        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, bool* doSplash) {
-            if (f.TryGet(entity, out MarioPlayer mario)) {
-                *doSplash = !mario.IsDead && !f.Exists(mario.CurrentPipe);
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                return;
+            }
+
+            *doSplash = !mario->IsDead && !f.Exists(mario->CurrentPipe);
+
+            if (!*doSplash) {
+                return;
+            }
+
+            var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
+
+            if (exit) {
+                if (liquid->LiquidType == LiquidType.Water) {
+                    mario->WaterColliderCount--;
+                    if (QuantumUtils.Decrement(ref mario->WaterColliderCount)) {
+                        // Jump
+                        mario->SwimExitForceJump = true;
+                    }
+                }
+            } else {
+                switch (liquid->LiquidType) {
+                case LiquidType.Water:
+                    mario->WaterColliderCount++;
+                    break;
+                case LiquidType.Lava:
+                    // Kill, fire death
+                    mario->Death(f, entity, true);
+                    break;
+                case LiquidType.Poison:
+                    // Kill, normal death
+                    mario->Death(f, entity, false);
+                    break;
+                }
             }
         }
 
@@ -1513,8 +1547,8 @@ namespace Quantum {
             var projectileAsset = f.FindAsset(projectile->Asset);
             bool dropStars = true;
 
-            if (f.TryGet(projectile->Owner, out MarioPlayer ownerMario)) {
-                dropStars = ownerMario.Team == mario->Team;
+            if (f.Unsafe.TryGetPointer(projectile->Owner, out MarioPlayer* ownerMario)) {
+                dropStars = ownerMario->Team == mario->Team;
             }
 
             if (!mario->IsInKnockback

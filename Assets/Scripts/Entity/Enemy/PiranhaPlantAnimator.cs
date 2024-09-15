@@ -30,7 +30,10 @@ public class PiranhaPlantAnimator : MonoBehaviour {
             return;
         }
 
-        PiranhaPlant piranhaPlant = f.Get<PiranhaPlant>(entity.EntityRef);
+        var freezable = f.Get<Freezable>(entity.EntityRef);
+        animator.speed = freezable.IsFrozen(f) ? 0 : 1;
+
+        var piranhaPlant = f.Get<PiranhaPlant>(entity.EntityRef);
         animator.SetBool("active", piranhaPlant.ChompFrames > 0);
         animator.SetBool("chomping", piranhaPlant.PopupAnimationTime == 1);
         sRenderer.enabled = piranhaPlant.PopupAnimationTime != 0;
@@ -46,5 +49,6 @@ public class PiranhaPlantAnimator : MonoBehaviour {
         }
 
         sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Death);
+        sfx.PlayOneShot(SoundEffect.Enemy_Shell_Kick);
     }
 }
