@@ -52,10 +52,14 @@ public class BulletBillAnimator : MonoBehaviour {
         }
 
         var enemy = f.Get<Enemy>(entity.EntityRef);
+        var freezable = f.Get<Freezable>(entity.EntityRef);
+        bool frozen = freezable.IsFrozen(f);
+
         sRenderer.enabled = enemy.IsActive;
 
         var emission = trailParticles.emission;
-        emission.enabled = enemy.IsActive;
+        emission.enabled = enemy.IsActive && !frozen;
+        legacyAnimation.enabled = !frozen;
 
         if (enemy.IsDead) {
             transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);

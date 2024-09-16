@@ -1,7 +1,8 @@
 using Photon.Deterministic;
+using UnityEngine.UIElements;
 
 namespace Quantum {
-    public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill> {
+    public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill>, ISignalOnIceBlockBroken {
 
         public override void OnInit(Frame f) {
             InteractionSystem.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
@@ -54,8 +55,10 @@ namespace Quantum {
                 launcher->BulletBillCount++;
             }
 
-            var bulletBills = f.Filter<BulletBill, Transform2D, Enemy, PhysicsObject>();
-            while (bulletBills.NextUnsafe(out EntityRef entity, out BulletBill* bulletBill, out Transform2D* transform, out Enemy* enemy, out PhysicsObject* physicsObject)) {
+            var bulletBills = f.Filter<BulletBill, Transform2D, Enemy, PhysicsObject, Freezable>();
+            while (bulletBills.NextUnsafe(out EntityRef entity, out BulletBill* bulletBill, out Transform2D* transform, 
+                out Enemy* enemy, out PhysicsObject* physicsObject, out Freezable* freezable)) {
+
                 if (!enemy->IsAlive) {
                     if (bulletBill->DespawnFrames == 0) {
                         bulletBill->DespawnFrames = 255;
@@ -64,6 +67,10 @@ namespace Quantum {
                     if (QuantumUtils.Decrement(ref bulletBill->DespawnFrames)) {
                         f.Destroy(entity);
                     }
+                    continue;
+                }
+
+                if (freezable->IsFrozen(f)) {
                     continue;
                 }
 
@@ -158,6 +165,14 @@ namespace Quantum {
         public void OnRemoved(Frame f, EntityRef entity, BulletBill* component) {
             if (f.Unsafe.TryGetPointer(component->Owner, out BulletBillLauncher* launcher)) {
                 launcher->BulletBillCount--;
+            }
+        }
+
+        public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
+            if (f.Unsafe.TryGetPointer(iceBlock->Entity, out BulletBill* bulletBill)) {
+                bulletBill->Kill(f, iceBlock->Entity, brokenIceBlock, false);
+                f.Events.PlayComboSound(f, iceBlock->Entity, 0);
             }
         }
     }

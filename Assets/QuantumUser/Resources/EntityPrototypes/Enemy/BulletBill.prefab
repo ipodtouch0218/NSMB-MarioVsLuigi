@@ -5518,9 +5518,9 @@ MonoBehaviour:
   Prototype:
     IceBlockSize:
       X:
-        RawValue: 34079
+        RawValue: 45875
       Y:
-        RawValue: 27525
+        RawValue: 29491
     AutoBreakFrames: 180
     AutoBreakGrabAdditionalFrames: 0
     AutoBreakWhileHeld:
@@ -5532,6 +5532,8 @@ MonoBehaviour:
         RawValue: 0
     IsCarryable:
       Value: 1
+    IsFlying:
+      Value: 0
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

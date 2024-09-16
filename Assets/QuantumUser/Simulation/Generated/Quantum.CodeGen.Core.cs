@@ -1267,10 +1267,13 @@ namespace Quantum {
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public FPVector2 ChildOffset;
-    [FieldOffset(12)]
+    [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public QBoolean IsFlying;
-    [FieldOffset(16)]
+    [FieldOffset(12)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsFalling;
+    [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public QBoolean IsSliding;
     [FieldOffset(8)]
@@ -1293,6 +1296,7 @@ namespace Quantum {
         hash = hash * 31 + Size.GetHashCode();
         hash = hash * 31 + ChildOffset.GetHashCode();
         hash = hash * 31 + IsFlying.GetHashCode();
+        hash = hash * 31 + IsFalling.GetHashCode();
         hash = hash * 31 + IsSliding.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + AutoBreakFrames.GetHashCode();
@@ -1307,6 +1311,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->WaterColliderCount);
         serializer.Stream.Serialize((byte*)&p->InLiquidType);
         QBoolean.Serialize(&p->FacingRight, serializer);
+        QBoolean.Serialize(&p->IsFalling, serializer);
         QBoolean.Serialize(&p->IsFlying, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);
         EntityRef.Serialize(&p->Entity, serializer);

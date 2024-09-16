@@ -20,6 +20,7 @@ public class IceBlockAnimator : MonoBehaviour {
     }
 
     public void Start() {
+        QuantumEvent.Subscribe<EventIceBlockSinking>(this, OnIceBlockSinking);
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
@@ -55,5 +56,15 @@ public class IceBlockAnimator : MonoBehaviour {
 
     public void Destroyed(QuantumGame game) {
         Instantiate(breakPrefab, transform.position, Quaternion.identity);
+    }
+
+    private void OnIceBlockSinking(EventIceBlockSinking e) {
+        if (e.Entity != entity.EntityRef) {
+            return;
+        }
+
+        if (e.LiquidType == LiquidType.Lava) {
+            sfx.PlayOneShot(SoundEffect.Enemy_Generic_FreezeMelt);
+        }
     }
 }

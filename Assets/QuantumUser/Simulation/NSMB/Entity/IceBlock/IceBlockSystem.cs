@@ -22,6 +22,11 @@ namespace Quantum {
         public override void Update(Frame f, ref Filter filter) {
             var entity = filter.Entity;
             var iceBlock = filter.IceBlock;
+            if (!f.Exists(iceBlock->Entity)) {
+                // Child despawned.
+                Destroy(f, entity, IceBlockBreakReason.None);
+            }
+
             var transform = filter.Transform;
             var childFreezable = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
             var physicsObject = filter.PhysicsObject;
@@ -32,12 +37,15 @@ namespace Quantum {
             }
 
             if (iceBlock->IsSliding) {
+                physicsObject->IsFrozen = false;
                 physicsObject->Velocity.X = iceBlock->SlidingSpeed * (iceBlock->FacingRight ? 1 : -1);
 
                 if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                     Destroy(f, entity, IceBlockBreakReason.HitWall);
                     return;
                 }
+            } else if (iceBlock->IsFlying) {
+                physicsObject->IsFrozen = true;
             }
 
             if (iceBlock->WaterColliderCount > 0) {
@@ -214,6 +222,9 @@ namespace Quantum {
                 var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
                 iceBlock->InLiquidType = liquid->LiquidType;
 
+                if (iceBlock->InLiquidType != LiquidType.Water) {
+                    f.Events.IceBlockSinking(entity, iceBlock->InLiquidType);
+                }
             } else if (f.Unsafe.TryGetPointer(entity, out Freezable* freezable)) {
                 *doSplash &= !freezable->IsFrozen(f);
             }

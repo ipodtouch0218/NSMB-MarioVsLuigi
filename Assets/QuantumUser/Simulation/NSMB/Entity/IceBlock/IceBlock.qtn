@@ -7,6 +7,7 @@ component IceBlock {
 	[ExcludeFromPrototype] FPVector2 Size;
 	[ExcludeFromPrototype] FPVector2 ChildOffset;
 	[ExcludeFromPrototype] bool IsFlying;
+	[ExcludeFromPrototype] bool IsFalling;
 	[ExcludeFromPrototype] bool IsSliding;
 	[ExcludeFromPrototype] bool FacingRight;
 	[ExcludeFromPrototype] byte AutoBreakFrames;
@@ -15,3 +16,8 @@ component IceBlock {
 }
 
 signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason);
+
+event IceBlockSinking {
+	EntityRef Entity;
+	LiquidType LiquidType;
+}
