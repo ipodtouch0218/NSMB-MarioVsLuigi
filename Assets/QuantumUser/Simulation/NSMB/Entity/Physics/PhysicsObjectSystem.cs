@@ -94,7 +94,13 @@ namespace Quantum {
             }
 
             if (!maxVelocity.HasValue) {
-                physicsObject->Velocity += physicsObject->ParentVelocity;
+                // exclusion: jumping off downwards platform eating velocity.
+                FPVector2 adjustment = physicsObject->ParentVelocity;
+                if (physicsObject->Velocity.Y > 0 && adjustment.Y < 0) {
+                    adjustment.Y = 0;
+                }
+
+                physicsObject->Velocity += adjustment;
                 physicsObject->ParentVelocity = FPVector2.Zero;
                 return;
             }
@@ -394,7 +400,6 @@ namespace Quantum {
                             }
                         }
 
-                        Draw.Ray(hit.Point, FPVector2.Right, ColorRGBA.Cyan);
                         potentialContacts.Add(new PhysicsContact {
                             Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.X) - RaycastSkin,
                             Normal = hit.Normal,
@@ -511,7 +516,6 @@ namespace Quantum {
 
         public static bool Raycast(Frame f, VersusStageData stage, FPVector2 position, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
 
-            Draw.Ray(position, direction.Normalized * maxDistance);
             contact = default;
             FPVector2 stepSize = new(
                 direction.X == 0 ? 0 : FPMath.Sqrt(1 + (direction.Y / direction.X) * (direction.Y / direction.X)),

@@ -53,6 +53,7 @@ namespace Quantum {
             HandleGroundpound(f, ref filter, physics, input, stage);
             HandleSliding(f, ref filter, physics, input);
             HandleWalkingRunning(f, ref filter, physics, input);
+            HandleSpinners(f, ref filter, stage);
             HandleJumping(f, ref filter, physics, input);
             HandleSwimming(f, ref filter, physics, input);
             HandleBlueShell(f, ref filter, physics, input, stage);
@@ -316,29 +317,31 @@ namespace Quantum {
                 return;
             }
 
-            /*
-            if (!mario->DoEntityBounce && OnSpinner && !HeldEntity) {
+            if (f.Exists(mario->CurrentSpinner) && !f.Exists(mario->HeldEntity)) {
                 // Jump of spinner
-                body.Velocity = new(body.Velocity.x, launchVelocity);
-                IsSpinnerFlying = true;
-                SpinnerLaunchAnimCounter++;
-                IsOnGround = false;
-                PreviousTickIsOnGround = false;
-                IsCrouching = false;
-                IsInShell = false;
-                IsSkidding = false;
-                IsTurnaround = false;
-                IsSliding = false;
-                WallSlideEndTimer = TickTimer.None;
-                IsGroundpounding = false;
-                GroundpoundStartTimer = TickTimer.None;
-                IsDrilling = false;
-                IsPropellerFlying = false;
-                OnSpinner.ArmPosition = 0;
-                OnSpinner = null;
+                physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
+                
+                mario->IsSkidding = false;
+                mario->IsTurnaround = false;
+                mario->IsSliding = false;
+                mario->WallslideEndFrames = 0;
+                mario->IsGroundpounding = false;
+                mario->GroundpoundStartFrames = 0;
+                mario->IsDrilling = false;
+                mario->IsSpinnerFlying = true;
+                mario->IsPropellerFlying = false;
+                mario->SwimExitForceJump = false;
+                mario->JumpBufferFrames = 0;
+                mario->WasTouchingGroundLastFrame = false;
+                physicsObject->IsTouchingGround = false;
+
+                // Disable koyote time
+                mario->CoyoteTimeFrames = 0;
+
+                f.Events.MarioPlayerUsedSpinner(f, filter.Entity, mario->CurrentSpinner);
+                mario->CurrentSpinner = EntityRef.None;
                 return;
             }
-            */
 
             bool topSpeed = FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
             bool canSpecialJump = topSpeed && !inputs.Down.IsDown && (doJump || (mario->DoEntityBounce && inputs.Jump.IsDown)) && mario->JumpState != JumpState.None && !mario->IsSpinnerFlying && !mario->IsPropellerFlying && ((f.Number - mario->LandedFrame < 12) || mario->DoEntityBounce) && !mario->HeldEntity.IsValid && mario->JumpState != JumpState.TripleJump && !mario->IsCrouching && !mario->IsInShell && (physicsObject->Velocity.X < 0 != mario->FacingRight) /* && !Runner.GetPhysicsScene2D().Raycast(body.Position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround) */;
@@ -1329,6 +1332,47 @@ namespace Quantum {
                 if (playBumpSound ?? true) {
                     f.Events.PlayBumpSound(f, filter.Entity);
                 }
+            }
+        }
+
+        private void HandleSpinners(Frame f, ref Filter filter, VersusStageData stage) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+            
+            if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
+                return;
+            }
+
+            mario->IsSpinnerFlying &= !physicsObject->IsTouchingGround;
+
+            EntityRef currentSpinner = EntityRef.None;
+            foreach (var contact in contacts) {
+                if (f.Has<Spinner>(contact.Entity)
+                    && FPVector2.Dot(contact.Normal, FPVector2.Up) > PhysicsObjectSystem.GroundMaxAngle) {
+                    currentSpinner = contact.Entity;
+                    break;
+                }
+            }
+
+            mario->CurrentSpinner = currentSpinner;
+
+            if (currentSpinner == EntityRef.None) {
+                return;
+            }
+
+            // We have a spinner
+            if (FPMath.Abs(physicsObject->Velocity.X) > FP._0_10) {
+                // Too fast to be auto-moved
+                return;
+            }
+
+            var transform = filter.Transform;
+            var spinnerTransform = f.Unsafe.GetPointer<Transform2D>(currentSpinner);
+
+            FP moveVelocity = QuantumUtils.MoveTowards(transform->Position.X, spinnerTransform->Position.X, 1) - transform->Position.X;
+
+            if (FPMath.Abs(moveVelocity) > 0) {
+                PhysicsObjectSystem.MoveHorizontally(f, moveVelocity, filter.Entity, stage, contacts);
             }
         }
 

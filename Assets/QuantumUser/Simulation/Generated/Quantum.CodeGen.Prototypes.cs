@@ -551,6 +551,7 @@ namespace Quantum.Prototypes {
     public QBoolean PipeEntering;
     public Byte PipeFrames;
     public Byte PipeCooldownFrames;
+    public MapEntityId CurrentSpinner;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.MarioPlayer component = default;
         Materialize((Frame)f, ref component, in context);
@@ -633,6 +634,7 @@ namespace Quantum.Prototypes {
         result.PipeEntering = this.PipeEntering;
         result.PipeFrames = this.PipeFrames;
         result.PipeCooldownFrames = this.PipeCooldownFrames;
+        PrototypeValidator.FindMapEntity(this.CurrentSpinner, in context, out result.CurrentSpinner);
     }
   }
   [System.SerializableAttribute()]
@@ -741,6 +743,25 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.Projectile result, in PrototypeMaterializationContext context = default) {
         result.Asset = this.Asset;
         result.Speed = this.Speed;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Spinner))]
+  public unsafe partial class SpinnerPrototype : ComponentPrototype<Quantum.Spinner> {
+    public FP ArmMoveSpeed;
+    public FP ArmMoveDistance;
+    public FP ArmPosition;
+    partial void MaterializeUser(Frame frame, ref Quantum.Spinner result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Spinner component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Spinner result, in PrototypeMaterializationContext context = default) {
+        result.ArmMoveSpeed = this.ArmMoveSpeed;
+        result.ArmMoveDistance = this.ArmMoveDistance;
+        result.ArmPosition = this.ArmPosition;
         MaterializeUser(frame, ref result, in context);
     }
   }

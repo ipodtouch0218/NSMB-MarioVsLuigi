@@ -15,6 +15,7 @@ namespace Quantum {
             systems.Add(
                 new GameplaySystemGroup(
                     new GenericMoverSystem(),
+                    new SpinnerSystem(),
                     new MovingPlatformSystem(),
                     new EnemySystem(),
                     new InteractionSystem(),

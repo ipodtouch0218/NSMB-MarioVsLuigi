@@ -100,6 +100,7 @@ public class MarioPlayerPhysicsInfo : AssetObject {
     // --- Flying
     public FP[] FlyingMaxVelocity = FF(new[] { 1.12060546875f, 2.8125f });
     public FP[] FlyingAcceleration = FF(new[] { 7.91015625f, 3.955078125f });
+    public FP SpinnerLaunchVelocity = 12;
 
     // --- Knockback
     public FP KnockbackDeceleration = FF(7.9101585f);

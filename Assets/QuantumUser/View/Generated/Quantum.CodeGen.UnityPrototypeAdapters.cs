@@ -144,6 +144,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean PipeEntering;
     public Byte PipeFrames;
     public Byte PipeCooldownFrames;
+    public Quantum.QuantumEntityPrototype CurrentSpinner;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.MarioPlayerPrototype prototype);
     public override Quantum.Prototypes.MarioPlayerPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.MarioPlayerPrototype();
@@ -223,6 +224,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.PipeEntering, out result.PipeEntering);
       converter.Convert(this.PipeFrames, out result.PipeFrames);
       converter.Convert(this.PipeCooldownFrames, out result.PipeCooldownFrames);
+      converter.Convert(this.CurrentSpinner, out result.CurrentSpinner);
       ConvertUser(converter, ref result);
       return result;
     }

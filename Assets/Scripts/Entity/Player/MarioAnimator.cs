@@ -147,6 +147,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerReceivedKnockback>(this, OnMarioPlayerReceivedKnockback);
             QuantumEvent.Subscribe<EventMarioPlayerEnteredPipe>(this, OnMarioPlayerEnteredPipe);
             QuantumEvent.Subscribe<EventMarioPlayerStoppedSliding>(this, OnMarioPlayerStoppedSliding);
+            QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner);
 
             stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
@@ -795,7 +796,7 @@ namespace NSMB.Entities.Player {
             }
 
             animator.SetTrigger("fireball");
-            sfx.PlayOneShot(e.Mario.CurrentPowerupState == PowerupState.IceFlower ? SoundEffect.Powerup_Iceball_Shoot : SoundEffect.Powerup_Fireball_Shoot);
+            PlaySound(e.Mario.CurrentPowerupState == PowerupState.IceFlower ? SoundEffect.Powerup_Iceball_Shoot : SoundEffect.Powerup_Fireball_Shoot);
         }
 
         private void OnMarioPlayerWalljumped(EventMarioPlayerWalljumped e) {
@@ -994,7 +995,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            sfx.PlayOneShot(SoundEffect.Player_Sound_Powerdown);
+            PlaySound(SoundEffect.Player_Sound_Powerdown);
         }
 
         private void OnMarioPlayerStoppedSliding(EventMarioPlayerStoppedSliding e) {
@@ -1003,8 +1004,16 @@ namespace NSMB.Entities.Player {
             }
 
             if (e.IsStationary) {
-                sfx.PlayOneShot(SoundEffect.Player_Sound_SlideEnd);
+                PlaySound(SoundEffect.Player_Sound_SlideEnd);
             }
+        }
+
+        private void OnMarioPlayerUsedSpinner(EventMarioPlayerUsedSpinner e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            PlaySound(SoundEffect.Player_Voice_SpinnerLaunch);
         }
     }
 }

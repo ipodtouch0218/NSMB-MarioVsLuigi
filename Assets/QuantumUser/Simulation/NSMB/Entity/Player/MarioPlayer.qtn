@@ -120,6 +120,8 @@ component MarioPlayer {
 	bool PipeEntering;
 	byte PipeFrames;
 	byte PipeCooldownFrames;
+
+	entity_ref CurrentSpinner;
 }
 
 event MarioPlayerJumped {
@@ -256,4 +258,10 @@ event MarioPlayerStoppedSliding {
 	nothashed Frame Frame;
 	entity_ref Entity;
 	bool IsStationary;
+}
+
+event MarioPlayerUsedSpinner {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	entity_ref Spinner;
 }

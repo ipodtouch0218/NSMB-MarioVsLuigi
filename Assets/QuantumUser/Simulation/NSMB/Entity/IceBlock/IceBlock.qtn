@@ -7,7 +7,6 @@ component IceBlock {
 	[ExcludeFromPrototype] FPVector2 Size;
 	[ExcludeFromPrototype] FPVector2 ChildOffset;
 	[ExcludeFromPrototype] bool IsFlying;
-	[ExcludeFromPrototype] bool IsFalling;
 	[ExcludeFromPrototype] bool IsSliding;
 	[ExcludeFromPrototype] bool FacingRight;
 	[ExcludeFromPrototype] byte AutoBreakFrames;

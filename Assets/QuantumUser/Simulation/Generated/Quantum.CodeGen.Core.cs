@@ -1267,13 +1267,10 @@ namespace Quantum {
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public FPVector2 ChildOffset;
-    [FieldOffset(16)]
-    [ExcludeFromPrototype()]
-    public QBoolean IsFlying;
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
-    public QBoolean IsFalling;
-    [FieldOffset(20)]
+    public QBoolean IsFlying;
+    [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public QBoolean IsSliding;
     [FieldOffset(8)]
@@ -1296,7 +1293,6 @@ namespace Quantum {
         hash = hash * 31 + Size.GetHashCode();
         hash = hash * 31 + ChildOffset.GetHashCode();
         hash = hash * 31 + IsFlying.GetHashCode();
-        hash = hash * 31 + IsFalling.GetHashCode();
         hash = hash * 31 + IsSliding.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + AutoBreakFrames.GetHashCode();
@@ -1311,7 +1307,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->WaterColliderCount);
         serializer.Stream.Serialize((byte*)&p->InLiquidType);
         QBoolean.Serialize(&p->FacingRight, serializer);
-        QBoolean.Serialize(&p->IsFalling, serializer);
         QBoolean.Serialize(&p->IsFlying, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);
         EntityRef.Serialize(&p->Entity, serializer);
@@ -1489,7 +1484,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 232;
+    public const Int32 SIZE = 240;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(184)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
@@ -1629,13 +1624,13 @@ namespace Quantum {
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(22)]
     public Byte PropellerDrillCooldown;
-    [FieldOffset(208)]
+    [FieldOffset(216)]
     public EntityRef HeldEntity;
     [FieldOffset(56)]
     public Int32 HoldStartFrame;
     [FieldOffset(200)]
     public EntityRef CurrentPipe;
-    [FieldOffset(216)]
+    [FieldOffset(224)]
     public FPVector2 PipeDirection;
     [FieldOffset(152)]
     public QBoolean PipeEntering;
@@ -1643,6 +1638,8 @@ namespace Quantum {
     public Byte PipeFrames;
     [FieldOffset(17)]
     public Byte PipeCooldownFrames;
+    [FieldOffset(208)]
+    public EntityRef CurrentSpinner;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 5503;
@@ -1722,6 +1719,7 @@ namespace Quantum {
         hash = hash * 31 + PipeEntering.GetHashCode();
         hash = hash * 31 + PipeFrames.GetHashCode();
         hash = hash * 31 + PipeCooldownFrames.GetHashCode();
+        hash = hash * 31 + CurrentSpinner.GetHashCode();
         return hash;
       }
     }
@@ -1801,6 +1799,7 @@ namespace Quantum {
         AssetRef.Serialize(&p->PhysicsAsset, serializer);
         AssetRef.Serialize(&p->ReserveItem, serializer);
         EntityRef.Serialize(&p->CurrentPipe, serializer);
+        EntityRef.Serialize(&p->CurrentSpinner, serializer);
         EntityRef.Serialize(&p->HeldEntity, serializer);
         FPVector2.Serialize(&p->PipeDirection, serializer);
     }
@@ -2075,6 +2074,73 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct Spinner : Quantum.IComponent {
+    public const Int32 SIZE = 56;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(24)]
+    public FP ArmMoveSpeed;
+    [FieldOffset(16)]
+    public FP ArmMoveDistance;
+    [FieldOffset(32)]
+    public FP ArmPosition;
+    [FieldOffset(40)]
+    [ExcludeFromPrototype()]
+    public FP PlatformHeight;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    [AllocateOnComponentAdded()]
+    [FreeOnComponentRemoved()]
+    public QHashSetPtr<EntityRef> MariosOnPlatform;
+    [FieldOffset(48)]
+    [ExcludeFromPrototype()]
+    public FP Rotation;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public FP AngularVelocity;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public Byte RotationWaitFrames;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 2999;
+        hash = hash * 31 + ArmMoveSpeed.GetHashCode();
+        hash = hash * 31 + ArmMoveDistance.GetHashCode();
+        hash = hash * 31 + ArmPosition.GetHashCode();
+        hash = hash * 31 + PlatformHeight.GetHashCode();
+        hash = hash * 31 + MariosOnPlatform.GetHashCode();
+        hash = hash * 31 + Rotation.GetHashCode();
+        hash = hash * 31 + AngularVelocity.GetHashCode();
+        hash = hash * 31 + RotationWaitFrames.GetHashCode();
+        return hash;
+      }
+    }
+    public void ClearPointers(FrameBase f, EntityRef entity) {
+      if (MariosOnPlatform != default) f.FreeHashSet(ref MariosOnPlatform);
+    }
+    public static void OnRemoved(FrameBase frame, EntityRef entity, void* ptr) {
+      var p = (Quantum.Spinner*)ptr;
+      p->ClearPointers((Frame)frame, entity);
+    }
+    public void AllocatePointers(FrameBase f, EntityRef entity) {
+      f.TryAllocateHashSet(ref MariosOnPlatform);
+    }
+    public static void OnAdded(FrameBase frame, EntityRef entity, void* ptr) {
+      var p = (Quantum.Spinner*)ptr;
+      p->AllocatePointers((Frame)frame, entity);
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (Spinner*)ptr;
+        serializer.Stream.Serialize(&p->RotationWaitFrames);
+        QHashSet.Serialize(&p->MariosOnPlatform, serializer, Statics.SerializeEntityRef);
+        FP.Serialize(&p->AngularVelocity, serializer);
+        FP.Serialize(&p->ArmMoveDistance, serializer);
+        FP.Serialize(&p->ArmMoveSpeed, serializer);
+        FP.Serialize(&p->ArmPosition, serializer);
+        FP.Serialize(&p->PlatformHeight, serializer);
+        FP.Serialize(&p->Rotation, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct WrappingObject : Quantum.IComponent {
     public const Int32 SIZE = 4;
     public const Int32 ALIGNMENT = 4;
@@ -2266,6 +2332,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.Powerup>();
       BuildSignalsArrayOnComponentAdded<Quantum.Projectile>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Projectile>();
+      BuildSignalsArrayOnComponentAdded<Quantum.Spinner>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.Spinner>();
       BuildSignalsArrayOnComponentAdded<Transform2D>();
       BuildSignalsArrayOnComponentRemoved<Transform2D>();
       BuildSignalsArrayOnComponentAdded<Transform2DVertical>();
@@ -2555,6 +2623,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(RNGSession), RNGSession.SIZE);
       typeRegistry.Register(typeof(Shape2D), Shape2D.SIZE);
       typeRegistry.Register(typeof(Shape3D), Shape3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.Spinner), Quantum.Spinner.SIZE);
       typeRegistry.Register(typeof(SpringJoint), SpringJoint.SIZE);
       typeRegistry.Register(typeof(SpringJoint3D), SpringJoint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.StageTileInstance), Quantum.StageTileInstance.SIZE);
@@ -2566,7 +2635,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 28)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 29)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
@@ -2595,6 +2664,7 @@ namespace Quantum {
         .Add<Quantum.PiranhaPlant>(Quantum.PiranhaPlant.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Powerup>(Quantum.Powerup.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Projectile>(Quantum.Projectile.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.Spinner>(Quantum.Spinner.Serialize, Quantum.Spinner.OnAdded, Quantum.Spinner.OnRemoved, ComponentFlags.None)
         .Add<Quantum.WrappingObject>(Quantum.WrappingObject.Serialize, null, null, ComponentFlags.None)
         .Finish();
     }
