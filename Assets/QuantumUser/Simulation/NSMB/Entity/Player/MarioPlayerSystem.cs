@@ -143,7 +143,7 @@ namespace Quantum {
             FP xVel = physicsObject->Velocity.X;
             FP xVelAbs = FPMath.Abs(xVel);
             FP sign = FPMath.Sign(xVel);
-            bool uphill = FPMath.Sign(physicsObject->FloorAngle) == sign;
+            bool uphill = FPMath.Abs(physicsObject->FloorAngle) > physics.SlideMinimumAngle && FPMath.Sign(physicsObject->FloorAngle) != sign;
 
             if (!physicsObject->IsTouchingGround) {
                 mario->FastTurnaroundFrames = 0;
@@ -317,7 +317,7 @@ namespace Quantum {
                 return;
             }
 
-            if (f.Exists(mario->CurrentSpinner) && !f.Exists(mario->HeldEntity)) {
+            if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= 0 && !f.Exists(mario->HeldEntity)) {
                 // Jump of spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
                 
@@ -1369,7 +1369,7 @@ namespace Quantum {
             var transform = filter.Transform;
             var spinnerTransform = f.Unsafe.GetPointer<Transform2D>(currentSpinner);
 
-            FP moveVelocity = QuantumUtils.MoveTowards(transform->Position.X, spinnerTransform->Position.X, 1) - transform->Position.X;
+            FP moveVelocity = QuantumUtils.MoveTowards(transform->Position.X, spinnerTransform->Position.X, 4) - transform->Position.X;
 
             if (FPMath.Abs(moveVelocity) > 0) {
                 PhysicsObjectSystem.MoveHorizontally(f, moveVelocity, filter.Entity, stage, contacts);
@@ -1413,6 +1413,7 @@ namespace Quantum {
                             physicsObject->Velocity = FPVector2.Up * 7;
                             physicsObject->IsFrozen = false;
                             physicsObject->DisableCollision = true;
+                            f.Events.MarioPlayerDeathUp(f, filter.Entity);
                         }
                         if (!spawnAgain) {
                             mario->PreRespawnFrames = 144;

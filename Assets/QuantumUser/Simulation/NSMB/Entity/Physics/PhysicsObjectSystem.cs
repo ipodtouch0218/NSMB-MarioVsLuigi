@@ -732,8 +732,10 @@ namespace Quantum {
             return PointIsInsidePolygon(testPosition, boxCorners);
         }
 
-        public static bool BoxInsideTile(Frame f, FPVector2 position, Shape2D shape) {
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+        public static bool BoxInsideTile(Frame f, FPVector2 position, Shape2D shape, VersusStageData stage = null) {
+            if (!stage) {
+                stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            }
             var extents = shape.Box.Extents;
 
             FPVector2 origin = position + shape.Centroid;
@@ -758,11 +760,12 @@ namespace Quantum {
                         continue;
                     }
                     FPVector2[][] tilePolygons = tileInstance.GetWorldPolygons(tile, QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y)));
-                    if (tilePolygons.Length <= 2) {
-                        continue;
-                    }
 
                     foreach (var polygon in tilePolygons) {
+                        if (polygon.Length <= 2) {
+                            continue;
+                        }
+
                         foreach (var corner in boxCorners) {
                             if (PointIsInsidePolygon(corner, polygon)) {
                                 return true;

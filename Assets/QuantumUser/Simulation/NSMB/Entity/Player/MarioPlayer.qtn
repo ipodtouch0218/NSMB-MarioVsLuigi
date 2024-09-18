@@ -195,7 +195,13 @@ event MarioPlayerPropellerSpin {
 synced event MarioPlayerDied {
 	Frame Frame;
 	entity_ref Entity;
+	bool IsLava;
 	MarioPlayer Mario;
+}
+
+event MarioPlayerDeathUp {
+	nothashed Frame Frame;
+	EntityRef Entity;
 }
 
 synced event MarioPlayerTookDamage {

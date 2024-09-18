@@ -92,6 +92,9 @@ namespace Quantum {
             Transform2D transform = new() {
                 Position = position
             };
+
+            Draw.Rectangle(position + FPVector2.Up * (extents.Y + FP._0_25), extents * 2, 0);
+
             var hits = f.Physics2D.OverlapShape(transform, Shape2D.CreateBox(extents, FPVector2.Up * (extents.Y + FP._0_25)));
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits[i];

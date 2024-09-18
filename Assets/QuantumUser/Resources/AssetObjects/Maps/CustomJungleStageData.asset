@@ -55,7 +55,7 @@ MonoBehaviour:
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 0
   SpawnVerticalPowerups: 1
-  MainMusic: {fileID: 11400000, guid: 853814253b9d46741895bfc7bc7b2972, type: 2}
+  MainMusic: {fileID: 11400000, guid: 617713047951d2f4aa8a780bf95df792, type: 2}
   InvincibleMusic: {fileID: 11400000, guid: 628804e165b231243abe39caa050a76c, type: 2}
   MegaMushroomMusic: {fileID: 11400000, guid: d2c80d3a80e82cb4b988278210db3bb9, type: 2}
   TileData:

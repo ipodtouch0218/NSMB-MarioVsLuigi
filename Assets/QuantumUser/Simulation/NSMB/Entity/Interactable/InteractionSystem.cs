@@ -75,7 +75,7 @@ namespace Quantum {
             }
         }
 
-        private void TryCollideWithEntity(Frame f, EntityRef entityA, EntityRef entityB) {
+        private void TryCollideWithEntity(Frame f, EntityRef entityA, in EntityRef entityB) {
             var entities = (entityA, entityB);
             if (entityA == entityB
                 || alreadyCollided.Contains(entities)) {
@@ -114,7 +114,7 @@ namespace Quantum {
             }
         }
 
-        private void TryCollideWithEntity(Frame f, EntityRef entityA, EntityRef entityB, PhysicsContact contact) {
+        private void TryCollideWithEntity(Frame f, EntityRef entityA, EntityRef entityB, in PhysicsContact contact) {
             var entities = (entityA, entityB);
             if (entityA == entityB
                 || alreadyCollided.Contains(entities)) {
