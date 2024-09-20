@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Quantum {
 
-    public unsafe class IceBlockSystem : SystemMainThreadFilter<IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
+    public unsafe class IceBlockSystem : SystemMainThreadFilterStage<IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
         ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash {
 
         public struct Filter {
@@ -11,6 +11,7 @@ namespace Quantum {
             public Transform2D* Transform;
             public IceBlock* IceBlock;
             public PhysicsObject* PhysicsObject;
+            public PhysicsCollider2D* PhysicsCollider;
         }
 
         public override void OnInit(Frame f) {
@@ -19,7 +20,7 @@ namespace Quantum {
             InteractionSystem.RegisterInteraction<IceBlock, Coin>(OnIceBlockCoinInteraction);
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var entity = filter.Entity;
             var iceBlock = filter.IceBlock;
             if (!f.Exists(iceBlock->Entity)) {
@@ -30,6 +31,13 @@ namespace Quantum {
             var transform = filter.Transform;
             var childFreezable = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
             var physicsObject = filter.PhysicsObject;
+
+            if (f.Number % 2 == 0
+                && PhysicsObjectSystem.BoxInsideTile(f, transform->Position, filter.PhysicsCollider->Shape, stage)) {
+
+                Destroy(f, entity, IceBlockBreakReason.HitWall);
+                return;
+            }
 
             if (childFreezable->IsCarryable) {
                 var childTransform = f.Unsafe.GetPointer<Transform2D>(iceBlock->Entity);

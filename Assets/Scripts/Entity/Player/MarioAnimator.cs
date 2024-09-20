@@ -4,9 +4,7 @@ using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using UnityEngine;
-using UnityEngine.Rendering.UI;
 using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {

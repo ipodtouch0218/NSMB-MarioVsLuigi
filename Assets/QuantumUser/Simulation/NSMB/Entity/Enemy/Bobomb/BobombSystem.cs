@@ -34,7 +34,6 @@ namespace Quantum {
             }
 
             bool lit = bobomb->CurrentDetonationFrames > 0;
-
             if (lit) {
                 if (QuantumUtils.Decrement(ref bobomb->CurrentDetonationFrames)) {
                     Explode(f, ref filter);

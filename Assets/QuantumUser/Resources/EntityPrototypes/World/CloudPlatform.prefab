@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8010249587145537853}
   - component: {fileID: 6774445834162848449}
   - component: {fileID: 128866428235369491}
+  - component: {fileID: 4072318311435999511}
   m_Layer: 0
   m_Name: CloudPlatform
   m_TagString: platform
@@ -328,7 +329,35 @@ MonoBehaviour:
   ErrorRotationTeleportDistance: 0.5
   OnEntityInstantiated:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4072318311435999511}
+        m_TargetAssemblyTypeName: CloudAnimator, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnEntityDestroyed:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4072318311435999511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8010249587145537848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f45f722d3f9f3b46a5d7d0db116941d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entity: {fileID: 128866428235369491}
+  sRenderer: {fileID: 8010249587145537853}
+  samplesPerTile: 16
+  time: 0.25
