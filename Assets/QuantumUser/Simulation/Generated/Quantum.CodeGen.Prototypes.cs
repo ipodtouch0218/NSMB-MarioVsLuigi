@@ -290,6 +290,26 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.GameRules))]
+  public unsafe partial class GameRulesPrototype : StructPrototype {
+    public Byte StarsToWin;
+    public Byte CoinsForPowerup;
+    public Byte Lives;
+    public Byte TimerSeconds;
+    public QBoolean TeamsEnabled;
+    public QBoolean CustomPowerupsEnabled;
+    partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
+        result.StarsToWin = this.StarsToWin;
+        result.CoinsForPowerup = this.CoinsForPowerup;
+        result.Lives = this.Lives;
+        result.TimerSeconds = this.TimerSeconds;
+        result.TeamsEnabled = this.TeamsEnabled;
+        result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.GenericMover))]
   public unsafe partial class GenericMoverPrototype : ComponentPrototype<Quantum.GenericMover> {
     public AssetRef<GenericMoverAsset> MoverAsset;
@@ -704,6 +724,43 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.PiranhaPlant result, in PrototypeMaterializationContext context = default) {
         PrototypeValidator.FindMapEntity(this.Pipe, in context, out result.Pipe);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PlayerData))]
+  public unsafe partial class PlayerDataPrototype : ComponentPrototype<Quantum.PlayerData> {
+    public PlayerRef PlayerRef;
+    public QBoolean IsRoomHost;
+    public QBoolean IsReady;
+    public Byte Character;
+    public Byte Skin;
+    public Byte Team;
+    public QBoolean IsSpectator;
+    public Int32 Wins;
+    public FP LastChatMessage;
+    public QBoolean IsLoaded;
+    public Int32 JoinTick;
+    public Int32 Ping;
+    partial void MaterializeUser(Frame frame, ref Quantum.PlayerData result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.PlayerData component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.PlayerData result, in PrototypeMaterializationContext context = default) {
+        result.PlayerRef = this.PlayerRef;
+        result.IsRoomHost = this.IsRoomHost;
+        result.IsReady = this.IsReady;
+        result.Character = this.Character;
+        result.Skin = this.Skin;
+        result.Team = this.Team;
+        result.IsSpectator = this.IsSpectator;
+        result.Wins = this.Wins;
+        result.LastChatMessage = this.LastChatMessage;
+        result.IsLoaded = this.IsLoaded;
+        result.JoinTick = this.JoinTick;
+        result.Ping = this.Ping;
+        MaterializeUser(frame, ref result, in context);
     }
   }
   [System.SerializableAttribute()]

@@ -2,6 +2,7 @@ using NSMB.Extensions;
 using NSMB.Utils;
 using Quantum;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,10 +30,19 @@ namespace NSMB.Loading {
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
-        public void Initialize() {
+        public unsafe void Initialize(QuantumGame game) {
             initialized = true;
 
-            NetworkUtils.GetCustomProperty(NetworkHandler.Client.LocalPlayer.CustomProperties, Enums.NetPlayerProperties.Character, out int characterIndex);
+            int characterIndex = 0;
+
+            Frame f = game.Frames.Predicted;
+            List<PlayerRef> localPlayers = game.GetLocalPlayers();
+            if (localPlayers.Count > 0) {
+                PlayerRef player = localPlayers[0];
+                var playerData = f.Get<PlayerData>(f.ResolveDictionary(f.Global->PlayerDatas)[player]);
+                characterIndex = playerData.Character;
+            }
+
             var characters = GlobalController.Instance.config.CharacterDatas;
             mario.Initialize(characters[characterIndex % characters.Length]);
 

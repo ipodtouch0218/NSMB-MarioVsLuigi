@@ -154,10 +154,11 @@ namespace NSMB.Entities.Player {
         }
 
         public void Initialize(QuantumGame game) {
-            var mario = game.Frames.Predicted.Get<MarioPlayer>(entity.EntityRef);
-            var playerData = game.Frames.Predicted.GetPlayerData(mario.PlayerRef);
+            Frame f = game.Frames.Predicted;
+            var mario = f.Get<MarioPlayer>(entity.EntityRef);
+            var playerData = f.Get<PlayerData>(f.ResolveDictionary(f.Global->PlayerDatas)[mario.PlayerRef]);
 
-            if (ScriptableManager.Instance.skins[playerData?.SkinIndex ?? 0] is PlayerColorSet colorSet) {
+            if (ScriptableManager.Instance.skins[playerData.Skin] is PlayerColorSet colorSet) {
                 skin = colorSet.GetPlayerColors(character);
             }
 

@@ -1,14 +1,40 @@
+#pragma max_players 10
+
 import enum GameState(byte);
 
 global {
+	GameRules Rules;	
 	GameState GameState;
 	int StartFrame;
 	ushort GameStartFrames;
+
+	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
+	byte RealPlayers;
+}
+
+struct GameRules {
+	byte StarsToWin;
+	byte CoinsForPowerup;
+	byte Lives;
+	byte TimerSeconds;
+
+	bool TeamsEnabled;
+	bool CustomPowerupsEnabled;
 }
 
 signal OnGameStarting();
 
-event GameStateChanged {
+synced event GameStateChanged {
 	Frame Frame;
 	GameState NewState;
+}
+
+synced event PlayerAdded {
+	Frame Frame;
+	PlayerRef Player;
+}
+
+synced event PlayerRemoved {
+	Frame Frame;
+	PlayerRef Player;
 }

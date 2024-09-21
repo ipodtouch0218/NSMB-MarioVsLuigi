@@ -72,7 +72,7 @@ public unsafe class DiscordController : MonoBehaviour {
         }
     }
 
-    public void UpdateActivity(RoomInfo room = null) {
+    public unsafe void UpdateActivity(RoomInfo room = null) {
 #if UNITY_WEBGL || UNITY_WSA
         return;
 #endif
@@ -106,21 +106,24 @@ public unsafe class DiscordController : MonoBehaviour {
             activity.Secrets = new() { Join = room.Name };
         }
         if (game != null) {
-            // In a level
-            activity.Details ??= tm.GetTranslation("discord.offline");
             Frame f = game.Frames.Predicted;
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            activity.Assets = new ActivityAssets {
-                LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
-                LargeText = tm.GetTranslation(stage.TranslationKey).Replace("<sprite name=room_customlevel>", "")
-            };
+            if (f != null && f.Global->GameState != GameState.PreGameRoom) {
+                // In a level
+                activity.Details ??= tm.GetTranslation("discord.offline");
+                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            if (game.Configurations.Runtime.TimerEnabled) {
-                activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
-            } else {
-                activity.Timestamps = new() { Start = now - (f.Number * f.DeltaTime * 1000).AsLong };
+                activity.Assets = new ActivityAssets {
+                    LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
+                    LargeText = tm.GetTranslation(stage.TranslationKey).Replace("<sprite name=room_customlevel>", "")
+                };
+
+                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                if (f.Global->Rules.TimerSeconds > 0) {
+                    activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
+                } else {
+                    activity.Timestamps = new() { Start = now - (f.Number * f.DeltaTime * 1000).AsLong };
+                }
             }
         } else {
             // In the main menu, not in a room

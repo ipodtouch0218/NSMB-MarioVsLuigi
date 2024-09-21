@@ -107,12 +107,12 @@ public class UIUpdater : QuantumCallbacks {
         */
 
         if (uiHidden) {
-            ToggleUI(game, false);
+            ToggleUI(f, false);
         }
 
         UpdateStoredItemUI(mario);
-        UpdateTextUI(mario);
-        ApplyUIColor(mario);
+        UpdateTextUI(f, mario);
+        ApplyUIColor(f, mario);
     }
 
     private void OnMarioInitialized(Frame f, MarioAnimator mario) {
@@ -145,10 +145,10 @@ public class UIUpdater : QuantumCallbacks {
 
     }
 
-    private void ToggleUI(QuantumGame game, bool hidden) {
+    private unsafe void ToggleUI(Frame f, bool hidden) {
         uiHidden = hidden;
 
-        teamsParent.SetActive(!hidden && game.Configurations.Runtime.TeamsEnabled);
+        teamsParent.SetActive(!hidden && f.Global->Rules.TeamsEnabled);
         starsParent.SetActive(!hidden);
         livesParent.SetActive(!hidden);
         coinsParent.SetActive(!hidden);
@@ -187,13 +187,17 @@ public class UIUpdater : QuantumCallbacks {
         timerMaterial.SetColor("_Color", Color.red);
     }
 
-    private unsafe void UpdateTextUI(MarioPlayer mario) {
-        var game = QuantumRunner.DefaultGame;
-        var config = game.Configurations.Runtime;
-        int starRequirement = config.StarsToWin;
-        int coinRequirement = config.CoinsForPowerup;
+    private unsafe void UpdateTextUI(Frame f, MarioPlayer mario) {
 
-        if (config.TeamsEnabled) {
+        var rules = f.Global->Rules;
+
+        int starRequirement = rules.StarsToWin;
+        int coinRequirement = rules.CoinsForPowerup;
+        bool teamsEnabled = rules.TeamsEnabled;
+        bool livesEnabled = rules.Lives > 0;
+        bool timerEnabled = rules.TimerSeconds > 0;
+
+        if (rules.TeamsEnabled) {
             int teamIndex = mario.Team;
             //teamManager?.GetTeamStars(teamIndex, out teamStars);
             Team team = ScriptableManager.Instance.teams[teamIndex];
@@ -201,10 +205,11 @@ public class UIUpdater : QuantumCallbacks {
         } else {
             teamsParent.SetActive(false);
         }
+
         if (mario.Stars != cachedStars) {
             cachedStars = mario.Stars;
             string starString = "Sx" + cachedStars;
-            if (!game.Configurations.Runtime.TeamsEnabled) {
+            if (!teamsEnabled) {
                 starString += "/" + starRequirement;
             }
 
@@ -215,7 +220,7 @@ public class UIUpdater : QuantumCallbacks {
             uiCoins.text = Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
         }
 
-        if (config.LivesEnabled) {
+        if (livesEnabled) {
             if (mario.Lives != cachedLives) {
                 cachedLives = mario.Lives;
                 uiLives.text = QuantumUnityDB.GetGlobalAsset(mario.CharacterAsset).UiString + Utils.GetSymbolString("x" + cachedLives);
@@ -224,8 +229,8 @@ public class UIUpdater : QuantumCallbacks {
             livesParent.SetActive(false);
         }
 
-        if (config.TimerEnabled) {
-            float timeRemaining = game.Frames.Predicted.Global->Timer.AsFloat;
+        if (timerEnabled) {
+            float timeRemaining = f.Global->Timer.AsFloat;
             int secondsRemaining = Mathf.Max(Mathf.CeilToInt(timeRemaining), 0);
 
             if (secondsRemaining != cachedTimer) {
@@ -273,9 +278,8 @@ public class UIUpdater : QuantumCallbacks {
         //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
     }
 
-    private void ApplyUIColor(MarioPlayer mario) {
-        var config = QuantumRunner.DefaultGame.Configurations.Runtime;
-        Color color = config.TeamsEnabled ? Utils.GetTeamColor(mario.Team, 0.8f, 1f) : stage.UIColor;
+    private unsafe void ApplyUIColor(Frame f, MarioPlayer mario) {
+        Color color = f.Global->Rules.TeamsEnabled ? Utils.GetTeamColor(mario.Team, 0.8f, 1f) : stage.UIColor;
 
         foreach (Image bg in backgrounds) {
             bg.color = color;

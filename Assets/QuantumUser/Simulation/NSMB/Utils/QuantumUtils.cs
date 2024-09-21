@@ -187,9 +187,11 @@ public static unsafe class QuantumUtils {
         //gm.teamManager.GetTeamStars(player.Data.Team, out int ourStars);
         int ourStars = GetTeamStars(f, mario.Team);
         int leaderStars = GetFirstPlaceStars(f);
-        int starsToWin = f.RuntimeConfig.StarsToWin;
-        bool custom = f.RuntimeConfig.CustomPowerupsEnabled;
-        bool lives = f.RuntimeConfig.LivesEnabled;
+
+        var rules = f.Global->Rules;
+        int starsToWin = rules.StarsToWin;
+        bool custom = rules.CustomPowerupsEnabled;
+        bool lives = rules.Lives > 0;
 
         bool big = stage.SpawnBigPowerups;
         bool vertical = stage.SpawnVerticalPowerups;

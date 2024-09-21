@@ -1,5 +1,3 @@
-using NSMB.UI.MainMenu;
-using Photon.Client;
 using Photon.Realtime;
 using System.Text;
 using System;
@@ -11,9 +9,8 @@ using UnityEngine;
 using Photon.Deterministic;
 using Quantum;
 using static NSMB.Utils.NetworkUtils;
-using static UnityEngine.CullingGroup;
 
-public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IOnEventCallback, IConnectionCallbacks {
+public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
     //---Events
     public static event Action OnLocalPlayerConfirmed;
@@ -80,9 +77,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public IEnumerator PingUpdateCoroutine() {
         WaitForSeconds seconds = new(1);
         while (true) {
-            realtimeClient.LocalPlayer.SetCustomProperties(new PhotonHashtable() {
-                [Enums.NetPlayerProperties.Ping] = (int) realtimeClient.RealtimePeer.Stats.RoundtripTime
-            });
+            // TODO
+            //realtimeClient.LocalPlayer.SetCustomProperties(new PhotonHashtable() {
+            //    [Enums.NetPlayerProperties.Ping] = (int) realtimeClient.RealtimePeer.Stats.RoundtripTime
+            //});
             yield return seconds;
         }
     }
@@ -180,11 +178,32 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     public void OnCreateRoomFailed(short returnCode, string message) { }
 
-    public void OnJoinedRoom() {
+    public async void OnJoinedRoom() {
         if (pingUpdateCoroutine != null) {
             StopCoroutine(pingUpdateCoroutine);
         }
         pingUpdateCoroutine = StartCoroutine(PingUpdateCoroutine());
+
+        var sessionRunnerArguments = new SessionRunner.Arguments {
+            RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
+            GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
+            ClientId = Client.UserId,
+            RuntimeConfig = new RuntimeConfig {
+                SimulationConfig = GlobalController.Instance.config,
+                Map = null,
+                Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+            },
+            SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
+            GameMode = DeterministicGameMode.Multiplayer,
+            PlayerCount = 10,
+            Communicator = new QuantumNetworkCommunicator(Client),
+        };
+
+        Runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
+        Runner.Game.AddPlayer(new RuntimePlayer {
+            PlayerNickname = Settings.Instance.generalNickname,
+            UserId = Guid.Parse(Client.UserId),
+        });
     }
 
     public void OnJoinRoomFailed(short returnCode, string message) { }
@@ -195,56 +214,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         if (pingUpdateCoroutine != null) {
             StopCoroutine(pingUpdateCoroutine);
             pingUpdateCoroutine = null;
-        }
-    }
-
-    public async void OnEvent(EventData photonEvent) {
-        if (photonEvent.Code == (byte) Enums.NetEvents.StartGame) {
-
-            int players = 0;
-            foreach ((_, Player player) in Client.CurrentRoom.Players) {
-                if (GetCustomProperty(player.CustomProperties, Enums.NetPlayerProperties.Spectator, out int spectator) && spectator == 1) {
-                    continue;
-                }
-                players++;
-            }
-
-            GetCustomProperty(Client.CurrentRoom.CustomProperties, Enums.NetRoomProperties.IntProperties, out int rawIntProperties);
-            GetCustomProperty(Client.CurrentRoom.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int rawBoolProperties);
-            IntegerProperties intProperties = rawIntProperties;
-            BooleanProperties boolProperties = rawBoolProperties;
-
-            var sessionRunnerArguments = new SessionRunner.Arguments {
-                RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
-                GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
-                ClientId = Client.UserId,
-                RuntimeConfig = new RuntimeConfig {
-                    SimulationConfig = GlobalController.Instance.config,
-                    Map = MainMenuManager.Instance.maps[intProperties.Level].mapAsset,
-                    Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
-                    StarsToWin = (byte) intProperties.StarRequirement,
-                    CoinsForPowerup = (byte) intProperties.CoinRequirement,
-                    Lives = (byte) intProperties.Lives,
-                    TimerSeconds = intProperties.Timer,
-                    TeamsEnabled = boolProperties.Teams,
-                    CustomPowerupsEnabled = boolProperties.CustomPowerups,
-                    ExpectedPlayers = (byte) players,
-                },
-                SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
-                GameMode = DeterministicGameMode.Multiplayer,
-                PlayerCount = players,
-                StartGameTimeoutInSeconds = 10,
-                Communicator = new QuantumNetworkCommunicator(Client),
-                RecordingFlags = RecordingFlags.All,
-            };
-
-            Runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
-            Runner.Game.AddPlayer(new RuntimePlayer {
-                CharacterIndex = 0,
-                SkinIndex = 0,
-                RequestedTeam = 0,
-                PlayerNickname = Settings.Instance.generalNickname,
-            });
         }
     }
 

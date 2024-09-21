@@ -61,7 +61,7 @@ public class KoopaAnimator : MonoBehaviour {
         if (enemy.IsDead) {
             transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
 
-        } else if (koopa.IsInShell) {
+        } else if (koopa.IsInShell && !koopa.IsKicked) {
             if (!freezable.IsFrozen(f)) {
                 if (koopa.IsFlipped && !dontFlip) {
                     dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);

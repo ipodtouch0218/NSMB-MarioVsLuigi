@@ -160,9 +160,11 @@ namespace Quantum {
 
                 physicsObject->Velocity.X += (physics.FastTurnaroundAcceleration * (mario->FacingRight ? -1 : 1) * f.DeltaTime);
 
-            } else if ((inputs.Left ^ inputs.Right) &&
-                       (!mario->IsCrouching || (mario->IsCrouching && !physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.BlueShell)) &&
-                       !mario->IsInKnockback && !mario->IsSliding) {
+            } else if ((inputs.Left ^ inputs.Right)
+                       && (!mario->IsCrouching || (mario->IsCrouching && !physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.BlueShell))
+                       && !mario->IsInKnockback
+                       && !mario->IsSliding) {
+
                 // We can walk here
                 bool reverse = physicsObject->Velocity.X != 0 && ((inputs.Left ? 1 : -1) == sign);
 
@@ -238,7 +240,7 @@ namespace Quantum {
                 } else if (mario->IsSliding) {
                     if (angle > physics.SlideMinimumAngle) {
                         // Uphill / downhill
-                        acc = (angle > 30 ? physics.SlideFastAcceleration : physics.SlideSlowAcceleration) * (uphill ? 1 : -1);
+                        acc = (angle > 30 ? physics.SlideFastAcceleration : physics.SlideSlowAcceleration) * (uphill ? -1 : 1);
                     } else {
                         // Flat ground
                         acc = -physics.WalkAcceleration[0];
@@ -270,9 +272,11 @@ namespace Quantum {
 
             bool wasInShell = mario->IsInShell;
             mario->IsInShell |= mario->CurrentPowerupState == PowerupState.BlueShell && !mario->IsSliding && physicsObject->IsTouchingGround
-                               && run && !mario->HeldEntity.IsValid
-                               && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * FP.FromString("0.9")
-                               && (physicsObject->Velocity.X > 0) == mario->FacingRight;
+                                && run && !mario->HeldEntity.IsValid
+                                && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * FP.FromString("0.9")
+                                && (physicsObject->Velocity.X > 0) == mario->FacingRight;
+
+            mario->IsCrouching &= !mario->IsSliding;
 
             if (!wasInShell && mario->IsInShell) {
                 f.Events.MarioPlayerCrouched(f, filter.Entity, *mario);
@@ -607,11 +611,11 @@ namespace Quantum {
 
             if (mario->WalljumpFrames > 0) {
                 mario->FacingRight = physicsObject->Velocity.X > 0;
-            } else if (!mario->IsInShell && !mario->IsSliding && !mario->IsSkidding && !mario->IsInKnockback && !(/*animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || */ mario->IsTurnaround)) {
+            } else if (!mario->IsInShell && !mario->IsSliding && !mario->IsSkidding && !mario->IsInKnockback && !mario->IsTurnaround) {
                 if (rightOrLeft) {
                     mario->FacingRight = inputs.Right.IsDown;
                 }
-            } else if (mario->MegaMushroomStartFrames == 0 && mario->MegaMushroomEndFrames == 0 && !mario->IsSkidding && !(/*animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") ||*/ mario->IsTurnaround)) {
+            } else if (mario->MegaMushroomStartFrames == 0 && mario->MegaMushroomEndFrames == 0 && !mario->IsSkidding && !mario->IsTurnaround) {
                 if (mario->IsInKnockback || (physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
                     mario->FacingRight = physicsObject->Velocity.X > 0;
                 } else if ((!mario->IsInShell || mario->MegaMushroomStartFrames > 0) && (rightOrLeft)) {
@@ -1049,7 +1053,7 @@ namespace Quantum {
                 return;
             }
 
-            if (mario->IsDead || /*mario->IsFrozen || */ mario->IsGroundpounding || mario->IsInKnockback || f.Exists(mario->CurrentPipe)
+            if (mario->IsDead || filter.Freezable->IsFrozen(f) || mario->IsGroundpounding || mario->IsInKnockback || f.Exists(mario->CurrentPipe)
                 || mario->HeldEntity.IsValid || mario->IsCrouching || mario->IsSliding) {
                 return;
             }
@@ -1165,6 +1169,8 @@ namespace Quantum {
 
             bool validFloorAngle = FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle;
 
+            mario->IsCrouching &= !mario->IsSliding;
+
             if (physicsObject->IsOnSlideableGround 
                 && validFloorAngle
                 && !f.Exists(mario->HeldEntity)
@@ -1175,7 +1181,7 @@ namespace Quantum {
                 mario->IsSliding = true;
                 mario->IsCrouching = false;
             }
-            mario->IsCrouching &= !mario->IsSliding;
+
             if (mario->IsSliding && physicsObject->IsTouchingGround && validFloorAngle) {
                 FP runningMaxSpeed = physics.WalkMaxVelocity[physics.RunSpeedStage];
                 FP angleDeg = physicsObject->FloorAngle * FP.Deg2Rad;
@@ -1401,7 +1407,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
                     mario->PreRespawn(f, filter.Entity, stage);
                 } else if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
-                    bool spawnAgain = !((f.RuntimeConfig.LivesEnabled && mario->Lives == 0) || mario->Disconnected);
+                    bool spawnAgain = !((f.Global->Rules.Lives > 0 && mario->Lives == 0) || mario->Disconnected);
                     if (!spawnAgain && mario->Stars > 0) {
                         // Try to drop more stars
                         mario->SpawnStars(f, filter.Entity, 1);
@@ -1457,10 +1463,32 @@ namespace Quantum {
         }
 
         public void OnGameStarting(Frame f) {
+            // Spawn players
+            var config = f.SimulationConfig;
+            for (int i = 0; i < f.PlayerCount; i++) {
+                var playerDatas = f.Filter<PlayerData>();
+
+                while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                    if (data->IsSpectator) {
+                        continue;
+                    }
+
+                    int characterIndex = Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length - 1);
+                    CharacterAsset character = config.CharacterDatas[characterIndex];
+
+                    EntityRef newPlayer = f.Create(character.Prototype);
+                    var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
+                    mario->PlayerRef = data->PlayerRef;
+                    var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
+                    newTransform->Position = f.FindAsset<VersusStageData>(f.Map.UserAsset).Spawnpoint;
+                }
+            }
+
+            // And respawn them
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var filter = f.Filter<MarioPlayer>();
             while (filter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
-                mario->Lives = f.RuntimeConfig.Lives;
+                mario->Lives = f.Global->Rules.Lives;
                 mario->PreRespawn(f, entity, stage);
             }
         }

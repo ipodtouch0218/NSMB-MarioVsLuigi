@@ -29,7 +29,7 @@ namespace Quantum {
                         continue;
                     }
 
-                    physicsObject->Velocity = physicsObject->PreviousVelocity;
+                    physicsObject->Velocity = physicsObject->PreviousFrameVelocity;
                     physicsObject->Velocity.Y *= -FP._0_33 * 2;
 
                     if (physicsObject->Velocity.Y > FP._0_75) {
@@ -91,7 +91,7 @@ namespace Quantum {
 
         public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
             byte newCoins = (byte) (mario->Coins + 1);
-            bool item = newCoins == f.RuntimeConfig.CoinsForPowerup;
+            bool item = newCoins == f.Global->Rules.CoinsForPowerup;
             if (item) {
                 mario->Coins = 0;
                 MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default);

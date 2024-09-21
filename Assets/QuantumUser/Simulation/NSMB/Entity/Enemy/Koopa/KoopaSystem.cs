@@ -101,7 +101,7 @@ namespace Quantum {
             }
 
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
-                FPVector2 checkPosition = transform->Position + (FPVector2.Right * FP._0_10 * (enemy->FacingRight ? 1 : -1));
+                FPVector2 checkPosition = transform->Position + (FPVector2.Right * FP._0_05 * (enemy->FacingRight ? 1 : -1));
                 if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_33, out var hit)) {
                     enemy->FacingRight = !enemy->FacingRight;
                 }

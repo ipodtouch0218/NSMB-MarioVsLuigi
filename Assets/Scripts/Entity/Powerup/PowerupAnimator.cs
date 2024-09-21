@@ -93,6 +93,7 @@ public class PowerupAnimator : QuantumCallbacks {
         } else if (inSpawnAnimation) {
             sRenderer.transform.localScale = Vector3.one;
             inSpawnAnimation = false;
+            sRenderer.sortingOrder = 15;
 
             mpb.SetFloat("WaveEnabled", 1);
             sRenderer.SetPropertyBlock(mpb);

@@ -77,7 +77,7 @@ namespace Quantum {
                 var hit = vertical[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
-                    //|| ((FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y)) && (FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)))
+                    || (shape.Type == Shape2DType.Edge && (FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y)) && (FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
                     continue;
                 }

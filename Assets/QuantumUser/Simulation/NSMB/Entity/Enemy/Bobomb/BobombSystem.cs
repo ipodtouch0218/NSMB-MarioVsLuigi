@@ -1,4 +1,6 @@
 using Photon.Deterministic;
+using Quantum.Collections;
+using UnityEditor;
 using UnityEngine;
 
 namespace Quantum {
@@ -50,7 +52,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 enemy->FacingRight = physicsObject->IsTouchingLeftWall;
-                physicsObject->Velocity.X = (lit ? FPMath.Abs(physicsObject->PreviousVelocity.X) : bobomb->Speed) * (enemy->FacingRight ? 1 : -1);
+                physicsObject->Velocity.X = (lit ? FPMath.Abs(physicsObject->PreviousFrameVelocity.X) : bobomb->Speed) * (enemy->FacingRight ? 1 : -1);
             }
 
             // Friction

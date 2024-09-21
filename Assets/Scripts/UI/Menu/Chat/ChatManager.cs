@@ -4,9 +4,9 @@ using UnityEngine;
 using NSMB.Utils;
 using NSMB.UI.MainMenu;
 using Photon.Realtime;
-using Photon.Client;
+using Quantum;
 
-public class ChatManager : MonoBehaviour, IOnEventCallback {
+public class ChatManager : MonoBehaviour {
 
     //---Static Variables
     public static readonly Color32 Red = new Color32(219, 107, 107, 255);
@@ -23,13 +23,15 @@ public class ChatManager : MonoBehaviour, IOnEventCallback {
     }
 
     public void OnEnable() {
-        NetworkHandler.Client.AddCallbackTarget(this);
         OnChatMessage += OnChatMessageCallback;
     }
 
     public void OnDisable() {
-        NetworkHandler.Client.RemoveCallbackTarget(this);
         OnChatMessage -= OnChatMessageCallback;
+    }
+
+    public void Start() {
+        QuantumEvent.Subscribe<EventPlayerSentChatMessage>(this, OnPlayerSentChatMessage);
     }
 
     public void AddChatMessage(string message, int player, Color? color = null, bool filter = false) {
@@ -60,9 +62,9 @@ public class ChatManager : MonoBehaviour, IOnEventCallback {
     }
 
     public void SendChatMessage(string text) {
-        NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.ChatMessage, text, new RaiseEventArgs {
-            Receivers = ReceiverGroup.All
-        }, SendOptions.SendReliable);
+        QuantumRunner.DefaultGame.SendCommand(new CommandSendChatMessage {
+            Message = text
+        });
     }
 
     /* TODO
@@ -129,38 +131,34 @@ public class ChatManager : MonoBehaviour, IOnEventCallback {
         if (data.isSystemMessage) {
             Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
         } else {
-            Player player = NetworkHandler.Client.CurrentRoom.Players[data.playerNumber];
-            Debug.Log($"[Chat] ({player.UserId}) {data.message}");
+            RuntimePlayer runtimeData = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(data.playerNumber);
+            Debug.Log($"[Chat] ({runtimeData.UserId}) {data.message}");
         }
     }
 
-    public void OnEvent(EventData photonEvent) {
-        if (photonEvent.Code == (byte) Enums.NetEvents.ChatMessage) {
-            if (!NetworkHandler.Client.CurrentRoom.Players.TryGetValue(photonEvent.Sender, out Player sender)) {
-                return;
-            }
+    public void OnPlayerSentChatMessage(EventPlayerSentChatMessage e) {
 
-            /* TODO
-            if (data.IsMuted) {
-                return;
-            }
-            */
+        /* TODO
+        if (data.IsMuted) {
+            return;
+        }
+        */
 
-            // Format message, in case we can't trust the host to do it for us.
-            string message = (string) photonEvent.CustomData;
-            message = message[..Mathf.Min(128, message.Length)];
-            message = message.Replace("\n", " ").Trim();
+        // Format message, in case we can't trust the host to do it for us.
+        string message = e.Message;
+        message = message[..Mathf.Min(128, message.Length)];
+        message = message.Replace("\n", " ").Trim();
 
-            // Add username
-            message = sender.NickName.ToValidUsername() + ": " + message.Filter();
+        // Add username
+        RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
+        message = runtimeData.PlayerNickname.ToValidUsername() + ": " + message.Filter();
 
-            AddChatMessage(message, sender.ActorNumber);
+        AddChatMessage(message, e.Player);
 
-            if (MainMenuManager.Instance) {
-                PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(sender.ActorNumber);
-                if (ple) {
-                    ple.typingCounter = 0;
-                }
+        if (MainMenuManager.Instance) {
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(e.Player);
+            if (ple) {
+                ple.typingCounter = 0;
             }
         }
     }

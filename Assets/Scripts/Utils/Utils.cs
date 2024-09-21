@@ -1,6 +1,7 @@
 using Photon.Realtime;
 using Quantum;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -438,67 +439,53 @@ namespace NSMB.Utils {
         }
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
-        public static Color GetPlayerColor(QuantumGame game, PlayerRef player, float s = 1, float v = 1) {
-            MarioPlayer? mario = null;
-            int playerCount = 0;
-            var allPlayers = game.Frames.Predicted.Filter<MarioPlayer>();
-            while (allPlayers.Next(out _, out MarioPlayer aMario)) {
-                playerCount++;
-                if (aMario.PlayerRef == player) {
-                    mario = aMario;
+        public unsafe static Color GetPlayerColor(QuantumGame game, PlayerRef player, float s = 1, float v = 1) {
+            Frame f = game.Frames.Predicted;
+
+            // Prioritize spectator status
+            if (!f.TryResolveDictionary(f.Global->PlayerDatas, out var playerDataDict)
+                || !playerDataDict.TryGetValue(player, out EntityRef playerDataEntity)
+                || !f.TryGet(playerDataEntity, out PlayerData playerData)
+                || playerData.IsSpectator) {
+
+                return spectatorColor;
+            }
+
+            // Or dead marios
+            if (f.Global->GameState != GameState.PreGameRoom) {
+                var marioFilter = f.Filter<MarioPlayer>();
+                bool hasMario = false;
+                while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
+                    if (mario->PlayerRef == player) {
+                        hasMario = true;
+                        break;
+                    }
+                }
+
+                if (!hasMario) {
+                    return spectatorColor;
                 }
             }
 
-            if (!mario.HasValue) {
-                return spectatorColor;
-            }
-
-            if (game.Configurations.Runtime.TeamsEnabled) {
-                return GetTeamColor(mario.Value.Team, s, v);
-            }
-
-            return Color.HSVToRGB((player._index - 1) / (playerCount + 1f), s, v);
-        }
-
-        public static Color GetPlayerColor(Player player, float s = 1, float v = 1) {
-
-            // Prioritize spectator status
-            if (player == null /* TODO || player.IsManualSpectator || player.IsCurrentlySpectating */) {
-                return spectatorColor;
-            }
-
-            // Then teams
-            QuantumGame game = QuantumRunner.DefaultGame;
-            if (game != null && game.Configurations.Runtime.TeamsEnabled) {
-
+            // Then team
+            if (f.Global->Rules.TeamsEnabled) {
+                return GetTeamColor(playerData.Team, s, v);
             }
 
             // Then id based color
-            int result = -1;
-            int count = 0;
-            var players = NetworkHandler.Client.CurrentRoom.Players.OrderBy(kvp => kvp.Key);
+            int playersBeforeUs = 0;
+            int totalPlayers = 0;
 
-            foreach ((int otherPlayerActorNumber, Player otherPlayer) in players) {
-                /* TODO
-                // Skip spectators in color calculations
-                if (playerData.IsManualSpectator || playerData.IsCurrentlySpectating) {
+            var players = f.Filter<PlayerData>();
+            while (players.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
+                if (otherPlayerData->IsSpectator) {
                     continue;
                 }
-                */
 
-                if (otherPlayerActorNumber == player.ActorNumber) {
-                    result = count;
-                    break;
-                }
-
-                count++;
+                totalPlayers++;
             }
-
-            if (result == -1) {
-                return spectatorColor;
-            }
-
-            return Color.HSVToRGB(result / ((float) count + 1), s, v);
+            
+            return Color.HSVToRGB(playersBeforeUs / (totalPlayers + 1f), s, v);
         }
 
         public static Color GetTeamColor(int team, float s = 1, float v = 1) {

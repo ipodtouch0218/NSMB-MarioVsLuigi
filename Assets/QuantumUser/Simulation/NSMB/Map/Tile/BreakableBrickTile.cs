@@ -1,8 +1,8 @@
 using static IInteractableTile;
+using Photon.Deterministic;
 using Quantum;
 using System;
 using UnityEngine;
-using Photon.Deterministic;
 
 public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
@@ -47,8 +47,10 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         } else if (f.Unsafe.TryGetPointer(entity, out Koopa* koopa) && koopa->IsKicked) {
             doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
             doBump = true;
-            bumpOwner = f.Unsafe.GetPointer<Holdable>(entity)->PreviousHolder;
 
+            if (!doBreak) {
+                bumpOwner = f.Unsafe.GetPointer<Holdable>(entity)->PreviousHolder;
+            }
         } else if (f.Has<Bobomb>(entity)) {
              doBreak = BreakingRules.HasFlag(BreakableBy.Bombs);
              doBump = false;

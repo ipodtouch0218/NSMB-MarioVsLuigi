@@ -7,6 +7,7 @@ component PhysicsObject {
     [ExcludeFromPrototype] FPVector2 Velocity;
     [ExcludeFromPrototype] FPVector2 ParentVelocity;
     [ExcludeFromPrototype] FPVector2 PreviousVelocity;
+    [ExcludeFromPrototype] FPVector2 PreviousFrameVelocity;
 
     [ExcludeFromPrototype] byte HoverFrames;
     [ExcludeFromPrototype] bool IsTouchingLeftWall;

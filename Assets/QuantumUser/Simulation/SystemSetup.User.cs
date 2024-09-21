@@ -8,7 +8,6 @@ namespace Quantum {
             // Add or remove systems to the collection: systems.Add(new SystemFoo());
 
             systems.Add(new PlayerConnectedSystem());
-            systems.Add(new ClientSystem());
             systems.Add(new GameLogicSystem());
 
             systems.Add(new PhysicsSystem2D());

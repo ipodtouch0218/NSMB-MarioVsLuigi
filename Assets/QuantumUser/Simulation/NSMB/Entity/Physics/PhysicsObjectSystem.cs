@@ -3,6 +3,7 @@ using Quantum.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
@@ -25,13 +26,15 @@ namespace Quantum {
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var physicsObject = filter.PhysicsObject;
-            var transform = filter.Transform;
             if (physicsObject->IsFrozen) {
                 return;
             }
 
+            var transform = filter.Transform;
+            var entity = filter.Entity;
+
             bool wasOnGround = physicsObject->IsTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousVelocity.Y;
-            physicsObject->PreviousVelocity = physicsObject->Velocity;
+            physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
 
             if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
                 contacts = f.AllocateList(out physicsObject->Contacts);
@@ -47,17 +50,19 @@ namespace Quantum {
             physicsObject->IsOnSlideableGround = false;
             physicsObject->IsOnSlipperyGround = false;
 
-            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, filter.Entity, stage, contacts);
-            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, filter.Entity, stage, contacts);
+            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
+            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, entity, stage, contacts);
             ResolveContacts(physicsObject, contacts);
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
-                FPVector2 previousPosition = filter.Transform->Position;
-                MoveVertically(f, -FP._0_33, filter.Entity, stage, contacts);
+                FPVector2 previousPosition = transform->Position;
+                
+                MoveVertically(f, -FP._0_25 * f.UpdateRate, entity, stage, contacts);
                 ResolveContacts(physicsObject, contacts);
+
                 if (!physicsObject->IsTouchingGround) {
-                    filter.Transform->Position = previousPosition;
+                    transform->Position = previousPosition;
                     physicsObject->Velocity.Y = 0;
                     physicsObject->HoverFrames = 2;
                 }
@@ -71,7 +76,9 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
                 physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
             }
+
             physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
+            physicsObject->PreviousVelocity = physicsObject->Velocity;
         }
 
         private void MoveWithPlatform(Frame f, ref Filter filter, QList<PhysicsContact> contacts) {
@@ -211,7 +218,6 @@ namespace Quantum {
                             }
                         }
 
-                        Draw.Ray(hit.Point, FPVector2.Right, ColorRGBA.Cyan);
                         potentialContacts.Add(new PhysicsContact {
                             Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.Y) - RaycastSkin,
                             Normal = hit.Normal,

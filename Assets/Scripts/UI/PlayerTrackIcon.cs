@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerTrackIcon : TrackIcon {
+public unsafe class PlayerTrackIcon : TrackIcon {
 
     //---Static Variables
     public static bool HideAllPlayerIcons = false;
@@ -33,12 +33,12 @@ public class PlayerTrackIcon : TrackIcon {
     }
 
     public void Start() {
-        var game = QuantumRunner.DefaultGame;
-        var config = game.Configurations.Runtime;
+        QuantumGame game = QuantumRunner.DefaultGame;
+        Frame f = game.Frames.Predicted;
 
         var mario = game.Frames.Predicted.Get<MarioPlayer>(targetEntity);
         image.color = Utils.GetPlayerColor(game, mario.PlayerRef);
-        if (config.TeamsEnabled) {
+        if (f.Global->Rules.TeamsEnabled) {
             teamIcon.sprite = ScriptableManager.Instance.teams[mario.Team].spriteColorblind;
         }
 
@@ -51,7 +51,9 @@ public class PlayerTrackIcon : TrackIcon {
 
         bool controllingCamera = playerElements.CameraAnimator.Target == targetEntity;
         transform.localScale = controllingCamera ? FlipY : TwoThirds;
-        teamIcon.gameObject.SetActive(Settings.Instance.GraphicsColorblind && game.Configurations.Runtime.TeamsEnabled && !controllingCamera);
+
+        Frame f = game.Frames.Predicted;
+        teamIcon.gameObject.SetActive(Settings.Instance.GraphicsColorblind && f.Global->Rules.TeamsEnabled && !controllingCamera);
     }
 
     private IEnumerator Flash() {

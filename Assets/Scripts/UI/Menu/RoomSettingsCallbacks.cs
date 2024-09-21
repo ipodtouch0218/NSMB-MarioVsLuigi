@@ -1,6 +1,7 @@
 using NSMB.Translation;
 using Photon.Client;
 using Photon.Realtime;
+using Quantum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,9 +17,6 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private Slider playersSlider;
         [SerializeField] private Toggle privateEnabledToggle, timerEnabledToggle, livesEnabledToggle, drawEnabledToggle, teamsEnabledToggle, customPowerupsEnabledToggle;
         [SerializeField] private TeamChooser teamSelectorButton;
-
-
-        //---Properties
 
         //---Private Variables
         private bool isRoomCodeVisible;
@@ -50,7 +48,7 @@ namespace NSMB.UI.MainMenu {
             SetRoomIdVisibility(isRoomCodeVisible);
 
             if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
                 MainMenuManager.Instance.UpdateStartGameButton();
             }
         }
@@ -274,7 +272,7 @@ namespace NSMB.UI.MainMenu {
             });
 
             if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
             }
         }
         private void ChangeTeams(bool value) {
@@ -282,7 +280,7 @@ namespace NSMB.UI.MainMenu {
             teamSelectorButton.SetEnabled(value);
 
             if (!teamsEnabledToggle.isOn && value) {
-                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries();
+                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
             }
         }
         #endregion

@@ -1,0 +1,30 @@
+component PlayerData {
+
+	PlayerRef PlayerRef;
+	bool IsRoomHost;
+	bool IsReady;
+
+	byte Character;
+	byte Skin;
+	byte Team;
+
+	bool IsSpectator;
+
+	int Wins;
+	FP LastChatMessage;
+	bool IsLoaded;
+	int JoinTick;
+	int Ping;
+
+}
+
+event PlayerStartedTyping {
+	Frame Frame;
+	PlayerRef Player;
+}
+
+synced event PlayerSentChatMessage {
+	Frame Frame;
+	PlayerRef Player;
+	String Message;
+}

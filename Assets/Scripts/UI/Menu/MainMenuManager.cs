@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu {
-    public class MainMenuManager : Singleton<MainMenuManager>, IOnEventCallback {
+    public class MainMenuManager : Singleton<MainMenuManager> {
 
         //---Static Variables
         public static readonly int NicknameMin = 2, NicknameMax = 20;
@@ -80,7 +80,6 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
             NetworkHandler.StateChanged += OnClientStateChanged;
-            NetworkHandler.Client.AddCallbackTarget(this);
 
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -98,7 +97,14 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
             NetworkHandler.StateChanged -= OnClientStateChanged;
-            NetworkHandler.Client.RemoveCallbackTarget(this);
+            NetworkHandler.OnLocalPlayerConfirmed += () => {
+                QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
+                    Character = (byte) Settings.Instance.generalCharacter,
+                    Skin = (byte) Settings.Instance.generalSkin,
+                    Spectating = false,
+                    Team = 0,
+                });
+            };
 
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -160,6 +166,11 @@ namespace NSMB.UI.MainMenu {
 #endif
 
             GlobalController.Instance.firstConnection = false;
+
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+            QuantumCallback.Subscribe<CallbackGameInit>(this, OnGameInit);
         }
 
         public void Update() {
@@ -202,7 +213,6 @@ namespace NSMB.UI.MainMenu {
                 chat.ReplayChatMessages();
             } else {
                 chatTextField.SetTextWithoutNotify("");
-                sfx.PlayOneShot(SoundEffect.UI_PlayerConnect);
                 if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
                 }
@@ -222,21 +232,9 @@ namespace NSMB.UI.MainMenu {
             roomSettingsCallbacks.UpdateAllSettings(NetworkHandler.Client.CurrentRoom, false);
 
             // Set the player settings
-            PhotonHashtable properties = NetworkHandler.Client.LocalPlayer.CustomProperties;
-            int characterIndex = 0;
-            if (properties.TryGetValue(Enums.NetPlayerProperties.Character, out object character) && character is int) {
-                characterIndex = (int) character;
-            }
-            characterDropdown.SetValueWithoutNotify(characterIndex);
-            currentCharacter = GlobalController.Instance.config.CharacterDatas[characterIndex % GlobalController.Instance.config.CharacterDatas.Length];
-            colorManager.ChangeCharacter(currentCharacter);
-
+            SwapCharacter(Settings.Instance.generalCharacter, false);
             SwapPlayerSkin(Settings.Instance.generalSkin, false);
-            bool spectate = false;
-            if (properties.TryGetValue(Enums.NetPlayerProperties.Spectator, out object spectator) && spectator is int spectatorInt) {
-                spectate = spectatorInt == 1;
-            }
-            spectateToggle.isOn = spectate;
+            spectateToggle.isOn = false;
 
             // Reset the "Game start" button counting down
             OnCountdownTick(-1);
@@ -248,7 +246,7 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.discordController.UpdateActivity();
 
             // Create player icons
-            playerList.PopulatePlayerEntries();
+            playerList.PopulatePlayerEntries(QuantumRunner.DefaultGame);
         }
 
         public void UpdateRoomHeader() {
@@ -419,36 +417,30 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void QuitRoom() {
-            OpenRoomListMenu();
-            _ = Reconnect();
-            GlobalController.Instance.discordController.UpdateActivity();
+            QuantumRunner.Default.Shutdown();
         }
 
-        public void StartCountdown() {
-            if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
+        public unsafe void StartCountdown() {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
 
-                /* TODO
-                if (!cowndownStarted && !IsRoomConfigurationValid()) {
-                    return;
-                }
-                */
 
-                /*
-                Debug.Log("CHANGE COUTNDOWN STATE");
-                Debug.Log(NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.ChangeCountdownState, !isCountdownStarted,
-                    new RaiseEventArgs() { Receivers = ReceiverGroup.All, }, SendOptions.SendReliable
-                ));
-                */
+            var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
+            List<PlayerData> playerDatas = new();
+            foreach (PlayerRef localPlayer in game.GetLocalPlayers()) {
+                playerDatas.Add(f.Get<PlayerData>(playerDataDictionary[localPlayer]));
+            }
 
-                NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.StartGame, null, new RaiseEventArgs {
-                    Receivers = ReceiverGroup.All,
-                }, SendOptions.SendReliable);
-
+            PlayerData? host = playerDatas.Cast<PlayerData?>().FirstOrDefault(pd => pd.HasValue && pd.Value.IsRoomHost);
+            if (host.HasValue) {
+                int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host.Value.PlayerRef)];
+                game.SendCommand(slot, new CommandToggleCountdown());
             } else {
                 isReady = !isReady;
-                NetworkHandler.Client.LocalPlayer.SetCustomProperties(new() {
-                    [Enums.NetPlayerProperties.Ready] = isReady,
-                });
+                foreach (int slot in game.GetLocalPlayerSlots()) {
+                    // All players are ready at the same time
+                    game.SendCommand(new CommandToggleReady());
+                }
 
                 sfx.PlayOneShot(isReady ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
             }
@@ -552,9 +544,9 @@ namespace NSMB.UI.MainMenu {
 
         public void SwapCharacter(int character, bool broadcast) {
             if (broadcast) {
-                NetworkHandler.Client.LocalPlayer.SetCustomProperties(new PhotonHashtable {
-                    [Enums.NetPlayerProperties.Character] = character
-                });
+                //NetworkHandler.Client.LocalPlayer.SetCustomProperties(new PhotonHashtable {
+                //    [Enums.NetPlayerProperties.Character] = character
+                //});
             } else {
                 characterDropdown.SetValueWithoutNotify(character);
             }
@@ -728,10 +720,6 @@ namespace NSMB.UI.MainMenu {
 
         private void OnClientStateChanged(ClientState oldState, ClientState newState) {
             switch (newState) {
-            case ClientState.Joined:
-                // Joined a room
-                EnterRoom(false);
-                break;
             case ClientState.DisconnectingFromNameServer:
                 // Add regions to dropdown
                 UpdateRegionDropdown();
@@ -779,28 +767,6 @@ namespace NSMB.UI.MainMenu {
             */
         }
 
-        /* TODO
-        private void OnPlayerDataReady(PlayerData data) {
-            if (data.Owner == Runner.LocalPlayer) {
-                EnterRoom(false);
-            }
-
-            sfx.PlayOneShot(Sounds.UI_PlayerConnect);
-            UpdateStartGameButton();
-        }
-        */
-
-        /* TODO
-        private void OnPlayerDataDespawned(PlayerData data) {
-            if (!Runner.IsShutdown && data.Owner != Runner.LocalPlayer) {
-                sfx.PlayOneShot(Sounds.UI_PlayerDisconnect);
-                UpdateStartGameButton();
-            }
-
-            GlobalController.Instance.discordController.UpdateActivity();
-        }
-        */
-
         private void OnPause(InputAction.CallbackContext context) {
             if (isActiveAndEnabled && (NetworkHandler.Client?.InRoom ?? false) && !wasSettingsOpen) {
                 // Open the settings menu if we're inside a room (so we dont have to leave)
@@ -809,26 +775,31 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        private void OnSceneLoadStart() {
-            /* TODO
-            if (!Runner.TryGetSceneInfo(out var sceneInfo) || sceneInfo.Scenes[0].AsIndex != 0) {
-                GlobalController.Instance.loadingCanvas.Initialize();
+        private void OnGameStateChanged(EventGameStateChanged e) {
+            if (e.NewState == GameState.WaitingForPlayers) {
+                GlobalController.Instance.loadingCanvas.Initialize(e.Game);
+                transform.parent.gameObject.SetActive(false);
+            } else if (e.NewState == GameState.PreGameRoom) {
+                transform.parent.gameObject.SetActive(true);
             }
-            */
         }
 
-        public void OnEvent(EventData photonEvent) {
-            if (photonEvent.Code == (byte) Enums.NetEvents.StartGame) {
-                GlobalController.Instance.loadingCanvas.Initialize();
-                transform.parent.gameObject.SetActive(false);
-            }
-            /*
-            if (photonEvent.Code == (byte) Enums.NetEvents.ChangeCountdownState) {
-                isCountdownStarted = (bool) photonEvent.CustomData;
-                sfx.PlayOneShot(isCountdownStarted ? SoundEffect.UI_Back : SoundEffect.UI_StartGame);
-            }
-            */
-                // Debug.Log(photonEvent.Code + " - " + photonEvent.CustomData);
+        private void OnGameDestroyed(CallbackGameDestroyed e) {
+            OpenRoomListMenu();
+            GlobalController.Instance.discordController.UpdateActivity();
+            _ = Reconnect();
+        }
+
+        private void OnGameInit(CallbackGameInit e) {
+            EnterRoom(false);
+        }
+
+        private void OnPlayerAdded(EventPlayerAdded e) {
+            sfx.PlayOneShot(SoundEffect.UI_PlayerConnect);
+        }
+
+        private void OnPlayerRemoved(EventPlayerRemoved e) {
+            sfx.PlayOneShot(SoundEffect.UI_PlayerDisconnect);
         }
 
         //---Debug

@@ -1,15 +1,11 @@
-using NSMB.Extensions;
-using Photon.Client;
-using Photon.Realtime;
-using System.Collections.Generic;
-using UnityEngine;
-
 using Quantum;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace NSMB.UI.MainMenu {
-    public class PlayerListHandler : MonoBehaviour, IInRoomCallbacks {
+    public class PlayerListHandler : MonoBehaviour {
 
         //---Serialized Variables
         [SerializeField] private GameObject contentPane, template;
@@ -19,7 +15,6 @@ namespace NSMB.UI.MainMenu {
         private Coroutine autoRefreshCoroutine;
 
         public void OnEnable() {
-            NetworkHandler.Client.AddCallbackTarget(this);
             autoRefreshCoroutine = StartCoroutine(AutoUpdateCoroutine());
         }
 
@@ -29,31 +24,42 @@ namespace NSMB.UI.MainMenu {
                 StopCoroutine(autoRefreshCoroutine);
                 autoRefreshCoroutine = null;
             }
-            NetworkHandler.Client?.RemoveCallbackTarget(this);
         }
 
-        public void PopulatePlayerEntries() {
+        public void Start() {
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+        }
+
+        public unsafe void PopulatePlayerEntries(QuantumGame game) {
             RemoveAllPlayerEntries();
 
-            foreach ((_, Player player) in NetworkHandler.Client.CurrentRoom.Players) {
-                AddPlayerEntry(player);
+            Frame f = game.Frames.Predicted;
+            var playerDataFilter = f.Filter<PlayerData>();
+
+            while (playerDataFilter.NextUnsafe(out _, out PlayerData* playerData)) {
+                AddPlayerEntry(game, playerData->PlayerRef);
             }
         }
 
-        public void AddPlayerEntry(Player player) {
+        public void AddPlayerEntry(QuantumGame game, PlayerRef player) {
             if (player == null || !template) {
                 return;
             }
 
-            if (!playerListEntries.ContainsKey(player.ActorNumber)) {
+            Frame f = game.Frames.Predicted;
+            RuntimePlayer runtimePlayerData = f.GetPlayerData(player);
+
+            if (!playerListEntries.ContainsKey(player)) {
                 GameObject go = Instantiate(template, contentPane.transform);
-                go.name = $"{player.NickName} ({player.UserId})";
-                playerListEntries[player.ActorNumber] = go.GetComponent<PlayerListEntry>();
-                playerListEntries[player.ActorNumber].player = player;
+                go.name = $"{runtimePlayerData.PlayerNickname} ({runtimePlayerData.UserId})";
+                playerListEntries[player] = go.GetComponent<PlayerListEntry>();
+                playerListEntries[player].player = player;
                 go.SetActive(true);
             }
 
-            UpdateAllPlayerEntries();
+            UpdateAllPlayerEntries(game);
         }
 
         public void RemoveAllPlayerEntries() {
@@ -64,19 +70,19 @@ namespace NSMB.UI.MainMenu {
         }
 
 
-        public void RemovePlayerEntry(Player player) {
-            if (!playerListEntries.ContainsKey(player.ActorNumber)) {
+        public void RemovePlayerEntry(QuantumGame game, PlayerRef player) {
+            if (!playerListEntries.ContainsKey(player)) {
                 return;
             }
 
-            Destroy(playerListEntries[player.ActorNumber].gameObject);
-            playerListEntries.Remove(player.ActorNumber);
-            UpdateAllPlayerEntries();
+            Destroy(playerListEntries[player].gameObject);
+            playerListEntries.Remove(player);
+            UpdateAllPlayerEntries(game);
         }
 
-        public void UpdateAllPlayerEntries() {
-            foreach ((_, Player player) in NetworkHandler.Client.CurrentRoom.Players) {
-                UpdatePlayerEntry(player, false);
+        public void UpdateAllPlayerEntries(QuantumGame game) {
+            foreach ((PlayerRef player, _) in playerListEntries) {
+                UpdatePlayerEntry(game, player, false);
             }
 
             if (MainMenuManager.Instance) {
@@ -84,13 +90,13 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public void UpdatePlayerEntry(Player player, bool updateChat = true) {
-            if (!playerListEntries.TryGetValue(player.ActorNumber, out PlayerListEntry entry)) {
+        public void UpdatePlayerEntry(QuantumGame game, PlayerRef player, bool updateChat = true) {
+            if (!playerListEntries.TryGetValue(player, out PlayerListEntry entry)) {
                 //AddPlayerEntry(data);
                 return;
             }
 
-            entry.UpdateText();
+            entry.UpdateText(game);
             ReorderEntries();
 
             if (updateChat && MainMenuManager.Instance) {
@@ -110,32 +116,29 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public PlayerListEntry GetPlayerListEntry(int actorNumber) {
-            return playerListEntries.GetValueOrDefault(actorNumber);
+        public PlayerListEntry GetPlayerListEntry(PlayerRef player) {
+            return playerListEntries.GetValueOrDefault(player);
         }
 
         private IEnumerator AutoUpdateCoroutine() {
             WaitForSeconds seconds = new(1);
             while (true) {
                 yield return seconds;
-                UpdateAllPlayerEntries();
+                UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
             }
         }
 
         //---Callbacks
-        public void OnPlayerEnteredRoom(Player newPlayer) {
-            AddPlayerEntry(newPlayer);
-            MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_PlayerConnect);
+        private void OnPlayerAdded(EventPlayerAdded e) {
+            AddPlayerEntry(e.Game, e.Player);
         }
 
-        public void OnPlayerLeftRoom(Player otherPlayer) {
-            RemovePlayerEntry(otherPlayer);
+        private void OnPlayerRemoved(EventPlayerRemoved e) {
+            RemovePlayerEntry(e.Game, e.Player);
         }
 
-        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) { }
-
-        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) { }
-
-        public void OnMasterClientSwitched(Player newMasterClient) { }
+        private void OnGameDestroyed(CallbackGameDestroyed e) {
+            RemoveAllPlayerEntries();
+        }
     }
 }

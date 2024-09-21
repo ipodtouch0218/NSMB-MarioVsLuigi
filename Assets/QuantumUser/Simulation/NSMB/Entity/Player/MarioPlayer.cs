@@ -136,7 +136,7 @@ namespace Quantum {
             PreRespawnFrames = 180;
             RespawnFrames = 78;
 
-            if ((f.RuntimeConfig.LivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
+            if ((f.Global->Rules.Lives > 0 && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
                 // Last death - drop all stars at 0.5s each
                 // TODO if (!GameManager.Instance.CheckForWinner()) {
                     SpawnStars(f, entity, 1);
@@ -241,7 +241,7 @@ namespace Quantum {
                 }
             }
 
-            if (f.RuntimeConfig.LivesEnabled && Lives == 0) {
+            if (f.Global->Rules.Lives > 0 && Lives == 0) {
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
                 starDirection = NoLivesStarDirection;
@@ -285,13 +285,13 @@ namespace Quantum {
 
             RespawnFrames = 78;
 
-            if (f.RuntimeConfig.LivesEnabled && Lives == 0) {
+            if (f.Global->Rules.Lives > 0 && Lives == 0) {
                 // TODO GameManager.Instance.CheckForWinner();
                 f.Destroy(entity);
                 return;
             }
 
-            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.RuntimeConfig.ExpectedPlayers);
+            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->RealPlayers);
             transform->Position = spawnpoint;
             f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
             

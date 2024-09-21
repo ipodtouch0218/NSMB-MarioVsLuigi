@@ -1,17 +1,16 @@
 using NSMB.Extensions;
 using NSMB.Utils;
-using Photon.Client;
-using Photon.Realtime;
+using Quantum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu {
-    public class PlayerListEntry : MonoBehaviour, IInRoomCallbacks {
+    public class PlayerListEntry : MonoBehaviour {
 
         //---Public Variables
-        public Player player;
+        public PlayerRef player;
         public float typingCounter;
 
         //---Serialized Variables
@@ -53,9 +52,13 @@ namespace NSMB.UI.MainMenu {
 
         public void Start() {
             nameText.color = NicknameColor.color;
+
+            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         }
 
-        public void Update() {
+        public void OnUpdateView(CallbackUpdateView e) {
+            QuantumGame game = e.Game;
+
             nameText.color = NicknameColor.color;
             if (NicknameColor.isRainbow) {
                 nameText.color = Utils.Utils.GetRainbowColor();
@@ -69,32 +72,29 @@ namespace NSMB.UI.MainMenu {
                 typingCounter = 0;
             }
 
-            UpdateText();
+            UpdateText(game);
         }
 
-        public void UpdateText() {
-            colorStrip.color = Utils.Utils.GetPlayerColor(player);
+        public unsafe void UpdateText(QuantumGame game) {
+            colorStrip.color = Utils.Utils.GetPlayerColor(game, player);
 
-            /*
-            if (player.Wins == 0) {
+            Frame f = game.Frames.Predicted;
+            var playerData = f.Get<PlayerData>(f.ResolveDictionary(f.Global->PlayerDatas)[player]);
+
+            if (playerData.Wins == 0) {
                 winsText.text = "";
             } else {
-                winsText.text = "<sprite name=room_wins>" + player.Wins;
+                winsText.text = "<sprite name=room_wins>" + playerData.Wins;
             }
-            */
 
-            if (player.CustomProperties.TryGetValue(Enums.NetPlayerProperties.Ping, out object ping) && ping is int pingInt) {
-                pingText.text = pingInt + " " + Utils.Utils.GetPingSymbol(pingInt);
-            } else {
-                pingText.text = "";
-            }
+            pingText.text = playerData.Ping + " " + Utils.Utils.GetPingSymbol(playerData.Ping);
 
             string permissionSymbol = "";
-            if (player.IsMasterClient) {
+            if (playerData.IsRoomHost) {
                 permissionSymbol += "<sprite name=room_host>";
             }
 
-            NetworkUtils.GetCustomProperty(player.CustomProperties, Enums.NetPlayerProperties.Character, out int characterIndex);
+            int characterIndex = playerData.Character;
             characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
             string characterSymbol = GlobalController.Instance.config.CharacterDatas[characterIndex].UiString;
 
@@ -109,7 +109,8 @@ namespace NSMB.UI.MainMenu {
             */
             //nameText.text = permissionSymbol + characterSymbol + teamSymbol + player.GetNickname();
 
-            nameText.text = permissionSymbol + characterSymbol + player.NickName.ToValidUsername();
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+            nameText.text = permissionSymbol + characterSymbol + runtimePlayer.PlayerNickname.ToValidUsername();
 
             Transform parent = transform.parent;
             int childIndex = 0;
@@ -130,7 +131,8 @@ namespace NSMB.UI.MainMenu {
                 Destroy(blockerInstance);
             }
 
-            bool adminOptions = NetworkHandler.Client.LocalPlayer.IsMasterClient && player != NetworkHandler.Client.LocalPlayer;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            bool adminOptions = NetworkHandler.Client.LocalPlayer.IsMasterClient && !game.PlayerIsLocal(player);
             foreach (GameObject option in adminOnlyOptions) {
                 option.SetActive(adminOptions);
             }
@@ -179,8 +181,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void CopyPlayerId() {
+            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+
             TextEditor te = new() {
-                text = player.UserId,
+                text = runtimePlayer.UserId.ToString(),
             };
             te.SelectAll();
             te.Copy();
@@ -189,7 +194,7 @@ namespace NSMB.UI.MainMenu {
 
         //---Callbacks
         private void OnColorblindModeChanged() {
-            UpdateText();
+            UpdateText(QuantumRunner.DefaultGame);
         }
 
         private void OnInSettingsChanged(bool inSettings) {
@@ -199,19 +204,5 @@ namespace NSMB.UI.MainMenu {
         private void OnIsReadyChanged(bool isReady) {
             readyIcon.SetActive(isReady);
         }
-
-        public void OnPlayerEnteredRoom(Player newPlayer) { }
-
-        public void OnPlayerLeftRoom(Player otherPlayer) { }
-
-        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) { }
-
-        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) {
-            if (player == targetPlayer) {
-                UpdateText();
-            }
-        }
-
-        public void OnMasterClientSwitched(Player newMasterClient) { }
     }
 }

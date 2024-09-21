@@ -55,24 +55,10 @@ public static class Enums {
     #endregion
     #region NETWORKING
     // Networking Enums
-    public enum NetEvents : byte {
-        ChangeCountdownState = 100,
-        StartGame = 101,
-        ChatMessage = 102,
-        ChatTyping = 103,
-    }
-
     public static class NetRoomProperties {
         public const string IntProperties = "I";
         public const string BoolProperties = "B";
         public const string HostName = "H";
-    }
-
-    public static class NetPlayerProperties {
-        public const string Ping = "P";
-        public const string Character = "C";
-        public const string Ready = "R";
-        public const string Spectator = "S";
     }
     #endregion
 }

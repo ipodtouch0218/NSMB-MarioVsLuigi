@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using TMPro;
 using NSMB.Translation;
 using NSMB.Extensions;
 using Photon.Realtime;
 using Photon.Client;
+using Quantum;
 
 namespace NSMB.UI.MainMenu {
 
@@ -16,7 +16,7 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         [SerializeField] private ChatMessage messagePrefab;
         [SerializeField] private TMP_InputField chatbox;
-        [SerializeField] private Button sendBtn;
+        [SerializeField] private UnityEngine.UI.Button sendBtn;
         [SerializeField] private TMP_Text chatPrompt;
         [SerializeField] private GameObject chatWindow;
 
@@ -28,8 +28,6 @@ namespace NSMB.UI.MainMenu {
             ChatManager.OnChatMessage += OnChatMessage;
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
-            NetworkHandler.Client.EventReceived += OnEvent;
-
             OnDisableChatChanged();
         }
 
@@ -37,7 +35,10 @@ namespace NSMB.UI.MainMenu {
             ChatManager.OnChatMessage -= OnChatMessage;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
-            NetworkHandler.Client.EventReceived -= OnEvent;
+        }
+
+        public void Start() {
+            QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping);   
         }
 
         public void ReplayChatMessages() {
@@ -143,18 +144,14 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            NetworkHandler.Client.OpRaiseEvent((byte) Enums.NetEvents.ChatTyping, null, new RaiseEventArgs {
-                Receivers = ReceiverGroup.All,
-            }, SendOptions.SendUnreliable);
+            QuantumRunner.DefaultGame.SendCommand(new CommandStartTyping());
         }
 
-        private void OnEvent(EventData photonEvent) {
-            if (photonEvent.Code == (byte) Enums.NetEvents.ChatTyping) {
-                Player player = NetworkHandler.Client.CurrentRoom.Players[photonEvent.Sender];
-                PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player.ActorNumber);
-                if (ple) {
-                    ple.typingCounter = 4;
-                }
+        private void OnPlayerStartedTyping(EventPlayerStartedTyping e) {
+            Player player = NetworkHandler.Client.CurrentRoom.Players[e.Player];
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player.ActorNumber);
+            if (ple) {
+                ple.typingCounter = 4;
             }
         }
     }

@@ -28,7 +28,7 @@ public class MusicManager : MonoBehaviour {
 
     private unsafe void HandleMusic(QuantumGame game, bool force) {
         Frame f = game.Frames.Predicted;
-        var config = game.Configurations.Runtime;
+        var rules = f.Global->Rules;
 
         if (!force && !musicPlayer.IsPlaying) {
             return;
@@ -42,7 +42,7 @@ public class MusicManager : MonoBehaviour {
         int playersWithOneLife = 0;
         int playerCount = 0;
         while (allPlayers.Next(out _, out MarioPlayer mario)) {
-            if (config.LivesEnabled) {
+            if (rules.Lives > 0) {
                 if (mario.Lives == 1) {
                     playersWithOneLife++;
                 }
@@ -57,10 +57,10 @@ public class MusicManager : MonoBehaviour {
             invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && mario.IsStarmanInvincible;
         }
 
-        speedup |= config.TimerEnabled && f.Global->Timer <= 60;
-        speedup |= QuantumUtils.GetFirstPlaceStars(f) >= config.StarsToWin - 1;
+        speedup |= rules.TimerSeconds > 0 && f.Global->Timer <= 60;
+        speedup |= QuantumUtils.GetFirstPlaceStars(f) >= rules.StarsToWin - 1;
 
-        if (!speedup && config.LivesEnabled) {
+        if (!speedup && rules.Lives > 0) {
             // Also speed up the music if:
             // A: two players left, at least one has one life
             // B: three+ players left, all have one life
