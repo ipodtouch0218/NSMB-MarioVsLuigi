@@ -11,6 +11,7 @@ namespace Quantum {
     /// <summary>
     /// The runner object set during <see cref="QuantumRunner.StartGame(SessionRunner.Arguments)"/>
     /// </summary>
+    [InlineHelp]
     public QuantumRunner Runner;
 
     /// <summary>

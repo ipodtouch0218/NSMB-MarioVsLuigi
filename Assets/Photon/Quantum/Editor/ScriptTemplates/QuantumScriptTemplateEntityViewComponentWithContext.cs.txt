@@ -1,6 +1,8 @@
-namespace Quantum {
-  using UnityEngine;
+namespace Quantum
+{
+    using UnityEngine;
 
-  public class #SCRIPTNAME# : QuantumEntityViewComponent<IQuantumViewContext> {
-  }
+    public class #SCRIPTNAME# : QuantumEntityViewComponent<IQuantumViewContext>
+    {
+    }
 }

@@ -26,7 +26,7 @@
             The MulRound constant is 0.
             The MulShift constant is equal to the precision value.
             The MulShiftTrunc constant is equal to the precision value.
-            The UsesRoundedConstants constant is either <see langword="true"/> or <see langword="false"/>, depending on the value of PHOTONDETERMINISTIC_FP_NEW_CONSTANTS.
+            The UsesRoundedConstants constant is either <see langword="true"/> or <see langword="false"/>, depending on the value of PHOTONDETERMINISTIC_FP_OLD_CONSTANTS.
             </remarks>
             <seealso cref="T:Photon.Deterministic.FPLut"/>
             <see langword="true"/>
@@ -1076,22 +1076,32 @@
         </member>
         <member name="M:Photon.Deterministic.FP.FromRoundedDouble_UNSAFE(System.Double)">
             <summary>
-            Converts a rounded double value to a FP value.
+            Converts a double value to an instance of the FP, with rounding to the nearest representable FP.
             </summary>
             <param name="value">The rounded double value to convert.</param>
             <returns>The FP value that represents the rounded double value.</returns>
         </member>
         <member name="M:Photon.Deterministic.FP.FromDouble_UNSAFE(System.Double)">
             <summary>
-            Converts a double value to an instance of the FP struct.
+            Converts a double value to an instance of the FP, with rounding towards zero..
+            To round towards nearest representable FP, use <see cref="M:Photon.Deterministic.FP.FromRoundedDouble_UNSAFE(System.Double)"/>.
             This method is marked as unsafe because it is not deterministic.
             </summary>
             <param name="value">The double value to convert.</param>
             <returns>An instance of the FP struct that represents the converted value.</returns>
         </member>
+        <member name="M:Photon.Deterministic.FP.FromRoundedFloat_UNSAFE(System.Single)">
+            <summary>
+            Converts a single-precision floating-point value to an instance of the FP, with rounding to the nearest representable FP.
+            This method is marked as unsafe because it is not deterministic.
+            </summary>
+            <param name="value">The value to convert.</param>
+            <returns>The converted value.</returns>
+        </member>
         <member name="M:Photon.Deterministic.FP.FromFloat_UNSAFE(System.Single)">
             <summary>
-            Converts a single-precision floating-point value to an instance of the FP struct.
+            Converts a single-precision floating-point value to an instance of the FP, with rounding towards zero..
+            To round towards nearest representable FP, use <see cref="M:Photon.Deterministic.FP.FromRoundedFloat_UNSAFE(System.Single)"/>.
             This method is marked as unsafe because it is not deterministic.
             </summary>
             <param name="value">The value to convert.</param>
@@ -8075,6 +8085,31 @@
             </summary>
             <param name="frameData">The frame data to use for resynchronization.</param>
             <param name="frameNumber">The frame number to resynchronize with.</param>
+        </member>
+        <member name="T:Photon.Deterministic.DeterministicCommandSendResult">
+            <summary>
+            The result of sending a deterministic command.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.DeterministicCommandSendResult.Success">
+            <summary>
+            Success
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.DeterministicCommandSendResult.FailedIsSpectating">
+            <summary>
+            Can't send commands when running in spectating mode.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.DeterministicCommandSendResult.FailedTooBig">
+            <summary>
+            Command message is too big
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.DeterministicCommandSendResult.FailedSimulationNotRunning">
+            <summary>
+            Simulation is not running
+            </summary>
         </member>
         <member name="T:Photon.Deterministic.DeterministicSessionArgs">
             <summary>

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using static NSMB.Utils.NetworkUtils;
 
 namespace NSMB.UI.MainMenu {
-    public class RoomSettingsCallbacks : MonoBehaviour, IInRoomCallbacks {
+    public unsafe class RoomSettingsCallbacks : MonoBehaviour {
 
         //---Serailized Variables
         [SerializeField] private TMP_Dropdown levelDropdown;
@@ -23,12 +23,10 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
-            NetworkHandler.Client.AddCallbackTarget(this);
         }
 
         public void OnDisable() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
-            NetworkHandler.Client.RemoveCallbackTarget(this);
         }
 
         public void UpdateAllSettings(Room roomData, bool level) {
@@ -55,6 +53,17 @@ namespace NSMB.UI.MainMenu {
 
         #region Level Index
         public void SetLevelIndex() {
+            int index = levelDropdown.value;
+            MainMenuManager.MapData mapData = MainMenuManager.Instance.maps[index];
+
+            QuantumGame game = QuantumRunner.DefaultGame;
+            var settings = game.Frames.Predicted.Global->Rules;
+            if (settings.Level == mapData.mapAsset) {
+                // Already have this level set.
+                return;
+            }
+
+
             Room room = NetworkHandler.Client.CurrentRoom;
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
             IntegerProperties properties = v;

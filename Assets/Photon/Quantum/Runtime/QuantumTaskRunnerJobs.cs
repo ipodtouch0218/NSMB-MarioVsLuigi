@@ -2,9 +2,9 @@ namespace Quantum {
   using System;
   using Photon.Analyzer;
   using Photon.Deterministic;
-  using global::Unity.Collections;
-  using global::Unity.Jobs;
-  using global::Unity.Jobs.LowLevel.Unsafe;
+  using Unity.Collections;
+  using Unity.Jobs;
+  using Unity.Jobs.LowLevel.Unsafe;
   using UnityEngine;
   using UnityEngine.Profiling;
   using Object = UnityEngine.Object;

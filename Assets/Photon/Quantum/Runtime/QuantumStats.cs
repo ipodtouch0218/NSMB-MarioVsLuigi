@@ -1,7 +1,7 @@
 namespace Quantum {
-  using Photon.Client;
   using System;
   using System.Diagnostics;
+  using Photon.Client;
   using UnityEngine;
   using UnityEngine.EventSystems;
   using UnityEngine.UI;
@@ -150,9 +150,7 @@ namespace Quantum {
         Toggles[i].SetActive(state);
       }
 
-      if (ToggleButtonText) {
-        ToggleButtonText.text = state ? "Hide Stats" : "Show Stats";
-      }
+      ToggleButtonText.text = state ? "Hide Stats" : "Show Stats";
     }
 
     /// <summary>

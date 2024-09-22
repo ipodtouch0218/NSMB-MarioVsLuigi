@@ -1,5 +1,5 @@
 namespace Quantum.Profiling {
-  using global::Unity.Profiling;
+  using Unity.Profiling;
 
   /// <summary>
   /// A Quantum graph profiler that records the garbage collection time.

@@ -83,16 +83,6 @@ namespace Quantum {
       [DisplayName("Type")]
       public Shape3DConfig Shape3D;
       /// <summary>
-      /// Used to scale the 2d shape to.
-      /// </summary>
-      [HideInInspector]
-      public Shape2DConfig ScaledShape2D;
-      /// <summary>
-      /// Used to scale the 3d shape to.
-      /// </summary>
-      [HideInInspector]
-      public Shape3DConfig ScaledShape3D;
-      /// <summary>
       /// The source for the layer.
       /// </summary>
       public QuantumEntityPrototypeColliderLayerSource LayerSource;
@@ -347,7 +337,6 @@ namespace Quantum {
           PhysicsCollider.Layer = this.gameObject.layer;
         }
 
-        ScaleShapeConfig2D(this.transform, PhysicsCollider.Shape2D, PhysicsCollider.ScaledShape2D);
       } else if (TransformMode == QuantumEntityPrototypeTransformMode.Transform3D) {
         if (QPrototypePhysicsCollider3D.TrySetShapeConfigFromSourceCollider(PhysicsCollider.Shape3D, transform, PhysicsCollider.SourceCollider, out var isTrigger)) {
           PhysicsCollider.IsTrigger = isTrigger;
@@ -358,8 +347,6 @@ namespace Quantum {
         } else if (PhysicsCollider.LayerSource == QuantumEntityPrototypeColliderLayerSource.GameObject) {
           PhysicsCollider.Layer = this.gameObject.layer;
         }
-
-        ScaleShapeConfig3D(this.transform, PhysicsCollider.Shape3D, PhysicsCollider.ScaledShape3D);
       }
 
       {
@@ -382,12 +369,24 @@ namespace Quantum {
       }
     }
 
+    internal Shape2DConfig GetScaledShape2DConfig() {
+      var result = new Shape2DConfig();
+      ScaleShapeConfig2D(transform, PhysicsCollider.Shape2D, result);
+      return result;
+    }
+    
+    internal Shape3DConfig GetScaledShape3DConfig() {
+      var result = new Shape3DConfig();
+      ScaleShapeConfig3D(transform, PhysicsCollider.Shape3D, result);
+      return result;
+    }
+    
     private static void ScaleShapeConfig2D(Transform t, Shape2DConfig from, Shape2DConfig scaledTo) {
       if (Shape2DConfig.Copy(from, scaledTo) == false) {
         return;
       }
-
-      var scale = t.lossyScale.ToFPVector2();
+      
+      var scale = t.lossyScale.ToRoundedFPVector2();
 
       scaledTo.BoxExtents.X *= scale.X;
       scaledTo.BoxExtents.Y *= scale.Y;
@@ -428,7 +427,7 @@ namespace Quantum {
         return;
       }
 
-      var scale = t.lossyScale.ToFPVector3();
+      var scale        = t.lossyScale.ToRoundedFPVector3();
       var sphereRadius = FPMath.Max(scale.X, scale.Y, scale.Z);
 
       scaledTo.BoxExtents.X *= scale.X;
@@ -481,7 +480,7 @@ namespace Quantum {
 
         if (Transform2DVertical.IsEnabled) {
 #if QUANTUM_XY
-        var verticalScale = transform.lossyScale.z.ToFP();
+          var verticalScale = transform.lossyScale.z.ToFP();
 #else
           var verticalScale = transform.lossyScale.y.ToFP();
 #endif
@@ -496,7 +495,7 @@ namespace Quantum {
             IsTrigger = PhysicsCollider.IsTrigger,
             Layer = PhysicsCollider.Layer,
             PhysicsMaterial = PhysicsCollider.Material,
-            ShapeConfig = PhysicsCollider.ScaledShape2D
+            ShapeConfig = GetScaledShape2DConfig(),
           });
 
           result.Add(new Quantum.Prototypes.PhysicsCallbacks2DPrototype() {
@@ -525,7 +524,7 @@ namespace Quantum {
             IsTrigger = PhysicsCollider.IsTrigger,
             Layer = PhysicsCollider.Layer,
             PhysicsMaterial = PhysicsCollider.Material,
-            ShapeConfig = PhysicsCollider.ScaledShape3D
+            ShapeConfig = GetScaledShape3DConfig(),
           });
 
           result.Add(new Quantum.Prototypes.PhysicsCallbacks3DPrototype() {

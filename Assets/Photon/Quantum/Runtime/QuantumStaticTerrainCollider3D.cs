@@ -2,12 +2,26 @@ namespace Quantum {
   using System;
   using Photon.Deterministic;
   using UnityEngine;
-  
+
+  /// <summary>
+  /// The script will create a static 3D terrain collider during Quantum map baking.
+  /// </summary>
   [ExecuteInEditMode]
   public class QuantumStaticTerrainCollider3D : QuantumMonoBehaviour {
-    public Quantum.TerrainCollider Asset;
+    /// <summary>
+    /// The Quantum terrain collider asset.
+    /// </summary>
+    [InlineHelp]
+    public TerrainCollider Asset;
+    /// <summary>
+    /// Additional static collider settings.
+    /// </summary>
+    [InlineHelp, DrawInline, Space]
     public QuantumStaticColliderSettings Settings = new QuantumStaticColliderSettings();
 
+    /// <summary>
+    /// The physics solver will resolve sphere and capsule shapes against terrain collisions as if it was a regular flat and smooth plane.
+    /// </summary>
     [HideInInspector]
     public Boolean SmoothSphereMeshCollisions = false;
 
@@ -25,8 +39,8 @@ namespace Quantum {
       Asset.Resolution = t.terrainData.heightmapResolution;
 
       Asset.HeightMap = new FP[Asset.Resolution * Asset.Resolution];
-      Asset.Position  = transform.position.ToFPVector3();
-      Asset.Scale     = t.terrainData.heightmapScale.ToFPVector3();
+      Asset.Position = transform.position.ToFPVector3();
+      Asset.Scale = t.terrainData.heightmapScale.ToFPVector3();
 
       for (int i = 0; i < Asset.Resolution; i++) {
         for (int j = 0; j < Asset.Resolution; j++) {

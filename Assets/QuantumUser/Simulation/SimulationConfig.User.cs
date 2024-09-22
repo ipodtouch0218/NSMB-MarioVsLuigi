@@ -1,6 +1,8 @@
 ﻿namespace Quantum {
     public partial class SimulationConfig : AssetObject {
 
+        public Map LobbyMap;
+
         public StageTile InvisibleSolidTile;
 
         public PowerupAsset[] AllPowerups;
@@ -9,5 +11,6 @@
 
         public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype;
 
+        public GameRules DefaultRules;
     }
 }

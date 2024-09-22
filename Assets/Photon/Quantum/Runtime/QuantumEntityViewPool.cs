@@ -6,7 +6,7 @@ namespace Quantum {
   /// <summary>
   /// An implementation of a EntityView pool to be used with the <see cref="QuantumEntityViewUpdater.Pool"/>.
   /// Add this behaviour to the same game object that the <see cref="QuantumEntityViewUpdater"/> behaviour is on.
-  /// Using QuantumCallback.Subscribe() with pooled objects as listener nees to use the onlyIfActiveAndEnabled option to not be callbacks from disabled pooled objects.
+  /// Using QuantumCallback.Subscribe() with pooled objects as listener needs to use the onlyIfActiveAndEnabled option to not be callbacks from disabled pooled objects.
   /// </summary>
   public class QuantumEntityViewPool : QuantumMonoBehaviour, IQuantumEntityViewPool {
     /// <summary>
@@ -191,15 +191,9 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Shutdow the pool.
+    /// Shutdown the pool.
     /// </summary>
     public void OnDestroy() {
-//#if DEBUG
-//      foreach (var item in _borrowed) {
-//        Debug.LogError($"Object {item.Value.name} from cache was not returned");
-//      }
-//#endif
-
       _deferred.Clear();
       _borrowed.Clear();
       _cached.Clear();

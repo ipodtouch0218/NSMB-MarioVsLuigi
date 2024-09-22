@@ -2,17 +2,12 @@ namespace Quantum.Editor {
   using System;
   using System.Collections.Generic;
   using System.Diagnostics;
-  using System.Linq;
   using UnityEditor;
   using UnityEditor.AssetImporters;
   using UnityEngine;
   using UnityEngine.Profiling;
   using UnityEngine.Serialization;
   using Debug = UnityEngine.Debug;
-#if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES
-  using UnityEditor.AddressableAssets;
-  using UnityEditor.AddressableAssets.Settings;
-#endif
 
   [ScriptedImporter(6, Extension, importQueueOffset: 200000)]
   internal unsafe partial class QuantumUnityDBImporter : ScriptedImporter {

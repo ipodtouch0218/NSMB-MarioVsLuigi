@@ -1,6 +1,8 @@
-namespace Quantum {
-  using Photon.Deterministic;
+namespace Quantum
+{
+    using Photon.Deterministic;
 
-  public class #SCRIPTNAME# : AssetObject {
-  }
+    public class #SCRIPTNAME# : AssetObject
+    {
+    }
 }

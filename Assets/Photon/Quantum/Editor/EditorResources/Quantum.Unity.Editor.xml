@@ -4,6 +4,103 @@
         <name>Quantum.Unity.Editor</name>
     </assembly>
     <members>
+        <member name="T:Quantum.Editor.QuantumUnityDBUtilities">
+            <summary>
+            QuantumUnityDB Editor utilities.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBUtilities.AssetLabel">
+            <summary>
+            Label applied to Quantum AssetObject assets.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.GetGlobalDBPath">
+            <summary>
+            Returns the default path to the <see cref="T:Quantum.QuantumUnityDB"/> asset. 
+            </summary>
+            <returns></returns>
+            <see cref="T:Quantum.QuantumGlobalScriptableObject`1"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.RefreshGlobalDB(System.Boolean)">
+            <summary>
+            Refreshes the global Quantum Unity DB. If <paramref name="force"/> is false, an update will only happen if the hash calculated
+            with assets under <see cref="F:Quantum.Editor.QuantumUnityDBUtilities.AssetLabel"/> label has changed. If <paramref name="force"/> is true, a refresh will be performed
+            regardless.
+            </summary>
+            <param name="force">Force the reimport.</param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.SetQuantumUnityDBRefreshMode(System.Boolean)">
+            <summary>
+            Sets the Quantum Unity DB refresh mode. By default, after an asset with <see cref="F:Quantum.Editor.QuantumUnityDBUtilities.AssetLabel"/> is imported, a call to
+            <see cref="M:Quantum.Editor.QuantumUnityDBImporter.RefreshAssetObjectHash"/> is scheduled. When running in batch mode, it may result
+            in the hash never being refreshed and the global <see cref="T:Quantum.QuantumUnityDB"/> not being updated. To prevent this,
+            call this method with <paramref name="immediate"/> set to true.
+            </summary>
+            <param name="immediate">Should <see cref="M:Quantum.Editor.QuantumUnityDBImporter.RefreshAssetObjectHash"/> be called immediately
+            after an asset import.</param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.ExportAsJson">
+            <summary>
+            Export the global DB to a JSON file. A dialog is shown to select the file.
+            </summary>
+            <returns><see langword="true"/> if a file was selected and saved into.</returns>
+            <see cref="M:Quantum.Editor.QuantumUnityDBUtilities.ExportAsJson(System.String)"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.ExportAsJson(System.String)">
+            <summary>
+            Export the global DB to a JSON file with <see cref="T:Quantum.QuantumUnityJsonSerializer"/>. None of the asset will have its
+            <see cref="M:Quantum.AssetObject.Loaded(Quantum.IResourceManager,Photon.Deterministic.Native.Allocator)"/> called, as they are loaded with <see cref="P:Quantum.IQuantumAssetObjectSource.EditorInstance"/>.
+            </summary>
+            <param name="path">Output path.</param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.IterateAssets">
+            <summary>
+            Enumerates <see cref="T:Quantum.AssetObject"/> assets with <see cref="F:Quantum.Editor.QuantumUnityDBUtilities.AssetLabel"/> label.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.CreateDeterministicAssetGuid(UnityEngine.LazyLoadReference{UnityEngine.Object})">
+            <summary>
+            Create a deterministic <see cref="T:Quantum.AssetGuid"/> for the given asset, based on its Unity GUID and FileID.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.CreateDeterministicAssetGuid(UnityEditor.GUID,System.Int64)">
+            <summary> 
+            Create a deterministic <see cref="T:Quantum.AssetGuid"/> for a Unity GUID and a FileID.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.GetExpectedAssetGuid(UnityEditor.GUID,System.Int64,System.Boolean@)">
+            <summary>
+            Returns the expected <see cref="T:Quantum.AssetGuid"/> for the given Unity asset GUID and FileID. If an override is set, it will be returned instead.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.GetExpectedAssetGuid(UnityEngine.LazyLoadReference{UnityEngine.Object},System.Boolean@)">
+            <summary>
+            Returns the expected <see cref="T:Quantum.AssetGuid"/> for the given asset. If an override is set, it will be returned instead.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.IsAssetGuidOverriden(UnityEngine.LazyLoadReference{UnityEngine.Object})">
+            <summary>
+            Returns true if the given asset has an AssetGuid override set.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.SetAssetGuidOverride(UnityEngine.LazyLoadReference{UnityEngine.Object},Quantum.AssetGuid)">
+            <summary>
+            Sets the AssetGuid override for the given asset. If the override is already set, it will be replaced. If
+            <paramref name="assetGuid"/> is <see cref="F:Quantum.AssetGuid.Invalid"/>, the override will be removed.
+            </summary>
+            <returns><see langword="true"/> if there actually was a change</returns>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.RemoveAssetGuidOverride(UnityEditor.GUID,System.Int64)">
+            <summary>
+            Removes the AssetGuid override for the given asset. 
+            </summary>
+            <returns>The override value, if present or <see cref="F:Quantum.AssetGuid.Invalid"/>.</returns>
+        </member>
+        <member name="M:Quantum.Editor.QuantumUnityDBUtilities.Append(UnityEngine.Hash128@,Quantum.AssetGuid)">
+            <summary>
+            Appends the <see cref="T:Quantum.AssetGuid"/> to the hash.
+            </summary>
+        </member>
         <member name="T:Quantum.Editor.QuantumEditorToolbarUtilities">
             <summary>
             An editor script that places a drop down selection to quickly load Unity scenes, which are listed in the BuildSettings.
@@ -21,6 +118,21 @@
             if fields include inline help (?) buttons, use indent : 1 
              </summary>
         </member>
+        <member name="F:Quantum.Editor.QuantumEditorGUI.ScriptPropertyName">
+            <summary>
+            The name of the script property in Unity objects
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorGUI.WhitespaceContent">
+            <summary>
+            GUIContent with a single whitespace
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorGUI.FoldoutWidth">
+            <summary>
+            Width of the foldout arrow
+            </summary>
+        </member>
         <member name="T:Quantum.Editor.QuantumDotnetBuildSettingsInspector">
             <summary>
             Inspector code to manage the QuantumDotnetBuildSettings asset in the editor.
@@ -36,6 +148,11 @@
             Draw the inspector GUI.
             </summary>
         </member>
+        <member name="T:Quantum.Editor.ReplayMenu">
+            <summary>
+            Unity menu items to export replays and savegames.
+            </summary>
+        </member>
         <member name="T:Quantum.Editor.QuantumUnityDBInspector">
             <summary>
             An editor class that renders a windows displaying assets from the Quantum DB.
@@ -46,7 +163,7 @@
             <summary>
             The main class to manage the Quantum Hub window.
             The Hub for example completes the installation of a user project by creating vital config files that are not overwritten by upgrades.
-            It can also installs samples and addons that are packaged with the Quantum SDK.
+            It can also install samples and addons that are packaged with the Quantum SDK.
             </summary>
         </member>
         <member name="F:Quantum.Editor.QuantumEditorHubWindow.QuantumHubSkin">
@@ -163,8 +280,49 @@
         </member>
         <member name="T:Quantum.Editor.SerializableEnterRoomArgs">
             <summary>
-            This class wraps the PhotonRealtime EnterRoomArgs class to make problematic members (Hashtable, TypedLobby retrictions) and its hierarchy XML serializable.  
+            This class wraps the PhotonRealtime EnterRoomArgs class to make problematic members (Hashtable, TypedLobby restrictions) and its hierarchy XML serializable.  
             </summary>
+        </member>
+        <member name="F:Quantum.Editor.SerializableEnterRoomArgs.HasLobby">
+            <summary>
+            Is <see langword="true"/> if <see cref="F:Photon.Realtime.EnterRoomArgs.Lobby"/> is set.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.SerializableEnterRoomArgs.LobbyName">
+            <summary>
+            <see cref="F:Photon.Realtime.EnterRoomArgs.Lobby"/> name.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.SerializableEnterRoomArgs.LobbyType">
+            <summary>
+            <see cref="F:Photon.Realtime.EnterRoomArgs.Lobby"/> lobby type.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.SerializableEnterRoomArgs.Serialize(System.Xml.XmlWriter,Quantum.Editor.SerializableEnterRoomArgs)">
+            <summary>
+            Serialize the class using a xml serializer.
+            </summary>
+            <example>
+            <code>
+            var enterRoomArgs = new SerializableEnterRoomArgs();
+            using (var writer = XmlWriter.Create("EnterRoomArgs.xml", new XmlWriterSettings { Indent = true }))
+              SerializableEnterRoomArgs.Serialize(writer, enterRoomArgs);
+            </code></example>
+            <param name="writer">XmlWriter</param>
+            <param name="obj">The object to serialize.</param>
+        </member>
+        <member name="M:Quantum.Editor.SerializableEnterRoomArgs.Deserialize(System.Xml.XmlReader)">
+            <summary>
+            Read the class using a xml reader.
+            </summary>
+            <param name="reader">Xml reader.</param>
+            <returns>Deserialized class.</returns>
+        </member>
+        <member name="M:Quantum.Editor.SerializableEnterRoomArgs.CreateSerializer">
+            <summary>
+            Create a xml serializer with the necessary overrides.
+            </summary>
+            <returns>Xml serializer for SerializableEnterRoomArgs.</returns>
         </member>
         <member name="T:Quantum.Editor.QuantumEditorMenuCreateScene">
             <summary>
@@ -281,6 +439,46 @@
             Return a workspace asmref file path.
             </summary>
         </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserSystemSetup">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.DeterministicSystemSetup"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserCommandSetup">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.DeterministicCommandSetup"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserFrame">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.Frame"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserFrameContext">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.FrameContextUser"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserRuntimeConfig">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.RuntimeConfig"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserRuntimePlayer">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.RuntimePlayer"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserSimulationConfig">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.SimulationConfig"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorUserScriptGeneration.TemplateUserCodeGenSettings">
+            <summary>
+            Template to add user code to <see cref="T:Quantum.Editor.QuantumCodeGenSettings"/>.
+            </summary>
+        </member>
         <member name="M:Quantum.Editor.QuantumEditorUserScriptGeneration.GenerateUserFiles">
             <summary>
             Generate user files.
@@ -326,6 +524,107 @@
             Empty unity update method.
             </summary>
         </member>
+        <member name="T:Quantum.Editor.IQuantumAssetSourceFactory">
+            <summary>
+            A factory that creates <see cref="!:IQuantumAssetSource"/> instances for a given asset.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.IQuantumAssetSourceFactory.Order">
+            <summary>
+            The order in which this factory is executed. The lower the number, the earlier it is executed.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumAssetSourceFactoryContext">
+            <summary>
+            A context object that is passed to <see cref="T:Quantum.Editor.IQuantumAssetSourceFactory"/> instances to create an <see cref="!:IQuantumAssetSource"/> instance.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryContext.InstanceID">
+            <summary>
+            Asset instance ID.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryContext.AssetGuid">
+            <summary>
+            Asset Unity GUID;
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryContext.AssetName">
+            <summary>
+            Asset name;
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryContext.IsMainAsset">
+            <summary>
+            Is this the main asset.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumAssetSourceFactoryContext.AssetPath">
+            <summary>
+            Asset Unity path.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryContext.#ctor(System.String,System.Int32,System.String,System.Boolean)">
+            <summary>
+            Create a new instance of <see cref="T:Quantum.Editor.QuantumAssetSourceFactoryContext"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryContext.#ctor(UnityEditor.HierarchyProperty)">
+            <summary>
+            Create a new instance of <see cref="T:Quantum.Editor.QuantumAssetSourceFactoryContext"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryContext.#ctor(UnityEngine.Object)">
+            <summary>
+            Create a new instance of <see cref="T:Quantum.Editor.QuantumAssetSourceFactoryContext"/>.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumAssetSourceFactoryStatic">
+            <summary>
+            A <see cref="T:Quantum.Editor.IQuantumAssetSourceFactory"/> implementation that creates <see cref="T:Quantum.QuantumAssetSourceStaticLazy`1"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryStatic.Order">
+            <inheritdoc cref="P:Quantum.Editor.IQuantumAssetSourceFactory.Order"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryStatic.TryCreateInternal``2(Quantum.Editor.QuantumAssetSourceFactoryContext@,``0@)">
+            <summary>
+            Creates <see cref="T:Quantum.QuantumAssetSourceStaticLazy`1"/>.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumAssetSourceFactoryResource">
+            <summary>
+            A <see cref="T:Quantum.Editor.IQuantumAssetSourceFactory"/> implementation that creates <see cref="T:Quantum.QuantumAssetSourceResource`1"/>
+            instances for assets in the Resources folder.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryResource.Order">
+            <inheritdoc cref="P:Quantum.Editor.IQuantumAssetSourceFactory.Order"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryResource.TryCreateInternal``2(Quantum.Editor.QuantumAssetSourceFactoryContext@,``0@)">
+            <summary>
+            Creates <see cref="T:Quantum.QuantumAssetSourceResource`1"/> if the asset is in the Resources folder.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumAssetSourceFactoryAddressable">
+            <summary>
+            A <see cref="T:Quantum.Editor.IQuantumAssetSourceFactory"/> implementation that creates <see cref="T:Quantum.QuantumAssetSourceAddressable`1"/>
+            if the asset is an Addressable.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryAddressable.Order">
+            <inheritdoc cref="P:Quantum.Editor.IQuantumAssetSourceFactory.Order"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryAddressable.#ctor">
+            <summary>
+            Creates a new instance. Checks if AddressableAssetSettings exists and logs a warning if it does not.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryAddressable.TryCreateInternal``2(Quantum.Editor.QuantumAssetSourceFactoryContext@,``0@)">
+            <summary>
+            Creates <see cref="T:Quantum.QuantumAssetSourceAddressable`1"/> if the asset is an Addressable.
+            </summary>
+        </member>
         <member name="T:Quantum.Editor.QuantumEditorMenuCustomPlugin">
             <summary>
             Methods to export Quantum assets and configs.
@@ -339,7 +638,7 @@
         <member name="T:Quantum.Editor.QuantumEditorMenuDllToggle">
             <summary>
             A static utility class that enabled Unity menu methods to toggle Quantum Debug and Release dlls by extracting a zip archive and overwriting the libraries.
-            In eariler versions this was handed by the QUANTUM_DEBUG define and multiple version of dlls but the Quantum.Engine.dll has internal MonoBehaviours 
+            In earlier versions this was handed by the QUANTUM_DEBUG define and multiple version of dlls but the Quantum.Engine.dll has internal MonoBehaviours 
             that lose the script guids this way.
             </summary>
         </member>
@@ -370,7 +669,7 @@
         </member>
         <member name="F:Quantum.Editor.QuantumEditorMenuPriority.GlobalConfigs">
             <summary>
-            Configuratios entries.
+            Configuration entries.
             </summary>
         </member>
         <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Setup">
@@ -542,6 +841,216 @@
             Open the Frame Differ window.
             </summary>
         </member>
+        <member name="T:Quantum.Editor.AssetDatabaseUtils">
+            <summary>
+            Utility methods for working with Unity's <see cref="T:UnityEditor.AssetDatabase"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.AddAddressableAssetsWithLabelMonitor(System.String,System.Action{UnityEngine.Hash128})">
+            <summary>
+            Register a handler that will be called when an addressable asset with a specific label is added or removed.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.SetAssetAndTheMainAssetDirty(UnityEngine.Object)">
+            <summary>
+            Sets the asset dirty and, if is a sub-asset, also sets the main asset dirty.
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAssetPathOrThrow(System.Int32)">
+            <summary>
+            Returns the asset path for the given instance ID or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAssetPathOrThrow(UnityEngine.Object)">
+            <summary>
+            Returns the asset path for the given object or throws an exception if <paramref name="obj"/> is
+            not an asset.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAssetPathOrThrow(System.String)">
+            <summary>
+            Returns the asset path for the given asset GUID or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAssetGuidOrThrow(System.String)">
+            <summary>
+            Returns the asset GUID for the given asset path or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAssetGuidOrThrow(System.Int32)">
+            <summary>
+            Returns the asset GUID for the given instance ID or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetAssetGuidOrThrow(UnityEngine.Object)">
+            <summary>
+            Returns the asset GUID for the given object reference or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow``1(UnityEngine.LazyLoadReference{``0})">
+            <summary>
+            Gets the GUID and local file identifier for the given object reference or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(UnityEngine.Object)">
+            <summary>
+            Gets the GUID and local file identifier for the given object reference or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(System.Int32)">
+            <summary>
+            Gets the GUID and local file identifier for the instance ID or throws an exception if the asset is not found.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.MoveAssetOrThrow(System.String,System.String)">
+            <summary>
+            Moves the asset at <paramref name="source"/> to <paramref name="destination"/> or throws an exception if the move fails.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasLabel(System.String,System.String)">
+            <summary>
+            Returns <see langword="true"/> if the asset at <paramref name="assetPath"/> has the given <paramref name="label"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasLabel(UnityEngine.Object,System.String)">
+            <summary>
+            Returns <see langword="true"/> if the asset <paramref name="obj"/> has the given <paramref name="label"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasLabel(UnityEditor.GUID,System.String)">
+            <summary>
+            Returns <see langword="true"/> if the asset <paramref name="guid"/> has the given <paramref name="label"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasAnyLabel(System.String,System.String[])">
+            <summary>
+            Returns <see langword="true"/> if the asset at <paramref name="assetPath"/> has any of the given <paramref name="labels"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.SetLabel(System.String,System.String,System.Boolean)">
+            <summary>
+            Sets or unsets <paramref name="label"/> label for the asset at <paramref name="assetPath"/>, depending
+            on the value of <paramref name="present"/>.
+            </summary>
+            <returns><see langword="true"/> if there was a change to the labels.</returns>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.SetLabel(UnityEngine.Object,System.String,System.Boolean)">
+            <summary>
+            Sets or unsets the <paramref name="label"/> label for the asset <paramref name="obj"/>, depending
+            on the value of <paramref name="present"/>.
+            </summary>
+            <returns><see langword="true"/> if there was a change to the labels.</returns>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.SetLabels(System.String,System.String[])">
+            <summary>
+            Sets all the labels for the asset at <paramref name="assetPath"/>.
+            </summary>
+            <returns><see langword="true"/> if the asset was found</returns>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasScriptingDefineSymbol(UnityEditor.BuildTargetGroup,System.String)">
+            <summary>
+            Checks if a scripting define <paramref name="value"/> is defined for <paramref name="group"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.SetScriptableObjectType``1(UnityEngine.ScriptableObject)">
+            <inheritdoc cref="M:Quantum.Editor.AssetDatabaseUtils.SetScriptableObjectType(UnityEngine.ScriptableObject,System.Type)"/>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.SetScriptableObjectType(UnityEngine.ScriptableObject,System.Type)">
+            <summary>
+            Changes the type of scriptable object.
+            </summary>
+            <returns>The new instance with requested type</returns>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasScriptingDefineSymbol(System.String)">
+            <summary>
+            Checks if any and all <see cref="T:UnityEditor.BuildTargetGroup"/> have the given scripting define symbol.
+            </summary>
+            <returns><see langword="true"/> if all groups have the symbol, <see langword="false"/> if none have it, <see langword="null"/> if some have it and some don't</returns>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.UpdateScriptingDefineSymbol(UnityEditor.BuildTargetGroup,System.String,System.Boolean)">
+            <summary>
+            Adds or removes <paramref name="define"/> scripting define symbol from <paramref name="group"/>, depending
+            on the value of <paramref name="enable"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.UpdateScriptingDefineSymbol(System.String,System.Boolean)">
+            <summary>
+            Adds or removes <paramref name="define"/> from all <see cref="T:UnityEditor.BuildTargetGroup"/>s, depending on the value of <paramref name="enable"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.IterateAssets``1(System.String,System.String)">
+            <summary>
+            Iterates over all assets in the project that match the given search criteria, without
+            actually loading them.
+            </summary>
+            <param name="root">The optional root folder</param>
+            <param name="label">The optional label</param>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.IterateAssets(System.String,System.String,System.Type)">
+            <summary>
+            Iterates over all assets in the project that match the given search criteria, without
+            actually loading them.
+            </summary>
+            <param name="root">The optional root folder</param>
+            <param name="label">The optional label</param>
+            <param name="type">The optional type</param>
+        </member>
+        <member name="T:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator">
+            <summary>
+            Enumerates assets in the project that match the given search criteria using <see cref="T:UnityEditor.HierarchyProperty"/> API.
+            Obtained with <see cref="M:Quantum.Editor.AssetDatabaseUtils.IterateAssets(System.String,System.String,System.Type)"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator.#ctor(System.String,System.String,System.Type)">
+            <summary>
+            Creates a new instance.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator.MoveNext">
+            <summary>
+            Updates internal <see cref="T:UnityEditor.HierarchyProperty"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator.Reset">
+            <summary>
+            Throws <see cref="T:System.NotImplementedException"/>.
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="P:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator.Current">
+            <summary>
+            Returns the internernal <see cref="T:UnityEditor.HierarchyProperty"/>. Most of the time
+            this will be the same instance as returned the last time, so do not cache
+            the result - check its properties intestead.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:Quantum.Editor.AssetDatabaseUtils.AssetEnumerable">
+            <summary>
+            Enumerable of assets in the project that match the given search criteria.
+            </summary>
+            <seealso cref="T:Quantum.Editor.AssetDatabaseUtils.AssetEnumerator"/>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.AssetEnumerable.#ctor(System.String,System.String,System.Type)">
+            <summary>
+            Not intended to be called directly. Use <see cref="M:Quantum.Editor.AssetDatabaseUtils.IterateAssets(System.String,System.String,System.Type)"/> instead.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.AssetEnumerable.GetEnumerator">
+            <summary>
+            Not intended to be called directly. Use <see cref="M:Quantum.Editor.AssetDatabaseUtils.IterateAssets(System.String,System.String,System.Type)"/> instead.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.RegisterCustomDependencyWithMppmWorkaround(System.String,UnityEngine.Hash128)">
+            <summary>
+            Sends out <see cref="T:Quantum.QuantumMppmRegisterCustomDependencyCommand"/> command to virtual peers
+            before calling <see cref="M:UnityEditor.AssetDatabase.RegisterCustomDependency(System.String,UnityEngine.Hash128)"/>.
+            </summary>
+        </member>
         <member name="M:Quantum.Editor.HashCodeUtilities.GetHashDeterministic(System.String,System.Int32)">
             <summary>
               This may only be deterministic on 64 bit systems.
@@ -549,6 +1058,111 @@
             <param name="str"></param>
             <param name="initialHash"></param>
             <returns></returns>
+        </member>
+        <member name="T:Quantum.Editor.QuantumEditor">
+            <summary>
+            Base class for all Photon Common editors. Supports <see cref="T:Quantum.EditorButtonAttribute"/> and <see cref="T:Quantum.ScriptHelpAttribute"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditor.PrepareOnInspectorGUI">
+            <summary>
+            Prepares the editor by initializing the script header drawer.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditor.DrawEditorButtons">
+            <summary>
+            Draws the editor buttons.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditor.OnInspectorGUI">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditor.DrawScriptPropertyField">
+            <summary>
+            Draws the script property field.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditor.OnEnable">
+            <summary>
+            Empty implementations, provided for compatibility with OdinEditor class.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditor.OnDisable">
+            <summary>
+            Empty implementations, provided for compatibility with OdinEditor class.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumEditorGUIDisplayTypePickerMenuFlags">
+            <summary>
+            Flags for the <see cref="M:Quantum.Editor.QuantumEditorGUI.DisplayTypePickerMenu(UnityEngine.Rect,System.Type[],System.Action{System.Type},System.Func{System.Type,System.Boolean},System.String,System.Type,Quantum.Editor.QuantumEditorGUIDisplayTypePickerMenuFlags)"/> method
+            and its overloads.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorGUIDisplayTypePickerMenuFlags.None">
+            <summary>
+            No special flags
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorGUIDisplayTypePickerMenuFlags.GroupByNamespace">
+            <summary>
+            Group types by their namespace
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorGUIDisplayTypePickerMenuFlags.ShowFullName">
+            <summary>
+            Show the full name of the type including the namespace
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorGUIDisplayTypePickerMenuFlags.Default">
+            <summary>
+            The default flags
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumGlobalScriptableObjectUtils">
+            <summary>
+            Utility methods for working with <see cref="T:Quantum.QuantumGlobalScriptableObject"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumGlobalScriptableObjectUtils.GlobalAssetLabel">
+            <summary>
+            The label that is assigned to global assets.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.SetDirty(Quantum.QuantumGlobalScriptableObject)">
+            <summary>
+            Calls <see cref="M:UnityEditor.EditorUtility.SetDirty(UnityEngine.Object)"/> on the object.
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.GetGlobalAssetPath``1">
+            <summary>
+            Locates the asset that is going to be used as a global asset for the given type, that is
+            an asset marked with the <see cref="F:Quantum.Editor.QuantumGlobalScriptableObjectUtils.GlobalAssetLabel"/> label. If there are multiple such assets,
+            exception is thrown. If there are no such assets, empty string is returned.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.TryGetGlobalAssetPath``1(System.String@)">
+            <summary>
+            A wrapper around <see cref="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.GetGlobalAssetPath``1"/> that returns a value indicating if
+            it was able to find the asset.
+            </summary>
+            <param name="path"></param>
+            <typeparam name="T"></typeparam>
+            <returns><see langword="true"/> if the asset was found</returns>
+        </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.EnsureAssetExists``1">
+            <summary>
+            If the global asset does not exist, creates it based on the type's <see cref="T:Quantum.QuantumGlobalScriptableObjectAttribute"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns><see langword="true"/> If the asset already existed.</returns>
+        </member>
+        <member name="M:Quantum.Editor.QuantumGlobalScriptableObjectUtils.TryImportGlobal``1">
+            <summary>
+            Attempts to import the global asset for the given type.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns><see langword="true"/> if the asset was found and reimported</returns>
         </member>
         <member name="M:Quantum.Editor.ReflectionUtils.GetMemberIncludingBaseTypes(System.Type,System.String,System.Reflection.BindingFlags,System.Type)">
             <summary>
@@ -875,19 +1489,9 @@
             If set MapData will be automatically baked on building, on saving a scene and on building a player.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumEditorSettings.AutoRunQtnCodeGen">
-            <summary>
-            If enabled any changes in .qtn files in quantum.code will run the codegen immediately.
-            </summary>
-        </member>
         <member name="F:Quantum.QuantumEditorSettings.AssetGuidOverrides">
             <summary>
             A list of Quantum assets that enabled GUID Override. This list is tracked automatically.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumEditorSettings.QuantumSolutionPath">
-            <summary>
-            Not used at the moment. Split solution tooling will return during the Quantum 3 Preview.
             </summary>
         </member>
         <member name="T:Quantum.QuantumToolbarZone">

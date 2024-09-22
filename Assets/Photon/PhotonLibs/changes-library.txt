@@ -3,6 +3,12 @@ Photon C# Client Library - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
+Version 5.0.10 (10 July 2024 - rev7627)
+    Fixed: SendAcksOnly() for TCP and WS/WSS. It now sends a ping immediately to actually keep the connection up if SendOutgoingCommands() is not called for longer (e.g. when PUN IsMessageQueueRunning is false).
+    Note: NOTE: The above issue was introduced 8. May 2024, rev7552. So v5.0.8. and v5.0.9 would time out for TCP or WebSockets, if SendOutgoingCommands() was paused longer.
+    Internal: TPeer.SendPing() to have an optional parameter to send the ping immediately. This allows SendAcksOnly to send it without sending anything queued.
+    Internal: TPeer.Reset() to also update lastPingActivity.
+
 Version 5.0.9 (26. June 2024 - rev7603)
     Fixed: De/serialization when using struct-based Custom Types (e.g. Fusion's NetworkId).
     Renamed: TrafficStatsSnapshot.SnapshotTimeStamp to SnapshotTimestamp with lowercase "stamp". Obsolete version is in place to avoid renaming trouble.

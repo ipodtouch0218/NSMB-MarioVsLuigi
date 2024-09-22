@@ -126,7 +126,9 @@ namespace Quantum.Editor {
         includes
       );
       
-      Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+      var outputFolder = Path.GetDirectoryName(outputPath);
+      Assert.Check(outputFolder != null);
+      Directory.CreateDirectory(outputFolder);
 
       File.WriteAllText(outputPath, contents);
     }
@@ -147,7 +149,7 @@ namespace Quantum.Editor {
       projectElement.Add(new XComment("Includes"));
       
       var group = new XElement("ItemGroup");
-      
+
       foreach (var source in includes) {
         if (Directory.Exists(source)) {
           group.Add(new XElement("Compile",
@@ -156,8 +158,19 @@ namespace Quantum.Editor {
           group.Add(new XElement("None",
             new XAttribute("Include", $"{pathPrefix}/{source}/**/*.qtn"),
             new XAttribute("LinkBase", DropAssetsPrefix(source))));
+          continue;
+        }
+        
+        var extension = Path.GetExtension(source).ToLower();
+        if (extension == ".dll") {
+          // add assembly reference
+          var assemblyName = Path.GetFileNameWithoutExtension(source);
+          group.Add(new XElement("Reference",
+            new XAttribute("Include", assemblyName),
+            new XElement("HintPath", $"{pathPrefix}/{source}")
+          ));
         } else {
-          group.Add(new XElement(Path.GetExtension(source) == ".cs" ? "Compile" : "None",
+          group.Add(new XElement(extension == ".cs" ? "Compile" : "None",
             new XAttribute("Include", $"{pathPrefix}/{source}"),
             new XElement("Link", DropAssetsPrefix(source)))
           );

@@ -690,3 +690,5 @@ MonoBehaviour:
         RawValue: 0
     IsCarryable:
       Value: 1
+    IsFlying:
+      Value: 0

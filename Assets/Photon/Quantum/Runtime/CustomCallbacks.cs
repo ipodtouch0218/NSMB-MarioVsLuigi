@@ -1,5 +1,4 @@
 namespace Quantum.Demo.Legacy {
-  using Quantum;
   using System;
   using UnityEngine;
 

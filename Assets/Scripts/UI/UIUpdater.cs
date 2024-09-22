@@ -194,7 +194,7 @@ public class UIUpdater : QuantumCallbacks {
         int starRequirement = rules.StarsToWin;
         int coinRequirement = rules.CoinsForPowerup;
         bool teamsEnabled = rules.TeamsEnabled;
-        bool livesEnabled = rules.Lives > 0;
+        bool livesEnabled = rules.IsLivesEnabled;
         bool timerEnabled = rules.TimerSeconds > 0;
 
         if (rules.TeamsEnabled) {

@@ -292,20 +292,24 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.GameRules))]
   public unsafe partial class GameRulesPrototype : StructPrototype {
+    public AssetRef<Map> Level;
     public Byte StarsToWin;
     public Byte CoinsForPowerup;
     public Byte Lives;
-    public Byte TimerSeconds;
+    public UInt16 TimerSeconds;
     public QBoolean TeamsEnabled;
     public QBoolean CustomPowerupsEnabled;
+    public QBoolean DrawOnTimeUp;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
+        result.Level = this.Level;
         result.StarsToWin = this.StarsToWin;
         result.CoinsForPowerup = this.CoinsForPowerup;
         result.Lives = this.Lives;
         result.TimerSeconds = this.TimerSeconds;
         result.TeamsEnabled = this.TeamsEnabled;
         result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
+        result.DrawOnTimeUp = this.DrawOnTimeUp;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -737,7 +741,7 @@ namespace Quantum.Prototypes {
     public Byte Team;
     public QBoolean IsSpectator;
     public Int32 Wins;
-    public FP LastChatMessage;
+    public Int32 LastChatMessage;
     public QBoolean IsLoaded;
     public Int32 JoinTick;
     public Int32 Ping;

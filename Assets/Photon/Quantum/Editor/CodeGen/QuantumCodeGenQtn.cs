@@ -1,7 +1,6 @@
 namespace Quantum.Editor {
   using System;
   using System.Collections.Generic;
-  using System.ComponentModel;
   using System.Diagnostics;
   using System.IO;
   using System.Linq;
@@ -9,30 +8,41 @@ namespace Quantum.Editor {
   using Photon.Deterministic;
   using UnityEditor;
 
+  /// <summary>
+  /// Quantum CodeGen for Qtn files. This type is placed in a standalone asmdef to make sure it can be compiled and run even in
+  /// case of compile errors in other parts of the project.
+  /// </summary>
   public static class QuantumCodeGenQtn {
     /// <summary>
     /// The Quantum CodeGen version that the SDK expects. This is used to show a hint to restart UnityEditor during upgrading for example.
     /// </summary>
     public const string VersionFilepath = "Assets/Photon/Quantum/Editor/CodeGen/QuantumCodeGenQtn.Version.txt";
 
+    /// <summary>
+    /// Runs the Quantum CodeGen for all <see cref="QuantumQtnAsset"/> in the project with default settings. Can be invoked with
+    /// command line argument (-executeMethod Quantum.Editor.QuantumCodeGenQtn.Run).
+    /// </summary>
+    /// <seealso cref="QuantumCodeGenSettings.DefaultOptions"/>
     public static void Run() {
       Run(verbose: false);
     }
     
-    [MenuItem("Tools/Quantum/CodeGen/Run Qtn CodeGen", priority = QuantumCodeGenSettings.MenuPriority + 1)]
-    static void MenuItemRunNonVerbose() {
-      Run(false);
-    }
-    
-    [MenuItem("Tools/Quantum/CodeGen/Run Qtn CodeGen (verbose)", priority = QuantumCodeGenSettings.MenuPriority + 2)]
-    static void MenuItemRunVerbose() {
-      Run(true);
-    }
-    
+    /// <summary>
+    /// Runs the Quantum CodeGen for specific Qtn files with default settings.
+    /// </summary>
+    /// <param name="qtnFiles">Qtn files to be analyzed</param>
+    /// <param name="verbose">Log verbose output</param>
+    /// <seealso cref="QuantumCodeGenSettings.DefaultOptions"/>
     public static void Run(string[] qtnFiles, bool verbose) {
       Run(qtnFiles, verbose, null);
     }
 
+    /// <summary>
+    /// Runs the Quantum CodeGen for specific Qtn files with custom settings.
+    /// </summary>
+    /// <param name="qtnFiles">Qtn files to be analyzed</param>
+    /// <param name="verbose">Log verbose output</param>
+    /// <param name="options">CodeGen options</param>
     public static void Run(string[] qtnFiles, bool verbose, GeneratorOptions options) {
       if (qtnFiles == null) {
         throw new ArgumentNullException(nameof(qtnFiles));
@@ -130,6 +140,11 @@ namespace Quantum.Editor {
       AssetDatabase.Refresh();
     }
 
+    /// <summary>
+    /// Runs the Quantum CodeGen for all <see cref="QuantumQtnAsset"/> in the project with custom settings.
+    /// </summary>
+    /// <param name="verbose">Log verbose output</param>
+    /// <param name="options">CodeGen options</param>
     public static void Run(bool verbose, GeneratorOptions options) {
       var assets = AssetDatabase.FindAssets($"t:{nameof(QuantumQtnAsset)}")
        .Select(x => AssetDatabase.GUIDToAssetPath(x))
@@ -139,11 +154,16 @@ namespace Quantum.Editor {
       Run(assets, verbose, options);
     }
     
+    /// <summary>
+    /// Runs the Quantum CodeGen for all <see cref="QuantumQtnAsset"/> in the project with default settings.
+    /// </summary>
+    /// <param name="verbose">Log verbose output</param>
+    /// <seealso cref="QuantumCodeGenSettings.DefaultOptions"/>
     public static void Run(bool verbose) {
       Run(verbose, null);
     }
     
-    public static void UpdateScriptsDirectory(string outputDir, IEnumerable<GeneratorOutputFile> files, Action<string> logProgress, Predicate<string> ignoreFilter = null) {
+    static void UpdateScriptsDirectory(string outputDir, IEnumerable<GeneratorOutputFile> files, Action<string> logProgress, Predicate<string> ignoreFilter = null) {
       logProgress?.Invoke($"Generating scripts to {outputDir}");
       Directory.CreateDirectory(outputDir); // Create a directory first, because it might not exist.
       
@@ -226,11 +246,7 @@ namespace Quantum.Editor {
       }
     }
 
-    public static void SaveVersionToFile() {
-      File.WriteAllText(VersionFilepath, Generator.Version.ToString());
-    }
-
-    public static bool VerifyVersion(bool throwError) {
+    static bool VerifyVersion(bool throwError) {
       if (File.Exists(VersionFilepath)) {
         int version = 0;
         try {
@@ -250,6 +266,16 @@ namespace Quantum.Editor {
       }
 
       return true;
+    }
+    
+    [MenuItem("Tools/Quantum/CodeGen/Run Qtn CodeGen", priority = QuantumCodeGenSettings.MenuPriority + 1)]
+    static void MenuItemRunNonVerbose() {
+      Run(false);
+    }
+    
+    [MenuItem("Tools/Quantum/CodeGen/Run Qtn CodeGen (verbose)", priority = QuantumCodeGenSettings.MenuPriority + 2)]
+    static void MenuItemRunVerbose() {
+      Run(true);
     }
   }
 }

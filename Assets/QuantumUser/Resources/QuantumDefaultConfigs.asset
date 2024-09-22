@@ -199,6 +199,7 @@ MonoBehaviour:
   HeapPageShift: 15
   HeapPageCount: 256
   HeapExtraCount: 0
+  LobbyMap: {fileID: 11400000, guid: 5b020bbd639390c47ba588a7e0bd0449, type: 2}
   InvisibleSolidTile: {fileID: 11400000, guid: af92f900a1bff3d459eaf5b25d41a4ac, type: 2}
   AllPowerups:
   - {fileID: 11400000, guid: e76c0ec90859dff49866293da2354232, type: 2}
@@ -232,6 +233,20 @@ MonoBehaviour:
   IceBlockPrototype:
     Id:
       Value: 1386525317044462577
+  DefaultRules:
+    Level:
+      Id:
+        Value: 438935048561577377
+    StarsToWin: 10
+    CoinsForPowerup: 8
+    Lives: 0
+    TimerSeconds: 0
+    TeamsEnabled:
+      Value: 0
+    CustomPowerupsEnabled:
+      Value: 1
+    DrawOnTimeUp:
+      Value: 0
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,25 +346,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/QuantumDefaultConfigs|DefaultConfigSystems
     Guid:
       Value: 3654882389298375385
-  Entries:
-  - SystemType:
-      AssemblyQualifiedName: Quantum.Core.CullingSystem2D, Quantum.Simulation, Version=0.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-    SystemName: 
-    StartDisabled: 0
-    Children: []
-  - SystemType:
-      AssemblyQualifiedName: Quantum.Core.EntityPrototypeSystem, Quantum.Simulation,
-        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-    SystemName: 
-    StartDisabled: 0
-    Children: []
-  - SystemType:
-      AssemblyQualifiedName: Quantum.Core.PlayerConnectedSystem, Quantum.Simulation,
-        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-    SystemName: 
-    StartDisabled: 0
-    Children: []
+  Entries: []
 --- !u!114 &4894074246963618225
 MonoBehaviour:
   m_ObjectHideFlags: 0

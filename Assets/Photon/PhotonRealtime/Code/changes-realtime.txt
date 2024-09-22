@@ -3,6 +3,10 @@ Photon Realtime C# Client - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
+Version 5.0.10 (10 July 2024 - rev7627)
+    Fixed: EventBetter now assignes an instance to EventBetterWorker.EventBetterInstance.
+    Changed: Player.UpdateNickNameOnJoined() avoids sending the NickName if it is empty and also not found in the props.
+
 Version 5.0.9 (26. June 2024 - rev7603)
     Added: Authentication exception for connect async operation.
     Fixed: Matchmaking ticket is now in MatchmakingArguments. Ticket and lobby get correctly set when using async api to get into a room (e.g. ConnectToRoomAsync and RejoinRoomAsync).

@@ -25,66 +25,71 @@ namespace Quantum {
     /// simulation during break points.
     /// Has to be set before starting the runner and can only be changed on the runner directly during runtime: <see cref="SessionRunner.DeltaTimeType"/>.
     /// </summary>
-    [Tooltip("Set the DeltaTimeType to EngineDeltaTime to not progress the simulation time during break points.")]
+    [InlineHelp]
     public SimulationUpdateTime DeltaTypeType = SimulationUpdateTime.EngineDeltaTime;
     /// <summary>
     /// Set RecordingFlags of the local simulation to enable saving a replay.
+    /// Caveat: Input recording allocates during runtime.
     /// </summary>
-    [Tooltip("Set RecordingFlags to All to record input and checksums to enable saving a replay. Caveat: Input recording allocates during runtime.")]
+    [InlineHelp]
     public RecordingFlags RecordingFlags = RecordingFlags.None;
     /// <summary>
     /// Set InstantReplaySettings to enable instant replays.
     /// </summary>
-    [Tooltip("Customize the InstantReplaySettings.")]
+    [InlineHelp]
     public InstantReplaySettings InstantReplayConfig = InstantReplaySettings.Default;
     /// <summary>
     /// Configure the RuntimeConfig used for the local simulation.
     /// </summary>
     [FormerlySerializedAs("Config")]
-    [Tooltip("RuntimeConfig used for this simulation.")]
+    [InlineHelp]
     public RuntimeConfig RuntimeConfig;
     /// <summary>
     /// Select the SessionConfig used for the local simulation. Will revert to the global default if not set.
     /// </summary>
-    [Tooltip("SessionConfig used for this simulation, if null it will search for the global SessionConfig.")]
+    [InlineHelp]
     public QuantumDeterministicSessionConfigAsset SessionConfig;
     /// <summary>
     /// Configure the players added to the game after the simulation has started.
     /// </summary>
-    [Tooltip("The local players that are added to the simulation during game start.")]
     [FormerlySerializedAs("Players")]
+    [InlineHelp]
     public RuntimePlayer[] LocalPlayers;
     /// <summary>
     /// Overwrite the max player count for this simulation otherwise Quantum.Constants.PLAYER_COUNT is used. Default is 0.
     /// </summary>
-    [Tooltip("Overwrite the max player count for this simulation otherwise Quantum.Constants.PLAYER_COUNT is used.\nDefault is 0.")]
+    [InlineHelp]
     public int MaxPlayerCount;
     /// <summary>
     /// Set a factor to increase or decrease the simulation speed and update the simulation during Update(). Default is 1.
     /// </summary>
-    [Tooltip("Set a factor to increase or decrease the simulation speed and update the simulation during Update(). \nDefault is 1.")]
+    [InlineHelp]
     public float SimulationSpeedMultiplier = 1.0f;
     /// <summary>
     /// Show the reload simulation button.
     /// </summary>
-    [Tooltip("Show the reload simulation button.")]
+    [InlineHelp]
     public bool DisplaySaveAndReloadButton;
     /// <summary>
     /// Enabled loading Addressables before simulation start.
     /// </summary>
-    [Tooltip("Enabled loading Addressables before simulation start.")]
+    [InlineHelp]
     public bool PreloadAddressables = false;
-    /// <summary>
-    /// Set a dynamic asset db.
-    /// </summary>
-    [Tooltip("Set a dynamic asset db.")]
-    public DynamicAssetDBSettings DynamicAssetDB;
     /// <summary>
     /// Enable the Quantum task profiler. Must be set before starting. Works with debug and release Quantum dlls.
     /// </summary>
-    [Tooltip("Enable the Quantum task profiler. Must be set before starting. Works with debug and release Quantum dlls.")]
+    [InlineHelp]
     public bool IsTaskProfilerEnabled;
-
+    /// <summary>
+    /// Set a dynamic asset db.
+    /// </summary>
+    [InlineHelp]
+    public DynamicAssetDBSettings DynamicAssetDB;
+    /// <summary>
+    /// Unity event that is called before the Quantum simulation is started.
+    /// </summary>
+    public UnityEvent<SessionRunner.Arguments> OnBeforeStart;
+    
     /// <summary>
     /// Unity start event, will start the Quantum simulation.
     /// </summary>
@@ -173,6 +178,8 @@ namespace Quantum {
         GameFlags             = (IsTaskProfilerEnabled ? QuantumGameFlags.EnableTaskProfiler : 0),
         RecordingFlags        = RecordingFlags
       };
+      
+      OnBeforeStart?.Invoke(arguments);
 
       var runner = QuantumRunner.StartGame(arguments);
     }

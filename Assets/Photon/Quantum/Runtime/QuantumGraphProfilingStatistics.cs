@@ -1,5 +1,5 @@
 namespace Quantum.Profiling {
-  using global::Unity.Profiling;
+  using Unity.Profiling;
   using UnityEngine;
   using UnityEngine.UI;
 

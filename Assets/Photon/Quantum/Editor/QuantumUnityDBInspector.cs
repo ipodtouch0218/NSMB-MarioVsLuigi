@@ -3,7 +3,6 @@ namespace Quantum.Editor {
   using System.Collections.Generic;
   using System.Linq;
   using JetBrains.Annotations;
-  using Photon.Client.StructWrapping;
   using UnityEditor;
   using UnityEditor.IMGUI.Controls;
   using UnityEngine;

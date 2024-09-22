@@ -319,7 +319,7 @@ namespace Quantum.Editor {
           try {
             File.Copy(Path.GetFullPath($"{path}"), $"{lutAssetPath}/{Path.GetFileName(path)}", true);
           } catch (IOException e) {
-            QuantumEditorLog.Error(e);
+            QuantumEditorLog.Exception(e);
           }
 
           break;

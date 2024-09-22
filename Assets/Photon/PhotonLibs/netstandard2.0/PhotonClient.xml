@@ -2559,8 +2559,9 @@
         <member name="M:Photon.Client.TPeer.EnqueueMessageAsPayload(Photon.Client.DeliveryMode,Photon.Client.StreamBuffer,System.Byte)">
             <summary>enqueues serialized operations to be sent as tcp stream / package</summary>
         </member>
-        <member name="M:Photon.Client.TPeer.SendPing">
+        <member name="M:Photon.Client.TPeer.SendPing(System.Boolean)">
             <summary>Queues a ping (operation or "message") and updates this.lastPingActivity to avoid another ping for a while.</summary>
+            <param name="sendImmediately">Set to true to immediately send a Ping (not queueing it first). This is useful for SendAcksOnly() to keep the connection up.</param>
         </member>
         <member name="M:Photon.Client.TPeer.ReceiveIncomingCommands(System.Byte[],System.Int32)">
             <summary>reads incoming tcp-packages to create and queue incoming commands*</summary>

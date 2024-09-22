@@ -33,6 +33,18 @@
         <member name="M:Quantum.SystemGroup.OnDisabled(Quantum.Frame)">
             <inheritdoc cref="M:Quantum.SystemBase.OnDisabled(Quantum.Frame)"/>
         </member>
+        <member name="T:Quantum.GameResult">
+            <summary>
+            The game result class can be extended by a partial class. 
+            It is used with the <see cref="T:Quantum.EventGameResult"/> to report the game result to the server.
+            See the online documentation for more information.
+            </summary>
+        </member>
+        <member name="F:Quantum.GameResult.Frame">
+            <summary>
+            The frame when the game result was created.
+            </summary>
+        </member>
         <member name="T:Quantum.EventGameResult">
             <summary>
             Does not have to implement checksum, because it's a hard-coded synced event.
@@ -1429,6 +1441,17 @@
             Reference to the default player avatar prototype to be used when creating player entities.
             </summary>
         </member>
+        <member name="T:Quantum.Statics">
+            <summary>
+            Static type registry is completed by code generation.
+            </summary>
+        </member>
+        <member name="M:Quantum.Statics.RegisterSimulationTypes(Quantum.TypeRegistry)">
+            <summary>
+            Register Quantum types. Use <see cref="M:Quantum.Statics.RegisterSimulationTypesUser(Quantum.TypeRegistry)"/> partial method to extend.
+            </summary>
+            <param name="typeRegistry">Type registry.</param>
+        </member>
         <member name="T:Quantum.QuantumJsonFriendlyDataBlob">
             <summary>
             Wrapper around storing binary data in JSON to work around the problem that Unity JSON tools only serialize byte arrays verbosely.
@@ -1471,6 +1494,21 @@
             <param name="isCompressed">Is the data GZip compressed</param>
             <param name="asBase64String">Is the data converted to base64</param>
             <returns>Encoded data object</returns>
+        </member>
+        <member name="T:Quantum.FrameContextUser">
+            <summary>
+            Use this class to extend the <see cref="T:Quantum.Core.FrameContext"/> class.
+            </summary>
+        </member>
+        <member name="M:Quantum.FrameContextUser.#ctor(Quantum.Core.FrameContext.Args)">
+            <summary>
+            Frame context user constructor.
+            </summary>
+        </member>
+        <member name="M:Quantum.FrameContextUser.Dispose">
+            <summary>
+            Dispose user systems and memory.
+            </summary>
         </member>
         <member name="T:Quantum.RingBufferInputProvider">
             <summary>
@@ -2002,6 +2040,11 @@
                //..
              }
             </code></example>
+        </member>
+        <member name="M:Quantum.Frame.InitStatic">
+            <summary>
+            Initialized Quantum static type registry.
+            </summary>
         </member>
         <member name="M:Quantum.Frame.GetPlayerData(Quantum.PlayerRef)">
             <summary>
@@ -2872,6 +2915,12 @@
             Runner specific exceptions.
             </summary>
         </member>
+        <member name="M:Quantum.SessionRunnerException.#ctor(System.String)">
+            <summary>
+            Constructs a new exception with a message.
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
         <member name="F:Quantum.RuntimePlayer.PlayerAvatar">
             <summary>
             Optionally let players select an avatar prototype using RuntimePlayer. This field can be removed from RuntimePlayer if not needed.
@@ -2890,10 +2939,31 @@
         </member>
         <member name="T:Quantum.DeterministicSystemSetup">
             <summary>
-            Responsible for instantiating Quantum systems on simualation start.
+            Responsible for instantiating Quantum systems on simulation start.
             User systems can be added by adding a <see cref="T:Quantum.SystemsConfig"/> to the <see cref="T:Quantum.RuntimeConfig"/>.
             Or adding them in the user callback <see cref="M:Quantum.DeterministicSystemSetup.AddSystemsUser(System.Collections.Generic.ICollection{Quantum.SystemBase},Quantum.RuntimeConfig,Quantum.SimulationConfig,Quantum.SystemsConfig)"/>.
             </summary>
+        </member>
+        <member name="M:Quantum.DeterministicSystemSetup.CreateSystems(Quantum.RuntimeConfig,Quantum.SimulationConfig,Quantum.SystemsConfig)">
+            <summary>
+            The methods instantiates requested Quantum systems when starting the simulation.
+            <para>
+            It first tries to call the legacy system setup method (SystemSetup class), if the method is found it will return those systems on not use the provided systems config.
+            </para>
+            <para>
+            If <paramref name="systemsConfig"/> is null only the default Quantum system are created. Otherwise the types inside <paramref name="systemsConfig"/> are created.
+            </para>
+            <para>
+            Debug build will add the <see cref="T:Quantum.Core.DebugCommand"/> system. Disable this by defining QUANTUM_DEBUG_COMMAND_DISABLED.
+            </para>
+            <para>
+            Finally the <see cref="M:Quantum.DeterministicSystemSetup.AddSystemsUser(System.Collections.Generic.ICollection{Quantum.SystemBase},Quantum.RuntimeConfig,Quantum.SimulationConfig,Quantum.SystemsConfig)"/> partial method is called to allow changes to the final system list.
+            </para>
+            </summary>
+            <param name="gameConfig">Runtime config.</param>
+            <param name="simulationConfig">Simulation config.</param>
+            <param name="systemsConfig">List of systems to create.</param>
+            <returns>Collection of Quantum system objects.</returns>
         </member>
         <member name="T:Quantum.ISignalOnPlayerAdded">
             <inheritdoc cref="M:Quantum.ISignalOnPlayerAdded.OnPlayerAdded(Quantum.Frame,Quantum.PlayerRef,System.Boolean)"/>
@@ -4327,6 +4397,11 @@
             <param name="drag">Drag factor of the dynamic body.</param>
             <returns>The predicted velocity.</returns>
             <exception cref="T:System.InvalidOperationException">if <paramref name="ticksAhead"/> is smaller than 0.</exception>
+        </member>
+        <member name="T:Quantum.FrameThreadSafeExtensions">
+            <summary>
+            Extension methods for the <see cref="T:Quantum.FrameThreadSafe"/> class.
+            </summary>
         </member>
         <member name="M:Quantum.FrameThreadSafeExtensions.GetGlobal(Quantum.FrameThreadSafe)">
             <summary>

@@ -42,7 +42,7 @@ public class MusicManager : MonoBehaviour {
         int playersWithOneLife = 0;
         int playerCount = 0;
         while (allPlayers.Next(out _, out MarioPlayer mario)) {
-            if (rules.Lives > 0) {
+            if (rules.IsLivesEnabled) {
                 if (mario.Lives == 1) {
                     playersWithOneLife++;
                 }
@@ -60,7 +60,7 @@ public class MusicManager : MonoBehaviour {
         speedup |= rules.TimerSeconds > 0 && f.Global->Timer <= 60;
         speedup |= QuantumUtils.GetFirstPlaceStars(f) >= rules.StarsToWin - 1;
 
-        if (!speedup && rules.Lives > 0) {
+        if (!speedup && rules.IsLivesEnabled) {
             // Also speed up the music if:
             // A: two players left, at least one has one life
             // B: three+ players left, all have one life

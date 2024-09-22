@@ -3,7 +3,6 @@
 #region Assets/Photon/Quantum/Runtime/AssetTypes/AssetTypes.Partial.cs
 
 namespace Quantum {
-
   using System;
   using System.Linq;
   using Photon.Deterministic;
@@ -11,7 +10,6 @@ namespace Quantum {
   using Physics3D;
   using UnityEngine;
   using UnityEngine.Serialization;
-  using UnityEditor;
 
   public partial class QPrototypeNavMeshPathfinder {
     [LocalReference]
@@ -1166,6 +1164,9 @@ namespace Quantum {
 
     private IEnumerator LoadScene(string sceneName) {
       try {
+        if (string.IsNullOrEmpty(sceneName)) {
+          yield break;
+        }
         PublishCallback(_callbackUnitySceneLoadBegin, sceneName);
         yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
@@ -1177,6 +1178,9 @@ namespace Quantum {
 
     private IEnumerator UnloadScene(string sceneName) {
       try {
+        if (string.IsNullOrEmpty(sceneName)) {
+          yield break;
+        }
         PublishCallback(_callbackUnitySceneUnloadBegin, sceneName);
         yield return SceneManager.UnloadSceneAsync(sceneName);
         PublishCallback(_callbackUnitySceneUnloadDone, sceneName);
@@ -1807,6 +1811,7 @@ namespace Quantum {
     /// Is toggled during <see cref="Activate"/> and <see cref="Deactivate"/>."/>
     /// </summary>
     bool IsActive { get; }
+    bool IsInitialized { get; }
   }
 }
 
@@ -2203,19 +2208,23 @@ namespace Quantum {
 
 namespace Quantum {
   using static QuantumUnityExtensions;
-  
+
   /// <summary>
   /// The SceneViewComponent is able to attach itself to the <see cref="QuantumEntityViewUpdater"/> and received updates from it.
+  /// <para>Set <see cref="Updater"/> explicitly, or set <see cref="UseFindUpdater"/> or make this script a child of <see cref="QuantumEntityViewUpdater"/>.</para>
   /// </summary>
   /// <typeparam name="T"></typeparam>
   public abstract class QuantumSceneViewComponent<T> : QuantumViewComponent<T> where T : IQuantumViewContext {
     /// <summary>
     /// Will attach this view component to this EntityViewUpdater so it receives update callbacks from there.
+    /// This field will not be set unless set explicitly or <see cref="UseFindUpdater"/> is true.
     /// </summary>
+    [InlineHelp]
     public QuantumEntityViewUpdater Updater;
     /// <summary>
     /// Uses UnityEngine.Object.FindObjectOfType/FindObjectByType to find the <see cref="Updater"/>. This is very slow and not recommended.
     /// </summary>
+    [InlineHelp]
     public bool UseFindUpdater;
 
     /// <summary>
@@ -2407,9 +2416,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/Entity/QuantumViewComponent.cs
 
 namespace Quantum {
-  using Quantum.Profiling;
   using System;
   using System.Collections.Generic;
+  using Profiling;
   using UnityEngine;
 
   /// <summary>
@@ -2446,6 +2455,10 @@ namespace Quantum {
     /// Is the view component currently activated.
     /// </summary>
     public bool IsActive { get; private set; }
+    /// <summary>
+    /// Returns true if the view component has been initialized.
+    /// </summary>
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Cached game object is updated during <see cref="Activate"/> and <see cref="GameChanged"/>.
@@ -2497,6 +2510,7 @@ namespace Quantum {
       }
 
       OnInitialize();
+      IsInitialized = true;
     }
 
     /// <summary>
@@ -2525,18 +2539,16 @@ namespace Quantum {
     /// Is only called internally.
     /// </summary>
     public void UpdateView() {
-      HostProfiler.Start("QuantumViewComponent.UpdateView");
+      using var profilerScope = HostProfiler.Start("QuantumViewComponent.UpdateView");
       OnUpdateView();
-      HostProfiler.End();
     }
 
     /// <summary>
     /// Is only called internally.
     /// </summary>
     public void LateUpdateView() {
-      HostProfiler.Start("QuantumViewComponent.OnLateUpdateView");
+      using var profilerScope = HostProfiler.Start("QuantumViewComponent.OnLateUpdateView");
       OnLateUpdateView();
-      HostProfiler.End();
     }
 
     /// <summary>
@@ -3157,9 +3169,9 @@ namespace Quantum {
 namespace Quantum {
 #if UNITY_EDITOR
   using System;
-  using UnityEditor;
   using System.Collections.Generic;
   using Photon.Analyzer;
+  using UnityEditor;
   using UnityEngine;
   using UnityEngine.SceneManagement;
   using static UnityEngine.Object;
@@ -3569,11 +3581,11 @@ namespace Quantum {
 
       if (behaviour.PhysicsCollider.IsEnabled) {
         if (behaviour.TransformMode == QuantumEntityPrototypeTransformMode.Transform2D) {
-          config2D = physicsCollider.ScaledShape2D;
+          config2D = behaviour.GetScaledShape2DConfig();
           isDynamic2D = physicsBody.IsEnabled && !physicsCollider.IsTrigger &&
                         (physicsBody.Config2D & PhysicsBody2D.ConfigFlags.IsKinematic) == default;
         } else if (transformMode == QuantumEntityPrototypeTransformMode.Transform3D) {
-          config3D = physicsCollider.ScaledShape3D;
+          config3D = behaviour.GetScaledShape3DConfig();
           isDynamic3D = physicsBody.IsEnabled && !physicsCollider.IsTrigger &&
                         (physicsBody.Config3D & PhysicsBody3D.ConfigFlags.IsKinematic) == default;
         }
@@ -3596,9 +3608,9 @@ namespace Quantum {
         var vertical = SafeGetPrototype<Quantum.Prototypes.Transform2DVerticalPrototype>(behaviour);
         if (vertical != null) {
 #if QUANTUM_XY
-        var verticalScale = transform.lossyScale.z;
-        height = -vertical.Height.AsFloat * verticalScale;
-        position2D.z = -vertical.Position.AsFloat * verticalScale;
+          var verticalScale = transform.lossyScale.z;
+          height = -vertical.Height.AsFloat * verticalScale;
+          position2D.z = -vertical.Position.AsFloat * verticalScale;
 #else
           var verticalScale = transform.lossyScale.y;
           height = vertical.Height.AsFloat * verticalScale;
@@ -3895,10 +3907,7 @@ namespace Quantum {
               mesh.VisitCells((x, y, z, tris, count) => {
                 if (count > 0) {
                   var c = mesh.GetNodeCenter(x, y, z).ToUnityVector3();
-                  var s = default(Vector3);
-                  s.x = mesh.CellSize;
-                  s.y = mesh.CellSize;
-                  s.z = mesh.CellSize;
+                  var s = mesh.CellSize.AsFloat * Vector3.one;
 
                   GizmoUtils.DrawGizmosBox(
                     c,
@@ -4084,9 +4093,13 @@ namespace Quantum {
   using Photon.Deterministic;
   using UnityEditor;
   using UnityEngine;
-  
+
   public partial class QuantumGameGizmos {
     static unsafe void OnDrawGizmos_NavMesh(Frame frame, QuantumGameGizmosSettings gizmosSettings, GizmoType type) {
+      if (frame.MapAssetRef == default) {
+        return;
+      }
+      
       var navmeshList = new List<NavMesh>();
       navmeshList.AddRange(frame.Map.NavMeshes.Values);
 
@@ -4301,8 +4314,7 @@ namespace Quantum {
         var mesh = new Mesh { subMeshCount = 3 };
 
 #if QUANTUM_XY
-      mesh.vertices =
-      navmesh.Vertices.Select(x => new Vector3(x.Point.X.AsFloat, x.Point.Z.AsFloat, x.Point.Y.AsFloat)).ToArray();
+        mesh.vertices = navmesh.Vertices.Select(x => new Vector3(x.Point.X.AsFloat, x.Point.Z.AsFloat, x.Point.Y.AsFloat)).ToArray();
 #else
         mesh.vertices = navmesh.Vertices.Select(x => x.Point.ToUnityVector3()).ToArray();
 #endif
@@ -4567,9 +4579,9 @@ namespace Quantum {
       var height = 0.0f;
 
 #if QUANTUM_XY
-    if (hasTransformVertical) {
-      height = -tVertical->Height.AsFloat;
-    }
+      if (hasTransformVertical) {
+        height = -tVertical->Height.AsFloat;
+      }
 #else
       if (hasTransformVertical) {
         height = tVertical->Height.AsFloat;
@@ -4583,9 +4595,9 @@ namespace Quantum {
         var rot = t->Rotation.ToUnityQuaternion();
 
 #if QUANTUM_XY
-      if (hasTransformVertical) {
-        pos.z = -tVertical->Position.AsFloat;
-      }
+        if (hasTransformVertical) {
+          pos.z = -tVertical->Position.AsFloat;
+        }
 #else
         if (hasTransformVertical) {
           pos.y = tVertical->Position.AsFloat;
@@ -4612,8 +4624,8 @@ namespace Quantum {
         case Shape2DType.Box:
           var size = s.Box.Extents.ToUnityVector3() * 2.0f;
 #if QUANTUM_XY
-        size.z = height;
-        pos.z += height * 0.5f;
+          size.z = height;
+          pos.z += height * 0.5f;
 #else
           size.y = height;
           pos.y += height * 0.5f;
@@ -4665,9 +4677,9 @@ namespace Quantum {
             var rot = transform->Rotation.ToUnityQuaternion();
 
 #if QUANTUM_XY
-          if (transformVertical != null) {
-            pos.z = -transformVertical->Position.AsFloat;
-          }
+            if (transformVertical != null) {
+              pos.z = -transformVertical->Position.AsFloat;
+            }
 #else
             if (transformVertical != null) {
               pos.y = transformVertical->Position.AsFloat;
@@ -4849,8 +4861,8 @@ namespace Quantum {
       var offset = Vector3.zero;
 
 #if QUANTUM_XY
-    size.z = -height.AsFloat;
-    offset.z = size.z / 2.0f;
+      size.z = -height.AsFloat;
+      offset.z = size.z / 2.0f;
 #else
       size.y = height.AsFloat;
       offset.y = size.y / 2.0f;
@@ -5264,7 +5276,7 @@ namespace Quantum {
 
       var matrix = Matrix4x4.TRS(
         t.TransformPoint(behaviour.PositionOffset.ToUnityVector3()),
-        Quaternion.Euler(t.rotation.eulerAngles + behaviour.RotationOffset.ToUnityVector3()),
+        t.rotation * Quaternion.Euler(behaviour.RotationOffset.ToUnityVector3()),
         t.lossyScale);
 
       GizmoUtils.DrawGizmosBox(
@@ -5506,6 +5518,7 @@ namespace Quantum {
 #if UNITY_EDITOR
   using Photon.Deterministic;
   using UnityEditor;
+
   public partial class QuantumGameGizmos {
     private static void OnDrawGizmos_Prediction(Frame frame, GizmoType type) {
       if (frame.Context.Culling != null) {
@@ -5518,8 +5531,7 @@ namespace Quantum {
         if (context.PredictionAreaRadius != FP.UseableMax) {
 #if QUANTUM_XY
           // The Quantum simulation does not know about QUANTUM_XY and always keeps the vector2 Y component in the vector3 Z component.
-          var predictionAreaCenter =
-              new UnityEngine.Vector3(context.PredictionAreaCenter.X.AsFloat, context.PredictionAreaCenter.Z.AsFloat, 0);
+          var predictionAreaCenter = new UnityEngine.Vector3(context.PredictionAreaCenter.X.AsFloat, context.PredictionAreaCenter.Z.AsFloat, 0);
 #else
           var predictionAreaCenter = context.PredictionAreaCenter.ToUnityVector3();
 #endif
@@ -5800,7 +5812,7 @@ namespace Quantum {
   using System.Reflection;
   using UnityEditor;
   using UnityEngine;
-  
+
   public interface IQuantumEditorGUI {
 #if UNITY_EDITOR
     [Obsolete("Use EditorGUILayout.PropertyField instead", true)]
@@ -6172,7 +6184,6 @@ namespace Quantum.Prototypes.Unity {
     [Quantum.DrawIfAttribute("JointType", 2, (Quantum.CompareOperator)0, (Quantum.DrawIfMode)0, Hide = true)]
     [UnityEngine.TooltipAttribute("The frequency in Hertz (Hz) at which the spring joint will attempt to oscillate.\nTypical values are below half the frequency of the simulation.")]
     public Photon.Deterministic.FP Frequency;
-    [UnityEngine.RangeAttribute(0, 2)]
     [Quantum.DrawIfAttribute("JointType", 2, (Quantum.CompareOperator)0, (Quantum.DrawIfMode)0, Hide = true)]
     [UnityEngine.TooltipAttribute("A dimensionless value representing the damper capacity of suppressing the spring oscillation, typically between 0 and 1.")]
     public Photon.Deterministic.FP DampingRatio;
@@ -6281,7 +6292,6 @@ namespace Quantum.Prototypes.Unity {
     [Quantum.DrawIfAttribute("JointType", 2, (Quantum.CompareOperator)0, (Quantum.DrawIfMode)0, Hide = true)]
     [UnityEngine.TooltipAttribute("The frequency in Hertz (Hz) at which the spring joint will attempt to oscillate.\nTypical values are below half the frequency of the simulation.")]
     public Photon.Deterministic.FP Frequency;
-    [UnityEngine.RangeAttribute(0, 2)]
     [Quantum.DrawIfAttribute("JointType", 2, (Quantum.CompareOperator)0, (Quantum.DrawIfMode)0, Hide = true)]
     [UnityEngine.TooltipAttribute("A dimensionless value representing the damper capacity of suppressing the spring oscillation, typically between 0 and 1.")]
     public Photon.Deterministic.FP DampingRatio;
@@ -6363,17 +6373,18 @@ namespace Quantum.Prototypes.Unity {
 #if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES
 namespace Quantum {
   using System;
-#if UNITY_EDITOR
-  using UnityEditor;
-#endif
   using UnityEngine;
   using UnityEngine.AddressableAssets;
   using UnityEngine.ResourceManagement.AsyncOperations;
-  using Object = UnityEngine.Object;
 
+  /// <summary>
+  /// An Addressables-based implementation of the asset source pattern. The asset is loaded from the Addressables system.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   [Serializable]
   public partial class QuantumAssetSourceAddressable<T> where T : UnityEngine.Object {
     
+    /// <see cref="RuntimeKey"/>
     [Obsolete("Use RuntimeKey instead")]
     public AssetReference Address {
       get {
@@ -6391,6 +6402,9 @@ namespace Quantum {
       }
     }
     
+    /// <summary>
+    /// Addressables runtime key. Can be used in any form Addressables supports, such as asset name, label, or address.
+    /// </summary>
     [UnityAddressablesRuntimeKey]
     public string RuntimeKey;
     
@@ -6400,6 +6414,7 @@ namespace Quantum {
     [NonSerialized] 
     private AsyncOperationHandle _op;
 
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.Acquire"/>
     public void Acquire(bool synchronous) {
       if (_acquireCount == 0) {
         LoadInternal(synchronous);
@@ -6407,6 +6422,7 @@ namespace Quantum {
       _acquireCount++;
     }
 
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.Release"/>
     public void Release() {
       if (_acquireCount <= 0) {
         throw new Exception("Asset is not loaded");
@@ -6416,8 +6432,10 @@ namespace Quantum {
       }
     }
 
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.IsCompleted"/>
     public bool IsCompleted => _op.IsDone;
 
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.WaitForResult"/>
     public T WaitForResult() {
       Debug.Assert(_op.IsValid());
       if (!_op.IsDone) {
@@ -6486,9 +6504,11 @@ namespace Quantum {
       throw new InvalidOperationException($"Failed to load asset: {RuntimeKey}; asset is not of type {typeof(T)}, but {result.GetType()}");
     }
     
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.Description"/>
     public string Description => "RuntimeKey: " + RuntimeKey;
     
 #if UNITY_EDITOR
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.EditorInstance"/>
     public T EditorInstance => (T)QuantumAddressablesUtils.LoadEditorInstance(RuntimeKey);
 #endif
   }
@@ -6507,10 +6527,21 @@ namespace Quantum {
   using Object = UnityEngine.Object;
   using UnityResources = UnityEngine.Resources;
 
+  /// <summary>
+  /// Resources-based implementation of the asset source pattern.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   [Serializable]
   public partial class QuantumAssetSourceResource<T> where T : UnityEngine.Object {
+    
+    /// <summary>
+    /// Resource path. Note that this is a Unity resource path, not a file path.
+    /// </summary>
     [UnityResourcePath(typeof(Object))]
     public string ResourcePath;
+    /// <summary>
+    /// Sub-object name. If empty, the main object is loaded.
+    /// </summary>
     public string SubObjectName;
 
     [NonSerialized]
@@ -6518,6 +6549,10 @@ namespace Quantum {
     [NonSerialized]
     private int    _acquireCount;
 
+    /// <summary>
+    /// Loads the asset. In synchronous mode, the asset is loaded immediately. In asynchronous mode, the asset is loaded in the background.
+    /// </summary>
+    /// <param name="synchronous"></param>
     public void Acquire(bool synchronous) {
       if (_acquireCount == 0) {
         LoadInternal(synchronous);
@@ -6525,6 +6560,11 @@ namespace Quantum {
       _acquireCount++;
     }
 
+    /// <summary>
+    /// Unloads the asset. If the asset is not loaded, an exception is thrown. If the asset is loaded multiple times, it is only
+    /// unloaded when the last acquire is released.
+    /// </summary>
+    /// <exception cref="Exception"></exception>
     public void Release() {
       if (_acquireCount <= 0) {
         throw new Exception("Asset is not loaded");
@@ -6534,6 +6574,9 @@ namespace Quantum {
       }
     }
 
+    /// <summary>
+    /// Returns <see langword="true"/> if the asset is loaded.
+    /// </summary>
     public bool IsCompleted {
       get {
         if (_state == null) {
@@ -6550,6 +6593,10 @@ namespace Quantum {
       }
     }
 
+    /// <summary>
+    /// Blocks until the asset is loaded. If the asset is not loaded, an exception is thrown.
+    /// </summary>
+    /// <returns>The loaded asset</returns>
     public T WaitForResult() {
       Debug.Assert(_state != null);
       if (_state is ResourceRequest asyncOp) {
@@ -6633,9 +6680,15 @@ namespace Quantum {
       _state = null;
     }
     
+    /// <summary>
+    /// The description of the asset source. Used for debugging.
+    /// </summary>
     public string Description => $"Resource: {ResourcePath}{(!string.IsNullOrEmpty(SubObjectName) ? $"[{SubObjectName}]" : "")}";
     
 #if UNITY_EDITOR
+    /// <summary>
+    /// Returns the asset instance for Editor purposes. Does not call <see cref="Acquire"/>.
+    /// </summary>
     public T EditorInstance => string.IsNullOrEmpty(SubObjectName) ? UnityResources.Load<T>(ResourcePath) : LoadNamedResource(ResourcePath, SubObjectName);
 #endif
   }
@@ -6648,35 +6701,52 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
-#if UNITY_EDITOR
-  using UnityEditor;
-#endif
-  using UnityEngine;
   using UnityEngine.Serialization;
-  using Object = UnityEngine.Object;
 
+  /// <summary>
+  /// Hard reference-based implementation of the asset source pattern. This asset source forms a hard reference to the asset and never releases it.
+  /// This type is meant to be used at runtime. For edit-time, prefer <see cref="QuantumAssetSourceStaticLazy{T}"/>, as it delays
+  /// actually loading the asset, improving the editor performance.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   [Serializable]
   public partial class QuantumAssetSourceStatic<T> where T : UnityEngine.Object {
 
+    /// <summary>
+    /// The asset reference. Can point to an asset or to a runtime-created object.
+    /// </summary>
     [FormerlySerializedAs("Prefab")]
     public T Object;
-
+    
+    /// <see cref="Object"/>
     [Obsolete("Use Asset instead")]
     public T Prefab {
       get => Object;
       set => Object = value;
     }
     
+    /// <summary>
+    /// Returns <see langword="true"/>.
+    /// </summary>
     public bool IsCompleted => true;
 
+    /// <summary>
+    /// Does nothing, the asset is always loaded.
+    /// </summary>
     public void Acquire(bool synchronous) {
       // do nothing
     }
 
+    /// <summary>
+    /// Does nothing, the asset is always loaded.
+    /// </summary>
     public void Release() {
       // do nothing
     }
 
+    /// <summary>
+    /// Returns <seealso cref="Object"/> or throws an exception if the reference is missing.
+    /// </summary>
     public T WaitForResult() {
       if (Object == null) {
         throw new InvalidOperationException("Missing static reference");
@@ -6685,6 +6755,7 @@ namespace Quantum {
       return Object;
     }
     
+    /// <inheritdoc cref="QuantumAssetSourceResource{T}.Description"/>
     public string Description {
       get {
         if (Object) {
@@ -6701,6 +6772,9 @@ namespace Quantum {
     }
     
 #if UNITY_EDITOR
+    /// <summary>
+    /// Returns <seealso cref="Object"/>.
+    /// </summary>
     public T EditorInstance => Object;
 #endif
   }
@@ -6713,35 +6787,45 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
-#if UNITY_EDITOR
-  using UnityEditor;
-#endif
   using UnityEngine;
   using UnityEngine.Serialization;
-  using Object = UnityEngine.Object;
 
+  /// <summary>
+  /// An edit-time optimised version of <see cref="QuantumAssetSourceStatic{T}"/>, taking advantage of Unity's lazy loading of
+  /// assets. At runtime, this type behaves exactly like <see cref="QuantumAssetSourceStatic{T}"/>, except for the inability
+  /// to use runtime-created objects.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   [Serializable]
   public partial class QuantumAssetSourceStaticLazy<T> where T : UnityEngine.Object {
     
+    /// <summary>
+    /// The asset reference. Can only point to an asset, runtime-created objects will not work.
+    /// </summary>
     [FormerlySerializedAs("Prefab")] 
     public LazyLoadReference<T> Object;
     
+    /// <inheritdoc cref="QuantumAssetSourceStatic{T}.Prefab"/>
     [Obsolete("Use Object instead")]
     public LazyLoadReference<T> Prefab {
       get => Object;
       set => Object = value;
     }
     
+    /// <inheritdoc cref="QuantumAssetSourceStatic{T}.IsCompleted"/>
     public bool IsCompleted => true;
-
+    
+    /// <inheritdoc cref="QuantumAssetSourceStatic{T}.Acquire"/>
     public void Acquire(bool synchronous) {
       // do nothing
     }
-
+    
+    /// <inheritdoc cref="QuantumAssetSourceStatic{T}.Release"/>
     public void Release() {
       // do nothing
     }
-
+    
+    /// <inheritdoc cref="QuantumAssetSourceStatic{T}.WaitForResult"/>
     public T WaitForResult() {
       if (Object.asset == null) {
         throw new InvalidOperationException("Missing static reference");
@@ -6750,6 +6834,7 @@ namespace Quantum {
       return Object.asset;
     }
     
+    /// <inheritdoc cref="QuantumAssetSourceStatic{T}.Description"/>
     public string Description {
       get {
         if (Object.isBroken) {
@@ -6768,6 +6853,7 @@ namespace Quantum {
     }
     
 #if UNITY_EDITOR
+    /// <inheritdoc cref="QuantumAssetSourceStatic{T}.EditorInstance"/>
     public T EditorInstance => Object.asset;
 #endif
   }
@@ -6781,20 +6867,31 @@ namespace Quantum {
 namespace Quantum {
   using System;
   using UnityEngine.Scripting;
-
 #if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES 
   using UnityEngine.AddressableAssets;
   using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
   
+  /// <summary>
+  /// If applied at the assembly level, allows <see cref="QuantumGlobalScriptableObject{T}"/> to be loaded with Addressables.
+  /// </summary>
   [Preserve]
   public class QuantumGlobalScriptableObjectAddressAttribute : QuantumGlobalScriptableObjectSourceAttribute {
+    /// <param name="objectType">The type this attribute will attempt to load.</param>
+    /// <param name="address">The address to load from.</param>
     public QuantumGlobalScriptableObjectAddressAttribute(Type objectType, string address) : base(objectType) {
       Address = address;
     }
 
+    /// <summary>
+    /// The address to load from.
+    /// </summary>
     public string Address { get; }
     
+    /// <summary>
+    /// Loads the asset from the <see cref="Address"/>. Uses WaitForCompletion internally, so platforms that do not support it need
+    /// to preload the address prior to loading.
+    /// </summary>
     public override QuantumGlobalScriptableObjectLoadResult Load(Type type) {
 #if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES
       Assert.Check(!string.IsNullOrEmpty(Address));
@@ -6823,22 +6920,38 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
-  using System.Diagnostics.CodeAnalysis;
   using System.IO;
   using System.Reflection;
   using UnityEngine;
   using UnityEngine.Scripting;
   using Object = UnityEngine.Object;
   
+  /// <summary>
+  /// If applied at the assembly level, allows <see cref="QuantumGlobalScriptableObject{T}"/> to be loaded with Resources.
+  /// There is a default registration for this attribute, which attempts to load the asset from Resources using path from
+  /// <see cref="QuantumGlobalScriptableObjectAttribute"/>.
+  /// </summary>
   [Preserve]
   public class QuantumGlobalScriptableObjectResourceAttribute : QuantumGlobalScriptableObjectSourceAttribute {
+    /// <param name="objectType">The type this attribute will attempt to load.</param>
+    /// <param name="resourcePath">Resources path or <see langword="null"/>/empty if path from <see cref="QuantumGlobalScriptableObjectAttribute"/>
+    /// is to be used.</param>
     public QuantumGlobalScriptableObjectResourceAttribute(Type objectType, string resourcePath = "") : base(objectType) {
       ResourcePath = resourcePath;
     }
     
+    /// <summary>
+    /// Path in Resources.
+    /// </summary>
     public string ResourcePath { get; }
+    /// <summary>
+    /// If loaded in the editor, should the result be instantiated instead of returning the asset itself? The default is <see langword="true"/>. 
+    /// </summary>
     public bool InstantiateIfLoadedInEditor { get; set; } = true;
     
+    /// <summary>
+    /// Loads the asset from Resources synchronously.
+    /// </summary>
     public override QuantumGlobalScriptableObjectLoadResult Load(Type type) {
       
       var attribute = type.GetCustomAttribute<QuantumGlobalScriptableObjectAttribute>();
@@ -7936,8 +8049,8 @@ namespace Quantum {
   using System;
   using System.Collections.Generic;
   using System.IO;
+  using Core;
   using Photon.Deterministic;
-  using Quantum.Core;
   using UnityEngine;
 
   /// <summary>
@@ -8235,9 +8348,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/QuantumLoadBalancingClient.cs
 
 namespace Quantum {
+  using System;
   using Photon.Client;
   using Photon.Realtime;
-  using System;
 
   /// <summary>
   /// Obsolete: Not used anymore. Replace by using RealtimeClient directly.
@@ -8496,8 +8609,8 @@ namespace Quantum {
           Position = collider.transform.TransformPoint(collider.PositionOffset.ToUnityVector3()).ToFPVector2(),
           Rotation = collider.transform.rotation.ToFPRotation2D(),
 #if QUANTUM_XY
-        VerticalOffset = -collider.transform.position.z.ToFP(),
-        Height = collider.Height * scale.z.ToFP(),
+          VerticalOffset = -collider.transform.position.z.ToFP(),
+          Height         = collider.Height * scale.z.ToFP(),
 #else
           VerticalOffset = collider.transform.position.y.ToFP(),
           Height         = collider.Height * scale.y.ToFP(),
@@ -8569,8 +8682,8 @@ namespace Quantum {
           Position = c.transform.TransformPoint(c.PositionOffset.ToUnityVector3()).ToFPVector2() + positionOffset,
           Rotation = rotation,
 #if QUANTUM_XY
-        VerticalOffset = -c.transform.position.z.ToFP(),
-        Height = c.Height * s.z.ToFP(),
+          VerticalOffset = -c.transform.position.z.ToFP(),
+          Height         = c.Height * s.z.ToFP(),
 #else
           VerticalOffset = c.transform.position.y.ToFP(),
           Height         = c.Height * s.y.ToFP(),
@@ -8613,8 +8726,8 @@ namespace Quantum {
           Position = collider.transform.TransformPoint(collider.PositionOffset.ToUnityVector3()).ToFPVector2(),
           Rotation = collider.transform.rotation.ToFPRotation2D() + collider.RotationOffset.FlipRotation() * FP.Deg2Rad,
 #if QUANTUM_XY
-        VerticalOffset = -collider.transform.position.z.ToFP(),
-        Height = collider.Height * s.z.ToFP(),
+          VerticalOffset = -collider.transform.position.z.ToFP(),
+          Height         = collider.Height * s.z.ToFP(),
 #else
           VerticalOffset = collider.transform.position.y.ToFP(),
           Height         = collider.Height * s.y.ToFP(),
@@ -8708,7 +8821,7 @@ namespace Quantum {
 
         staticCollider3DList.Add(new MapStaticCollider3D {
           Position        = collider.transform.TransformPoint(collider.PositionOffset.ToUnityVector3()).ToFPVector3(),
-          Rotation        = FPQuaternion.Euler(collider.transform.rotation.eulerAngles.ToFPVector3() + collider.RotationOffset),
+          Rotation        = (collider.transform.rotation * Quaternion.Euler(collider.RotationOffset.ToUnityVector3())).ToFPQuaternion(),
           PhysicsMaterial = collider.Settings.PhysicsMaterial,
           StaticData      = GetStaticData(collider.gameObject, collider.Settings, staticCollider3DList.Count),
 
@@ -9124,8 +9237,8 @@ namespace Quantum {
         Position = pos.ToFPVector2(),
         Rotation = rot.ToFPRotation2D(),
 #if QUANTUM_XY
-      VerticalOffset = -t.position.z.ToFP(),
-      Height = scaledHeight.ToFP(),
+        VerticalOffset = -t.position.z.ToFP(),
+        Height         = scaledHeight.ToFP(),
 #else
         VerticalOffset = t.position.y.ToFP(),
         Height         = scaledHeight.ToFP(),
@@ -9257,7 +9370,6 @@ namespace Quantum {
   using System;
   using System.Collections.Generic;
   using System.Linq;
-  using System.Reflection;
   using Photon.Analyzer;
   using Photon.Deterministic;
   using UnityEngine;
@@ -9266,7 +9378,6 @@ namespace Quantum {
   using Plane = UnityEngine.Plane;
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
   using UnityEngine.AI;
-  using static Quantum.QuantumNavMesh.DelaunayTriangulation;
 #endif
 
   /// <summary>
@@ -9640,7 +9751,7 @@ namespace Quantum {
       }
 
       /// <summary>
-      /// Splits a triangle into two triangles by inserting a new vertex at the edge between <paramref name="v0"/> and <paramref name="v1"/>.
+      /// Splits a triangle into two triangles by inserting a new vertex at the edge between <paramref name="v0"/> and v0 + 1.
       /// </summary>
       public static void SplitTriangle(ref NavMeshBakeDataTriangle[] triangles, int t, int v0, int vNew) {
         // Split edge is between vertex index 0 and 1
@@ -9828,10 +9939,10 @@ namespace Quantum {
             } else {
               // Add link
 #if QUANTUM_XY
-            if (settings.EnableQuantum_XY) {
-              startPosition = new Vector3(startPosition.x, startPosition.z, startPosition.y);
-              endPosition = new Vector3(endPosition.x, endPosition.z, endPosition.y);
-            }
+              if (settings.EnableQuantum_XY) {
+                startPosition = new Vector3(startPosition.x, startPosition.z, startPosition.y);
+                endPosition = new Vector3(endPosition.x, endPosition.z, endPosition.y);
+              }
 #endif
               ArrayUtils.Add(ref result.Links, new NavMeshBakeDataLink {
                 Start = startPosition.ToFPVector3(),
@@ -9911,8 +10022,8 @@ namespace Quantum {
 
 #if QUANTUM_ENABLE_AI_NAVIGATION
       public NavMeshLinkTemp(Unity.AI.Navigation.NavMeshLink link) {
-        StartPoint = link.transform.position + link.startPoint;
-        EndPoint = link.transform.position + link.endPoint;
+        StartPoint = link.transform != null ? link.transform.TransformPoint(link.startPoint) : link.startPoint;
+        EndPoint   = link.transform != null ? link.transform.TransformPoint(link.endPoint)   : link.endPoint;
         Width = link.width;
         CostModifier = link.costModifier;
         Bidirectional = link.bidirectional;
@@ -10928,7 +11039,7 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Returns the RTT measused by the Realtime client.
+    /// Returns the RTT measured by the Realtime client.
     /// </summary>
     public Int32 RoundTripTime {
       get {
@@ -11262,7 +11373,15 @@ namespace Quantum {
   using Photon.Realtime;
   using UnityEngine;
 
+  /// <summary>
+  /// Implements <see cref="MatchmakingReconnectInformation"/> to save reconnect information to player prefs.
+  /// This way the app can try to reconnect after app start.
+  /// </summary>
   public class QuantumReconnectInformation : MatchmakingReconnectInformation {
+    /// <summary>
+    /// Load the matchmaking information from player prefs.
+    /// <para>Always returns a valid object.</para>
+    /// </summary>
     public static MatchmakingReconnectInformation Load() {
       var result = JsonUtility.FromJson<QuantumReconnectInformation>(PlayerPrefs.GetString("Quantum.ReconnectInformation"));
       if (result == null) {
@@ -11272,6 +11391,10 @@ namespace Quantum {
       return result;
     }
 
+    /// <summary>
+    /// Is a callback from matchmaking that triggers a successful connect that can then be stored.
+    /// </summary>
+    /// <param name="client">Realtime client that created the connection.</param>
     public override void Set(RealtimeClient client) {
       base.Set(client);
 
@@ -11280,10 +11403,17 @@ namespace Quantum {
       }
     }
 
+    /// <summary>
+    /// Reset the saved reconnect information.
+    /// </summary>
     public static void Reset() {
       PlayerPrefs.SetString("Quantum.ReconnectInformation", string.Empty);
     }
 
+    /// <summary>
+    /// Save the reconnect information to player prefs.
+    /// </summary>
+    /// <param name="value">The info to store.</param>
     public static void Save(QuantumReconnectInformation value) {
       PlayerPrefs.SetString("Quantum.ReconnectInformation", JsonUtility.ToJson(value));
     }
@@ -11577,14 +11707,12 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
-  using System.Threading;
   using System.Threading.Tasks;
   using Photon.Analyzer;
   using Photon.Deterministic;
   using Photon.Realtime;
   using Profiling;
   using UnityEngine;
-  using Profiler = UnityEngine.Profiling.Profiler;
 
   /// <summary>
   /// Implements the runner factory to Unity platform.
@@ -11755,16 +11883,10 @@ namespace Quantum {
       // set runner factory and init Realtime.Async
       DefaultFactory = new QuantumRunnerUnityFactory();
 
-      // init profiler
-      HostProfiler.Init(
-        x => Profiler.BeginSample(x),
-        () => Profiler.EndSample());
-
-      // init thread profiling (2019.x and up)
-      HostProfiler.InitThread(
-        (a, b) => Profiler.BeginThreadProfiling(a, b),
-        () => Profiler.EndThreadProfiling());
-
+#if ENABLE_PROFILER
+      HostProfiler.Init(new QuantumUnityHostProfiler());
+#endif
+      
       // init debug draw functions
 #if QUANTUM_DRAW_SHAPES || UNITY_EDITOR
       Draw.Init(DebugDraw.Ray, DebugDraw.Line, DebugDraw.Circle, DebugDraw.Sphere, DebugDraw.Rectangle, DebugDraw.Box, DebugDraw.Capsule, DebugDraw.Clear);
@@ -11963,13 +12085,58 @@ namespace Quantum {
   [Serializable]
   public class QuantumStaticColliderSettings {
     public PhysicsCommon.StaticColliderMutableMode MutableMode;
-    public Quantum.AssetRef<Quantum.PhysicsMaterial>                 PhysicsMaterial;
-    public AssetRef                                Asset;
-    
+    public Quantum.AssetRef<Quantum.PhysicsMaterial> PhysicsMaterial;
+    public AssetRef Asset;
+
     [DrawIf("^SourceCollider", 0, ErrorOnConditionMemberNotFound = false)]
-    public Boolean                                 Trigger;
+    public Boolean Trigger;
   }
 }
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Runtime/QuantumUnityHostProfiler.cs
+
+#if ENABLE_PROFILER
+namespace Quantum {
+  using Profiling;
+  using Unity.Profiling;
+  using Unity.Profiling.LowLevel;
+  using Unity.Profiling.LowLevel.Unsafe;
+
+  /// <summary>
+  /// Profiler implementation for Unity.
+  /// </summary>
+  public class QuantumUnityHostProfiler : IHostProfiler {
+    /// <inheritdoc cref="IHostProfiler.CreateMarker"/>
+    public HostProfilerMarker CreateMarker(string name) {
+      var ptr = ProfilerUnsafeUtility.CreateMarker(name, ProfilerCategory.Scripts, MarkerFlags.Default, 0);
+      return new HostProfilerMarker(ptr);
+    }
+
+    /// <inheritdoc cref="IHostProfiler.StartMarker"/>
+    public void StartMarker(HostProfilerMarker marker) {
+      ProfilerUnsafeUtility.BeginSample(marker.RawValue);
+    }
+
+    /// <inheritdoc cref="IHostProfiler.EndMarker"/>
+    public void EndMarker(HostProfilerMarker marker) {
+      ProfilerUnsafeUtility.EndSample(marker.RawValue);
+    }
+
+    /// <inheritdoc cref="IHostProfiler.StartNamedMarker"/>
+    public void StartNamedMarker(string markerName) {
+      UnityEngine.Profiling.Profiler.BeginSample(markerName);
+    }
+
+    /// <inheritdoc cref="IHostProfiler.EndLastNamedMarker"/>
+    public void EndLastNamedMarker() {
+      UnityEngine.Profiling.Profiler.EndSample();
+    }
+  }
+}
+#endif
 
 #endregion
 
@@ -11986,16 +12153,32 @@ namespace Quantum {
   using UnityEngine;
   using UnityEngine.Serialization;
 
+  /// <summary>
+  /// Asset serializer implementation based on <see cref="UnityEngine.JsonUtility"/> and a set of utility methods from
+  /// <see cref="JsonUtilityExtensions"/>. Can use surrogates to replace asset types with more efficient
+  /// representations (<see cref="RegisterSurrogate{AssetType,SurrogateType}"/>. Additionally, any Unity-object references
+  /// are serialized as null by default (<see cref="NullifyUnityObjectReferences"/>).
+  /// <p/>
+  /// The output can be deserialized with Newtonsoft.Json-based deserializer from Quantum.Json assembly. If this interoperability is
+  /// needed, consider enabling <see cref="IntegerEnquotingMinDigits"/> to ensure that large integers are enquoted and not treated as
+  /// floating points.
+  /// </summary>
   public class QuantumUnityJsonSerializer : IAssetSerializer {
     private Dictionary<Type, (Type SurrogateType, Delegate Factory)> _surrogateFactories = new();
     private Dictionary<Type, Type> _surrogateToAssetType = new();
 
+    /// <summary>
+    /// No longer used.
+    /// </summary>
     [Obsolete("No longer used")]
     public bool PrettyPrintEnabled {
       get => false;
       set { }
     }
     
+    /// <summary>
+    /// No longer used.
+    /// </summary>
     [Obsolete("No longer used")]
     public bool EntityViewPrefabResolvingEnabled { get => false; set {} }
     
@@ -12044,7 +12227,9 @@ namespace Quantum {
     /// </summary>
     public Func<string, Type, Type> TypeResolver { get; set; } 
     
-    
+    /// <summary>
+    /// Creates a new instance of <see cref="QuantumUnityJsonSerializer"/>.
+    /// </summary>
     public QuantumUnityJsonSerializer() {
       RegisterSurrogate((EntityView asset) => new EntityViewSurrogate() {
         Identifier = asset.Identifier,
@@ -12052,6 +12237,12 @@ namespace Quantum {
       RegisterSurrogate((BinaryData asset) => BinaryDataSurrogate.Create(asset, CompressBinaryDataOnSerializationThreshold));
     }
     
+    /// <summary>
+    /// Registers a surrogate type for the provided asset type. Surrogates are types that are serialized and deserialized instead of
+    /// the original asset type. By default, the serializer only provides surrogates for <see cref="EntityView"/> and
+    /// <see cref="BinaryData"/>, for a more efficient serialization.
+    /// </summary>
+    /// <param name="factory">Delegate to be used when an instance of a surrogate is needed.</param>
     public void RegisterSurrogate<AssetType, SurrogateType>(Func<AssetType, SurrogateType> factory) 
       where AssetType : AssetObject
       where SurrogateType : AssetObjectSurrogate {
@@ -12079,27 +12270,41 @@ namespace Quantum {
       return globalEntityView.Prefab;
     }
     
+    /// <summary>
+    /// Creates a new instance of <see cref="StreamReader"/> with UTF8 encoding. The underlying stream is not closed.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
     protected virtual TextReader CreateReader(Stream stream) => new StreamReader(stream, Encoding.UTF8, true, 1024, true);
+    /// <summary>
+    /// Creates a new instance of <see cref="StreamWriter"/> with UTF8 encoding. The underlying stream is not closed.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
     protected virtual TextWriter CreateWriter(Stream stream) => new StreamWriter(stream, new UTF8Encoding(false), 1024, true);
     
+    /// <inheritdoc cref="IAssetSerializer.SerializeConfig"/>
     public void SerializeConfig(Stream stream, IRuntimeConfig config) {
       using (var writer = CreateWriter(stream)) {
         ToJson(config, writer);
       }
     }
 
+    /// <inheritdoc cref="IAssetSerializer.SerializePlayer"/>
     public void SerializePlayer(Stream stream, IRuntimePlayer player) {
       using (var writer = CreateWriter(stream)) {
         ToJson(player, writer);
       }
     }
 
+    /// <inheritdoc cref="IAssetSerializer.SerializeResult"/>
     public void SerializeResult(Stream stream, IGameResult config) {
       using (var writer = CreateWriter(stream)) {
         ToJson(config, writer);
       }
     }
 
+    /// <inheritdoc cref="IAssetSerializer.SerializeAssets"/>
     public void SerializeAssets(Stream stream, AssetObject[] assets) {
       
       List<object> list = new List<object>(assets.Length);
@@ -12120,24 +12325,28 @@ namespace Quantum {
       }
     }
     
+    /// <inheritdoc cref="IAssetSerializer.DeserializeConfig"/>
     public IRuntimeConfig DeserializeConfig(Stream stream) {
       using (var reader = CreateReader(stream)) {
         return (IRuntimeConfig)FromJson(reader, typeof(IRuntimeConfig));
       }
     }
 
+    /// <inheritdoc cref="IAssetSerializer.DeserializePlayer"/>
     public IRuntimePlayer DeserializePlayer(Stream stream) {
       using (var reader = CreateReader(stream)) {
         return (IRuntimePlayer)FromJson(reader, typeof(IRuntimePlayer));
       }
     }
 
+    /// <inheritdoc cref="IAssetSerializer.DeserializeResult"/>
     public IGameResult DeserializeResult(Stream stream) {
       using (var reader = CreateReader(stream)) {
         return (IGameResult)FromJson(reader, typeof(IGameResult));
       }
     }
 
+    /// <inheritdoc cref="IAssetSerializer.DeserializeAssets"/>
     public AssetObject[] DeserializeAssets(Stream stream) {
       using (var reader = CreateReader(stream)) {
         var list = (IList)FromJson(reader, typeof(AssetObject));
@@ -12155,6 +12364,7 @@ namespace Quantum {
       }
     }
 
+    /// <inheritdoc cref="IAssetSerializer.PrintObject"/>
     public string PrintObject(object obj) {
       return JsonUtility.ToJson(obj, true);
     }
@@ -12203,14 +12413,30 @@ namespace Quantum {
       });
     }
     
+    /// <summary>
+    /// Base class for asset object surrogates.
+    /// </summary>
     [Serializable]
     public abstract class AssetObjectSurrogate {
+      /// <summary>
+      /// Asset identifier.
+      /// </summary>
       public AssetObjectIdentifier Identifier;
+      /// <summary>
+      /// Creates an asset object from the surrogate.
+      /// </summary>
+      /// <param name="serializer"></param>
+      /// <returns></returns>
       public abstract AssetObject CreateAsset(QuantumUnityJsonSerializer serializer);
     }
     
+    /// <summary>
+    /// <see cref="Quantum.EntityView"/> surrogate. Does not serialize the prefab reference, but only the identifier.
+    /// <see cref="QuantumUnityJsonSerializer.ResolvePrefab"/> is used to resolve the prefab during deserialization.
+    /// </summary>
     [Serializable]
     protected class EntityViewSurrogate : AssetObjectSurrogate {
+      /// <inheritdoc cref="AssetObjectSurrogate.CreateAsset"/>
       public override AssetObject CreateAsset(QuantumUnityJsonSerializer serializer) {
         var result = AssetObject.Create<EntityView>();
         result.Identifier = Identifier;
@@ -12219,11 +12445,26 @@ namespace Quantum {
       }
     }
 
+    /// <summary>
+    /// <see cref="Quantum.BinaryData"/> surrogate. Compresses the data if it is larger than the threshold and replaces the data with a base64 encoded string.
+    /// </summary>
     [Serializable]
     protected class BinaryDataSurrogate : AssetObjectSurrogate {
+      /// <summary>
+      /// Is the data compressed.
+      /// </summary>
       public bool IsCompressed;
+      /// <summary>
+      /// Binary data as a base64 encoded string.
+      /// </summary>
       [FormerlySerializedAs("Base64Data")] public string Data;
 
+      /// <summary>
+      /// Creates a surrogate from the asset. Optionally compresses the data if it is larger than the threshold.
+      /// </summary>
+      /// <param name="asset"></param>
+      /// <param name="compressThreshold"></param>
+      /// <returns></returns>
       public static BinaryDataSurrogate Create(BinaryData asset, int? compressThreshold) {
         byte[] data = asset.Data ?? Array.Empty<byte>();
         bool isCompressed = asset.IsCompressed;
@@ -12239,6 +12480,7 @@ namespace Quantum {
         };
       }
       
+      /// <inheritdoc cref="AssetObjectSurrogate.CreateAsset"/>
       public override AssetObject CreateAsset(QuantumUnityJsonSerializer serializer) {
         var result = AssetObject.Create<BinaryData>();
         result.Identifier = Identifier;
@@ -12309,7 +12551,7 @@ namespace Quantum {
     /// </summary>
     public string NameUnavailableObjectDestroyedLabel = "(destroyed)";
     /// <summary>
-    /// Cusomize logged object names from other threads.
+    /// Customize logged object names from other threads.
     /// </summary>
     public string NameUnavailableInWorkerThreadLabel = "";
     /// <summary>
@@ -12365,6 +12607,10 @@ namespace Quantum {
       }
     }
 
+    /// <summary>
+    /// Create unity logger instance.
+    /// </summary>
+    /// <param name="mainThread">The thread used by <see cref="IsInMainThread"/> or <see langword="null"/> to use the current thread.</param>
     public QuantumUnityLogger(Thread mainThread = null) {
 
       _mainThread = mainThread ?? Thread.CurrentThread;
@@ -12382,6 +12628,12 @@ namespace Quantum {
       GlobalPrefixColor = Color32ToRGBString(QuantumColor.Log);
     }
 
+    /// <summary>
+    /// Log a message that will call <see cref="Debug.Log(object, UnityEngine.Object)"/>.
+    /// </summary>
+    /// <param name="logType">Log type.</param>
+    /// <param name="message">The log message.</param>
+    /// <param name="logContext">The context object or <see langword="null"/>.</param>
     public void Log(LogType logType, string message, in LogContext logContext) {
       Debug.Assert(_builder.Length == 0);
       string fullMessage;
@@ -12457,6 +12709,12 @@ namespace Quantum {
       }
     }
 
+    /// <summary>
+    /// Log an exception.
+    /// <para>Tries to force console windows double click to the exception source when UNITY_EDITOR is defined, otherwise will also call <see cref="Debug.LogException(Exception, UnityEngine.Object)"/>.</para>
+    /// </summary>
+    /// <param name="ex">Exception to log.</param>
+    /// <param name="logContext">Log context or <see langword="null"/></param>
     public void LogException(Exception ex, in LogContext logContext) {
       Log(LogType.Warn, $"{ex.GetType()} <i>See next error log entry for details.</i>", in logContext);
 
@@ -12578,7 +12836,7 @@ namespace Quantum {
 namespace Quantum {
   using System;
   using System.Reflection;
-  using global::Unity.Collections.LowLevel.Unsafe;
+  using Unity.Collections.LowLevel.Unsafe;
 
   public class QuantumUnityMemoryLayoutVerifierPlatform : MemoryLayoutVerifier.IPlatform {
     public int FieldOffset(FieldInfo field) {
@@ -12601,14 +12859,14 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/QuantumUnityNativeImplementation.cs
 
 namespace Quantum {
-  using System;
   using Photon.Analyzer;
   using Photon.Deterministic;
-  using global::Unity.Collections.LowLevel.Unsafe;
+  using Unity.Collections.LowLevel.Unsafe;
   using UnityAllocator = global::Unity.Collections.Allocator;
 
 #if ENABLE_IL2CPP
   using AOT;
+  using System;
   using System.Collections.Generic;
 #endif
 
@@ -12766,21 +13024,21 @@ namespace Quantum {
 #region QuantumGlobalScriptableObject.cs
 
 namespace Quantum {
-  using UnityEngine;
   using System;
   using System.Collections.Generic;
-  using System.IO;
   using System.Linq;
   using System.Reflection;
-  using JetBrains.Annotations;
-  using UnityEngine.Scripting;
-  using Trace = System.Diagnostics.Trace;
+  using UnityEngine;
 #if UNITY_EDITOR
   using static QuantumEditorLog;
-  #else
+#else
   using static Log;
-  #endif
+#endif
 
+  /// <summary>
+  /// A base class for ScriptableObjects that are meant to be globally accessible, at edit-time and runtime. The way such objects
+  /// are loaded is driven by usages of <see cref="QuantumGlobalScriptableObjectSourceAttribute"/> attributes. 
+  /// </summary>
   public abstract class QuantumGlobalScriptableObject : QuantumScriptableObject {
     private static IEnumerable<T> GetAssemblyAttributes<T>() where T : Attribute {
       foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -12790,31 +13048,46 @@ namespace Quantum {
       }
     }
     
-    protected static QuantumGlobalScriptableObjectSourceAttribute[] SourceAttributes => s_sourceAttributes.Value;
+    internal static QuantumGlobalScriptableObjectSourceAttribute[] SourceAttributes => s_sourceAttributes.Value;
 
     private static readonly Lazy<QuantumGlobalScriptableObjectSourceAttribute[]> s_sourceAttributes = new Lazy<QuantumGlobalScriptableObjectSourceAttribute[]>(() => {
       return GetAssemblyAttributes<QuantumGlobalScriptableObjectSourceAttribute>().OrderBy(x => x.Order).ToArray();
     });
   }
   
+  /// <inheritdoc cref="QuantumGlobalScriptableObject{T}"/>
   public abstract partial class QuantumGlobalScriptableObject<T> : QuantumGlobalScriptableObject where T : QuantumGlobalScriptableObject<T> {
     private static T                                                s_instance;
     private static QuantumGlobalScriptableObjectUnloadDelegate s_unloadHandler;
     
+    /// <summary>
+    /// Is this instance a global instance.
+    /// </summary>
     public bool IsGlobal { get; private set; }
-
+    
+    /// <summary>
+    /// Invoked when the instance is loaded as global.
+    /// </summary>
     protected virtual void OnLoadedAsGlobal() {
     }
 
+    /// <summary>
+    /// Invoked when the instance is unloaded as global.
+    /// </summary>
+    /// <param name="destroyed"></param>
     protected virtual void OnUnloadedAsGlobal(bool destroyed) {
     }
     
     private static string LogPrefix => $"[Global {typeof(T).Name}]: ";
     private static string AsId(QuantumGlobalScriptableObject<T> obj) => obj ? $"[IID:{obj.GetInstanceID()}]" : "null";
     
-    // OnDestroy is weirs in ScriptableObjects; it can realistically only happen for fully runtime/scene bound ones. Addressables
-    // seem to omit even OnDisable.
+    /// <summary>
+    /// If the current instance is global, unsets <see cref="IsGlobal"/> and calls <see cref="OnUnloadedAsGlobal"/>
+    /// </summary>
     protected virtual void OnDisable() {
+      // OnDestroy is weird in ScriptableObjects; it can realistically only happen for fully runtime/scene bound ones. Addressables
+      // seem to omit even OnDisable.
+      
       if (!IsGlobal) {
         Trace($"{LogPrefix}OnDisable called for {AsId(this)}, but is not global");
         return;
@@ -12834,6 +13107,11 @@ namespace Quantum {
       OnUnloadedAsGlobal(true);
     }
 
+    /// <summary>
+    /// A singleton instance-like property. Loads or returns the current global instance. Derived classes can package it in a property
+    /// with a different name. Throws if loading an instance failed.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
     protected static T GlobalInternal {
       get {
         var instance = GetOrLoadGlobalInstance();
@@ -12854,10 +13132,18 @@ namespace Quantum {
       }
     }
     
+    /// <summary>
+    /// Returns true if a global instance is loaded. Compared to <see cref="GlobalInternal"/>, it does not attempt to load an instance.
+    /// </summary>
     protected static bool IsGlobalLoadedInternal {
       get => s_instance != null;
     }
 
+    /// <summary>
+    /// Loads or returns the current global instance. Returns <see langword="null"/> if loading an instance failed.
+    /// </summary>
+    /// <param name="global"></param>
+    /// <returns></returns>
     protected static bool TryGetGlobalInternal(out T global) {
       var instance = GetOrLoadGlobalInstance();
       if (ReferenceEquals(instance, null)) {
@@ -12869,6 +13155,10 @@ namespace Quantum {
       return true;
     }
 
+    /// <summary>
+    /// Unloads the global instance if it is loaded.
+    /// </summary>
+    /// <returns><see langword="true"/> if an instance was unloaded</returns>
     protected static bool UnloadGlobalInternal() {
       
       var instance = s_instance;
@@ -12978,14 +13268,30 @@ namespace Quantum {
 namespace Quantum {
   using System;
 
+  /// <summary>
+  /// Provides additional information for a global scriptable object.
+  /// </summary>
   [AttributeUsage(AttributeTargets.Class)]
   public class QuantumGlobalScriptableObjectAttribute : Attribute {
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="defaultPath">The default path for the asset.</param>
     public QuantumGlobalScriptableObjectAttribute(string defaultPath) {
       DefaultPath = defaultPath;
     }
     
+    /// <summary>
+    /// The default path for the asset.
+    /// </summary>
     public string DefaultPath { get; }
+    /// <summary>
+    /// The default contents for the asset, if it is a TextAsset.
+    /// </summary>
     public string DefaultContents { get; set; }
+    /// <summary>
+    /// Name of the method that is used to generate the default contents for the asset.
+    /// </summary>
     public string DefaultContentsGeneratorMethod { get; set; }
   }
 }
@@ -12998,40 +13304,84 @@ namespace Quantum {
 namespace Quantum {
   using System;
 
+  /// <summary>
+  /// Base class for all attributes that can be used to load <see cref="QuantumGlobalScriptableObject"/>.
+  /// Attributes need to be registered at the assembly level. For instance, this snippet is used to register a default loader,
+  /// that attempts to load from Resources based on <see cref="QuantumGlobalScriptableObjectAttribute.DefaultPath"/>:
+  /// <code>
+  /// [assembly: Quantum.QuantumGlobalScriptableObjectResource(typeof(Quantum.QuantumGlobalScriptableObject), Order = 2000, AllowFallback = true)]
+  /// </code>
+  /// </summary>
+  /// <seealso cref="QuantumGlobalScriptableObjectAddressAttribute"/>
+  /// <seealso cref="QuantumGlobalScriptableObjectResourceAttribute"/>
   [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
   public abstract class QuantumGlobalScriptableObjectSourceAttribute : Attribute {
+    /// <param name="objectType">Type or the base type of <see cref="QuantumGlobalScriptableObject"/> that this loader supports.</param>
     public QuantumGlobalScriptableObjectSourceAttribute(Type objectType) {
       ObjectType = objectType;
     }
     
+    /// <summary>
+    /// Type or the base type of <see cref="QuantumGlobalScriptableObject"/> that this loader supports.
+    /// </summary>
     public Type ObjectType { get; }
+    /// <summary>
+    /// Order in which this loader will be executed. Lower values are executed first.
+    /// </summary>
     public int Order { get; set; }
+    /// <summary>
+    /// Can this loader be used in edit mode.
+    /// </summary>
     public bool AllowEditMode { get; set; } = false;
+    /// <summary>
+    /// Does this loader allow fallback to the next loader?
+    /// </summary>
     public bool AllowFallback { get; set; } = false;
 
+    /// <summary>
+    /// Attempt to load the object of the specified type. Return <see langword="default"/> if the object cannot be loaded.
+    /// </summary>
+    /// <param name="type">The requested type</param>
     public abstract QuantumGlobalScriptableObjectLoadResult Load(Type type);
   }
   
   [Obsolete("Use one of QuantumGlobalScriptableObjectSourceAttribute-derived types instead", true)]
   [AttributeUsage(AttributeTargets.Method)]
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
   public class QuantumGlobalScriptableObjectLoaderMethodAttribute : Attribute {
     public int Order { get; set; }
   }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
   
-  public delegate QuantumGlobalScriptableObjectLoadResult QuantumGlobalScriptableObjectLoadDelegate(Type type);
-
+  /// <summary>
+  /// A delegate that can be used to unload a <see cref="QuantumGlobalScriptableObject"/>.
+  /// </summary>
   public delegate void QuantumGlobalScriptableObjectUnloadDelegate(QuantumGlobalScriptableObject instance);
   
+  /// <summary>
+  /// The result of <see cref="QuantumGlobalScriptableObjectSourceAttribute.Load"/>. Contains the loaded object and an optional
+  /// unloader delegate.
+  /// </summary>
   public readonly struct QuantumGlobalScriptableObjectLoadResult {
+    /// <summary>
+    /// Object instance.
+    /// </summary>
     public readonly QuantumGlobalScriptableObject               Object;
+    /// <summary>
+    /// An optional delegate that is used to unload <see cref="Object"/>.
+    /// </summary>
     public readonly QuantumGlobalScriptableObjectUnloadDelegate Unloader;
-
+    
+    /// <param name="obj">Object instance.</param>
+    /// <param name="unloader">An optional delegate that is used to unload <paramref name="obj"/>.</param>
     public QuantumGlobalScriptableObjectLoadResult(QuantumGlobalScriptableObject obj, QuantumGlobalScriptableObjectUnloadDelegate unloader = null) {
       Object = obj;
       Unloader = unloader;
     }
     
-    // implicit cast operators
+    /// <summary>
+    /// Implicitly converts a <see cref="QuantumGlobalScriptableObject"/> to a <see cref="QuantumGlobalScriptableObjectLoadResult"/>.
+    /// </summary>
     public static implicit operator QuantumGlobalScriptableObjectLoadResult(QuantumGlobalScriptableObject result) => new QuantumGlobalScriptableObjectLoadResult(result, null);
   }
 }
@@ -13044,6 +13394,9 @@ namespace Quantum {
 namespace Quantum {
   using UnityEngine;
 
+  /// <summary>
+  /// Base class for all Quantum MonoBehaviours.
+  /// </summary>
   public abstract partial class QuantumMonoBehaviour : MonoBehaviour {
     
   }
@@ -13057,8 +13410,10 @@ namespace Quantum {
 namespace Quantum {
   using UnityEngine;
 
+  /// <summary>
+  /// Base class for all Quantum scriptable objects.
+  /// </summary>
   public abstract partial class QuantumScriptableObject : ScriptableObject {
-    
   }
 }
 
@@ -13084,19 +13439,39 @@ namespace Quantum {
   using System.Text.RegularExpressions;
   using UnityEngine;
 
+  /// <summary>
+  /// Extends capabilities of <see cref="JsonUtility"/> by adding type annotations to the serialized JSON, Unity object reference
+  /// handling and integer enquotement.
+  /// </summary>
   public static class JsonUtilityExtensions {
     
+    /// <see cref="JsonUtilityExtensions.FromJsonWithTypeAnnotation"/>
     public delegate Type TypeResolverDelegate(string typeName);
+    /// <see cref="JsonUtilityExtensions.ToJsonWithTypeAnnotation(object,Quantum.JsonUtilityExtensions.InstanceIDHandlerDelegate)"/>
     public delegate string TypeSerializerDelegate(Type type);
+    /// <see cref="JsonUtilityExtensions.ToJsonWithTypeAnnotation(object,Quantum.JsonUtilityExtensions.InstanceIDHandlerDelegate)"/>
     public delegate string InstanceIDHandlerDelegate(object context, int value);
     
     private const string TypePropertyName = "$type";
 
+    /// <summary>
+    /// Enquotes integers in the JSON string that are at least <paramref name="minDigits"/> long. This is useful for parsers that
+    /// interpret large integers as floating point numbers.
+    /// </summary>
+    /// <param name="json">JSON to process</param>
+    /// <param name="minDigits">Digit threshold to perform the enquoting</param>
+    /// <returns><paramref name="json"/> with long integers enquoted.</returns>
     public static string EnquoteIntegers(string json, int minDigits = 8) {
       var result = Regex.Replace(json, $@"(?<="":\s*)(-?[0-9]{{{minDigits},}})(?=[,}}\n\r\s])", "\"$1\"", RegexOptions.Compiled);
       return result;
     }
 
+    /// <summary>
+    /// Converts the object to JSON with type annotations.
+    /// </summary>
+    /// <param name="obj">Object to be serialized.</param>
+    /// <param name="instanceIDHandler">Handler for UnityEngine.Object references. If the handler returns an empty string,
+    /// the reference is removed from the final result.</param>
     public static string ToJsonWithTypeAnnotation(object obj, InstanceIDHandlerDelegate instanceIDHandler = null) {
       var sb = new StringBuilder(1000);
       using (var writer = new StringWriter(sb)) {
@@ -13105,6 +13480,16 @@ namespace Quantum {
       return sb.ToString();
     }
 
+    /// <summary>
+    /// Converts the object/IList to JSON with type annotations.
+    /// </summary>
+    /// <param name="obj">Object to be serialized.</param>
+    /// <param name="writer">The output TextWriter.</param>
+    /// <param name="integerEnquoteMinDigits"><see cref="EnquoteIntegers"/></param>
+    /// <param name="typeSerializer">Handler for obtaining serialized type names. If <see langword="null"/>, the short assembly
+    /// qualified name (namespace + name + assembly name) will be used.</param>
+    /// <param name="instanceIDHandler">Handler for UnityEngine.Object references. If the handler returns an empty string,
+    /// the reference is removed from the final result.</param>
     public static void ToJsonWithTypeAnnotation(object obj, TextWriter writer, int? integerEnquoteMinDigits = null, TypeSerializerDelegate typeSerializer = null, InstanceIDHandlerDelegate instanceIDHandler = null) {
       if (obj == null) {
         writer.Write("null");
@@ -13128,7 +13513,12 @@ namespace Quantum {
     }
     
     
-    
+    /// <summary>
+    /// Converts JSON with type annotation to an instance of <typeparamref name="T"/>. If the JSON contains type annotations, they need to match
+    /// the expected result type. If there are no type annotations, use <paramref name="typeResolver"/> to return the expected type.
+    /// </summary>
+    /// <param name="json">JSON to be parsed</param>
+    /// <param name="typeResolver">Converts type name to a type instance.</param>
     public static T FromJsonWithTypeAnnotation<T>(string json, TypeResolverDelegate typeResolver = null) {
       if (typeof(T).IsArray) {
         var listType = typeof(List<>).MakeGenericType(typeof(T).GetElementType());
@@ -13149,6 +13539,11 @@ namespace Quantum {
       return (T)FromJsonWithTypeAnnotationInternal(json, typeResolver);
     }
 
+    /// <summary>
+    /// Converts JSON with type annotation. If there are no type annotations, use <paramref name="typeResolver"/> to return the expected type.
+    /// </summary>
+    /// <param name="json">JSON to be parsed</param>
+    /// <param name="typeResolver">Converts type name to a type instance.</param>
     public static object FromJsonWithTypeAnnotation(string json, TypeResolverDelegate typeResolver = null) {
       Assert.Check(json != null);
 
@@ -13391,6 +13786,7 @@ namespace Quantum {
     [Serializable]
     private class TypeNameWrapper {
 #pragma warning disable CS0649 // Set by serialization
+      // ReSharper disable once InconsistentNaming
       public string __TypeName;
 #pragma warning restore CS0649
     }
@@ -13418,7 +13814,7 @@ namespace Quantum {
     /// <param name="address">The address to parse.</param>
     /// <param name="mainPart">The main part of the address.</param>
     /// <param name="subObjectName">The sub object name.</param>
-    /// <returns><c>true</c> if the address is successfully parsed; otherwise, <c>false</c>.</returns>
+    /// <returns><see langword="true"/> if the address is successfully parsed; otherwise, <see langword="false"/>.</returns>
     public static bool TryParseAddress(string address, out string mainPart, out string subObjectName) {
       if (string.IsNullOrEmpty(address)) {
         mainPart = null;
@@ -13513,14 +13909,13 @@ namespace Quantum {
   using System;
   using System.Diagnostics;
   using JetBrains.Annotations;
-  using UnityEditor;
 #if QUANTUM_ENABLE_MPPM
   using System.Collections.Generic;
   using System.IO;
   using System.Linq;
   using System.Text.RegularExpressions;
   using System.Threading;
-  using System.Threading.Tasks;
+  using UnityEditor;
 #if UNITY_EDITOR
   using UnityEditor.MPE;
 #endif
@@ -13800,15 +14195,29 @@ namespace Quantum {
   using System;
   using UnityEngine;
 
+  /// <summary>
+  /// A command implementing a workaround for MPPM not syncing custom dependencies.
+  /// </summary>
   [Serializable]
   public class QuantumMppmRegisterCustomDependencyCommand : QuantumMppmCommand {
+    /// <summary>
+    /// Name of the custom dependency.
+    /// </summary>
     public string DependencyName;
+    /// <summary>
+    /// Hash of the custom dependency.
+    /// </summary>
     public string Hash;
       
+    /// <inheritdoc cref="QuantumMppmCommand.NeedsAck"/>
     public override bool NeedsAck => true;
 
+    /// <inheritdoc cref="QuantumMppmCommand.PersistentKey"/>
     public override string PersistentKey => $"Dependency_{DependencyName}";
       
+    /// <summary>
+    /// Registers a custom dependency with the given name and hash.
+    /// </summary>
     public override void Execute() {
       QuantumEditorLog.TraceMppm($"Registering custom dependency {DependencyName} with hash {Hash}");
       var hash = Hash128.Parse(Hash);
@@ -13824,8 +14233,13 @@ namespace Quantum {
 #region QuantumUnityExtensions.cs
 
 namespace Quantum {
+#if UNITY_2022_1_OR_NEWER && !UNITY_2022_2_OR_NEWER
   using UnityEngine;
+#endif
 
+  /// <summary>
+  /// Provides backwards compatibility for Unity API.
+  /// </summary>
   public static class QuantumUnityExtensions {
     
     #region New Find API
@@ -14317,7 +14731,7 @@ namespace Quantum {
       GetMaterial(circle.Color).SetPass(0);
 
       if (circle.Wire) {
-        var m = Matrix4x4.TRS(circle.Center.ToUnityVector3(true), circle.Rotation.ToUnityQuaternion(true), Vector3.one * (circle.Radius.AsFloat + circle.Radius.AsFloat));
+        var m = Matrix4x4.TRS(circle.Center.ToUnityVector3(true), circle.Rotation.ToUnityQuaternion(true), Vector3.one);
         GL.PushMatrix();
         GL.MultMatrix(m);
         GL.Begin(GL.LINE_STRIP);
@@ -14487,8 +14901,8 @@ namespace Quantum {
 
           var m = Matrix4x4.TRS(capsule.Center.ToUnityVector3(true), capsule.Rotation.ToUnityQuaternion(true) * r, Vector3.one);
           GL.MultMatrix(m);
-          Draw2DCircle(new Vector3(0, capsule.Height.AsFloat * 0.5f, 0), capsule.Radius.AsFloat);
-          Draw2DCircle(new Vector3(0, -capsule.Height.AsFloat * 0.5f, 0), capsule.Radius.AsFloat);
+          Draw2DCircle(new Vector3(0, capsule.Extent.AsFloat, 0), capsule.Radius.AsFloat);
+          Draw2DCircle(new Vector3(0, -capsule.Extent.AsFloat, 0), capsule.Radius.AsFloat);
 
 #if QUANTUM_XY
           r = Quaternion.identity;
@@ -14498,7 +14912,7 @@ namespace Quantum {
 
           m = Matrix4x4.TRS(capsule.Center.ToUnityVector3(true), capsule.Rotation.ToUnityQuaternion(true) * r, Vector3.one);
           GL.MultMatrix(m);
-          Draw2DCapsuleShape(capsule.Height.AsFloat, capsule.Radius.AsFloat);
+          Draw2DCapsuleShape(capsule.Extent.AsFloat, capsule.Radius.AsFloat);
 
 #if QUANTUM_XY
           r = Quaternion.Euler(0, 90, 0);
@@ -14508,7 +14922,7 @@ namespace Quantum {
 
           m = Matrix4x4.TRS(capsule.Center.ToUnityVector3(true), capsule.Rotation.ToUnityQuaternion(true) * r, Vector3.one);
           GL.MultMatrix(m);
-          Draw2DCapsuleShape(capsule.Height.AsFloat, capsule.Radius.AsFloat);
+          Draw2DCapsuleShape(capsule.Extent.AsFloat, capsule.Radius.AsFloat);
 
           GL.PopMatrix();
         } else {
@@ -14520,41 +14934,39 @@ namespace Quantum {
       }
     }
 
-    static void Draw2DCapsuleShape(float height, float radius) {
+    static void Draw2DCapsuleShape(float extent, float radius) {
       GL.Begin(GL.LINE_STRIP);
-
-      var halfHeight = height * 0.5f;
 
       for (int i = 0; i < CircleResolution / 2; i++) {
 #if QUANTUM_XY
-        GL.Vertex3(CirclePoints[i].x * radius, CirclePoints[i].z * radius + halfHeight, 0.0f);
+        GL.Vertex3(CirclePoints[i].x * radius, CirclePoints[i].z * radius + extent, 0.0f);
 #else
-        GL.Vertex3(CirclePoints[i].x * radius, 0.0f, CirclePoints[i].z * radius + halfHeight);
+        GL.Vertex3(CirclePoints[i].x * radius, 0.0f, CirclePoints[i].z * radius + extent);
 #endif
       }
 
 #if QUANTUM_XY
-      GL.Vertex3(-radius, halfHeight, 0.0f);
-      GL.Vertex3(-radius, -halfHeight, 0.0f);
+      GL.Vertex3(-radius, extent, 0.0f);
+      GL.Vertex3(-radius, -extent, 0.0f);
 #else
-      GL.Vertex3(-radius, 0.0f, halfHeight);
-      GL.Vertex3(-radius, 0.0f, -halfHeight);
+      GL.Vertex3(-radius, 0.0f, extent);
+      GL.Vertex3(-radius, 0.0f, -extent);
 #endif
 
       for (int i = CircleResolution / 2; i < CircleResolution; i++) {
 #if QUANTUM_XY
-        GL.Vertex3(CirclePoints[i].x * radius, CirclePoints[i].z * radius - halfHeight, 0.0f);
+        GL.Vertex3(CirclePoints[i].x * radius, CirclePoints[i].z * radius - extent, 0.0f);
 #else
-        GL.Vertex3(CirclePoints[i].x * radius, 0.0f, CirclePoints[i].z * radius - halfHeight);
+        GL.Vertex3(CirclePoints[i].x * radius, 0.0f, CirclePoints[i].z * radius - extent);
 #endif
       }
 
 #if QUANTUM_XY
-      GL.Vertex3(radius, -halfHeight, 0.0f);
-      GL.Vertex3(radius, halfHeight, 0.0f);
+      GL.Vertex3(radius, -extent, 0.0f);
+      GL.Vertex3(radius, extent, 0.0f);
 #else
-      GL.Vertex3(radius, 0.0f, -halfHeight);
-      GL.Vertex3(radius, 0.0f, halfHeight);
+      GL.Vertex3(radius, 0.0f, -extent);
+      GL.Vertex3(radius, 0.0f, extent);
 #endif
 
       GL.End();
@@ -14621,8 +15033,8 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/Utils/DebugMesh.cs
 
 namespace Quantum {
-  using Photon.Analyzer;
   using System;
+  using Photon.Analyzer;
   using UnityEngine;
 
   /// <summary>
@@ -14910,13 +15322,22 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Convert a float to an FP. 
-    /// This is always considered to be unsafe an non-deterministic and should never be used in conjunction with the simulation.
+    /// Convert a float to an FP, with rounding towards zero.
+    /// To round towards nearest representable FP, use <see cref="ToRoundedFP"/>.
+    /// This is always considered to be unsafe and non-deterministic and should never be used in conjunction with the simulation.
     /// </summary>
-    /// <param name="v"></param>
-    /// <returns></returns>
+    /// <seealso cref="FP.FromFloat_UNSAFE"/>
     public static FP ToFP(this Single v) {
       return FP.FromFloat_UNSAFE(v);
+    }
+    
+    /// <summary>
+    /// Convert a float to an FP, with rounding to the nearest representable FP.
+    /// This is always considered to be unsafe and non-deterministic and should never be used in conjunction with the simulation.
+    /// </summary>
+    /// <seealso cref="FP.FromRoundedFloat_UNSAFE"/>
+    public static FP ToRoundedFP(this Single v) {
+      return FP.FromRoundedFloat_UNSAFE(v);
     }
 
     /// <summary>
@@ -15044,7 +15465,8 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Converts a Unity Vector2 to a Quantum FPVector2.
+    /// Converts a Unity Vector2 to a Quantum FPVector2, with each component being rounded towards zero.
+    /// To round towards the nearest representable FP, use <see cref="ToRoundedFPVector2"/>.
     /// </summary>
     /// <param name="v">Unity vector2</param>
     /// <returns>Quantum vector2</returns>
@@ -15063,18 +15485,35 @@ namespace Quantum {
 
     /// <summary>
     /// Converts a Unity Vector3 to a Quantum FPVector2 by removing the y component 
-    /// (removing the z component if QUANTUM_XY is defined).
+    /// (removing the z component if QUANTUM_XY is defined). Each component is rounded towards zero.
     /// </summary>
     /// <param name="v">Unity vector3</param>
     /// <returns>Quantum vector2</returns>
+    /// <seealso cref="FP.FromFloat_UNSAFE"/>
     public static FPVector2 ToFPVector2(this Vector3 v) {
 #if QUANTUM_XY
-        return new FPVector2(v.x.ToFP(), v.y.ToFP());
+      return new FPVector2(v.x.ToFP(), v.y.ToFP());
 #else
       return new FPVector2(v.x.ToFP(), v.z.ToFP());
 #endif
     }
 
+    /// <summary>
+    /// Converts a Unity Vector3 to a Quantum FPVector2 by removing the y component 
+    /// (removing the z component if QUANTUM_XY is defined). Each component is rounded towards
+    /// the nearest representable FP.
+    /// </summary>
+    /// <param name="v">Unity vector3</param>
+    /// <returns>Quantum vector2</returns>
+    /// <seealso cref="FP.FromRoundedFloat_UNSAFE"/>
+    public static FPVector2 ToRoundedFPVector2(this Vector3 v) {
+#if QUANTUM_XY
+      return new FPVector2(v.x.ToRoundedFP(), v.y.ToRoundedFP());
+#else
+      return new FPVector2(v.x.ToRoundedFP(), v.z.ToRoundedFP());
+#endif
+    }
+    
     /// <summary>
     /// Extracts the vertical position of a Unity Vector3 and converts it to a Quantum FP.
     /// Will use the inverse z component if QUANTUM_XY is defined.
@@ -15090,7 +15529,7 @@ namespace Quantum {
     }
 
     /// <summary>
-    /// Converts a Unity vector3 to a Quantum FPVector3.
+    /// Converts a Unity vector3 to a Quantum FPVector3, with each component being rounded towards zero.
     /// </summary>
     /// <param name="v">Unity vector3</param>
     /// <returns>Quantum vector3</returns>
@@ -15098,6 +15537,44 @@ namespace Quantum {
       return new FPVector3(v.x.ToFP(), v.y.ToFP(), v.z.ToFP());
     }
 
+    /// <summary>
+    /// Converts a Unity Matrix4x4 to a Quantum FPMatrix4x4, with each component being rounded towards the nearest representable FP.
+    /// </summary>
+    /// <param name="m">The Unity Matrix4x4</param>
+    /// <returns>Quantum Matrix4x4</returns>
+    public static FPMatrix4x4 ToFPMatrix4X4(this Matrix4x4 m) {
+      return new FPMatrix4x4 {
+        M00 = m.m00.ToFP(),
+        M01 = m.m01.ToFP(),
+        M02 = m.m02.ToFP(),
+        M03 = m.m03.ToFP(),
+        
+        M10 = m.m10.ToFP(),
+        M11 = m.m11.ToFP(),
+        M12 = m.m12.ToFP(),
+        M13 = m.m13.ToFP(),
+        
+        M20 = m.m20.ToFP(),
+        M21 = m.m21.ToFP(),
+        M22 = m.m22.ToFP(),
+        M23 = m.m23.ToFP(),
+        
+        M30 = m.m30.ToFP(),
+        M31 = m.m31.ToFP(),
+        M32 = m.m32.ToFP(),
+        M33 = m.m33.ToFP(),
+      };
+    }
+
+    /// <summary>
+    /// Converts a Unity vector3 to a Quantum FPVector3, with each component being rounded towards the nearest representable FP.
+    /// </summary>
+    /// <param name="v">Unity vector3</param>
+    /// <returns>Quantum vector3</returns>
+    public static FPVector3 ToRoundedFPVector3(this Vector3 v) {
+      return new FPVector3(v.x.ToRoundedFP(), v.y.ToRoundedFP(), v.z.ToRoundedFP());
+    }
+    
     /// <summary>
     /// Converts a Quantum vector2 to a Unity vector3 by setting the y component to 0.
     /// (sets the z component to 0 if QUANTUM_XY is defined).
@@ -15360,7 +15837,7 @@ namespace Quantum {
   using Photon.Deterministic;
   using UnityEditor;
   using UnityEngine;
-  
+
   /// <summary>
   /// Utility class for drawing gizmos.
   /// </summary>
@@ -16612,7 +17089,6 @@ namespace Quantum {
   using System.Linq;
   using System.Linq.Expressions;
   using System.Reflection;
-  using UnityEditor;
 
   /// <summary>
   /// Quantum reflection utilities.
@@ -17164,7 +17640,7 @@ namespace Quantum {
   using System.Text.RegularExpressions;
   using Photon.Analyzer;
   using UnityEditor;
-  
+
   /// <summary>
   /// Quantum utilities to work with Unity serialized objects.
   /// </summary>
@@ -17204,7 +17680,7 @@ namespace Quantum {
     /// Find a property at a relative path to the parent property
     /// </summary>
     /// <param name="property">Serialized property to start searching from</param>
-    /// <param name="relativePath">´Relative path from the parent</param>
+    /// <param name="relativePath">Relative path from the parent</param>
     /// <returns>Found property or null</returns>
     public static SerializedProperty FindPropertyRelativeToParent(this SerializedProperty property, string relativePath) {
       SerializedProperty otherProperty;
@@ -17236,7 +17712,7 @@ namespace Quantum {
     /// Find a property at a relative path to the parent property or throw an exception if not found.
     /// </summary>
     /// <param name="property">Serialized property to start searching from</param>
-    /// <param name="relativePath">´Relative path from the parent</param>
+    /// <param name="relativePath">Relative path from the parent</param>
     /// <returns>Found property or null</returns>
     /// <exception cref="ArgumentOutOfRangeException">Is raised when not found</exception>
     public static SerializedProperty FindPropertyRelativeToParentOrThrow(this SerializedProperty property, string relativePath) {

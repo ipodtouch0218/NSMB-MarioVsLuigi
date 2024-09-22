@@ -687,20 +687,11 @@ MonoBehaviour:
     SystemsConfig:
       Id:
         Value: 3654882389298375385
-    StarsToWin: 10
-    CoinsForPowerup: 8
-    Lives: 3
-    TimerSeconds: 0
-    TeamsEnabled: 0
-    CustomPowerupsEnabled: 1
-    ExpectedPlayers: 1
+    IsRealGame: 0
   SessionConfig: {fileID: 11400000, guid: a095ff8a2ef576047bdebfec7a20e387, type: 2}
   LocalPlayers:
   - PlayerNickname: 
-    CharacterIndex: 0
-    SkinIndex: 0
-    RequestedTeam: 0
-  MaxPlayerCount: 10
+  MaxPlayerCount: 1
   SimulationSpeedMultiplier: 1
   DisplaySaveAndReloadButton: 0
   PreloadAddressables: 0

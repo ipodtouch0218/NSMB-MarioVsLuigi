@@ -1,7 +1,7 @@
 namespace Quantum.Profiling {
   using System.Collections.Generic;
-  using UnityEngine;
   using Photon.Deterministic;
+  using UnityEngine;
 
   /// <summary>
   /// A Quantum graph profiler that records custom markers.

@@ -4,7 +4,7 @@ namespace Quantum.Editor {
   using UnityEngine;
 
   [ScriptedImporter(0, "editorconfig")]
-  public class QuantumEditorConfigImporter : ScriptedImporter {
+  class QuantumEditorConfigImporter : ScriptedImporter {
     public override void OnImportAsset(AssetImportContext ctx) {
       var path      = ctx.assetPath;
       var contents  = File.ReadAllText(path);

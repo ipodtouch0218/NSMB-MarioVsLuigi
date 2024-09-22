@@ -7,13 +7,20 @@ namespace Quantum {
             // In game
             factories.Add(new CommandSpawnReserveItem());
 
-            // In room
-            factories.Add(new CommandChangePlayerData());
+            // --- In room
+            // Chat
             factories.Add(new CommandSendChatMessage());
             factories.Add(new CommandStartTyping());
+            
+            // Start Game
             factories.Add(new CommandToggleCountdown());
             factories.Add(new CommandToggleReady());
             factories.Add(new CommandUpdatePing());
+
+            // Change Data
+            factories.Add(new CommandChangePlayerData());
+            factories.Add(new CommandChangeRules());
+            factories.Add(new CommandChangeHost());
         }
     }
 }

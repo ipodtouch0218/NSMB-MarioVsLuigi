@@ -1,8 +1,8 @@
 namespace Quantum.Profiling {
   using System.Collections.Generic;
+  using Photon.Client;
   using UnityEngine;
   using UnityEngine.UI;
-  using Photon.Client;
 
   /// <summary>
   /// A Unity script that renders additional profiling tools to the graph UI.

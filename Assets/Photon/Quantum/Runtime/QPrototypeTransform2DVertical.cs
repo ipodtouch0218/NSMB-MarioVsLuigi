@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypeTransform2DVertical : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.Transform2DVerticalPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.Transform2DVertical> {

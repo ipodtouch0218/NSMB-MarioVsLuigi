@@ -136,10 +136,10 @@ namespace Quantum {
       Physics.PenetrationCorrection = FPMath.Clamp01(Physics.PenetrationCorrection);
     }
     
+#if QUANTUM_UNITY
     /// <summary>
     /// Unity Reset() method is used to initialized class fields with default values.
     /// </summary>
-#if QUANTUM_UNITY
     public override void Reset() {
       Physics    = new PhysicsCommon.Config();
       Navigation = new Navigation.Config();

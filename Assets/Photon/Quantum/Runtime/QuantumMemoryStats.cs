@@ -3,20 +3,53 @@ namespace Quantum {
   using Photon.Analyzer;
   using UnityEngine.UI;
 
+  /// <summary>
+  /// A script that displays memory stats of the Quantum heap.
+  /// </summary>
   public unsafe class QuantumMemoryStats : QuantumMonoBehaviour {
+    /// <summary>
+    /// The total memory in MB.
+    /// </summary>
     public Text TotalMemory;
+    /// <summary>
+    /// The number of pages in the heap.
+    /// </summary>
     public Text TotalPages;
+    /// <summary>
+    /// The percentage of memory used.
+    /// </summary>
     public Text TotalUsage;
-
+    /// <summary>
+    /// The pages that are free.
+    /// </summary>
     public Text PagesFree;
+    /// <summary>
+    /// The pages that are full.
+    /// </summary>
     public Text PagesFull;
+    /// <summary>
+    /// The pages used.
+    /// </summary>
     public Text PagesUsed;
-
+    /// <summary>
+    /// The total amount of bytes allocated in KB.
+    /// </summary>
     public Text BytesAllocated;
+    /// <summary>
+    /// The total amount of bytes reserved in KB.
+    /// </summary>
     public Text BytesReserved;
+    /// <summary>
+    /// The total amount of bytes commited in KB.
+    /// </summary>
     public Text BytesCommited;
-
+    /// <summary>
+    /// The entity count.
+    /// </summary>
     public Text EntityCount;
+    /// <summary>
+    /// The memory used by entities in KB.
+    /// </summary>
     public Text EntityMemory;
 
     void Update() {
@@ -60,9 +93,9 @@ namespace Quantum {
         return "0" + suf[0];
       }
 
-      long   bytes = Math.Abs(byteCount);
-      int    place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
-      double num   = Math.Round(bytes / Math.Pow(1024, place), 1);
+      long bytes = Math.Abs(byteCount);
+      int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+      double num = Math.Round(bytes / Math.Pow(1024, place), 1);
 
       return (Math.Sign(byteCount) * num) + suf[place];
     }

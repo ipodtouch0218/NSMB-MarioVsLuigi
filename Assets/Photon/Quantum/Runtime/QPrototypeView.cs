@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypeView : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.ViewPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.View> {

@@ -7,7 +7,7 @@
 #region RegisterEditorLoader.cs
 
 // the default edit-mode loader
-[assembly:Quantum.Editor.QuantumGlobalScriptableObjectEditorAttribute(typeof(Quantum.QuantumGlobalScriptableObject), AllowEditMode = true, Order = int.MaxValue)]
+[assembly: Quantum.Editor.QuantumGlobalScriptableObjectEditorAttribute(typeof(Quantum.QuantumGlobalScriptableObject), AllowEditMode = true, Order = int.MaxValue)]
 
 #endregion
 

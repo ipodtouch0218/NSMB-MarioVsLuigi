@@ -265,17 +265,30 @@ namespace Quantum {
       return Global.DisposeAsset(assetGuid, immediate);
     }
     
-    /// <inheritdoc cref="IResourceManagerExtensions.FindAssetGuid"/>
+    
+    /// <summary>
+    /// Finds the asset GUID based on the provided query.
+    /// </summary>
+    /// <param name="query">The query to filter the assets.</param>
+    /// <returns>The asset GUID.</returns>
     public static AssetGuid FindGlobalAssetGuid(AssetObjectQuery query) {
       return Global.FindAssetGuid(query);
     }
-    
-    /// <inheritdoc cref="IResourceManagerExtensions.FindAssetGuids(Quantum.IResourceManager,Quantum.AssetObjectQuery,System.Collections.Generic.List{Quantum.AssetGuid})"/>
+
+    /// <summary>
+    /// Finds the asset GUIDs based on the provided query.
+    /// </summary>
+    /// <param name="query">The query to filter the assets.</param>
+    /// <param name="result">The list to store results.</param>
     public static void FindGlobalAssetGuids(AssetObjectQuery query, List<AssetGuid> result) {
       Global.FindAssetGuids(query, result);
     }
     
-    /// <inheritdoc cref="IResourceManagerExtensions.FindAssetGuids(Quantum.IResourceManager,Quantum.AssetObjectQuery)"/>
+    /// <summary>
+    /// Finds the asset GUIDs based on the provided query.
+    /// </summary>
+    /// <param name="query">The query to filter the assets.</param>
+    /// <returns>The list of asset GUIDs.</returns>
     public static List<AssetGuid> FindGlobalAssetGuids(AssetObjectQuery query) {
       return Global.FindAssetGuids(query);
     }
@@ -310,41 +323,57 @@ namespace Quantum {
       return Global.GetAssetType(guid);
     }
     
-    /// <inheritdoc cref="IResourceManagerExtensions.GetAsset(Quantum.IResourceManager,Quantum.AssetRef)"/>
+    /// <inheritdoc cref="GetAsset"/>
     public static AssetObject GetGlobalAsset(AssetRef assetRef) {
       return Global.GetAsset(assetRef.Id);
     }
     
-    /// <inheritdoc cref="IResourceManagerExtensions.GetAsset(Quantum.IResourceManager,Quantum.AssetRef)"/>
+    /// <inheritdoc cref="GetAsset"/>
     /// <returns>The loaded asset object or <c>null</c>, if not found or its type does not match <typeparamref name="T"/>.</returns>
     public static T GetGlobalAsset<T>(AssetRef<T> assetRef) where T : AssetObject {
       return Global.GetAsset(assetRef.Id) as T;
     }
 
-    /// <inheritdoc cref="IResourceManagerExtensions.GetAsset(Quantum.IResourceManager,string)"/>
+    /// <summary>
+    /// Gets an asset based on its path.
+    /// </summary>
+    /// <param name="assetPath">The path of the asset.</param>
+    /// <returns>The asset object.</returns>
     public static AssetObject GetGlobalAsset(string assetPath) {
       return Global.GetAsset(assetPath);
     }
     
-    /// <inheritdoc cref="IResourceManagerExtensions.TryGetAsset{T}(Quantum.IResourceManager,Quantum.AssetGuid,out T)"/>
+    /// <summary>
+    /// Tries to get an asset of type T from the global DB. Note that if type T is not the same as the asset type,
+    /// the asset will remain loaded in the memory until it is disposed.
+    /// </summary>
+    /// <param name="assetGuid">The guid of the asset.</param>
+    /// <param name="result">The result asset object.</param>
+    /// <returns><see langword="true"/> if the asset of type T exists.</returns>
     public static bool TryGetGlobalAsset<T>(AssetGuid assetGuid, out T result)
       where T : AssetObject {
       return Global.TryGetAsset(assetGuid, out result);
     }
 
-    /// <inheritdoc cref="IResourceManagerExtensions.TryGetAsset{T}(Quantum.IResourceManager,Quantum.AssetRef,out T)"/>
+    /// <inheritdoc cref="TryGetGlobalAsset{T}(AssetGuid, out T)"/>
     public static bool TryGetGlobalAsset<T>(AssetRef assetRef, out T result)
       where T : AssetObject {
       return Global.TryGetAsset(assetRef, out result);
     }
 
-    /// <inheritdoc cref="IResourceManagerExtensions.TryGetAsset{T}(Quantum.IResourceManager,Quantum.AssetRef,out T)"/>
+    /// <inheritdoc cref="TryGetGlobalAsset{T}(AssetGuid, out T)"/>
     public static bool TryGetGlobalAsset<T>(AssetRef<T> assetRef, out T result)
       where T : AssetObject {
       return Global.TryGetAsset(assetRef, out result);
     }
-
-    /// <inheritdoc cref="IResourceManagerExtensions.TryGetAsset{T}(Quantum.IResourceManager,string,out T)"/>
+    
+    /// <summary>
+    /// Tries to get an asset of type T from the global DB. Note that if type T is not the same as the asset type,
+    /// the asset will remain loaded in the memory until it is disposed.
+    /// </summary>
+    /// <param name="assetPath">The path of the asset.</param>
+    /// <param name="result">The result asset object.</param>
+    /// <returns><see langword="true"/> if the asset of type T exists.</returns>
     public static bool TryGetGlobalAsset<T>(string assetPath, out T result)
       where T : AssetObject {
       return Global.TryGetAsset(assetPath, out result);

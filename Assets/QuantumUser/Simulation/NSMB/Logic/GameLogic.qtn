@@ -13,13 +13,16 @@ global {
 }
 
 struct GameRules {
+	asset_ref<Map> Level;
+
 	byte StarsToWin;
 	byte CoinsForPowerup;
 	byte Lives;
-	byte TimerSeconds;
+	ushort TimerSeconds;
 
 	bool TeamsEnabled;
 	bool CustomPowerupsEnabled;
+	bool DrawOnTimeUp;
 }
 
 signal OnGameStarting();
@@ -37,4 +40,28 @@ synced event PlayerAdded {
 synced event PlayerRemoved {
 	Frame Frame;
 	PlayerRef Player;
+}
+
+event PlayerDataChanged {
+	nothashed Frame Frame;
+	PlayerRef Player;
+}
+
+event StartingCountdownChanged {
+	nothashed Frame Frame;
+	bool IsGameStarting;
+}
+
+event CountdownTick {
+	nothashed Frame Frame;
+	int SecondsRemaining;
+}
+
+synced event HostChanged {
+	Frame Frame;
+	PlayerRef NewHost;
+}
+
+synced event RulesChanged {
+	Frame Frame;
 }

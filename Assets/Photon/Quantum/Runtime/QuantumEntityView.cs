@@ -391,11 +391,11 @@ namespace Quantum {
       /// </summary>
       public Quaternion NewRotation;
       /// <summary>
-      /// The uninterpolated position.
+      /// The un-interpolated position.
       /// </summary>
       public Vector3 UninterpolatedPosition;
       /// <summary>
-      /// The uninterpolated rotation.
+      /// The un-interpolated rotation.
       /// </summary>
       public Quaternion UninterpolatedRotation;
       /// <summary>
@@ -434,7 +434,7 @@ namespace Quantum {
     /// <param name="frame">Frame</param>
     public virtual void OnActivate(Frame frame) { }
     /// <summary>
-    /// A callback to override to add custom logic to the deactication of this entity view.
+    /// A callback to override to add custom logic to the deactivation of this entity view.
     /// </summary>
     public virtual void OnDeactivate() { }
     /// <summary>
@@ -446,7 +446,7 @@ namespace Quantum {
     /// </summary>
     public virtual void OnLateUpdateView() { }
     /// <summary>
-    /// A callack to override to add custom logic when the associate game has changed on the connected <see cref="QuantumEntityViewUpdater"/>.
+    /// A callback to override to add custom logic when the associate game has changed on the connected <see cref="QuantumEntityViewUpdater"/>.
     /// </summary>
     public virtual void OnGameChanged() { }
 
@@ -480,15 +480,22 @@ namespace Quantum {
           QuantumCallback.Subscribe(this, (CallbackSimulateFinished callback) => RegisterSnapshot(callback.Frame));
     }
 
-    internal void Activate(QuantumGame game, Frame frame, Dictionary<Type, IQuantumViewContext> contexts,
-      QuantumEntityViewUpdater entityViewUpdater) {
+    internal void Activate(QuantumGame game, Frame frame, Dictionary<Type, IQuantumViewContext> contexts, QuantumEntityViewUpdater entityViewUpdater) {
       // TODO: When the observed game is switched, this needs to be propagated here.
       _lastPredictedPosition2D = default(FPVector2);
       _lastPredictedRotation2D = default(FP);
       _lastPredictedPosition3D = default(FPVector3);
-      _lastPredictedRotation3D = default(FPQuaternion);
+      _lastPredictedRotation3D = FPQuaternion.Identity;
       _errorVisualVector = default(Vector3);
       _errorVisualQuaternion = Quaternion.identity;
+
+      if (frame.Has<Transform2D>(EntityRef)) {
+        Game = game;
+        UpdateFromTransform2D(game, false, false, isSpawning: true);
+      } else if (frame.Has<Transform3D>(EntityRef)) {
+        Game = game;
+        UpdateFromTransform3D(game, false, false, isSpawning: true);
+      }
 
       ViewContexts = contexts;
 
@@ -823,7 +830,7 @@ namespace Quantum {
       param.RotationTeleport = transform.RotationTeleportFrame == toFrame;
       if (hasVertical) {
 #if QUANTUM_XY
-      param.NewPosition.z = -tVertical.Position.AsFloat;
+        param.NewPosition.z = -tVertical.Position.AsFloat;
 #else
         param.NewPosition.y = tVertical.Position.AsFloat;
 #endif
@@ -929,9 +936,9 @@ namespace Quantum {
       param.PositionErrorTeleport = positionErrorTeleport;
       param.RotationErrorTeleport = rotationErrorTeleport;
 
-      HostProfiler.Start("QuantumEntityView.ApplyTransform");
-      ApplyTransform(ref param);
-      HostProfiler.End();
+      using (HostProfiler.Start("QuantumEntityView.ApplyTransform")) {
+        ApplyTransform(ref param);
+      }
 
       // reduce position error
       var positionCorrectionMultiplier = 1f - (Time.deltaTime * positionCorrectionRate);

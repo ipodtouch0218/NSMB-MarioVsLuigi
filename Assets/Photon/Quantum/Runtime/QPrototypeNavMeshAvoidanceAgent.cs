@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypeNavMeshAvoidanceAgent : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.NavMeshAvoidanceAgentPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.NavMeshAvoidanceAgent> {

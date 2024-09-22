@@ -35,8 +35,14 @@ namespace Photon.Realtime
 
 
     /// <summary>
-    /// Intentionally made partial, in case you want to extend it easily.
+    /// Allows registering for individual callbacks of the Photon Realtime API, using Message Types.
     /// </summary>
+    /// <remarks>
+    /// Intentionally made partial, in case you want to extend it easily.
+    /// 
+    /// In Unity, the EventBetterWorker is used to clean up unused registrations in LateUpdate() automatically.
+    /// In .Net apps, the game logic should RemoveUnusedHandlers.
+    /// </remarks>
     public partial class EventBetter
     {
         #if SUPPORTED_UNITY
@@ -335,7 +341,7 @@ namespace Photon.Realtime
 
             private void LateUpdate()
             {
-                Debug.Assert(instanceId == EventBetterInstance.s_worker.instanceId);
+                Debug.Assert(EventBetterInstance != null && instanceId == EventBetterInstance.s_worker.instanceId);
                 EventBetterInstance.RemoveUnusedHandlers();
             }
         }
@@ -671,6 +677,8 @@ namespace Photon.Realtime
             s_worker = go.GetComponent<EventBetterWorker>();
             if (!s_worker)
                 throw new InvalidOperationException("Unable to create EventBetterWorker");
+            
+            this.s_worker.EventBetterInstance = this;
             #endif
         }
 

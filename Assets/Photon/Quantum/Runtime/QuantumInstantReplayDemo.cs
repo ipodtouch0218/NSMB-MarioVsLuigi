@@ -12,45 +12,50 @@ namespace Quantum {
     /// <summary>
     /// The playback speed of the replay. Default is 1.0f.
     /// </summary>
+    [InlineHelp]
     public float PlaybackSpeed = 1.0f;
     /// <summary>
     /// The length of the replay in seconds. Default is 2.0f.
     /// </summary>
+    [InlineHelp]
     public float ReplayLengthSec = 2.0f;
     /// <summary>
     /// If set to true, displays a replay label on the screen during the replay.
     /// </summary>
+    [InlineHelp]
     public bool ShowReplayLabel = true;
     /// <summary>
     /// If set to true, displays a fading effect when starting and stopping the replay.
     /// </summary>
+    [InlineHelp]
     public bool ShowFadingEffect = true;
     /// <summary>
     /// Read-only flag to indicate if the replay is running.
     /// </summary>
-    [ReadOnly] public bool IsReplayRunning;
+    [InlineHelp, ReadOnly] public bool IsReplayRunning;
     /// <summary>
     /// Read-only flag to indicate the start button can be pressed.
     /// </summary>
-    [ReadOnly] public bool Button_StartInstantReplay;
+    [InlineHelp, ReadOnly] public bool Button_StartInstantReplay;
     /// <summary>
     /// Read-only flag to indicate the stop button can be pressed.
     /// </summary>
-    [ReadOnly] public bool Button_StopInstantReplay;
+    [InlineHelp, ReadOnly] public bool Button_StopInstantReplay;
     /// <summary>
     /// Set the rewind mode to loop the replay or seek to a desired frame.
     /// </summary>
+    [InlineHelp]
     public QuantumInstantReplaySeekMode RewindMode = QuantumInstantReplaySeekMode.Disabled;
     /// <summary>
     /// Loops the replay. Only available when <see cref="RewindMode"/> is not disabled.
     /// </summary>
-    [DrawIf(nameof(RewindMode), Mode = DrawIfMode.Hide)] 
+    [InlineHelp, DrawIf(nameof(RewindMode), Mode = DrawIfMode.Hide)] 
     public bool EnableLoop = false;
     /// <summary>
     /// The replay normalized time. This value is between 0 and 1.
     /// Use the slider to jump to a desired time in the replay.
     /// </summary>
-    [Range(0, 1)]
+    [InlineHelp, Range(0, 1)]
     public float NormalizedTime;
 
     private float previousNormalizedTime;

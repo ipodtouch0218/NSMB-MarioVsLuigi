@@ -17,7 +17,7 @@ namespace Quantum.Editor {
     public object Object;
 
     [SerializeReference]
-    [SerializeReferenceTypePicker]
+    [SerializeReferenceTypePicker(GroupTypesByNamespace = false)]
     public ComponentPrototype[] PendingComponentPrototypes = Array.Empty<ComponentPrototype>();
   }
 }

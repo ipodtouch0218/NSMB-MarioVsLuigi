@@ -59,7 +59,17 @@ namespace Quantum.Editor {
     public static readonly LazyGUIStyle RawDataStyle = LazyGUIStyle.Create(_ => new GUIStyle(EditorStyles.textArea) { wordWrap = true });
     
     private static Texture2D FindTextureOrThrow(string id) {
-      return EditorGUIUtility.FindTexture(id) ?? throw new ArgumentOutOfRangeException($"Could not find texture with id {id}");
+      var texture = EditorGUIUtility.FindTexture(id);
+      if (texture) {
+        return texture;
+      }
+      
+      var icon = EditorGUIUtility.IconContent(id);
+      if (icon?.image) {
+        return (Texture2D)icon.image;
+      }
+      
+      throw new ArgumentOutOfRangeException($"Could not find texture with id {id}");
     }
 
     private Dictionary<ScriptHeaderBackColor, Color> _scriptHeaderStyles = new() {

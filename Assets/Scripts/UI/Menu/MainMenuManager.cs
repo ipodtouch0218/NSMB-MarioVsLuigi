@@ -12,7 +12,6 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
-using Photon.Client;
 using Photon.Realtime;
 using Quantum;
 using System.Threading.Tasks;
@@ -63,7 +62,8 @@ namespace NSMB.UI.MainMenu {
         //---Private Variables
         private CharacterAsset currentCharacter;
         private Coroutine quitCoroutine, fadeMusicCoroutine;
-        private bool wasSettingsOpen, isCountdownStarted, isReady;
+        private int lastCountdownStartFrame;
+        private bool wasSettingsOpen, startingGame;
 
         public void Awake() {
             Set(this, false);
@@ -80,6 +80,7 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
             NetworkHandler.StateChanged += OnClientStateChanged;
+            NetworkHandler.OnLocalPlayerConfirmed += OnLocalPlayerConfirmed;
 
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -97,14 +98,7 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
             NetworkHandler.StateChanged -= OnClientStateChanged;
-            NetworkHandler.OnLocalPlayerConfirmed += () => {
-                QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
-                    Character = (byte) Settings.Instance.generalCharacter,
-                    Skin = (byte) Settings.Instance.generalSkin,
-                    Spectating = false,
-                    Team = 0,
-                });
-            };
+            NetworkHandler.OnLocalPlayerConfirmed -= OnLocalPlayerConfirmed;
 
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -125,16 +119,6 @@ namespace NSMB.UI.MainMenu {
             if (GlobalController.Instance.firstConnection) {
                 OpenTitleScreen();
             }
-            /* TODO
-            else if ((Runner.IsServer || Runner.IsConnectedToServer) && SessionData.Instance && SessionData.Instance.Object) {
-                // Call enterroom callback
-                EnterRoom(true);
-
-            } else {
-                // Quit out of a room unexpectedly
-                OpenRoomListMenu();
-            }
-            */
 
             // Controls & Settings
             nicknameField.text = Settings.Instance.generalNickname;
@@ -169,6 +153,10 @@ namespace NSMB.UI.MainMenu {
 
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumEvent.Subscribe<EventStartingCountdownChanged>(this, OnCountdownChanged);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+            QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
+            QuantumEvent.Subscribe<EventCountdownTick>(this, OnCountdownTick);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumCallback.Subscribe<CallbackGameInit>(this, OnGameInit);
         }
@@ -209,20 +197,13 @@ namespace NSMB.UI.MainMenu {
         public void EnterRoom(bool inSameRoom) {
 
             // Chat
-            if (inSameRoom) {
-                chat.ReplayChatMessages();
-            } else {
-                chatTextField.SetTextWithoutNotify("");
-                if (NetworkHandler.Client.LocalPlayer.IsMasterClient) {
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
-                }
-            }
-
-            isReady = false;
-            isCountdownStarted = false;
-
+            chatTextField.SetTextWithoutNotify("");
+            
             // Open the in-room menu
             OpenInRoomMenu();
+
+            // Host reminder
+            SendHostReminder();
 
             // Fix the damned setting scroll menu
             StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
@@ -423,26 +404,18 @@ namespace NSMB.UI.MainMenu {
         public unsafe void StartCountdown() {
             QuantumGame game = QuantumRunner.DefaultGame;
             Frame f = game.Frames.Predicted;
+            PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
 
-
-            var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
-            List<PlayerData> playerDatas = new();
-            foreach (PlayerRef localPlayer in game.GetLocalPlayers()) {
-                playerDatas.Add(f.Get<PlayerData>(playerDataDictionary[localPlayer]));
-            }
-
-            PlayerData? host = playerDatas.Cast<PlayerData?>().FirstOrDefault(pd => pd.HasValue && pd.Value.IsRoomHost);
-            if (host.HasValue) {
-                int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host.Value.PlayerRef)];
-                game.SendCommand(slot, new CommandToggleCountdown());
+            if (game.PlayerIsLocal(host)) {
+                int hostSlot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
+                game.SendCommand(hostSlot, new CommandToggleCountdown());
             } else {
-                isReady = !isReady;
                 foreach (int slot in game.GetLocalPlayerSlots()) {
                     // All players are ready at the same time
-                    game.SendCommand(new CommandToggleReady());
+                    game.SendCommand(slot, new CommandToggleReady());
                 }
 
-                sfx.PlayOneShot(isReady ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
+                //sfx.PlayOneShot(isReady ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
             }
         }
 
@@ -458,31 +431,38 @@ namespace NSMB.UI.MainMenu {
             startGameButtonText.text = tm.GetTranslation(ready ? "ui.inroom.buttons.unready" : "ui.inroom.buttons.readyup");
         }
 
-        public void UpdateStartGameButton() {
-            /* TODO
-            if (!SessionData.Instance || SessionData.Instance.GameStartTimer.IsRunning) {
+        public unsafe void UpdateStartGameButton() {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
+            PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+            bool weAreHost = game.PlayerIsLocal(host);
+
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            
+            if (f.Global->GameStartFrames > 0) {
                 return;
             }
 
-            PlayerData data = Runner.GetLocalPlayerData();
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            if (data && data.IsRoomOwner) {
+            if (weAreHost) {
                 startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
                 startGameBtn.interactable = IsRoomConfigurationValid();
             } else {
-                UpdateReadyButton(data && data.IsReady);
+                // UpdateReadyButton(data && data.IsReady);
                 startGameBtn.interactable = true;
             }
-            */
         }
 
-        /*
-        public bool IsRoomConfigurationValid() {
-            return
-                SessionData.Instance.PlayerDatas
-                    .Any(kvp => !kvp.Value.IsManualSpectator);
+        public unsafe bool IsRoomConfigurationValid() {
+            var filter = QuantumRunner.DefaultGame.Frames.Predicted.Filter<PlayerData>();
+
+            while (filter.NextUnsafe(out _, out PlayerData* data)) {
+                if (!data->IsSpectator) {
+                    return true;
+                }
+            }
+
+            return false;
         }
-        */
 
         /* TODO
         public void Kick(PlayerData target) {
@@ -544,9 +524,10 @@ namespace NSMB.UI.MainMenu {
 
         public void SwapCharacter(int character, bool broadcast) {
             if (broadcast) {
-                //NetworkHandler.Client.LocalPlayer.SetCustomProperties(new PhotonHashtable {
-                //    [Enums.NetPlayerProperties.Character] = character
-                //});
+                QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.Character,
+                    Character = (byte) character
+                });
             } else {
                 characterDropdown.SetValueWithoutNotify(character);
             }
@@ -582,6 +563,14 @@ namespace NSMB.UI.MainMenu {
 
             currentSkin = index;
         }
+
+        public void EnableSpectator(Toggle toggle) {
+            QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
+                EnabledChanges = CommandChangePlayerData.Changes.Spectating,
+                Spectating = toggle.isOn,
+            });
+        }
+
 
         private void UpdateNickname() {
             bool validUsername = Settings.Instance.generalNickname.IsValidUsername();
@@ -632,31 +621,19 @@ namespace NSMB.UI.MainMenu {
             OpenMainMenu();
         }
 
-        public void EnableSpectator(Toggle toggle) {
-            /* TODO
-            PlayerData data = Runner.GetLocalPlayerData();
-
-            data.Rpc_SetPermanentSpectator(toggle.isOn);
-            */
+        private void SendHostReminder() {
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
         }
 
-        /* TODO
-        public SceneRef GetCurrentSceneRef() {
-            if (!SessionData.Instance) {
-                return SceneRef.None;
-            }
+        public unsafe void OnCountdownTick(int time) {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
+            PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+            bool weAreHost = game.PlayerIsLocal(host);
 
-            byte index = SessionData.Instance.Level;
-            return SceneRef.FromIndex(maps[index].buildIndex);
-        }
-        */
-
-        public void OnCountdownTick(int time) {
-            /* TODO
-            PlayerData data = Runner.GetLocalPlayerData();
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (time > 0) {
-                startGameBtn.interactable = data && data.IsRoomOwner;
+                startGameBtn.interactable = weAreHost;
                 startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", time.ToString());
                 hostControlsGroup.interactable = false;
                 if (time == 1 && fadeMusicCoroutine == null) {
@@ -664,7 +641,7 @@ namespace NSMB.UI.MainMenu {
                 }
             } else {
                 UpdateStartGameButton();
-                hostControlsGroup.interactable = Runner.IsServer || Runner.IsSharedModeMasterClient || (data && data.IsRoomOwner);
+                hostControlsGroup.interactable = weAreHost;
                 if (fadeMusicCoroutine != null) {
                     StopCoroutine(fadeMusicCoroutine);
                     fadeMusicCoroutine = null;
@@ -673,7 +650,6 @@ namespace NSMB.UI.MainMenu {
             }
 
             startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
-            */
         }
 
         //---Callbacks
@@ -717,6 +693,18 @@ namespace NSMB.UI.MainMenu {
             }
         }
         */
+
+        private void OnLocalPlayerConfirmed() {
+            NetworkHandler.OnLocalPlayerConfirmed += () => {
+                QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.All,
+                    Character = (byte) Settings.Instance.generalCharacter,
+                    Skin = (byte) Settings.Instance.generalSkin,
+                    Spectating = false,
+                    Team = 0,
+                });
+            };
+        }
 
         private void OnClientStateChanged(ClientState oldState, ClientState newState) {
             switch (newState) {
@@ -800,6 +788,38 @@ namespace NSMB.UI.MainMenu {
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
             sfx.PlayOneShot(SoundEffect.UI_PlayerDisconnect);
+        }
+
+        private unsafe void OnCountdownChanged(EventStartingCountdownChanged e) {
+            Frame f = e.Frame;
+            PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+            OnCountdownTick(e.IsGameStarting ? 3 : -1);
+
+            if (e.Game.PlayerIsLocal(host)
+                || (startingGame && !e.IsGameStarting)
+                || f.Number - lastCountdownStartFrame > 60 * 3) {
+                // Play the sound (and send the chat message)
+
+                sfx.PlayOneShot(e.IsGameStarting ? SoundEffect.UI_FileSelect : SoundEffect.UI_Back);
+
+                if (e.IsGameStarting) {
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", ChatManager.Red, "countdown", "3");
+                } else {
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled", ChatManager.Red);
+                }
+                startingGame = e.IsGameStarting;
+            }
+            lastCountdownStartFrame = f.Number;
+        }
+
+        private void OnCountdownTick(EventCountdownTick e) {
+            OnCountdownTick(e.SecondsRemaining);
+        }
+
+        private void OnHostChanged(EventHostChanged e) {
+            if (e.Game.PlayerIsLocal(e.NewHost)) {
+                SendHostReminder();
+            }
         }
 
         //---Debug

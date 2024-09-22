@@ -130,12 +130,6 @@ namespace Quantum {
     public QuantumMapDataBakeFlags AutoBuildOnBuild = QuantumMapDataBakeFlags.BakeMapData;
 
     /// <summary>
-    /// If enabled any changes in .qtn files in quantum.code will run the codegen immediately.
-    /// </summary>
-    [InlineHelp] 
-    public bool AutoRunQtnCodeGen = false;
-
-    /// <summary>
     /// A list of Quantum assets that enabled GUID Override. This list is tracked automatically.
     /// </summary>
     [Header("Assets That Have Non-Deterministic GUIDs")]
@@ -244,14 +238,6 @@ namespace Quantum {
 
     [Obsolete("Use TryGetGlobal() instead")]
     public QuantumEditorSettings InstanceFailSilently => TryGetGlobal(out var instance) ? instance : null;
-
-
-    /// <summary>
-    /// Not used at the moment. Split solution tooling will return during the Quantum 3 Preview.
-    /// </summary>
-    [InlineHelp]
-    [Obsolete("Not used at the moment. Split solution tooling will return during the Quantum 3 Preview.")]
-    public string QuantumSolutionPath;
 
     #endregion
 

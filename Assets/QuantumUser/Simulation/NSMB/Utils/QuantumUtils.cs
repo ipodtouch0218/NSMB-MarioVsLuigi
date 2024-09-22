@@ -16,6 +16,30 @@ public static unsafe class QuantumUtils {
         SoundEffect.Enemy_Shell_Combo7,
     };
 
+    public static unsafe PlayerData* GetPlayerData(Frame f, PlayerRef player) {
+        if (!f.TryResolveDictionary(f.Global->PlayerDatas, out var playerDataDictionary)
+            || !f.Unsafe.TryGetPointer(playerDataDictionary[player], out PlayerData* data)) {
+
+            return null;
+        }
+
+        return data;
+    }
+
+    public static unsafe PlayerRef GetHostPlayer(Frame f, out PlayerData* data) {
+        var filter = f.Filter<PlayerData>();
+        while (filter.NextUnsafe(out _, out PlayerData* playerData)) {
+            if (playerData->IsRoomHost) {
+                data = playerData;
+                return playerData->PlayerRef;
+            }
+        }
+
+        data = null;
+        return PlayerRef.None;
+    }
+
+
     public static SoundEffect GetComboSoundEffect(int combo) {
         return ComboSounds[Mathf.Clamp(combo, 0, ComboSounds.Length - 1)];
     }

@@ -53,6 +53,7 @@ namespace NSMB.UI.MainMenu {
         public void Start() {
             nameText.color = NicknameColor.color;
 
+            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         }
 
@@ -203,6 +204,14 @@ namespace NSMB.UI.MainMenu {
 
         private void OnIsReadyChanged(bool isReady) {
             readyIcon.SetActive(isReady);
+        }
+
+        private void OnPlayerDataChanged(EventPlayerDataChanged e) {
+            if (e.Player != player) {
+                return;
+            }
+
+            UpdateText(e.Game);
         }
     }
 }

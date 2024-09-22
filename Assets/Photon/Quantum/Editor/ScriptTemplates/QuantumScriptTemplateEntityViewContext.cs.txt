@@ -1,6 +1,8 @@
-namespace Quantum {
-  using UnityEngine;
+namespace Quantum
+{
+    using UnityEngine;
 
-  public class #SCRIPTNAME# : QuantumMonoBehaviour, IQuantumViewContext {
-  }
+    public class #SCRIPTNAME# : QuantumMonoBehaviour, IQuantumViewContext
+    {
+    }
 }

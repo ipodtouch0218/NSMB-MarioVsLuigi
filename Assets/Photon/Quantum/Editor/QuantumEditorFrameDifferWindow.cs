@@ -1,10 +1,10 @@
 namespace Quantum.Editor {
 
-  using System.Linq;
   using System.IO;
+  using System.Linq;
+  using Quantum;
   using UnityEditor;
   using UnityEngine;
-  using Quantum;
   using static QuantumUnityExtensions;
 
   /// <summary>

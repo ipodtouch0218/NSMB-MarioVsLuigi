@@ -466,29 +466,35 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 12;
-    public const Int32 ALIGNMENT = 4;
+    public const Int32 SIZE = 32;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(24)]
+    public AssetRef<Map> Level;
     [FieldOffset(2)]
     public Byte StarsToWin;
     [FieldOffset(0)]
     public Byte CoinsForPowerup;
     [FieldOffset(1)]
     public Byte Lives;
-    [FieldOffset(3)]
-    public Byte TimerSeconds;
-    [FieldOffset(8)]
-    public QBoolean TeamsEnabled;
     [FieldOffset(4)]
+    public UInt16 TimerSeconds;
+    [FieldOffset(16)]
+    public QBoolean TeamsEnabled;
+    [FieldOffset(8)]
     public QBoolean CustomPowerupsEnabled;
+    [FieldOffset(12)]
+    public QBoolean DrawOnTimeUp;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
+        hash = hash * 31 + Level.GetHashCode();
         hash = hash * 31 + StarsToWin.GetHashCode();
         hash = hash * 31 + CoinsForPowerup.GetHashCode();
         hash = hash * 31 + Lives.GetHashCode();
         hash = hash * 31 + TimerSeconds.GetHashCode();
         hash = hash * 31 + TeamsEnabled.GetHashCode();
         hash = hash * 31 + CustomPowerupsEnabled.GetHashCode();
+        hash = hash * 31 + DrawOnTimeUp.GetHashCode();
         return hash;
       }
     }
@@ -499,7 +505,9 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->StarsToWin);
         serializer.Stream.Serialize(&p->TimerSeconds);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
+        QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
+        AssetRef.Serialize(&p->Level, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -653,10 +661,8 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 1696;
+    public const Int32 SIZE = 1720;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(1692)]
-    private fixed Byte _alignment_padding_[4];
     [FieldOffset(0)]
     public AssetRef<Map> Map;
     [FieldOffset(8)]
@@ -675,35 +681,35 @@ namespace Quantum {
     public BitSet1024 Systems;
     [FieldOffset(248)]
     public PhysicsSceneSettings PhysicsSettings;
-    [FieldOffset(536)]
+    [FieldOffset(544)]
     public Int32 PlayerConnectedCount;
-    [FieldOffset(540)]
+    [FieldOffset(548)]
     [FramePrinter.FixedArrayAttribute(typeof(Input), 10)]
     private fixed Byte _input_[1080];
-    [FieldOffset(1624)]
+    [FieldOffset(1632)]
     public BitSet10 PlayerLastConnectionState;
-    [FieldOffset(1638)]
+    [FieldOffset(1646)]
     public UInt16 BigStarSpawnTimer;
-    [FieldOffset(1664)]
+    [FieldOffset(1672)]
     public EntityRef MainBigStar;
-    [FieldOffset(1656)]
+    [FieldOffset(1664)]
     public BitSet64 UsedStarSpawns;
-    [FieldOffset(1648)]
+    [FieldOffset(1656)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1680)]
+    [FieldOffset(1688)]
     public GameRules Rules;
-    [FieldOffset(1636)]
-    public GameState GameState;
     [FieldOffset(1644)]
-    public Int32 StartFrame;
-    [FieldOffset(1640)]
-    public UInt16 GameStartFrames;
+    public GameState GameState;
     [FieldOffset(1652)]
+    public Int32 StartFrame;
+    [FieldOffset(1648)]
+    public UInt16 GameStartFrames;
+    [FieldOffset(1660)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1632)]
+    [FieldOffset(1640)]
     public Byte RealPlayers;
-    [FieldOffset(1672)]
+    [FieldOffset(1680)]
     public FP Timer;
     public FixedArray<Input> input {
       get {
@@ -2023,13 +2029,13 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PlayerData : Quantum.IComponent {
-    public const Int32 SIZE = 48;
-    public const Int32 ALIGNMENT = 8;
-    [FieldOffset(16)]
+    public const Int32 SIZE = 40;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(20)]
     public PlayerRef PlayerRef;
-    [FieldOffset(28)]
+    [FieldOffset(32)]
     public QBoolean IsRoomHost;
-    [FieldOffset(24)]
+    [FieldOffset(28)]
     public QBoolean IsReady;
     [FieldOffset(0)]
     public Byte Character;
@@ -2037,17 +2043,17 @@ namespace Quantum {
     public Byte Skin;
     [FieldOffset(2)]
     public Byte Team;
-    [FieldOffset(32)]
+    [FieldOffset(36)]
     public QBoolean IsSpectator;
-    [FieldOffset(12)]
+    [FieldOffset(16)]
     public Int32 Wins;
-    [FieldOffset(40)]
-    public FP LastChatMessage;
-    [FieldOffset(20)]
+    [FieldOffset(8)]
+    public Int32 LastChatMessage;
+    [FieldOffset(24)]
     public QBoolean IsLoaded;
     [FieldOffset(4)]
     public Int32 JoinTick;
-    [FieldOffset(8)]
+    [FieldOffset(12)]
     public Int32 Ping;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -2073,6 +2079,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Skin);
         serializer.Stream.Serialize(&p->Team);
         serializer.Stream.Serialize(&p->JoinTick);
+        serializer.Stream.Serialize(&p->LastChatMessage);
         serializer.Stream.Serialize(&p->Ping);
         serializer.Stream.Serialize(&p->Wins);
         PlayerRef.Serialize(&p->PlayerRef, serializer);
@@ -2080,7 +2087,6 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsReady, serializer);
         QBoolean.Serialize(&p->IsRoomHost, serializer);
         QBoolean.Serialize(&p->IsSpectator, serializer);
-        FP.Serialize(&p->LastChatMessage, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -2667,6 +2673,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.BulletBill), Quantum.BulletBill.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBillLauncher), Quantum.BulletBillLauncher.SIZE);
       typeRegistry.Register(typeof(Button), Button.SIZE);
+      typeRegistry.Register(typeof(CallbackFlags), 4);
       typeRegistry.Register(typeof(Quantum.CameraController), Quantum.CameraController.SIZE);
       typeRegistry.Register(typeof(CharacterController2D), CharacterController2D.SIZE);
       typeRegistry.Register(typeof(CharacterController3D), CharacterController3D.SIZE);
@@ -2752,6 +2759,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Ptr), Ptr.SIZE);
       typeRegistry.Register(typeof(QBoolean), QBoolean.SIZE);
       typeRegistry.Register(typeof(Quantum.Ptr), Quantum.Ptr.SIZE);
+      typeRegistry.Register(typeof(QueryOptions), 2);
       typeRegistry.Register(typeof(RNGSession), RNGSession.SIZE);
       typeRegistry.Register(typeof(Shape2D), Shape2D.SIZE);
       typeRegistry.Register(typeof(Shape3D), Shape3D.SIZE);
@@ -2804,6 +2812,7 @@ namespace Quantum {
     [Preserve()]
     public static void EnsureNotStrippedGen() {
       FramePrinter.EnsureNotStripped();
+      FramePrinter.EnsurePrimitiveNotStripped<CallbackFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<GameState>();
       FramePrinter.EnsurePrimitiveNotStripped<IceBlockBreakReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InputButtons>();
@@ -2812,6 +2821,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<ParticleEffect>();
       FramePrinter.EnsurePrimitiveNotStripped<PowerupReserveResult>();
       FramePrinter.EnsurePrimitiveNotStripped<PowerupState>();
+      FramePrinter.EnsurePrimitiveNotStripped<QueryOptions>();
     }
   }
 }

@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypeNavMeshPathfinder : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.NavMeshPathfinderPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.NavMeshPathfinder> {

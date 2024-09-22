@@ -1,11 +1,11 @@
 namespace Quantum {
 #if !UNITY_EDITOR
-  using Photon.Deterministic;
-  using Quantum.Json;
-  using System.IO;
   using System;
-  using Newtonsoft.Json;
+  using System.IO;
   using System.Threading;
+  using Json;
+  using Newtonsoft.Json;
+  using Photon.Deterministic;
 
   /// <summary>
   /// Simple command-line runner for Quantum simulations.

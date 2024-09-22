@@ -11,7 +11,7 @@ component PlayerData {
 	bool IsSpectator;
 
 	int Wins;
-	FP LastChatMessage;
+	int LastChatMessage;
 	bool IsLoaded;
 	int JoinTick;
 	int Ping;

@@ -1407,7 +1407,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
                     mario->PreRespawn(f, filter.Entity, stage);
                 } else if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
-                    bool spawnAgain = !((f.Global->Rules.Lives > 0 && mario->Lives == 0) || mario->Disconnected);
+                    bool spawnAgain = !((f.Global->Rules.IsLivesEnabled && mario->Lives == 0) || mario->Disconnected);
                     if (!spawnAgain && mario->Stars > 0) {
                         // Try to drop more stars
                         mario->SpawnStars(f, filter.Entity, 1);
@@ -1465,23 +1465,20 @@ namespace Quantum {
         public void OnGameStarting(Frame f) {
             // Spawn players
             var config = f.SimulationConfig;
-            for (int i = 0; i < f.PlayerCount; i++) {
-                var playerDatas = f.Filter<PlayerData>();
-
-                while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
-                    if (data->IsSpectator) {
-                        continue;
-                    }
-
-                    int characterIndex = Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length - 1);
-                    CharacterAsset character = config.CharacterDatas[characterIndex];
-
-                    EntityRef newPlayer = f.Create(character.Prototype);
-                    var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
-                    mario->PlayerRef = data->PlayerRef;
-                    var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
-                    newTransform->Position = f.FindAsset<VersusStageData>(f.Map.UserAsset).Spawnpoint;
+            var playerDatas = f.Filter<PlayerData>();
+            while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                if (data->IsSpectator) {
+                    continue;
                 }
+
+                int characterIndex = Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length - 1);
+                CharacterAsset character = config.CharacterDatas[characterIndex];
+
+                EntityRef newPlayer = f.Create(character.Prototype);
+                var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
+                mario->PlayerRef = data->PlayerRef;
+                var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
+                newTransform->Position = f.FindAsset<VersusStageData>(f.Map.UserAsset).Spawnpoint;
             }
 
             // And respawn them

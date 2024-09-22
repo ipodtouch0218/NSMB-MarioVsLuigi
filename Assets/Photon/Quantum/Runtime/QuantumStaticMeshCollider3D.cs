@@ -1,16 +1,34 @@
 namespace Quantum {
   using System;
+  using System.Collections.Generic;
+  using System.Linq;
   using Photon.Deterministic;
   using UnityEngine;
 
+  /// <summary>
+  /// The script will create a static 3D mesh collider during Quantum map baking.
+  /// </summary>
   public class QuantumStaticMeshCollider3D : QuantumMonoBehaviour {
 #if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
+    /// <summary>
+    /// The Unity mesh to convert into a Quantum static mesh colliders.
+    /// </summary>
+    [InlineHelp]
     public Mesh Mesh;
+    /// <summary>
+    /// Additional static collider settings.
+    /// </summary>
+    [InlineHelp, DrawInline, Space]
     public QuantumStaticColliderSettings Settings = new QuantumStaticColliderSettings();
 
-    [Header("Experimental")] public Boolean SmoothSphereMeshCollisions = false;
+    /// <summary>
+    /// The physics solver will resolve sphere and capsule shapes against mesh collisions as if the mesh was a regular flat and smooth plane.
+    /// </summary>
+    [InlineHelp, Header("Experimental")]
+    public Boolean SmoothSphereMeshCollisions = false;
 
-    [NonSerialized] public MeshTriangleVerticesCcw MeshTriangles = new MeshTriangleVerticesCcw();
+    [NonSerialized]
+    public MeshTriangleVerticesCcw MeshTriangles = new MeshTriangleVerticesCcw();
 
     void Reset() {
       // default to mesh collider
@@ -27,7 +45,7 @@ namespace Quantum {
         }
       }
     }
-
+    
     public bool Bake(Int32 index) {
       MeshTriangles = CreateMeshTriangles();
       MeshTriangles.MeshColliderIndex = index;
@@ -39,6 +57,10 @@ namespace Quantum {
       return MeshTriangles.Triangles.Length > 0;
     }
 
+    /// <summary>
+    /// Create mesh triangles from the Unity mesh.
+    /// </summary>
+    /// <returns>The resulting <see cref="MeshTriangleVerticesCcw"/>.</returns>
     public MeshTriangleVerticesCcw CreateMeshTriangles() {
       FPMathUtils.LoadLookupTables(false);
 
@@ -48,74 +70,17 @@ namespace Quantum {
         if (!Mesh) {
           // log warning
           Debug.LogWarning($"No mesh for static mesh collider selected on {gameObject.name}");
-          
+
           // don't do anything else
           return null;
         }
       }
+
+      var fpVertices = Mesh.vertices.Select(x => x.ToFPVector3()).ToArray();
+     
+      var matrix = transform.localToWorldMatrix.ToFPMatrix4X4();
       
-      var result = new MeshTriangleVerticesCcw();
-
-      var localToWorld = transform.localToWorldMatrix;
-
-      // Normally, Unity Mesh triangles are defined in CW order. However, if the local-to-world
-      // transformation scales the mesh with negative values in an even number of axes,
-      // this will result in vertices that now define a CCW triangle, which needs to be taken
-      // into consideration when baking the transformed vertices in the static mesh collider.
-      var scale = localToWorld.lossyScale;
-      var isCcw = scale.x * scale.y * scale.z < 0;
-
-      var degenerateCount = 0;
-
-      result.Vertices = new FPVector3[Mesh.vertices.Length];
-      result.Triangles = new TriangleVerticesCcw[Mesh.triangles.Length / 3];
-
-      // Save the arrays to reduce overhead of the property calls during the loop.
-      var cachedUnityTriangles = Mesh.triangles;
-      var cachedUnityVertices = Mesh.vertices;
-
-      for (int vertexId = 0; vertexId < cachedUnityVertices.Length; vertexId++) {
-        result.Vertices[vertexId] = localToWorld.MultiplyPoint(cachedUnityVertices[vertexId]).ToFPVector3();
-      }
-
-      for (int i = 0; i < cachedUnityTriangles.Length; i += 3) {
-        var vertexA = cachedUnityTriangles[i];
-        var vertexB = cachedUnityTriangles[i + 1];
-        var vertexC = cachedUnityTriangles[i + 2];
-
-        TriangleVerticesCcw triVertices;
-        if (isCcw) {
-          triVertices = new TriangleVerticesCcw(vertexA, vertexB, vertexC);
-        } else {
-          triVertices = new TriangleVerticesCcw(vertexC, vertexB, vertexA);
-        }
-
-        result.Triangles[i / 3] = triVertices;
-
-        var vA = result.Vertices[triVertices.VertexA];
-        var vB = result.Vertices[triVertices.VertexB];
-        var vC = result.Vertices[triVertices.VertexC];
-        var edgeAB = vB - vA;
-        var edgeBC = vC - vB;
-        var edgeCA = vA - vC;
-        var normal = FPVector3.Cross(edgeAB, edgeCA).Normalized;
-
-        if (normal == default || edgeAB.SqrMagnitude == default || edgeBC.SqrMagnitude == default ||
-            edgeCA.SqrMagnitude == default) {
-          degenerateCount++;
-          Debug.LogWarning($"Degenerate triangle on game object {gameObject.name} using mesh {Mesh.name}. " +
-                           $"Triangle vertices in world space: \n" +
-                           $"Vertex A: index {vertexA}, value {localToWorld.MultiplyPoint(cachedUnityVertices[vertexA])} \n" +
-                           $"Vertex B: index {vertexB}, value {localToWorld.MultiplyPoint(cachedUnityVertices[vertexB])} \n" +
-                           $"Vertex C: index {vertexC}, value {localToWorld.MultiplyPoint(cachedUnityVertices[vertexC])}.");
-        }
-      }
-
-      if (degenerateCount > 0) {
-        Array.Resize(ref result.Triangles, result.Triangles.Length - degenerateCount);
-      }
-      
-      return result;
+      return MeshTriangleVerticesCcw.Create(fpVertices, Mesh.triangles, matrix);
     }
 #endif
   }

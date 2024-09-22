@@ -44,7 +44,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void AddPlayerEntry(QuantumGame game, PlayerRef player) {
-            if (player == null || !template) {
+            if (!player.IsValid || !template) {
                 return;
             }
 

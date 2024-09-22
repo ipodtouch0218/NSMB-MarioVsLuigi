@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypeCharacterController3D : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.CharacterController3DPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.CharacterController3D> {

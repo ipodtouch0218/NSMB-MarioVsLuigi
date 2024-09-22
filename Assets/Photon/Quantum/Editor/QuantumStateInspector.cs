@@ -8,7 +8,6 @@ namespace Quantum.Editor {
   using UnityEditor;
   using UnityEditor.IMGUI.Controls;
   using UnityEngine;
-  using Object = UnityEngine.Object;
   using static QuantumUnityExtensions;
 
   /// <summary>
@@ -33,12 +32,12 @@ namespace Quantum.Editor {
     [NonSerialized] private QuantumRunner _currentRunner;
     [NonSerialized] private bool _needsReload;
     [NonSerialized] private bool _needsSelectionSync;
-    [NonSerialized] private bool _addingComponent;
     [NonSerialized] private string _buildEntityRunnerId;
     [NonSerialized] private List<EntityRef> _entityRefBuffer = new List<EntityRef>();
     [NonSerialized] private CommandQueue _pendingDebugCommands = new CommandQueue();
     [NonSerialized] private List<Tuple<string, EntityRef>> _pendingSelection = new List<Tuple<string, EntityRef>>();
     [NonSerialized] private RunnersTreeView _runnersTreeView;
+    [NonSerialized] private SerializedProperty _componentsBeingAdded;
 
     private static Skin skin => _skin.Value;
 
@@ -69,7 +68,7 @@ namespace Quantum.Editor {
     private void OnEnable() {
       _runnersTreeView = new RunnersTreeView(_runnersTreeViewState, _model);
       _runnersTreeView.TreeSelectionChanged += (sender, selection) => {
-        _addingComponent = false;
+        _componentsBeingAdded = null;
         _buildEntityRunnerId = null;
         _runnersTreeView.SetForceShowItems(null);
         if (_syncWithActiveGameObject) {
@@ -84,8 +83,8 @@ namespace Quantum.Editor {
       _runnersTreeView.WithComponents = _requiredComponents;
       _runnersTreeView.WithoutComponents = _prohibitedComponents;
       _runnersTreeView.Reload();
-
-      DebugCommand.CommandExecuted       += CommandExecuted;
+      
+      DebugCommand.CommandExecuted       -= CommandExecuted;
       Selection.selectionChanged         -= DeferredSyncWithSelection;
       Selection.selectionChanged         += DeferredSyncWithSelection;
       EditorApplication.hierarchyChanged -= DeferredSyncWithSelection;
@@ -160,6 +159,7 @@ namespace Quantum.Editor {
           _syncWithActiveGameObject = GUILayout.Toggle(_syncWithActiveGameObject, "Sync Selection", EditorStyles.toolbarButton);
           if (GUILayout.Button("Clear", EditorStyles.toolbarButton)) {
             _model.Runners.Clear();
+            _pendingDebugCommands.Clear();
             _needsReload = true;
           }
           DrawComponentDropdown(_requiredComponents, "Entities With");
@@ -338,7 +338,11 @@ namespace Quantum.Editor {
         _pendingDebugCommands.Add(Tuple.Create(runner.Id, payload[i]));
       }
 
-      DebugCommand.Send(runner.Game, payload);
+      if (!DebugCommand.Send(runner.Game, payload)) {
+        for (int i = 0; i < payload.Length; ++i) {
+          _pendingDebugCommands.RemoveReturn(payload[i].Id);
+        }
+      }
     }
 
     private void CommandExecuted(DebugCommand.Payload payload, Exception error) {
@@ -396,28 +400,30 @@ namespace Quantum.Editor {
     }
 
     private void DrawAddComponentGUI(QuantumRunner runner, EntityRef entity) {
-      if (!_addingComponent) {
+      if (_componentsBeingAdded?.serializedObject.targetObject == null) {
+        _componentsBeingAdded = null;
+      }
+      if (_componentsBeingAdded == null) {
         using (new GUILayout.HorizontalScope()) {
           GUILayout.FlexibleSpace();
           if (EditorGUILayout.DropdownButton(skin.addComponentContent, FocusType.Passive, UnityInternal.Styles.AddComponentButton)) {
-            _addingComponent = true;
-            QuantumEditorUtility.GetPendingEntityPrototypeRoot(clear: true);
+            _componentsBeingAdded = QuantumEditorUtility.GetPendingEntityPrototypeRoot(clear: true);
           }
           GUILayout.FlexibleSpace();
         }
       } else {
         using (new QuantumEditorGUI.HierarchyModeScope(true))
         using (new QuantumEditorGUI.BoxScope(null)) {
-          QuantumEditorGUI.Inspector(QuantumEditorUtility.GetPendingEntityPrototypeRoot(), skipRoot: true);
+          EditorGUILayout.PropertyField(_componentsBeingAdded);
           using (new GUILayout.HorizontalScope()) {
             using (new EditorGUI.DisabledScope(runner == null)) {
               if (GUILayout.Button("OK")) {
                 CommandEnqueue(runner, DebugCommand.CreateMaterializePayload(entity, QuantumEditorUtility.FinishPendingEntityPrototype(), runner.Game.AssetSerializer));
-                _addingComponent = false;
+                _componentsBeingAdded = null;
               }
             }
             if (GUILayout.Button("Cancel")) {
-              _addingComponent = false;
+              _componentsBeingAdded = null;
             }
           }
         }
@@ -647,7 +653,7 @@ namespace Quantum.Editor {
           runnerState.DynamicDB.Add(assetState);
         }
       }
-
+      
       foreach (var pair in _pendingDebugCommands) {
         var runner = _model.FindRunner(pair.Item1);
         if (runner == null) {

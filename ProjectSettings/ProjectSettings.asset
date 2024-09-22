@@ -819,7 +819,7 @@ PlayerSettings:
     PS5: 
     QNX: 
     Stadia: 
-    Standalone: QUANTUM_XY
+    Standalone: QUANTUM_XY;QUANTUM_DISABLE_AI
     WebGL: FUSION_WEAVER;FUSION2
     Windows Store Apps: FUSION_WEAVER
     XboxOne: 

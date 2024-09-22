@@ -1,25 +1,25 @@
 namespace Quantum.Editor {
   using System;
   using System.Collections.Generic;
-  using System.IO;
   using System.Diagnostics;
+  using System.IO;
+  using System.Linq;
   using System.Reflection;
   using System.Text.RegularExpressions;
-  using System.Linq;
-  using UnityEngine;
+  using Photon.Deterministic;
   using UnityEditor;
   using UnityEditor.SceneManagement;
-  using Photon.Deterministic;
+  using UnityEngine;
   using Debug = UnityEngine.Debug;
   using EditorUtility = UnityEditor.EditorUtility;
 
   /// <summary>
   /// The main class to manage the Quantum Hub window.
   /// The Hub for example completes the installation of a user project by creating vital config files that are not overwritten by upgrades.
-  /// It can also installs samples and addons that are packaged with the Quantum SDK.
+  /// It can also install samples and addons that are packaged with the Quantum SDK.
   /// </summary>
   [InitializeOnLoad]
-  public partial class QuantumEditorHubWindow : EditorWindow {
+  internal partial class QuantumEditorHubWindow : EditorWindow {
     const int NavWidth = 256 + 2;
     const int NavButtonHeight = 56;
     const int NavButtonWidth = 260;
@@ -28,7 +28,7 @@ namespace Quantum.Editor {
     const string UrlDoc = "https://doc.photonengine.com/quantum/v3";
     const string UrlSDK = UrlDoc + "/getting-started/initial-setup";
     const string UrlChangelog = UrlDoc + "/getting-started/release-notes";
-    const string Url100Tutorial = UrlDoc + "/quantum-100/overview";
+    const string Url100Tutorial = UrlDoc + "/tutorials/asteroids/1-overview";
     const string UrlPublicDiscord = "https://dashboard.photonengine.com/discord/joinphotonengine";
     const string UrlDashboard = "https://dashboard.photonengine.com/";
     const string UrlDocApi = "https://doc-api.photonengine.com/en/quantum/v3/index.html";
@@ -62,7 +62,9 @@ namespace Quantum.Editor {
     const string TextWelcome_InstallAsteroids = "<size=20>Step 2</size>   Install the asteroids Quantum game sample and press play see the game running in local mode.";
     const string TextWelcome_CreateAppId = "<size=20>Step 3</size>   Register to a Photon account on our website and create an AppId to run online games.";
     const string TextWelcome_InstallMenu = "<size=20>Step 4</size>   Install the menu package and make Unity builds to see the asteroids sample in online mode.";
-    const string TextWelcome_Final = "Further readings:";
+    const string TextWelcome_Configurations = "Further Configurations";
+    const string TextWelcome_Final = "Further Reading";
+    const string TextLogLevel = "<b>Quantum Log Level  [<color=#FFDDBB>{0}</color>]</b>\n<color=#aaaaaa>Change the Quantum log level to Debug or Info for development.</color>";
     const string TitleVersionReformat = "<size=22><color=white>{0}</color></size>";
     const string SectionReformat = "<i><color=lightblue>{0}</color></i>";
     const string Header1Reformat = "<size=22><color=white>{0}</color></size>";
@@ -80,7 +82,7 @@ namespace Quantum.Editor {
 
     ButtonInfo Button_InstallAsteroidSample = new ButtonInfo(Icon.Samples,
       "Install Quantum Asteroids Sample Game",
-      "Imports the asteroids game sample programmed with Quantum. Parts of the sample are covered by the Quantum 100 online documentation.");
+      "Imports the asteroids game sample programmed with Quantum. Parts of the sample are covered by the Quantum online tutorials.");
     ButtonInfo Button_InstallAsteroidSample2 = new ButtonInfo(Icon.Samples,
       "Reimport Quantum Asteroids Sample Game",
       "Reimports the asteroids game sample programmed with Quantum.");
@@ -97,11 +99,19 @@ namespace Quantum.Editor {
       "Reinstall Simple Connection Sample Scene",
       "Recreates the simple connection sample scene.");
     ButtonInfo Button_Docs100Tutorial = new ButtonInfo(Icon.Link,
-      "Quantum 100 Tutorial (Opens Web Browser)",
+      "Quantum Asteroids Tutorial (Opens Web Browser)",
       "Open Online Documentation About Quantum Fundamentals");
     ButtonInfo Button_CommunityDiscord = new ButtonInfo(Icon.Link,
       "Photon Discord Server (Opens Web Browser)", 
       "Join our Photon Discord Server.");
+    ButtonInfo Button_QuantumXY = new ButtonInfo(Icon.BuiltIn_2DIcon,
+#if QUANTUM_XY
+      "Toggle Quantum XY  [<color=#7de886>Enabled</color>]",
+      "Quantum 2D uses the XZ plane.");
+#else
+      "Toggle Quantum XY  [<color=#FFDDBB>Disabled</color>]",
+      "If your project is intended to be 2D, consider enabling XY mode to use the same 2D axis as Unity.");
+#endif
     ButtonInfo Button_DocsOnlineLink = new ButtonInfo(Icon.Link,
       "Quantum 3 Online Documentation (Opens Web Browser)",
       "Open the Quantum 3 online documentation to discover tons of material including tutorials, manuals, concepts, samples and addons");
@@ -129,10 +139,10 @@ namespace Quantum.Editor {
     ButtonInfo Button_DashboardLink = new ButtonInfo(Icon.Link,
       "Photon Dashboard (Opens Web Browser)",
       "Register a Photon account and create free AppIds");
-    ButtonInfo Button_SelectPhotonServerAsset = new ButtonInfo(Icon.BuildIn_ScriptableObjectIcon,
+    ButtonInfo Button_SelectPhotonServerAsset = new ButtonInfo(Icon.BuiltIn_ScriptableObjectIcon,
         "Select Photon Server Settings Asset",
         "Select the Photon network transport configuration asset that the AppId is stored in.");
-    ButtonInfo Button_ToolsClearPlayerPrefs = new ButtonInfo(Icon.BuildIn_RefreshIcon, 
+    ButtonInfo Button_ToolsClearPlayerPrefs = new ButtonInfo(Icon.BuiltIn_RefreshIcon, 
       "Clear Quantum PlayerPrefs",
       "Delete all PlayerPrefs created by Quantum.");
 
@@ -226,14 +236,16 @@ namespace Quantum.Editor {
     int _currentSection;
     double _nextForceRepaint;
     Vector2 _scrollRect;
-    List<Texture2D> _buildInIcons;
     double _welcomeScreenConditionsTimestamp;
 
     GUIStyle GetBoxStyle => QuantumHubSkin.GetStyle("SteelBox");
+    GUIStyle GetButtonPaneStyle => QuantumHubSkin.GetStyle("ButtonPane");
 
     enum Icon {
-      BuildIn_ScriptableObjectIcon,
-      BuildIn_RefreshIcon,
+      BuiltIn_ScriptableObjectIcon,
+      BuiltIn_RefreshIcon,
+      BuiltIn_2DIcon,
+      BuiltIn_ConsoleIcon,
       Setup,
       Documentation,
       Samples,
@@ -297,13 +309,6 @@ namespace Quantum.Editor {
       EditorApplication.update -= ReOpen;
     }
 
-    private void Awake() {
-      _buildInIcons = new List<Texture2D> {
-        (Texture2D)EditorGUIUtility.IconContent("ScriptableObject Icon").image,
-        (Texture2D)EditorGUIUtility.IconContent("Refresh@2x").image,
-      };
-    }
-
     void OnEnable() {
       _isOpen = false;
 
@@ -349,7 +354,7 @@ namespace Quantum.Editor {
       } catch (ExitGUIException) {
         // hide gui exception
       } catch (Exception e) {
-        QuantumEditorLog.Error($"Exception when drawing the Hub Window: {e.Message}");
+        QuantumEditorLog.Exception($"Exception when drawing the Hub Window", e);
       }
 
       // Force repaints while mouse is over the window, to keep Hover graphics working (Unity quirk)
@@ -478,10 +483,44 @@ namespace Quantum.Editor {
         }
       }
 
+      GUILayout.Label(TextWelcome_Configurations);
+
+
+      // Toggle XY mode only when unity is in 2D mode
+      if (SceneView.lastActiveSceneView != null && SceneView.lastActiveSceneView.in2DMode) {
+        DrawButtonAction(Button_QuantumXY, callback: () => {
+          bool xy = false;
+#if QUANTUM_XY
+      xy = true;
+#endif
+          AssetDatabaseExt.UpdateScriptingDefineSymbol("QUANTUM_XY", !xy);
+        });
+      }
+
+      // Change the log level shortcut
+      {
+        var currentLogLevel = QuantumUnityLogger.DefinedLogLevel;
+        var height = IconSize + GUI.skin.button.padding.top + GUI.skin.button.padding.bottom;
+        var rect = EditorGUILayout.GetControlRect(false, height, GUILayout.ExpandWidth(true));
+        GUI.Label(rect, QuantumEditorSkin.ConsoleIcon, GetButtonPaneStyle);
+        rect.xMin += IconSize + IconMargin * 2;
+        GUI.Label(rect, string.Format(TextLogLevel, currentLogLevel));
+        rect.xMin += rect.width - 100;
+        rect.width -= IconMargin;
+        var newHeight = EditorStyles.popup.CalcSize(new GUIContent("T")).y;
+        var newY = rect.y + rect.height / 2 - newHeight / 2;
+        rect.y = newY;
+        rect.height = newHeight;
+        var newLogLevel = (Quantum.LogType)EditorGUI.EnumPopup(rect, currentLogLevel);
+        if (newLogLevel != currentLogLevel) {
+          QuantumEditorSettingsEditor.SetLogLevel(newLogLevel);
+        }
+      }
+
       // Further readings
       GUILayout.Label(TextWelcome_Final);
       DrawButtonAction(Button_DocsOnlineLink, callback: OpenURL(UrlDoc));
-    }    
+    }
 
     void DrawSectionInstallation() {
       GUILayout.Label(TextSection_Setup);
@@ -955,8 +994,7 @@ namespace Quantum.Editor {
     }
 
     static void DrawButtonAction(Texture2D icon, string header, string description = null, bool enabled = true, Action callback = null, int? width = null, Texture2D statusIcon = null) {
-      var padding = GUI.skin.button.padding.top + GUI.skin.button.padding.bottom;
-      var height = IconSize + padding;
+      var height = IconSize + GUI.skin.button.padding.top + GUI.skin.button.padding.bottom;
 
       // Draw text separately (not part of button guicontent) to have control over the space between the icon and the text.
       var rect = EditorGUILayout.GetControlRect(false, height, width.HasValue ? GUILayout.Width(width.Value) : GUILayout.ExpandWidth(true));
@@ -1020,10 +1058,11 @@ namespace Quantum.Editor {
         case Icon.ProductLogo: return ProductLogo;
         case Icon.PhotonCloud: return PhotonCloudIcon;
         case Icon.Installation: return InstallationIcon;
-        default: 
-          if (icon < Icon.Setup && _buildInIcons != null && _buildInIcons.Count >= (int)icon) {
-            return _buildInIcons[(int)icon];
-          }
+        case Icon.BuiltIn_2DIcon: return QuantumEditorSkin._2DIcon;
+        case Icon.BuiltIn_ConsoleIcon: return QuantumEditorSkin.ConsoleIcon;
+        case Icon.BuiltIn_RefreshIcon: return QuantumEditorSkin.RefreshIcon;
+        case Icon.BuiltIn_ScriptableObjectIcon: return QuantumEditorSkin.ScriptableObjectIcon;
+        default:
           return null;
       }
     }
@@ -1061,13 +1100,13 @@ namespace Quantum.Editor {
         normal = { background = _guiSkin.button.active.background, textColor = Color.white }
       };
 
-
       _textLabelStyle = new GUIStyle(_guiSkin.label) {
         wordWrap = true,
         normal = { textColor = commonTextColor },
         richText = true,
 
       };
+      
       _headerLabelStyle = new GUIStyle(_textLabelStyle) {
         fontSize = 15,
       };

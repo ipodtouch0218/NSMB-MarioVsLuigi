@@ -38,7 +38,7 @@ namespace Photon.Realtime
         /// Photon client to log information and statistics from.
         /// </summary>
         public RealtimeClient Client { get; set; }
-        
+
         /// <summary>Optional string identifier for the instance (for debugging).</summary>
         public string Id;
 
@@ -69,15 +69,15 @@ namespace Photon.Realtime
         /// <summary>Indicates that the (Unity) app is Paused. This means the main thread is not running.</summary>
         [NonSerialized]
         public static bool AppPause;
-        
+
         /// <summary>Indicates that the app was paused within the last 5 seconds.</summary>
         [NonSerialized]
         public static bool AppPauseRecent;
-        
+
         /// <summary>Indicates that the app is not in focus.</summary>
         [NonSerialized]
         public static bool AppOutOfFocus;
-        
+
         /// <summary>Indicates that the app was out of focus within the last 5 seconds.</summary>
         [NonSerialized]
         public static bool AppOutOfFocusRecent;
@@ -155,14 +155,14 @@ namespace Photon.Realtime
                 UnityEngine.Debug.LogError("A ConnectionHandler should not be put into a scene. It is created by RealtimeClient.ConnectUsingSettings().", this);
             }
         }
-        
+
         /// <summary>Starts the fallback thread automatically.</summary>
         protected virtual void OnEnable()
         {
             this.StartFallbackSendAckThread();
         }
 
-        
+
         /// <summary>Stops the fallback thread automatically.</summary>
         protected virtual void OnDisable()
         {
@@ -238,7 +238,7 @@ namespace Photon.Realtime
             #endif
         }
 
-        /// <summary>Starts a thread to run RealtimeFallbackThread.</summary>
+        /// <summary>Starts periodic calls of RealtimeFallbackThread.</summary>
         public void StartFallbackSendAckThread()
         {
             #if UNITY_WEBGL
@@ -256,7 +256,7 @@ namespace Photon.Realtime
         }
 
 
-        /// <summary>Stops the thread which runs RealtimeFallbackThread.</summary>
+        /// <summary>Stops the periodic calls of RealtimeFallbackThread.</summary>
         public void StopFallbackSendAckThread()
         {
             #if UNITY_WEBGL
@@ -278,7 +278,7 @@ namespace Photon.Realtime
             this.RealtimeFallback();
         }
 
-        /// <summary>A thread which runs independent from the Update() calls. Keeps connections online while loading or in background. See <see cref="KeepAliveInBackground"/>.</summary>
+        /// <summary>A thread which runs independently of the Update() calls. Keeps connections online while loading or in background. See <see cref="KeepAliveInBackground"/>.</summary>
         public void RealtimeFallback(object state = null)
         {
             if (this.Client == null)
@@ -360,21 +360,21 @@ namespace Photon.Realtime
         //
         // System/Platform -> should be in other analytic values (not this)
 
-        
+
         /// <summary>Version of the SystemConnectionSummary type.</summary>
         public readonly byte Version = 0;
-        
+
         /// <summary>Which protocol is used. Refer to ConnectionProtocol.</summary>
         public byte UsedProtocol;
 
         /// <summary>True if the Unity app is closing / shut down.</summary>
         public bool AppQuits;
-        
+
         /// <summary>True if the Unity app is paused.</summary>
         public bool AppPause;
         /// <summary>True if the Unity app was paused recently (past 5 sec).</summary>
         public bool AppPauseRecent;
-        
+
         /// <summary>True if the Unity app is out of focus / minimized.</summary>
         public bool AppOutOfFocus;
         /// <summary>True if the Unity app was out of focus / minimized recently (past 5 sec).</summary>
@@ -382,12 +382,12 @@ namespace Photon.Realtime
 
         /// <summary>True if the Unity engine tells us the network is reachable.</summary>
         public bool NetworkReachable;
-        
+
         /// <summary>True if the Socket-level error code fits into the usual byte "budget".</summary>
         public bool ErrorCodeFits;
         /// <summary>True if the Socket-level error code is WinSock based.</summary>
         public bool ErrorCodeWinSock;
-        
+
         /// <summary>Socket-level error code (if any is available).</summary>
         public int SocketErrorCode;
 

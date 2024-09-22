@@ -1,17 +1,16 @@
+using NSMB.Extensions;
+using NSMB.Translation;
+using Photon.Realtime;
+using Quantum;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using TMPro;
-using NSMB.Translation;
-using NSMB.Extensions;
-using Photon.Realtime;
-using Photon.Client;
-using Quantum;
 
 namespace NSMB.UI.MainMenu {
 
-    public class MainMenuChat : MonoBehaviour {
+    public unsafe class MainMenuChat : MonoBehaviour {
 
         //---Serialized Variables
         [SerializeField] private ChatMessage messagePrefab;
@@ -55,17 +54,22 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void SendChat() {
-            /* TODO
-            NetworkRunner runner = NetworkHandler.Runner;
-            PlayerData data = runner.GetLocalPlayerData();
-            if (data.MessageCooldownTimer.IsActive(runner)) {
-                // Can't send a message yet.
-                return;
-            }
-            */
-
             string text = chatbox.text.Replace("\n", " ").Trim();
             if (string.IsNullOrWhiteSpace(text)) {
+                return;
+            }
+
+            QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
+
+            List<PlayerRef> localPlayers = game.GetLocalPlayers();
+            if (localPlayers.Count == 0) {
+                return;
+            }
+
+            PlayerRef player = localPlayers[0];
+            var playerData = f.Unsafe.GetPointer<PlayerData>(f.ResolveDictionary(f.Global->PlayerDatas)[player]);
+            if (!playerData->CanSendChatMessage(f)) {
                 return;
             }
 
@@ -139,7 +143,12 @@ namespace NSMB.UI.MainMenu {
 
             previousTextLength = size;
 
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(NetworkHandler.Client.LocalPlayer.ActorNumber);
+            List<PlayerRef> localPlayers = QuantumRunner.DefaultGame.GetLocalPlayers();
+            if (localPlayers.Count <= 0) {
+                return;
+            }
+
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(localPlayers[0]);
             if (!ple || ple.typingCounter > 2) {
                 return;
             }
@@ -148,8 +157,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnPlayerStartedTyping(EventPlayerStartedTyping e) {
-            Player player = NetworkHandler.Client.CurrentRoom.Players[e.Player];
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(player.ActorNumber);
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(e.Player);
             if (ple) {
                 ple.typingCounter = 4;
             }

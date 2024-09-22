@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypePhysicsJoints3D : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.PhysicsJoints3DPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.PhysicsJoints3D> {

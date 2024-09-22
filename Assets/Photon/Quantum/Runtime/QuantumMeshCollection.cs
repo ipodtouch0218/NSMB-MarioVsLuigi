@@ -4,7 +4,6 @@ namespace Quantum {
   /// <summary>
   /// A collection of Unity mesh asset to draw gizmos or scene object. 
   /// </summary>
-  //[CreateAssetMenu(menuName = "Quantum/QuantumMeshCollection")]
   [QuantumGlobalScriptableObject("Assets/Photon/Quantum/Resources/QuantumMeshCollection.asset")]
   public partial class QuantumMeshCollection : QuantumGlobalScriptableObject<QuantumMeshCollection> {
     /// <summary>

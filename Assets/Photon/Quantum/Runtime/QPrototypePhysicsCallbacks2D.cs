@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypePhysicsCallbacks2D : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.PhysicsCallbacks2DPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.PhysicsCallbacks2D> {

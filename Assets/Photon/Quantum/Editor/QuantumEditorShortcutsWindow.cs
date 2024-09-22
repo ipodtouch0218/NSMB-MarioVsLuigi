@@ -1,10 +1,10 @@
 namespace Quantum.Editor {
-  using Quantum;
   using System;
   using System.Collections.Generic;
+  using Quantum;
   using UnityEditor;
   using UnityEngine;
-  
+
   /// <summary>
   /// A utility window to quickly access Quantum global configs.
   /// </summary>

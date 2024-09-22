@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypeNavMeshSteeringAgent : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.NavMeshSteeringAgentPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.NavMeshSteeringAgent> {

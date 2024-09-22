@@ -675,11 +675,18 @@
             <param name="msg">A message</param>
             <param name="obj">The source of the message</param>
         </member>
-        <member name="M:Quantum.QuantumEditorLog.Error(System.Exception)">
+        <member name="M:Quantum.QuantumEditorLog.Exception(System.String,System.Exception)">
             <summary>
             Logs an exception to the Unity console if UNITY_EDITOR is defined.
             </summary>
-            <param name="e">The exception to log</param>
+            <param name="message">A message to log before the exception.</param>
+            <param name="ex">The exception to log</param>
+        </member>
+        <member name="M:Quantum.QuantumEditorLog.Exception(System.Exception)">
+            <summary>
+            Logs an exception to the Unity console if UNITY_EDITOR is defined.
+            </summary>
+            <param name="ex">The exception to log</param>
         </member>
         <member name="M:Quantum.QuantumEditorLog.Trace(System.String)">
             <summary>

@@ -112,7 +112,138 @@
 - The context `LayerInfo` is now exposed in `FrameThreadSafe.Layers` property, similarly to `Frame.Layers`.
 - `Quantum.TypeUtils` is now obsolete
 
+## Stable
+
+### Build 1548 (Aug 20, 2024)
+
+- Initial stable release
+
 ## RC
+
+### Build 1547 (Aug 15, 2024)
+
+**What's New**
+
+- Added a unity event callback to the `QuantumDebugRunner` start sequence
+- DynamicMap can expand existing mesh collider
+- Added a `LogLevel` toggle button to the main Quantum Hub screen
+
+**Improvements**
+
+- 2D and 3D Physics engines no longer integrate linear velocities that move the transform position out of the FP usable range
+- Instead, a warn will be logged in debug and the velocity will be reset
+
+**Changes**
+
+- Map `TriangleMeshCellSize` is now called `SceneMeshCellSize` and is an FP value instead of Int32
+
+**Removed**
+
+- Obsolete `QuantumEditorSettings.QuantumSolutionPath` property, we have not decided if and how we introduce split solution tooling like in Quantum 2
+
+**Bug Fixes**
+
+- Fixed: Update used count when removing mesh collider
+- Fixed: Mark free triangles as serializable
+- Fixed: Apply rotations to navmesh links
+- Fixed: The contact point from edge shapes collision in 2D. It was not being converted to the world space
+- Fixed: Refactor MeshTriangleVerticesCcw to allow for simulation baking
+- Fixed: Static box collider rotation offset was calculated incorrectly
+- Fixed: Script compilation errors for Unity 2022.1
+- Fixed: An issue that prevented the frame differ to work during checksum errors
+- Fixed: The collision between capsule 2D and edges when they are parallel
+
+### Build 1543 (Aug 05, 2024)
+
+**Bug Fixes**
+
+- Fixed: `Exception: MemoryIntegrity Check Failed:  
+globals.PlayerConnectedCount overlaps previous field globals.PhysicsSettings on type Quantum.globals` error
+- Fixed: `The type or namespace name 'IntPtr' could not be found` error when making a il2cpp build
+
+### Build 1542 (Aug 02, 2024)
+
+**What's New**
+
+- Physics `ShapeCastMinIterations` setting to Simulation Config
+- Add QoL methods to FrameTimer
+- Added XY Toggle to Hub
+- AddMeshCollider() include for pos and rot
+- 2D and 3D JointPrototype.Materialize overloads that receive anchor references instead of a PrototypeMaterializationContext
+- Support to physics QueryOptions and CallbackFlags in the DSL and generated prototypes
+
+**Improvements**
+
+- Physics Shape Cast accuracy when very close to a collider at the cast origin
+- `FrameTimer` helper methods and properties, along with improvements to the API doc
+
+**Changes**
+
+- CodeGen - an error is raised if a struct nested in `input` definition has `button` field. `button` fields are only meant to be used directly
+- Assemblies added to the `QuantumDotnetProjectSettings.IncludePaths` or marked with `QuantumDotnetInclude` are added as references to the exported project
+- `[RangeEx]` attribute supports FP properties
+- When removing a component T or destroying an entity that `Has<T>`, `ComponentCount<T>` is now reduced after component-remove signals are invoked instead of before
+- Changing the coding conventions of script templates to a more common C# style
+- Renamed `PrototypeMaterializationContext.ComponentTypeIndex` to `ComponentTypeId`
+- Terrain Collider now detects degenerate triangles, logs a warning and does not bake them into the serialized mesh
+
+**Bug Fixes**
+
+- Fixed: 3D Shape Cast queries with DetectOverlapsAtCastOrigin option not working correctly for 3D mesh hits
+- Fixed: AsteroidsWaveSpawnerSystem
+- Fixed: Removed halfHeight from Draw2DCapsuleShape when QUANTUM_XY
+- Fixed: The LineIntersectsAABB function was setting the Y size of AABB as the same values as X
+- Fixed: The size of capsules and circles when using the function Debug.Draw
+- Fixed: Issue with component Filters that caused the 'any' filter rule to be disregarded and the 'without' rule be used in its place
+- Fixed: Using `entity_ref` in `input` causing "Fixed size input (size: X) is enabled but input size we got was Y" errors
+- Fixed: Warnings in `SimulationConfig` in standalone project
+- Fixed: Using unions in `input` causing "Fixed size input (size: X) is enabled but input size we got was Y" errors
+- Fixed: The penetration correction when an object collides with multiple triangles
+- Fixed: `QuantumGameFlags.EnableTaskProfiler` flag having an opposite effect: not passing it in `SessionRunner.Arguments.GameFlags` enabled the profiler, passing it in - disabled
+- Fixed: Inconsistent naming of parameters in `GetEventTypeCodeGen`
+- Fixed: GC allocs on entering each task profiler section, if task profiler is enabled
+- Fixed: Prototype assets of variant prefabs not being updated if base prefab adds/removes component prototypes
+- Fixed: Quantum Task Profiler data is saved as .dat,json and cannot be loaded without manually renaming it
+- Fixed: Quantum DB Window does not respect the ‘Sync Selection’ option and always syncs selection
+- Fixed: Making the Asteriods sample work in `QUANTUM_XY` mode
+- Fixed: Added `Preserve` attribute to all Asteroids systems
+- Fixed: QuantumEditorSettings now has a toggle for Quantum XY
+- Fixed: The collision between capsule 2D and polygon generates normal vectors to the opposite side to the closest edge
+- Fixed: An issue that caused `SceneViewComponents` to be initialized twice when located as a child of `EntityViewUpdater` and the `Updater field was set`
+- Fixed: Adding the `Preserve` attribute to system templates
+
+### Build 1523 (Jul 10, 2024)
+
+**Breaking Changes**
+
+- FP multiplication is now rounded instead of being truncated, i.e. rounded towards negative infinity
+
+**What's New**
+
+- `FP.FromRoundedFloat_UNSAFE`
+- Extension methods `ToRoundedFP`, `ToRoundedFPVector2` and `ToRoundedFPVector3`
+- 2D and 3D Compound Shape method to `ReserveCapacity`
+- `HostProfiler.CreateMarker` - allows for a lower overhead profiling by creating markers ahead of time
+
+**Changes**
+
+- Upgraded Photon Realtime to version `5.0.10`
+- `HostProfiler.Init` - pass an implementation of `IHostProfiler` rather than a set of delegates
+
+**Removed**
+
+- `HostProfiler.Start/EndThread`
+- 2D and 3D `CollisionResultInfo.InvertResult` is now internal. The `.Normal` field already takes the inverted flag into account
+
+**Bug Fixes**
+
+- Fixed: An issue with `QuantumEntityView` that caused the error correction to initially glitch in some situations
+- Fixed: StateInspector - adding components crashing the editor
+- Fixed: DynamicMap.FromStaticMap() does not maintain AllRuntimeTriangles key
+- Fixed: Typo in `InstantReplayConfig.LengthSeconds`
+- Fixed: 2D and 3D Spring Joint damping ratio not being configurable on the editor
+- Fixed: Migration: initial CodeGen not emitting AssetObject stubs correctly
+- Fixed: Migration: prefab variants occasionally left unaffected by guid transfer / restoring asset data
 
 ### Build 1519 (Jul 02, 2024)
 

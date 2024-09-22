@@ -1,4 +1,6 @@
+using Photon.Deterministic;
 using Photon.Realtime;
+using Quantum;
 using System.Text;
 using System;
 using System.Collections;
@@ -6,8 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using Photon.Deterministic;
-using Quantum;
 using static NSMB.Utils.NetworkUtils;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
@@ -71,6 +71,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
                 or ClientState.JoiningLobby
                 or ClientState.Leaving
                 or ClientState.ConnectedToNameServer // Include this since we can't do anything and will auto-disconnect anyway
+                || Client.State == ClientState.Joined && !Runner
         );
     }
 
@@ -190,8 +191,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             ClientId = Client.UserId,
             RuntimeConfig = new RuntimeConfig {
                 SimulationConfig = GlobalController.Instance.config,
+                //Map = GlobalController.Instance.config.LobbyMap,
                 Map = null,
                 Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+                IsRealGame = true
             },
             SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
             GameMode = DeterministicGameMode.Multiplayer,
@@ -204,6 +207,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             PlayerNickname = Settings.Instance.generalNickname,
             UserId = Guid.Parse(Client.UserId),
         });
+
+        GlobalController.Instance.connecting.SetActive(false);
     }
 
     public void OnJoinRoomFailed(short returnCode, string message) { }

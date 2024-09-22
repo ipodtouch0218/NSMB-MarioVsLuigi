@@ -1,28 +1,45 @@
 namespace Quantum {
-  using System;
   using Photon.Deterministic;
   using UnityEngine;
 
+  /// <summary>
+  /// The script will create a static 2D capsule collider during Quantum map baking.
+  /// </summary>
   public class QuantumStaticCapsuleCollider2D : QuantumMonoBehaviour {
 #if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
-    
-    [MultiTypeReference(typeof(CapsuleCollider2D), typeof(CapsuleCollider))]
+    /// <summary>
+    /// Link a Unity capsule collider to copy its size and position of during Quantum map baking.
+    /// </summary>
+    [InlineHelp, MultiTypeReference(typeof(CapsuleCollider2D), typeof(CapsuleCollider))]
     public Component SourceCollider;
-
-    [DrawIf("SourceCollider", 0)]
+    /// <summary>
+    /// Define the capsule size if not source collider exists. The x-axis is the diameter and the y-axis is the height.
+    /// </summary>
+    [InlineHelp, DrawIf("SourceCollider", 0)]
     public FPVector2 Size;
-
-    [DrawIf("SourceCollider", 0)]
+    /// <summary>
+    /// The position offset added to the <see cref="Transform.position"/> during baking.
+    /// </summary>
+    [InlineHelp, DrawIf("SourceCollider", 0)]
     public FPVector2 PositionOffset;
+    /// <summary>
+    /// The rotation offset added to the <see cref="Transform.rotation"/> during baking.
+    /// </summary>
+    [InlineHelp]
     public FP RotationOffset;
-    
-    [DrawInline, Space]
+    /// <summary>
+    /// Additional static collider settings.
+    /// </summary>
+    [InlineHelp, DrawInline, Space]
     public QuantumStaticColliderSettings Settings = new QuantumStaticColliderSettings();
 
     private void OnValidate() {
       UpdateFromSourceCollider();
     }
 
+    /// <summary>
+    /// Copy collider configuration from source collider if exist. 
+    /// </summary>
     public void UpdateFromSourceCollider() {
       if (SourceCollider == null) {
         return;
@@ -49,6 +66,9 @@ namespace Quantum {
       }
     }
 
+    /// <summary>
+    /// Callback before baking the collider.
+    /// </summary>
     public virtual void BeforeBake() {
       UpdateFromSourceCollider();
     }

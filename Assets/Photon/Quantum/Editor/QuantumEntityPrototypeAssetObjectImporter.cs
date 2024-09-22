@@ -1,16 +1,11 @@
 namespace Quantum.Editor {
-  using System;
   using System.IO;
   using UnityEditor;
   using UnityEditor.AssetImporters;
   using UnityEngine;
 
-#if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES
-  using UnityEngine.AddressableAssets;
-#endif
 
-
-  [ScriptedImporter(14, Extension, 100000)]
+  [ScriptedImporter(15, Extension, 100000)]
   public partial class QuantumEntityPrototypeAssetObjectImporter : ScriptedImporter {
     public const string Extension = "qprototype";
     public const string ExtensionWithDot = ".qprototype";
@@ -41,6 +36,17 @@ namespace Quantum.Editor {
       if (!prefab) {
         QuantumEditorLog.TraceImport(ctx.assetPath, $"Not importing, prefab {prefabGuid} not found or failed to load");
         return;
+      }
+      
+      if (PrefabUtility.GetPrefabAssetType(prefab) == PrefabAssetType.Variant) {
+        // ok variant needs to trace back to the original prefab
+        Object source = prefab;
+        while ((source = PrefabUtility.GetCorrespondingObjectFromSource(source)) != null) {
+          var sourcePath = AssetDatabase.GetAssetPath(source);
+          QuantumEditorLog.Assert(!string.IsNullOrEmpty(sourcePath));
+          QuantumEditorLog.TraceImport(ctx.assetPath, $"Prefab {prefabGuid} is a variant, tracing back to source {sourcePath}");
+          ctx.DependsOnSourceAsset(sourcePath);
+        }
       }
       
       ctx.DependsOnSourceAsset(new GUID(prefabGuid));

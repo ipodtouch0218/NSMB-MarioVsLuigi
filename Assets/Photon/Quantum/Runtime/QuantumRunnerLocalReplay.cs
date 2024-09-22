@@ -2,10 +2,7 @@ namespace Quantum {
   using Photon.Deterministic;
   using UnityEditor;
   using UnityEngine;
-#if QUANTUM_ENABLE_NEWTONSOFT
-  using Newtonsoft.Json;
-#endif
-
+  
   /// <summary>
   /// An example of how to start a Quantum replay simulation from a replay file.
   /// </summary>
@@ -14,35 +11,34 @@ namespace Quantum {
     /// Set the <see cref="DeltaTypeType" /> to <see cref="SimulationUpdateTime.EngineDeltaTime" /> to not progress the
     /// simulation time during break points.
     /// </summary>
-    [Tooltip("Set the DeltaTimeType to EngineDeltaTime to not progress the simulation time during break points.")]
+    [InlineHelp]
     public SimulationUpdateTime DeltaTypeType = SimulationUpdateTime.EngineDeltaTime;
-
     /// <summary>
     /// Replay JSON file.
     /// </summary>
+    [InlineHelp]
     public TextAsset ReplayFile;
     /// <summary>
     /// Quantum asset database Json file.
     /// </summary>
+    [InlineHelp]
     public TextAsset DatabaseFile;
     /// <summary>
     /// Simulation speed multiplier to playback the replay in a different speed.
     /// </summary>
+    [InlineHelp]
     public float SimulationSpeedMultiplier = 1.0f;
     /// <summary>
     /// Toggle the replay gui label on/off.
     /// </summary>
+    [InlineHelp]
     public bool ShowReplayLabel;
     /// <summary>
     /// Instant replay configurations to start the replay with.
     /// </summary>
+    [InlineHelp]
     public InstantReplaySettings InstantReplayConfig = InstantReplaySettings.Default;
-    /// <summary>
-    /// Force Unity json deserialization of the replay file even when Newtonsoft is available.
-    /// Newtonsoft is very slow when compiled with IL2CPP. But Unity Json deserialization expects the byte arrays to be int array instead on base64 strings.
-    /// </summary>
-    public bool ForceUsingUnityJson;
-
+    
     QuantumRunner _runner;
     IResourceManager _resourceManager;
     Native.Allocator _resourceAllocator;

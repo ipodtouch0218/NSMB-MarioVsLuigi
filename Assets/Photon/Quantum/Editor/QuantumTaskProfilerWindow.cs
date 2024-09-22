@@ -7,7 +7,6 @@ namespace Quantum.Editor {
   using Quantum.Profiling;
   using UnityEditor;
   using UnityEngine;
-  using Debug = UnityEngine.Debug;
 
   public partial class QuantumTaskProfilerWindow : EditorWindow, ISerializationCallbackReceiver {
 
@@ -62,6 +61,9 @@ namespace Quantum.Editor {
     private bool _showFullClientInfo;
     [SerializeField]
     private Vector2 _clientInfoScroll;
+    
+    [NonSerialized]
+    private readonly GUIContent _saveButtonContent = new GUIContent("Save");
 
     [NonSerialized]
     private BitArray _searchMask = new BitArray(0);
@@ -519,16 +521,24 @@ namespace Quantum.Editor {
           }
 
           using (new EditorGUI.DisabledScope(_session.Frames.Count == 0)) {
-            if (GUILayout.Button("Save", EditorStyles.toolbarButton)) {
+            var rect    = GUILayoutUtility.GetRect(_saveButtonContent, EditorStyles.toolbarDropDown);
+            if (EditorGUI.DropdownButton(rect, _saveButtonContent, FocusType.Keyboard, EditorStyles.toolbarDropDown)) {
+              var menu = new GenericMenu();
+              menu.AddItem(new GUIContent("JSON"), false, () => SaveFile(true));
+              menu.AddItem(new GUIContent("DAT"), false, () => SaveFile(false));
+              menu.DropDown(rect);
+            }
+
+            void SaveFile(bool asJson) {
               string fileName;
               if (_selectedSourceIndex == 0) {
                 fileName = "ProfilerReport";
               } else {
                 fileName = $"ProfilerReport_{_sources[_selectedSourceIndex].id}";
               }
-              var target = EditorUtility.SaveFilePanel("Save Profiler Report", ".", fileName, "dat,json");
+              var target = EditorUtility.SaveFilePanel("Save Profiler Report", ".", fileName, asJson ? "json" : "dat");
               if (!string.IsNullOrEmpty(target)) {
-                if (Path.GetExtension(target).Equals(".json", StringComparison.InvariantCultureIgnoreCase)) {
+                if (asJson) {
                   File.WriteAllText(target, JsonUtility.ToJson(_session));
                 } else {
                   using (var serializer = new BinarySerializer(File.Create(target), true)) {
@@ -592,7 +602,7 @@ namespace Quantum.Editor {
           _navigationPanel.range = _session.Frames.Count;
           RefreshSearch();
         } catch (Exception e) {
-          QuantumEditorLog.Error(e);
+          QuantumEditorLog.Exception(e);
         }
       }
     }

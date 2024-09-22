@@ -1,7 +1,7 @@
 namespace Quantum {
-  using Quantum.Profiling;
   using System;
   using System.Collections.Generic;
+  using Profiling;
   using UnityEngine;
   using static QuantumUnityExtensions;
 
@@ -159,8 +159,10 @@ namespace Quantum {
       // Load initial view component from the hierarchy underneath EntityViewUpdater
       var initialViewComponents = GetComponentsInChildren<IQuantumViewComponent>();
       for (int i = 0; i < initialViewComponents.Length; i++) {
-        initialViewComponents[i].Initialize(_viewContexts);
-        _viewComponentsToAdd.Enqueue(initialViewComponents[i]);
+        if (initialViewComponents[i].IsInitialized == false) {
+          initialViewComponents[i].Initialize(_viewContexts);
+          _viewComponentsToAdd.Enqueue(initialViewComponents[i]);
+        }
       }
     }
 
@@ -184,12 +186,15 @@ namespace Quantum {
     /// <summary>
     /// Attach a non-entity view component that is then updated by the EntityViewUpdater.
     /// The <see cref="QuantumViewComponent{T}.OnActivate"/> will be deferred until the next view update.
+    /// <para>Does not add the view component if it already was added (e.g. <see cref="IQuantumViewComponent.IsInitialized"/> returns <see langword="true"/>).</para>
     /// </summary>
     /// <param name="viewComponent">View component instance</param>
     public void AddViewComponent(IQuantumViewComponent viewComponent) {
       LoadViewContexts();
-      viewComponent.Initialize(_viewContexts);
-      _viewComponentsToAdd.Enqueue(viewComponent);
+      if (viewComponent.IsInitialized == false) {
+        viewComponent.Initialize(_viewContexts);
+        _viewComponentsToAdd.Enqueue(viewComponent);
+      }
     }
 
     /// <summary>
@@ -239,7 +244,7 @@ namespace Quantum {
         return;
       }
 
-      HostProfiler.Start("QuantumEntityView.OnObservedGameUpdated");
+      using var profilerScope = HostProfiler.Start("QuantumEntityView.OnObservedGameUpdated");
       var verifiedFrame = game.Frames.Verified;
       
       if (verifiedFrame != null) {
@@ -326,8 +331,6 @@ namespace Quantum {
           instance.UpdateView(useClockAliasingInterpolation, useErrorCorrection);
         }
       }
-
-      HostProfiler.End();
 
       // reset teleport to false always
       _teleport = false;
@@ -497,14 +500,6 @@ namespace Quantum {
       }
 
       instance.EntityRef = handle;
-      //Debug.Log("Spawn called");
-      if (f.Has<Transform2D>(handle)) {
-        instance.Game = game;
-        instance.UpdateFromTransform2D(game, false, false, isSpawning: true);
-      } else if (f.Has<Transform3D>(handle)) {
-        instance.Game = game;
-        instance.UpdateFromTransform3D(game, false, false, isSpawning: true);
-      }
 
       // add to lookup
       _activeViews.Add(handle, instance);

@@ -3,7 +3,6 @@ namespace Quantum.Demo {
   using System.Collections.Generic;
   using Photon.Deterministic;
   using Photon.Realtime;
-  using Quantum;
   using UnityEngine;
 
   /// <summary>

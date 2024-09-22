@@ -13,7 +13,9 @@ public class BreakableObjectAnimator : MonoBehaviour {
     public void OnValidate() {
         this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer);
+    }
 
+    public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventBreakableObjectBroken>(this, OnBreakableObjectBroken);
     }

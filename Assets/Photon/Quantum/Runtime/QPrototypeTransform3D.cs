@@ -1,7 +1,4 @@
 namespace Quantum {
-  using UnityEngine;
-
-
   [UnityEngine.DisallowMultipleComponent]
   public partial class QPrototypeTransform3D : Quantum.QuantumUnityComponentPrototype<Quantum.Prototypes.Transform3DPrototype>, 
     IQuantumUnityPrototypeWrapperForComponent<Quantum.Transform3D> {

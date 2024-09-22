@@ -6,12 +6,22 @@ namespace Quantum.Editor {
   using UnityEditor.AssetImporters;
   using UnityEngine;
 
-  [ScriptedImporter(Quantum.CodeGen.Generator.Version, Extension)]
+  /// <summary>
+  /// Importer for <see cref="QuantumQtnAsset"/>. Handles files with the <see cref="QuantumQtnAssetImporter.Extension"/> extension.
+  /// </summary>
+  [ScriptedImporter(CodeGen.Generator.Version, Extension)]
   public class QuantumQtnAssetImporter : ScriptedImporter {
+    /// <summary>
+    /// The extension of the Quantum Qtn asset.
+    /// </summary>
     public const string Extension        = "qtn";
-    public const string ExtensionWithDot = "." + Extension;
 
-
+    internal const string ExtensionWithDot = "." + Extension;
+    
+    /// <summary>
+    /// Creates a new instance of <see cref="QuantumQtnAsset"/> and sets it as the main object.
+    /// </summary>
+    /// <param name="ctx"></param>
     public override void OnImportAsset(AssetImportContext ctx) {
       var ast = ScriptableObject.CreateInstance<QuantumQtnAsset>();
       ctx.AddObjectToAsset("main", ast);

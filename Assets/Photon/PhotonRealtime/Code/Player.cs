@@ -413,7 +413,7 @@ namespace Photon.Realtime
             this.RoomReference.CustomProperties.TryGetValue(ActorProperties.NickName, out nameObj);
             string nickFromProps = nameObj as string;
 
-            if (!string.Equals(this.NickName, nickFromProps))
+            if (!string.Equals(this.NickName, nickFromProps) && !(string.IsNullOrEmpty(this.NickName) && string.IsNullOrEmpty(nickFromProps)))
             {
                 return this.SetNickNameProperty();
             }

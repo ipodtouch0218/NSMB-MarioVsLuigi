@@ -1,8 +1,13 @@
-namespace Quantum {
-  using Photon.Deterministic;
+namespace Quantum
+{
+    using Photon.Deterministic;
+    using UnityEngine.Scripting;
 
-  public unsafe class #SCRIPTNAME# : SystemMainThread {
-    public override void Update(Frame f) {
+    [Preserve]
+    public unsafe class #SCRIPTNAME# : SystemMainThread
+    {
+        public override void Update(Frame f)
+        {
+        }
     }
-  }
 }

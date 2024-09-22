@@ -10,10 +10,6 @@
 #region Assets/Photon/Quantum/Simulation/Core/CodeGenStub.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
-  using System;
-  using UnityEngine;
-
   public unsafe partial struct _globals_ {
     
     static partial void SerializeCodeGen(void* ptr, FrameSerializer serializer);
@@ -85,7 +81,7 @@ namespace Quantum {
       
       static partial void GetParentEventIDCodeGen(int eventID, ref int parentEventID);
       static partial void GetEventTypeCountCodeGen(ref int eventCount);
-      static partial void GetEventTypeCodeGen(int eventID, ref System.Type eventType);
+      static partial void GetEventTypeCodeGen(int eventID, ref System.Type result);
       
       public static int GetParentEventID(int eventID) {
         int result = -1;
@@ -141,9 +137,6 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Core/Collision.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
-  using System;
-
   /// <summary>
   /// Interface for receiving callbacks once per frame while two non-trigger 2D colliders are touching.
   /// <remarks>At least one of the entities involved in a collision must have the respective <see cref="CallbackFlags"/> set for the callback to be called.</remarks>
@@ -387,15 +380,15 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Core/Frame.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
-  using Quantum.Core;
-  using Quantum.Profiling;
   using System;
   using System.Collections.Generic;
   using System.Diagnostics;
   using System.IO;
   using System.Linq;
   using System.Runtime.CompilerServices;
+  using Photon.Deterministic;
+  using Quantum.Core;
+  using Quantum.Profiling;
 
   /// <summary>
   /// The user implementation of <see cref="FrameBase"/> that resides in the project quantum_state and has access to all user relevant classes.
@@ -1139,7 +1132,7 @@ namespace Quantum {
       
       if (serializer.Stream is FrameChecksumerBitStream checksumStream) {
 
-        Profiling.HostProfiler.Start("CalculateChecksumInternal");
+        using var scope = HostProfiler.Markers.CalculateChecksumInternal.Start();
 
         try {
           serializer.Reset();
@@ -1158,7 +1151,6 @@ namespace Quantum {
           return checksumStream.Checksum;
         } finally {
           serializer.Frame = null;
-          Profiling.HostProfiler.End();
         }
       } else {
         throw new InvalidOperationException($"Serializer's stream needs to be of {nameof(FrameChecksumerBitStream)} type (is: {serializer.Stream?.GetType().FullName}");
@@ -1172,43 +1164,42 @@ namespace Quantum {
     protected sealed override void Copy(DeterministicFrame frame) {
       var f = (Frame)frame;
 
-      HostProfiler.Start("Frame Copy");
+      using (HostProfiler.Markers.FrameCopy.Start()) {
 
-      if (IsVerified) {
-        // TODO(Erick): fix and optimize size see DeterministicFrame.Init()
-        if (RawInputs == null) {
-          RawInputs = new int[1024 * 32];
+        if (IsVerified) {
+          // TODO(Erick): fix and optimize size see DeterministicFrame.Init()
+          if (RawInputs == null) {
+            RawInputs = new int[1024 * 32];
+          }
+
+          // only copy RawInputs into verified frame buffer, checksum and replay ring buffer, etc
+          Array.Copy(f.RawInputs, RawInputs, f.RawInputs.Length);
         }
-        // only copy RawInputs into verified frame buffer, checksum and replay ring buffer, etc
-        Array.Copy(f.RawInputs, RawInputs, f.RawInputs.Length);
+
+        // copy player data
+        _playerData = f._playerData;
+
+        using (HostProfiler.Markers.FrameCopyHeap.Start()) {
+          // copy heap from frame
+          Allocator.Heap.Copy(Context.Allocator, _frameHeap.HeapUnsafe, f._frameHeap.HeapUnsafe);
+        }
+
+        // copy entity registry
+        FrameBase.Copy(this, f);
+
+        // dynamic DB
+        DynamicAssetDB.CopyFrom(f.DynamicAssetDB);
+
+        // perform native copy
+
+        using (HostProfiler.Markers.FrameCopyGlobals.Start()) {
+          CopyFromGen(f);
+        }
+
+        using (HostProfiler.Markers.FrameCopyUser.Start()) {
+          CopyFromUser(f);
+        }
       }
-
-      // copy player data
-      _playerData = f._playerData;
-
-      HostProfiler.Start("Copy Heap");
-      // copy heap from frame
-      Allocator.Heap.Copy(Context.Allocator, _frameHeap.HeapUnsafe, f._frameHeap.HeapUnsafe);
-
-      HostProfiler.End();
-
-      // copy entity registry
-      FrameBase.Copy(this, f);
-
-      // dynamic DB
-      DynamicAssetDB.CopyFrom(f.DynamicAssetDB);
-
-      // perform native copy
-
-      HostProfiler.Start("Copy Globals");
-      CopyFromGen(f);
-      HostProfiler.End();
-
-      HostProfiler.Start("Copy User");
-      CopyFromUser(f);
-      HostProfiler.End();
-
-      HostProfiler.End();
     }
 
     public sealed override void Free() {
@@ -1411,6 +1402,9 @@ namespace Quantum {
       Context.Events.AddLast(evnt);
     }
 
+    /// <summary>
+    /// Initialized Quantum static type registry.
+    /// </summary>
     public static void InitStatic() {
       Statics.Init();
     }
@@ -1579,12 +1573,21 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Core/FrameContextUser.cs
 
 namespace Quantum {
+  /// <summary>
+  /// Use this class to extend the <see cref="Core.FrameContext"/> class.
+  /// </summary>
   public partial class FrameContextUser : Core.FrameContext {
+    /// <summary>
+    /// Frame context user constructor.
+    /// </summary>
     public FrameContextUser(Args args) 
       : base(args) {
       ConstructUser(args);
     }
 
+    /// <summary>
+    /// Dispose user systems and memory.
+    /// </summary>
     public override sealed void Dispose() {
       DisposeUser();
       base.Dispose();
@@ -1601,11 +1604,6 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Core/FrameEvents.cs
 
 namespace Quantum {
-  using System;
-  using System.Collections.Generic;
-  using System.Linq;
-  using System.Text;
-
   partial class Frame {
     public partial struct FrameEvents {
       Frame _f;
@@ -1970,7 +1968,10 @@ namespace Quantum {
 
 namespace Quantum {
   using System.Runtime.CompilerServices;
-  
+
+  /// <summary>
+  /// Extension methods for the <see cref="FrameThreadSafe"/> class.
+  /// </summary>
   public static unsafe class FrameThreadSafeExtensions {
     /// <summary>
     /// A convenience method to get the global state from a frame without having to cast it.
@@ -1993,8 +1994,16 @@ namespace Quantum {
 namespace Quantum {
   using System;
 
+  /// <summary>
+  /// The game result class can be extended by a partial class. 
+  /// It is used with the <see cref="EventGameResult"/> to report the game result to the server.
+  /// See the online documentation for more information.
+  /// </summary>
   [Serializable]
   public partial class GameResult : IGameResult {
+    /// <summary>
+    /// The frame when the game result was created.
+    /// </summary>
     public int Frame;
   }
 }
@@ -2155,9 +2164,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Core/RuntimeConfig.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
   using System.Text;
+  using Photon.Deterministic;
 
   /// <summary>
   /// In contrast to the <see cref="SimulationConfig"/>, which has only static configuration data, the RuntimeConfig holds information that can be different from game to game.
@@ -2238,12 +2247,18 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Core/RuntimePlayer.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
+  using Photon.Deterministic;
 
   [Serializable]
   public partial class RuntimePlayer : IRuntimePlayer {
-
+    /// <summary>
+    /// Optionally let players select an avatar prototype using RuntimePlayer. This field can be removed from RuntimePlayer if not needed.
+    /// </summary>
+    public Quantum.AssetRef<Quantum.EntityPrototype> PlayerAvatar;
+    /// <summary>
+    /// Optionally assign a nickname to players using RuntimePlayer. This field can be removed from RuntimePlayer if not needed.
+    /// </summary>
     public string PlayerNickname;
 
     #region Legacy
@@ -2278,10 +2293,12 @@ namespace Quantum {
 namespace Quantum {
   using UnityEngine;
 
+  /// <summary>
+  /// Static type registry is completed by code generation.
+  /// </summary>
   partial class Statics {
     static Statics() {
       InitComponentTypeIdGen();
-      
       InitStaticDelegatesGen();
       InitStaticDelegatesBotSDK();
       InitStaticDelegatesUser();
@@ -2294,7 +2311,11 @@ namespace Quantum {
     public static void Init() {
       // this will invoke the static constructor
     }
-    
+
+    /// <summary>
+    /// Register Quantum types. Use <see cref="RegisterSimulationTypesUser"/> partial method to extend.
+    /// </summary>
+    /// <param name="typeRegistry">Type registry.</param>
     public static void RegisterSimulationTypes(TypeRegistry typeRegistry) {
       RegisterSimulationTypesGen(typeRegistry);
       RegisterLegacySimulationTypesGen(typeRegistry);
@@ -2326,13 +2347,32 @@ namespace Quantum {
   using System.Reflection;
 
   /// <summary>
-  /// Responsible for instantiating Quantum systems on simualation start.
+  /// Responsible for instantiating Quantum systems on simulation start.
   /// User systems can be added by adding a <see cref="SystemsConfig"/> to the <see cref="RuntimeConfig"/>.
   /// Or adding them in the user callback <see cref="AddSystemsUser"/>.
   /// </summary>
   public static partial class DeterministicSystemSetup {
     static partial void AddSystemsUser(ICollection<SystemBase> systems, RuntimeConfig gameConfig, SimulationConfig simulationConfig, SystemsConfig systemsConfig);
 
+    /// <summary>
+    /// The methods instantiates requested Quantum systems when starting the simulation.
+    /// <para>
+    /// It first tries to call the legacy system setup method (SystemSetup class), if the method is found it will return those systems on not use the provided systems config.
+    /// </para>
+    /// <para>
+    /// If <paramref name="systemsConfig"/> is null only the default Quantum system are created. Otherwise the types inside <paramref name="systemsConfig"/> are created.
+    /// </para>
+    /// <para>
+    /// Debug build will add the <see cref="Core.DebugCommand"/> system. Disable this by defining QUANTUM_DEBUG_COMMAND_DISABLED.
+    /// </para>
+    /// <para>
+    /// Finally the <see cref="AddSystemsUser(ICollection{SystemBase}, RuntimeConfig, SimulationConfig, SystemsConfig)"/> partial method is called to allow changes to the final system list.
+    /// </para>
+    /// </summary>
+    /// <param name="gameConfig">Runtime config.</param>
+    /// <param name="simulationConfig">Simulation config.</param>
+    /// <param name="systemsConfig">List of systems to create.</param>
+    /// <returns>Collection of Quantum system objects.</returns>
     public static ICollection<SystemBase> CreateSystems(RuntimeConfig gameConfig, SimulationConfig simulationConfig, SystemsConfig systemsConfig) {
       // Call legacy SystemSettings by reflection and print warning if exists
       var systems = CallLegacySystemSetup(gameConfig, simulationConfig);
@@ -2734,12 +2774,12 @@ namespace Quantum {
 
 namespace Quantum {
   using System;
-  using System.IO;
   using System.Collections.Generic;
+  using System.IO;
   using System.Linq;
   using Photon.Deterministic;
-  using Quantum.Core;
   using Quantum.Allocator;
+  using Quantum.Core;
   using Quantum.Profiling;
 
   /// <summary>
@@ -2916,8 +2956,8 @@ namespace Quantum {
     /// command.CellIndex = 42;
     /// QuantumRunner.Default.Game.SendCommand(command);
     /// </code></example>
-    public void SendCommand(DeterministicCommand command) {
-      Session.SendCommand(0, command);
+    public DeterministicCommandSendResult SendCommand(DeterministicCommand command) {
+      return Session.SendCommand(0, command);
     }
 
     /// <summary>
@@ -2927,8 +2967,8 @@ namespace Quantum {
     /// <param name="command">Command to send</param>
     /// <para>See <see cref="SendCommand(DeterministicCommand)"/></para>
     /// <para>Games that only have one local player can ignore the player index field.</para>
-    public void SendCommand(Int32 playerSlot, DeterministicCommand command) {
-      Session.SendCommand(playerSlot, command);
+    public DeterministicCommandSendResult SendCommand(Int32 playerSlot, DeterministicCommand command) {
+      return Session.SendCommand(playerSlot, command);
     }
 
     /// <summary>
@@ -3081,7 +3121,7 @@ namespace Quantum {
         heapCount += Math.Max(0, HeapExtraCount);
         heapCount += SnapshotsCreateBuffers(Session.SessionConfig.UpdateFPS,
           Session.IsOnline ? Session.SessionConfig.ChecksumInterval : 0, Configurations.Simulation.ChecksumSnapshotHistoryLengthSeconds,
-          InstantReplayConfig.SnapshotsPerSecond == 0 ? 0 : Session.SessionConfig.UpdateFPS / InstantReplayConfig.SnapshotsPerSecond, InstantReplayConfig.LenghtSeconds);
+          InstantReplayConfig.SnapshotsPerSecond == 0 ? 0 : Session.SessionConfig.UpdateFPS / InstantReplayConfig.SnapshotsPerSecond, InstantReplayConfig.LengthSeconds);
 
         // set system runtime indices
         for (Int32 i = 0; i < _systemsAll.Length; ++i) {
@@ -3265,48 +3305,49 @@ namespace Quantum {
     /// </summary>
     /// <param name="state">Frame that was simulated</param>
     public void OnSimulate(DeterministicFrame state) {
-      HostProfiler.Start("QuantumGame.OnSimulate");
+      using var profilerScope = HostProfiler.Markers.OnSimulate.Start();
 
       var f = (Frame)state;
 
       try {
         // reset profiling
-        HostProfiler.Start("Init Profiler");
-        f.Context.ProfilerContext.Reset();
-        var profiler = f.Context.ProfilerContext.GetProfilerForTaskThread(0);
-        HostProfiler.End();
+        Profiler profiler;
+        using (HostProfiler.Markers.OnSimulateInitProfiler.Start()) {
+          f.Context.ProfilerContext.Reset();
+          profiler = f.Context.ProfilerContext.GetProfilerForTaskThread(0);
+        }
 
-        HostProfiler.Start("ApplyInputs");
-        //ApplyInputs(f);
-        ApplyInputs(f);
-        HostProfiler.End();
+        using (HostProfiler.Markers.OnSimulateApplyInputs.Start()) {
+          //ApplyInputs(f);
+          ApplyInputs(f);
+        }
 
-        HostProfiler.Start("OnSimulateBegin");
-        f.Context.OnFrameSimulationBegin(f);
-        f.OnFrameSimulateBegin();
-        f.Context.TaskContext.BeginFrame(f);
-        HostProfiler.End();
+        using (HostProfiler.Markers.OnSimulateBegin.Start()) {
+          f.Context.OnFrameSimulationBegin(f);
+          f.OnFrameSimulateBegin();
+          f.Context.TaskContext.BeginFrame(f);
+        }
 
         var handle = f.Context.TaskContext.AddRootTask();
 
-        HostProfiler.Start("UpdatePlayerData");
-        f.UpdatePlayerData(this);
-        HostProfiler.End();
+        using (HostProfiler.Markers.OnSimulateUpdatePlayerData.Start()) {
+          f.UpdatePlayerData(this);
+        }
 
         profiler.Start("Scheduling Tasks #ff9900");
-        HostProfiler.Start("Scheduling Tasks");
 
-        for (Int32 i = 0; i < _systemsRoot.Length; ++i) {
-          if (f.SystemIsEnabledSelf(_systemsRoot[i])) {
-            try {
-              handle = _systemsRoot[i].OnSchedule(f, handle);
-            } catch (Exception exn) {
-              LogSimulationException(exn);
+        using (HostProfiler.Markers.OnSimulateSchedulingTasks.Start()) {
+          for (Int32 i = 0; i < _systemsRoot.Length; ++i) {
+            if (f.SystemIsEnabledSelf(_systemsRoot[i])) {
+              try {
+                handle = _systemsRoot[i].OnSchedule(f, handle);
+              } catch (Exception exn) {
+                LogSimulationException(exn);
+              }
             }
           }
         }
 
-        HostProfiler.End();
         profiler.End();
 
         try {
@@ -3329,8 +3370,6 @@ namespace Quantum {
       } catch (Exception exn) {
         LogSimulationException(exn);
       }
-
-      HostProfiler.End();
     }
 
     /// <summary>
@@ -3672,9 +3711,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Game/QuantumGame.EventDispatcher.cs
 
 namespace Quantum {
-  using Quantum.Profiling;
   using System;
   using System.Collections.Generic;
+  using Quantum.Profiling;
 
   public partial class QuantumGame {
 
@@ -3694,14 +3733,13 @@ namespace Quantum {
     }
 
     void RaiseEvent(EventBase evnt) {
-      HostProfiler.Start("QuantumGame.InvokeEvents");
+      using var profilerScope = HostProfiler.Markers.RaiseEvent.Start();
       try {
         evnt.Game = this;
         _eventDispatcher?.Publish(evnt);
       } catch (Exception exn) {
         Log.Exception("## Event Callback Threw Exception ##", exn);
       }
-      HostProfiler.End();
     }
 
     void CancelPendingEvents() {
@@ -3715,7 +3753,7 @@ namespace Quantum {
 
 
     void InvokeEvents() {
-      HostProfiler.Start("QuantumGame.InvokeEvents");
+      using var profilerScope = HostProfiler.Markers.InvokeEvents.Start();
       while (_context.Events.Count > 0) {
         var head = _context.Events.PopHead();
         try {
@@ -3765,7 +3803,6 @@ namespace Quantum {
 
         InvokeOnEvent(key, confirmed);
       }
-      HostProfiler.End();
     }
   }
 }
@@ -3776,10 +3813,10 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Game/QuantumGame.ReplayTools.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
   using System.Collections.Generic;
   using System.IO;
+  using Photon.Deterministic;
 
   public partial class QuantumGame {
 
@@ -4043,7 +4080,7 @@ namespace Quantum {
         return;
       }
 
-      if (InstantReplayConfig.LenghtSeconds <= 0 || InstantReplayConfig.SnapshotsPerSecond <= 0) {
+      if (InstantReplayConfig.LengthSeconds <= 0 || InstantReplayConfig.SnapshotsPerSecond <= 0) {
         Assert.Check(_instantReplaySnapshotBuffer == null);
         Assert.Check(_commonSnapshotInterval <= 0);
         Log.Error($"Can't start recording replay snapshots with these settings: {InstantReplayConfig}");
@@ -4087,7 +4124,7 @@ namespace Quantum {
         return;
       }
 
-      HostProfiler.Start("QuantumGame.RecordingSnapshots");
+      using var profilerScope = HostProfiler.Markers.RecordingSnapshots.Start();
 
       if (_checksumSnapshotBuffer != null) {
         // in case replay interval is less than checksum interval and replay is not being recorded,
@@ -4111,8 +4148,6 @@ namespace Quantum {
           _instantReplaySnapshotBuffer.PushBack(state, this, _context);
         }
       }
-
-      HostProfiler.End();
     }
 
     Int32 SnapshotsCreateBuffers(Int32 simulationRate, Int32 checksumInterval, FP checksumTimeWindow, Int32 replayInterval, FP replayTimeWindow) {
@@ -5016,17 +5051,16 @@ namespace Quantum {
     }
 
     void InvokeOnUpdateView() {
-      HostProfiler.Start("QuantumGame.InvokeOnUpdateView");
+      using var profilerScope = HostProfiler.Markers.InvokeOnUpdateView.Start();
       try {
         _callbackDispatcher?.Publish(_callbackUpdateView);
       } catch (Exception ex) {
         Log.Exception(ex);
       }
-      HostProfiler.End();
     }
 
     void InvokeOnSimulateFinished(DeterministicFrame state) {
-      HostProfiler.Start("QuantumGame.InvokeOnSimulateFinished");
+      using var profilerScope = HostProfiler.Markers.InvokeOnSimulateFinished.Start();
       try {
         _callbackSimulateFinished.Frame = (Frame)state;
         _callbackDispatcher?.Publish(_callbackSimulateFinished);
@@ -5035,7 +5069,6 @@ namespace Quantum {
       }
 
       _callbackSimulateFinished.Frame = null;
-      HostProfiler.End();
     }
 
     void InvokeOnChecksumError(DeterministicTickChecksumError error, DeterministicFrame[] frames) {
@@ -5078,7 +5111,7 @@ namespace Quantum {
     }
 
     void InvokeOnChecksumErrorFrameDump(Int32 actorId, Int32 frameNumber, DeterministicSessionConfig sessionConfig, byte[] runtimeConfig, byte[] frameData, byte[] extraData, IAssetSerializer serializer) {
-      HostProfiler.Start("QuantumGame.InvokeOnChecksumErrorFrameDump");
+      using var profilerScope = HostProfiler.Markers.InvokeOnChecksumErrorFrameDump.Start();
       try {
 
         // find the frame that's going to be overwritten: 
@@ -5112,11 +5145,10 @@ namespace Quantum {
       } catch (Exception ex) {
         Log.Exception(ex);
       }
-      HostProfiler.End();
     }
 
     void InvokeOnEvent(EventKey key, bool confirmed) {
-      HostProfiler.Start("QuantumGame.InvokeOnEvent");
+      using var profilerScope = HostProfiler.Markers.InvokeOnEvent.Start();
       try {
         if (confirmed) {
           _callbackEventConfirmed.EventKey = key;
@@ -5130,7 +5162,6 @@ namespace Quantum {
       } catch (Exception ex) {
         Log.Exception(ex);
       }
-      HostProfiler.End();
     }
 
     void InvokeOnPluginDisconnect(string reason) {
@@ -5236,9 +5267,8 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Legacy/QuantumGame.Legacy.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
-  
+
   public partial class QuantumGame {
     [Obsolete("Use QuantumGame(in QuantumGameStartParameters startParams)")]
     public QuantumGame(in StartParameters startParams) : this(in startParams.Parameters) { }
@@ -5313,8 +5343,8 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Legacy/SessionContainer.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
+  using Photon.Deterministic;
   [Obsolete("Has been replaced by SessionRunner class.")]
   public class SessionContainer {
     public static Boolean _loadedAllStatics = false;
@@ -5747,9 +5777,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Replay/DotNetTaskRunner.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
   using System.Threading;
+  using Photon.Deterministic;
 
   /// <summary>
   /// The implementation of <see cref="IDeterministicPlatformTaskRunner"/> for .Net frameworks.
@@ -5823,8 +5853,8 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Replay/InactiveTaskRunner.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
+  using Photon.Deterministic;
 
   /// <summary>
   /// An implementation of <see cref="IDeterministicPlatformTaskRunner"/> that forces the Quantum task system to run synchronously (single-threaded).
@@ -6190,8 +6220,8 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Replay/QuantumInputHistoryData.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
+  using Photon.Deterministic;
 
   /// <summary>
   /// Input history wrapper to used to store on replay files.
@@ -6224,8 +6254,8 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Replay/QuantumJsonFriendlyDataBlob.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
+  using Photon.Deterministic;
 
   /// <summary>
   /// Wrapper around storing binary data in JSON to work around the problem that Unity JSON tools only serialize byte arrays verbosely.
@@ -6646,10 +6676,10 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Replay/StreamReplayInputProvider.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
-  using Quantum.Core;
   using System;
   using System.IO;
+  using Photon.Deterministic;
+  using Quantum.Core;
 
   /// <summary>
   /// The stream replay input provider is used to play back input from a stream.
@@ -6764,9 +6794,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Runner/DotNetRunnerFactory.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
   using System.Threading.Tasks;
+  using Photon.Deterministic;
 
   /// <summary>
   /// Platform dependent information and factory methods for the <see cref="SessionRunner"/>.
@@ -6887,9 +6917,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Runner/DotNetSessionRunner.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
   using System.IO;
+  using Photon.Deterministic;
 
   /// <summary>
   /// This class implements the <see cref="IDeterministicSessionRunner"/> interface and contains code to glue together the Quantum server and Quantum session runner.
@@ -7099,9 +7129,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Runner/IRunnerFactory.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
   using System.Threading.Tasks;
+  using Photon.Deterministic;
 
   /// <summary>
   /// The interface for the runner factory. It creates platform specific objects to run the Quantum simulation.
@@ -7151,9 +7181,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Runner/SessionRunner.Arguments.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
   using System.Threading;
+  using Photon.Deterministic;
 
   public partial class SessionRunner {
     /// <summary>
@@ -7367,11 +7397,10 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Runner/SessionRunner.cs
 
 namespace Quantum {
-  using Photon.Deterministic;
   using System;
-  using System.Text;
   using System.Threading;
   using System.Threading.Tasks;
+  using Photon.Deterministic;
 
   /// <summary>
   /// The SessionRunner helps to start, run and shutdown a Quantum simulation.
@@ -7872,6 +7901,10 @@ namespace Quantum {
   /// Runner specific exceptions.
   /// </summary>
   public class SessionRunnerException : Exception {
+    /// <summary>
+    /// Constructs a new exception with a message.
+    /// </summary>
+    /// <param name="message">Exception message</param>
     public SessionRunnerException(string message) : base(message) {
     }
   }
@@ -8111,9 +8144,9 @@ namespace Quantum.Task {
 #region Assets/Photon/Quantum/Simulation/Systems/Base/SystemBase.cs
 
 namespace Quantum {
-  using Quantum.Task;
   using System;
   using System.Collections.Generic;
+  using Quantum.Task;
 
   /// <summary>
   /// The Quantum system base class.
@@ -8496,9 +8529,9 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Simulation/Systems/Base/SystemMainThreadGroup.cs
 
 namespace Quantum {
-  using Quantum.Task;
   using System;
   using System.Collections.Generic;
+  using Quantum.Task;
 
   /// <summary>
   /// A Quantum main thread system that has a system hierarchy.
@@ -8885,13 +8918,15 @@ namespace Quantum.Core {
     /// </summary>
     /// <param name="game">The reference game.</param>
     /// <param name="payload">The command payloads can include multiple instances.</param>
-    public static void Send(QuantumGame game, params Payload[] payload) {
+    public static bool Send(QuantumGame game, params Payload[] payload) {
 #if DEBUG && !QUANTUM_DEBUG_COMMAND_DISABLED
-      game.SendCommand(new InternalCommand() {
+      var result = game.SendCommand(new InternalCommand() {
         Data = payload
       });
+      return result == DeterministicCommandSendResult.Success;
 #else
       Log.Warn("DebugCommand works only in DEBUG builds without QUANTUM_DEBUG_COMMAND_DISABLED define.");
+      return false;
 #endif
     }
 
@@ -9067,7 +9102,7 @@ namespace Quantum.Core {
           stream.Serialize(ref Data[i].Data);
           unsafe {
             var components = Data[i].Components;
-            stream.SerializeBuffer(components.Set, ComponentSet.BLOCK_COUNT * sizeof(ulong));
+            stream.SerializeBuffer(components.Set, ComponentSet.BLOCK_COUNT);
             Data[i].Components = components;
           }
           SerializeUser(stream, ref Data[i]);
@@ -9167,8 +9202,8 @@ namespace Quantum.Core {
 #region Assets/Photon/Quantum/Simulation/Systems/Core/NavigationSystem.cs
 
 namespace Quantum.Core {
-  using Quantum.Task;
   using Photon.Deterministic;
+  using Quantum.Task;
   using UnityEngine.Scripting;
 
   /// <summary>
@@ -9344,11 +9379,6 @@ namespace Quantum.Core {
     /// Update the player connected system.
     /// </summary>
     /// <param name="f">The frame reference.</param>
-    /// 
-    public override void OnInit(Frame f) {
-      f.PlayerConnectedCount = 0;
-    }
-
     public override void Update(Frame f) {
       if (f.IsVerified == false) {
         return;

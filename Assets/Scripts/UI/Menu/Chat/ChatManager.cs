@@ -32,6 +32,8 @@ public class ChatManager : MonoBehaviour {
 
     public void Start() {
         QuantumEvent.Subscribe<EventPlayerSentChatMessage>(this, OnPlayerSentChatMessage);
+        QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
+        QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
     }
 
     public void AddChatMessage(string message, int player, Color? color = null, bool filter = false) {
@@ -161,5 +163,15 @@ public class ChatManager : MonoBehaviour {
                 ple.typingCounter = 0;
             }
         }
+    }
+
+    private void OnPlayerAdded(EventPlayerAdded e) {
+        RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
+        AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername());
+    }
+
+    private void OnPlayerRemoved(EventPlayerRemoved e) {
+        RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
+        AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername());
     }
 }
