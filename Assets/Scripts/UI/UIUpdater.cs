@@ -256,14 +256,6 @@ public class UIUpdater : QuantumCallbacks {
         return icon;
     }
 
-    private int GetCurrentPing() {
-        try {
-            return (int) QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.RoundtripTime;
-        } catch {
-            return 0;
-        }
-    }
-
     private static readonly WaitForSeconds PingSampleRate = new(0.5f);
     private IEnumerator UpdatePingTextCoroutine() {
         while (true) {
@@ -273,7 +265,7 @@ public class UIUpdater : QuantumCallbacks {
     }
 
     private void UpdatePingText() {
-        int ping = GetCurrentPing();
+        int ping = (int) NetworkHandler.Ping.Value;
         uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
         //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
     }

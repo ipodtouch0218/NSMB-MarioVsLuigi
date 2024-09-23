@@ -63,7 +63,7 @@ namespace NSMB.UI.MainMenu {
         private CharacterAsset currentCharacter;
         private Coroutine quitCoroutine, fadeMusicCoroutine;
         private int lastCountdownStartFrame;
-        private bool wasSettingsOpen, startingGame;
+        private bool wasSettingsOpen, startingGame, alreadyInRoom;
 
         public void Awake() {
             Set(this, false);
@@ -80,7 +80,6 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
             NetworkHandler.StateChanged += OnClientStateChanged;
-            NetworkHandler.OnLocalPlayerConfirmed += OnLocalPlayerConfirmed;
 
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -98,7 +97,6 @@ namespace NSMB.UI.MainMenu {
             //NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
             //MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
             NetworkHandler.StateChanged -= OnClientStateChanged;
-            NetworkHandler.OnLocalPlayerConfirmed -= OnLocalPlayerConfirmed;
 
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -159,6 +157,7 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventCountdownTick>(this, OnCountdownTick);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumCallback.Subscribe<CallbackGameInit>(this, OnGameInit);
+            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerConfirmed);
         }
 
         public void Update() {
@@ -194,8 +193,7 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public void EnterRoom(bool inSameRoom) {
-
+        public unsafe void EnterRoom() {
             // Chat
             chatTextField.SetTextWithoutNotify("");
             
@@ -209,8 +207,13 @@ namespace NSMB.UI.MainMenu {
             StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
 
             // Set the room settings
-            hostControlsGroup.interactable = NetworkHandler.Client.LocalPlayer.IsMasterClient;
-            roomSettingsCallbacks.UpdateAllSettings(NetworkHandler.Client.CurrentRoom, false);
+            QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
+            PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
+            bool isHost = game.PlayerIsLocal(hostPlayer);
+
+            hostControlsGroup.interactable = isHost;
+            roomSettingsCallbacks.RefreshSettingsUI(f, false);
 
             // Set the player settings
             SwapCharacter(Settings.Instance.generalCharacter, false);
@@ -621,15 +624,20 @@ namespace NSMB.UI.MainMenu {
             OpenMainMenu();
         }
 
-        private void SendHostReminder() {
-            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
+        private unsafe void SendHostReminder() {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+
+            if (game.PlayerIsLocal(hostPlayer)) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.hostreminder", ChatManager.Red);
+            }
         }
 
         public unsafe void OnCountdownTick(int time) {
             QuantumGame game = QuantumRunner.DefaultGame;
             Frame f = game.Frames.Predicted;
-            PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
-            bool weAreHost = game.PlayerIsLocal(host);
+            PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
+            bool weAreHost = game.PlayerIsLocal(hostPlayer);
 
             TranslationManager tm = GlobalController.Instance.translationManager;
             if (time > 0) {
@@ -694,16 +702,22 @@ namespace NSMB.UI.MainMenu {
         }
         */
 
-        private void OnLocalPlayerConfirmed() {
-            NetworkHandler.OnLocalPlayerConfirmed += () => {
-                QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
-                    EnabledChanges = CommandChangePlayerData.Changes.All,
-                    Character = (byte) Settings.Instance.generalCharacter,
-                    Skin = (byte) Settings.Instance.generalSkin,
-                    Spectating = false,
-                    Team = 0,
-                });
-            };
+        private void OnLocalPlayerConfirmed(CallbackLocalPlayerAddConfirmed e) {
+            QuantumGame game = e.Game;
+            int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(e.Player)];
+
+            QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
+                EnabledChanges = CommandChangePlayerData.Changes.All,
+                Character = (byte) Settings.Instance.generalCharacter,
+                Skin = (byte) Settings.Instance.generalSkin,
+                Spectating = false,
+                Team = 0,
+            });
+
+            if (e.Game.PlayerIsLocal(e.Player) && !alreadyInRoom) {
+                EnterRoom();
+                alreadyInRoom = true;
+            }
         }
 
         private void OnClientStateChanged(ClientState oldState, ClientState newState) {
@@ -772,14 +786,15 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
+        private void OnGameInit(CallbackGameInit e) {
+            alreadyInRoom = false;
+        }
+
         private void OnGameDestroyed(CallbackGameDestroyed e) {
+            alreadyInRoom = false;
             OpenRoomListMenu();
             GlobalController.Instance.discordController.UpdateActivity();
             _ = Reconnect();
-        }
-
-        private void OnGameInit(CallbackGameInit e) {
-            EnterRoom(false);
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {
@@ -817,9 +832,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnHostChanged(EventHostChanged e) {
-            if (e.Game.PlayerIsLocal(e.NewHost)) {
-                SendHostReminder();
-            }
+            SendHostReminder();
         }
 
         //---Debug

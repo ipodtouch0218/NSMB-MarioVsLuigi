@@ -111,7 +111,7 @@ namespace Quantum {
                         }
 
                         f.Global->Rules = rules;
-                        f.Events.PlayerDataChanged(f, playerData->PlayerRef);
+                        f.Events.RulesChanged(f);
                         break;
                     }
                 }

@@ -29,20 +29,51 @@ namespace NSMB.UI.MainMenu {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
-        public void UpdateAllSettings(Room roomData, bool level) {
-            GetCustomProperty(roomData.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties intProperties = v;
+        public void Start() {
+            QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+        }
 
-            ChangePrivate(!roomData.IsVisible);
-            ChangeMaxPlayers(roomData.MaxPlayers);
-            ChangeLevelIndex(intProperties.Level, level);
-            ChangeStarRequirement(intProperties.StarRequirement);
-            ChangeCoinRequirement(intProperties.CoinRequirement);
-            ChangeLives(intProperties.Lives);
-            ChangeTime(intProperties.Timer);
-            // ChangeTeams(roomData.Teams);
-            // ChangeDrawOnTimeUp(roomData.DrawOnTimeUp);
-            // ChangeCustomPowerups(roomData.CustomPowerups);
+        public void UpdateRealtimeRoomProperties(QuantumGame game) {
+            if (!IsHostLocal(game, out _)) {
+                return;
+            }
+
+            Frame f = game.Frames.Predicted;
+            var rules = f.Global->Rules;
+            IntegerProperties intProperties = new IntegerProperties {
+                Level = 0, // TODO
+                StarRequirement = rules.StarsToWin,
+                CoinRequirement = rules.CoinsForPowerup,
+                Lives = rules.Lives,
+                Timer = rules.TimerSeconds,
+            };
+            BooleanProperties boolProperties = new BooleanProperties {
+                Teams = rules.TeamsEnabled,
+                CustomPowerups = rules.CustomPowerupsEnabled,
+                DrawOnTimeUp = rules.DrawOnTimeUp,
+            };
+
+            NetworkHandler.Client.CurrentRoom.SetCustomProperties(new PhotonHashtable {
+                [Enums.NetRoomProperties.IntProperties] = (int) intProperties,
+                [Enums.NetRoomProperties.BoolProperties] = (int) boolProperties,
+            });
+        }
+
+        public void RefreshSettingsUI(Frame f, bool sendMessage) {
+            // Realtime rules
+            Room realtimeRoom = NetworkHandler.Client.CurrentRoom;
+            ChangePrivate(!realtimeRoom.IsVisible);
+            ChangeMaxPlayers(realtimeRoom.MaxPlayers);
+           
+            var rules = f.Global->Rules;
+            ChangeLevelIndex(rules.Level, sendMessage);
+            ChangeStarRequirement(rules.StarsToWin);
+            ChangeCoinRequirement(rules.CoinsForPowerup);
+            ChangeLives(rules.Lives);
+            ChangeTime(rules.TimerSeconds);
+            ChangeTeams(rules.TeamsEnabled);
+            ChangeDrawOnTimeUp(rules.DrawOnTimeUp);
+            ChangeCustomPowerups(rules.CustomPowerupsEnabled);
             SetRoomIdVisibility(isRoomCodeVisible);
 
             if (MainMenuManager.Instance) {
@@ -53,65 +84,49 @@ namespace NSMB.UI.MainMenu {
 
         #region Level Index
         public void SetLevelIndex() {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
+
             int index = levelDropdown.value;
             MainMenuManager.MapData mapData = MainMenuManager.Instance.maps[index];
 
-            QuantumGame game = QuantumRunner.DefaultGame;
-            var settings = game.Frames.Predicted.Global->Rules;
-            if (settings.Level == mapData.mapAsset) {
-                // Already have this level set.
-                return;
-            }
-
-
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties properties = v;
-
-            int oldValue = properties.Level;
-            int newValue = levelDropdown.value;
-            if (newValue == oldValue || newValue < 0) {
-                ChangeLevelIndex(oldValue, false);
-                return;
-            }
-
-            properties.Level = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.Level,
+                Level = mapData.mapAsset,
             });
         }
-        private void ChangeLevelIndex(int index, bool changed) {
-            levelDropdown.SetValueWithoutNotify(index);
-            if (levelDropdown.value != index && MainMenuManager.Instance is MainMenuManager mm) {
-                if (changed) {
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.map", ChatManager.Red, "map", mm.maps[index].translationKey);
-                }
-                mm.PreviewLevel(index);
+        private void ChangeLevelIndex(AssetRef<Map> newMap, bool changed) {
+            MainMenuManager mm = MainMenuManager.Instance;
+            int newDropdownIndex = mm.maps.IndexOf(md => md.mapAsset == newMap);
+
+            if (changed && (levelDropdown.value != newDropdownIndex || IsHostLocal(QuantumRunner.DefaultGame, out _))) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.map", ChatManager.Red, "map", mm.maps[newDropdownIndex].translationKey);
             }
+
+            mm.PreviewLevel(newDropdownIndex);
+            levelDropdown.SetValueWithoutNotify(newDropdownIndex);
         }
         #endregion
 
         #region Stars
         public void SetStarRequirement() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            int oldValue = properties.StarRequirement;
             if (!int.TryParse(starsInputField.text, out int newValue)) {
                 return;
             }
-
             newValue = Mathf.Clamp(newValue, 1, 25);
 
-            if (oldValue == newValue) {
-                ChangeStarRequirement(oldValue);
-                return;
-            }
-
-            properties.StarRequirement = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.StarsToWin,
+                StarsToWin = (byte) newValue,
             });
         }
         private void ChangeStarRequirement(int stars) {
@@ -121,25 +136,20 @@ namespace NSMB.UI.MainMenu {
 
         #region Coins
         public void SetCoinRequirement() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            int oldValue = properties.CoinRequirement;
             if (!int.TryParse(coinsInputField.text, out int newValue)) {
                 return;
             }
-
             newValue = Mathf.Clamp(newValue, 3, 25);
 
-            if (newValue == oldValue) {
-                ChangeCoinRequirement(oldValue);
-                return;
-            }
-
-            properties.CoinRequirement = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.CoinsForPowerup,
+                CoinsForPowerup = (byte) newValue,
             });
         }
         private void ChangeCoinRequirement(int coins) {
@@ -149,38 +159,34 @@ namespace NSMB.UI.MainMenu {
 
         #region Lives
         public void SetLives() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            int oldValue = properties.Lives;
             if (!int.TryParse(livesInputField.text, out int newValue)) {
                 return;
             }
-
             newValue = Mathf.Clamp(newValue, 1, 25);
 
-            if (newValue == oldValue) {
-                ChangeLives(oldValue);
-                return;
-            }
-
-            properties.Lives = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.Lives,
+                Lives = (byte) newValue,
             });
         }
 
         public void EnableLives() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            int newValue = livesEnabledToggle.isOn ? int.Parse(livesInputField.text) : 0;
-
-            properties.Lives = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            int newValue = livesEnabledToggle.isOn ? Mathf.Clamp(int.Parse(livesInputField.text), 1, 25) : 0;
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.Lives,
+                Lives = (byte) newValue,
             });
         }
 
@@ -197,42 +203,38 @@ namespace NSMB.UI.MainMenu {
 
         #region Timer
         public void SetTime() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            int oldValue = properties.Timer;
             if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
                 return;
             }
 
             newValue = Mathf.Clamp(newValue, 1, 99);
-
-            if (newValue == oldValue) {
-                ChangeTime(oldValue);
-                return;
-            }
-
-            properties.Timer = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.TimerSeconds,
+                TimerSeconds = (byte) newValue,
             });
         }
 
         public void EnableTime() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int v);
-            IntegerProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
             if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
                 return;
             }
 
             newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : 0;
-
-            properties.Timer = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.IntProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.TimerSeconds,
+                TimerSeconds = (byte) newValue,
             });
         }
 
@@ -251,15 +253,15 @@ namespace NSMB.UI.MainMenu {
 
         #region DrawOnTimeUp
         public void SetDrawOnTimeUp() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int v);
-            BooleanProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            bool newValue = drawEnabledToggle.isOn;
-
-            properties.DrawOnTimeUp = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.BoolProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.DrawOnTimeUp,
+                DrawOnTimeUp = drawEnabledToggle.isOn,
             });
         }
         private void ChangeDrawOnTimeUp(bool value) {
@@ -269,15 +271,15 @@ namespace NSMB.UI.MainMenu {
 
         #region Teams
         public void SetTeams() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int v);
-            BooleanProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            bool newValue = teamsEnabledToggle.isOn;
-
-            properties.Teams = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.BoolProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.TeamsEnabled,
+                TeamsEnabled = teamsEnabledToggle.isOn,
             });
 
             if (MainMenuManager.Instance) {
@@ -296,15 +298,15 @@ namespace NSMB.UI.MainMenu {
 
         #region Custom Powerups
         public void SetCustomPowerups() {
-            Room room = NetworkHandler.Client.CurrentRoom;
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int v);
-            BooleanProperties properties = v;
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (!IsHostLocal(game, out int hostSlot)) {
+                // Only hosts can change.
+                return;
+            }
 
-            bool newValue = customPowerupsEnabledToggle.isOn;
-
-            properties.CustomPowerups = newValue;
-            room.SetCustomProperties(new PhotonHashtable {
-                [Enums.NetRoomProperties.BoolProperties] = (int) properties
+            game.SendCommand(hostSlot, new CommandChangeRules {
+                EnabledChanges = CommandChangeRules.Changes.CustomPowerupsEnabled,
+                CustomPowerupsEnabled = customPowerupsEnabledToggle.isOn,
             });
         }
         private void ChangeCustomPowerups(bool value) {
@@ -378,22 +380,27 @@ namespace NSMB.UI.MainMenu {
         }
         #endregion
 
+        private bool IsHostLocal(QuantumGame game, out int slot) {
+            Frame f = game.Frames.Predicted;
+            PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
+            if (!game.PlayerIsLocal(hostPlayer)) {
+                // Only hosts can change.
+                slot = 0;
+                return false;
+            }
+            slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(hostPlayer)];
+            return true;
+        }
+
         //---Callbacks
         private void OnLanguageChanged(TranslationManager tm) {
             SetRoomIdVisibility(isRoomCodeVisible);
             roomIdText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
-        public void OnPlayerEnteredRoom(Player newPlayer) { }
-
-        public void OnPlayerLeftRoom(Player otherPlayer) { }
-
-        public void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) {
-            UpdateAllSettings(NetworkHandler.Client.CurrentRoom, true);
+        private void OnRulesChanged(EventRulesChanged e) {
+            RefreshSettingsUI(e.Frame, true);
+            UpdateRealtimeRoomProperties(e.Game);
         }
-
-        public void OnPlayerPropertiesUpdate(Player targetPlayer, PhotonHashtable changedProps) { }
-
-        public void OnMasterClientSwitched(Player newMasterClient) { }
     }
 }

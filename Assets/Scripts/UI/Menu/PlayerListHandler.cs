@@ -97,21 +97,24 @@ namespace NSMB.UI.MainMenu {
             }
 
             entry.UpdateText(game);
-            ReorderEntries();
+            ReorderEntries(game);
 
             if (updateChat && MainMenuManager.Instance) {
                 MainMenuManager.Instance.chat.UpdatePlayerColors();
             }
         }
 
-        public void ReorderEntries() {
-            var playerList = NetworkHandler.Client.CurrentRoom.Players.OrderByDescending(kvp => kvp.Key);
-
-            foreach ((PlayerRef player, _) in playerList) {
-                if (!playerListEntries.TryGetValue(player, out PlayerListEntry entry)) {
-                    continue;
+        public unsafe void ReorderEntries(QuantumGame game) {
+            Frame f = game.Frames.Predicted;
+            var sortedEntries = playerListEntries.OrderByDescending(ple => {
+                PlayerData* data = QuantumUtils.GetPlayerData(f, ple.Key);
+                if (data == null) {
+                    return int.MaxValue;
                 }
+                return data->JoinTick;
+            });
 
+            foreach ((PlayerRef player, PlayerListEntry entry) in sortedEntries) {
                 entry.transform.SetAsFirstSibling();
             }
         }

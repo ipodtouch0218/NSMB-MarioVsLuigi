@@ -27,7 +27,9 @@ MonoBehaviour:
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
-  TriangleMeshCellSize: 4
+  SceneMeshCellSize:
+    RawValue: 262144
+  TriangleMeshCellSize: -1
   StaticColliders3DTrianglesData:
     Id:
       Value: 421617125456758207
@@ -244,7 +246,7 @@ MonoBehaviour:
             RawValue: 0
           BoxExtents:
             X:
-              RawValue: 24575
+              RawValue: 24576
             Y:
               RawValue: 13107
           PositionOffset:

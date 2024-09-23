@@ -22,6 +22,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     //---Static
     public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
+    public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
     public static List<Region> Regions => Client.RegionHandler.EnabledRegions;
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
@@ -78,10 +79,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public IEnumerator PingUpdateCoroutine() {
         WaitForSeconds seconds = new(1);
         while (true) {
-            // TODO
-            //realtimeClient.LocalPlayer.SetCustomProperties(new PhotonHashtable() {
-            //    [Enums.NetPlayerProperties.Ping] = (int) realtimeClient.RealtimePeer.Stats.RoundtripTime
-            //});
+            if (Runner) {
+                QuantumGame game = Runner.Game;
+                foreach (int slot in game.GetLocalPlayerSlots()) {
+                    Runner.Game.SendCommand(slot, new CommandUpdatePing {
+                        PingMs = (int) Ping.Value,
+                    });
+                }
+            }
             yield return seconds;
         }
     }
