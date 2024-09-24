@@ -16,6 +16,7 @@ using Photon.Realtime;
 using Quantum;
 using System.Threading.Tasks;
 using Button = UnityEngine.UI.Button;
+using System.Runtime.CompilerServices;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuManager : Singleton<MainMenuManager> {
@@ -211,8 +212,8 @@ namespace NSMB.UI.MainMenu {
             Frame f = game.Frames.Predicted;
             PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
             bool isHost = game.PlayerIsLocal(hostPlayer);
-
             hostControlsGroup.interactable = isHost;
+
             roomSettingsCallbacks.RefreshSettingsUI(f, false);
 
             // Set the player settings
@@ -833,6 +834,7 @@ namespace NSMB.UI.MainMenu {
 
         private void OnHostChanged(EventHostChanged e) {
             SendHostReminder();
+            hostControlsGroup.interactable = e.Game.PlayerIsLocal(e.NewHost);
         }
 
         //---Debug

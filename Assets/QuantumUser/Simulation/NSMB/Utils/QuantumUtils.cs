@@ -18,7 +18,8 @@ public static unsafe class QuantumUtils {
 
     public static unsafe PlayerData* GetPlayerData(Frame f, PlayerRef player) {
         if (!f.TryResolveDictionary(f.Global->PlayerDatas, out var playerDataDictionary)
-            || !f.Unsafe.TryGetPointer(playerDataDictionary[player], out PlayerData* data)) {
+            || !playerDataDictionary.TryGetValue(player, out EntityRef playerDataEntity)
+            || !f.Unsafe.TryGetPointer(playerDataEntity, out PlayerData* data)) {
 
             return null;
         }

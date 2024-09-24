@@ -452,7 +452,7 @@ namespace NSMB.Utils {
             }
 
             // Or dead marios
-            if (f.Global->GameState != GameState.PreGameRoom) {
+            if (f.Global->GameState > GameState.WaitingForPlayers) {
                 var marioFilter = f.Filter<MarioPlayer>();
                 bool hasMario = false;
                 while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
@@ -473,19 +473,18 @@ namespace NSMB.Utils {
             }
 
             // Then id based color
-            int playersBeforeUs = 0;
-            int totalPlayers = 0;
-
-            var players = f.Filter<PlayerData>();
-            while (players.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
+            List<PlayerData> players = new();
+            var playerFilter = f.Filter<PlayerData>();
+            while (playerFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
                 if (otherPlayerData->IsSpectator) {
                     continue;
                 }
 
-                totalPlayers++;
+                players.Add(*otherPlayerData);
             }
-            
-            return Color.HSVToRGB(playersBeforeUs / (totalPlayers + 1f), s, v);
+            int ourIndex = players.OrderBy(pd => pd.JoinTick).IndexOf(pd => pd.PlayerRef == player);
+
+            return Color.HSVToRGB(ourIndex / Mathf.Max(players.Count, 1), s, v);
         }
 
         public static Color GetTeamColor(int team, float s = 1, float v = 1) {

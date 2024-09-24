@@ -79,8 +79,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public IEnumerator PingUpdateCoroutine() {
         WaitForSeconds seconds = new(1);
         while (true) {
-            if (Runner) {
-                QuantumGame game = Runner.Game;
+            QuantumGame game;
+            if (Runner && (game = Runner.Game) != null) {
                 foreach (int slot in game.GetLocalPlayerSlots()) {
                     Runner.Game.SendCommand(slot, new CommandUpdatePing {
                         PingMs = (int) Ping.Value,
@@ -196,10 +196,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             ClientId = Client.UserId,
             RuntimeConfig = new RuntimeConfig {
                 SimulationConfig = GlobalController.Instance.config,
-                //Map = GlobalController.Instance.config.LobbyMap,
                 Map = null,
                 Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
-                IsRealGame = true
+                IsRealGame = true,
             },
             SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
             GameMode = DeterministicGameMode.Multiplayer,

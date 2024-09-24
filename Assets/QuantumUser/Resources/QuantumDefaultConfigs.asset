@@ -100,6 +100,7 @@ MonoBehaviour:
     SimplexMinBitShift: 0
     SimplexMaxBitShift: 2
     ShapeCastMaxIterations: 16
+    ShapeCastMinIterations: 4
     ShapeCastHardTolerance:
       RawValue: 66
     ShapeCastSoftTolerance:
@@ -346,7 +347,12 @@ MonoBehaviour:
     Path: QuantumUser/Resources/QuantumDefaultConfigs|DefaultConfigSystems
     Guid:
       Value: 3654882389298375385
-  Entries: []
+  Entries:
+  - SystemType:
+      AssemblyQualifiedName: Quantum.KoopaSystem, Quantum.Simulation
+    SystemName: 
+    StartDisabled: 0
+    Children: []
 --- !u!114 &4894074246963618225
 MonoBehaviour:
   m_ObjectHideFlags: 0

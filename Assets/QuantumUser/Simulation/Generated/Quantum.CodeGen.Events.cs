@@ -293,10 +293,11 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventRulesChanged RulesChanged(Frame Frame) {
+      public EventRulesChanged RulesChanged(Frame Frame, QBoolean LevelChanged) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventRulesChanged>(EventRulesChanged.ID);
         ev.Frame = Frame;
+        ev.LevelChanged = LevelChanged;
         _f.AddEvent(ev);
         return ev;
       }
@@ -1176,6 +1177,7 @@ namespace Quantum {
   public unsafe partial class EventRulesChanged : EventBase {
     public new const Int32 ID = 22;
     public Frame Frame;
+    public QBoolean LevelChanged;
     protected EventRulesChanged(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -1194,6 +1196,7 @@ namespace Quantum {
       unchecked {
         var hash = 139;
         hash = hash * 31 + Frame.GetHashCode();
+        hash = hash * 31 + LevelChanged.GetHashCode();
         return hash;
       }
     }

@@ -64,4 +64,5 @@ synced event HostChanged {
 
 synced event RulesChanged {
 	Frame Frame;
+	bool LevelChanged;
 }

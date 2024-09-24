@@ -24,11 +24,11 @@ namespace NSMB.UI.MainMenu {
 
         //---Private Variables
         private GameObject blockerInstance;
+        private EntityRef playerDataEntity;
         // TODO private NicknameColor NicknameColor => player.NicknameColor;
         private NicknameColor NicknameColor => NicknameColor.White;
 
         public void OnEnable() {
-            NetworkHandler.Client.AddCallbackTarget(this);
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
             // TODO
             // player.OnInOptionsChangedEvent += OnInSettingsChanged;
@@ -37,7 +37,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisable() {
-            NetworkHandler.Client.RemoveCallbackTarget(this);
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
             // TODO
             // player.OnInOptionsChangedEvent -= OnInSettingsChanged;
@@ -80,38 +79,39 @@ namespace NSMB.UI.MainMenu {
             colorStrip.color = Utils.Utils.GetPlayerColor(game, player);
 
             Frame f = game.Frames.Predicted;
-            var playerData = f.Get<PlayerData>(f.ResolveDictionary(f.Global->PlayerDatas)[player]);
+            var playerData = QuantumUtils.GetPlayerData(f, player);
 
-            if (playerData.Wins == 0) {
-                winsText.text = "";
-            } else {
-                winsText.text = "<sprite name=room_wins>" + playerData.Wins;
+            if (playerData == null) {
+                return;
             }
 
-            pingText.text = playerData.Ping + " " + Utils.Utils.GetPingSymbol(playerData.Ping);
+            if (playerData->Wins == 0) {
+                winsText.text = "";
+            } else {
+                winsText.text = "<sprite name=room_wins>" + playerData->Wins;
+            }
+
+            pingText.text = playerData->Ping + ' ' + Utils.Utils.GetPingSymbol(playerData->Ping);
 
             string permissionSymbol = "";
-            if (playerData.IsRoomHost) {
+            if (playerData->IsRoomHost) {
                 permissionSymbol += "<sprite name=room_host>";
             }
 
-            int characterIndex = playerData.Character;
+            int characterIndex = playerData->Character;
             characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
             string characterSymbol = GlobalController.Instance.config.CharacterDatas[characterIndex].UiString;
 
-            /*
             string teamSymbol;
-            if (SessionData.Instance.Teams && Settings.Instance.GraphicsColorblind) {
-                Team team = ScriptableManager.Instance.teams[player.Team];
+            if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
+                Team team = ScriptableManager.Instance.teams[playerData->Team];
                 teamSymbol = team.textSpriteColorblindBig;
             } else {
                 teamSymbol = "";
             }
-            */
-            //nameText.text = permissionSymbol + characterSymbol + teamSymbol + player.GetNickname();
 
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            nameText.text = permissionSymbol + characterSymbol + runtimePlayer.PlayerNickname.ToValidUsername();
+            nameText.text = permissionSymbol + characterSymbol + teamSymbol + runtimePlayer.PlayerNickname.ToValidUsername();
 
             Transform parent = transform.parent;
             int childIndex = 0;

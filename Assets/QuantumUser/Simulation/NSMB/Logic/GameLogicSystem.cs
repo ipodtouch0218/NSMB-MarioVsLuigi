@@ -12,14 +12,19 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
+            // Ping command is always accepted
+            for (int i = 0; i < f.PlayerCount; i++) {
+                var playerData = QuantumUtils.GetPlayerData(f, i);
+                if (playerData != null && f.GetPlayerCommand(i) is CommandUpdatePing cup) {
+                    playerData->Ping = cup.PingMs;
+                    f.Events.PlayerDataChanged(f, i);
+                }
+            }
+
             switch (f.Global->GameState) {
             case GameState.PreGameRoom:
-                var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
                 for (int i = 0; i < f.PlayerCount; i++) {
-                    if (!playerDataDictionary.TryGetValue(i, out EntityRef entity)
-                        || !f.Unsafe.TryGetPointer(entity, out PlayerData* playerData)) {
-                        continue;
-                    }
+                    var playerData = QuantumUtils.GetPlayerData(f, i);
 
                     switch (f.GetPlayerCommand(i)) {
                     case CommandChangePlayerData changeData:
@@ -67,8 +72,8 @@ namespace Quantum {
                             // Only the host can give it to another player.
                             break;
                         }
-                        if (!playerDataDictionary.TryGetValue(changeHost.NewHost, out EntityRef newHostEntity)
-                            || !f.Unsafe.TryGetPointer(newHostEntity, out PlayerData* newHostPlayerData)) {
+                        var newHostPlayerData = QuantumUtils.GetPlayerData(f, changeHost.NewHost);
+                        if (newHostPlayerData == null) {
                             return;
                         }
 
@@ -84,8 +89,10 @@ namespace Quantum {
 
                         CommandChangeRules.Changes rulesChanges = changeRules.EnabledChanges;
                         var rules = f.Global->Rules;
+                        bool levelChanged = false;
 
                         if (rulesChanges.HasFlag(CommandChangeRules.Changes.Level)) {
+                            levelChanged = rules.Level != changeRules.Level;
                             rules.Level = changeRules.Level;
                         }
                         if (rulesChanges.HasFlag(CommandChangeRules.Changes.StarsToWin)) {
@@ -111,7 +118,7 @@ namespace Quantum {
                         }
 
                         f.Global->Rules = rules;
-                        f.Events.RulesChanged(f);
+                        f.Events.RulesChanged(f, levelChanged);
                         break;
                     }
                 }
@@ -194,6 +201,7 @@ namespace Quantum {
             if (datas.Count == 0) {
                 // First player is host
                 newData->IsRoomHost = true;
+                f.Events.HostChanged(f, player);
             }
 
             datas[player] = newEntity;
@@ -205,14 +213,17 @@ namespace Quantum {
 
             if (datas.TryGetValue(player, out EntityRef entity)) {
                 var deletedPlayerData = f.Unsafe.GetPointer<PlayerData>(entity);
+
                 if (deletedPlayerData->IsRoomHost) {
                     // Give the host to the youngest player.
                     var playerDataFilter = f.Filter<PlayerData>();
                     PlayerData* youngestPlayer = null;
                     while (playerDataFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
-                        if (youngestPlayer == null
-                            || otherPlayerData->JoinTick < youngestPlayer->JoinTick) {
-
+                        if (deletedPlayerData == otherPlayerData) {
+                            continue;
+                        }
+                        
+                        if (youngestPlayer == null || otherPlayerData->JoinTick < youngestPlayer->JoinTick) {
                             youngestPlayer = otherPlayerData;
                         }
                     }
