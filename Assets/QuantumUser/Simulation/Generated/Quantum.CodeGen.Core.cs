@@ -704,6 +704,8 @@ namespace Quantum {
     public Int32 StartFrame;
     [FieldOffset(1648)]
     public UInt16 GameStartFrames;
+    [FieldOffset(1650)]
+    public UInt16 PlayerLoadFrames;
     [FieldOffset(1660)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
@@ -739,6 +741,7 @@ namespace Quantum {
         hash = hash * 31 + (byte)GameState;
         hash = hash * 31 + StartFrame.GetHashCode();
         hash = hash * 31 + GameStartFrames.GetHashCode();
+        hash = hash * 31 + PlayerLoadFrames.GetHashCode();
         hash = hash * 31 + PlayerDatas.GetHashCode();
         hash = hash * 31 + RealPlayers.GetHashCode();
         hash = hash * 31 + Timer.GetHashCode();
@@ -769,6 +772,7 @@ namespace Quantum {
         serializer.Stream.Serialize((byte*)&p->GameState);
         serializer.Stream.Serialize(&p->BigStarSpawnTimer);
         serializer.Stream.Serialize(&p->GameStartFrames);
+        serializer.Stream.Serialize(&p->PlayerLoadFrames);
         serializer.Stream.Serialize(&p->StartFrame);
         serializer.Stream.Serialize(&p->UsedStarSpawnCount);
         QDictionary.Serialize(&p->PlayerDatas, serializer, Statics.SerializePlayerRef, Statics.SerializeEntityRef);
@@ -2029,28 +2033,30 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PlayerData : Quantum.IComponent {
-    public const Int32 SIZE = 40;
+    public const Int32 SIZE = 44;
     public const Int32 ALIGNMENT = 4;
     [FieldOffset(20)]
     public PlayerRef PlayerRef;
-    [FieldOffset(32)]
+    [FieldOffset(36)]
     public QBoolean IsRoomHost;
     [FieldOffset(28)]
-    public QBoolean IsReady;
+    public QBoolean IsLoaded;
     [FieldOffset(0)]
     public Byte Character;
     [FieldOffset(1)]
     public Byte Skin;
     [FieldOffset(2)]
     public Byte Team;
-    [FieldOffset(36)]
+    [FieldOffset(40)]
     public QBoolean IsSpectator;
     [FieldOffset(16)]
     public Int32 Wins;
     [FieldOffset(8)]
     public Int32 LastChatMessage;
+    [FieldOffset(32)]
+    public QBoolean IsReady;
     [FieldOffset(24)]
-    public QBoolean IsLoaded;
+    public QBoolean IsInSettings;
     [FieldOffset(4)]
     public Int32 JoinTick;
     [FieldOffset(12)]
@@ -2060,14 +2066,15 @@ namespace Quantum {
         var hash = 10271;
         hash = hash * 31 + PlayerRef.GetHashCode();
         hash = hash * 31 + IsRoomHost.GetHashCode();
-        hash = hash * 31 + IsReady.GetHashCode();
+        hash = hash * 31 + IsLoaded.GetHashCode();
         hash = hash * 31 + Character.GetHashCode();
         hash = hash * 31 + Skin.GetHashCode();
         hash = hash * 31 + Team.GetHashCode();
         hash = hash * 31 + IsSpectator.GetHashCode();
         hash = hash * 31 + Wins.GetHashCode();
         hash = hash * 31 + LastChatMessage.GetHashCode();
-        hash = hash * 31 + IsLoaded.GetHashCode();
+        hash = hash * 31 + IsReady.GetHashCode();
+        hash = hash * 31 + IsInSettings.GetHashCode();
         hash = hash * 31 + JoinTick.GetHashCode();
         hash = hash * 31 + Ping.GetHashCode();
         return hash;
@@ -2083,6 +2090,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Ping);
         serializer.Stream.Serialize(&p->Wins);
         PlayerRef.Serialize(&p->PlayerRef, serializer);
+        QBoolean.Serialize(&p->IsInSettings, serializer);
         QBoolean.Serialize(&p->IsLoaded, serializer);
         QBoolean.Serialize(&p->IsReady, serializer);
         QBoolean.Serialize(&p->IsRoomHost, serializer);

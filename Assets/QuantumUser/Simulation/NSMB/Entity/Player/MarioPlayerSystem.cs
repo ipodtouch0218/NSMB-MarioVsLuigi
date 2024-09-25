@@ -1466,6 +1466,7 @@ namespace Quantum {
             // Spawn players
             var config = f.SimulationConfig;
             var playerDatas = f.Filter<PlayerData>();
+            int teamCounter = 0;
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
                 if (data->IsSpectator) {
                     continue;
@@ -1477,6 +1478,8 @@ namespace Quantum {
                 EntityRef newPlayer = f.Create(character.Prototype);
                 var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
                 mario->PlayerRef = data->PlayerRef;
+                mario->Team = (byte) (f.Global->Rules.TeamsEnabled ? data->Team : teamCounter++);
+                
                 var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
                 newTransform->Position = f.FindAsset<VersusStageData>(f.Map.UserAsset).Spawnpoint;
             }

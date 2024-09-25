@@ -399,7 +399,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnRulesChanged(EventRulesChanged e) {
-            RefreshSettingsUI(e.Frame, true);
+            RefreshSettingsUI(e.Frame, e.LevelChanged);
             UpdateRealtimeRoomProperties(e.Game);
         }
     }

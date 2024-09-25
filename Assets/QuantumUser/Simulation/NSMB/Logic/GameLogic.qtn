@@ -7,6 +7,7 @@ global {
 	GameState GameState;
 	int StartFrame;
 	ushort GameStartFrames;
+	ushort PlayerLoadFrames;
 
 	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
 	byte RealPlayers;
@@ -65,4 +66,9 @@ synced event HostChanged {
 synced event RulesChanged {
 	Frame Frame;
 	bool LevelChanged;
+}
+
+synced event PlayerLoaded {
+	Frame Frame;
+	PlayerRef Player;
 }

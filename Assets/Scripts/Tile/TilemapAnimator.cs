@@ -1,8 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -14,10 +12,9 @@ public class TilemapAnimator : MonoBehaviour {
 
     //---Private Variables
     private readonly Dictionary<EntityRef, AudioSource> entityBreakBlockSounds = new();
-    private VersusStageData stage;
-
     private readonly Dictionary<int, TileChangeData> eventData = new();
     private readonly Dictionary<Vector3Int, List<TileEventData>> tileStack = new();
+    private VersusStageData stage;
 
 
     public void OnValidate() {

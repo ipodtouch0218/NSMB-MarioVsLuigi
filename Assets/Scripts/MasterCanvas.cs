@@ -1,3 +1,4 @@
+using Quantum;
 using UnityEngine;
 
 public class MasterCanvas : MonoBehaviour {
@@ -5,20 +6,16 @@ public class MasterCanvas : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private PlayerElements playerElementsPrefab;
 
-    public void Awake() {
-        NetworkHandler.OnLocalPlayerConfirmed += OnLocalPlayerAdded;
-        OnLocalPlayerAdded();
+    public void Start() {
+        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);    
     }
 
-    public void OnDestroy() {
-        NetworkHandler.OnLocalPlayerConfirmed -= OnLocalPlayerAdded;
-    }
-
-    private void OnLocalPlayerAdded() {
-        foreach (var e in NetworkHandler.localPlayerConfirmations) {
-            PlayerElements elements = Instantiate(playerElementsPrefab, transform);
-            elements.Initialize(e.Player);
+    private void OnGameStateChanged(EventGameStateChanged e) {
+        if (e.NewState == GameState.Starting) {
+            foreach (PlayerRef player in e.Game.GetLocalPlayers()) {
+                PlayerElements elements = Instantiate(playerElementsPrefab, transform);
+                elements.Initialize(player);
+            }
         }
-        NetworkHandler.localPlayerConfirmations.Clear();
     }
 }

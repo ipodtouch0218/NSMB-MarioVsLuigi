@@ -483,8 +483,8 @@ namespace NSMB.Utils {
                 players.Add(*otherPlayerData);
             }
             int ourIndex = players.OrderBy(pd => pd.JoinTick).IndexOf(pd => pd.PlayerRef == player);
-
-            return Color.HSVToRGB(ourIndex / Mathf.Max(players.Count, 1), s, v);
+            
+            return Color.HSVToRGB(ourIndex / (players.Count + 1f), s, v);
         }
 
         public static Color GetTeamColor(int team, float s = 1, float v = 1) {

@@ -15,9 +15,17 @@ namespace Quantum {
             // Ping command is always accepted
             for (int i = 0; i < f.PlayerCount; i++) {
                 var playerData = QuantumUtils.GetPlayerData(f, i);
-                if (playerData != null && f.GetPlayerCommand(i) is CommandUpdatePing cup) {
-                    playerData->Ping = cup.PingMs;
-                    f.Events.PlayerDataChanged(f, i);
+                if (playerData != null) {
+                    switch (f.GetPlayerCommand(i)) {
+                    case CommandUpdatePing updatePing:
+                        playerData->Ping = updatePing.PingMs;
+                        f.Events.PlayerDataChanged(f, i);
+                        break;
+                    case CommandToggleReady:
+                        playerData->IsReady = !playerData->IsReady;
+                        f.Events.PlayerDataChanged(f, i);
+                        break;
+                    }
                 }
             }
 
@@ -55,8 +63,9 @@ namespace Quantum {
                         playerData->LastChatMessage = f.Number;
                         f.Events.PlayerSentChatMessage(f, i, chatMessage.Message);
                         break;
-                    case CommandToggleReady:
-                        playerData->IsReady = !playerData->IsReady;
+                    case CommandSetInSettings setInSettings:
+                        playerData->IsInSettings = setInSettings.InSettings;
+                        f.Events.PlayerDataChanged(f, i);
                         break;
                     case CommandToggleCountdown:
                         if (!playerData->IsRoomHost) {
@@ -129,6 +138,7 @@ namespace Quantum {
                         if (f.IsVerified) {
                             f.MapAssetRef = f.Global->Rules.Level;
                         }
+                        f.Global->PlayerLoadFrames = (ushort) (25 * f.UpdateRate);
                         f.Global->GameState = GameState.WaitingForPlayers;
                         f.Events.GameStateChanged(f, GameState.WaitingForPlayers);
                     } else if (f.Global->GameStartFrames % 60 == 0) {
@@ -138,10 +148,22 @@ namespace Quantum {
 
                 break;
             case GameState.WaitingForPlayers:
+                for (int i = 0; i < f.PlayerCount; i++) {
+                    var playerData = QuantumUtils.GetPlayerData(f, i);
+                    if (f.GetPlayerCommand(i) is CommandPlayerLoaded) {
+                        bool wasLoaded = playerData->IsLoaded;
+                        playerData->IsLoaded = true;
+                        
+                        if (!wasLoaded) {
+                            f.Events.PlayerLoaded(f, i);
+                        }
+                    }
+                }
+                
                 bool allPlayersLoaded = true;
                 var playerDataFilter = f.Filter<PlayerData>();
                 byte players = 0;
-                while (playerDataFilter.NextUnsafe(out EntityRef entity, out PlayerData* data)) {
+                while (playerDataFilter.NextUnsafe(out _, out PlayerData* data)) {
                     allPlayersLoaded &= data->IsSpectator || data->IsLoaded;
                     if (!data->IsSpectator) {
                         players++;
@@ -153,12 +175,12 @@ namespace Quantum {
                     break;
                 }
 
-                if (!f.RuntimeConfig.IsRealGame || !allPlayersLoaded) {
+                if (!f.RuntimeConfig.IsRealGame || allPlayersLoaded) {
                     // Progress to next stage.
                     f.Global->GameState = GameState.Starting;
                     f.Global->GameStartFrames = 3 * 60 + 78;
                     f.Global->Timer = f.Global->Rules.TimerSeconds;
-                    f.Events.GameStateChanged(f, GameState.Starting);    
+                    f.Events.GameStateChanged(f, GameState.Starting);  
                 } else {
                     // TODO Time out if players don't send a "ready" command in time
                 }

@@ -1,8 +1,8 @@
 using NSMB.Extensions;
-using NSMB.Utils;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,8 +39,8 @@ namespace NSMB.Loading {
             List<PlayerRef> localPlayers = game.GetLocalPlayers();
             if (localPlayers.Count > 0) {
                 PlayerRef player = localPlayers[0];
-                var playerData = f.Get<PlayerData>(f.ResolveDictionary(f.Global->PlayerDatas)[player]);
-                characterIndex = playerData.Character;
+                var playerData = QuantumUtils.GetPlayerData(f, player);
+                characterIndex = playerData->Character;
             }
 
             var characters = GlobalController.Instance.config.CharacterDatas;
@@ -69,16 +69,17 @@ namespace NSMB.Loading {
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.Starting) {
-                EndLoading();
+                EndLoading(e.Game);
             }
         }
 
-        public void EndLoading() {
+        public unsafe void EndLoading(QuantumGame game) {
+            Frame f = game.Frames.Predicted;
 
-            bool spectator = false;
-            // TODO bool spectator = NetworkHandler.Runner.GetLocalPlayerData().IsCurrentlySpectating;
+            bool validPlayer = game.GetLocalPlayers().Any(p => QuantumUtils.GetPlayerData(f, p)->IsSpectator);
+            
             readyGroup.gameObject.SetActive(true);
-            animator.SetTrigger(spectator ? "spectating" : "loaded");
+            animator.SetTrigger(validPlayer ? "loaded" : "spectating");
 
             initialized = false;
 

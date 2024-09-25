@@ -735,14 +735,15 @@ namespace Quantum.Prototypes {
   public unsafe partial class PlayerDataPrototype : ComponentPrototype<Quantum.PlayerData> {
     public PlayerRef PlayerRef;
     public QBoolean IsRoomHost;
-    public QBoolean IsReady;
+    public QBoolean IsLoaded;
     public Byte Character;
     public Byte Skin;
     public Byte Team;
     public QBoolean IsSpectator;
     public Int32 Wins;
     public Int32 LastChatMessage;
-    public QBoolean IsLoaded;
+    public QBoolean IsReady;
+    public QBoolean IsInSettings;
     public Int32 JoinTick;
     public Int32 Ping;
     partial void MaterializeUser(Frame frame, ref Quantum.PlayerData result, in PrototypeMaterializationContext context);
@@ -754,14 +755,15 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.PlayerData result, in PrototypeMaterializationContext context = default) {
         result.PlayerRef = this.PlayerRef;
         result.IsRoomHost = this.IsRoomHost;
-        result.IsReady = this.IsReady;
+        result.IsLoaded = this.IsLoaded;
         result.Character = this.Character;
         result.Skin = this.Skin;
         result.Team = this.Team;
         result.IsSpectator = this.IsSpectator;
         result.Wins = this.Wins;
         result.LastChatMessage = this.LastChatMessage;
-        result.IsLoaded = this.IsLoaded;
+        result.IsReady = this.IsReady;
+        result.IsInSettings = this.IsInSettings;
         result.JoinTick = this.JoinTick;
         result.Ping = this.Ping;
         MaterializeUser(frame, ref result, in context);

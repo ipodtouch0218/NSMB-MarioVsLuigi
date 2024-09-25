@@ -2,20 +2,19 @@ component PlayerData {
 
 	PlayerRef PlayerRef;
 	bool IsRoomHost;
-	bool IsReady;
+	bool IsLoaded;
 
 	byte Character;
 	byte Skin;
 	byte Team;
-
 	bool IsSpectator;
 
 	int Wins;
 	int LastChatMessage;
-	bool IsLoaded;
+	bool IsReady;
+	bool IsInSettings;
 	int JoinTick;
 	int Ping;
-
 }
 
 event PlayerStartedTyping {

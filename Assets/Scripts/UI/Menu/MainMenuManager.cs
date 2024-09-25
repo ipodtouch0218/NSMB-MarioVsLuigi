@@ -16,7 +16,6 @@ using Photon.Realtime;
 using Quantum;
 using System.Threading.Tasks;
 using Button = UnityEngine.UI.Button;
-using System.Runtime.CompilerServices;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuManager : Singleton<MainMenuManager> {
@@ -150,8 +149,8 @@ namespace NSMB.UI.MainMenu {
 
             GlobalController.Instance.firstConnection = false;
 
-            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
-            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded, onlyIfActiveAndEnabled: true);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved, onlyIfActiveAndEnabled: true);
             QuantumEvent.Subscribe<EventStartingCountdownChanged>(this, OnCountdownChanged);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
@@ -304,10 +303,10 @@ namespace NSMB.UI.MainMenu {
 
         public void TryOpenCreateRoomPrompt() {
 #if PLATFORM_WEBGL
-        DisableAllMenus();
-        bg.SetActive(true);
-        lobbyMenu.SetActive(true);
-        webglCreateLobbyPrompt.SetActive(true);
+            DisableAllMenus();
+            bg.SetActive(true);
+            lobbyMenu.SetActive(true);
+            webglCreateLobbyPrompt.SetActive(true);
 #else
             OpenCreateRoomPrompt();
 #endif
@@ -419,7 +418,15 @@ namespace NSMB.UI.MainMenu {
                     game.SendCommand(slot, new CommandToggleReady());
                 }
 
-                //sfx.PlayOneShot(isReady ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
+                List<PlayerRef> localPlayers = game.GetLocalPlayers();
+                bool isReady = false;
+                if (localPlayers.Count > 0) {
+                    var playerData = QuantumUtils.GetPlayerData(f, localPlayers[0]);
+                    isReady = playerData->IsReady;
+                }
+
+                sfx.PlayOneShot(isReady ? SoundEffect.UI_Back : SoundEffect.UI_Decide);
+                UpdateReadyButton(!isReady);
             }
         }
 
@@ -451,8 +458,14 @@ namespace NSMB.UI.MainMenu {
                 startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
                 startGameBtn.interactable = IsRoomConfigurationValid();
             } else {
-                // UpdateReadyButton(data && data.IsReady);
-                startGameBtn.interactable = true;
+                List<PlayerRef> localPlayers = game.GetLocalPlayers();
+                if (localPlayers.Count > 0) {
+                    var playerData = QuantumUtils.GetPlayerData(f, localPlayers[0]);
+                    if (playerData != null) {
+                        UpdateReadyButton(playerData->IsReady);
+                    }
+                    startGameBtn.interactable = true;
+                }
             }
         }
 

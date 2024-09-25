@@ -198,20 +198,16 @@ namespace NSMB.UI.MainMenu {
             UpdateText(QuantumRunner.DefaultGame);
         }
 
-        private void OnInSettingsChanged(bool inSettings) {
-            settingsIcon.SetActive(inSettings);
-        }
-
-        private void OnIsReadyChanged(bool isReady) {
-            readyIcon.SetActive(isReady);
-        }
-
-        private void OnPlayerDataChanged(EventPlayerDataChanged e) {
+        private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
             if (e.Player != player) {
                 return;
             }
 
             UpdateText(e.Game);
+
+            var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
+            readyIcon.SetActive(playerData->IsReady);
+            settingsIcon.SetActive(playerData->IsInSettings);
         }
     }
 }

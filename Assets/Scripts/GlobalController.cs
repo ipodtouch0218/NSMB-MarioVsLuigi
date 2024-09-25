@@ -82,6 +82,7 @@ public class GlobalController : Singleton<GlobalController> {
 
         //NetworkHandler.OnShutdown += OnShutdown;
         //NetworkHandler.OnHostMigration += OnHostMigration;
+        QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
     }
 
     public void OnDestroy() {
@@ -169,6 +170,12 @@ public class GlobalController : Singleton<GlobalController> {
             QualitySettings.vSyncCount = previousVsyncCount;
             Application.targetFrameRate = previousFrameRate;
 #endif
+        }
+    }
+
+    public void OnUnitySceneLoadDone(CallbackUnitySceneLoadDone e) {
+        foreach (int localPlayer in e.Game.GetLocalPlayerSlots()) {
+            e.Game.SendCommand(localPlayer, new CommandPlayerLoaded());
         }
     }
 

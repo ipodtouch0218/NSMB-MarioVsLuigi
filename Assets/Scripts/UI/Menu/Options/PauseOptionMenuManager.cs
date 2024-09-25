@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 using NSMB.Extensions;
+using Quantum;
 
 namespace NSMB.UI.Pause.Options {
 
@@ -299,6 +300,13 @@ namespace NSMB.UI.Pause.Options {
             EnableInput = true;
             SetTab(0, false);
             //SetCurrentOption(0);
+
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (game != null) {
+                foreach (var slot in game.GetLocalPlayerSlots()) {
+                    game.SendCommand(slot, new CommandSetInSettings { InSettings = true });
+                }
+            }
         }
 
         public void CloseMenu() {
@@ -313,6 +321,13 @@ namespace NSMB.UI.Pause.Options {
             EnableInput = false;
             gameObject.SetActive(false);
             GlobalController.Instance.PlaySound(SoundEffect.UI_Back);
+
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (game != null) {
+                foreach (var slot in game.GetLocalPlayerSlots()) {
+                    game.SendCommand(slot, new CommandSetInSettings { InSettings = false });
+                }
+            }
         }
 
         public void SetCurrentOption(int index, bool center = false) {

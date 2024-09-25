@@ -27,7 +27,9 @@ MonoBehaviour:
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
-  TriangleMeshCellSize: 4
+  SceneMeshCellSize:
+    RawValue: 262144
+  TriangleMeshCellSize: -1
   StaticColliders3DTrianglesData:
     Id:
       Value: 362228757069171524
@@ -206,8 +208,19 @@ MonoBehaviour:
             RawValue: 39322
           Y:
             RawValue: 39322
+        AutoBreakFrames: 180
+        AutoBreakGrabAdditionalFrames: 0
+        AutoBreakWhileHeld:
+          Value: 0
+        Offset:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
         IsCarryable:
           Value: 1
+        IsFlying:
+          Value: 0
     - rid: 777974220477956101
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -373,8 +386,19 @@ MonoBehaviour:
             RawValue: 39322
           Y:
             RawValue: 39322
+        AutoBreakFrames: 180
+        AutoBreakGrabAdditionalFrames: 0
+        AutoBreakWhileHeld:
+          Value: 0
+        Offset:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
         IsCarryable:
           Value: 1
+        IsFlying:
+          Value: 0
     - rid: 1904270922169188357
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -738,8 +762,19 @@ MonoBehaviour:
             RawValue: 39322
           Y:
             RawValue: 39322
+        AutoBreakFrames: 180
+        AutoBreakGrabAdditionalFrames: 0
+        AutoBreakWhileHeld:
+          Value: 0
+        Offset:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
         IsCarryable:
           Value: 1
+        IsFlying:
+          Value: 0
     - rid: 5636341017683689477
       type: {class: GoombaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -905,7 +940,18 @@ MonoBehaviour:
             RawValue: 0
           Y:
             RawValue: 0
+        AutoBreakFrames: 180
+        AutoBreakGrabAdditionalFrames: 0
+        AutoBreakWhileHeld:
+          Value: 0
+        Offset:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
         IsCarryable:
+          Value: 1
+        IsFlying:
           Value: 0
     - rid: 7515263985617207301
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
