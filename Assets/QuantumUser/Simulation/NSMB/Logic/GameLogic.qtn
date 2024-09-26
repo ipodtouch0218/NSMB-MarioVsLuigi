@@ -26,7 +26,10 @@ struct GameRules {
 	bool DrawOnTimeUp;
 }
 
+signal OnLoadingComplete();
 signal OnGameStarting();
+signal OnGameEnding(int winningTeam, bool hasWinner);
+signal OnReturnToRoom();
 
 synced event GameStateChanged {
 	Frame Frame;
@@ -71,4 +74,10 @@ synced event RulesChanged {
 synced event PlayerLoaded {
 	Frame Frame;
 	PlayerRef Player;
+}
+
+synced event GameEnded {
+	Frame Frame;
+	int WinningTeam;
+	bool HasWinner;
 }

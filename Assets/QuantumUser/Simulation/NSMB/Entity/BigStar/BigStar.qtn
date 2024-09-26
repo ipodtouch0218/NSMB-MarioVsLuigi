@@ -16,6 +16,8 @@ component BigStar {
 	[ExcludeFromPrototype] bool FacingRight;
 }
 
+signal OnMarioPlayerCollectedStar(EntityRef entity);
+
 synced event MarioPlayerCollectedStar {
 	Frame Frame;
 	entity_ref Entity;

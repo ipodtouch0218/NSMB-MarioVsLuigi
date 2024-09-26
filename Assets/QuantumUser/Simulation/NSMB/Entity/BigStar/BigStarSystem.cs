@@ -110,6 +110,7 @@ namespace Quantum {
                 stage.ResetStage(f, false);
             }
 
+            f.Signals.OnMarioPlayerCollectedStar(info.Entity);
             f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario, f.Unsafe.GetPointer<Transform2D>(info.Other)->Position);
             f.Global->BigStarSpawnTimer = (ushort) (624 - (f.PlayerConnectedCount * 12));
             f.Destroy(info.Other);

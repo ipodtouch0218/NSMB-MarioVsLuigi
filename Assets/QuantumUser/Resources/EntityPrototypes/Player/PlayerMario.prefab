@@ -10494,67 +10494,6 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 4
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 11468
-        Y:
-          RawValue: 13763
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 13763
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
     LayerSource: 1
     Layer: 9
     CallbackFlags:
@@ -10695,6 +10634,8 @@ MonoBehaviour:
   models: {fileID: 8422425992379838812}
   entity: {fileID: 8832712012989740833}
   character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
+  playerElementsPrefab: {fileID: 2296227441865922173, guid: 18c3a33796560c4448895ccfbe44362c,
+    type: 3}
   coinNumberParticle: {fileID: 4677531960176377302, guid: 818e60315a414df48a229c8d1186ce98,
     type: 3}
   coinFromBlockParticle: {fileID: 4355208377719065490, guid: e55364fb26d178a4fbb31ba42edc3c9a,
@@ -10979,112 +10920,6 @@ MonoBehaviour:
     CharacterAsset:
       Id:
         Value: 532063855470386108
-    PlayerRef:
-      _index: 0
-    SpawnpointIndex: 0
-    Team: 0
-    CurrentPowerupState: 0
-    PreviousPowerupState: 0
-    ReserveItem:
-      Id:
-        Value: 0
-    Stars: 0
-    Coins: 0
-    Lives: 0
-    Disconnected:
-      Value: 0
-    IsDead:
-      Value: 0
-    FireDeath:
-      Value: 0
-    IsRespawning:
-      Value: 0
-    DeathAnimationFrames: 0
-    PreRespawnFrames: 0
-    RespawnFrames: 0
-    NoLivesStarDirection: 0
-    FacingRight:
-      Value: 0
-    IsSkidding:
-      Value: 0
-    IsTurnaround:
-      Value: 0
-    FastTurnaroundFrames: 0
-    SlowTurnaroundFrames: 0
-    JumpState: 0
-    PreviousJumpState: 0
-    JumpLandingFrames: 0
-    JumpBufferFrames: 0
-    CoyoteTimeFrames: 0
-    LandedFrame: 0
-    WasTouchingGroundLastFrame:
-      Value: 0
-    DoEntityBounce:
-      Value: 0
-    WallslideLeft:
-      Value: 0
-    WallslideRight:
-      Value: 0
-    WallslideEndFrames: 0
-    WalljumpFrames: 0
-    IsGroundpounding:
-      Value: 0
-    IsGroundpoundActive:
-      Value: 0
-    GroundpoundStartFrames: 0
-    GroundpoundCooldownFrames: 0
-    GroundpoundStandFrames: 0
-    WaterColliderCount: 0
-    SwimExitForceJump:
-      Value: 0
-    IsInKnockback:
-      Value: 0
-    IsInWeakKnockback:
-      Value: 0
-    KnockbackWasOriginallyFacingRight:
-      Value: 0
-    KnockbackTick: 0
-    DamageInvincibilityFrames: 0
-    IsCrouching:
-      Value: 0
-    IsSliding:
-      Value: 0
-    IsSpinnerFlying:
-      Value: 0
-    IsDrilling:
-      Value: 0
-    Combo: 0
-    InvincibilityFrames: 0
-    MegaMushroomStartFrames: 0
-    MegaMushroomFrames: 0
-    MegaMushroomEndFrames: 0
-    MegaMushroomStationaryEnd:
-      Value: 0
-    ProjectileDelayFrames: 0
-    ProjectileVolleyFrames: 0
-    CurrentProjectiles: 0
-    CurrentVolley: 0
-    IsInShell:
-      Value: 0
-    ShellSlowdownFrames: 0
-    IsPropellerFlying:
-      Value: 0
-    PropellerLaunchFrames: 0
-    PropellerSpinFrames: 0
-    UsedPropellerThisJump:
-      Value: 0
-    PropellerDrillCooldown: 0
-    HeldEntity: {fileID: 0}
-    CurrentPipe: {fileID: 0}
-    PipeDirection:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PipeEntering:
-      Value: 0
-    PipeFrames: 0
-    PipeCooldownFrames: 0
 --- !u!114 &8682297443920381521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11184,7 +11019,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    _empty_prototype_dummy_field_: 0
+    IceBlockSize:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    AutoBreakFrames: 0
+    AutoBreakGrabAdditionalFrames: 0
+    AutoBreakWhileHeld:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    IsCarryable:
+      Value: 0
+    IsFlying:
+      Value: 0
 --- !u!1 &4824223342336871188
 GameObject:
   m_ObjectHideFlags: 0

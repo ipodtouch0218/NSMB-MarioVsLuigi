@@ -5,6 +5,8 @@ using TMPro;
 
 using NSMB.Extensions;
 using NSMB.Translation;
+using Quantum;
+using NSMB.Utils;
 
 public class ChatMessage : MonoBehaviour {
 
@@ -54,11 +56,11 @@ public class ChatMessage : MonoBehaviour {
             return;
         }
 
-        // TODO image.color = Utils.GetPlayerColor(data.player, 0.2f);
+        image.color = Utils.GetPlayerColor(QuantumRunner.DefaultGame, data.player, 0.2f);
     }
 
     public class ChatMessageData {
-        public int playerNumber;
+        public PlayerRef player;
         public Color color;
         public bool isSystemMessage;
         public string message;

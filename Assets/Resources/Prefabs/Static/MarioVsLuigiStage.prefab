@@ -122,7 +122,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6560545802608712613}
   - component: {fileID: 2241726022772292916}
-  - component: {fileID: 4717264315283397726}
   - component: {fileID: 3376222087803369003}
   - component: {fileID: 3125791299856946878}
   m_Layer: 5
@@ -174,20 +173,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &4717264315283397726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1922647946039554095}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1390f3595be91c24886ec1b21b29068b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerElementsPrefab: {fileID: 2296227441865922173, guid: 18c3a33796560c4448895ccfbe44362c,
-    type: 3}
 --- !u!114 &3376222087803369003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -674,7 +659,7 @@ MonoBehaviour:
   RecordingFlags: -1
   InstantReplayConfig:
     SnapshotsPerSecond: 1
-    LenghtSeconds:
+    LengthSeconds:
       RawValue: 196608
   RuntimeConfig:
     Seed: 0
@@ -690,17 +675,23 @@ MonoBehaviour:
     IsRealGame: 0
   SessionConfig: {fileID: 11400000, guid: a095ff8a2ef576047bdebfec7a20e387, type: 2}
   LocalPlayers:
-  - PlayerNickname: 
+  - PlayerAvatar:
+      Id:
+        Value: 0
+    PlayerNickname: 
   MaxPlayerCount: 1
   SimulationSpeedMultiplier: 1
   DisplaySaveAndReloadButton: 0
   PreloadAddressables: 0
+  IsTaskProfilerEnabled: 0
   DynamicAssetDB:
     OnInitialDynamicAssetsRequested:
       m_PersistentCalls:
         m_Calls: []
     IsLegacyModeEnabled: 0
-  IsTaskProfilerEnabled: 0
+  OnBeforeStart:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &193195408209990055
 PrefabInstance:
   m_ObjectHideFlags: 0

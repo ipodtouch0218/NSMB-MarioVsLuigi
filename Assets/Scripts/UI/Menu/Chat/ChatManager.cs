@@ -36,14 +36,14 @@ public class ChatManager : MonoBehaviour {
         QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
     }
 
-    public void AddChatMessage(string message, int player, Color? color = null, bool filter = false) {
+    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
         if (filter) {
             message = message.Filter();
         }
 
         ChatMessage.ChatMessageData data = new() {
             isSystemMessage = false,
-            playerNumber = player,
+            player = player,
             color = color ?? Color.black,
             message = message,
         };
@@ -133,7 +133,7 @@ public class ChatManager : MonoBehaviour {
         if (data.isSystemMessage) {
             Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
         } else {
-            RuntimePlayer runtimeData = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(data.playerNumber);
+            RuntimePlayer runtimeData = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(data.player);
             Debug.Log($"[Chat] ({runtimeData.UserId}) {data.message}");
         }
     }

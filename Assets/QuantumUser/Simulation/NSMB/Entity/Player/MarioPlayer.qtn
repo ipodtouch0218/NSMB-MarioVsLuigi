@@ -19,109 +19,109 @@ input {
 component MarioPlayer {
     asset_ref<MarioPlayerPhysicsInfo> PhysicsAsset;
 	asset_ref<CharacterAsset> CharacterAsset;
-	PlayerRef PlayerRef;
-	byte SpawnpointIndex;
-	byte Team;
+	[ExcludeFromPrototype] PlayerRef PlayerRef;
+	[ExcludeFromPrototype] byte SpawnpointIndex;
+	[ExcludeFromPrototype] byte Team;
 
-	PowerupState CurrentPowerupState;
-	PowerupState PreviousPowerupState;
-	asset_ref<PowerupAsset> ReserveItem;
+	[ExcludeFromPrototype] PowerupState CurrentPowerupState;
+	[ExcludeFromPrototype] PowerupState PreviousPowerupState;
+	[ExcludeFromPrototype] asset_ref<PowerupAsset> ReserveItem;
 
-	byte Stars;
-	byte Coins;
-	byte Lives;
+	[ExcludeFromPrototype] byte Stars;
+	[ExcludeFromPrototype] byte Coins;
+	[ExcludeFromPrototype] byte Lives;
 
-	bool Disconnected;
-	bool IsDead;
-	bool FireDeath;
-	bool IsRespawning;
-	byte DeathAnimationFrames;
-	byte PreRespawnFrames;
-	byte RespawnFrames;
-	byte NoLivesStarDirection;
+	[ExcludeFromPrototype] bool Disconnected;
+	[ExcludeFromPrototype] bool IsDead;
+	[ExcludeFromPrototype] bool FireDeath;
+	[ExcludeFromPrototype] bool IsRespawning;
+	[ExcludeFromPrototype] byte DeathAnimationFrames;
+	[ExcludeFromPrototype] byte PreRespawnFrames;
+	[ExcludeFromPrototype] byte RespawnFrames;
+	[ExcludeFromPrototype] byte NoLivesStarDirection;
 
 	// Walk/Running
-    bool FacingRight;
-    bool IsSkidding;
-    bool IsTurnaround;
-    byte FastTurnaroundFrames;
-    byte SlowTurnaroundFrames;
+    [ExcludeFromPrototype] bool FacingRight;
+    [ExcludeFromPrototype] bool IsSkidding;
+    [ExcludeFromPrototype] bool IsTurnaround;
+    [ExcludeFromPrototype] byte FastTurnaroundFrames;
+    [ExcludeFromPrototype] byte SlowTurnaroundFrames;
 
 	// Jumping
-	JumpState JumpState;
-	JumpState PreviousJumpState;
-    byte JumpLandingFrames;
-	byte JumpBufferFrames;
-	byte CoyoteTimeFrames;
-	int LandedFrame;
-	bool WasTouchingGroundLastFrame;
-	bool DoEntityBounce;
+	[ExcludeFromPrototype] JumpState JumpState;
+	[ExcludeFromPrototype] JumpState PreviousJumpState;
+    [ExcludeFromPrototype] byte JumpLandingFrames;
+	[ExcludeFromPrototype] byte JumpBufferFrames;
+	[ExcludeFromPrototype] byte CoyoteTimeFrames;
+	[ExcludeFromPrototype] int LandedFrame;
+	[ExcludeFromPrototype] bool WasTouchingGroundLastFrame;
+	[ExcludeFromPrototype] bool DoEntityBounce;
 
 	// Wallslide
-	bool WallslideLeft;
-	bool WallslideRight;
-	byte WallslideEndFrames;
-    byte WalljumpFrames;
+	[ExcludeFromPrototype] bool WallslideLeft;
+	[ExcludeFromPrototype] bool WallslideRight;
+	[ExcludeFromPrototype] byte WallslideEndFrames;
+    [ExcludeFromPrototype] byte WalljumpFrames;
 
 	// Groundpound
-    bool IsGroundpounding;
-	bool IsGroundpoundActive;
-	byte GroundpoundStartFrames;
-	byte GroundpoundCooldownFrames;
-	byte GroundpoundStandFrames;
+    [ExcludeFromPrototype] bool IsGroundpounding;
+	[ExcludeFromPrototype] bool IsGroundpoundActive;
+	[ExcludeFromPrototype] byte GroundpoundStartFrames;
+	[ExcludeFromPrototype] byte GroundpoundCooldownFrames;
+	[ExcludeFromPrototype] byte GroundpoundStandFrames;
 
 	// Swimming
-	byte WaterColliderCount;
-	bool SwimExitForceJump;
+	[ExcludeFromPrototype] byte WaterColliderCount;
+	[ExcludeFromPrototype] bool SwimExitForceJump;
 
 	// Knockback
-    bool IsInKnockback;
-	bool IsInWeakKnockback;
-	bool KnockbackWasOriginallyFacingRight;
-	int KnockbackTick;
-	byte DamageInvincibilityFrames;
+    [ExcludeFromPrototype] bool IsInKnockback;
+	[ExcludeFromPrototype] bool IsInWeakKnockback;
+	[ExcludeFromPrototype] bool KnockbackWasOriginallyFacingRight;
+	[ExcludeFromPrototype] int KnockbackTick;
+	[ExcludeFromPrototype] byte DamageInvincibilityFrames;
 
 	// Crouching
-    bool IsCrouching;
-    bool IsSliding;
+    [ExcludeFromPrototype] bool IsCrouching;
+    [ExcludeFromPrototype] bool IsSliding;
 
 	// Block Interactions
-    bool IsSpinnerFlying;
-	bool IsDrilling;
+    [ExcludeFromPrototype] bool IsSpinnerFlying;
+	[ExcludeFromPrototype] bool IsDrilling;
 
 	// Powerups
-	byte Combo;
-    ushort InvincibilityFrames;
+	[ExcludeFromPrototype] byte Combo;
+    [ExcludeFromPrototype] ushort InvincibilityFrames;
 	
-	byte MegaMushroomStartFrames;
-	ushort MegaMushroomFrames;
-	byte MegaMushroomEndFrames;
-	bool MegaMushroomStationaryEnd;
+	[ExcludeFromPrototype] byte MegaMushroomStartFrames;
+	[ExcludeFromPrototype] ushort MegaMushroomFrames;
+	[ExcludeFromPrototype] byte MegaMushroomEndFrames;
+	[ExcludeFromPrototype] bool MegaMushroomStationaryEnd;
 
-	byte ProjectileDelayFrames;
-	byte ProjectileVolleyFrames;
-	byte CurrentProjectiles;
-	byte CurrentVolley;
+	[ExcludeFromPrototype] byte ProjectileDelayFrames;
+	[ExcludeFromPrototype] byte ProjectileVolleyFrames;
+	[ExcludeFromPrototype] byte CurrentProjectiles;
+	[ExcludeFromPrototype] byte CurrentVolley;
 
-    bool IsInShell;
-    byte ShellSlowdownFrames;
+    [ExcludeFromPrototype] bool IsInShell;
+    [ExcludeFromPrototype] byte ShellSlowdownFrames;
 
-    bool IsPropellerFlying;
-	byte PropellerLaunchFrames;
-	byte PropellerSpinFrames;
-	bool UsedPropellerThisJump;
-	byte PropellerDrillCooldown;
+    [ExcludeFromPrototype] bool IsPropellerFlying;
+	[ExcludeFromPrototype] byte PropellerLaunchFrames;
+	[ExcludeFromPrototype] byte PropellerSpinFrames;
+	[ExcludeFromPrototype] bool UsedPropellerThisJump;
+	[ExcludeFromPrototype] byte PropellerDrillCooldown;
 
-    entity_ref HeldEntity;
-	int HoldStartFrame;
+    [ExcludeFromPrototype] entity_ref HeldEntity;
+	[ExcludeFromPrototype] int HoldStartFrame;
 
-    entity_ref CurrentPipe;
-	FPVector2 PipeDirection;
-	bool PipeEntering;
-	byte PipeFrames;
-	byte PipeCooldownFrames;
+    [ExcludeFromPrototype] entity_ref CurrentPipe;
+	[ExcludeFromPrototype] FPVector2 PipeDirection;
+	[ExcludeFromPrototype] bool PipeEntering;
+	[ExcludeFromPrototype] byte PipeFrames;
+	[ExcludeFromPrototype] byte PipeCooldownFrames;
 
-	entity_ref CurrentSpinner;
+	[ExcludeFromPrototype] entity_ref CurrentSpinner;
 }
 
 event MarioPlayerJumped {
@@ -198,6 +198,8 @@ synced event MarioPlayerDied {
 	bool IsLava;
 	MarioPlayer Mario;
 }
+
+signal OnMarioPlayerDied(EntityRef entity);
 
 event MarioPlayerDeathUp {
 	nothashed Frame Frame;

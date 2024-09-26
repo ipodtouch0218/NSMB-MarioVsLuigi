@@ -1,7 +1,9 @@
+using Photon.Deterministic;
 using UnityEngine;
 
 namespace Quantum {
-    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved {
+    public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
+        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
@@ -21,8 +23,8 @@ namespace Quantum {
                         playerData->Ping = updatePing.PingMs;
                         f.Events.PlayerDataChanged(f, i);
                         break;
-                    case CommandToggleReady:
-                        playerData->IsReady = !playerData->IsReady;
+                    case CommandSetInSettings setInSettings:
+                        playerData->IsInSettings = setInSettings.InSettings;
                         f.Events.PlayerDataChanged(f, i);
                         break;
                     }
@@ -63,8 +65,8 @@ namespace Quantum {
                         playerData->LastChatMessage = f.Number;
                         f.Events.PlayerSentChatMessage(f, i, chatMessage.Message);
                         break;
-                    case CommandSetInSettings setInSettings:
-                        playerData->IsInSettings = setInSettings.InSettings;
+                    case CommandToggleReady:
+                        playerData->IsReady = !playerData->IsReady;
                         f.Events.PlayerDataChanged(f, i);
                         break;
                     case CommandToggleCountdown:
@@ -180,7 +182,9 @@ namespace Quantum {
                     f.Global->GameState = GameState.Starting;
                     f.Global->GameStartFrames = 3 * 60 + 78;
                     f.Global->Timer = f.Global->Rules.TimerSeconds;
-                    f.Events.GameStateChanged(f, GameState.Starting);  
+
+                    f.Signals.OnLoadingComplete();
+                    f.Events.GameStateChanged(f, GameState.Starting);
                 } else {
                     // TODO Time out if players don't send a "ready" command in time
                 }
@@ -189,8 +193,8 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                     // Now playing
                     f.Global->GameState = GameState.Playing;
-                    f.Global->StartFrame = f.Number;
                     f.Events.GameStateChanged(f, GameState.Playing);
+                    f.Global->StartFrame = f.Number;
 
                 } else if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
@@ -203,14 +207,101 @@ namespace Quantum {
                 if (f.Global->Rules.TimerSeconds > 0 && f.Global->Timer > 0) {
                     if ((f.Global->Timer -= f.DeltaTime) <= 0) {
                         f.Global->Timer = 0;
-                        // ...
+                        CheckForGameEnd(f);
+                        f.Events.TimerExpired(f);
                     }
                 }
                 break;
 
             case GameState.Ended:
+                if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
+                    // Move back to lobby.
+                    f.SystemEnable<GameplaySystemGroup>();
+                    if (f.IsVerified) {
+                        f.Map = null;
+                        Debug.Log("map = null");
+                    }
+                    f.Signals.OnReturnToRoom();
+                    f.Global->GameState = GameState.PreGameRoom;
+                    f.Events.GameStateChanged(f, GameState.PreGameRoom);
+                    f.SystemDisable<GameplaySystemGroup>();
+                }
                 break;
             }
+        }
+
+        public static void CheckForGameEnd(Frame f) {
+            
+            // End Condition: only one team alive
+            var marioFilter = f.Filter<MarioPlayer>();
+            bool livesGame = f.Global->Rules.IsLivesEnabled;
+
+            bool oneOrNoTeamAlive = true;
+            int aliveTeam = -1;
+            while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
+                if (livesGame && mario->Lives <= 0) {
+                    continue;
+                }
+
+                if (aliveTeam == -1) {
+                    aliveTeam = mario->Team;
+                } else {
+                    oneOrNoTeamAlive = false;
+                    break;
+                }
+            }
+
+            if (oneOrNoTeamAlive) {
+                if (aliveTeam == -1) {
+                    // It's a draw
+                    EndGame(f, null);
+                    return;
+                } else if (f.Global->RealPlayers > 1) {
+                    // <team> wins, assuming more than 1 player
+                    // so the player doesn't insta-win in a solo game.
+                    EndGame(f, aliveTeam);
+                    return;
+                }
+            }
+
+            int? winningTeam = QuantumUtils.GetWinningTeam(f, out int stars);
+
+            // End Condition: team gets to 10+ stars
+            if (winningTeam != null && stars >= f.Global->Rules.StarsToWin) {
+                // <team> wins
+                EndGame(f, winningTeam.Value);
+                return;
+            }
+
+            // End Condition: timer expires
+            if (f.Global->Timer <= 0) {
+                if (f.Global->Rules.DrawOnTimeUp) {
+                    // It's a draw
+                    EndGame(f, null);
+                    return;
+                }
+
+                // Check if one team is winning
+                if (winningTeam != null) {
+                    // <team> wins
+                    EndGame(f, winningTeam.Value);
+                    return;
+                }
+            }
+        }
+
+        public static void EndGame(Frame f, int? winningTeam) {
+            f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
+            f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
+
+            f.Global->GameState = GameState.Ended;
+            f.Events.GameStateChanged(f, GameState.Ended);
+            f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);
+            f.SystemDisable<GameplaySystemGroup>();
+        }
+
+        public void OnMarioPlayerDied(Frame f, EntityRef entity) {
+            CheckForGameEnd(f);
         }
 
         public void OnPlayerAdded(Frame f, PlayerRef player, bool firstTime) {
@@ -261,6 +352,34 @@ namespace Quantum {
             }
 
             f.Events.PlayerRemoved(f, player);
+        }
+
+        public void OnLoadingComplete(Frame f) {
+            // Spawn players
+            var config = f.SimulationConfig;
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var playerDatas = f.Filter<PlayerData>();
+            int teamCounter = 0;
+            while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                if (data->IsSpectator) {
+                    continue;
+                }
+
+                int characterIndex = FPMath.Clamp(data->Character, 0, config.CharacterDatas.Length - 1);
+                CharacterAsset character = config.CharacterDatas[characterIndex];
+
+                EntityRef newPlayer = f.Create(character.Prototype);
+                var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
+                mario->PlayerRef = data->PlayerRef;
+                mario->Team = (byte) (f.Global->Rules.TeamsEnabled ? data->Team : teamCounter++);
+
+                var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
+                newTransform->Position = stage.Spawnpoint;
+            }
+        }
+
+        public void OnMarioPlayerCollectedStar(Frame f, EntityRef entity) {
+            CheckForGameEnd(f);
         }
     }
 }

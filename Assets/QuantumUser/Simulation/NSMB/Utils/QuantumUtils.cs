@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static unsafe class QuantumUtils {
@@ -171,13 +172,59 @@ public static unsafe class QuantumUtils {
         Right
     }
 
+    public static int? GetWinningTeam(Frame f, out int winningStars) {
+        winningStars = 0;
+        int? winningTeam = null;
+        bool tie = false;
+
+        Dictionary<int, int> teamStars = GetTeamStars(f);
+        foreach ((int team, int stars) in teamStars) {
+
+            if (winningTeam == null) {
+                winningTeam = team;
+                winningStars = stars;
+                tie = false;
+            } else if (stars > winningStars) {
+                winningTeam = team;
+                winningStars = stars;
+                tie = false;
+            } else if (stars == winningStars) {
+                tie = true;   
+            }
+        }
+
+        return tie ? null : winningTeam;
+    }
+
+    public static Dictionary<int,int> GetTeamStars(Frame f) {
+        Dictionary<int, int> stars = new();
+
+        var allPlayers = f.Filter<MarioPlayer>();
+        while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
+            if (!stars.ContainsKey(mario->Team)) {
+                stars[mario->Team] = 0;
+            }
+
+            if (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+                continue;
+            }
+
+            stars[mario->Team] += mario->Stars;
+        }
+
+        return stars;
+    }
+
     public static int GetTeamStars(Frame f, int team) {
         int sum = 0;
         var allPlayers = f.Filter<MarioPlayer>();
-        while (allPlayers.Next(out _, out MarioPlayer mario)) {
-            if (mario.Team == team) {
-                sum += mario.Stars;
+        while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
+            if (mario->Team != team
+                || mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+                continue;
             }
+
+            sum += mario->Stars;
         }
 
         return sum;

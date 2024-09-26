@@ -1560,154 +1560,229 @@ namespace Quantum {
     [FieldOffset(176)]
     public AssetRef<CharacterAsset> CharacterAsset;
     [FieldOffset(68)]
+    [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
     [FieldOffset(28)]
+    [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
     [FieldOffset(30)]
+    [ExcludeFromPrototype()]
     public Byte Team;
     [FieldOffset(44)]
+    [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
     [FieldOffset(48)]
+    [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
     [FieldOffset(192)]
+    [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
     [FieldOffset(29)]
+    [ExcludeFromPrototype()]
     public Byte Stars;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte Coins;
     [FieldOffset(13)]
+    [ExcludeFromPrototype()]
     public Byte Lives;
     [FieldOffset(72)]
+    [ExcludeFromPrototype()]
     public QBoolean Disconnected;
     [FieldOffset(92)]
+    [ExcludeFromPrototype()]
     public QBoolean IsDead;
     [FieldOffset(84)]
+    [ExcludeFromPrototype()]
     public QBoolean FireDeath;
     [FieldOffset(124)]
+    [ExcludeFromPrototype()]
     public QBoolean IsRespawning;
     [FieldOffset(6)]
+    [ExcludeFromPrototype()]
     public Byte DeathAnimationFrames;
     [FieldOffset(19)]
+    [ExcludeFromPrototype()]
     public Byte PreRespawnFrames;
     [FieldOffset(25)]
+    [ExcludeFromPrototype()]
     public Byte RespawnFrames;
     [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public Byte NoLivesStarDirection;
     [FieldOffset(80)]
+    [ExcludeFromPrototype()]
     public QBoolean FacingRight;
     [FieldOffset(128)]
+    [ExcludeFromPrototype()]
     public QBoolean IsSkidding;
     [FieldOffset(140)]
+    [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
     [FieldOffset(7)]
+    [ExcludeFromPrototype()]
     public Byte FastTurnaroundFrames;
     [FieldOffset(27)]
+    [ExcludeFromPrototype()]
     public Byte SlowTurnaroundFrames;
     [FieldOffset(36)]
+    [ExcludeFromPrototype()]
     public JumpState JumpState;
     [FieldOffset(40)]
+    [ExcludeFromPrototype()]
     public JumpState PreviousJumpState;
     [FieldOffset(12)]
+    [ExcludeFromPrototype()]
     public Byte JumpLandingFrames;
     [FieldOffset(11)]
+    [ExcludeFromPrototype()]
     public Byte JumpBufferFrames;
     [FieldOffset(2)]
+    [ExcludeFromPrototype()]
     public Byte CoyoteTimeFrames;
     [FieldOffset(64)]
+    [ExcludeFromPrototype()]
     public Int32 LandedFrame;
     [FieldOffset(172)]
+    [ExcludeFromPrototype()]
     public QBoolean WasTouchingGroundLastFrame;
     [FieldOffset(76)]
+    [ExcludeFromPrototype()]
     public QBoolean DoEntityBounce;
     [FieldOffset(164)]
+    [ExcludeFromPrototype()]
     public QBoolean WallslideLeft;
     [FieldOffset(168)]
+    [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
     [FieldOffset(32)]
+    [ExcludeFromPrototype()]
     public Byte WallslideEndFrames;
     [FieldOffset(31)]
+    [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
     [FieldOffset(104)]
+    [ExcludeFromPrototype()]
     public QBoolean IsGroundpounding;
     [FieldOffset(100)]
+    [ExcludeFromPrototype()]
     public QBoolean IsGroundpoundActive;
     [FieldOffset(10)]
+    [ExcludeFromPrototype()]
     public Byte GroundpoundStartFrames;
     [FieldOffset(8)]
+    [ExcludeFromPrototype()]
     public Byte GroundpoundCooldownFrames;
     [FieldOffset(9)]
+    [ExcludeFromPrototype()]
     public Byte GroundpoundStandFrames;
     [FieldOffset(33)]
+    [ExcludeFromPrototype()]
     public Byte WaterColliderCount;
     [FieldOffset(156)]
+    [ExcludeFromPrototype()]
     public QBoolean SwimExitForceJump;
     [FieldOffset(108)]
+    [ExcludeFromPrototype()]
     public QBoolean IsInKnockback;
     [FieldOffset(116)]
+    [ExcludeFromPrototype()]
     public QBoolean IsInWeakKnockback;
     [FieldOffset(144)]
+    [ExcludeFromPrototype()]
     public QBoolean KnockbackWasOriginallyFacingRight;
     [FieldOffset(60)]
+    [ExcludeFromPrototype()]
     public Int32 KnockbackTick;
     [FieldOffset(5)]
+    [ExcludeFromPrototype()]
     public Byte DamageInvincibilityFrames;
     [FieldOffset(88)]
+    [ExcludeFromPrototype()]
     public QBoolean IsCrouching;
     [FieldOffset(132)]
+    [ExcludeFromPrototype()]
     public QBoolean IsSliding;
     [FieldOffset(136)]
+    [ExcludeFromPrototype()]
     public QBoolean IsSpinnerFlying;
     [FieldOffset(96)]
+    [ExcludeFromPrototype()]
     public QBoolean IsDrilling;
     [FieldOffset(1)]
+    [ExcludeFromPrototype()]
     public Byte Combo;
     [FieldOffset(50)]
+    [ExcludeFromPrototype()]
     public UInt16 InvincibilityFrames;
     [FieldOffset(15)]
+    [ExcludeFromPrototype()]
     public Byte MegaMushroomStartFrames;
     [FieldOffset(52)]
+    [ExcludeFromPrototype()]
     public UInt16 MegaMushroomFrames;
     [FieldOffset(14)]
+    [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
     [FieldOffset(148)]
+    [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
     [FieldOffset(20)]
+    [ExcludeFromPrototype()]
     public Byte ProjectileDelayFrames;
     [FieldOffset(21)]
+    [ExcludeFromPrototype()]
     public Byte ProjectileVolleyFrames;
     [FieldOffset(3)]
+    [ExcludeFromPrototype()]
     public Byte CurrentProjectiles;
     [FieldOffset(4)]
+    [ExcludeFromPrototype()]
     public Byte CurrentVolley;
     [FieldOffset(112)]
+    [ExcludeFromPrototype()]
     public QBoolean IsInShell;
     [FieldOffset(26)]
+    [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
     [FieldOffset(120)]
+    [ExcludeFromPrototype()]
     public QBoolean IsPropellerFlying;
     [FieldOffset(23)]
+    [ExcludeFromPrototype()]
     public Byte PropellerLaunchFrames;
     [FieldOffset(24)]
+    [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
     [FieldOffset(160)]
+    [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(22)]
+    [ExcludeFromPrototype()]
     public Byte PropellerDrillCooldown;
     [FieldOffset(216)]
+    [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
     [FieldOffset(56)]
+    [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
     [FieldOffset(200)]
+    [ExcludeFromPrototype()]
     public EntityRef CurrentPipe;
     [FieldOffset(224)]
+    [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
     [FieldOffset(152)]
+    [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
     [FieldOffset(18)]
+    [ExcludeFromPrototype()]
     public Byte PipeFrames;
     [FieldOffset(17)]
+    [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
     [FieldOffset(208)]
+    [ExcludeFromPrototype()]
     public EntityRef CurrentSpinner;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -2296,6 +2371,9 @@ namespace Quantum {
         var p = (WrappingObject*)ptr;
     }
   }
+  public unsafe partial interface ISignalOnMarioPlayerCollectedStar : ISignal {
+    void OnMarioPlayerCollectedStar(Frame f, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnEntityBumped : ISignal {
     void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump);
   }
@@ -2317,8 +2395,17 @@ namespace Quantum {
   public unsafe partial interface ISignalOnEnemyEnemyCollision : ISignal {
     void OnEnemyEnemyCollision(Frame f, EntityRef a, EntityRef b);
   }
+  public unsafe partial interface ISignalOnLoadingComplete : ISignal {
+    void OnLoadingComplete(Frame f);
+  }
   public unsafe partial interface ISignalOnGameStarting : ISignal {
     void OnGameStarting(Frame f);
+  }
+  public unsafe partial interface ISignalOnGameEnding : ISignal {
+    void OnGameEnding(Frame f, Int32 winningTeam, QBoolean hasWinner);
+  }
+  public unsafe partial interface ISignalOnReturnToRoom : ISignal {
+    void OnReturnToRoom(Frame f);
   }
   public unsafe partial interface ISignalOnThrowHoldable : ISignal {
     void OnThrowHoldable(Frame f, EntityRef entity, EntityRef mario, QBoolean crouching, QBoolean dropped);
@@ -2331,6 +2418,9 @@ namespace Quantum {
   }
   public unsafe partial interface ISignalOnTryLiquidSplash : ISignal {
     void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, QBoolean exit, bool* doSplash);
+  }
+  public unsafe partial interface ISignalOnMarioPlayerDied : ISignal {
+    void OnMarioPlayerDied(Frame f, EntityRef entity);
   }
   public unsafe partial interface ISignalOnBeforePhysicsCollision : ISignal {
     void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision);
@@ -2345,6 +2435,7 @@ namespace Quantum {
     public const Int32 maxplayers = 10;
   }
   public unsafe partial class Frame {
+    private ISignalOnMarioPlayerCollectedStar[] _ISignalOnMarioPlayerCollectedStarSystems;
     private ISignalOnEntityBumped[] _ISignalOnEntityBumpedSystems;
     private ISignalOnBobombExplodeEntity[] _ISignalOnBobombExplodeEntitySystems;
     private ISignalOnBreakableObjectChangedHeight[] _ISignalOnBreakableObjectChangedHeightSystems;
@@ -2352,11 +2443,15 @@ namespace Quantum {
     private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
     private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
     private ISignalOnEnemyEnemyCollision[] _ISignalOnEnemyEnemyCollisionSystems;
+    private ISignalOnLoadingComplete[] _ISignalOnLoadingCompleteSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
+    private ISignalOnGameEnding[] _ISignalOnGameEndingSystems;
+    private ISignalOnReturnToRoom[] _ISignalOnReturnToRoomSystems;
     private ISignalOnThrowHoldable[] _ISignalOnThrowHoldableSystems;
     private ISignalOnIceBlockBroken[] _ISignalOnIceBlockBrokenSystems;
     private ISignalOnBeforeInteraction[] _ISignalOnBeforeInteractionSystems;
     private ISignalOnTryLiquidSplash[] _ISignalOnTryLiquidSplashSystems;
+    private ISignalOnMarioPlayerDied[] _ISignalOnMarioPlayerDiedSystems;
     private ISignalOnBeforePhysicsCollision[] _ISignalOnBeforePhysicsCollisionSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
     private ISignalOnTileChanged[] _ISignalOnTileChangedSystems;
@@ -2371,6 +2466,7 @@ namespace Quantum {
     }
     partial void InitGen() {
       Initialize(this, this.SimulationConfig.Entities, 256);
+      _ISignalOnMarioPlayerCollectedStarSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedStar>();
       _ISignalOnEntityBumpedSystems = BuildSignalsArray<ISignalOnEntityBumped>();
       _ISignalOnBobombExplodeEntitySystems = BuildSignalsArray<ISignalOnBobombExplodeEntity>();
       _ISignalOnBreakableObjectChangedHeightSystems = BuildSignalsArray<ISignalOnBreakableObjectChangedHeight>();
@@ -2378,11 +2474,15 @@ namespace Quantum {
       _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
       _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
       _ISignalOnEnemyEnemyCollisionSystems = BuildSignalsArray<ISignalOnEnemyEnemyCollision>();
+      _ISignalOnLoadingCompleteSystems = BuildSignalsArray<ISignalOnLoadingComplete>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
+      _ISignalOnGameEndingSystems = BuildSignalsArray<ISignalOnGameEnding>();
+      _ISignalOnReturnToRoomSystems = BuildSignalsArray<ISignalOnReturnToRoom>();
       _ISignalOnThrowHoldableSystems = BuildSignalsArray<ISignalOnThrowHoldable>();
       _ISignalOnIceBlockBrokenSystems = BuildSignalsArray<ISignalOnIceBlockBroken>();
       _ISignalOnBeforeInteractionSystems = BuildSignalsArray<ISignalOnBeforeInteraction>();
       _ISignalOnTryLiquidSplashSystems = BuildSignalsArray<ISignalOnTryLiquidSplash>();
+      _ISignalOnMarioPlayerDiedSystems = BuildSignalsArray<ISignalOnMarioPlayerDied>();
       _ISignalOnBeforePhysicsCollisionSystems = BuildSignalsArray<ISignalOnBeforePhysicsCollision>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
       _ISignalOnTileChangedSystems = BuildSignalsArray<ISignalOnTileChanged>();
@@ -2514,6 +2614,15 @@ namespace Quantum {
       Physics3D.Init(_globals->PhysicsState3D.MapStaticCollidersState.TrackedMap);
     }
     public unsafe partial struct FrameSignals {
+      public void OnMarioPlayerCollectedStar(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerCollectedStarSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerCollectedStar(_f, entity);
+          }
+        }
+      }
       public void OnEntityBumped(EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump) {
         var array = _f._ISignalOnEntityBumpedSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
@@ -2577,12 +2686,39 @@ namespace Quantum {
           }
         }
       }
+      public void OnLoadingComplete() {
+        var array = _f._ISignalOnLoadingCompleteSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnLoadingComplete(_f);
+          }
+        }
+      }
       public void OnGameStarting() {
         var array = _f._ISignalOnGameStartingSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnGameStarting(_f);
+          }
+        }
+      }
+      public void OnGameEnding(Int32 winningTeam, QBoolean hasWinner) {
+        var array = _f._ISignalOnGameEndingSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnGameEnding(_f, winningTeam, hasWinner);
+          }
+        }
+      }
+      public void OnReturnToRoom() {
+        var array = _f._ISignalOnReturnToRoomSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnReturnToRoom(_f);
           }
         }
       }
@@ -2619,6 +2755,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnTryLiquidSplash(_f, entity, liquid, exit, doSplash);
+          }
+        }
+      }
+      public void OnMarioPlayerDied(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerDiedSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerDied(_f, entity);
           }
         }
       }

@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Photon.Deterministic;
+using Photon.Realtime;
 using Quantum;
 using System;
 using System.Collections;
@@ -12,7 +13,6 @@ namespace NSMB.Entities.Player {
     public unsafe class MarioAnimator : QuantumCallbacks {
 
         //---Static
-        public static event Action<Frame, MarioAnimator> MarioPlayerInitialized;
         public static event Action<Frame, MarioAnimator> MarioPlayerDestroyed;
 
         //---Static Variables
@@ -70,6 +70,7 @@ namespace NSMB.Entities.Player {
         //---Serialized Variables
         [SerializeField] public QuantumEntityView entity;
         [SerializeField] private CharacterAsset character;
+        [SerializeField] private PlayerElements playerElementsPrefab;
         [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
@@ -149,29 +150,25 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerStoppedSliding>(this, OnMarioPlayerStoppedSliding);
             QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner);
             QuantumEvent.Subscribe<EventMarioPlayerDeathUp>(this, OnMarioPlayerDeathUp);
-
-            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
 
         public void Initialize(QuantumGame game) {
             Frame f = game.Frames.Predicted;
             var mario = f.Get<MarioPlayer>(entity.EntityRef);
-            var playerData = f.Get<PlayerData>(f.ResolveDictionary(f.Global->PlayerDatas)[mario.PlayerRef]);
+            var playerData = QuantumUtils.GetPlayerData(f, mario.PlayerRef);
 
-            if (ScriptableManager.Instance.skins[playerData.Skin] is PlayerColorSet colorSet) {
+            var skins = ScriptableManager.Instance.skins;
+            if (skins[Mathf.Clamp(playerData->Skin, 0, skins.Length - 1)] is PlayerColorSet colorSet) {
                 skin = colorSet.GetPlayerColors(character);
             }
 
             GlowColor = Utils.Utils.GetPlayerColor(game, mario.PlayerRef);
+            stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            foreach (PlayerElements pe in PlayerElements.AllPlayerElements) {
-                if (pe.Player == mario.PlayerRef) {
-                    pe.SetEntity(entity.EntityRef);
-                    break;
-                }
+            if (game.PlayerIsLocal(mario.PlayerRef)) {
+                PlayerElements elements = Instantiate(playerElementsPrefab, GameObject.FindGameObjectWithTag("MasterCanvas").transform);
+                elements.Initialize(entity.EntityRef, mario.PlayerRef);
             }
-
-            MarioPlayerInitialized?.Invoke(game.Frames.Verified, this);
         }
 
         public void Destroy(QuantumGame game) {
@@ -489,7 +486,7 @@ namespace NSMB.Entities.Player {
                 AnimatorStateInfo[] layerInfo = new AnimatorStateInfo[animator.layerCount];
                 for (int i = 0; i < animator.layerCount; i++) {
                     layerInfo[i] = animator.GetCurrentAnimatorStateInfo(i);
-                    Debug.Log(i + " - " + layerInfo[i].fullPathHash);
+                    //Debug.Log(i + " - " + layerInfo[i].fullPathHash);
                 }
 
                 animator.avatar = targetAvatar;
@@ -501,7 +498,7 @@ namespace NSMB.Entities.Player {
                 for (int i = 0; i < animator.layerCount; i++) {
                     animator.Play(layerInfo[i].fullPathHash, i, layerInfo[i].normalizedTime);
                     animator.Update(0);
-                    Debug.Log(i + " -" + animator.GetCurrentAnimatorStateInfo(i).fullPathHash);
+                    //Debug.Log(i + " -" + animator.GetCurrentAnimatorStateInfo(i).fullPathHash);
                 }
 
                 animator.Update(0);

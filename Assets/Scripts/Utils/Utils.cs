@@ -440,6 +440,10 @@ namespace NSMB.Utils {
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public unsafe static Color GetPlayerColor(QuantumGame game, PlayerRef player, float s = 1, float v = 1) {
+            if (game == null) {
+                return spectatorColor;
+            }
+
             Frame f = game.Frames.Predicted;
 
             // Prioritize spectator status

@@ -4,6 +4,7 @@ using NSMB.Utils;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -44,8 +45,6 @@ public class UIUpdater : QuantumCallbacks {
 
     protected override void OnEnable() {
         base.OnEnable();
-
-        MarioAnimator.MarioPlayerInitialized += OnMarioInitialized;
         MarioAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
         BigStarAnimator.BigStarInitialized += OnStarInitialized;
         BigStarAnimator.BigStarDestroyed += OnStarDestroyed;
@@ -55,8 +54,6 @@ public class UIUpdater : QuantumCallbacks {
 
     protected override void OnDisable() {
         base.OnDisable();
-
-        MarioAnimator.MarioPlayerInitialized -= OnMarioInitialized;
         MarioAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
         BigStarAnimator.BigStarInitialized -= OnStarInitialized;
         BigStarAnimator.BigStarDestroyed -= OnStarDestroyed;
@@ -77,17 +74,17 @@ public class UIUpdater : QuantumCallbacks {
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+        PlayerTrackIcon.HideAllPlayerIcons = stage.HidePlayersOnMinimap;
     }
 
     public void Start() {
+        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
         boos.SetActive(stage.HidePlayersOnMinimap);
         StartCoroutine(UpdatePingTextCoroutine());
     }
 
     public override void OnUpdateView(QuantumGame game) {
-        // PlayerTrackIcon.HideAllPlayerIcons = !GameManager.Instance.spectationManager.Spectating && GameManager.Instance.hidePlayersOnMinimap;
-
         Frame f = game.Frames.Predicted;
         UpdateTrackIcons(f);
 
@@ -113,10 +110,6 @@ public class UIUpdater : QuantumCallbacks {
         UpdateStoredItemUI(mario);
         UpdateTextUI(f, mario);
         ApplyUIColor(f, mario);
-    }
-
-    private void OnMarioInitialized(Frame f, MarioAnimator mario) {
-        entityTrackIcons[mario] = CreateTrackIcon(f, mario.entity.EntityRef, mario.transform);
     }
 
     private void OnMarioDestroyed(Frame f, MarioAnimator mario) {
@@ -281,6 +274,14 @@ public class UIUpdater : QuantumCallbacks {
     }
 
     //---Callbacks
+    private void OnGameStateChanged(EventGameStateChanged e) {
+        if (e.NewState == GameState.Starting) {
+            foreach (var mario in FindObjectsOfType<MarioAnimator>()) {
+                entityTrackIcons[mario] = CreateTrackIcon(e.Frame, mario.entity.EntityRef, mario.transform);
+            }
+        }
+    }
+
     private void OnLanguageChanged(TranslationManager tm) {
         UpdatePingText();
     }
@@ -311,8 +312,11 @@ public class UIUpdater : QuantumCallbacks {
     }
 
     public void OnReserveItemIconClicked() {
-        if (QuantumRunner.DefaultGame is QuantumGame game) {
-            game.SendCommand(new CommandSpawnReserveItem());
+        if (QuantumRunner.DefaultGame == null) {
+            return;
         }
+
+        QuantumGame game = QuantumRunner.DefaultGame;
+        game.SendCommand(new CommandSpawnReserveItem());
     }
 }

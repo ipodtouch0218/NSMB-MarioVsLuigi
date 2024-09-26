@@ -18,6 +18,7 @@ public class MusicManager : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
@@ -76,6 +77,10 @@ public class MusicManager : MonoBehaviour {
         }
 
         musicPlayer.FastMusic = speedup;
+    }
+
+    private void OnGameEnded(EventGameEnded e) {
+        musicPlayer.Stop();
     }
 
     private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {

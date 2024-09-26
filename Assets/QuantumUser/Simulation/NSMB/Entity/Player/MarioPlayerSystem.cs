@@ -1463,28 +1463,7 @@ namespace Quantum {
         }
 
         public void OnGameStarting(Frame f) {
-            // Spawn players
-            var config = f.SimulationConfig;
-            var playerDatas = f.Filter<PlayerData>();
-            int teamCounter = 0;
-            while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
-                if (data->IsSpectator) {
-                    continue;
-                }
-
-                int characterIndex = Mathf.Clamp(data->Character, 0, config.CharacterDatas.Length - 1);
-                CharacterAsset character = config.CharacterDatas[characterIndex];
-
-                EntityRef newPlayer = f.Create(character.Prototype);
-                var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
-                mario->PlayerRef = data->PlayerRef;
-                mario->Team = (byte) (f.Global->Rules.TeamsEnabled ? data->Team : teamCounter++);
-                
-                var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
-                newTransform->Position = f.FindAsset<VersusStageData>(f.Map.UserAsset).Spawnpoint;
-            }
-
-            // And respawn them
+            // Respawn players
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var filter = f.Filter<MarioPlayer>();
             while (filter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {

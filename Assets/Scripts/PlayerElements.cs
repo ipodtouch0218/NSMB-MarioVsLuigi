@@ -40,15 +40,13 @@ public class PlayerElements : MonoBehaviour {
         AllPlayerElements.Remove(this);
     }
 
-    public void Initialize(PlayerRef player) {
+    public void Initialize(EntityRef entity, PlayerRef player) {
         this.player = player;
-        Camera.transform.SetParent(null);
-        Camera.transform.localScale = Vector3.one;
-    }
-
-    public void SetEntity(EntityRef entity) {
         this.entity = entity;
         uiUpdater.Target = entity;
+        
         cameraAnimator.Target = entity;
+        Camera.transform.SetParent(null);
+        Camera.transform.localScale = Vector3.one;
     }
 }
