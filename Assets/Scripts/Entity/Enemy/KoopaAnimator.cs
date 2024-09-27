@@ -37,10 +37,16 @@ public class KoopaAnimator : MonoBehaviour {
         QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound);
     }
 
-    private void OnUpdateView(CallbackUpdateView e) {
+    private unsafe void OnUpdateView(CallbackUpdateView e) {
         QuantumGame game = e.Game;
         Frame f = game.Frames.Predicted;
+
         if (!f.Exists(entity.EntityRef)) {
+            return;
+        }
+
+        if (f.Global->GameState >= GameState.Ended) {
+            animator.speed = 0;
             return;
         }
 

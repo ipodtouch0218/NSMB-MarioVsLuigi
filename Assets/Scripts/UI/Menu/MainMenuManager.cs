@@ -193,15 +193,25 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public unsafe void EnterRoom() {
+        public unsafe void InitializeRoom() {
             // Chat
             chatTextField.SetTextWithoutNotify("");
-            
-            // Open the in-room menu
-            OpenInRoomMenu();
 
             // Host reminder
             SendHostReminder();
+
+            // Set the player settings
+            SwapCharacter(Settings.Instance.generalCharacter, false);
+            SwapPlayerSkin(Settings.Instance.generalSkin, false);
+            spectateToggle.isOn = false;
+
+            // Create player icons
+            playerList.PopulatePlayerEntries(QuantumRunner.DefaultGame);
+        }
+
+        public unsafe void EnterRoom() {
+            // Open the in-room menu
+            OpenInRoomMenu();
 
             // Fix the damned setting scroll menu
             StartCoroutine(SetVerticalNormalizedPositionFix(settingsScroll, 1));
@@ -212,13 +222,7 @@ namespace NSMB.UI.MainMenu {
             PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
             bool isHost = game.PlayerIsLocal(hostPlayer);
             hostControlsGroup.interactable = isHost;
-
             roomSettingsCallbacks.RefreshSettingsUI(f, false);
-
-            // Set the player settings
-            SwapCharacter(Settings.Instance.generalCharacter, false);
-            SwapPlayerSkin(Settings.Instance.generalSkin, false);
-            spectateToggle.isOn = false;
 
             // Reset the "Game start" button counting down
             OnCountdownTick(-1);
@@ -228,9 +232,6 @@ namespace NSMB.UI.MainMenu {
 
             // Discord RPC
             GlobalController.Instance.discordController.UpdateActivity();
-
-            // Create player icons
-            playerList.PopulatePlayerEntries(QuantumRunner.DefaultGame);
         }
 
         public void UpdateRoomHeader() {
@@ -729,6 +730,7 @@ namespace NSMB.UI.MainMenu {
             });
 
             if (e.Game.PlayerIsLocal(e.Player) && !alreadyInRoom) {
+                InitializeRoom();
                 EnterRoom();
                 alreadyInRoom = true;
             }
@@ -797,6 +799,7 @@ namespace NSMB.UI.MainMenu {
                 transform.parent.gameObject.SetActive(false);
             } else if (e.NewState == GameState.PreGameRoom) {
                 transform.parent.gameObject.SetActive(true);
+                EnterRoom();
             }
         }
 

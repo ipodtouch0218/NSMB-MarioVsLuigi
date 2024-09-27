@@ -9,8 +9,8 @@ namespace Quantum {
         }
 
         public void OnMapChanged(Frame f, AssetRef<Map> previousMap) {
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            if (!stage) {
+            if (!f.Map || !f.TryFindAsset<VersusStageData>(f.Map.UserAsset, out _)) {
+                // Not a valid VersusStage
                 f.StageTiles = Array.Empty<StageTileInstance>();
             }
         }

@@ -188,6 +188,14 @@ namespace NSMB.Entities.Player {
             */
 
             Frame f = game.Frames.Predicted;
+            if (!f.Exists(entity.EntityRef)) {
+                return;
+            }
+
+            if (f.Global->GameState >= GameState.Ended) {
+                animator.speed = 0;
+                return;
+            }
 
             var mario = f.Get<MarioPlayer>(entity.EntityRef);
             var freezable = f.Get<Freezable>(entity.EntityRef);

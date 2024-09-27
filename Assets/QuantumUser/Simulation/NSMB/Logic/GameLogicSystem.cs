@@ -1,9 +1,10 @@
 using Photon.Deterministic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
-        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar {
+        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
@@ -219,7 +220,6 @@ namespace Quantum {
                     f.SystemEnable<GameplaySystemGroup>();
                     if (f.IsVerified) {
                         f.Map = null;
-                        Debug.Log("map = null");
                     }
                     f.Signals.OnReturnToRoom();
                     f.Global->GameState = GameState.PreGameRoom;
@@ -380,6 +380,23 @@ namespace Quantum {
 
         public void OnMarioPlayerCollectedStar(Frame f, EntityRef entity) {
             CheckForGameEnd(f);
+        }
+
+        public void OnReturnToRoom(Frame f) {
+            // Destroy all entities except PlayerDatas
+            List<EntityRef> entities = new();
+            f.GetAllEntityRefs(entities);
+
+            foreach (var entity in entities) {
+                if (f.Has<PlayerData>(entity)) {
+                    continue;
+                }
+
+                f.Destroy(entity);
+            }
+
+            // Reset variables
+            f.Global->Timer = 0;
         }
     }
 }

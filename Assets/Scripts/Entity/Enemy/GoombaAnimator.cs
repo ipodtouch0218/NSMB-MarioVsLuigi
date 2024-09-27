@@ -25,9 +25,18 @@ public class GoombaAnimator : MonoBehaviour {
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound);
     }
 
-    private void OnUpdateView(CallbackUpdateView view) {
+    private unsafe void OnUpdateView(CallbackUpdateView view) {
         QuantumGame game = view.Game;
         Frame f = game.Frames.Predicted;
+
+        if (!f.Exists(entity.EntityRef)) {
+            return;
+        }
+
+        if (f.Global->GameState >= GameState.Ended) {
+            legacyAnimation.enabled = false;
+            return;
+        }
 
         var enemy = f.Get<Enemy>(entity.EntityRef);
         var goomba = f.Get<Goomba>(entity.EntityRef);
