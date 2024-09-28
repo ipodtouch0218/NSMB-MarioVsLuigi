@@ -228,17 +228,15 @@ namespace NSMB.UI.MainMenu {
             OnCountdownTick(-1);
 
             // Update the room header text + color
-            UpdateRoomHeader();
+            UpdateRoomHeader(f, hostPlayer);
 
             // Discord RPC
             GlobalController.Instance.discordController.UpdateActivity();
         }
 
-        public void UpdateRoomHeader() {
+        public unsafe void UpdateRoomHeader(Frame f, PlayerRef host) {
             const int rngSeed = 2035767;
-
-            Room room = NetworkHandler.Client.CurrentRoom;
-            string hostname = room.Players[room.MasterClientId].NickName.ToValidUsername();
+            string hostname = f.GetPlayerData(host).PlayerNickname.ToValidUsername();
 
             lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
             UnityEngine.Random.InitState(hostname.GetHashCode() + rngSeed);

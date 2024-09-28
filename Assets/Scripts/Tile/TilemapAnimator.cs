@@ -1,6 +1,7 @@
 using NSMB.Extensions;
 using Quantum;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -28,6 +29,9 @@ public class TilemapAnimator : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackEventConfirmed>(this, OnEventConfirmed);
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+        if (QuantumRunner.DefaultGame != null) {
+            RefreshMap(QuantumRunner.DefaultGame.Frames.Verified);
+        }
     }
 
     private void OnEventConfirmed(CallbackEventConfirmed e) {
@@ -130,6 +134,25 @@ public class TilemapAnimator : MonoBehaviour {
         particle.Play();
     }
     
+    private void RefreshMap(Frame f) {
+        int width = stage.TileDimensions.x;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < stage.TileDimensions.y; y++) {
+                Vector3Int coords = new Vector3Int(x, y, 0) + (Vector3Int) stage.TileOrigin;
+
+                StageTileInstance tileInstance = f.StageTiles[x + y * width];
+                StageTile stageTile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);
+                TileBase unityTile = stageTile ? stageTile.Tile : null;
+
+                tilemap.SetTile(coords, unityTile);
+                Matrix4x4 mat = Matrix4x4.TRS(default, Quaternion.Euler(0, 0, tileInstance.Rotation.AsFloat), new Vector3(tileInstance.Scale.X.AsFloat, tileInstance.Scale.Y.AsFloat, 1));
+                tilemap.SetTransformMatrix(coords, mat);
+            }
+        }
+
+        tilemap.RefreshAllTiles();
+    }
+
     public struct TileEventData {
         public int Id;
         public TileChangeData ChangeData;

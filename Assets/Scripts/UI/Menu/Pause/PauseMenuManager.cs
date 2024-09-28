@@ -1,5 +1,4 @@
 using NSMB.Translation;
-using NSMB.UI.Pause.Options;
 using Quantum;
 using System;
 using TMPro;
@@ -53,7 +52,7 @@ namespace NSMB.UI.Pause {
             Pause(true);
         }
 
-        public void Pause(bool playSound) {
+        public unsafe void Pause(bool playSound) {
             ControlSystem.controls.UI.Navigate.performed += OnNavigate;
             ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
             ControlSystem.controls.UI.Submit.performed += OnSubmit;
@@ -62,10 +61,10 @@ namespace NSMB.UI.Pause {
             OnLanguageChanged(GlobalController.Instance.translationManager);
 
             skipSound = true;
-            isHost = true;
-            var client = QuantumRunner.Default.NetworkClient;
-            isHost = client == null || client.CurrentRoom == null || client.LocalPlayer.IsMasterClient;
-            options[1].text.fontMaterial = isHost ? enabledMaterial : disabledMaterial;
+
+            QuantumGame game = QuantumRunner.DefaultGame;
+            isHost = game == null || game.PlayerIsLocal(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _));
+            options[1].text.fontSharedMaterial = isHost ? enabledMaterial : disabledMaterial;
             SelectOption(0);
 
             isInConfirmation = false;
@@ -155,10 +154,18 @@ namespace NSMB.UI.Pause {
                 return;
             }
             if (isPaused) {
-                if (selected == 0) {
-                    Unpause(true);
+                if (isInConfirmation) {
+                    if (isInConfirmationYesSelected) {
+                        SelectConfirmNo(true);
+                    } else {
+                        ClickConfirmNo();
+                    }
                 } else {
-                    SelectOption(0);
+                    if (selected == 0) {
+                        Unpause(true);
+                    } else {
+                        SelectOption(0);
+                    }
                 }
             }
         }
@@ -183,11 +190,19 @@ namespace NSMB.UI.Pause {
             noConfirmText.text = "» " + originalNoText + " «";
         }
 
-        public void ClickConfirmYes() {
+        public unsafe void ClickConfirmYes() {
             if (isInConfirmationForQuitting) {
-                // GameManager.Instance.PauseQuitGame();
+                QuantumRunner.Default.Shutdown();
             } else {
-                // GameManager.Instance.PauseEndMatch();
+                QuantumGame game = QuantumRunner.DefaultGame;
+                Frame f = game.Frames.Predicted;
+                PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
+
+                int index = game.GetLocalPlayers().IndexOf(hostPlayer);
+                if (index != -1) {
+                    int slot = game.GetLocalPlayerSlots()[index];
+                    game.SendCommand(slot, new CommandHostEndGame());
+                }
             }
             Unpause(false);
         }
@@ -195,7 +210,7 @@ namespace NSMB.UI.Pause {
         public void ClickConfirmNo() {
             isInConfirmation = false;
             confirmationPrompt.SetActive(false);
-            GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Back);
         }
 
         public void OpenSettings() {
@@ -208,11 +223,7 @@ namespace NSMB.UI.Pause {
             isInConfirmationForQuitting = quit;
 
             TranslationManager tm = GlobalController.Instance.translationManager;
-            if (quit && isHost) {
-                confirmationText.text = tm.GetSubTranslations("{ui.generic.confirmation}\n\n<size=40>{ui.pause.quit.hostwarning}");
-            } else {
-                confirmationText.text = tm.GetTranslation("ui.generic.confirmation");
-            }
+            confirmationText.text = tm.GetTranslation("ui.generic.confirmation");
 
             confirmationPrompt.SetActive(true);
             GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);

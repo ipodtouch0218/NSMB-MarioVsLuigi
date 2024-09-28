@@ -212,6 +212,11 @@ namespace Quantum {
                         f.Events.TimerExpired(f);
                     }
                 }
+
+                PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+                if (f.GetPlayerCommand(host) is CommandHostEndGame) {
+                    EndGame(f, null);
+                }
                 break;
 
             case GameState.Ended:
@@ -266,7 +271,7 @@ namespace Quantum {
 
             int? winningTeam = QuantumUtils.GetWinningTeam(f, out int stars);
 
-            // End Condition: team gets to 10+ stars
+            // End Condition: team gets to enough stars
             if (winningTeam != null && stars >= f.Global->Rules.StarsToWin) {
                 // <team> wins
                 EndGame(f, winningTeam.Value);
@@ -274,7 +279,7 @@ namespace Quantum {
             }
 
             // End Condition: timer expires
-            if (f.Global->Timer <= 0) {
+            if (f.Global->Rules.IsTimerEnabled && f.Global->Timer <= 0) {
                 if (f.Global->Rules.DrawOnTimeUp) {
                     // It's a draw
                     EndGame(f, null);
