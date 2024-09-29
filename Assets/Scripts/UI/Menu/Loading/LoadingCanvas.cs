@@ -40,7 +40,12 @@ namespace NSMB.Loading {
             if (localPlayers.Count > 0) {
                 PlayerRef player = localPlayers[0];
                 var playerData = QuantumUtils.GetPlayerData(f, player);
-                characterIndex = playerData->Character;
+
+                if (playerData != null) {
+                    characterIndex = playerData->Character;
+                } else {
+                    characterIndex = Settings.Instance.generalCharacter;
+                }
             }
 
             var characters = GlobalController.Instance.config.CharacterDatas;

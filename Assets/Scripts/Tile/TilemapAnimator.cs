@@ -135,6 +135,10 @@ public class TilemapAnimator : MonoBehaviour {
     }
     
     private void RefreshMap(Frame f) {
+        if (f.StageTiles == null) {
+            return;
+        }
+
         int width = stage.TileDimensions.x;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < stage.TileDimensions.y; y++) {

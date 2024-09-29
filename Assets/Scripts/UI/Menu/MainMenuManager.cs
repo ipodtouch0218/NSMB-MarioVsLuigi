@@ -236,7 +236,14 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void UpdateRoomHeader(Frame f, PlayerRef host) {
             const int rngSeed = 2035767;
-            string hostname = f.GetPlayerData(host).PlayerNickname.ToValidUsername();
+            var playerData = f.GetPlayerData(host);
+            string hostname;
+
+            if (playerData == null) {
+                hostname = Settings.Instance.generalNickname.ToValidUsername();
+            } else {
+                hostname = playerData.PlayerNickname.ToValidUsername();
+            }
 
             lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
             UnityEngine.Random.InitState(hostname.GetHashCode() + rngSeed);
@@ -673,6 +680,11 @@ namespace NSMB.UI.MainMenu {
             startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
+        private void GameStart(QuantumGame game) {
+            GlobalController.Instance.loadingCanvas.Initialize(game);
+            transform.parent.gameObject.SetActive(false);
+        }
+
         //---Callbacks
         /* TODO
         public void OnLobbyConnect(NetworkRunner runner, LobbyInfo info) {
@@ -715,9 +727,10 @@ namespace NSMB.UI.MainMenu {
         }
         */
 
-        private void OnLocalPlayerConfirmed(CallbackLocalPlayerAddConfirmed e) {
+        private unsafe void OnLocalPlayerConfirmed(CallbackLocalPlayerAddConfirmed e) {
             QuantumGame game = e.Game;
             int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(e.Player)];
+            Frame f = game.Frames.Predicted;
 
             QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
                 EnabledChanges = CommandChangePlayerData.Changes.All,
@@ -727,9 +740,13 @@ namespace NSMB.UI.MainMenu {
                 Team = 0,
             });
 
-            if (e.Game.PlayerIsLocal(e.Player) && !alreadyInRoom) {
+            if (!alreadyInRoom && e.Game.PlayerIsLocal(e.Player)) {
                 InitializeRoom();
-                EnterRoom();
+                if (f.Global->GameState == GameState.PreGameRoom) {
+                    EnterRoom();
+                } else {
+                    GameStart(game);
+                }
                 alreadyInRoom = true;
             }
         }
@@ -760,7 +777,7 @@ namespace NSMB.UI.MainMenu {
             UpdateNickname();
         }
 
-        private void OnLanguageChanged(TranslationManager tm) {
+        private unsafe void OnLanguageChanged(TranslationManager tm) {
             int selectedLevel = levelDropdown.value;
             levelDropdown.ClearOptions();
             levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
@@ -775,26 +792,25 @@ namespace NSMB.UI.MainMenu {
             characterDropdown.SetValueWithoutNotify(selectedCharacter);
             characterDropdown.RefreshShownValue();
 
-            /* TODO
-            if (SessionData.Instance && SessionData.Instance.Object) {
-                UpdateRoomHeader();
-                OnCountdownTick((int) (SessionData.Instance.GameStartTimer.RemainingRenderTime(NetworkHandler.Runner) ?? -1));
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (game != null) {
+                Frame f = game.Frames.Predicted;
+                UpdateRoomHeader(f, QuantumUtils.GetHostPlayer(f, out _));
+                OnCountdownTick(f.Global->GameStartFrames == 0 ? -1 : f.Global->GameStartFrames / 60);
             }
-            */
         }
 
         private void OnPause(InputAction.CallbackContext context) {
             if (isActiveAndEnabled && (NetworkHandler.Client?.InRoom ?? false) && !wasSettingsOpen) {
                 // Open the settings menu if we're inside a room (so we dont have to leave)
-                // ConfirmSound();
+                ConfirmSound();
                 OpenOptions();
             }
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.WaitingForPlayers) {
-                GlobalController.Instance.loadingCanvas.Initialize(e.Game);
-                transform.parent.gameObject.SetActive(false);
+                GameStart(e.Game);
             } else if (e.NewState == GameState.PreGameRoom) {
                 transform.parent.gameObject.SetActive(true);
                 EnterRoom();

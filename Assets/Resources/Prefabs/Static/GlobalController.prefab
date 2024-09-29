@@ -21677,7 +21677,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   marioX: -270
   peachX: 296
-  minX: -410
+  minX: -450
   movementSpeed: {x: -170.66667, y: 0, z: 0}
   mario: {fileID: 2335449052012428788}
   animator: {fileID: 5704040236557124245}
@@ -26525,7 +26525,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23
+  m_fontSize: 24.05
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
