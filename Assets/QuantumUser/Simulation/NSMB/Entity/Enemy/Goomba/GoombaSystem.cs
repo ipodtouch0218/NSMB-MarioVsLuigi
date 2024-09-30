@@ -147,8 +147,8 @@ namespace Quantum {
 
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
-            if (f.Unsafe.TryGetPointer(iceBlock->Entity, out Goomba* koopa)) {
-                koopa->Kill(f, iceBlock->Entity, brokenIceBlock, true);
+            if (f.Unsafe.TryGetPointer(iceBlock->Entity, out Goomba* goomba)) {
+                goomba->Kill(f, iceBlock->Entity, brokenIceBlock, true);
             }
         }
     }

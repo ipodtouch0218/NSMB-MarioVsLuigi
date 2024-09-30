@@ -177,6 +177,8 @@ public class GlobalController : Singleton<GlobalController> {
         foreach (int localPlayer in e.Game.GetLocalPlayerSlots()) {
             e.Game.SendCommand(localPlayer, new CommandPlayerLoaded());
         }
+
+        discordController.UpdateActivity();
     }
 
     private void StopCoroutineNullable(ref Coroutine coroutine) {

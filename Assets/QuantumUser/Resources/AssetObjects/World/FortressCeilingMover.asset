@@ -16,241 +16,50 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/World/FortressCeilingMover
     Guid:
       Value: 423006977350367073
-  CurveX:
-    Samples:
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    PreWrapMode: 0
-    PostWrapMode: 0
-    StartTime:
-      RawValue: 0
-    EndTime:
-      RawValue: 65536
-    Resolution: 64
-    OriginalPreWrapMode: 0
-    OriginalPostWrapMode: 0
-    Keys:
-    - Time:
+  ObjectPath:
+  - Position:
+      X:
         RawValue: 0
-      Value:
+      Y:
         RawValue: 0
-      InTangent:
+    TravelDuration:
+      RawValue: 458752
+    EaseIn: 1
+    EaseOut: 1
+  - Position:
+      X:
         RawValue: 0
-      OutTangent:
-        RawValue: 0
-      TangentMode: 0
-      TangentModeLeft: 4
-      TangentModeRight: 4
-      WeightedMode: 0
-    - Time:
-        RawValue: 65536
-      Value:
-        RawValue: 0
-      InTangent:
-        RawValue: 0
-      OutTangent:
-        RawValue: 0
-      TangentMode: 0
-      TangentModeLeft: 4
-      TangentModeRight: 4
-      WeightedMode: 0
-  CurveY:
-    Samples:
-    - RawValue: -154
-    - RawValue: 674
-    - RawValue: 3073
-    - RawValue: 6915
-    - RawValue: 12069
-    - RawValue: 18407
-    - RawValue: 25800
-    - RawValue: 34119
-    - RawValue: 43235
-    - RawValue: 53018
-    - RawValue: 63340
-    - RawValue: 74073
-    - RawValue: 85086
-    - RawValue: 96250
-    - RawValue: 107438
-    - RawValue: 118519
-    - RawValue: 129365
-    - RawValue: 139847
-    - RawValue: 149835
-    - RawValue: 159201
-    - RawValue: 167816
-    - RawValue: 175551
-    - RawValue: 182276
-    - RawValue: 187862
-    - RawValue: 192182
-    - RawValue: 195105
-    - RawValue: 196503
-    - RawValue: 196608
-    - RawValue: 196608
-    - RawValue: 196608
-    - RawValue: 196608
-    - RawValue: 196608
-    - RawValue: 196608
-    - RawValue: 196608
-    - RawValue: 196596
-    - RawValue: 195577
-    - RawValue: 193003
-    - RawValue: 189004
-    - RawValue: 183708
-    - RawValue: 177244
-    - RawValue: 169741
-    - RawValue: 161328
-    - RawValue: 152134
-    - RawValue: 142289
-    - RawValue: 131919
-    - RawValue: 121156
-    - RawValue: 110127
-    - RawValue: 98962
-    - RawValue: 87789
-    - RawValue: 76737
-    - RawValue: 65936
-    - RawValue: 55514
-    - RawValue: 45600
-    - RawValue: 36322
-    - RawValue: 27811
-    - RawValue: 20195
-    - RawValue: 13602
-    - RawValue: 8162
-    - RawValue: 4003
-    - RawValue: 1255
-    - RawValue: 46
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: 0
-    - RawValue: -154
-    PreWrapMode: 0
-    PostWrapMode: 0
-    StartTime:
-      RawValue: 0
-    EndTime:
-      RawValue: 1114112
-    Resolution: 64
-    OriginalPreWrapMode: 0
-    OriginalPostWrapMode: 0
-    Keys:
-    - Time:
-        RawValue: 0
-      Value:
-        RawValue: -154
-      InTangent:
-        RawValue: 0
-      OutTangent:
-        RawValue: 0
-      TangentMode: 0
-      TangentModeLeft: 4
-      TangentModeRight: 4
-      WeightedMode: 0
-    - Time:
-        RawValue: 458752
-      Value:
+      Y:
         RawValue: 196608
-      InTangent:
+    TravelDuration:
+      RawValue: 131072
+    EaseIn: 1
+    EaseOut: 1
+  - Position:
+      X:
         RawValue: 0
-      OutTangent:
-        RawValue: 0
-      TangentMode: 0
-      TangentModeLeft: 4
-      TangentModeRight: 4
-      WeightedMode: 0
-    - Time:
-        RawValue: 589824
-      Value:
+      Y:
         RawValue: 196608
-      InTangent:
+    TravelDuration:
+      RawValue: 458752
+    EaseIn: 1
+    EaseOut: 1
+  - Position:
+      X:
         RawValue: 0
-      OutTangent:
+      Y:
         RawValue: 0
-      TangentMode: 0
-      TangentModeLeft: 4
-      TangentModeRight: 4
-      WeightedMode: 0
-    - Time:
-        RawValue: 1048576
-      Value:
+    TravelDuration:
+      RawValue: 32768
+    EaseIn: 1
+    EaseOut: 1
+  - Position:
+      X:
         RawValue: 0
-      InTangent:
+      Y:
         RawValue: 0
-      OutTangent:
-        RawValue: 0
-      TangentMode: 0
-      TangentModeLeft: 4
-      TangentModeRight: 4
-      WeightedMode: 0
-    - Time:
-        RawValue: 1114112
-      Value:
-        RawValue: 0
-      InTangent:
-        RawValue: 0
-      OutTangent:
-        RawValue: 0
-      TangentMode: 0
-      TangentModeLeft: 4
-      TangentModeRight: 4
-      WeightedMode: 0
+    TravelDuration:
+      RawValue: 0
+    EaseIn: 1
+    EaseOut: 1
+  LoopMode: 1

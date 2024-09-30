@@ -91,7 +91,7 @@ namespace NSMB.UI.MainMenu {
                 winsText.text = "<sprite name=room_wins>" + playerData->Wins;
             }
 
-            pingText.text = playerData->Ping + "  " + Utils.Utils.GetPingSymbol(playerData->Ping);
+            pingText.text = playerData->Ping + " " + Utils.Utils.GetPingSymbol(playerData->Ping);
 
             string permissionSymbol = "";
             if (playerData->IsRoomHost) {

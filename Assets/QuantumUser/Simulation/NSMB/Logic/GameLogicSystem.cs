@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
@@ -52,6 +51,10 @@ namespace Quantum {
                         }
                         if (playerChanges.HasFlag(CommandChangePlayerData.Changes.Spectating)) {
                             playerData->IsSpectator = changeData.Spectating;
+                        }
+
+                        if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
+                            StopCountdown(f);
                         }
 
                         f.Events.PlayerDataChanged(f, playerData->PlayerRef);
@@ -131,6 +134,10 @@ namespace Quantum {
 
                         f.Global->Rules = rules;
                         f.Events.RulesChanged(f, levelChanged);
+
+                        if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
+                            StopCountdown(f);
+                        }
                         break;
                     }
                 }
@@ -233,6 +240,11 @@ namespace Quantum {
                 }
                 break;
             }
+        }
+
+        public static void StopCountdown(Frame f) {
+            f.Global->GameStartFrames = 0;
+            f.Events.StartingCountdownChanged(f, false);
         }
 
         public static void CheckForGameEnd(Frame f) {
@@ -357,6 +369,10 @@ namespace Quantum {
             }
 
             f.Events.PlayerRemoved(f, player);
+
+            if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
+                StopCountdown(f);
+            }
         }
 
         public void OnLoadingComplete(Frame f) {

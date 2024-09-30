@@ -449,6 +449,46 @@ public static unsafe class QuantumUtils {
         return null;
     }
 
+    public static bool IsGameStartable(Frame f) {
+        // If game is already started, it's valid.
+        if (f.Global->GameState != GameState.PreGameRoom) {
+            return true;
+        }
+
+        PlayerData*[] allPlayerDatas = new PlayerData*[f.ComponentCount<PlayerData>()];
+        int index = 0;
+        var playerDataFilter = f.Filter<PlayerData>();
+        while (playerDataFilter.NextUnsafe(out _, out PlayerData* pd)) {
+            allPlayerDatas[index++] = pd;
+        }
+
+        // Check that at least one non-spectator exists
+        bool nonSpectator = false;
+        foreach (PlayerData* pd in allPlayerDatas) {
+            if (!pd->IsSpectator) {
+                nonSpectator = true;
+                break;
+            }
+        }
+        if (!nonSpectator) {
+            return false;
+        }
+
+        // Check that at least two teams exist
+        if (f.Global->Rules.TeamsEnabled && allPlayerDatas.Length > 1) {
+            HashSet<int> teams = new();
+            foreach (PlayerData* pd in allPlayerDatas) {
+                teams.Add(pd->Team);
+            }
+
+            if (teams.Count < 2) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static bool Decrement(ref byte timer) {
         if (timer > 0) {
             return --timer == 0;

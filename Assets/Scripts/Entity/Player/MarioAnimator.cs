@@ -699,7 +699,13 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (e.Frame.Get<Holdable>(e.OtherEntity).HoldAboveHead) {
+            Frame f = e.Frame;
+
+            if (!f.Exists(e.OtherEntity)) {
+                return;
+            }
+
+            if (f.Get<Holdable>(e.OtherEntity).HoldAboveHead) {
                 animator.Play("head-pickup");
                 animator.ResetTrigger("fireball");
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);

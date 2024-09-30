@@ -59,7 +59,7 @@ namespace NSMB.UI.MainMenu {
             });
         }
 
-        public void RefreshSettingsUI(Frame f, bool sendMessage) {
+        public void RefreshSettingsUI(QuantumGame game, Frame f, bool sendMessage) {
             // Realtime rules
             Room realtimeRoom = NetworkHandler.Client.CurrentRoom;
             ChangePrivate(!realtimeRoom.IsVisible);
@@ -78,7 +78,7 @@ namespace NSMB.UI.MainMenu {
 
             if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
-                MainMenuManager.Instance.UpdateStartGameButton();
+                MainMenuManager.Instance.UpdateStartGameButton(game);
             }
         }
 
@@ -399,7 +399,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnRulesChanged(EventRulesChanged e) {
-            RefreshSettingsUI(e.Frame, e.LevelChanged);
+            RefreshSettingsUI(e.Game, e.Frame, e.LevelChanged);
             UpdateRealtimeRoomProperties(e.Game);
         }
     }

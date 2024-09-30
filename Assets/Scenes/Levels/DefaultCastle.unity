@@ -354,7 +354,7 @@ PrefabInstance:
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.size
-      value: 15
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
@@ -435,7 +435,7 @@ PrefabInstance:
         type: 3}
       propertyPath: MapEntityReferences.Array.data[15]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 760158873}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.data[16]
@@ -11377,121 +11377,6 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 16
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes:
-      - ShapeType: 4
-        PolygonCollider:
-          Id:
-            Value: 0
-        CircleRadius:
-          RawValue: 0
-        CapsuleSize:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        EdgeExtent:
-          RawValue: 0
-        BoxExtents:
-          X:
-            RawValue: 32768
-          Y:
-            RawValue: 98304
-        PositionOffset:
-          X:
-            RawValue: 557056
-          Y:
-            RawValue: -65536
-        RotationOffset:
-          RawValue: 0
-        UserTag: 0
-        IsSetFromSourceCollider: 0
-      - ShapeType: 4
-        PolygonCollider:
-          Id:
-            Value: 0
-        CircleRadius:
-          RawValue: 0
-        CapsuleSize:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        EdgeExtent:
-          RawValue: 0
-        BoxExtents:
-          X:
-            RawValue: 1048576
-          Y:
-            RawValue: 163840
-        PositionOffset:
-          X:
-            RawValue: -196608
-          Y:
-            RawValue: 327680
-        RotationOffset:
-          RawValue: 0
-        UserTag: 0
-        IsSetFromSourceCollider: 0
-    ScaledShape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
     LayerSource: 0
     Layer: 8
     CallbackFlags:
@@ -11575,6 +11460,8 @@ MonoBehaviour:
     MoverAsset:
       Id:
         Value: 423006977350367073
+    StartOffset:
+      RawValue: 0
 --- !u!114 &361225201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11624,6 +11511,8 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
+    IgnoreMovement:
+      Value: 0
 --- !u!1001 &386921147
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12014,6 +11903,86 @@ Transform:
   m_Children: []
   m_Father: {fileID: 279632422}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &760158872
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4457025799422764819, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_Name
+      value: Ice Flower
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.43394
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.58972216
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1c0c7582045793f42b2983b08068485f, type: 3}
+--- !u!114 &760158873 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5565156223957319043, guid: 1c0c7582045793f42b2983b08068485f,
+    type: 3}
+  m_PrefabInstance: {fileID: 760158872}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &787259839
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13584,3 +13553,4 @@ SceneRoots:
   - {fileID: 1017008731}
   - {fileID: 1707566438}
   - {fileID: 279632422}
+  - {fileID: 760158872}

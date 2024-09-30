@@ -237,67 +237,6 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 4
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 10321
-        Y:
-          RawValue: 10321
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 12288
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
     LayerSource: 1
     Layer: 9
     CallbackFlags:
@@ -659,9 +598,9 @@ MonoBehaviour:
   Prototype:
     IceBlockSize:
       X:
-        RawValue: 47186
+        RawValue: 42598
       Y:
-        RawValue: 35389
+        RawValue: 42598
     AutoBreakFrames: 180
     AutoBreakGrabAdditionalFrames: 0
     AutoBreakWhileHeld:
@@ -673,3 +612,5 @@ MonoBehaviour:
         RawValue: 0
     IsCarryable:
       Value: 1
+    IsFlying:
+      Value: 0

@@ -155,6 +155,7 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumEvent.Subscribe<EventCountdownTick>(this, OnCountdownTick);
+            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumCallback.Subscribe<CallbackGameInit>(this, OnGameInit);
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerConfirmed);
@@ -222,10 +223,10 @@ namespace NSMB.UI.MainMenu {
             PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
             bool isHost = game.PlayerIsLocal(hostPlayer);
             hostControlsGroup.interactable = isHost;
-            roomSettingsCallbacks.RefreshSettingsUI(f, false);
+            roomSettingsCallbacks.RefreshSettingsUI(game, f, false);
 
             // Reset the "Game start" button counting down
-            OnCountdownTick(-1);
+            OnCountdownTick(game, -1);
 
             // Update the room header text + color
             UpdateRoomHeader(f, hostPlayer);
@@ -448,8 +449,8 @@ namespace NSMB.UI.MainMenu {
             startGameButtonText.text = tm.GetTranslation(ready ? "ui.inroom.buttons.unready" : "ui.inroom.buttons.readyup");
         }
 
-        public unsafe void UpdateStartGameButton() {
-            QuantumGame game = QuantumRunner.DefaultGame;
+        public unsafe void UpdateStartGameButton(QuantumGame game) {
+
             Frame f = game.Frames.Predicted;
             PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
             bool weAreHost = game.PlayerIsLocal(host);
@@ -462,7 +463,7 @@ namespace NSMB.UI.MainMenu {
 
             if (weAreHost) {
                 startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
-                startGameBtn.interactable = IsRoomConfigurationValid();
+                startGameBtn.interactable = QuantumUtils.IsGameStartable(f);
             } else {
                 List<PlayerRef> localPlayers = game.GetLocalPlayers();
                 if (localPlayers.Count > 0) {
@@ -473,18 +474,6 @@ namespace NSMB.UI.MainMenu {
                     startGameBtn.interactable = true;
                 }
             }
-        }
-
-        public unsafe bool IsRoomConfigurationValid() {
-            var filter = QuantumRunner.DefaultGame.Frames.Predicted.Filter<PlayerData>();
-
-            while (filter.NextUnsafe(out _, out PlayerData* data)) {
-                if (!data->IsSpectator) {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /* TODO
@@ -653,8 +642,7 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public unsafe void OnCountdownTick(int time) {
-            QuantumGame game = QuantumRunner.DefaultGame;
+        public unsafe void OnCountdownTick(QuantumGame game, int time) {
             Frame f = game.Frames.Predicted;
             PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
             bool weAreHost = game.PlayerIsLocal(hostPlayer);
@@ -668,7 +656,7 @@ namespace NSMB.UI.MainMenu {
                     fadeMusicCoroutine = StartCoroutine(FadeMusic());
                 }
             } else {
-                UpdateStartGameButton();
+                UpdateStartGameButton(game);
                 hostControlsGroup.interactable = weAreHost;
                 if (fadeMusicCoroutine != null) {
                     StopCoroutine(fadeMusicCoroutine);
@@ -796,7 +784,7 @@ namespace NSMB.UI.MainMenu {
             if (game != null) {
                 Frame f = game.Frames.Predicted;
                 UpdateRoomHeader(f, QuantumUtils.GetHostPlayer(f, out _));
-                OnCountdownTick(f.Global->GameStartFrames == 0 ? -1 : f.Global->GameStartFrames / 60);
+                OnCountdownTick(game, f.Global->GameStartFrames == 0 ? -1 : f.Global->GameStartFrames / 60);
             }
         }
 
@@ -839,7 +827,7 @@ namespace NSMB.UI.MainMenu {
         private unsafe void OnCountdownChanged(EventStartingCountdownChanged e) {
             Frame f = e.Frame;
             PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
-            OnCountdownTick(e.IsGameStarting ? 3 : -1);
+            OnCountdownTick(e.Game, e.IsGameStarting ? 3 : -1);
 
             if (e.Game.PlayerIsLocal(host)
                 || (startingGame && !e.IsGameStarting)
@@ -858,8 +846,12 @@ namespace NSMB.UI.MainMenu {
             lastCountdownStartFrame = f.Number;
         }
 
+        private void OnPlayerDataChanged(EventPlayerDataChanged e) {
+            UpdateStartGameButton(e.Game);
+        }
+
         private void OnCountdownTick(EventCountdownTick e) {
-            OnCountdownTick(e.SecondsRemaining);
+            OnCountdownTick(e.Game, e.SecondsRemaining);
         }
 
         private void OnHostChanged(EventHostChanged e) {

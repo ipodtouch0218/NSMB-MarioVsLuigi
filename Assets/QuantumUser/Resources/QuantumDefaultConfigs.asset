@@ -347,12 +347,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/QuantumDefaultConfigs|DefaultConfigSystems
     Guid:
       Value: 3654882389298375385
-  Entries:
-  - SystemType:
-      AssemblyQualifiedName: Quantum.KoopaSystem, Quantum.Simulation
-    SystemName: 
-    StartDisabled: 0
-    Children: []
+  Entries: []
 --- !u!114 &4894074246963618225
 MonoBehaviour:
   m_ObjectHideFlags: 0

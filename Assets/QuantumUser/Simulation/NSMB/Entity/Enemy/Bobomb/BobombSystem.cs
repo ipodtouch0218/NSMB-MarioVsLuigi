@@ -1,12 +1,10 @@
 using Photon.Deterministic;
-using Quantum.Collections;
-using UnityEditor;
 using UnityEngine;
 
 namespace Quantum {
 
     public unsafe class BobombSystem : SystemMainThreadFilter<BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
-        ISignalOnBobombExplodeEntity {
+        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken {
         
         public struct Filter {
             public EntityRef Entity;
@@ -16,6 +14,7 @@ namespace Quantum {
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
             public Holdable* Holdable;
+            public Freezable* Freezable;
         }
 
         public override void OnInit(Frame f) {
@@ -31,7 +30,8 @@ namespace Quantum {
             var bobomb = filter.Bobomb;
             var enemy = filter.Enemy;
 
-            if (!enemy->IsAlive) {
+            if (!enemy->IsAlive
+                || filter.Freezable->IsFrozen(f)) {
                 return;
             }
 
@@ -289,6 +289,13 @@ namespace Quantum {
         public void OnBobombExplodeEntity(Frame f, EntityRef bobombEntity, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
                 bobomb->Kill(f, entity, bobombEntity, true);
+            }
+        }
+
+        public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
+            if (f.Unsafe.TryGetPointer(iceBlock->Entity, out Bobomb* bobomb)) {
+                bobomb->Kill(f, iceBlock->Entity, brokenIceBlock, true);
             }
         }
     }

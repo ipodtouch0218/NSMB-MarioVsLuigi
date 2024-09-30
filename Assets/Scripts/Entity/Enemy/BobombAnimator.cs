@@ -43,9 +43,18 @@ public class BobombAnimator : MonoBehaviour {
             return;
         }
 
-        Bobomb bobomb = f.Get<Bobomb>(entity.EntityRef);
-        Enemy enemy = f.Get<Enemy>(entity.EntityRef);
-        Holdable holdable = f.Get<Holdable>(entity.EntityRef);
+        var freezable = f.Get<Freezable>(entity.EntityRef);
+        if (freezable.IsFrozen(f)) {
+            animator.speed = 0;
+            sfx.Stop();
+            return;
+        } else {
+            animator.speed = 1;
+        }
+
+        var bobomb = f.Get<Bobomb>(entity.EntityRef);
+        var enemy = f.Get<Enemy>(entity.EntityRef);
+        var holdable = f.Get<Holdable>(entity.EntityRef);
 
         bool lit = bobomb.CurrentDetonationFrames > 0;
         animator.SetBool(ParamLit, lit);

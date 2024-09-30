@@ -77,8 +77,12 @@ namespace Quantum {
                 var hit = vertical[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
-                    || (shape.Type == Shape2DType.Edge && (FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y)) && (FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)))
                     || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
+                    continue;
+                }
+
+                bool sameDirection = FPMath.Sign(hitPhysicsObject->Velocity.Y) == FPMath.Sign(yMovement.Y);
+                if (/*shape.Type == Shape2DType.Edge && */ sameDirection && FPMath.Abs(hitPhysicsObject->Velocity.Y) > FPMath.Abs(yMovement.Y)) {
                     continue;
                 }
 
@@ -104,8 +108,8 @@ namespace Quantum {
                     movement -= PhysicsObjectSystem.Skin;
                 }
                 PhysicsObjectSystem.MoveVertically(f, movement * f.UpdateRate, hit.Entity, stage);
-                hitPhysicsObject->Velocity.Y = 0;
 
+                /*
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
                     hitContacts = f.AllocateList(out hitPhysicsObject->Contacts);
                 }
@@ -118,6 +122,7 @@ namespace Quantum {
                     Entity = filter.Entity,
                     Frame = f.Number,
                 });
+                */
             }
         }
 
@@ -196,6 +201,7 @@ namespace Quantum {
                 PhysicsObjectSystem.MoveHorizontally(f, movement * f.UpdateRate, hit.Entity, stage);
                 hitPhysicsObject->Velocity.X = 0;
 
+                /*
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
                     hitContacts = f.AllocateList(out hitPhysicsObject->Contacts);
                 }
@@ -208,6 +214,7 @@ namespace Quantum {
                     Entity = filter.Entity,
                     Frame = f.Number,
                 });
+                */
             }
         }
     }

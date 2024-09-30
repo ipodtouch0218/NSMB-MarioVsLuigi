@@ -72,7 +72,7 @@ public unsafe class DiscordController : MonoBehaviour {
         }
     }
 
-    public unsafe void UpdateActivity(RoomInfo room = null) {
+    public unsafe void UpdateActivity() {
 #if UNITY_WEBGL || UNITY_WSA
         return;
 #endif
@@ -88,22 +88,24 @@ public unsafe class DiscordController : MonoBehaviour {
         TranslationManager tm = GlobalController.Instance.translationManager;
         QuantumRunner runner = QuantumRunner.Default;
         QuantumGame game = QuantumRunner.DefaultGame;
-        if (room == null && runner && runner.NetworkClient != null) {
-            room = runner.NetworkClient.CurrentRoom;
+
+        Room realtimeRoom = null;
+        if (runner && runner.NetworkClient != null) {
+            realtimeRoom = runner.NetworkClient.CurrentRoom;
         }
 
         Activity activity = new();
-        if (room != null) {
+        if (realtimeRoom != null) {
             activity.Party = new() {
                 Size = new() {
-                    CurrentSize = room.PlayerCount,
-                    MaxSize = room.MaxPlayers,
+                    CurrentSize = realtimeRoom.PlayerCount,
+                    MaxSize = realtimeRoom.MaxPlayers,
                 },
-                Id = room.Name + "1",
+                Id = realtimeRoom.Name + "1",
             };
-            activity.State = room.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
+            activity.State = realtimeRoom.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
             activity.Details = tm.GetTranslation("discord.online");
-            activity.Secrets = new() { Join = room.Name };
+            activity.Secrets = new() { Join = realtimeRoom.Name };
         }
         if (game != null) {
             Frame f = game.Frames.Predicted;
@@ -135,7 +137,7 @@ public unsafe class DiscordController : MonoBehaviour {
     }
 
     private void OnLanguageChanged(TranslationManager tm) {
-        UpdateActivity(null);
+        UpdateActivity();
     }
 
     public void TryJoinGame(string secret) {
