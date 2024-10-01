@@ -63,9 +63,10 @@ public class BigStarAnimator : QuantumCallbacks {
         }
     }
 
-    public override void OnUpdateView(QuantumGame game) {
+    public unsafe override void OnUpdateView(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        if (!f.Exists(entity.EntityRef)) {
+        if (!f.Exists(entity.EntityRef)
+            || f.Global->GameState >= GameState.Ended) {
             return;
         }
 

@@ -9,6 +9,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using static NSMB.Utils.NetworkUtils;
+using System.IO;
+using UnityEditor;
+using NSMB.Utils;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -43,6 +46,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         realtimeClient.AddCallbackTarget(this);
 
         QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, CallbackOnLocalPlayerConfirmed);
+        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
     }
 
     public void Update() {
@@ -224,6 +228,61 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             StopCoroutine(pingUpdateCoroutine);
             pingUpdateCoroutine = null;
         }
+    }
+
+    int initialFrame;
+    byte[] initialFrameData;
+    private void OnGameStateChanged(EventGameStateChanged e) {
+        QuantumGame game = e.Game;
+#if UNITY_STANDALONE
+        if (e.NewState == GameState.Starting) {
+            Debug.Log("[Replay] Started recording a new replay.");
+            game.StartRecordingInput(e.Frame.Number);
+            initialFrameData = e.Frame.Serialize(DeterministicFrameSerializeMode.Serialize);
+            initialFrame = e.Frame.Number;
+
+        } else if (e.NewState == GameState.Ended) {
+            QuantumReplayFile replay = game.GetRecordedReplay();
+            replay.InitialTick = initialFrame;
+            replay.InitialFrameData = initialFrameData;
+            initialFrame = 0;
+            initialFrameData = null;
+
+            string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
+            Directory.CreateDirectory(replayFolder);
+
+            string json = JsonUtility.ToJson(replay);
+            string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".json");
+            File.WriteAllText(finalFilePath, json);
+
+            FileInfo writtenFile = new FileInfo(finalFilePath);
+            Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenFile.Length)})");
+        }
+#endif
+    }
+
+    public async static void StartReplay(QuantumReplayFile replay) {
+
+        var serializer = new QuantumUnityJsonSerializer();
+        var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.RuntimeConfigData.Decode(), compressed: true);
+        var _replayInputProvider = replay.CreateInputProvider();
+
+        var arguments = new SessionRunner.Arguments {
+            RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
+            GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
+            RuntimeConfig = runtimeConfig,
+            SessionConfig = replay.DeterministicConfig,
+            ReplayProvider = _replayInputProvider,
+            GameMode = DeterministicGameMode.Replay,
+            RunnerId = "LOCALREPLAY",
+            PlayerCount = replay.DeterministicConfig.PlayerCount,
+            //InstantReplaySettings = InstantReplayConfig,
+            InitialTick = replay.InitialTick,
+            FrameData = replay.InitialFrameData,
+            //DeltaTimeType = DeltaTime
+        };
+
+        Runner = (QuantumRunner) await SessionRunner.StartAsync(arguments);
     }
 
     private void CallbackOnLocalPlayerConfirmed(CallbackLocalPlayerAddConfirmed e) {

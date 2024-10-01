@@ -656,7 +656,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeltaTypeType: 1
-  RecordingFlags: -1
+  RecordingFlags: 0
   InstantReplayConfig:
     SnapshotsPerSecond: 1
     LengthSeconds:

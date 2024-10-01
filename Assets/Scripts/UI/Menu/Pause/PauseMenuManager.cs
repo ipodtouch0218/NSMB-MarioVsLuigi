@@ -150,22 +150,25 @@ namespace NSMB.UI.Pause {
         }
 
         public void OnCancel(InputAction.CallbackContext context) {
+            if (!isPaused) {
+                return;
+            }
+
             if (GlobalController.Instance.optionsManager.gameObject.activeSelf) {
                 return;
             }
-            if (isPaused) {
-                if (isInConfirmation) {
-                    if (isInConfirmationYesSelected) {
-                        SelectConfirmNo(true);
-                    } else {
-                        ClickConfirmNo();
-                    }
+
+            if (isInConfirmation) {
+                if (isInConfirmationYesSelected) {
+                    SelectConfirmNo(true);
                 } else {
-                    if (selected == 0) {
-                        Unpause(true);
-                    } else {
-                        SelectOption(0);
-                    }
+                    ClickConfirmNo();
+                }
+            } else {
+                if (selected == 0) {
+                    Unpause(true);
+                } else {
+                    SelectOption(0);
                 }
             }
         }

@@ -16,6 +16,7 @@ using Photon.Realtime;
 using Quantum;
 using System.Threading.Tasks;
 using Button = UnityEngine.UI.Button;
+using System.IO;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuManager : Singleton<MainMenuManager> {
@@ -335,6 +336,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenCredits() {
+            string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "replays"));
+            string file = files.Where(file => !file.EndsWith("meta")).First();
+            NetworkHandler.StartReplay(JsonUtility.FromJson<QuantumReplayFile>(File.ReadAllText(file)));
+            return;
+
             DisableAllMenus();
             bg.SetActive(true);
             creditsMenu.SetActive(true);

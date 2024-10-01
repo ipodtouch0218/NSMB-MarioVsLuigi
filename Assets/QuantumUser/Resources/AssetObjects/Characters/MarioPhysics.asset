@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MarioPhysics
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/MarioPhysics
+    Path: QuantumUser/Resources/AssetObjects/Characters/MarioPhysics
     Guid:
       Value: 429607978212108660
   WalkSpeedStage: 1
@@ -200,6 +200,8 @@ MonoBehaviour:
   FlyingAcceleration:
   - RawValue: 518400
   - RawValue: 259200
+  SpinnerLaunchVelocity:
+    RawValue: 786432
   KnockbackDeceleration:
     RawValue: 518400
   SlideMaxVelocity:

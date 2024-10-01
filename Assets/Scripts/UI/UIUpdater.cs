@@ -258,9 +258,13 @@ public class UIUpdater : QuantumCallbacks {
     }
 
     private void UpdatePingText() {
-        int ping = (int) NetworkHandler.Ping.Value;
-        uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
-        //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+        if (NetworkHandler.Client.InRoom) {
+            int ping = (int) NetworkHandler.Ping.Value;
+            uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
+            //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
+        } else {
+            uiDebug.enabled = false;
+        }
     }
 
     private unsafe void ApplyUIColor(Frame f, MarioPlayer mario) {

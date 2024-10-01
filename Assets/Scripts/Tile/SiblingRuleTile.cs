@@ -11,7 +11,12 @@ namespace NSMB.Tiles {
     /// </summary>
     [CreateAssetMenu(fileName = "New Sibling Rule Tile", menuName = "Sibling RuleTile", order = 0)]
     [ExecuteInEditMode]
-    public class SiblingRuleTile : RuleTile {
+    public class SiblingRuleTile : RuleTile<SiblingRuleTile.Neighbor> {
+
+        public class Neighbor : RuleTile.TilingRule.Neighbor {
+            public const int Self = 3;
+            public const int NotSelf = 4;
+        }
 
         //---Static Variables
         private static QuantumMapData mapData;
@@ -22,8 +27,10 @@ namespace NSMB.Tiles {
 
         public override bool RuleMatch(int neighbor, TileBase other) {
             return neighbor switch {
-                TilingRuleOutput.Neighbor.This => siblings.Contains(other) || base.RuleMatch(neighbor, other),
-                TilingRuleOutput.Neighbor.NotThis => !siblings.Contains(other) && base.RuleMatch(neighbor, other),
+                TilingRuleOutput.Neighbor.This => siblings.Contains(other) || other == this,
+                TilingRuleOutput.Neighbor.NotThis => !siblings.Contains(other) && other != this,
+                Neighbor.Self => other == this,
+                Neighbor.NotSelf => other != this,
                 _ => base.RuleMatch(neighbor, other),
             };
         }
