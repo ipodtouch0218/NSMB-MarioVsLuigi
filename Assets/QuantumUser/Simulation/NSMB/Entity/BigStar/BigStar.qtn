@@ -24,3 +24,8 @@ synced event MarioPlayerCollectedStar {
 	MarioPlayer Mario;
 	FPVector2 Position;
 }
+
+synced event MarioPlayerDroppedStar {
+	Frame Frame;
+	entity_ref Entity;
+}

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e6aa951566f17244a0b6ee83dbefe12, type: 3}
+  m_Name: 2 Blue
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Teams/2 Blue
+    Guid:
+      Value: 434877241313458872
+  id: 2
+  nameTranslationKey: team.blue
+  textSpriteNormal: <sprite name=team_blue>
+  textSpriteColorblind: <sprite name=team_blue_alt>
+  textSpriteColorblindBig: <sprite name=team_blue_alt_big>
+  color: {r: 0, g: 0.58431375, b: 1, a: 0}
+  spriteNormal: {fileID: -96458051, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}
+  spriteColorblind: {fileID: 983047248, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}

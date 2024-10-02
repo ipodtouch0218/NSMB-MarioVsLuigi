@@ -117,6 +117,7 @@ GameObject:
   - component: {fileID: 2500730416425235570}
   - component: {fileID: 375791657849812480}
   - component: {fileID: 1300477647465244240}
+  - component: {fileID: 3441377640062739975}
   m_Layer: 5
   m_Name: ScoreboardEntry (Template)
   m_TagString: Untagged
@@ -183,6 +184,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3441377640062739975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562545429808609873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d690da3f43c0bc4da2fd650a9d482b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  background: {fileID: 1300477647465244240}
+  nicknameText: {fileID: 4965239114828728600}
+  scoreText: {fileID: 6949632747967690810}
 --- !u!1 &769797885108136250
 GameObject:
   m_ObjectHideFlags: 0
@@ -2527,6 +2543,7 @@ GameObject:
   - component: {fileID: 6964153992126106376}
   - component: {fileID: 6371814265733663943}
   - component: {fileID: 7396989138894499337}
+  - component: {fileID: 1764676025845282627}
   - component: {fileID: 2365961199692771259}
   - component: {fileID: 2441749545117445781}
   m_Layer: 5
@@ -2612,7 +2629,25 @@ MonoBehaviour:
   itemColor: {fileID: 7459204673355060085}
   boos: {fileID: 9175913648187823716}
   reserveAnimator: {fileID: 8221848716897339028}
-  pauseAction: {fileID: 0}
+--- !u!114 &1764676025845282627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3432117151805071402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33ea7cada2913e849afa9400d347f258, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entryTemplate: {fileID: 3441377640062739975}
+  teamHeader: {fileID: 6657841386413748236}
+  spectatorText: {fileID: 3570606654109817726}
+  teamHeaderText: {fileID: 2621348589421499231}
+  animator: {fileID: 4876935635417249144}
+  toggleScoreboardAction: {fileID: -7539312271756866380, guid: d29805f34fe91da4e94010a38823fab7,
+    type: 3}
 --- !u!114 &2365961199692771259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3037,7 +3072,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 98.45
+  m_fontSize: 99
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

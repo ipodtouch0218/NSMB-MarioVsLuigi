@@ -56,7 +56,7 @@ public class ChatMessage : MonoBehaviour {
             return;
         }
 
-        image.color = Utils.GetPlayerColor(QuantumRunner.DefaultGame, data.player, 0.2f);
+        image.color = Utils.GetPlayerColor(QuantumRunner.DefaultGame.Frames.Predicted, data.player, 0.2f);
     }
 
     public class ChatMessageData {

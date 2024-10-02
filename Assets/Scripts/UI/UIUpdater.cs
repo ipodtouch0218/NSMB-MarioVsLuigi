@@ -4,10 +4,8 @@ using NSMB.Utils;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class UIUpdater : QuantumCallbacks {
@@ -28,7 +26,6 @@ public class UIUpdater : QuantumCallbacks {
     [SerializeField] private Image itemReserve, itemColor;
     [SerializeField] private GameObject boos;
     [SerializeField] private Animator reserveAnimator;
-    [SerializeField] private InputActionReference pauseAction;
 
     //---Private Variables
     private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
@@ -74,14 +71,15 @@ public class UIUpdater : QuantumCallbacks {
         backgrounds.Add(timerParent.GetComponentInChildren<Image>());
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-        PlayerTrackIcon.HideAllPlayerIcons = stage.HidePlayersOnMinimap;
     }
 
     public void Start() {
-        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
-        QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
+        PlayerTrackIcon.HideAllPlayerIcons = stage.HidePlayersOnMinimap;
         boos.SetActive(stage.HidePlayersOnMinimap);
         StartCoroutine(UpdatePingTextCoroutine());
+
+        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+        QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
     }
 
     public override void OnUpdateView(QuantumGame game) {
@@ -92,16 +90,6 @@ public class UIUpdater : QuantumCallbacks {
             || !f.TryGet(Target, out MarioPlayer mario)) {
             return;
         }
-
-        /*
-        if (!player) {
-            if (!uiHidden) {
-                ToggleUI(true);
-            }
-
-            return;
-        }
-        */
 
         if (uiHidden) {
             ToggleUI(f, false);

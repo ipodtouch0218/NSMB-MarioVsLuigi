@@ -216,6 +216,12 @@ MonoBehaviour:
   CharacterDatas:
   - {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   - {fileID: 11400000, guid: 20241e3c68674eb4dbb58f063d01cfd2, type: 2}
+  Teams:
+  - {fileID: 11400000, guid: bcf92b1630ab5c343bf5fa73ad79fc89, type: 2}
+  - {fileID: 11400000, guid: 7bf34ce9b8de8f940a7d54b75f404511, type: 2}
+  - {fileID: 11400000, guid: e33c0d39bc8139e47b46c512e5bfdca3, type: 2}
+  - {fileID: 11400000, guid: 437c1b4891fe12346ba9d84056d0a671, type: 2}
+  - {fileID: 11400000, guid: 8ce2d81bba3ca02408b028c0fb6fed8f, type: 2}
   FireballPrototype:
     Id:
       Value: 1460912212237464861

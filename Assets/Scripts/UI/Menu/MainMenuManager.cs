@@ -39,6 +39,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private ColorChooser colorManager;
         [SerializeField] public MainMenuChat chat;
         [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
+        [SerializeField] private LoopingMusicPlayer musicPlayer;
 
         [Header("UI Elements")]
         [SerializeField] private GameObject title;
@@ -85,6 +86,8 @@ namespace NSMB.UI.MainMenu {
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
+
+            musicPlayer.Restart();
         }
 
         public void OnDisable() {
@@ -195,7 +198,7 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public unsafe void InitializeRoom() {
+        public unsafe void InitializeRoom(Frame f) {
             // Chat
             chatTextField.SetTextWithoutNotify("");
 
@@ -208,7 +211,7 @@ namespace NSMB.UI.MainMenu {
             spectateToggle.isOn = false;
 
             // Create player icons
-            playerList.PopulatePlayerEntries(QuantumRunner.DefaultGame);
+            playerList.PopulatePlayerEntries(f);
         }
 
         public unsafe void EnterRoom() {
@@ -735,7 +738,7 @@ namespace NSMB.UI.MainMenu {
             });
 
             if (!alreadyInRoom && e.Game.PlayerIsLocal(e.Player)) {
-                InitializeRoom();
+                InitializeRoom(f);
                 if (f.Global->GameState == GameState.PreGameRoom) {
                     EnterRoom();
                 } else {

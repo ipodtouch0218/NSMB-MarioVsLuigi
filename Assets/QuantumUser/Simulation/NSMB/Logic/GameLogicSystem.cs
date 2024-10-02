@@ -231,7 +231,7 @@ namespace Quantum {
                     // Move back to lobby.
                     f.SystemEnable<GameplaySystemGroup>();
                     if (f.IsVerified) {
-                        f.Map = null;
+                        f.Map = f.SimulationConfig.LobbyMap;
                     }
                     f.Signals.OnReturnToRoom();
                     f.Global->GameState = GameState.PreGameRoom;
@@ -326,6 +326,7 @@ namespace Quantum {
             f.Add(newEntity, out PlayerData* newData);
             newData->PlayerRef = player;
             newData->JoinTick = f.Number;
+            newData->IsSpectator = f.Global->GameState != GameState.PreGameRoom;
             
             var datas = f.ResolveDictionary(f.Global->PlayerDatas);
             if (datas.Count == 0) {

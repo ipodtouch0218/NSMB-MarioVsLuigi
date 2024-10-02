@@ -37,7 +37,7 @@ public unsafe class PlayerTrackIcon : TrackIcon {
         Frame f = game.Frames.Predicted;
 
         var mario = game.Frames.Predicted.Get<MarioPlayer>(targetEntity);
-        image.color = Utils.GetPlayerColor(game, mario.PlayerRef);
+        image.color = Utils.GetPlayerColor(f, mario.PlayerRef);
         if (f.Global->Rules.TeamsEnabled) {
             teamIcon.sprite = ScriptableManager.Instance.teams[mario.Team].spriteColorblind;
         }

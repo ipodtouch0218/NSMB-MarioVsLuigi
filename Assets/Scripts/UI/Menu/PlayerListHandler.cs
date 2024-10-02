@@ -19,7 +19,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisable() {
-            RemoveAllPlayerEntries();
+            //RemoveAllPlayerEntries();
             if (autoRefreshCoroutine != null) {
                 StopCoroutine(autoRefreshCoroutine);
                 autoRefreshCoroutine = null;
@@ -32,23 +32,21 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
         }
 
-        public unsafe void PopulatePlayerEntries(QuantumGame game) {
+        public unsafe void PopulatePlayerEntries(Frame f) {
             RemoveAllPlayerEntries();
 
-            Frame f = game.Frames.Predicted;
             var playerDataFilter = f.Filter<PlayerData>();
 
             while (playerDataFilter.NextUnsafe(out _, out PlayerData* playerData)) {
-                AddPlayerEntry(game, playerData->PlayerRef);
+                AddPlayerEntry(f, playerData->PlayerRef);
             }
         }
 
-        public void AddPlayerEntry(QuantumGame game, PlayerRef player) {
+        public void AddPlayerEntry(Frame f, PlayerRef player) {
             if (!player.IsValid || !template) {
                 return;
             }
 
-            Frame f = game.Frames.Predicted;
             RuntimePlayer runtimePlayerData = f.GetPlayerData(player);
 
             if (!playerListEntries.ContainsKey(player)) {
@@ -59,7 +57,7 @@ namespace NSMB.UI.MainMenu {
                 go.SetActive(true);
             }
 
-            UpdateAllPlayerEntries(game);
+            UpdateAllPlayerEntries(f);
         }
 
         public void RemoveAllPlayerEntries() {
@@ -70,19 +68,19 @@ namespace NSMB.UI.MainMenu {
         }
 
 
-        public void RemovePlayerEntry(QuantumGame game, PlayerRef player) {
+        public void RemovePlayerEntry(Frame f, PlayerRef player) {
             if (!playerListEntries.ContainsKey(player)) {
                 return;
             }
 
             Destroy(playerListEntries[player].gameObject);
             playerListEntries.Remove(player);
-            UpdateAllPlayerEntries(game);
+            UpdateAllPlayerEntries(f);
         }
 
-        public void UpdateAllPlayerEntries(QuantumGame game) {
+        public void UpdateAllPlayerEntries(Frame f) {
             foreach ((PlayerRef player, _) in playerListEntries) {
-                UpdatePlayerEntry(game, player, false);
+                UpdatePlayerEntry(f, player, false);
             }
 
             if (MainMenuManager.Instance) {
@@ -90,22 +88,21 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        public void UpdatePlayerEntry(QuantumGame game, PlayerRef player, bool updateChat = true) {
+        public void UpdatePlayerEntry(Frame f, PlayerRef player, bool updateChat = true) {
             if (!playerListEntries.TryGetValue(player, out PlayerListEntry entry)) {
                 //AddPlayerEntry(data);
                 return;
             }
 
-            entry.UpdateText(game);
-            ReorderEntries(game);
+            entry.UpdateText(f);
+            ReorderEntries(f);
 
             if (updateChat && MainMenuManager.Instance) {
                 MainMenuManager.Instance.chat.UpdatePlayerColors();
             }
         }
 
-        public unsafe void ReorderEntries(QuantumGame game) {
-            Frame f = game.Frames.Predicted;
+        public unsafe void ReorderEntries(Frame f) {
             var sortedEntries = playerListEntries.OrderByDescending(ple => {
                 PlayerData* data = QuantumUtils.GetPlayerData(f, ple.Key);
                 if (data == null) {
@@ -127,17 +124,19 @@ namespace NSMB.UI.MainMenu {
             WaitForSeconds seconds = new(1);
             while (true) {
                 yield return seconds;
-                UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
+                if (QuantumRunner.DefaultGame != null) {
+                    UpdateAllPlayerEntries(QuantumRunner.DefaultGame.Frames.Predicted);
+                }
             }
         }
 
         //---Callbacks
         private void OnPlayerAdded(EventPlayerAdded e) {
-            AddPlayerEntry(e.Game, e.Player);
+            AddPlayerEntry(e.Frame, e.Player);
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
-            RemovePlayerEntry(e.Game, e.Player);
+            RemovePlayerEntry(e.Frame, e.Player);
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {

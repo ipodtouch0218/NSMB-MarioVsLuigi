@@ -19,18 +19,20 @@ MonoBehaviour:
   UserAsset:
     Id:
       Value: 0
-  Scene: 
-  ScenePath: 
-  SceneGuid: 
+  Scene: MainMenu
+  ScenePath: Assets/Scenes/MainMenu.unity
+  SceneGuid: 04dc29cc092387a43aa97e7c82eefd58
   WorldSize: 256
   BucketsCount: 16
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
-  TriangleMeshCellSize: 4
+  SceneMeshCellSize:
+    RawValue: 262144
+  TriangleMeshCellSize: -1
   StaticColliders3DTrianglesData:
     Id:
-      Value: 0
+      Value: 321239658870279021
   SerializeTrianglesMetadata: 0
   GridSizeX: 64
   GridSizeY: 64
@@ -40,7 +42,7 @@ MonoBehaviour:
   StaticColliders2D: []
   StaticColliders3D: []
   MapEntities: []
-  SerializedTriangleDataUncompressedSize: 0
+  SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
     RefIds: []

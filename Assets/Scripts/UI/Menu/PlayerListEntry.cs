@@ -57,8 +57,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
-            QuantumGame game = e.Game;
-
             nameText.color = NicknameColor.color;
             if (NicknameColor.isRainbow) {
                 nameText.color = Utils.Utils.GetRainbowColor();
@@ -72,13 +70,12 @@ namespace NSMB.UI.MainMenu {
                 typingCounter = 0;
             }
 
-            UpdateText(game);
+            UpdateText(e.Game.Frames.Predicted);
         }
 
-        public unsafe void UpdateText(QuantumGame game) {
-            colorStrip.color = Utils.Utils.GetPlayerColor(game, player);
+        public unsafe void UpdateText(Frame f) {
+            colorStrip.color = Utils.Utils.GetPlayerColor(f, player);
 
-            Frame f = game.Frames.Predicted;
             var playerData = QuantumUtils.GetPlayerData(f, player);
 
             if (playerData == null) {
@@ -195,7 +192,7 @@ namespace NSMB.UI.MainMenu {
 
         //---Callbacks
         private void OnColorblindModeChanged() {
-            UpdateText(QuantumRunner.DefaultGame);
+            UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
         }
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
@@ -203,7 +200,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            UpdateText(e.Game);
+            UpdateText(e.Frame);
 
             var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
             readyIcon.SetActive(playerData->IsReady);

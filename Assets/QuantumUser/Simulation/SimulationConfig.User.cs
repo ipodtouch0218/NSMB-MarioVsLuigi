@@ -8,6 +8,7 @@
         public PowerupAsset[] AllPowerups;
         public PowerupAsset FallbackPowerup;
         public CharacterAsset[] CharacterDatas;
+        public TeamAsset[] Teams;
 
         public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype;
 

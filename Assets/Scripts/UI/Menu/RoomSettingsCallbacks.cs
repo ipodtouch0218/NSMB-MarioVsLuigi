@@ -77,7 +77,7 @@ namespace NSMB.UI.MainMenu {
             SetRoomIdVisibility(isRoomCodeVisible);
 
             if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
+                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(f);
                 MainMenuManager.Instance.UpdateStartGameButton(game);
             }
         }
@@ -272,6 +272,8 @@ namespace NSMB.UI.MainMenu {
         #region Teams
         public void SetTeams() {
             QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
+
             if (!IsHostLocal(game, out int hostSlot)) {
                 // Only hosts can change.
                 return;
@@ -283,15 +285,18 @@ namespace NSMB.UI.MainMenu {
             });
 
             if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
+                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(f);
             }
         }
         private void ChangeTeams(bool value) {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            Frame f = game.Frames.Predicted;
+
             teamsEnabledToggle.SetIsOnWithoutNotify(value);
             teamSelectorButton.SetEnabled(value);
 
             if (!teamsEnabledToggle.isOn && value) {
-                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(QuantumRunner.DefaultGame);
+                MainMenuManager.Instance.playerList.UpdateAllPlayerEntries(f);
             }
         }
         #endregion

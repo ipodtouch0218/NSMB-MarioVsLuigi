@@ -255,6 +255,7 @@ namespace Quantum {
                 };
             }
 
+            int droppedStars = 0;
             while (amount > 0) {
                 if (Stars <= 0) {
                     break;
@@ -277,8 +278,13 @@ namespace Quantum {
 
                 Stars--;
                 amount--;
+                droppedStars++;
             }
-            // TODO GameManager.Instance.CheckForWinner();
+
+            if (droppedStars > 0) {
+                f.Events.MarioPlayerDroppedStar(f, entity);
+                GameLogicSystem.CheckForGameEnd(f);
+            }
         }
 
         public void PreRespawn(Frame f, EntityRef entity, VersusStageData stage) {

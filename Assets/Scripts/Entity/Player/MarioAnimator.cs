@@ -162,7 +162,7 @@ namespace NSMB.Entities.Player {
                 skin = colorSet.GetPlayerColors(character);
             }
 
-            GlowColor = Utils.Utils.GetPlayerColor(game, mario.PlayerRef);
+            GlowColor = Utils.Utils.GetPlayerColor(f, mario.PlayerRef);
             stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
             if (game.PlayerIsLocal(mario.PlayerRef)) {
@@ -851,7 +851,7 @@ namespace NSMB.Entities.Player {
             GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(), Quaternion.identity);
             number.GetComponentInChildren<NumberParticle>().Initialize(
                 Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
-                Utils.Utils.GetPlayerColor(e.Game, e.Mario.PlayerRef),
+                Utils.Utils.GetPlayerColor(e.Frame, e.Mario.PlayerRef),
                 e.ItemSpawned
             );
 

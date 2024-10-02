@@ -19,6 +19,7 @@ public class PlayerElements : MonoBehaviour {
     [SerializeField] private CameraAnimator cameraAnimator;
     [SerializeField] private Camera ourCamera;
     [SerializeField] private InputCollector inputCollector;
+    [SerializeField] private ScoreboardUpdater scoreboardUpdater;
 
     //---Private Variables
     private PlayerRef player;
@@ -30,6 +31,7 @@ public class PlayerElements : MonoBehaviour {
         this.SetIfNull(ref cameraAnimator);
         this.SetIfNull(ref ourCamera, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref inputCollector);
+        this.SetIfNull(ref scoreboardUpdater, UnityExtensions.GetComponentType.Children);
     }
 
     public void OnEnable() {
@@ -48,5 +50,7 @@ public class PlayerElements : MonoBehaviour {
         cameraAnimator.Target = entity;
         Camera.transform.SetParent(null);
         Camera.transform.localScale = Vector3.one;
+
+        scoreboardUpdater.Initialize(entity);
     }
 }
