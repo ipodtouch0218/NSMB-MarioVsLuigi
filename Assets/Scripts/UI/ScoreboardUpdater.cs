@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using NSMB.Utils;
 using Quantum;
 using System.Collections.Generic;
@@ -11,8 +12,10 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     //---Properties
     public bool RequestSorting { get; set; }
+    public EntityRef Target => playerElements.Entity;
 
     //---Serialized Variables
+    [SerializeField] private PlayerElements playerElements;
     [SerializeField] private ScoreboardEntry entryTemplate;
     [SerializeField] private GameObject teamHeader;
     [SerializeField] private TMP_Text spectatorText, teamHeaderText;
@@ -20,12 +23,14 @@ public class ScoreboardUpdater : MonoBehaviour {
     [SerializeField] private InputActionReference toggleScoreboardAction;
 
     //---Private Variables
-    private EntityRef owningPlayer;
     private bool isToggled;
     private List<ScoreboardEntry> entries = new();
 
-    public void Initialize(EntityRef owner) {
-        owningPlayer = owner;
+    public void OnValidate() {
+        this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
+    }
+
+    public void Initialize() {
         ShowWithoutAnimation();
     }
 
@@ -177,6 +182,14 @@ public class ScoreboardUpdater : MonoBehaviour {
         animator.Play("toggle", 0, Mathf.Clamp01(animator.GetCurrentAnimatorStateInfo(0).normalizedTime));
     }
 
+    public EntityRef EntityAtPosition(int index) {
+        if (index < 0 || index >= entries.Count) {
+            return EntityRef.None;
+        }
+
+        return entries[index].Target;
+    }
+
     private void OnToggleScoreboard(InputAction.CallbackContext context) {
         if (context.canceled) {
             return;
@@ -197,7 +210,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     private void OnMarioPlayerDied(EventMarioPlayerDied e) {
-        if (e.Entity != owningPlayer) {
+        if (e.Entity != Target) {
             return;
         }
 
@@ -209,7 +222,7 @@ public class ScoreboardUpdater : MonoBehaviour {
     }
 
     private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
-        if (e.Entity != owningPlayer) {
+        if (e.Entity != Target) {
             return;
         }
 

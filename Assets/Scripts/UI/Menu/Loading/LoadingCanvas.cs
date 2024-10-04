@@ -18,6 +18,8 @@ namespace NSMB.Loading {
         [SerializeField] private CanvasGroup loadingGroup, readyGroup;
         [SerializeField] private Image readyBackground;
 
+        [SerializeField] private CharacterAsset defaultCharacterAsset;
+
         //---Private Variables
         private bool initialized;
         private Coroutine fadeCoroutine;
@@ -34,22 +36,26 @@ namespace NSMB.Loading {
             initialized = true;
 
             int characterIndex = 0;
+            CharacterAsset character = defaultCharacterAsset;
+            if (game != null) {
+                Frame f = game.Frames.Predicted;
+                List<PlayerRef> localPlayers = game.GetLocalPlayers();
+                if (localPlayers.Count > 0) {
+                    PlayerRef player = localPlayers[0];
+                    var playerData = QuantumUtils.GetPlayerData(f, player);
 
-            Frame f = game.Frames.Predicted;
-            List<PlayerRef> localPlayers = game.GetLocalPlayers();
-            if (localPlayers.Count > 0) {
-                PlayerRef player = localPlayers[0];
-                var playerData = QuantumUtils.GetPlayerData(f, player);
-
-                if (playerData != null) {
-                    characterIndex = playerData->Character;
-                } else {
-                    characterIndex = Settings.Instance.generalCharacter;
+                    if (playerData != null) {
+                        characterIndex = playerData->Character;
+                    } else {
+                        characterIndex = Settings.Instance.generalCharacter;
+                    }
                 }
+
+                var characters = f.SimulationConfig.CharacterDatas;
+                character = characters[characterIndex % characters.Length];
             }
 
-            var characters = GlobalController.Instance.config.CharacterDatas;
-            mario.Initialize(characters[characterIndex % characters.Length]);
+            mario.Initialize(character);
 
             readyGroup.gameObject.SetActive(false);
             gameObject.SetActive(true);

@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
+using System.Linq;
 using UnityEngine;
 
 public class MusicManager : MonoBehaviour {
@@ -42,7 +43,7 @@ public class MusicManager : MonoBehaviour {
         var allPlayers = f.Filter<MarioPlayer>();
         int playersWithOneLife = 0;
         int playerCount = 0;
-        while (allPlayers.Next(out _, out MarioPlayer mario)) {
+        while (allPlayers.Next(out EntityRef entity, out MarioPlayer mario)) {
             if (rules.IsLivesEnabled) {
                 if (mario.Lives == 1) {
                     playersWithOneLife++;
@@ -50,7 +51,8 @@ public class MusicManager : MonoBehaviour {
             }
             playerCount++;
 
-            if (!game.PlayerIsLocal(mario.PlayerRef)) {
+            if (!game.PlayerIsLocal(mario.PlayerRef)
+                && !PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity)) {
                 continue;
             }
 
@@ -84,7 +86,8 @@ public class MusicManager : MonoBehaviour {
     }
 
     private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
-        if (e.Game.PlayerIsLocal(e.Mario.PlayerRef) && !musicPlayer.IsPlaying) {
+        if ((e.Game.PlayerIsLocal(e.Mario.PlayerRef) || PlayerElements.AllPlayerElements.Any(pe => pe.Entity == e.Entity))
+            && !musicPlayer.IsPlaying) {
             HandleMusic(e.Game, true);
         }
     }

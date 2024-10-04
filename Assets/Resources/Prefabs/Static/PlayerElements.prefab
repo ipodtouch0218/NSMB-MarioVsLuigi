@@ -2641,6 +2641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33ea7cada2913e849afa9400d347f258, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerElements: {fileID: 2296227441865922173}
   entryTemplate: {fileID: 3441377640062739975}
   teamHeader: {fileID: 6657841386413748236}
   spectatorText: {fileID: 3570606654109817726}
@@ -3520,6 +3521,9 @@ MonoBehaviour:
   cameraAnimator: {fileID: 6689543478587193701}
   ourCamera: {fileID: 9216439077095524751}
   inputCollector: {fileID: 4572094016511153426}
+  scoreboardUpdater: {fileID: 1764676025845282627}
+  spectationUI: {fileID: 6512350293295303382}
+  spectatingText: {fileID: 8230197844002157990}
 --- !u!114 &6689543478587193701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3533,6 +3537,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ourCamera: {fileID: 9216439077095524751}
+  playerElements: {fileID: 2296227441865922173}
   secondaryPositioners:
   - {fileID: 8612998918432236764}
 --- !u!222 &6954842842443700749

@@ -12,6 +12,7 @@ using static NSMB.Utils.NetworkUtils;
 using System.IO;
 using UnityEditor;
 using NSMB.Utils;
+using NSMB.UI.MainMenu;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -30,6 +31,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static List<Region> Regions => Client.RegionHandler.EnabledRegions;
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static readonly HashSet<CallbackLocalPlayerAddConfirmed> localPlayerConfirmations = new();
+    public static bool IsReplay { get; private set; }
 
     //---Private
     private RealtimeClient realtimeClient;
@@ -210,6 +212,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             Communicator = new QuantumNetworkCommunicator(Client),
         };
 
+        IsReplay = false;
         Runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
         Runner.Game.AddPlayer(new RuntimePlayer {
             PlayerNickname = Settings.Instance.generalNickname,
@@ -233,8 +236,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     int initialFrame;
     byte[] initialFrameData;
     private void OnGameStateChanged(EventGameStateChanged e) {
-        QuantumGame game = e.Game;
 #if UNITY_STANDALONE
+        if (Runner.Session.IsReplay) {
+            return;
+        }
+
+        QuantumGame game = e.Game;
         if (e.NewState == GameState.Starting) {
             Debug.Log("[Replay] Started recording a new replay.");
             game.StartRecordingInput(e.Frame.Number);
@@ -247,7 +254,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             replay.InitialFrameData = initialFrameData;
             initialFrame = 0;
             initialFrameData = null;
-
+            
             string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
             Directory.CreateDirectory(replayFolder);
 
@@ -279,9 +286,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             //InstantReplaySettings = InstantReplayConfig,
             InitialTick = replay.InitialTick,
             FrameData = replay.InitialFrameData,
-            //DeltaTimeType = DeltaTime
+            DeltaTimeType = SimulationUpdateTime.EngineDeltaTime
         };
 
+        GlobalController.Instance.loadingCanvas.Initialize(null);
+        IsReplay = true;
         Runner = (QuantumRunner) await SessionRunner.StartAsync(arguments);
     }
 

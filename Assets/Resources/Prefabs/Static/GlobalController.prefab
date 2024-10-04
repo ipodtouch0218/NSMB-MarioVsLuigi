@@ -17312,6 +17312,8 @@ MonoBehaviour:
   loadingGroup: {fileID: 6581389812410081186}
   readyGroup: {fileID: 7245564593415694122}
   readyBackground: {fileID: 2647977579914163713}
+  defaultCharacterAsset: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330,
+    type: 2}
 --- !u!223 &1480544161717833697
 Canvas:
   m_ObjectHideFlags: 0
@@ -26525,7 +26527,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.05
+  m_fontSize: 24.2
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

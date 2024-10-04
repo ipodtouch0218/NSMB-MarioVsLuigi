@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
 using System;
@@ -11,9 +12,10 @@ public class CameraAnimator : ResizingCamera {
     public static void TriggerScreenshake(float duration) => OnScreenshake?.Invoke(duration);
 
     //---Properties
-    public EntityRef Target { get; set; }
+    public EntityRef Target => playerElements.Entity;
 
     //---Serialized Variables
+    [SerializeField] private PlayerElements playerElements;
     [SerializeField] private List<SecondaryCameraPositioner> secondaryPositioners;
 
     //---Private Variables
@@ -22,7 +24,8 @@ public class CameraAnimator : ResizingCamera {
 
     public override void OnValidate() {
         base.OnValidate();
-        GetComponentsInChildren(secondaryPositioners); 
+        GetComponentsInChildren(secondaryPositioners);
+        this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
     }
 
     public override void Start() {

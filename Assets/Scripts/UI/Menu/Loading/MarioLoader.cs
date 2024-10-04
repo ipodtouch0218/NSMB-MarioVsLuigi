@@ -20,9 +20,12 @@ namespace NSMB.Loading {
                 _scale = value;
                 if (flashRoutine != null) {
                     StopCoroutine(flashRoutine);
+                    flashRoutine = null;
                 }
 
-                StartCoroutine(DoGrowShrinkFlash());
+                if (isActiveAndEnabled) {
+                    StartCoroutine(DoGrowShrinkFlash());
+                }
             }
         }
 

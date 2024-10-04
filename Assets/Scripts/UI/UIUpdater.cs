@@ -16,7 +16,7 @@ public class UIUpdater : QuantumCallbacks {
     private static readonly int ParamHasItem = Animator.StringToHash("has-item");
 
     //---Properties
-    public EntityRef Target { get; set; }
+    public EntityRef Target => playerElements.Entity;
 
     //---Serialized Variables
     [SerializeField] private PlayerElements playerElements;

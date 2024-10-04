@@ -161,7 +161,7 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventCountdownTick>(this, OnCountdownTick);
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
-            QuantumCallback.Subscribe<CallbackGameInit>(this, OnGameInit);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerConfirmed);
         }
 
@@ -814,8 +814,13 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        private void OnGameInit(CallbackGameInit e) {
+        private unsafe void OnGameStarted(CallbackGameStarted e) {
             alreadyInRoom = false;
+
+            if (NetworkHandler.IsReplay) {
+                GameStart(e.Game);
+                GlobalController.Instance.loadingCanvas.EndLoading(e.Game);
+            }
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
