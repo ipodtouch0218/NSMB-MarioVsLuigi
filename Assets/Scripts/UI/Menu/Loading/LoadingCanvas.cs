@@ -87,7 +87,7 @@ namespace NSMB.Loading {
         public unsafe void EndLoading(QuantumGame game) {
             Frame f = game.Frames.Predicted;
 
-            bool validPlayer = game.GetLocalPlayers().Any(p => QuantumUtils.GetPlayerData(f, p)->IsSpectator);
+            bool validPlayer = game.GetLocalPlayers().Any(p => !QuantumUtils.GetPlayerData(f, p)->IsSpectator);
             
             readyGroup.gameObject.SetActive(true);
             animator.SetTrigger(validPlayer ? "loaded" : "spectating");

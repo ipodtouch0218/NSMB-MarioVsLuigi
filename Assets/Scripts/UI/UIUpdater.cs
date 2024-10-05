@@ -32,13 +32,13 @@ public class UIUpdater : QuantumCallbacks {
     private readonly List<Image> backgrounds = new();
     private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
     private Material timerMaterial;
-    private PlayerRef localPlayer;
-    private bool uiHidden, paused;
+    private bool uiHidden;
 
     //private TeamManager teamManager;
     private int cachedCoins = -1, teamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1;
     private PowerupAsset previousPowerup;
     private VersusStageData stage;
+    private EntityRef previousTarget;
 
     protected override void OnEnable() {
         base.OnEnable();
@@ -95,9 +95,11 @@ public class UIUpdater : QuantumCallbacks {
             ToggleUI(f, false);
         }
 
-        UpdateStoredItemUI(mario);
+        UpdateStoredItemUI(mario, previousTarget == Target);
         UpdateTextUI(f, mario);
         ApplyUIColor(f, mario);
+
+        previousTarget = Target;
     }
 
     private void OnMarioDestroyed(Frame f, MarioAnimator mario) {
@@ -136,12 +138,12 @@ public class UIUpdater : QuantumCallbacks {
         timerParent.SetActive(!hidden);
     }
 
-    private void UpdateStoredItemUI(MarioPlayer mario) {
+    private void UpdateStoredItemUI(MarioPlayer mario, bool playAnimation) {
         PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario.ReserveItem);
         reserveAnimator.SetBool(ParamHasItem, powerup && powerup.ReserveSprite);
 
         if (!powerup) {
-            if (previousPowerup != powerup) {
+            if (playAnimation && previousPowerup != powerup) {
                 reserveAnimator.SetTrigger(ParamOut);
                 previousPowerup = powerup;
             }
@@ -149,7 +151,7 @@ public class UIUpdater : QuantumCallbacks {
         }
 
         itemReserve.sprite = powerup.ReserveSprite ? powerup.ReserveSprite : storedItemNull;
-        if (previousPowerup != powerup) {
+        if (playAnimation && previousPowerup != powerup) {
             reserveAnimator.SetTrigger(ParamIn);
             previousPowerup = powerup;
         }
@@ -180,8 +182,9 @@ public class UIUpdater : QuantumCallbacks {
 
         if (rules.TeamsEnabled) {
             int teamIndex = mario.Team;
-            //teamManager?.GetTeamStars(teamIndex, out teamStars);
-            Team team = ScriptableManager.Instance.teams[teamIndex];
+            teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
+            TeamAsset team = f.SimulationConfig.Teams[teamIndex];
+
             uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + teamStars + "/" + starRequirement);
         } else {
             teamsParent.SetActive(false);
@@ -256,7 +259,7 @@ public class UIUpdater : QuantumCallbacks {
     }
 
     private unsafe void ApplyUIColor(Frame f, MarioPlayer mario) {
-        Color color = f.Global->Rules.TeamsEnabled ? Utils.GetTeamColor(mario.Team, 0.8f, 1f) : stage.UIColor;
+        Color color = f.Global->Rules.TeamsEnabled ? Utils.GetTeamColor(f, mario.Team, 0.8f, 1f) : stage.UIColor;
 
         foreach (Image bg in backgrounds) {
             bg.color = color;
@@ -309,6 +312,9 @@ public class UIUpdater : QuantumCallbacks {
         }
 
         QuantumGame game = QuantumRunner.DefaultGame;
-        game.SendCommand(new CommandSpawnReserveItem());
+        int slotIndex = game.GetLocalPlayers().IndexOf(playerElements.Player);
+        if (slotIndex != -1) {
+            game.SendCommand(game.GetLocalPlayerSlots()[slotIndex], new CommandSpawnReserveItem());
+        }
     }
 }

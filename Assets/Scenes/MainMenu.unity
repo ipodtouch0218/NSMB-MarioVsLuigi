@@ -71950,7 +71950,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1730034125}
   m_Layer: 5
-  m_Name: CurrentLobby
+  m_Name: CurrentRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

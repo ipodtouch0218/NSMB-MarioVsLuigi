@@ -592,6 +592,7 @@ namespace Quantum.Prototypes {
     public Byte Skin;
     public Byte Team;
     public QBoolean IsSpectator;
+    public QBoolean ManualSpectator;
     public Int32 Wins;
     public Int32 LastChatMessage;
     public QBoolean IsReady;
@@ -612,6 +613,7 @@ namespace Quantum.Prototypes {
         result.Skin = this.Skin;
         result.Team = this.Team;
         result.IsSpectator = this.IsSpectator;
+        result.ManualSpectator = this.ManualSpectator;
         result.Wins = this.Wins;
         result.LastChatMessage = this.LastChatMessage;
         result.IsReady = this.IsReady;

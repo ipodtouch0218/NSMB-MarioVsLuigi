@@ -1,3 +1,4 @@
+using Quantum;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,14 +10,20 @@ public class TeamButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
     [SerializeField] private Image overlay, flag;
     [SerializeField] public int index;
 
-    public void OnEnable() {
-        /* TODO
-        PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
-        overlay.enabled = (Mathf.Clamp(data.Team, 0, 4) == index);
+    public unsafe void OnEnable() {
+        QuantumGame game = QuantumRunner.DefaultGame;
+        Frame f = game.Frames.Predicted;
+        var playerData = QuantumUtils.GetPlayerData(f, game.GetLocalPlayers()[0]);
 
-        Team team = ScriptableManager.Instance.teams[index];
-        flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
-        */
+        TeamAsset[] teams = f.SimulationConfig.Teams;
+        overlay.enabled = (playerData->Team % teams.Length) == index;
+        flag.sprite = Settings.Instance.GraphicsColorblind ? teams[index].spriteColorblind : teams[index].spriteNormal;
+
+        Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+    }
+
+    public void OnDisable() {
+        Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
     }
 
     public void OnSelect(BaseEventData eventData) {
@@ -31,5 +38,11 @@ public class TeamButton : MonoBehaviour, ISelectHandler, IDeselectHandler {
 
     public void OnPress() {
         overlay.sprite = overlayPressed;
+    }
+
+    private unsafe void OnColorblindModeChanged() {
+        QuantumGame game = QuantumRunner.DefaultGame;
+        TeamAsset[] teams = game.Configurations.Simulation.Teams;
+        flag.sprite = Settings.Instance.GraphicsColorblind ? teams[index].spriteColorblind : teams[index].spriteNormal;
     }
 }

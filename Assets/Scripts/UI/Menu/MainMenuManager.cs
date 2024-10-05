@@ -734,7 +734,7 @@ namespace NSMB.UI.MainMenu {
                 Character = (byte) Settings.Instance.generalCharacter,
                 Skin = (byte) Settings.Instance.generalSkin,
                 Spectating = false,
-                Team = 0,
+                Team = (byte) (e.Player % f.SimulationConfig.Teams.Length),
             });
 
             if (!alreadyInRoom && e.Game.PlayerIsLocal(e.Player)) {
@@ -824,9 +824,10 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
-            alreadyInRoom = false;
+            transform.parent.gameObject.SetActive(true);
             OpenRoomListMenu();
             GlobalController.Instance.discordController.UpdateActivity();
+            alreadyInRoom = false;
             _ = Reconnect();
         }
 

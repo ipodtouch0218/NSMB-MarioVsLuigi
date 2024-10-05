@@ -472,7 +472,7 @@ namespace NSMB.Utils {
 
             // Then team
             if (f.Global->Rules.TeamsEnabled) {
-                return GetTeamColor(playerData.Team, s, v);
+                return GetTeamColor(f, playerData.Team, s, v);
             }
 
             // Then id based color
@@ -490,12 +490,13 @@ namespace NSMB.Utils {
             return Color.HSVToRGB(ourIndex / (players.Count + 1f), s, v);
         }
 
-        public static Color GetTeamColor(int team, float s = 1, float v = 1) {
-            if (team < 0 || team >= ScriptableManager.Instance.teams.Length) {
+        public static Color GetTeamColor(Frame f, int team, float s = 1, float v = 1) {
+            var teams = f.SimulationConfig.Teams;
+            if (team < 0 || team >= teams.Length) {
                 return spectatorColor;
             }
 
-            Color color = ScriptableManager.Instance.teams[team].color;
+            Color color = teams[team].color;
             Color.RGBToHSV(color, out float hue, out float saturation, out float value);
             return Color.HSVToRGB(hue, saturation * s, value * v);
         }

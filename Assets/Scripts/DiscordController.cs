@@ -1,11 +1,10 @@
+using Discord;
+using NSMB.Translation;
+using Photon.Realtime;
+using Quantum;
 using System;
 using System.IO;
 using UnityEngine;
-
-using Discord;
-using NSMB.Translation;
-using Quantum;
-using Photon.Realtime;
 
 public unsafe class DiscordController : MonoBehaviour {
 #pragma warning disable IDE0079
@@ -17,6 +16,7 @@ public unsafe class DiscordController : MonoBehaviour {
     //---Private Variables
     private Discord.Discord discord;
     private ActivityManager activityManager;
+    private float lastInitializeTime;
 
     public void OnEnable() {
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -42,7 +42,12 @@ public unsafe class DiscordController : MonoBehaviour {
         return false;
 #endif
 
-        discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
+        lastInitializeTime = Time.time;
+        try {
+            discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
+        } catch {
+            return false;
+        }
         activityManager = discord.GetActivityManager();
         //activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
@@ -62,6 +67,10 @@ public unsafe class DiscordController : MonoBehaviour {
 
     public void Update() {
         if (discord == null) {
+            if (Time.time - lastInitializeTime > 10) {
+                // Try to recreate every 10 seconds
+                Initialize();
+            }
             return;
         }
 
@@ -81,7 +90,7 @@ public unsafe class DiscordController : MonoBehaviour {
         }
 
         if (!Settings.Instance.GeneralDiscordIntegration) {
-            activityManager.ClearActivity(res => { Debug.Log(res); });
+            activityManager.ClearActivity(res => { });
             return;
         }
 
@@ -110,9 +119,15 @@ public unsafe class DiscordController : MonoBehaviour {
         if (game != null) {
             Frame f = game.Frames.Predicted;
 
-            if (f != null && f.Global->GameState != GameState.PreGameRoom) {
+            if (f != null && f.Global->GameState >= GameState.Playing) {
                 // In a level
-                activity.Details ??= tm.GetTranslation("discord.offline");
+                if (activity.Details == null) {
+                    if (runner.Session.IsReplay) {
+                        activity.Details = tm.GetTranslation("discord.replay");
+                    } else {
+                        activity.Details = tm.GetTranslation("discord.offline");
+                    }
+                }
                 var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
                 activity.Assets = new ActivityAssets {
@@ -124,7 +139,7 @@ public unsafe class DiscordController : MonoBehaviour {
                 if (f.Global->Rules.TimerSeconds > 0) {
                     activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
                 } else {
-                    activity.Timestamps = new() { Start = now - (f.Number * f.DeltaTime * 1000).AsLong };
+                    activity.Timestamps = new() { Start = now - ((f.Number - f.Global->StartFrame) * f.DeltaTime * 1000).AsLong };
                 }
             }
         } else {

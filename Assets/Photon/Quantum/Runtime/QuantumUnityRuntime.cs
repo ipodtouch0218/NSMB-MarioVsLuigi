@@ -1204,19 +1204,24 @@ namespace Quantum {
         return;
       }
 
-      bool isNewSceneLoaded = SceneManager.GetSceneByName(map.Scene).IsValid();
-      if (isNewSceneLoaded) {
-        VerboseLog($"Scene {map.Scene} appears to have been loaded externally.");
-        _currentMap               = map;
-        _currentSceneNeedsCleanup = false;
-        return;
-      }
-
       var coroHost = QuantumMapLoader.Instance;
       Debug.Assert(coroHost != null);
 
       string previousScene = _currentMap?.Scene ?? string.Empty;
-      string newScene      = map.Scene;
+      string newScene = map.Scene;
+
+      bool isNewSceneLoaded = SceneManager.GetSceneByName(newScene).IsValid();
+      if (isNewSceneLoaded) {
+        VerboseLog($"Scene {map.Scene} appears to have been loaded externally.");
+        _currentMap               = map;
+        _currentSceneNeedsCleanup = false;
+
+        if (loadMode == SimulationConfig.AutoLoadSceneFromMapMode.LoadThenUnloadPreviousScene || loadMode == SimulationConfig.AutoLoadSceneFromMapMode.UnloadPreviousSceneThenLoad) {
+          // Fallback: return 
+          _coroutine = coroHost.StartCoroutine(UnloadScene(previousScene));
+        }
+        return;
+      }
 
       _currentMap               = map;
       _currentSceneNeedsCleanup = true;

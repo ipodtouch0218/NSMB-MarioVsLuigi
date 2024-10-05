@@ -7,7 +7,7 @@ namespace Quantum {
 
     public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
         ISignalOnGameStarting, ISignalOnBeforePhysicsCollision, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped,
-        ISignalOnBeforeInteraction {
+        ISignalOnBeforeInteraction, ISignalOnPlayerDisconnected {
 
         public struct Filter {
             public EntityRef Entity;
@@ -1898,6 +1898,20 @@ namespace Quantum {
 
         public void OnBeforeInteraction(Frame f, EntityRef entity, bool* allowInteraction) {
             *allowInteraction &= !f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario) || !(mario->IsDead || f.Exists(mario->CurrentPipe));
+        }
+
+        public void OnPlayerDisconnected(Frame f, PlayerRef player) {
+            var marios = f.Filter<MarioPlayer>();
+            while (marios.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
+                if (mario->PlayerRef != player) {
+                    continue;
+                }
+
+                mario->Disconnected = true;
+                mario->IsDead = false;
+                mario->PlayerRef = PlayerRef.None;
+                mario->Death(f, entity, false);
+            }
         }
     }
 }

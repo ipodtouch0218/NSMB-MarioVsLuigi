@@ -101,7 +101,7 @@ namespace NSMB.UI.MainMenu {
 
             string teamSymbol;
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
-                Team team = ScriptableManager.Instance.teams[playerData->Team];
+                TeamAsset team = f.SimulationConfig.Teams[playerData->Team];
                 teamSymbol = team.textSpriteColorblindBig;
             } else {
                 teamSymbol = "";

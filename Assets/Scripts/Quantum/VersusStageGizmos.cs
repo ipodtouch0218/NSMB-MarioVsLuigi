@@ -15,6 +15,10 @@ public class VersusStageGizmos : MonoBehaviour {
 
 
     public void OnDrawGizmos() {
+        if (!mapData || !mapData.Asset) {
+            return;
+        }
+
         var stage = QuantumUnityDB.GetGlobalAsset<VersusStageData>(mapData.Asset.UserAsset.Id);
 
         if (!stage) {

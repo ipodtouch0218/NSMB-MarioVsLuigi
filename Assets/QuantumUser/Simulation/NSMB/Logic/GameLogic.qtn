@@ -76,6 +76,10 @@ synced event PlayerLoaded {
 	PlayerRef Player;
 }
 
+synced event GameStarted {
+	Frame Frame;
+}
+
 synced event GameEnded {
 	Frame Frame;
 	int WinningTeam;

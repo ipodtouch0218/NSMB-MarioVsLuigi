@@ -2,7 +2,7 @@ using Photon.Deterministic;
 using Quantum.Physics2D;
 
 namespace Quantum {
-    public unsafe class BigStarSystem : SystemMainThread, ISignalOnTrigger2D {
+    public unsafe class BigStarSystem : SystemMainThread, ISignalOnTrigger2D, ISignalOnReturnToRoom {
 
         public override void Update(Frame f) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -112,8 +112,15 @@ namespace Quantum {
 
             f.Signals.OnMarioPlayerCollectedStar(info.Entity);
             f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario, f.Unsafe.GetPointer<Transform2D>(info.Other)->Position);
-            f.Global->BigStarSpawnTimer = (ushort) (624 - (f.PlayerConnectedCount * 12));
+            f.Global->BigStarSpawnTimer = (ushort) (624 - (f.Global->RealPlayers * 12));
             f.Destroy(info.Other);
+        }
+
+        public void OnReturnToRoom(Frame f) {
+            f.Global->MainBigStar = EntityRef.None;
+            f.Global->BigStarSpawnTimer = 0;
+            f.Global->UsedStarSpawnCount = 0;
+            f.Global->UsedStarSpawns.ClearAll();
         }
     }
 }

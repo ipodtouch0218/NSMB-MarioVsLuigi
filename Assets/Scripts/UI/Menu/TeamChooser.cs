@@ -1,9 +1,10 @@
+using NSMB.Extensions;
+using NSMB.UI.MainMenu;
+using Quantum;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
-using NSMB.Extensions;
-using NSMB.UI.MainMenu;
+using Button = UnityEngine.UI.Button;
 
 public class TeamChooser : MonoBehaviour {
 
@@ -38,24 +39,33 @@ public class TeamChooser : MonoBehaviour {
     }
 
     public void SelectTeam(TeamButton team) {
-        /* TODO
         int selected = team.index;
 
-        PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
-        data.Rpc_SetTeamNumber((sbyte) selected);
+        QuantumGame game = QuantumRunner.DefaultGame;
+        foreach (int slot in game.GetLocalPlayerSlots()) {
+            QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
+                EnabledChanges = CommandChangePlayerData.Changes.Team,
+                Team = (byte) selected,
+            });
+        }
+        
         Close(false);
-        Team teamScriptable = ScriptableManager.Instance.teams[selected];
+
+        TeamAsset teamScriptable = game.Configurations.Simulation.Teams[selected];
         flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
 
-        if (MainMenuManager.Instance)
-            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Decide);
-        */
+        if (MainMenuManager.Instance) {
+            MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
+        }
     }
 
-    public void Open() {
-        /* TODO
-        PlayerData data = NetworkHandler.Instance.runner.GetLocalPlayerData();
-        int selected = Mathf.Clamp(data.Team, 0, 4);
+    public unsafe void Open() {
+        QuantumGame game = QuantumRunner.DefaultGame;
+        Frame f = game.Frames.Predicted;
+        var playerData = QuantumUtils.GetPlayerData(f, game.GetLocalPlayers()[0]);
+
+        TeamAsset[] teams = f.SimulationConfig.Teams;
+        int selected = Mathf.Clamp(playerData->Team, 0, teams.Length);
         blockerInstance = Instantiate(blockerTemplate, baseCanvas.transform);
         blockerInstance.SetActive(true);
         content.SetActive(true);
@@ -65,9 +75,9 @@ public class TeamChooser : MonoBehaviour {
 
         EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
 
-        if (MainMenuManager.Instance)
-            MainMenuManager.Instance.sfx.PlayOneShot(Enums.Sounds.UI_Cursor);
-        */
+        if (MainMenuManager.Instance) {
+            MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Cursor);
+        }
     }
 
     public void Close(bool playSound) {
@@ -84,13 +94,13 @@ public class TeamChooser : MonoBehaviour {
         }
     }
 
-    private void OnColorblindModeChanged() {
-        /* TODO
-        if (!button.interactable || !NetworkHandler.Runner.GetLocalPlayerData()) return;
+    private unsafe void OnColorblindModeChanged() {
+        QuantumGame game = QuantumRunner.DefaultGame;
+        Frame f = game.Frames.Predicted;
+        var playerData = QuantumUtils.GetPlayerData(f, game.GetLocalPlayers()[0]);
 
-        int selected = NetworkHandler.Runner.GetLocalPlayerData().Team % 5;
-        Team teamScriptable = ScriptableManager.Instance.teams[selected];
-        flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
-        */
+        TeamAsset[] teams = f.SimulationConfig.Teams;
+        int selected = playerData->Team % teams.Length;
+        flag.sprite = Settings.Instance.GraphicsColorblind ? teams[selected].spriteColorblind : teams[selected].spriteNormal;
     }
 }

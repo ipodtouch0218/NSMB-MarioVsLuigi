@@ -48,7 +48,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         realtimeClient.AddCallbackTarget(this);
 
         QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, CallbackOnLocalPlayerConfirmed);
-        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+        QuantumEvent.Subscribe<EventGameStarted>(this, OnGameStarted);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
 
     public void Update() {
@@ -233,39 +234,40 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
     }
 
-    int initialFrame;
-    byte[] initialFrameData;
-    private void OnGameStateChanged(EventGameStateChanged e) {
+    private void OnGameEnded(EventGameEnded e) {
 #if UNITY_STANDALONE
         if (Runner.Session.IsReplay) {
             return;
         }
 
         QuantumGame game = e.Game;
-        if (e.NewState == GameState.Starting) {
-            Debug.Log("[Replay] Started recording a new replay.");
-            game.StartRecordingInput(e.Frame.Number);
-            initialFrameData = e.Frame.Serialize(DeterministicFrameSerializeMode.Serialize);
-            initialFrame = e.Frame.Number;
+        QuantumReplayFile replay = game.GetRecordedReplay();
+        replay.InitialTick = initialFrame;
+        replay.InitialFrameData = initialFrameData;
+        initialFrame = 0;
+        initialFrameData = null;
 
-        } else if (e.NewState == GameState.Ended) {
-            QuantumReplayFile replay = game.GetRecordedReplay();
-            replay.InitialTick = initialFrame;
-            replay.InitialFrameData = initialFrameData;
-            initialFrame = 0;
-            initialFrameData = null;
-            
-            string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
-            Directory.CreateDirectory(replayFolder);
+        string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
+        Directory.CreateDirectory(replayFolder);
 
-            string json = JsonUtility.ToJson(replay);
-            string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".json");
-            File.WriteAllText(finalFilePath, json);
+        string json = JsonUtility.ToJson(replay);
+        string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".json");
+        File.WriteAllText(finalFilePath, json);
 
-            FileInfo writtenFile = new FileInfo(finalFilePath);
-            Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenFile.Length)})");
-        }
+        FileInfo writtenFile = new FileInfo(finalFilePath);
+        Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenFile.Length)})");
 #endif
+    }
+
+    int initialFrame;
+    byte[] initialFrameData;
+    private void OnGameStarted(EventGameStarted e) {
+        QuantumGame game = e.Game;
+
+        game.StartRecordingInput(e.Frame.Number);
+        initialFrameData = e.Frame.Serialize(DeterministicFrameSerializeMode.Serialize);
+        initialFrame = e.Frame.Number;
+        Debug.Log("[Replay] Started recording a new replay.");
     }
 
     public async static void StartReplay(QuantumReplayFile replay) {

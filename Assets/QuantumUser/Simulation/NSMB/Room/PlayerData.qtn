@@ -8,6 +8,7 @@ component PlayerData {
 	byte Skin;
 	byte Team;
 	bool IsSpectator;
+	bool ManualSpectator;
 
 	int Wins;
 	int LastChatMessage;

@@ -113,6 +113,11 @@ public class ScoreboardUpdater : MonoBehaviour {
 
             return (mario1->PlayerRef > mario2->PlayerRef) ? 1 : -1;
         });
+
+        foreach (var entry in entries) {
+            entry.transform.SetAsLastSibling();
+        }
+        spectatorText.transform.SetAsLastSibling();
     }
 
     public unsafe void UpdateTeamHeader(Frame f) {

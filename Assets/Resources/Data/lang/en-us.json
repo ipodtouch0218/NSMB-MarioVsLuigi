@@ -34,10 +34,10 @@
   "ui.error.joinfull": "Failed to connect to the room: The room is full.",
   "ui.error.jointimeout": "Failed to connect to the room: No response from the host (timeout).",
   "ui.error.joinrefused": "Failed to connect to the room: Either the room is full, you were banned, or a connection could not be made.",
-  "ui.error.hostdisconnected": "The host disconnected while a game was in progress, so it was cancelled.\nMid-game host migration will be added in a later update.",
   "ui.error.gamebanned.noreason": "No reason given.",
   "ui.error.gamebanned.permanent": "You are permanently banned from the game.\nReason: {banreason}\n\nAppeal on the MvL Discord server: https://discord.gg/dgKVaUKpj5\nBan ID: {banid}",
   "ui.error.gamebanned.temporary": "You are temporarily banned from the game.\nReason: {banreason}\nExpires: {expiration}\n\nAppeal on the MvL Discord server: https://discord.gg/dgKVaUKpj5\nBan ID: {banid}",
+  "ui.error.hostdisconnected": "The host disconnected while a game was in progress, so it was cancelled.\nMid-game host migration will be added in a later update.",
   "ui.title.click": "Click to Continue...",
   "ui.title.button": "Press any button",
   "ui.main.header": "Main Menu",
@@ -260,5 +260,6 @@
   "discord.public": "In a Public Game",
   "discord.private": "In a Private Game",
   "discord.online": "Playing Online",
-  "discord.offline": "Playing Offline"
+  "discord.offline": "Playing Offline",
+  "discord.replay": "Watching a Replay",
 }

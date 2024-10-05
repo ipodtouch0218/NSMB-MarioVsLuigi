@@ -50,6 +50,7 @@ namespace Quantum {
                             playerData->Team = changeData.Team;
                         }
                         if (playerChanges.HasFlag(CommandChangePlayerData.Changes.Spectating)) {
+                            playerData->ManualSpectator = changeData.Spectating;
                             playerData->IsSpectator = changeData.Spectating;
                         }
 
@@ -188,7 +189,7 @@ namespace Quantum {
                 if (!f.RuntimeConfig.IsRealGame || allPlayersLoaded) {
                     // Progress to next stage.
                     f.Global->GameState = GameState.Starting;
-                    f.Global->GameStartFrames = 3 * 60 + 78;
+                    f.Global->GameStartFrames = 3 * 60 + 120;
                     f.Global->Timer = f.Global->Rules.TimerSeconds;
 
                     f.Signals.OnLoadingComplete();
@@ -208,6 +209,7 @@ namespace Quantum {
                     // Respawn all players and enable systems
                     f.SystemEnable<GameplaySystemGroup>();
                     f.Signals.OnGameStarting();
+                    f.Events.GameStarted(f);
                 }
                 break;
 
@@ -229,10 +231,10 @@ namespace Quantum {
             case GameState.Ended:
                 if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                     // Move back to lobby.
-                    f.SystemEnable<GameplaySystemGroup>();
                     if (f.IsVerified) {
-                        f.Map = f.SimulationConfig.LobbyMap;
+                        f.MapAssetRef = f.SimulationConfig.LobbyMap;
                     }
+                    f.SystemEnable<GameplaySystemGroup>();
                     f.Signals.OnReturnToRoom();
                     f.Global->GameState = GameState.PreGameRoom;
                     f.Events.GameStateChanged(f, GameState.PreGameRoom);
@@ -256,7 +258,7 @@ namespace Quantum {
             bool oneOrNoTeamAlive = true;
             int aliveTeam = -1;
             while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
-                if (livesGame && mario->Lives <= 0) {
+                if ((livesGame && mario->Lives <= 0) || mario->Disconnected) {
                     continue;
                 }
 
@@ -310,6 +312,15 @@ namespace Quantum {
         public static void EndGame(Frame f, int? winningTeam) {
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
             f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
+
+            if (winningTeam != null) {
+                var playerDatas = f.Filter<PlayerData>();
+                while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                    if (winningTeam == data->Team) {
+                        data->Wins++;
+                    }
+                }
+            }
 
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(f, GameState.Ended);
@@ -419,6 +430,12 @@ namespace Quantum {
 
             // Reset variables
             f.Global->Timer = 0;
+
+            var playerDatas = f.Filter<PlayerData>();
+            while (playerDatas.NextUnsafe(out _, out PlayerData* playerData)) {
+                playerData->IsLoaded = false;
+                playerData->IsReady = false;
+            }
         }
     }
 }

@@ -2108,7 +2108,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PlayerData : Quantum.IComponent {
-    public const Int32 SIZE = 44;
+    public const Int32 SIZE = 48;
     public const Int32 ALIGNMENT = 4;
     [FieldOffset(20)]
     public PlayerRef PlayerRef;
@@ -2124,6 +2124,8 @@ namespace Quantum {
     public Byte Team;
     [FieldOffset(40)]
     public QBoolean IsSpectator;
+    [FieldOffset(44)]
+    public QBoolean ManualSpectator;
     [FieldOffset(16)]
     public Int32 Wins;
     [FieldOffset(8)]
@@ -2146,6 +2148,7 @@ namespace Quantum {
         hash = hash * 31 + Skin.GetHashCode();
         hash = hash * 31 + Team.GetHashCode();
         hash = hash * 31 + IsSpectator.GetHashCode();
+        hash = hash * 31 + ManualSpectator.GetHashCode();
         hash = hash * 31 + Wins.GetHashCode();
         hash = hash * 31 + LastChatMessage.GetHashCode();
         hash = hash * 31 + IsReady.GetHashCode();
@@ -2170,6 +2173,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsReady, serializer);
         QBoolean.Serialize(&p->IsRoomHost, serializer);
         QBoolean.Serialize(&p->IsSpectator, serializer);
+        QBoolean.Serialize(&p->ManualSpectator, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]

@@ -39,7 +39,7 @@ public unsafe class PlayerTrackIcon : TrackIcon {
         var mario = game.Frames.Predicted.Get<MarioPlayer>(targetEntity);
         image.color = Utils.GetPlayerColor(f, mario.PlayerRef);
         if (f.Global->Rules.TeamsEnabled) {
-            teamIcon.sprite = ScriptableManager.Instance.teams[mario.Team].spriteColorblind;
+            teamIcon.sprite = f.SimulationConfig.Teams[mario.Team].spriteColorblind;
         }
 
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
