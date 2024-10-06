@@ -1,7 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
 using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -25,6 +24,7 @@ public class TilemapAnimator : MonoBehaviour {
     public void Start() {
         QuantumEvent.Subscribe<EventTileChanged>(this, OnTileChanged);
         QuantumEvent.Subscribe<EventTileBroken>(this, OnTileBroken);
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, e => RefreshMap(e.Game.Frames.Predicted));
         QuantumCallback.Subscribe<CallbackEventCanceled>(this, OnEventCanceled);
         QuantumCallback.Subscribe<CallbackEventConfirmed>(this, OnEventConfirmed);
 

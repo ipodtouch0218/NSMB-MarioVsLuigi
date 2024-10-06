@@ -219,7 +219,7 @@ public class UIUpdater : QuantumCallbacks {
 
             if (secondsRemaining != cachedTimer) {
                 cachedTimer = secondsRemaining;
-                uiCountdown.text = Utils.GetSymbolString("Tx" + (secondsRemaining / 60) + ":" + (secondsRemaining % 60).ToString("00"));
+                uiCountdown.text = Utils.GetSymbolString("Tx" + Utils.SecondsToMinuteSeconds(secondsRemaining));
                 timerParent.SetActive(true);
             }
         } else {

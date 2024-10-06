@@ -1,23 +1,20 @@
+using static NSMB.Utils.NetworkUtils;
+using NSMB.Utils;
 using Photon.Deterministic;
 using Photon.Realtime;
 using Quantum;
-using System.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static NSMB.Utils.NetworkUtils;
-using System.IO;
-using UnityEditor;
-using NSMB.Utils;
-using NSMB.UI.MainMenu;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
     //---Events
-    public static event Action OnLocalPlayerConfirmed;
     public static event Action<ClientState, ClientState> StateChanged;
 
     //---Constants
@@ -30,13 +27,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static QuantumRunner Runner { get; private set; }
     public static List<Region> Regions => Client.RegionHandler.EnabledRegions;
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
-    public static readonly HashSet<CallbackLocalPlayerAddConfirmed> localPlayerConfirmations = new();
     public static bool IsReplay { get; private set; }
+    public static int ReplayLength { get; private set; }
+    public static int ReplayStart { get; private set; }
+    public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
 
     //---Private
     private RealtimeClient realtimeClient;
     private string lastRegion;
     private Coroutine pingUpdateCoroutine;
+    private List<byte[]> replayFrameCache;
 
     public void Awake() {
         StateChanged += OnClientStateChanged;
@@ -47,7 +47,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         };
         realtimeClient.AddCallbackTarget(this);
 
-        QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, CallbackOnLocalPlayerConfirmed);
+        QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
         QuantumEvent.Subscribe<EventGameStarted>(this, OnGameStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
@@ -293,12 +293,27 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         GlobalController.Instance.loadingCanvas.Initialize(null);
         IsReplay = true;
+        ReplayLength = replay.LastTick - replay.InitialTick;
+        ReplayStart = replay.InitialTick;
+        Instance.replayFrameCache = new() {
+            replay.InitialFrameData
+        };
         Runner = (QuantumRunner) await SessionRunner.StartAsync(arguments);
     }
 
-    private void CallbackOnLocalPlayerConfirmed(CallbackLocalPlayerAddConfirmed e) {
-        localPlayerConfirmations.Add(e);
-        OnLocalPlayerConfirmed?.Invoke();
+    private void OnSimulateFinished(CallbackSimulateFinished e) {
+        if (!IsReplay) {
+            return;
+        }
+
+        if ((e.Frame.Number - ReplayStart) % (5 * QuantumRunner.Default.Session.SimulationRate) == 0) {
+            // Save this frame to the replay cache
+            Debug.Log("serialized frame #" + e.Frame.Number);
+            byte[] serializedFrame = e.Frame.Serialize(DeterministicFrameSerializeMode.Serialize);
+            byte[] copy = new byte[serializedFrame.Length];
+            Array.Copy(serializedFrame, copy, serializedFrame.Length);
+            replayFrameCache.Add(copy);
+        }
     }
 
     public void OnConnected() { }

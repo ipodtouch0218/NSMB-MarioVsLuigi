@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using NSMB.Translation;
 using Quantum;
 using System;
@@ -11,6 +12,7 @@ namespace NSMB.UI.Pause {
     public class PauseMenuManager : MonoBehaviour {
 
         //---Serialized Variables
+        [SerializeField] private PlayerElements playerElements;
         [SerializeField] private InputCollector inputCollector;
         [SerializeField] private GameObject main;
 
@@ -36,8 +38,16 @@ namespace NSMB.UI.Pause {
 
         private float unpauseTime;
 
+        public void OnValidate() {
+            this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
+        }
+
         public void Start() {
             ControlSystem.controls.UI.Pause.performed += OnPause;
+            if (NetworkHandler.IsReplay) {
+                options[1].translationKey = "ui.pause.replay.hide";
+            }
+            UpdateLabels();
         }
 
         public void OnDestroy() {
@@ -64,7 +74,7 @@ namespace NSMB.UI.Pause {
 
             QuantumGame game = QuantumRunner.DefaultGame;
             isHost = game == null || game.PlayerIsLocal(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _));
-            options[1].text.fontSharedMaterial = isHost ? enabledMaterial : disabledMaterial;
+            options[1].text.fontSharedMaterial = isHost || NetworkHandler.IsReplay ? enabledMaterial : disabledMaterial;
             SelectOption(0);
 
             isInConfirmation = false;
@@ -222,6 +232,18 @@ namespace NSMB.UI.Pause {
         }
         
         public void OpenConfirmationMenu(bool quit) {
+            if (NetworkHandler.IsReplay) {
+                // Toggle replay UI
+                bool replayNowActive = playerElements.ToggleReplayControls();
+                options[1].translationKey = replayNowActive ? "ui.pause.replay.hide" : "ui.pause.replay.show";
+                UpdateLabels();
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+                return;
+            }
+            if (!quit && !isHost) {
+                return;
+            }
+
             isInConfirmation = true;
             isInConfirmationForQuitting = quit;
 
@@ -238,7 +260,7 @@ namespace NSMB.UI.Pause {
         public void IncrementOption(int increment) {
             int newIndex = selected + increment;
 
-            if (newIndex == 1 && !isHost) {
+            if (newIndex == 1 && !isHost && !NetworkHandler.IsReplay) {
                 newIndex += increment;
             }
 
@@ -250,13 +272,13 @@ namespace NSMB.UI.Pause {
         }
 
         public void SelectOption(int index) {
-            if (selected == index || selected < 0 || selected >= options.Length || (index == 1 && !isHost)) {
+            if (selected == index || selected < 0 || selected >= options.Length || (index == 1 && !isHost  && !NetworkHandler.IsReplay)) {
                 skipSound = false;
                 return;
             }
 
             selected = index;
-            UpdateLabels(selected);
+            UpdateLabels();
 
             if (!skipSound) {
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
@@ -276,7 +298,7 @@ namespace NSMB.UI.Pause {
             SelectOption(index);
         }
 
-        private void UpdateLabels(int selected) {
+        public void UpdateLabels() {
             for (int i = 0; i < options.Length; i++) {
                 PauseMenuOptionWrapper option = options[i];
                 option.text.text = (selected == i) ? ("» " + option.originalText + " «") : option.originalText;
@@ -288,7 +310,7 @@ namespace NSMB.UI.Pause {
             foreach (PauseMenuOptionWrapper option in options) {
                 option.originalText = tm.GetTranslation(option.translationKey);
             }
-            UpdateLabels(selected);
+            UpdateLabels();
         }
 
         [Serializable]
