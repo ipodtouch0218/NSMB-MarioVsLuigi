@@ -1,4 +1,4 @@
-using NSMB.Extensions;
+﻿using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
 using Photon.Deterministic;
@@ -33,6 +33,7 @@ public class PlayerElements : MonoBehaviour {
 
     [SerializeField] private GameObject replayUI;
     [SerializeField] private TMP_Text replayTimecode;
+    [SerializeField] private TMP_Text replayPauseButton;
 
     //---Private Variables
     private PlayerRef player;
@@ -40,6 +41,9 @@ public class PlayerElements : MonoBehaviour {
 
     private bool spectating;
     private EntityRef spectatingEntity;
+
+    private float replaySpeed = 1;
+    private bool replayPaused;
 
     public void OnValidate() {
         this.SetIfNull(ref image);
@@ -146,6 +150,26 @@ public class PlayerElements : MonoBehaviour {
         } else {
             // We have to simulate up to this frame
             QuantumRunner.Default.Session.Update((newFrame - f.Number) * f.DeltaTime.AsDouble);
+        }
+    }
+
+    public void PausePlayReplay() {
+        replayPaused = !replayPaused;
+        if (replayPaused) {
+            Time.timeScale = 0;
+            replayPauseButton.text = "►";
+        } else {
+            Time.timeScale = replaySpeed;
+            replayPauseButton.text = "||";
+        }
+    }
+
+    public void ReplayChangeSpeed(Slider slider) {
+        float[] speeds = { 0.25f, 0.5f, 1f, 2f, 4f };
+        replaySpeed = speeds[Mathf.RoundToInt(slider.value)];
+        
+        if (!replayPaused) {
+            Time.timeScale = replaySpeed;
         }
     }
 
