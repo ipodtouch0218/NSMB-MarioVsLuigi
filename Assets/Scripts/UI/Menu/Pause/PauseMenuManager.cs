@@ -232,9 +232,9 @@ namespace NSMB.UI.Pause {
         }
         
         public void OpenConfirmationMenu(bool quit) {
-            if (NetworkHandler.IsReplay) {
+            if (NetworkHandler.IsReplay && !quit) {
                 // Toggle replay UI
-                bool replayNowActive = playerElements.ToggleReplayControls();
+                bool replayNowActive = playerElements.ReplayUi.ToggleReplayControls();
                 options[1].translationKey = replayNowActive ? "ui.pause.replay.hide" : "ui.pause.replay.show";
                 UpdateLabels();
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
@@ -299,6 +299,10 @@ namespace NSMB.UI.Pause {
         }
 
         public void UpdateLabels() {
+            foreach (PauseMenuOptionWrapper option in options) {
+                option.originalText = GlobalController.Instance.translationManager.GetTranslation(option.translationKey);
+            }
+
             for (int i = 0; i < options.Length; i++) {
                 PauseMenuOptionWrapper option = options[i];
                 option.text.text = (selected == i) ? ("» " + option.originalText + " «") : option.originalText;

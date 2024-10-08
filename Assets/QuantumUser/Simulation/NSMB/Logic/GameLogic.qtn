@@ -76,6 +76,10 @@ synced event PlayerLoaded {
 	PlayerRef Player;
 }
 
+synced event RecordingStarted {
+	Frame Frame;
+}
+
 synced event GameStarted {
 	Frame Frame;
 }

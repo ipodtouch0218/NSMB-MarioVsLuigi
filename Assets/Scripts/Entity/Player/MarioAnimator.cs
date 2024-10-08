@@ -106,17 +106,13 @@ namespace NSMB.Entities.Player {
 
         protected override void OnEnable() {
             base.OnEnable();
-            // GameManager.OnAllPlayersLoaded += OnAllPlayersLoaded;
         }
 
         protected override void OnDisable() {
             base.OnDisable();
-            // GameManager.OnAllPlayersLoaded -= OnAllPlayersLoaded;
         }
 
         public void Start() {
-            // DisableAllModels();
-
             renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
             renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
 
@@ -140,7 +136,6 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
             QuantumEvent.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage);
-            QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound);
             QuantumEvent.Subscribe<EventMarioPlayerPickedUpObject>(this, OnMarioPlayerPickedUpObject);
             QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject);
             QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart);
@@ -150,6 +145,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerStoppedSliding>(this, OnMarioPlayerStoppedSliding);
             QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner);
             QuantumEvent.Subscribe<EventMarioPlayerDeathUp>(this, OnMarioPlayerDeathUp);
+            QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound);
         }
 
         public void Initialize(QuantumGame game) {
@@ -287,7 +283,6 @@ namespace NSMB.Entities.Player {
             }
             */
 
-            //rotChangeTarget = models.transform.rotation.eulerAngles;
             float delta = Time.deltaTime;
 
             modelRotateInstantly = false;
@@ -666,11 +661,9 @@ namespace NSMB.Entities.Player {
 
             PlaySound(e.Weak ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
 
-            /*
-            if (cameraController.IsControllingCamera) {
+            if (MarioIsLocal(e.Entity)) {
                 GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, e.Weak ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
             }
-            */
         }
 
         private void OnMarioPlayerMegaEnd(EventMarioPlayerMegaEnd e) {
@@ -948,12 +941,10 @@ namespace NSMB.Entities.Player {
                 SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform.Position.ToUnityVector2());
                 CameraAnimator.TriggerScreenshake(0.35f);
 
-                /* TODO
-                if (cameraController.IsControllingCamera) {
+                if (MarioIsLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f,
                         RumbleManager.RumbleSetting.Low);
                 }
-                */
 
             } else {
                 SoundEffect soundEffect = mario.CurrentPowerupState switch {
@@ -963,13 +954,11 @@ namespace NSMB.Entities.Player {
                 PlaySound(soundEffect);
 
                 SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform.Position.ToUnityVector2());
-                /* TODO
 
-                if (cameraController.IsControllingCamera) {
+                if (MarioIsLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f,
                         RumbleManager.RumbleSetting.Low);
                 }
-                */
             }
         }
 
@@ -1003,11 +992,9 @@ namespace NSMB.Entities.Player {
             if (e.WasBounce) {
                 PlaySound(SoundEffect.Enemy_Generic_Stomp);
 
-                /*
-                if (cameraController.IsControllingCamera) {
+                if (MarioIsLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.4f, 0.15f, RumbleManager.RumbleSetting.Low);
                 }
-                */
             } else {
                 SoundEffect soundEffect = mario.CurrentPowerupState switch {
                     PowerupState.MiniMushroom => SoundEffect.Powerup_MiniMushroom_Jump,

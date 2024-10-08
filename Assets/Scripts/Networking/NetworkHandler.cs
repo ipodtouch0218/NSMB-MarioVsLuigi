@@ -28,8 +28,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static List<Region> Regions => Client.RegionHandler.EnabledRegions;
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay { get; private set; }
-    public static int ReplayLength { get; private set; }
     public static int ReplayStart { get; private set; }
+    public static int ReplayEnd { get; private set; }
+    public static int ReplayLength => ReplayEnd - ReplayStart;
     public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
 
     //---Private
@@ -48,7 +49,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         realtimeClient.AddCallbackTarget(this);
 
         QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
-        QuantumEvent.Subscribe<EventGameStarted>(this, OnGameStarted);
+        QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
 
@@ -261,12 +262,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     int initialFrame;
     byte[] initialFrameData;
-    private void OnGameStarted(EventGameStarted e) {
+    private void OnRecordingStarted(EventRecordingStarted e) {
         QuantumGame game = e.Game;
+        Frame startFrame = e.Frame;
 
-        game.StartRecordingInput(e.Frame.Number);
-        initialFrameData = e.Frame.Serialize(DeterministicFrameSerializeMode.Serialize);
-        initialFrame = e.Frame.Number;
+        game.StartRecordingInput(startFrame.Number);
+        initialFrameData = startFrame.Serialize(DeterministicFrameSerializeMode.Serialize);
+        initialFrame = startFrame.Number;
         Debug.Log("[Replay] Started recording a new replay.");
     }
 
@@ -293,8 +295,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         GlobalController.Instance.loadingCanvas.Initialize(null);
         IsReplay = true;
-        ReplayLength = replay.LastTick - replay.InitialTick;
         ReplayStart = replay.InitialTick;
+        ReplayEnd = replay.LastTick;
         Instance.replayFrameCache = new() {
             replay.InitialFrameData
         };
@@ -308,7 +310,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         if ((e.Frame.Number - ReplayStart) % (5 * QuantumRunner.Default.Session.SimulationRate) == 0) {
             // Save this frame to the replay cache
-            Debug.Log("serialized frame #" + e.Frame.Number);
+            int index = (e.Frame.Number - ReplayStart) / (5 * QuantumRunner.Default.Session.SimulationRate);
+            if (replayFrameCache.Count > index) {
+                Debug.Log("Skip already serialized frame");
+            } else {
+                Debug.Log("Serialize frame " + e.Frame.Number + ", index " + index);
+            }
             byte[] serializedFrame = e.Frame.Serialize(DeterministicFrameSerializeMode.Serialize);
             byte[] copy = new byte[serializedFrame.Length];
             Array.Copy(serializedFrame, copy, serializedFrame.Length);

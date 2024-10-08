@@ -205,7 +205,10 @@ namespace Quantum {
                     f.Events.GameStateChanged(f, GameState.Playing);
                     f.Global->StartFrame = f.Number;
 
-                } else if (f.Global->GameStartFrames == 78) {
+                } else if (f.Global->GameStartFrames == 79) {
+                    f.Events.RecordingStarted(f);
+
+                } if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
                     f.SystemEnable<GameplaySystemGroup>();
                     f.Signals.OnGameStarting();
