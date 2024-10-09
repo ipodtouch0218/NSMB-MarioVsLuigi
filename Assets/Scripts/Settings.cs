@@ -1,9 +1,9 @@
+using NSMB.Utils;
 using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
-using NSMB.Utils;
 
 public class Settings : Singleton<Settings> {
 
@@ -12,6 +12,7 @@ public class Settings : Singleton<Settings> {
     public static event Action OnColorblindModeChanged;
     public static event Action OnDisableChatChanged;
     public static event Action OnNdsBorderChanged;
+    public static event Action<bool> OnInputDisplayActiveChanged;
 
     //---Properties
 
@@ -52,7 +53,10 @@ public class Settings : Singleton<Settings> {
     private bool _generalDiscordIntegration;
     public bool GeneralDiscordIntegration {
         get => _generalDiscordIntegration;
-        set => _generalDiscordIntegration = value;// TODO GlobalController.Instance.discordController.UpdateActivity();
+        set {
+            _generalDiscordIntegration = value;
+            GlobalController.Instance.discordController.UpdateActivity();
+        }
     }
 
 
@@ -159,6 +163,19 @@ public class Settings : Singleton<Settings> {
         }
     }
 
+    private bool _graphicsInputDisplay;
+    public bool GraphicsInputDisplay {
+        get => _graphicsInputDisplay;
+        set {
+            bool oldValue = _graphicsInputDisplay;
+            _graphicsInputDisplay = value;
+
+            if (oldValue != value) {
+                OnInputDisplayActiveChanged?.Invoke(value);
+            }
+        }
+    }
+
     public string ControlsBindings {
         get => ControlSystem.controls.asset.SaveBindingOverridesAsJson();
         set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
@@ -218,6 +235,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_Nametags", GraphicsPlayerNametags ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_Colorblind", GraphicsColorblind ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_InputDisplay", GraphicsInputDisplay ? 1 : 0);
 
         // Audio
         PlayerPrefs.SetFloat("Audio_MasterVolume", AudioMasterVolume);
@@ -290,6 +308,7 @@ public class Settings : Singleton<Settings> {
         GraphicsPlayerOutlines = true;
         GraphicsPlayerNametags = true;
         GraphicsColorblind = false;
+        GraphicsInputDisplay = false;
 
         AudioMasterVolume = PlayerPrefs.GetFloat("volumeMaster", 0.75f);
         AudioMusicVolume = PlayerPrefs.GetFloat("volumeMusic", 0.5f);
@@ -338,6 +357,7 @@ public class Settings : Singleton<Settings> {
         TryGetSetting<bool>("Graphics_PlayerOutlines", nameof(GraphicsPlayerOutlines));
         TryGetSetting<bool>("Graphics_PlayerNametags", nameof(GraphicsPlayerNametags));
         TryGetSetting<bool>("Graphics_Colorblind", nameof(GraphicsColorblind));
+        TryGetSetting<bool>("Graphics_InputDisplay", nameof(GraphicsInputDisplay));
 
         // Audio
         TryGetSetting<float>("Audio_MasterVolume", nameof(AudioMasterVolume));

@@ -29,6 +29,7 @@ namespace NSMB.UI.Pause.Options {
         private int currentOptionIndex; // -1 = tabs are selected
         private bool inputted;
         private GameObject previouslySelected;
+        private float upHoldStart, downHoldStart;
 
         //---Propreties
         public bool EnableInput { get; set; }
@@ -137,6 +138,19 @@ namespace NSMB.UI.Pause.Options {
                 SelectedOption.OnLeftHeld();
             } else if (right) {
                 SelectedOption.OnRightHeld();
+            } else if (up) {
+                if (Time.time > upHoldStart) {
+                    int newOptionIndex = Mathf.Clamp(currentOptionIndex - 1, -1, SelectedTab.options.Count - 1);
+                    SetCurrentOption(newOptionIndex, true);
+                    upHoldStart = Time.time + 0.125f;
+                }
+            } else if (down) {
+                if (Time.time > downHoldStart) {
+                    // Move between options
+                    int newOptionIndex = Mathf.Clamp(currentOptionIndex + 1, -1, SelectedTab.options.Count - 1);
+                    SetCurrentOption(newOptionIndex, true);
+                    downHoldStart = Time.time + 0.125f;
+                }
             }
         }
 
@@ -249,8 +263,10 @@ namespace NSMB.UI.Pause.Options {
                     func = SelectedTab.OnDownPress;
                 } else if (left) {
                     func = SelectedTab.OnLeftPress;
-                } else {
+                } else if (right) {
                     func = SelectedTab.OnRightPress;
+                } else {
+                    return;
                 }
 
                 if (func(false)) {
@@ -261,6 +277,7 @@ namespace NSMB.UI.Pause.Options {
             if (Back && down) {
                 Back = false;
                 SetCurrentOption(0);
+                downHoldStart = Time.time + 0.5f;
                 if (currentOptionIndex == -1) {
                     SelectedTab.Highlighted();
                 }
@@ -272,6 +289,11 @@ namespace NSMB.UI.Pause.Options {
                 // Move between options
                 int newOptionIndex = Mathf.Clamp(currentOptionIndex + (up ? -1 : 1), -1, SelectedTab.options.Count - 1);
                 SetCurrentOption(newOptionIndex, true);
+                if (up) {
+                    upHoldStart = Time.time + 0.5f;
+                } else {
+                    downHoldStart = Time.time + 0.5f;
+                }
 
             } else if (currentOption) {
                 // Give this input to the option

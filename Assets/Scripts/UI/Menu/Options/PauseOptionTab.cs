@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using NSMB.Extensions;
 
 namespace NSMB.UI.Pause.Options {
     public class PauseOptionTab : MonoBehaviour {
@@ -19,7 +20,7 @@ namespace NSMB.UI.Pause.Options {
         [SerializeField] private Image image;
 
         public void OnValidate() {
-            if (!image) image = GetComponent<Image>();
+            this.SetIfNull(ref image);
         }
 
         public virtual void Selected() {
