@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CloudAnimator : MonoBehaviour {
+public unsafe class CloudAnimator : MonoBehaviour {
 
     //---Static Variables
     private static readonly int ParamDisplacementMap = Shader.PropertyToID("DisplacementMap");
@@ -36,7 +36,7 @@ public class CloudAnimator : MonoBehaviour {
     public void Initialize(QuantumGame game) {
         Frame f = game.Frames.Predicted;
 
-        FP width = f.Get<PhysicsCollider2D>(entity.EntityRef).Shape.Edge.Extent * 2;
+        FP width = f.Unsafe.GetPointer<PhysicsCollider2D>(entity.EntityRef)->Shape.Edge.Extent * 2;
         int samples = (int) (width * samplesPerTile);
 
         displacementMap = new(samples, 1) {
@@ -59,7 +59,7 @@ public class CloudAnimator : MonoBehaviour {
     public void OnUpdateView(CallbackUpdateView e) {
         QuantumGame game = e.Game;
         Frame f = game.Frames.Predicted;
-        Frame fPrev = game.Frames.PredictedPrevious;
+        Frame fp = game.Frames.PredictedPrevious;
 
         var filter = f.Filter<PhysicsObject>();
         while (filter.Next(out EntityRef filteredEntity, out PhysicsObject physicsObject)) {
@@ -107,8 +107,8 @@ public class CloudAnimator : MonoBehaviour {
 
             FPVector2 lerpedPosition = default;
             if (!contact.Exit) {
-                FPVector2 currentPosition = f.Get<Transform2D>(contact.Entity).Position;
-                FPVector2 previousPosition = fPrev.Get<Transform2D>(contact.Entity).Position;
+                FPVector2 currentPosition = f.Unsafe.GetPointer<Transform2D>(contact.Entity)->Position;
+                FPVector2 previousPosition = fp.Unsafe.GetPointer<Transform2D>(contact.Entity)->Position;
                 lerpedPosition = QuantumUtils.WrappedLerp(f, previousPosition, currentPosition, FP.FromFloat_UNSAFE(game.InterpolationFactor));
             }
 

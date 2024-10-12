@@ -4,7 +4,7 @@ using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MarioBrosPlatformAnimator : MonoBehaviour {
+public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
 
     //---Static Variables
     private static readonly Color BlankColor = new(0, 0, 0, 255);
@@ -39,9 +39,9 @@ public class MarioBrosPlatformAnimator : MonoBehaviour {
 
     public void Initialize(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        var collider = f.Get<PhysicsCollider2D>(entity.EntityRef);
+        var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity.EntityRef);
 
-        platformWidth = collider.Shape.Box.Extents.X.AsFloat * 2f;
+        platformWidth = collider->Shape.Box.Extents.X.AsFloat * 2f;
 
         sRenderer.size = new Vector2(platformWidth, sRenderer.size.y);
 
@@ -101,14 +101,14 @@ public class MarioBrosPlatformAnimator : MonoBehaviour {
         }
 
         Frame f = e.Frame;
-        Transform2D qTransform = f.Get<Transform2D>(e.Entity);
-        PhysicsCollider2D qCollider = f.Get<PhysicsCollider2D>(e.Entity);
+        var qTransform = f.Unsafe.GetPointer<Transform2D>(e.Entity);
+        var qCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(e.Entity);
 
-        FPVector2 localPos = qTransform.InverseTransformPoint(e.Position);
+        FPVector2 localPos = qTransform->InverseTransformPoint(e.Position);
         localPos = QuantumUtils.WrapWorld(stage, localPos, out _ );
 
         float posX = localPos.X.AsFloat;
-        float width = qCollider.Shape.Box.Extents.X.AsFloat * 2;
+        float width = qCollider->Shape.Box.Extents.X.AsFloat * 2;
 
         posX /= width;
         posX += 0.5f; // Get rid of negative coords

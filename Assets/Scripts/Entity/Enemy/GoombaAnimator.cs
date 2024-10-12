@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class GoombaAnimator : MonoBehaviour {
+public unsafe class GoombaAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -21,8 +21,8 @@ public class GoombaAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled);
-        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound);
+        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
     }
 
     private unsafe void OnUpdateView(CallbackUpdateView view) {
@@ -38,21 +38,21 @@ public class GoombaAnimator : MonoBehaviour {
             return;
         }
 
-        var enemy = f.Get<Enemy>(entity.EntityRef);
-        var goomba = f.Get<Goomba>(entity.EntityRef);
-        var freezable = f.Get<Freezable>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
+        var goomba = f.Unsafe.GetPointer<Goomba>(entity.EntityRef);
+        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
 
-        sRenderer.enabled = enemy.IsActive;
-        legacyAnimation.enabled = enemy.IsAlive && !freezable.IsFrozen(f);
-        sRenderer.flipX = enemy.FacingRight;
+        sRenderer.enabled = enemy->IsActive;
+        legacyAnimation.enabled = enemy->IsAlive && !freezable->IsFrozen(f);
+        sRenderer.flipX = enemy->FacingRight;
 
-        if (enemy.IsDead) {
-            if (goomba.DeathAnimationFrames > 0) {
+        if (enemy->IsDead) {
+            if (goomba->DeathAnimationFrames > 0) {
                 // Stomped
                 sRenderer.sprite = deadSprite;
             } else {
                 // Special killed
-                transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
+                transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
             }
         } else {
             transform.rotation = Quaternion.identity;

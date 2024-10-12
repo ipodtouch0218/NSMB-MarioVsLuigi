@@ -139,17 +139,17 @@ namespace NSMB.UI.Pause.Options {
             } else if (right) {
                 SelectedOption.OnRightHeld();
             } else if (up) {
-                if (Time.time > upHoldStart) {
+                if (Time.unscaledTime > upHoldStart) {
                     int newOptionIndex = Mathf.Clamp(currentOptionIndex - 1, -1, SelectedTab.options.Count - 1);
                     SetCurrentOption(newOptionIndex, true);
-                    upHoldStart = Time.time + 0.125f;
+                    upHoldStart = Time.unscaledTime + 0.125f;
                 }
             } else if (down) {
-                if (Time.time > downHoldStart) {
+                if (Time.unscaledTime > downHoldStart) {
                     // Move between options
                     int newOptionIndex = Mathf.Clamp(currentOptionIndex + 1, -1, SelectedTab.options.Count - 1);
                     SetCurrentOption(newOptionIndex, true);
-                    downHoldStart = Time.time + 0.125f;
+                    downHoldStart = Time.unscaledTime + 0.125f;
                 }
             }
         }
@@ -277,7 +277,7 @@ namespace NSMB.UI.Pause.Options {
             if (Back && down) {
                 Back = false;
                 SetCurrentOption(0);
-                downHoldStart = Time.time + 0.5f;
+                downHoldStart = Time.unscaledTime + 0.5f;
                 if (currentOptionIndex == -1) {
                     SelectedTab.Highlighted();
                 }
@@ -290,9 +290,9 @@ namespace NSMB.UI.Pause.Options {
                 int newOptionIndex = Mathf.Clamp(currentOptionIndex + (up ? -1 : 1), -1, SelectedTab.options.Count - 1);
                 SetCurrentOption(newOptionIndex, true);
                 if (up) {
-                    upHoldStart = Time.time + 0.5f;
+                    upHoldStart = Time.unscaledTime + 0.5f;
                 } else {
-                    downHoldStart = Time.time + 0.5f;
+                    downHoldStart = Time.unscaledTime + 0.5f;
                 }
 
             } else if (currentOption) {

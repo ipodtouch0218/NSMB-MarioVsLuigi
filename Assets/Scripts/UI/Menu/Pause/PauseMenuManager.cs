@@ -55,7 +55,7 @@ namespace NSMB.UI.Pause {
         }
 
         private void OnPause(InputAction.CallbackContext context) {
-            if (isPaused || unpauseTime == Time.time) {
+            if (isPaused || unpauseTime == Time.unscaledTime) {
                 return;
             }
 
@@ -103,7 +103,7 @@ namespace NSMB.UI.Pause {
             if (playSound) {
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Pause);
             }
-            unpauseTime = Time.time;
+            unpauseTime = Time.unscaledTime;
         }
 
         public void OnNavigate(InputAction.CallbackContext context) {

@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class BreakableObjectAnimator : MonoBehaviour {
+public unsafe class BreakableObjectAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -17,7 +17,7 @@ public class BreakableObjectAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventBreakableObjectBroken>(this, OnBreakableObjectBroken);
+        QuantumEvent.Subscribe<EventBreakableObjectBroken>(this, OnBreakableObjectBroken, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public unsafe void OnUpdateView(CallbackUpdateView e) {
@@ -28,9 +28,9 @@ public class BreakableObjectAnimator : MonoBehaviour {
             return;
         }
 
-        var breakable = f.Get<BreakableObject>(entity.EntityRef);
-        sRenderer.size = new Vector2(sRenderer.size.x, breakable.CurrentHeight.AsFloat);
-        sRenderer.sprite = breakable.IsBroken ? brokenSprite : unbrokenSprite;
+        var breakable = f.Unsafe.GetPointer<BreakableObject>(entity.EntityRef);
+        sRenderer.size = new Vector2(sRenderer.size.x, breakable->CurrentHeight.AsFloat);
+        sRenderer.sprite = breakable->IsBroken ? brokenSprite : unbrokenSprite;
     }
 
     private void OnBreakableObjectBroken(EventBreakableObjectBroken e) {
@@ -38,11 +38,11 @@ public class BreakableObjectAnimator : MonoBehaviour {
             return;
         }
 
-        var pipe = e.Frame.Get<BreakableObject>(e.Entity);
+        var pipe = e.Frame.Unsafe.GetPointer<BreakableObject>(e.Entity);
 
         SimplePhysicsMover particle = Instantiate(breakPrefab, transform.position, transform.rotation);
         //particle.transform.localScale = transform.localScale;
-        particle.transform.position += particle.transform.up * ((pipe.MinimumHeight + (e.Height / 2)) / 2).AsFloat;
+        particle.transform.position += particle.transform.up * ((pipe->MinimumHeight + (e.Height / 2)) / 2).AsFloat;
         SpriteRenderer sRenderer = particle.GetComponentInChildren<SpriteRenderer>();
         sRenderer.size = new Vector2(sRenderer.size.x, e.Height.AsFloat);
         sRenderer.transform.localPosition = new Vector2(0, -(e.Height / 2).AsFloat);

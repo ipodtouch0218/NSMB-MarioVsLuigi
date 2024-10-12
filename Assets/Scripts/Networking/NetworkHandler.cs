@@ -30,6 +30,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static bool IsReplay { get; private set; }
     public static int ReplayStart { get; private set; }
     public static int ReplayEnd { get; private set; }
+    public static bool IsReplayFastForwarding { get; set; }
     public static int ReplayLength => ReplayEnd - ReplayStart;
     public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
 
@@ -362,4 +363,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public void OnCustomAuthenticationFailed(string debugMessage) { }
+
+
+    public static bool FilterOutReplayFastForward(IDeterministicGame game) {
+        return !IsReplayFastForwarding;
+    }
 }

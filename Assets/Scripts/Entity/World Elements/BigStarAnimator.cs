@@ -38,10 +38,10 @@ public class BigStarAnimator : QuantumCallbacks {
 
     public unsafe void Initialize(QuantumGame game) {
         Frame f = game.Frames.Verified;
-        var star = f.Get<BigStar>(entity.EntityRef);
+        var star = f.Unsafe.GetPointer<BigStar>(entity.EntityRef);
 
-        stationary = star.IsStationary;
-        if (f.Global->GameState == GameState.Playing) {
+        stationary = star->IsStationary;
+        if (f.Global->GameState == GameState.Playing && !NetworkHandler.IsReplayFastForwarding) {
             sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
         }
         if (stationary) {
@@ -70,13 +70,13 @@ public class BigStarAnimator : QuantumCallbacks {
             return;
         }
 
-        var star = f.Get<BigStar>(entity.EntityRef);
+        var star = f.Unsafe.GetPointer<BigStar>(entity.EntityRef);
 
         if (!stationary) {
-            graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star.FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
-            float timeRemaining = star.Lifetime / 60f;
+            graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
+            float timeRemaining = star->Lifetime / 60f;
             sRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
-            sRenderer.color = star.UncollectableFrames > 0 ? uncollectableColor : Color.white;
+            sRenderer.color = star->UncollectableFrames > 0 ? uncollectableColor : Color.white;
         }
     }
 }

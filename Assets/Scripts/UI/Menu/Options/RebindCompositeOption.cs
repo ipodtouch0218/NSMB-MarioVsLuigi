@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+﻿using NSMB.Translation;
+using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using TMPro;
-
-using NSMB.Translation;
 
 namespace NSMB.UI.Pause.Options {
 

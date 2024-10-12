@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class BooAnimator : MonoBehaviour {
+public unsafe class BooAnimator : MonoBehaviour {
 
     //---Static Variables
     private static readonly int ParamFacingRight = Animator.StringToHash("FacingRight");
@@ -28,8 +28,8 @@ public class BooAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventBooBecomeActive>(this, OnBooBecameActive);
-        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound);
+        QuantumEvent.Subscribe<EventBooBecomeActive>(this, OnBooBecameActive, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
@@ -39,15 +39,15 @@ public class BooAnimator : MonoBehaviour {
 
         bobber.localPosition = new(0, Mathf.Sin(2 * Mathf.PI * time * sinSpeed) * sinAmplitude);
 
-        var boo = f.Get<Boo>(entity.EntityRef);
-        var enemy = f.Get<Enemy>(entity.EntityRef);
+        var boo = f.Unsafe.GetPointer<Boo>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
 
-        animator.SetBool(ParamFacingRight, enemy.FacingRight);
-        animator.SetBool(ParamScared, boo.UnscaredFrames > 0);
-        sRenderer.enabled = enemy.IsActive;
+        animator.SetBool(ParamFacingRight, enemy->FacingRight);
+        animator.SetBool(ParamScared, boo->UnscaredFrames > 0);
+        sRenderer.enabled = enemy->IsActive;
 
-        if (enemy.IsDead) {
-            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
+        if (enemy->IsDead) {
+            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
         } else {
             transform.rotation = Quaternion.identity;
         }

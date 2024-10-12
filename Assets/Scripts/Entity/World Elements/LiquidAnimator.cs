@@ -3,7 +3,7 @@ using Quantum;
 using UnityEngine;
 
 namespace NSMB.Entities.World {
-    public class LiquidAnimator : MonoBehaviour {
+    public unsafe class LiquidAnimator : MonoBehaviour {
 
         //---Serialized Variables
         [SerializeField] private GameObject splashPrefab, splashExitPrefab;
@@ -42,8 +42,8 @@ namespace NSMB.Entities.World {
         }
 
         public void Initialize(QuantumGame game) {
-            var liquid = game.Frames.Predicted.Get<Liquid>(entity.EntityRef);
-            Initialize(liquid.WidthTiles, liquid.HeightTiles);
+            var liquid = game.Frames.Predicted.Unsafe.GetPointer<Liquid>(entity.EntityRef);
+            Initialize(liquid->WidthTiles, liquid->HeightTiles);
             initialized = true;
         }
 

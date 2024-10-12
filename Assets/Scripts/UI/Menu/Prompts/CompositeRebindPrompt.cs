@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using TMPro;
-
 using NSMB.Translation;
 using NSMB.UI.Pause.Options;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace NSMB.UI.Prompts {
 

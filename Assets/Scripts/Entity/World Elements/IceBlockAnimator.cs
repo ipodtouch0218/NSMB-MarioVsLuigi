@@ -1,9 +1,8 @@
 using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class IceBlockAnimator : MonoBehaviour {
+public unsafe class IceBlockAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -26,10 +25,10 @@ public class IceBlockAnimator : MonoBehaviour {
 
     public void Initialize(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        var cube = f.Get<IceBlock>(entity.EntityRef);
+        var cube = f.Unsafe.GetPointer<IceBlock>(entity.EntityRef);
 
         sfx.PlayOneShot(SoundEffect.Enemy_Generic_Freeze);
-        sRenderer.size = cube.Size.ToUnityVector2() * 2;
+        sRenderer.size = cube->Size.ToUnityVector2() * 2;
 
         Vector3 position = transform.position;
         position.z = -4.25f;
@@ -42,13 +41,13 @@ public class IceBlockAnimator : MonoBehaviour {
             return;
         }
 
-        var cube = f.Get<IceBlock>(entity.EntityRef);
+        var cube = f.Unsafe.GetPointer<IceBlock>(entity.EntityRef);
 
-        if (cube.AutoBreakFrames > 0 && cube.AutoBreakFrames < 60
-            && cube.TimerEnabled(f, entity.EntityRef)) {
+        if (cube->AutoBreakFrames > 0 && cube->AutoBreakFrames < 60
+            && cube->TimerEnabled(f, entity.EntityRef)) {
 
             Vector3 position = transform.position;
-            float time = (cube.AutoBreakFrames - e.Game.InterpolationFactor) / 60f;
+            float time = (cube->AutoBreakFrames - e.Game.InterpolationFactor) / 60f;
             position.x += Mathf.Sin(time * shakeSpeed) * shakeAmount;
             transform.position = position;
         }

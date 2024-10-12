@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class BobombAnimator : MonoBehaviour {
+public unsafe class BobombAnimator : MonoBehaviour {
 
     //---Static Variables
     private static readonly int ParamLit = Animator.StringToHash("lit");
@@ -28,10 +28,10 @@ public class BobombAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventBobombExploded>(this, OnBobombExploded);
-        QuantumEvent.Subscribe<EventBobombLit>(this, OnBobombLit);
-        QuantumEvent.Subscribe<EventEntityBlockBumped>(this, OnEntityBlockBumped);
-        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound);
+        QuantumEvent.Subscribe<EventBobombExploded>(this, OnBobombExploded, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventBobombLit>(this, OnBobombLit, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventEntityBlockBumped>(this, OnEntityBlockBumped, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
 
         sRenderer.GetPropertyBlock(mpb = new());
     }
@@ -43,8 +43,8 @@ public class BobombAnimator : MonoBehaviour {
             return;
         }
 
-        var freezable = f.Get<Freezable>(entity.EntityRef);
-        if (freezable.IsFrozen(f)) {
+        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        if (freezable->IsFrozen(f)) {
             animator.speed = 0;
             sfx.Stop();
             return;
@@ -52,38 +52,38 @@ public class BobombAnimator : MonoBehaviour {
             animator.speed = 1;
         }
 
-        var bobomb = f.Get<Bobomb>(entity.EntityRef);
-        var enemy = f.Get<Enemy>(entity.EntityRef);
-        var holdable = f.Get<Holdable>(entity.EntityRef);
+        var bobomb = f.Unsafe.GetPointer<Bobomb>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
+        var holdable = f.Unsafe.GetPointer<Holdable>(entity.EntityRef);
 
-        bool lit = bobomb.CurrentDetonationFrames > 0;
+        bool lit = bobomb->CurrentDetonationFrames > 0;
         animator.SetBool(ParamLit, lit);
 
         if (!lit) {
             mpb.SetFloat(ParamFlashAmount, 0);
         } else {
-            float detonationTimer = bobomb.CurrentDetonationFrames / 60f;
+            float detonationTimer = bobomb->CurrentDetonationFrames / 60f;
             float redOverlayPercent = 5.39f / (detonationTimer + 2.695f) * 10f % 1f;
             mpb.SetFloat(ParamFlashAmount, redOverlayPercent);
         }
 
         // Bodge...
-        if (!enemy.IsAlive) {
+        if (!enemy->IsAlive) {
             sfx.Stop();
         }
 
         sRenderer.SetPropertyBlock(mpb);
-        sRenderer.enabled = enemy.IsActive;
-        sRenderer.flipX = !enemy.FacingRight;
+        sRenderer.enabled = enemy->IsActive;
+        sRenderer.flipX = !enemy->FacingRight;
 
         Vector3 modifiedZ = transform.position;
-        if (f.Exists(holdable.Holder)) {
+        if (f.Exists(holdable->Holder)) {
             modifiedZ.z = -4.1f;
         }
         transform.position = modifiedZ;
         
-        if (enemy.IsDead) {
-            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
+        if (enemy->IsDead) {
+            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
         } else {
             transform.rotation = Quaternion.identity;
         }

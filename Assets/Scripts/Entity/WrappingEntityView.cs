@@ -2,25 +2,26 @@ using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
 
-public class WrappingEntityView : QuantumEntityView {
+public unsafe class WrappingEntityView : QuantumEntityView {
 
     //---Private Variables
     private VersusStageData stage;
 
     protected override void ApplyTransform(ref UpdatePositionParameter param) {
-        Frame current = Game.Frames.Predicted;
+        Frame f = Game.Frames.Predicted;
         if (!stage) {
-            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(current.Map.UserAsset);
+            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(f.Map.UserAsset);
         }
 
-        Frame previous = Game.Frames.PredictedPrevious;
-        if (!previous.Has<Transform2D>(EntityRef)
-            || !previous.Has<Transform2D>(EntityRef)) {
+        Frame fp = Game.Frames.PredictedPrevious;
+        if (!fp.Has<Transform2D>(EntityRef)
+            || !fp.Has<Transform2D>(EntityRef)) {
             return;
         }
 
-        FPVector2 previousPosition = previous.Get<Transform2D>(EntityRef).Position;
-        FPVector2 currentPosition = current.Get<Transform2D>(EntityRef).Position + param.ErrorVisualVector.ToFPVector2();
+        // TODO: FIX ME DADDY!!
+        FPVector2 previousPosition = fp.Unsafe.GetPointer<Transform2D>(EntityRef)->Position;
+        FPVector2 currentPosition = f.Unsafe.GetPointer<Transform2D>(EntityRef)->Position + param.ErrorVisualVector.ToFPVector2();
 
         QuantumUtils.UnwrapWorldLocations(stage, previousPosition, currentPosition, out FPVector2 oldUnwrapped, out FPVector2 newUnwrapped);
         FPVector2 change = newUnwrapped - oldUnwrapped;

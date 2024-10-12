@@ -36,10 +36,10 @@ public unsafe class PlayerTrackIcon : TrackIcon {
         QuantumGame game = QuantumRunner.DefaultGame;
         Frame f = game.Frames.Predicted;
 
-        var mario = game.Frames.Predicted.Get<MarioPlayer>(targetEntity);
-        image.color = Utils.GetPlayerColor(f, mario.PlayerRef);
+        var mario = f.Unsafe.GetPointer<MarioPlayer>(targetEntity);
+        image.color = Utils.GetPlayerColor(f, mario->PlayerRef);
         if (f.Global->Rules.TeamsEnabled) {
-            teamIcon.sprite = f.SimulationConfig.Teams[mario.Team].spriteColorblind;
+            teamIcon.sprite = f.SimulationConfig.Teams[mario->Team].spriteColorblind;
         }
 
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);

@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class SpinnerAnimator : MonoBehaviour {
+public unsafe class SpinnerAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -21,17 +21,16 @@ public class SpinnerAnimator : MonoBehaviour {
     public void OnUpdateView(CallbackUpdateView e) {
         QuantumGame game = e.Game;
         Frame f = game.Frames.Predicted;
+        Frame fp = game.Frames.PredictedPrevious;
 
         if (!f.Exists(entity.EntityRef)) {
             return;
         }
 
-        var spinner = f.Get<Spinner>(entity.EntityRef);
+        var spinner = f.Unsafe.GetPointer<Spinner>(entity.EntityRef);
+        var spinnerPrev = fp.Unsafe.GetPointer<Spinner>(entity.EntityRef);
 
-        Frame fp = game.Frames.PredictedPrevious;
-        var spinnerPrev = fp.Get<Spinner>(entity.EntityRef);
-
-        float rotation = Mathf.LerpAngle(spinnerPrev.Rotation.AsFloat, spinner.Rotation.AsFloat, game.InterpolationFactor); 
+        float rotation = Mathf.LerpAngle(spinnerPrev->Rotation.AsFloat, spinner->Rotation.AsFloat, game.InterpolationFactor); 
         rotator.localRotation = Quaternion.Euler(0, rotation, 0);
     }
 

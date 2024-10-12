@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class StarTrackIcon : TrackIcon {
+public unsafe class StarTrackIcon : TrackIcon {
 
     //---Static Variables
     private static readonly Vector3 ThreeFourths = new(0.75f, 0.75f, 1f);
@@ -17,9 +17,9 @@ public class StarTrackIcon : TrackIcon {
 
     public void Start() {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
-        var star = f.Get<BigStar>(targetEntity);
+        var star = f.Unsafe.GetPointer<BigStar>(targetEntity);
 
-        if (star.IsStationary) {
+        if (star->IsStationary) {
             animator.enabled = true;
             transform.localScale = Vector3.zero;
         } else {

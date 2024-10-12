@@ -8,7 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIUpdater : QuantumCallbacks {
+public unsafe class UIUpdater : QuantumCallbacks {
 
     //---Static Variables
     private static readonly int ParamIn = Animator.StringToHash("in");
@@ -122,7 +122,7 @@ public class UIUpdater : QuantumCallbacks {
         HashSet<EntityRef> validEntities = new();
 
         var filter = f.Filter<BigStar>();
-        while (filter.Next(out EntityRef entity, out _)) {
+        while (filter.NextUnsafe(out EntityRef entity, out _)) {
             validEntities.Add(entity);
         }
 

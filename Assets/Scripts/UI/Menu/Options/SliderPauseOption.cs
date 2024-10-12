@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +14,7 @@ namespace NSMB.UI.Pause.Options {
 
         public override void OnValidate() {
             base.OnValidate();
-            if (!slider) slider = GetComponentInChildren<Slider>();
+            this.SetIfNull(ref slider, UnityExtensions.GetComponentType.Children);
         }
 
         public override void Awake() {
@@ -40,7 +41,7 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public override void OnLeftHeld() {
-            holdTime += Time.deltaTime;
+            holdTime += Time.unscaledDeltaTime;
 
             float range = slider.maxValue - slider.minValue;
             if (slider.wholeNumbers) {
@@ -50,12 +51,12 @@ namespace NSMB.UI.Pause.Options {
                     holdTime = 0;
                 }
             } else {
-                slider.value -= range * 0.5f * Time.deltaTime;
+                slider.value -= range * 0.5f * Time.unscaledDeltaTime;
             }
         }
 
         public override void OnRightHeld() {
-            holdTime += Time.deltaTime;
+            holdTime += Time.unscaledDeltaTime;
 
             float range = slider.maxValue - slider.minValue;
             if (slider.wholeNumbers) {
@@ -65,7 +66,7 @@ namespace NSMB.UI.Pause.Options {
                     holdTime = 0;
                 }
             } else {
-                slider.value += range * 0.5f * Time.deltaTime;
+                slider.value += range * 0.5f * Time.unscaledDeltaTime;
             }
         }
 

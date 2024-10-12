@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using TMPro;
 
 namespace NSMB.UI.Pause.Options {
 
@@ -44,8 +44,9 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public void Dehover() {
-            if (!parent.IsSelected)
+            if (!parent.IsSelected) {
                 Deselected();
+            }
         }
 
         public void UpdateLabel() {
@@ -62,8 +63,9 @@ namespace NSMB.UI.Pause.Options {
                     combined += addition + ",";
                 }
                 combined = combined.Replace("Up Arrow", "↑").Replace("Down Arrow", "↓").Replace("Left Arrow", "←").Replace("Right Arrow", "→");
-                if (combined.Length > 11)
+                if (combined.Length > 11) {
                     combined = "....";
+                }
 
                 label.text = combined[..^1];
             } else {

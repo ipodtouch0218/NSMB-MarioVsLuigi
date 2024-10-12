@@ -23,7 +23,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumEvent.Subscribe<EventTileChanged>(this, OnTileChanged);
-        QuantumEvent.Subscribe<EventTileBroken>(this, OnTileBroken);
+        QuantumEvent.Subscribe<EventTileBroken>(this, OnTileBroken, NetworkHandler.FilterOutReplayFastForward);
         QuantumCallback.Subscribe<CallbackGameResynced>(this, e => RefreshMap(e.Game.Frames.Predicted));
         QuantumCallback.Subscribe<CallbackEventCanceled>(this, OnEventCanceled);
         QuantumCallback.Subscribe<CallbackEventConfirmed>(this, OnEventConfirmed);

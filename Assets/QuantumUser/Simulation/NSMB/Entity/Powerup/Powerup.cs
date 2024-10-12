@@ -19,9 +19,10 @@ namespace Quantum {
             BlockSpawnDestination = spawnDestination;
             BlockSpawnAnimationLength = spawnAnimationLength;
             f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = spawnOrigin;
-            f.Unsafe.GetPointer<PhysicsObject>(thisEntity)->IsFrozen = true;
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(thisEntity);
+            physicsObject->IsFrozen = true;
+
             if (launch) {
                 // TODO magic number
                 physicsObject->Velocity = new FPVector2(2, 9);

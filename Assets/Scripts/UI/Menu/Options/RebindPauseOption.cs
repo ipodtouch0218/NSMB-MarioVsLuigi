@@ -41,8 +41,9 @@ namespace NSMB.UI.Pause.Options {
         public override void Deselected() {
             base.Deselected();
 
-            foreach (var button in buttons)
+            foreach (var button in buttons) {
                 button.Deselected();
+            }
         }
 
         public override void OnDisable() {
@@ -72,11 +73,13 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void SetCurrentOption(int index) {
-            if (index < 0 || index >= buttons.Length)
+            if (index < 0 || index >= buttons.Length) {
                 return;
+            }
 
-            foreach (var button in buttons)
+            foreach (var button in buttons) {
                 button.Deselected();
+            }
 
             selectedIndex = index;
             buttons[selectedIndex].Selected();

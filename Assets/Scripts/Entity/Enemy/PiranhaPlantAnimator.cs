@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class PiranhaPlantAnimator : MonoBehaviour {
+public unsafe class PiranhaPlantAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -30,13 +30,13 @@ public class PiranhaPlantAnimator : MonoBehaviour {
             return;
         }
 
-        var freezable = f.Get<Freezable>(entity.EntityRef);
-        animator.speed = freezable.IsFrozen(f) ? 0 : 1;
+        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        animator.speed = freezable->IsFrozen(f) ? 0 : 1;
 
-        var piranhaPlant = f.Get<PiranhaPlant>(entity.EntityRef);
-        animator.SetBool("active", piranhaPlant.ChompFrames > 0);
-        animator.SetBool("chomping", piranhaPlant.PopupAnimationTime == 1);
-        sRenderer.enabled = piranhaPlant.PopupAnimationTime != 0;
+        var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(entity.EntityRef);
+        animator.SetBool("active", piranhaPlant->ChompFrames > 0);
+        animator.SetBool("chomping", piranhaPlant->PopupAnimationTime == 1);
+        sRenderer.enabled = piranhaPlant->PopupAnimationTime != 0;
     }
 
     public void PlayChompSound() {

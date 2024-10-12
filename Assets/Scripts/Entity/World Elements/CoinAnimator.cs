@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class CoinAnimator : MonoBehaviour {
+public unsafe class CoinAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -20,14 +20,14 @@ public class CoinAnimator : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType);
         QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected);
-        QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced);
+        QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public void Initialize(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        var coin = f.Get<Coin>(entity.EntityRef);
+        var coin = f.Unsafe.GetPointer<Coin>(entity.EntityRef);
 
-        bool dotted = coin.IsCurrentlyDotted;
+        bool dotted = coin->IsCurrentlyDotted;
         defaultCoinAnimate.isDisplaying = !dotted;
         dottedCoinAnimate.isDisplaying = dotted;
     }
@@ -38,12 +38,12 @@ public class CoinAnimator : MonoBehaviour {
             return;
         }
 
-        var coin = f.Get<Coin>(entity.EntityRef);
-        if (coin.IsFloating) {
+        var coin = f.Unsafe.GetPointer<Coin>(entity.EntityRef);
+        if (coin->IsFloating) {
             // Bodge: OnCoinChangedCollected doesnt work when collecting a coin at the exact same time as a level reset 
-            sRenderer.enabled = !coin.IsCollected;
+            sRenderer.enabled = !coin->IsCollected;
         } else {
-            float despawnTimeRemaining = coin.Lifetime / 60f;
+            float despawnTimeRemaining = coin->Lifetime / 60f;
             sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
         }
     }
@@ -73,7 +73,7 @@ public class CoinAnimator : MonoBehaviour {
         defaultCoinAnimate.isDisplaying = !dotted;
         dottedCoinAnimate.isDisplaying = dotted;
 
-        if (!dotted) {
+        if (!dotted && !NetworkHandler.IsReplayFastForwarding) {
             sfx.PlayOneShot(SoundEffect.World_Coin_Dotted_Spawn);
         }
     }

@@ -1,19 +1,19 @@
+using NSMB.Translation;
+using NSMB.UI.Prompts;
+using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputActionRebindingExtensions;
-using TMPro;
 
-using NSMB.Translation;
-using NSMB.UI.Prompts;
 
 namespace NSMB.UI.Pause.Options {
 
     public class PauseOptionControlsTab : PauseOptionTab {
 
         //---Static Variables
-        private static readonly WaitForSeconds WaitForOneSecond = new(1f);
+        private static readonly WaitForSecondsRealtime WaitForOneSecond = new(1f);
 
         //---Serialized Variables
         [SerializeField] private PauseOptionMenuManager manager;

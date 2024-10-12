@@ -31,10 +31,10 @@ public class KoopaAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventKoopaEnteredShell>(this, OnKoopaEnteredShell);
-        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound);
-        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled);
-        QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound);
+        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
+        //QuantumEvent.Subscribe<EventKoopaEnteredShell>(this, OnKoopaEnteredShell, NetworkHandler.FilterOutReplayFastForward);
+        //QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
     }
 
     private unsafe void OnUpdateView(CallbackUpdateView e) {
@@ -50,26 +50,26 @@ public class KoopaAnimator : MonoBehaviour {
             return;
         }
 
-        var enemy = f.Get<Enemy>(entity.EntityRef);
-        var koopa = f.Get<Koopa>(entity.EntityRef);
-        var holdable = f.Get<Holdable>(entity.EntityRef);
-        var physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
-        var freezable = f.Get<Freezable>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
+        var koopa = f.Unsafe.GetPointer<Koopa>(entity.EntityRef);
+        var holdable = f.Unsafe.GetPointer<Holdable>(entity.EntityRef);
+        var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
+        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
 
         // Animation
-        animator.speed = freezable.IsFrozen(f) ? 0 : 1;
-        animator.SetBool(ParamShell, koopa.IsInShell || holdable.Holder.IsValid);
-        animator.SetFloat(ParamXVel, (koopa.IsInShell && !koopa.IsKicked) ? 0 : Mathf.Abs(physicsObject.Velocity.X.AsFloat));
-        animator.SetBool(ParamDead, enemy.IsDead);
+        animator.speed = freezable->IsFrozen(f) ? 0 : 1;
+        animator.SetBool(ParamShell, koopa->IsInShell || f.Exists(holdable->Holder));
+        animator.SetFloat(ParamXVel, (koopa->IsInShell && !koopa->IsKicked) ? 0 : Mathf.Abs(physicsObject->Velocity.X.AsFloat));
+        animator.SetBool(ParamDead, enemy->IsDead);
 
         // "Flip" rotation
-        float remainingWakeupTimer = koopa.WakeupFrames / 60f;
-        if (enemy.IsDead) {
-            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
+        float remainingWakeupTimer = koopa->WakeupFrames / 60f;
+        if (enemy->IsDead) {
+            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
 
-        } else if (koopa.IsInShell && !koopa.IsKicked) {
-            if (!freezable.IsFrozen(f)) {
-                if (koopa.IsFlipped && !dontFlip) {
+        } else if (koopa->IsInShell && !koopa->IsKicked) {
+            if (!freezable->IsFrozen(f)) {
+                if (koopa->IsFlipped && !dontFlip) {
                     dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
                     transform.eulerAngles = new Vector3(
                         rotation.eulerAngles.x,
@@ -88,11 +88,11 @@ public class KoopaAnimator : MonoBehaviour {
             transform.rotation = Quaternion.identity;
         }
 
-        sRenderer.enabled = enemy.IsActive;
-        sRenderer.flipX = enemy.FacingRight ^ mirrorSprite;
+        sRenderer.enabled = enemy->IsActive;
+        sRenderer.flipX = enemy->FacingRight ^ mirrorSprite;
 
         Vector3 modifiedZ = transform.position;
-        if (f.Exists(holdable.Holder)) {
+        if (f.Exists(holdable->Holder)) {
             modifiedZ.z = -4.1f;
         }
         transform.position = modifiedZ;
@@ -106,12 +106,6 @@ public class KoopaAnimator : MonoBehaviour {
         sfx.PlayOneShot(SoundEffect.World_Block_Bump);
     }
 
-    private void OnEnemyKilled(EventEnemyKilled e) {
-        if (e.Enemy != entity.EntityRef) {
-            return;
-        }
-    }
-
     private void OnPlayComboSound(EventPlayComboSound e) {
         if (e.Entity != entity.EntityRef) {
             return;
@@ -120,6 +114,7 @@ public class KoopaAnimator : MonoBehaviour {
         sfx.PlayOneShot(QuantumUtils.GetComboSoundEffect(e.Combo));
     }
 
+    /*
     private void OnKoopaEnteredShell(EventKoopaEnteredShell e) {
         if (e.Entity != entity.EntityRef) {
             return;
@@ -127,4 +122,11 @@ public class KoopaAnimator : MonoBehaviour {
 
         // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
     }
+
+    private void OnEnemyKilled(EventEnemyKilled e) {
+        if (e.Enemy != entity.EntityRef) {
+            return;
+        }
+    }
+    */
 }

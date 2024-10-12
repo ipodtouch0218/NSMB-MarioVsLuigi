@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class PowerupAnimator : QuantumCallbacks {
+public unsafe class PowerupAnimator : QuantumCallbacks {
 
     //---Serialized
     [SerializeField] private QuantumEntityView entity;
@@ -31,30 +31,34 @@ public class PowerupAnimator : QuantumCallbacks {
     }
 
     public void Initialize(QuantumGame game) {
-        var powerup = game.Frames.Predicted.Get<Powerup>(entity.EntityRef);
-        var scriptable = QuantumUnityDB.GetGlobalAsset(powerup.Scriptable);
+        sRenderer.GetPropertyBlock(mpb = new());
+        var powerup = game.Frames.Predicted.Unsafe.GetPointer<Powerup>(entity.EntityRef);
+        var scriptable = QuantumUnityDB.GetGlobalAsset(powerup->Scriptable);
 
-        if (powerup.ParentMarioPlayer.IsValid) {
+        if (powerup->ParentMarioPlayer.IsValid) {
             // Following mario
             sRenderer.sortingOrder = 15;
             if (childAnimator) {
                 childAnimator.enabled = false;
             }
-            sRenderer.GetPropertyBlock(mpb = new());
 
-        } else if (powerup.BlockSpawn) {
+        } else if (powerup->BlockSpawn) {
             // Block spawn
             sRenderer.sortingOrder = -1000;
-            sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
+            if (!NetworkHandler.IsReplayFastForwarding) {
+                sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
+            }
             if (childAnimation) {
                 childAnimation.Play();
             }
-        } else if (powerup.LaunchSpawn) {
+        } else if (powerup->LaunchSpawn) {
             // Spawn with velocity
             sRenderer.sortingOrder = -1000;
         } else {
             // Spawned by any other means (blue koopa, usually.)
-            sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
+            if (!NetworkHandler.IsReplayFastForwarding) {
+                sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
+            }
             if (childAnimation) {
                 childAnimation.Play();
             }
@@ -68,20 +72,20 @@ public class PowerupAnimator : QuantumCallbacks {
             return;
         }
 
-        var powerup = f.Get<Powerup>(entity.EntityRef);
-        var physicsObject = f.Get<PhysicsObject>(entity.EntityRef);
+        var powerup = f.Unsafe.GetPointer<Powerup>(entity.EntityRef);
+        var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
 
         if (childAnimator) {
-            childAnimator.SetBool("onGround", physicsObject.IsTouchingGround);
+            childAnimator.SetBool("onGround", physicsObject->IsTouchingGround);
         }
 
         HandleSpawningAnimation(f, powerup);
         HandleDespawningBlinking(powerup);
     }
 
-    private void HandleSpawningAnimation(Frame f, Powerup powerup) {
-        if (powerup.ParentMarioPlayer.IsValid && powerup.SpawnAnimationFrames > 0) {
-            float timeRemaining = powerup.SpawnAnimationFrames / 60f;
+    private void HandleSpawningAnimation(Frame f, Powerup* powerup) {
+        if (f.Exists(powerup->ParentMarioPlayer) && powerup->SpawnAnimationFrames > 0) {
+            float timeRemaining = powerup->SpawnAnimationFrames / 60f;
             float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
             sRenderer.transform.localScale = Vector3.one * (1 + adjustment);
 
@@ -100,9 +104,9 @@ public class PowerupAnimator : QuantumCallbacks {
         }
     }
 
-    private void HandleDespawningBlinking(Powerup powerup) {
-        if (powerup.Lifetime <= 60) {
-            sRenderer.enabled = ((powerup.Lifetime / 60f * blinkingRate) % 1) > 0.5f;
+    private void HandleDespawningBlinking(Powerup* powerup) {
+        if (powerup->Lifetime <= 60) {
+            sRenderer.enabled = ((powerup->Lifetime / 60f * blinkingRate) % 1) > 0.5f;
         }
     }
 

@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class BulletBillAnimator : MonoBehaviour {
+public unsafe class BulletBillAnimator : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -21,25 +21,27 @@ public class BulletBillAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled);
-        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound);
+        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public void Initialize(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        var enemy = f.Get<Enemy>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
 
-        sRenderer.flipX = enemy.FacingRight;
+        sRenderer.flipX = enemy->FacingRight;
         Vector2 pos = trailParticles.transform.localPosition;
-        pos.x = Mathf.Abs(pos.x) * (enemy.FacingRight ? -1 : 1);
+        pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
         trailParticles.transform.localPosition = pos;
 
         ParticleSystem.ShapeModule shape = shootParticles.shape;
-        shape.rotation = new Vector3(0, 0, enemy.FacingRight ? -33 : 147);
+        shape.rotation = new Vector3(0, 0, enemy->FacingRight ? -33 : 147);
 
-        shootParticles.Play();
         trailParticles.Play();
-        sfx.Play();
+        if (!NetworkHandler.IsReplayFastForwarding) {
+            shootParticles.Play();
+            sfx.Play();
+        }
         legacyAnimation.enabled = true;
     }
 
@@ -51,18 +53,18 @@ public class BulletBillAnimator : MonoBehaviour {
             return;
         }
 
-        var enemy = f.Get<Enemy>(entity.EntityRef);
-        var freezable = f.Get<Freezable>(entity.EntityRef);
-        bool frozen = freezable.IsFrozen(f);
+        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
+        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        bool frozen = freezable->IsFrozen(f);
 
-        sRenderer.enabled = enemy.IsActive;
+        sRenderer.enabled = enemy->IsActive;
 
         var emission = trailParticles.emission;
-        emission.enabled = enemy.IsActive && !frozen;
+        emission.enabled = enemy->IsActive && !frozen;
         legacyAnimation.enabled = !frozen;
 
-        if (enemy.IsDead) {
-            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy.FacingRight ? -1 : 1) * Time.deltaTime);
+        if (enemy->IsDead) {
+            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
         } else {
             transform.rotation = Quaternion.identity;
         }

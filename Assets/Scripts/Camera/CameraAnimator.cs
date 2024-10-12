@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraAnimator : ResizingCamera {
+public unsafe class CameraAnimator : ResizingCamera {
 
-    //---Static
+    //---Static Variables
     private static event Action<float> OnScreenshake;
     public static void TriggerScreenshake(float duration) => OnScreenshake?.Invoke(duration);
 
@@ -43,15 +43,19 @@ public class CameraAnimator : ResizingCamera {
 
     public void OnUpdateView(CallbackUpdateView e) {
         QuantumGame game = e.Game;
-        if (!Target.IsValid || !game.Frames.Predicted.Exists(Target) || !game.Frames.PredictedPrevious.Exists(Target)) {
+        Frame f = game.Frames.Predicted;
+        Frame fp = game.Frames.PredictedPrevious;
+
+        if (!Target.IsValid || !f.Exists(Target) || !fp.Exists(Target)) {
             return;
         }
 
-        var cameraControllerCurrent = game.Frames.Predicted.Get<CameraController>(Target);
-        var cameraControllerPrevious = game.Frames.PredictedPrevious.Get<CameraController>(Target);
 
-        FPVector2 origin = cameraControllerPrevious.CurrentPosition;
-        FPVector2 target = cameraControllerCurrent.CurrentPosition;
+        var cameraControllerCurrent = f.Unsafe.GetPointer<CameraController>(Target);
+        var cameraControllerPrevious = fp.Unsafe.GetPointer<CameraController>(Target);
+
+        FPVector2 origin = cameraControllerPrevious->CurrentPosition;
+        FPVector2 target = cameraControllerCurrent->CurrentPosition;
         FPVector2 difference = target - origin;
         FP distance = difference.Magnitude;
         if (distance > 10) {
@@ -65,21 +69,21 @@ public class CameraAnimator : ResizingCamera {
         Vector3 newPosition = QuantumUtils.WrapWorld(stage, FPVector2.Lerp(origin, target, game.InterpolationFactor.ToFP()), out _).ToUnityVector3();
         newPosition.z = -10;
 
-        var targetTransformPrevious = game.Frames.PredictedPrevious.Get<Transform2D>(Target);
-        var targetTransformCurrent = game.Frames.Predicted.Get<Transform2D>(Target);
-        var targetMario = game.Frames.Predicted.Get<MarioPlayer>(Target);
+        var targetTransformPrevious = fp.Unsafe.GetPointer<Transform2D>(Target);
+        var targetTransformCurrent = f.Unsafe.GetPointer<Transform2D>(Target);
+        var targetMario = f.Unsafe.GetPointer<MarioPlayer>(Target);
 
-        float playerHeight = targetMario.CurrentPowerupState switch {
+        float playerHeight = targetMario->CurrentPowerupState switch {
             PowerupState.MegaMushroom => 3.5f,
             > PowerupState.Mushroom => 1f,
             _ => 0.5f,
         };
 
         // Offset to always put the player in the center for extremely long aspect ratios
-        Vector2 cameraFocus = Vector2.Lerp(targetTransformPrevious.Position.ToUnityVector2(), targetTransformCurrent.Position.ToUnityVector2(), game.InterpolationFactor);
+        Vector2 cameraFocus = Vector2.Lerp(targetTransformPrevious->Position.ToUnityVector2(), targetTransformCurrent->Position.ToUnityVector2(), game.InterpolationFactor);
         cameraFocus.y += playerHeight * 0.5f;
 
-        if (!targetMario.IsDead || targetMario.IsRespawning) {
+        if (!targetMario->IsDead || targetMario->IsRespawning) {
             float cameraHalfHeight = ourCamera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
             newPosition.y = Mathf.Clamp(newPosition.y, cameraFocus.y - cameraHalfHeight, cameraFocus.y + cameraHalfHeight);
         }
@@ -111,8 +115,8 @@ public class CameraAnimator : ResizingCamera {
     private void OnScreenshakeCallback(float screenshake) {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-        if (f.TryGet(Target, out PhysicsObject physicsObject)
-            && physicsObject.IsTouchingGround) {
+        if (f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
+            && physicsObject->IsTouchingGround) {
 
             screenshakeTimer += screenshake;
         }
