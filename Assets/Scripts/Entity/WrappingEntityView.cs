@@ -21,9 +21,11 @@ public unsafe class WrappingEntityView : QuantumEntityView {
 
         // TODO: FIX ME DADDY!!
         FPVector2 previousPosition = fp.Unsafe.GetPointer<Transform2D>(EntityRef)->Position;
-        FPVector2 currentPosition = f.Unsafe.GetPointer<Transform2D>(EntityRef)->Position + param.ErrorVisualVector.ToFPVector2();
+        FPVector2 targetPosition = f.Unsafe.GetPointer<Transform2D>(EntityRef)->Position + param.ErrorVisualVector.ToFPVector2();
 
-        QuantumUtils.UnwrapWorldLocations(stage, previousPosition, currentPosition, out FPVector2 oldUnwrapped, out FPVector2 newUnwrapped);
+        //Debug.Log(param.ErrorVisualVector);
+
+        QuantumUtils.UnwrapWorldLocations(stage, previousPosition, targetPosition, out FPVector2 oldUnwrapped, out FPVector2 newUnwrapped);
         FPVector2 change = newUnwrapped - oldUnwrapped;
 
         FPVector2 result;

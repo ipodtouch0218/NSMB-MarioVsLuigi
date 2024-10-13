@@ -180,6 +180,10 @@ namespace NSMB.Utils {
             return Color.HSVToRGB(hue, saturation * s, value * v);
         }
 
+        public static bool IsMarioLocal(EntityRef entity) {
+            return PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity);
+        }
+
         public static string GetPingSymbol(int ping) {
             string pingSymbol;
             if (ping < 0) {

@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.Utils;
 using Quantum;
 using System.Linq;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class MusicManager : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
@@ -43,24 +45,22 @@ public class MusicManager : MonoBehaviour {
         var allPlayers = f.Filter<MarioPlayer>();
         int playersWithOneLife = 0;
         int playerCount = 0;
-        while (allPlayers.Next(out EntityRef entity, out MarioPlayer mario)) {
-            if (rules.IsLivesEnabled) {
-                if (mario.Lives == 1) {
-                    playersWithOneLife++;
-                }
+        while (allPlayers.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
+            if (rules.IsLivesEnabled && mario->Lives == 1) {
+                playersWithOneLife++;
             }
             playerCount++;
 
-            if (!game.PlayerIsLocal(mario.PlayerRef)
+            if (!game.PlayerIsLocal(mario->PlayerRef)
                 && !PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity)) {
                 continue;
             }
 
-            mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && mario.MegaMushroomFrames > 0;
-            invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && mario.IsStarmanInvincible;
+            mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && mario->MegaMushroomFrames > 0;
+            invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && mario->IsStarmanInvincible;
         }
 
-        speedup |= rules.TimerSeconds > 0 && f.Global->Timer <= 60;
+        speedup |= rules.IsTimerEnabled && f.Global->Timer <= 60;
         speedup |= QuantumUtils.GetFirstPlaceStars(f) >= rules.StarsToWin - 1;
 
         if (!speedup && rules.IsLivesEnabled) {
@@ -82,19 +82,26 @@ public class MusicManager : MonoBehaviour {
     }
 
     private void OnGameEnded(EventGameEnded e) {
+        if (NetworkHandler.IsReplay) {
+            return;
+        }
+
         musicPlayer.Stop();
     }
 
     private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
-        if ((e.Game.PlayerIsLocal(e.Mario.PlayerRef) || PlayerElements.AllPlayerElements.Any(pe => pe.Entity == e.Entity))
-            && !musicPlayer.IsPlaying) {
+        if (Utils.IsMarioLocal(e.Entity) && !musicPlayer.IsPlaying) {
             HandleMusic(e.Game, true);
         }
     }
 
     private void OnMarioPlayerDied(EventMarioPlayerDied e) {
-        if (e.Game.PlayerIsLocal(e.Mario.PlayerRef) && Settings.Instance.audioRestartMusicOnDeath) {
+        if (Utils.IsMarioLocal(e.Entity) && Settings.Instance.audioRestartMusicOnDeath) {
             musicPlayer.Stop();
         }
+    }
+
+    private void OnGameResynced(CallbackGameResynced e) {
+        HandleMusic(e.Game, true);
     }
 }

@@ -29,11 +29,12 @@ namespace Quantum {
                         continue;
                     }
 
-                    physicsObject->Velocity = physicsObject->PreviousFrameVelocity;
-                    physicsObject->Velocity.Y *= -FP._0_33 * 2;
-
-                    if (physicsObject->Velocity.Y > FP._0_75) {
+                    if (physicsObject->PreviousFrameVelocity.Y < -1) {
+                        physicsObject->Velocity = physicsObject->PreviousFrameVelocity;
+                        physicsObject->Velocity.Y *= -FP._0_33 * 2;
                         f.Events.CoinBounced(f, filter.Entity, *coin);
+                    } else {
+                        physicsObject->Velocity.Y = 0;
                     }
                 }
             }

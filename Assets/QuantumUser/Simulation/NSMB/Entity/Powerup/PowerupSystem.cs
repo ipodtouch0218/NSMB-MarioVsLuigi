@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System.Diagnostics;
 
 namespace Quantum {
 
@@ -204,7 +205,9 @@ namespace Quantum {
             if (mario->CurrentPowerupState == PowerupState.MiniMushroom && marioPhysicsObject->IsTouchingGround) {
                 Shape2D shape = collider->Shape;
                 shape.Box.Extents *= 2;
-                shape.Centroid.Y = shape.Box.Extents.Y / 2;
+                shape.Centroid.Y = shape.Box.Extents.Y / 2 + FP._0_01;
+
+                Draw.Shape(f, ref shape, transform->Position);
 
                 if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, shape)) {
                     return PowerupReserveResult.ReserveNewPowerup;

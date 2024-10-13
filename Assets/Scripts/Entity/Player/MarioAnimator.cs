@@ -489,10 +489,10 @@ namespace NSMB.Entities.Player {
 
             if (changedAvatar) {
                 // Preserve Animations
+                int[] layers = { 0, 1, 3 };
                 AnimatorStateInfo[] layerInfo = new AnimatorStateInfo[animator.layerCount];
-                for (int i = 0; i < animator.layerCount; i++) {
+                foreach (int i in layers) {
                     layerInfo[i] = animator.GetCurrentAnimatorStateInfo(i);
-                    //Debug.Log(i + " - " + layerInfo[i].fullPathHash);
                 }
 
                 animator.avatar = targetAvatar;
@@ -501,10 +501,9 @@ namespace NSMB.Entities.Player {
                 // Push back state 
                 animator.Update(0);
 
-                for (int i = 0; i < animator.layerCount; i++) {
+                foreach (int i in layers) {
                     animator.Play(layerInfo[i].fullPathHash, i, layerInfo[i].normalizedTime);
                     animator.Update(0);
-                    //Debug.Log(i + " -" + animator.GetCurrentAnimatorStateInfo(i).fullPathHash);
                 }
 
                 animator.Update(0);
@@ -647,10 +646,6 @@ namespace NSMB.Entities.Player {
         }
         */
 
-        private bool MarioIsLocal(EntityRef entity) {
-            return PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity);
-        }
-
         private void OnMarioPlayerReceivedKnockback(EventMarioPlayerReceivedKnockback e) {
             if (e.Entity != entity.EntityRef || NetworkHandler.IsReplayFastForwarding) {
                 return;
@@ -662,7 +657,7 @@ namespace NSMB.Entities.Player {
 
             PlaySound(e.Weak ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
 
-            if (MarioIsLocal(e.Entity)) {
+            if (Utils.Utils.IsMarioLocal(e.Entity)) {
                 GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, e.Weak ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
             }
         }
@@ -766,7 +761,7 @@ namespace NSMB.Entities.Player {
             animator.Play("deadstart");
 
             if (!NetworkHandler.IsReplayFastForwarding) {
-                PlaySound(MarioIsLocal(e.Entity) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);
+                PlaySound(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);
                 
                 if (e.IsLava) {
                     PlaySound(SoundEffect.Player_Sound_LavaHiss);
@@ -793,7 +788,7 @@ namespace NSMB.Entities.Player {
             }
 
             var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            PlaySound(MarioIsLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
+            PlaySound(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
             Instantiate(starCollectParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
@@ -876,7 +871,7 @@ namespace NSMB.Entities.Player {
 
             if (e.Success) {
                 PlaySound(SoundEffect.Player_Sound_PowerupReserveUse);
-            } else if (MarioIsLocal(e.Entity)) {
+            } else if (Utils.Utils.IsMarioLocal(e.Entity)) {
                 PlaySound(SoundEffect.UI_Error);
             }
         }
@@ -944,7 +939,7 @@ namespace NSMB.Entities.Player {
                 SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform->Position.ToUnityVector2());
                 CameraAnimator.TriggerScreenshake(0.35f);
 
-                if (MarioIsLocal(e.Entity)) {
+                if (Utils.Utils.IsMarioLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f,
                         RumbleManager.RumbleSetting.Low);
                 }
@@ -958,7 +953,7 @@ namespace NSMB.Entities.Player {
 
                 SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform->Position.ToUnityVector2());
 
-                if (MarioIsLocal(e.Entity)) {
+                if (Utils.Utils.IsMarioLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f,
                         RumbleManager.RumbleSetting.Low);
                 }
@@ -995,7 +990,7 @@ namespace NSMB.Entities.Player {
             if (e.WasBounce) {
                 PlaySound(SoundEffect.Enemy_Generic_Stomp);
 
-                if (MarioIsLocal(e.Entity)) {
+                if (Utils.Utils.IsMarioLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.4f, 0.15f, RumbleManager.RumbleSetting.Low);
                 }
             } else {

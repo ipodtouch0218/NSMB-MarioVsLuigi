@@ -309,18 +309,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             return;
         }
 
-        if ((e.Frame.Number - ReplayStart) % (5 * QuantumRunner.Default.Session.SimulationRate) == 0) {
+        Frame f = e.Frame;
+        if ((f.Number - ReplayStart) % (5 * f.UpdateRate) == 0) {
             // Save this frame to the replay cache
-            int index = (e.Frame.Number - ReplayStart) / (5 * QuantumRunner.Default.Session.SimulationRate);
-            if (replayFrameCache.Count > index) {
-                Debug.Log("Skip already serialized frame");
-            } else {
-                Debug.Log("Serialize frame " + e.Frame.Number + ", index " + index);
+            int index = (f.Number - ReplayStart) / (5 * f.UpdateRate);
+            if (replayFrameCache.Count <= index) {
+                byte[] serializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+                byte[] copy = new byte[serializedFrame.Length];
+                Array.Copy(serializedFrame, copy, serializedFrame.Length);
+                replayFrameCache.Add(copy);
             }
-            byte[] serializedFrame = e.Frame.Serialize(DeterministicFrameSerializeMode.Serialize);
-            byte[] copy = new byte[serializedFrame.Length];
-            Array.Copy(serializedFrame, copy, serializedFrame.Length);
-            replayFrameCache.Add(copy);
         }
     }
 

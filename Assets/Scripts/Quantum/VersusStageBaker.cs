@@ -1,15 +1,14 @@
 #if UNITY_EDITOR
 using Photon.Deterministic;
 using Quantum;
+using AssetObjectQuery = Quantum.AssetObjectQuery;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using AssetObjectQuery = Quantum.AssetObjectQuery;
 using UnityEditor;
-using System.Runtime.InteropServices;
 
 
 [assembly: QuantumMapBakeAssembly]

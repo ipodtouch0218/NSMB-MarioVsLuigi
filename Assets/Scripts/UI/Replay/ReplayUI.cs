@@ -1,9 +1,10 @@
 ﻿using NSMB.Extensions;
+using NSMB.UI.Pause.Options;
 using NSMB.Utils;
 using Quantum;
+using System.Drawing.Text;
 using System.Reflection;
 using TMPro;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ public class ReplayUI : MonoBehaviour {
 
     [SerializeField] private GameObject replayUI;
     [SerializeField] private Transform trackArrow;
+    [SerializeField] private RectMask2D trackBufferMask;
     [SerializeField] private TMP_Text trackArrowText;
     [SerializeField] private float minTrackX = -180, maxTrackX = 180;
     [SerializeField] private TMP_Text replayTimecode;
@@ -39,11 +41,13 @@ public class ReplayUI : MonoBehaviour {
         }
 
         trackArrowText.gameObject.SetActive(false);
+        PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenedToggled;
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
     public void OnDestroy() {
         Time.timeScale = 1;
+        PauseOptionMenuManager.OnOptionsOpenedToggled -= OnOptionsOpenedToggled;
     }
 
     public void Update() {
@@ -59,6 +63,12 @@ public class ReplayUI : MonoBehaviour {
             Utils.SecondsToMinuteSeconds(Mathf.FloorToInt((currentFrameNumber - NetworkHandler.ReplayStart) / f.UpdateRate))
             + "/"
             + Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate);
+
+        float width = maxTrackX - minTrackX;
+        float bufferPercentage = (float) NetworkHandler.ReplayFrameCache.Count * f.UpdateRate * 5 / NetworkHandler.ReplayLength;
+        Vector4 newPadding = trackBufferMask.padding;
+        newPadding.z = Mathf.Max((1f - bufferPercentage) * width + 8, 16);
+        trackBufferMask.padding = newPadding;
 
         float percentage;
         if (draggingArrow) {
@@ -168,6 +178,12 @@ public class ReplayUI : MonoBehaviour {
         if (newFrame != cachedFrame) {
             NetworkHandler.IsReplayFastForwarding = true;
             QuantumRunner.Default.Session.Update((newFrame - cachedFrame) * f.DeltaTime.AsDouble);
+        }
+    }
+
+    private void OnOptionsOpenedToggled(bool isEnabled) {
+        // TODO: me
+        if (isEnabled) {
         }
     }
 }
