@@ -29,16 +29,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay { get; private set; }
     public static int ReplayStart { get; private set; }
-    public static int ReplayEnd { get; private set; }
+    public static int ReplayLength { get; private set; }
+    public static int ReplayEnd => ReplayStart + ReplayLength;
     public static bool IsReplayFastForwarding { get; set; }
-    public static int ReplayLength => ReplayEnd - ReplayStart;
     public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
 
     //---Private
     private RealtimeClient realtimeClient;
     private string lastRegion;
     private Coroutine pingUpdateCoroutine;
-    private List<byte[]> replayFrameCache;
+    private readonly List<byte[]> replayFrameCache = new();
 
     public void Awake() {
         StateChanged += OnClientStateChanged;
@@ -242,22 +242,30 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             return;
         }
 
+        // JSON-friendly repla
         QuantumGame game = e.Game;
-        QuantumReplayFile replay = game.GetRecordedReplay();
-        replay.InitialTick = initialFrame;
-        replay.InitialFrameData = initialFrameData;
+        QuantumReplayFile jsonReplay = game.GetRecordedReplay();
+        jsonReplay.InitialTick = initialFrame;
+        jsonReplay.InitialFrameData = initialFrameData;
         initialFrame = 0;
         initialFrameData = null;
 
+        // Create directories and open file
         string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
         Directory.CreateDirectory(replayFolder);
+        string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".mvlreplay");
+        using FileStream outputStream = new FileStream(finalFilePath, FileMode.Create);
 
-        string json = JsonUtility.ToJson(replay);
-        string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".json");
-        File.WriteAllText(finalFilePath, json);
+        // Write binary replay
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay);
+        long writtenBytes = binaryReplay.WriteToStream(outputStream);
 
-        FileInfo writtenFile = new FileInfo(finalFilePath);
-        Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenFile.Length)})");
+        // string jsonFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".json");
+        // File.WriteAllText(jsonFilePath, JsonUtility.ToJson(jsonReplay));
+        // Debug.Log($"original JSON-encoded size: {JsonUtility.ToJson(jsonReplay).Length}");
+
+        // Complete
+        Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
 #endif
     }
 
@@ -273,34 +281,34 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         Debug.Log("[Replay] Started recording a new replay.");
     }
 
-    public async static void StartReplay(QuantumReplayFile replay) {
+    public async static void StartReplay(BinaryReplayFile replay) {
+        IsReplay = true;
+        ReplayStart = replay.InitialFrameNumber;
+        ReplayLength = replay.ReplayLengthInFrames;
 
         var serializer = new QuantumUnityJsonSerializer();
-        var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.RuntimeConfigData.Decode(), compressed: true);
-        var _replayInputProvider = replay.CreateInputProvider();
+        var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: true);
+        var deterministicConfig = DeterministicSessionConfig.FromByteArray(replay.DecompressedDeterministicConfigData);
+        var inputStream = new Photon.Deterministic.BitStream(replay.DecompressedInputData);
+        var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);
 
         var arguments = new SessionRunner.Arguments {
             RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
             GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
             RuntimeConfig = runtimeConfig,
-            SessionConfig = replay.DeterministicConfig,
-            ReplayProvider = _replayInputProvider,
+            SessionConfig = deterministicConfig,
+            ReplayProvider = replayInputProvider,
             GameMode = DeterministicGameMode.Replay,
             RunnerId = "LOCALREPLAY",
-            PlayerCount = replay.DeterministicConfig.PlayerCount,
-            //InstantReplaySettings = InstantReplayConfig,
-            InitialTick = replay.InitialTick,
-            FrameData = replay.InitialFrameData,
+            PlayerCount = deterministicConfig.PlayerCount,
+            InitialTick = ReplayStart,
+            FrameData = replay.DecompressedInitialFrameData,
             DeltaTimeType = SimulationUpdateTime.EngineDeltaTime
         };
 
         GlobalController.Instance.loadingCanvas.Initialize(null);
-        IsReplay = true;
-        ReplayStart = replay.InitialTick;
-        ReplayEnd = replay.LastTick;
-        Instance.replayFrameCache = new() {
-            replay.InitialFrameData
-        };
+        ReplayFrameCache.Clear();
+        ReplayFrameCache.Add(arguments.FrameData);
         Runner = (QuantumRunner) await SessionRunner.StartAsync(arguments);
     }
 

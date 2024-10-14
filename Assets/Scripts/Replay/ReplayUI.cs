@@ -2,7 +2,6 @@
 using NSMB.UI.Pause.Options;
 using NSMB.Utils;
 using Quantum;
-using System.Drawing.Text;
 using System.Reflection;
 using TMPro;
 using UnityEngine;

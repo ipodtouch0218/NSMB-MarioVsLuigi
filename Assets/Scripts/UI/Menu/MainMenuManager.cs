@@ -340,8 +340,13 @@ namespace NSMB.UI.MainMenu {
 
         public void OpenCredits() {
             string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "replays"));
-            string file = files.Where(file => !file.EndsWith("meta")).First();
-            NetworkHandler.StartReplay(JsonUtility.FromJson<QuantumReplayFile>(File.ReadAllText(file)));
+            string filepath = files.Where(file => file.EndsWith(".mvlreplay")).First();
+
+            using FileStream inputStream = new FileStream(filepath, FileMode.Open);
+            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile)) {
+                NetworkHandler.StartReplay(replayFile);
+            }
+
             return;
 
             DisableAllMenus();
