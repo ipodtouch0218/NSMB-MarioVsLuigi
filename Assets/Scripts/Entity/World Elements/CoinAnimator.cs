@@ -9,11 +9,13 @@ public unsafe class CoinAnimator : MonoBehaviour {
     [SerializeField] private LegacyAnimateSpriteRenderer defaultCoinAnimate, dottedCoinAnimate;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] private ParticleSystem sparkles;
 
     public void OnValidate() {
         this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer);
+        this.SetIfNull(ref sparkles, UnityExtensions.GetComponentType.Children);
     }
 
     public void Start() {
@@ -62,6 +64,9 @@ public unsafe class CoinAnimator : MonoBehaviour {
         }
 
         sRenderer.enabled = !e.Collected;
+        if (e.Collected && !NetworkHandler.IsReplayFastForwarding) {
+            sparkles.Play();
+        }
     }
 
     private void OnCoinChangedType(EventCoinChangedType e) {

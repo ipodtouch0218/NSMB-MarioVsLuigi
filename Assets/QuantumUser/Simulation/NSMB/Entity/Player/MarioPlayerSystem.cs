@@ -941,7 +941,7 @@ namespace Quantum {
 
                 } else {
                     // Still growing...
-                    if (f.Number % 4 == 0 && PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape)) {
+                    if (f.Number % 4 == 0 && PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape, false, stage)) {
                         // Cancel growing
                         mario->CurrentPowerupState = PowerupState.Mushroom;
                         mario->MegaMushroomEndFrames = (byte) (90 - mario->MegaMushroomStartFrames);

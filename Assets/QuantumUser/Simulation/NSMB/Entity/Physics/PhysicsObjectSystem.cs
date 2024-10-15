@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using Quantum.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,9 +37,7 @@ namespace Quantum {
             bool wasOnGround = physicsObject->IsTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousVelocity.Y;
             physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
 
-            if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
-                contacts = f.AllocateList(out physicsObject->Contacts);
-            }
+            QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
             MoveWithPlatform(f, ref filter, contacts);
             for (int i = 0; i < contacts.Count; i++) {
                 var contact = contacts[i];
@@ -125,11 +124,7 @@ namespace Quantum {
             }
 
             if (!contacts.HasValue) {
-                if (f.TryResolveList(physicsObject->Contacts, out var tempContacts)) {
-                    contacts = tempContacts;
-                } else {
-                    contacts = f.AllocateList(out physicsObject->Contacts);
-                }
+                contacts = f.ResolveList(physicsObject->Contacts);
             }
 
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
@@ -315,11 +310,7 @@ namespace Quantum {
             }
 
             if (!contacts.HasValue) {
-                if (f.TryResolveList(physicsObject->Contacts, out var tempContacts)) {
-                    contacts = tempContacts;
-                } else {
-                    contacts = f.AllocateList(out physicsObject->Contacts);
-                }
+                contacts = f.ResolveList(physicsObject->Contacts);
             }
 
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
@@ -738,7 +729,7 @@ namespace Quantum {
             return PointIsInsidePolygon(testPosition, boxCorners);
         }
 
-        public static bool BoxInsideTile(Frame f, FPVector2 position, Shape2D shape, VersusStageData stage = null) {
+        public static bool BoxInsideTile(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null) {
             if (!stage) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
@@ -762,7 +753,9 @@ namespace Quantum {
                 for (int y = min.y; y <= max.y; y++) {
                     StageTileInstance tileInstance = stage.GetTileRelative(f, x, y);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
-                    if (!tile || !tile.IsPolygon) {
+                    if (!tile
+                        || !tile.IsPolygon
+                        || (!includeMegaBreakable && tile is BreakableBrickTile breakable && breakable.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.MegaMario))) {
                         continue;
                     }
                     FPVector2[][] tilePolygons = tileInstance.GetWorldPolygons(tile, QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y)));

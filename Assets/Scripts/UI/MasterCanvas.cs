@@ -10,7 +10,8 @@ public class MasterCanvas : MonoBehaviour {
     public unsafe void Start() {
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         Frame f;
-        if ((f = QuantumRunner.DefaultGame.Frames.Predicted) != null
+        if (QuantumRunner.DefaultGame != null
+            && (f = QuantumRunner.DefaultGame.Frames.Predicted) != null
             && f.Global->GameState > GameState.WaitingForPlayers) {
 
             CheckForSpectatorUI();

@@ -175,6 +175,11 @@ namespace Quantum {
                 var playerDataFilter = f.Filter<PlayerData>();
                 byte players = 0;
                 while (playerDataFilter.NextUnsafe(out _, out PlayerData* data)) {
+                    if (!f.RuntimeConfig.IsRealGame) {
+                        data->IsLoaded = true;
+                        data->IsSpectator = false;
+                    }
+
                     allPlayersLoaded &= data->IsSpectator || data->IsLoaded;
                     if (!data->IsSpectator) {
                         players++;

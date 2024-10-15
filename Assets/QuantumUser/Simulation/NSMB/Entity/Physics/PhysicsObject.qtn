@@ -18,7 +18,7 @@ component PhysicsObject {
     [ExcludeFromPrototype] bool IsOnSlipperyGround;
     [ExcludeFromPrototype] bool IsOnSlideableGround;
 
-    [ExcludeFromPrototype, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
+    [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
 }
 
 struct PhysicsContact {

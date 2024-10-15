@@ -141,7 +141,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerReceivedKnockback>(this, OnMarioPlayerReceivedKnockback);
+            QuantumEvent.Subscribe<EventMarioPlayerReceivedKnockback>(this, OnMarioPlayerReceivedKnockback, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerEnteredPipe>(this, OnMarioPlayerEnteredPipe, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerStoppedSliding>(this, OnMarioPlayerStoppedSliding, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner, NetworkHandler.FilterOutReplayFastForward);
@@ -547,10 +547,10 @@ namespace NSMB.Entities.Player {
             characterData ??= character;
             sfx.PlayOneShot(soundEffect, characterData, variant, volume);
         }
-        public GameObject SpawnParticle(string particle, Vector2 worldPos, Quaternion? rot = null) {
+        public GameObject SpawnParticle(string particle, Vector3 worldPos, Quaternion? rot = null) {
             return Instantiate(Resources.Load(particle), worldPos, rot ?? Quaternion.identity) as GameObject;
         }
-        public GameObject SpawnParticle(GameObject particle, Vector2 worldPos, Quaternion? rot = null) {
+        public GameObject SpawnParticle(GameObject particle, Vector3 worldPos, Quaternion? rot = null) {
             return Instantiate(particle, worldPos, rot ?? Quaternion.identity);
         }
 
@@ -647,7 +647,7 @@ namespace NSMB.Entities.Player {
         */
 
         private void OnMarioPlayerReceivedKnockback(EventMarioPlayerReceivedKnockback e) {
-            if (e.Entity != entity.EntityRef || NetworkHandler.IsReplayFastForwarding) {
+            if (e.Entity != entity.EntityRef) {
                 return;
             }
 
@@ -896,7 +896,9 @@ namespace NSMB.Entities.Player {
 
                 if (powerup.State == PowerupState.MegaMushroom) {
                     animator.Play("mega-scale");
-                    SpawnParticle(Enums.PrefabParticle.Player_MegaMushroom.GetGameObject(), marioTransform->Position.ToUnityVector2());
+                    Vector3 spawnPosition = marioTransform->Position.ToUnityVector2();
+                    spawnPosition.z = -4f;
+                    SpawnParticle(Enums.PrefabParticle.Player_MegaMushroom.GetGameObject(), spawnPosition);
                 }
                 break;
             }

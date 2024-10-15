@@ -40,12 +40,16 @@ public class InputDisplay : MonoBehaviour {
         bool isPressed;
         if (inputType == InputType.ReserveItem) {
             // This uses a command
+            Debug.Log(f.GetPlayerCommand(player));
+            if (f.GetPlayerCommand(player) != null) {
+                Debug.Log(f.GetPlayerCommand(player).GetType().Name);
+            }
             if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
                 commandFrame = f.Number;
             }
 
             int diff = f.Number - commandFrame;
-            isPressed = diff > 0 && diff < f.UpdateRate / 2;
+            isPressed = diff > 0 && diff < f.UpdateRate / 3;
         } else {
             isPressed = GetButton(input, inputType);
         }
