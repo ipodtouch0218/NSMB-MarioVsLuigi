@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3977285621181604314}
   - component: {fileID: -8827579426703279798}
   - component: {fileID: 5432761528888521127}
+  - component: {fileID: 3527019452197092571}
   m_Layer: 9
   m_Name: Fireball
   m_TagString: Untagged
@@ -94,67 +95,6 @@ MonoBehaviour:
       IsPersistent: 1
       CompoundShapes: []
     Shape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 4
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 9011
-        Y:
-          RawValue: 9011
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 9011
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape3D:
       ShapeType: 0
       SphereRadius:
         RawValue: 0
@@ -297,16 +237,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -318,21 +248,6 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &3977285621181604314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -351,15 +266,6 @@ MonoBehaviour:
         Value: 503653222628643586
     Speed:
       RawValue: 0
-    Owner: {fileID: 0}
-    FacingRight:
-      Value: 0
-    HasBounced:
-      Value: 0
-    PlayDestroySound:
-      Value: 0
-    CheckedCollision:
-      Value: 0
 --- !u!114 &-8827579426703279798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -389,6 +295,21 @@ MonoBehaviour:
   Prototype:
     ColliderDisabled:
       Value: 0
+--- !u!114 &3527019452197092571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6307920351473437675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bde109c23ab3a64f9ccec5ac787f04b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyPrefab: {fileID: 5903185039186744869, guid: d5777f79309ac1e428227e6c2ade9525,
+    type: 3}
+  spawnOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &6817442949190414024
 GameObject:
   m_ObjectHideFlags: 0

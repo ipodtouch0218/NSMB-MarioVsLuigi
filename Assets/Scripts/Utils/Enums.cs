@@ -47,6 +47,9 @@ public static class Enums {
 
         [PrefabParticleData("Prefabs/Particle/Puff")] Enemy_Puff,
 
+        [PrefabParticleData("Prefabs/Particle/EnemyHardKick")] Enemy_HardKick,
+        [PrefabParticleData("Prefabs/Particle/KillPoof")] Enemy_KillPoof,
+
         [PrefabParticleData("Prefabs/Particle/WalljumpParticle")] Player_WallJump,
         [PrefabParticleData("Prefabs/Particle/GroundpoundDust")] Player_Groundpound,
         [PrefabParticleData("Prefabs/Particle/MegaMushroomGrow")] Player_MegaMushroom,

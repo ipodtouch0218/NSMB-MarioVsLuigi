@@ -21,10 +21,11 @@ namespace Quantum {
             var spinner = filter.Spinner;
             var movingPlatform = filter.MovingPlatform;
 
+            QuantumUtils.Decrement(ref spinner->PlatformWaitFrames);
             QHashSet<EntityRef> marios = f.ResolveHashSet(spinner->MariosOnPlatform);
             FP target = 1;
             FP targetAngularVelocity = -200;
-            if (marios.Count > 0) {
+            if (marios.Count > 0 || spinner->PlatformWaitFrames != 0) {
                 if (spinner->AngularVelocity == targetAngularVelocity) {
                     spinner->AngularVelocity = 0;
                 }
@@ -32,6 +33,7 @@ namespace Quantum {
                 targetAngularVelocity = -1800;
                 spinner->RotationWaitFrames = 0;
             }
+
             FP newValue = QuantumUtils.MoveTowards(spinner->ArmPosition, target, spinner->ArmMoveSpeed * f.DeltaTime);
             FP change = newValue - spinner->ArmPosition;
 

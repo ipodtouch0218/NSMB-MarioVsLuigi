@@ -18,4 +18,5 @@ component Koopa {
 event KoopaEnteredShell {
 	nothashed Frame Frame;
 	EntityRef Entity;
+	bool Groundpounded;
 }

@@ -2313,6 +2313,9 @@ namespace Quantum {
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public FP PlatformHeight;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public Byte PlatformWaitFrames;
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
@@ -2324,7 +2327,7 @@ namespace Quantum {
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public FP AngularVelocity;
-    [FieldOffset(0)]
+    [FieldOffset(1)]
     [ExcludeFromPrototype()]
     public Byte RotationWaitFrames;
     public override Int32 GetHashCode() {
@@ -2334,6 +2337,7 @@ namespace Quantum {
         hash = hash * 31 + ArmMoveDistance.GetHashCode();
         hash = hash * 31 + ArmPosition.GetHashCode();
         hash = hash * 31 + PlatformHeight.GetHashCode();
+        hash = hash * 31 + PlatformWaitFrames.GetHashCode();
         hash = hash * 31 + MariosOnPlatform.GetHashCode();
         hash = hash * 31 + Rotation.GetHashCode();
         hash = hash * 31 + AngularVelocity.GetHashCode();
@@ -2357,6 +2361,7 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Spinner*)ptr;
+        serializer.Stream.Serialize(&p->PlatformWaitFrames);
         serializer.Stream.Serialize(&p->RotationWaitFrames);
         QHashSet.Serialize(&p->MariosOnPlatform, serializer, Statics.SerializeEntityRef);
         FP.Serialize(&p->AngularVelocity, serializer);

@@ -8,13 +8,14 @@ public unsafe class SpinnerAnimator : MonoBehaviour {
     [SerializeField] private QuantumEntityView entity;
     [SerializeField] private Transform rotator;
     [SerializeField] private AudioSource sfx;
+    [SerializeField] private GameObject launchParticlePrefab;
 
     public void OnValidate() {
         this.SetIfNull(ref sfx);
     }
 
     public void Start() {
-        QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner);
+        QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner, NetworkHandler.FilterOutReplayFastForward);
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
@@ -39,8 +40,7 @@ public unsafe class SpinnerAnimator : MonoBehaviour {
             return;
         }
 
-        // TODO: the particle effect that comes from a spinner launch
-
         sfx.PlayOneShot(SoundEffect.World_Spinner_Launch);
+        Instantiate(launchParticlePrefab, transform.position, Quaternion.identity);
     }
 }

@@ -33,7 +33,7 @@ public class KoopaAnimator : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
-        //QuantumEvent.Subscribe<EventKoopaEnteredShell>(this, OnKoopaEnteredShell, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventKoopaEnteredShell>(this, OnKoopaEnteredShell, NetworkHandler.FilterOutReplayFastForward);
         //QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
     }
 
@@ -114,15 +114,20 @@ public class KoopaAnimator : MonoBehaviour {
         sfx.PlayOneShot(QuantumUtils.GetComboSoundEffect(e.Combo));
     }
 
-    /*
-    private void OnKoopaEnteredShell(EventKoopaEnteredShell e) {
+    private unsafe void OnKoopaEnteredShell(EventKoopaEnteredShell e) {
         if (e.Entity != entity.EntityRef) {
             return;
         }
 
-        // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
+        if (e.Groundpounded) {
+            Instantiate(
+                Enums.PrefabParticle.Enemy_HardKick.GetGameObject(),
+                transform.position + (Vector3.back * 5) + (Vector3.up * 0.1f),
+                Quaternion.identity);
+        }
     }
 
+    /*
     private void OnEnemyKilled(EventEnemyKilled e) {
         if (e.Enemy != entity.EntityRef) {
             return;

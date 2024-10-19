@@ -352,10 +352,11 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventKoopaEnteredShell KoopaEnteredShell(Frame Frame, EntityRef Entity) {
+      public EventKoopaEnteredShell KoopaEnteredShell(Frame Frame, EntityRef Entity, QBoolean Groundpounded) {
         var ev = _f.Context.AcquireEvent<EventKoopaEnteredShell>(EventKoopaEnteredShell.ID);
         ev.Frame = Frame;
         ev.Entity = Entity;
+        ev.Groundpounded = Groundpounded;
         _f.AddEvent(ev);
         return ev;
       }
@@ -1409,6 +1410,7 @@ namespace Quantum {
     public new const Int32 ID = 29;
     public Frame Frame;
     public EntityRef Entity;
+    public QBoolean Groundpounded;
     protected EventKoopaEnteredShell(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -1427,6 +1429,7 @@ namespace Quantum {
       unchecked {
         var hash = 179;
         hash = hash * 31 + Entity.GetHashCode();
+        hash = hash * 31 + Groundpounded.GetHashCode();
         return hash;
       }
     }

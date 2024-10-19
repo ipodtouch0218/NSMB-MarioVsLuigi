@@ -27,7 +27,9 @@ MonoBehaviour:
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
-  TriangleMeshCellSize: 4
+  SceneMeshCellSize:
+    RawValue: 262144
+  TriangleMeshCellSize: -1
   StaticColliders3DTrianglesData:
     Id:
       Value: 522519204170472112
@@ -842,6 +844,8 @@ MonoBehaviour:
           Y:
             RawValue: 0
         IsCarryable:
+          Value: 0
+        IsFlying:
           Value: 0
     - rid: 692988744814297093
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -2875,6 +2879,8 @@ MonoBehaviour:
           Y:
             RawValue: 0
         IsCarryable:
+          Value: 0
+        IsFlying:
           Value: 0
     - rid: 4642328894244913157
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

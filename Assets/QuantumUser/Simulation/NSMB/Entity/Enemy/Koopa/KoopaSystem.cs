@@ -232,7 +232,8 @@ namespace Quantum {
                         // Kick
                         koopa->IsInShell = true;
                         koopa->IsKicked = false;
-                        koopa->EnterShell(f, koopaEntity, marioEntity, false);
+                        koopaEnemy->FacingRight = ourPos.X > theirPos.X;
+                        koopa->EnterShell(f, koopaEntity, marioEntity, false, true);
                         koopa->Kick(f, koopaEntity, marioEntity, 3);
                         koopaPhysicsObject->Velocity.Y = 2;
                     }
@@ -240,7 +241,7 @@ namespace Quantum {
                     // Moving (either in shell, or walking)
                     if (attackedFromAbove) {
                         // Enter Shell
-                        if (koopa->SpawnPowerupWhenStomped.IsValid) {
+                        if (!koopa->IsKicked && koopa->SpawnPowerupWhenStomped.IsValid) {
                             PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
                             EntityRef newPowerup = f.Create(powerupAsset.Prefab);
                             var powerupTransform = f.Unsafe.GetPointer<Transform2D>(newPowerup);
@@ -254,9 +255,10 @@ namespace Quantum {
                             koopaEnemy->IsActive = false;
                             koopaEnemy->IsDead = true;
                             koopaPhysicsObject->IsFrozen = true;
-                            f.Events.KoopaEnteredShell(f, koopaEntity);
+                            f.Events.KoopaEnteredShell(f, koopaEntity, mario->IsGroundpoundActive);
+
                         } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->IsGroundpoundActive) {
-                            koopa->EnterShell(f, koopaEntity, marioEntity, false);
+                            koopa->EnterShell(f, koopaEntity, marioEntity, false, false);
                         }
                         mario->DoEntityBounce = true;
                         koopaHoldable->PreviousHolder = marioEntity;
@@ -412,7 +414,7 @@ namespace Quantum {
             }
 
             koopa->IsInShell = true; // Force sound effect off
-            koopa->EnterShell(f, entity, bumpOwner, true);
+            koopa->EnterShell(f, entity, bumpOwner, true, false);
             f.Events.PlayComboSound(f, entity, 0);
 
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);

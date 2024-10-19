@@ -51,6 +51,7 @@ namespace NSMB.UI.MainMenu {
                 Teams = rules.TeamsEnabled,
                 CustomPowerups = rules.CustomPowerupsEnabled,
                 DrawOnTimeUp = rules.DrawOnTimeUp,
+                
             };
 
             NetworkHandler.Client.CurrentRoom.SetCustomProperties(new PhotonHashtable {

@@ -15,12 +15,12 @@ namespace Quantum {
             holdable->PreviousHolder = default;
         }
 
-        public void EnterShell(Frame f, EntityRef entity, EntityRef initiator, bool flipped) {
+        public void EnterShell(Frame f, EntityRef entity, EntityRef initiator, bool flipped, bool groundpounded) {
             var holdable = f.Unsafe.GetPointer<Holdable>(entity);
             holdable->PreviousHolder = initiator;
 
-            if (!IsInShell || IsKicked) {
-                f.Events.KoopaEnteredShell(f, entity);
+            if (!IsInShell || IsKicked || groundpounded) {
+                f.Events.KoopaEnteredShell(f, entity, groundpounded);
             }
 
             CurrentSpeed = 0;

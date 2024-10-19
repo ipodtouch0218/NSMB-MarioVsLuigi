@@ -41,7 +41,7 @@ namespace NSMB.UI.MainMenu {
             BooleanProperties boolProperties = (BooleanProperties) packedBoolProperties;
 
             playersText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.players", "players", room.PlayerCount.ToString(), "maxplayers", room.MaxPlayers.ToString());
-            // inProgressText.text = boolProperties.GameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
+             inProgressText.text = boolProperties.GameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
 
             string symbols = "";
 

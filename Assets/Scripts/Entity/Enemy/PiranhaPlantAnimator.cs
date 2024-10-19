@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ public unsafe class PiranhaPlantAnimator : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled);
+        QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
@@ -50,5 +51,12 @@ public unsafe class PiranhaPlantAnimator : MonoBehaviour {
 
         sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Death);
         sfx.PlayOneShot(SoundEffect.Enemy_Shell_Kick);
+
+        Frame f = e.Frame;
+        var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(e.Enemy);
+        FPVector2 center = f.Unsafe.GetPointer<Transform2D>(e.Enemy)->Position
+                           + collider->Shape.Centroid + (FPVector2.Up * collider->Shape.Box.Extents.Y);
+
+        Instantiate(Enums.PrefabParticle.Enemy_KillPoof.GetGameObject(), center.ToUnityVector3(), Quaternion.identity);
     }
 }

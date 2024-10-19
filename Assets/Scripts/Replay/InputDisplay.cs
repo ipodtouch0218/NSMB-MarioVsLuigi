@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using Photon.Realtime;
 using Quantum;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +22,7 @@ public class InputDisplay : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
+        QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished, onlyIfActiveAndEnabled: true);
     }
 
     private unsafe void OnUpdateView(CallbackUpdateView e) {
@@ -29,32 +31,41 @@ public class InputDisplay : MonoBehaviour {
             return;
         }
 
-        PlayerRef player = mario->PlayerRef;
-        Quantum.Input input;
-        if (player.IsValid) {
-            input = *f.GetPlayerInput(player);
-        } else {
-            input = default;
-        }
-
         bool isPressed;
-        if (inputType == InputType.ReserveItem) {
-            // This uses a command
-            Debug.Log(f.GetPlayerCommand(player));
-            if (f.GetPlayerCommand(player) != null) {
-                Debug.Log(f.GetPlayerCommand(player).GetType().Name);
-            }
-            if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
-                commandFrame = f.Number;
-            }
+        PlayerRef player = mario->PlayerRef;
+        if (inputType != InputType.ReserveItem) {
 
+            Quantum.Input input;
+            if (player.IsValid) {
+                input = *f.GetPlayerInput(player);
+            } else {
+                input = default;
+            }
+            isPressed = GetButton(input, inputType);
+        } else {
             int diff = f.Number - commandFrame;
             isPressed = diff > 0 && diff < f.UpdateRate / 3;
-        } else {
-            isPressed = GetButton(input, inputType);
+        }
+        display.color = isPressed ? pressedColor : unpressedColor;
+    }
+
+    private unsafe void OnSimulateFinished(CallbackSimulateFinished e) {
+        Frame f = e.Game.Frames.Verified;
+        if (!f.Unsafe.TryGetPointer(playerElements.Entity, out MarioPlayer* mario)
+            || inputType != InputType.ReserveItem) {
+            return;
         }
 
-        display.color = isPressed ? pressedColor : unpressedColor;
+        PlayerRef player = mario->PlayerRef;
+        /*
+        if (e.Game.PlayerIsLocal(player)) {
+            f = e.Game.Frames.Predicted;
+        }
+        */
+
+        if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
+            commandFrame = f.Number;
+        }
     }
 
     private static bool GetButton(Quantum.Input input, InputType inputType) {

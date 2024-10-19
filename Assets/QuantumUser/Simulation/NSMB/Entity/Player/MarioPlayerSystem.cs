@@ -324,7 +324,8 @@ namespace Quantum {
             if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75 && !f.Exists(mario->HeldEntity)) {
                 // Jump of spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
-                
+                spinner->PlatformWaitFrames = 6;
+
                 mario->IsSkidding = false;
                 mario->IsTurnaround = false;
                 mario->IsSliding = false;

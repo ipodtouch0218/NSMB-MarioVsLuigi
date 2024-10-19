@@ -98,7 +98,8 @@ namespace Quantum {
             if (mario->InstakillsEnemies(marioPhysicsObject, false)) {
                 var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
                 piranhaPlant->Kill(f, piranhaPlantEntity, marioEntity, true);
-            } else {
+
+            } else if (!mario->IsCrouchedInShell) {
                 mario->Powerdown(f, marioEntity, false);
             }
         }

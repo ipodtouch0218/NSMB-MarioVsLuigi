@@ -15,10 +15,7 @@ public class SingleParticleManager : Singleton<SingleParticleManager> {
 
     public void Start() {
         Set(this, false);
-
         pairs = serializedSystems.ToDictionary(pp => pp.particle, pp => pp);
-
-        QuantumEvent.Subscribe<EventProjectileDestroyed>(this, OnProjectileDestroyed);
     }
 
     public void Play(ParticleEffect particle, Vector3 position, Color? color = null, float rot = 0) {
@@ -38,23 +35,12 @@ public class SingleParticleManager : Singleton<SingleParticleManager> {
         }
 
         pair.system.Emit(emitParams, UnityEngine.Random.Range(pair.particleMin, pair.particleMax + 1));
-
-        if (pair.playSound) {
-            TemporarySoundSource newSound = Instantiate(temporarySoundPrefab, position, Quaternion.identity);
-            newSound.Initialize(pair.sound);
-        }
-    }
-
-    private void OnProjectileDestroyed(EventProjectileDestroyed e) {
-        Play(e.Particle, e.Position.ToUnityVector3());
     }
 
     [Serializable]
     public struct ParticlePair {
         public ParticleEffect particle;
         public ParticleSystem system;
-        public bool playSound;
-        public SoundEffect sound;
         public int particleMin, particleMax;
     }
 }
