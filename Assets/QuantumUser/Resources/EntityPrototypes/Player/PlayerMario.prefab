@@ -6214,17 +6214,17 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
-    AutoBreakFrames: 0
-    AutoBreakGrabAdditionalFrames: 0
+    AutoBreakFrames: 90
+    AutoBreakGrabAdditionalFrames: 60
     AutoBreakWhileHeld:
-      Value: 0
+      Value: 1
     Offset:
       X:
         RawValue: 0
       Y:
         RawValue: 0
     IsCarryable:
-      Value: 0
+      Value: 1
     IsFlying:
       Value: 0
 --- !u!1 &4824223342336871188

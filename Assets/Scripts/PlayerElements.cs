@@ -68,12 +68,13 @@ public class PlayerElements : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
-    public void Initialize(EntityRef entity, PlayerRef player) {
+    public void Initialize(Frame f, EntityRef entity, PlayerRef player) {
         this.player = player;
         this.entity = entity;
 
         Camera.transform.SetParent(null);
         Camera.transform.localScale = Vector3.one;
+        uiUpdater.Initialize(f);
         scoreboardUpdater.Initialize();
     }
 

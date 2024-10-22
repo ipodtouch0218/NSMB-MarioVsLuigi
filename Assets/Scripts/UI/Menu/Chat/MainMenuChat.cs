@@ -23,21 +23,19 @@ namespace NSMB.UI.MainMenu {
         private readonly List<ChatMessage> chatMessages = new();
         private int previousTextLength;
 
-        public void OnEnable() {
+        public void Start() {
             ChatManager.OnChatMessage += OnChatMessage;
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnDisableChatChanged();
+
+            QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping, onlyIfActiveAndEnabled: true);
         }
 
-        public void OnDisable() {
+        public void OnDestroy() {
             ChatManager.OnChatMessage -= OnChatMessage;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
-        }
-
-        public void Start() {
-            QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping);   
         }
 
         public void ReplayChatMessages() {

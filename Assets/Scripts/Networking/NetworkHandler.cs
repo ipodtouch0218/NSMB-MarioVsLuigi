@@ -55,7 +55,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public void Update() {
-        if (Client.IsConnectedAndReady) {
+        if (Client != null && Client.IsConnectedAndReady) {
             Client.Service();
         }
     }
@@ -238,7 +238,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private void OnGameEnded(EventGameEnded e) {
 #if UNITY_STANDALONE
-        if (Runner.Session.IsReplay) {
+        if (IsReplay) {
             return;
         }
 
@@ -259,10 +259,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         // Write binary replay
         BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
-
-        // string jsonFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".json");
-        // File.WriteAllText(jsonFilePath, JsonUtility.ToJson(jsonReplay));
-        // Debug.Log($"original JSON-encoded size: {JsonUtility.ToJson(jsonReplay).Length}");
 
         // Complete
         Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");

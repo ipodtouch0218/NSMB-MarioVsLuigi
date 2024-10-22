@@ -28,9 +28,9 @@ public class VersusStageBaker : MapDataBakerCallback {
             return;
         }
 
-        GameObject tilemapGo = GameObject.FindGameObjectWithTag("MainTilemap");
+        GameObject tilemapGo = GameObject.FindObjectOfType<TilemapAnimator>().gameObject;
         if (!tilemapGo || !tilemapGo.TryGetComponent(out Tilemap tilemap)) {
-            LogError("Could not find a tilemap with tag MainTilemap");
+            LogError("Could not find a main tilemap (one that has a TilemapAnimator component!)");
             return;
         }
 

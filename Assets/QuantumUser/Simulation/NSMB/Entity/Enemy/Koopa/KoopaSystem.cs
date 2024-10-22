@@ -226,7 +226,7 @@ namespace Quantum {
                         koopaEnemy->IsActive = false;
                         koopaEnemy->IsDead = true;
                         koopaPhysicsObject->IsFrozen = true;
-                        f.Events.MarioPlayerCollectedPowerup(f, koopaEntity, *mario, reserve, powerup);
+                        f.Events.MarioPlayerCollectedPowerup(f, marioEntity, *mario, reserve, powerup);
 
                     } else {
                         // Kick
@@ -266,8 +266,9 @@ namespace Quantum {
                     } else {
                         // Damage
                         if (mario->IsCrouchedInShell) {
-                            mario->FacingRight = damageDirection.X < 0;
-                            marioPhysicsObject->Velocity.X = 0;
+                            //mario->FacingRight = damageDirection.X < 0;
+                            //marioPhysicsObject->Velocity.X = 0;
+                            koopa->Kill(f, koopaEntity, marioEntity, false);
 
                         } else if (mario->IsDamageable) {
                             mario->Powerdown(f, marioEntity, false);

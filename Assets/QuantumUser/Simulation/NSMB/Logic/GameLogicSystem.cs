@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
@@ -399,8 +400,15 @@ namespace Quantum {
             // Spawn players
             var config = f.SimulationConfig;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            var playerDatas = f.Filter<PlayerData>();
             int teamCounter = 0;
+
+            // Debug: give existing mario players the same team
+            var sceneMarios = f.Filter<MarioPlayer>();
+            while (sceneMarios.NextUnsafe(out _, out MarioPlayer* mario)) {
+                mario->Team = byte.MaxValue;
+            }
+
+            var playerDatas = f.Filter<PlayerData>();
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
                 if (data->IsSpectator) {
                     continue;
@@ -416,6 +424,17 @@ namespace Quantum {
 
                 var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
                 newTransform->Position = stage.Spawnpoint;
+            }
+
+            // Assign random spawnpoints
+            List<int> spawnpoints = Enumerable.Range(0, f.ComponentCount<MarioPlayer>()).ToList();
+            var allMarios = f.Filter<MarioPlayer>();
+            while (allMarios.NextUnsafe(out _, out MarioPlayer* mario)) {
+                int randomIndex = FPMath.FloorToInt(f.RNG->Next() * spawnpoints.Count);
+                mario->SpawnpointIndex = (byte) spawnpoints[randomIndex];
+                spawnpoints.RemoveAt(randomIndex);
+
+                f.Global->TotalMarios++;
             }
         }
 

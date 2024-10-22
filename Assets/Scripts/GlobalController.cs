@@ -29,6 +29,7 @@ public class GlobalController : Singleton<GlobalController> {
     public ScriptableRendererFeature outlineFeature;
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting, fusionStatsTemplate;
     public LoadingCanvas loadingCanvas;
+    public AudioSource sfx;
 
     public RectTransform ndsRect;
 
@@ -41,12 +42,10 @@ public class GlobalController : Singleton<GlobalController> {
 
     //---Serialized Variables
     [SerializeField] private AudioMixer mixer;
-    [SerializeField] private AudioSource sfx;
 
     //---Private Variables
     private Coroutine fadeMusicRoutine;
     private Coroutine fadeSfxRoutine;
-    //private GameObject fusionStats;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {

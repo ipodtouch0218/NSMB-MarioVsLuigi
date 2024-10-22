@@ -2211,7 +2211,6 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 347;
-        hash = hash * 31 + Frame.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
         return hash;
       }

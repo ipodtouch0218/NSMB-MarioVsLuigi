@@ -1,7 +1,5 @@
 #pragma max_players 10
 
-import enum GameState(byte);
-
 global {
 	GameRules Rules;	
 	GameState GameState;
@@ -11,6 +9,7 @@ global {
 
 	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
 	byte RealPlayers;
+	byte TotalMarios;
 }
 
 struct GameRules {
@@ -24,6 +23,14 @@ struct GameRules {
 	bool TeamsEnabled;
 	bool CustomPowerupsEnabled;
 	bool DrawOnTimeUp;
+}
+
+enum GameState : Byte {
+    PreGameRoom,
+    WaitingForPlayers,
+    Starting,
+    Playing,
+    Ended
 }
 
 signal OnLoadingComplete();

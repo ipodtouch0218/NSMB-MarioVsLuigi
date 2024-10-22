@@ -1,11 +1,10 @@
-using JetBrains.Annotations;
 using NSMB.Extensions;
+using Org.BouncyCastle.Cms;
 using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Input = Quantum.Input;
 
@@ -14,6 +13,8 @@ namespace NSMB.Entities.Player {
     public unsafe class MarioAnimator : QuantumCallbacks {
 
         //---Static
+        public static readonly HashSet<MarioAnimator> AllMarioPlayers = new();
+        public static event Action<Frame, MarioAnimator> MarioPlayerInitialized;
         public static event Action<Frame, MarioAnimator> MarioPlayerDestroyed;
 
         //---Static Variables
@@ -150,12 +151,14 @@ namespace NSMB.Entities.Player {
         }
 
         public void Initialize(QuantumGame game) {
-            Frame f = game.Frames.Predicted;
+            Frame f = game.Frames.Verified;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity.EntityRef);
-            var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
 
+            var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             var skins = ScriptableManager.Instance.skins;
-            if (skins[Mathf.Clamp(playerData->Skin, 0, skins.Length - 1)] is PlayerColorSet colorSet) {
+            int skinIndex = Mathf.Clamp(playerData != null ? playerData->Skin : 0, 0, skins.Length - 1);
+
+            if (skins[skinIndex] is PlayerColorSet colorSet) {
                 skin = colorSet.GetPlayerColors(character);
             }
 
@@ -164,8 +167,12 @@ namespace NSMB.Entities.Player {
 
             if (game.PlayerIsLocal(mario->PlayerRef)) {
                 PlayerElements elements = Instantiate(playerElementsPrefab, GameObject.FindGameObjectWithTag("MasterCanvas").transform);
-                elements.Initialize(entity.EntityRef, mario->PlayerRef);
+                elements.Initialize(f, entity.EntityRef, mario->PlayerRef);
             }
+
+            AllMarioPlayers.RemoveWhere(ma => ma == null);
+            AllMarioPlayers.Add(this);
+            MarioPlayerInitialized?.Invoke(f, this);
         }
 
         public void Destroy(QuantumGame game) {
@@ -236,7 +243,7 @@ namespace NSMB.Entities.Player {
             // Particles
             SetParticleEmission(drillParticle, !mario->IsDead && mario->IsDrilling);
             SetParticleEmission(sparkles, !mario->IsDead && mario->IsStarmanInvincible);
-            SetParticleEmission(dust, !mario->IsDead && (mario->IsWallsliding || (physicsObject->IsTouchingGround && (mario->IsSkidding || (mario->IsCrouching && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f))) || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
+            SetParticleEmission(dust, !mario->IsDead && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || mario->IsCrouching) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f))  || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
             SetParticleEmission(giantParticle, !mario->IsDead && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
             SetParticleEmission(bubblesParticle, !mario->IsDead && mario->IsInWater);
@@ -474,7 +481,7 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
-            models.SetActive(mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f))));
+            models.SetActive(mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f))));
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;
@@ -560,7 +567,13 @@ namespace NSMB.Entities.Player {
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity.EntityRef);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
             var physics = f.FindAsset(mario->PhysicsAsset);
-            Input input = *f.GetPlayerInput(mario->PlayerRef);
+
+            Input input;
+            try {
+                input = *f.GetPlayerInput(mario->PlayerRef);
+            } catch {
+                input = default;
+            }
 
             if (mario->IsInWater || mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 return;

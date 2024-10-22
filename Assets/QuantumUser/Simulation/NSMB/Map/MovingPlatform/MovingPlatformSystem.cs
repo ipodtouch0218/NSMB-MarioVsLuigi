@@ -1,6 +1,4 @@
 using Photon.Deterministic;
-using Quantum.Collections;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> { 
@@ -14,7 +12,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            EntityMask = f.Layers.GetLayerMask("Entity");
+            EntityMask = f.Layers.GetLayerMask("Entity", "Player");
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {

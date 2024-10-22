@@ -1,9 +1,5 @@
 #define maxplayers 10
 
-import enum PowerupState(byte);
-import enum JumpState(byte);
-import enum PowerupReserveResult(byte);
-
 input {
 	button Up;
 	button Down;
@@ -14,6 +10,13 @@ input {
 	button PowerupAction;
 	button FireballPowerupAction;
 	button PropellerPowerupAction;
+}
+
+enum JumpState : Byte {
+    None,
+    SingleJump,
+    DoubleJump,
+    TripleJump,
 }
 
 component MarioPlayer {
@@ -80,6 +83,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] bool KnockbackWasOriginallyFacingRight;
 	[ExcludeFromPrototype] int KnockbackTick;
 	[ExcludeFromPrototype] byte DamageInvincibilityFrames;
+	[ExcludeFromPrototype] byte KnockbackGetupFrames;
 
 	// Crouching
     [ExcludeFromPrototype] bool IsCrouching;

@@ -8,7 +8,7 @@ namespace Quantum {
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsInWater => WaterColliderCount > 0;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
-       
+
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef mario) {
             if (!f.Exists(HeldEntity)) {
                 return default;
@@ -294,17 +294,16 @@ namespace Quantum {
             RespawnFrames = 78;
 
             if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
-                // TODO GameManager.Instance.CheckForWinner();
                 f.Destroy(entity);
                 return;
             }
 
-            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->RealPlayers);
+            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
             transform->Position = spawnpoint;
             f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
             
             IsDead = true;
-            // IsFrozen = false;
+            f.Unsafe.GetPointer<Freezable>(entity)->FrozenCubeEntity = EntityRef.None;
             IsRespawning = true;
             FacingRight = true;
             WallslideLeft = false;
@@ -321,9 +320,9 @@ namespace Quantum {
             //animationController.DisableAllModels();
             DamageInvincibilityFrames = 0;
             InvincibilityFrames = 0;
-            //MegaTimer = TickTimer.None;
-            //MegaEndTimer = TickTimer.None;
-            //MegaStartTimer = TickTimer.None;
+            MegaMushroomFrames = 0;
+            MegaMushroomStartFrames = 0;
+            MegaMushroomEndFrames = 0;
             IsCrouching = false;
             IsSliding = false;
             IsTurnaround = false;
@@ -360,8 +359,9 @@ namespace Quantum {
             if (IsInKnockback && ((IsInWeakKnockback && weak) || !IsInWeakKnockback)) {
                 return;
             }
-            
-            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || /*IsFrozen ||*/ IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
+
+            var freezable = f.Unsafe.GetPointer<Freezable>(entity);
+            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || freezable->IsFrozen(f) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
                 return;
             }
 
@@ -384,13 +384,14 @@ namespace Quantum {
             //KnockbackAttacker = attacker;
 
             // Don't go into walls
-            // Vector2Int tileLoc = Utils.Utils.WorldToTilemapPosition(body.Position);
-            // TileBase tile = Utils.Utils.GetTileAtTileLocation(tileLoc + (fromRight ? Vector2Int.left : Vector2Int.right));
-            // if (!weak && tile) {
-            //     fromRight = !fromRight;
-            // }
-
+            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+
+            if (!weak && PhysicsObjectSystem.Raycast(f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
+                fromRight = !fromRight;
+            }
+
             physicsObject->Velocity = new FPVector2(
                 (fromRight ? -1 : 1) *
                     ((starsToDrop + 1) * FP._0_50) *
@@ -421,12 +422,15 @@ namespace Quantum {
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
-            DamageInvincibilityFrames = 60;
+
+            KnockbackGetupFrames = (byte) (IsInWeakKnockback || IsInWater ? 0 : 25);
+            DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
             ////DoEntityBounce = false;
             IsInKnockback = false;
             IsInWeakKnockback = false;
             //IsForwardsKnockback = false;
             FacingRight = KnockbackWasOriginallyFacingRight;
+            
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             physicsObject->Velocity.X = 0;

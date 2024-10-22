@@ -1,9 +1,11 @@
 using NSMB.Entities.Player;
+using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +29,9 @@ public unsafe class UIUpdater : QuantumCallbacks {
     [SerializeField] private GameObject boos;
     [SerializeField] private Animator reserveAnimator;
 
+    [SerializeField] private TMP_Text winText;
+    [SerializeField] private Animator winTextAnimator;
+    
     //---Private Variables
     private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
     private readonly List<Image> backgrounds = new();
@@ -42,6 +47,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
 
     protected override void OnEnable() {
         base.OnEnable();
+        MarioAnimator.MarioPlayerInitialized += OnMarioInitialized;
         MarioAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
         BigStarAnimator.BigStarInitialized += OnStarInitialized;
         BigStarAnimator.BigStarDestroyed += OnStarDestroyed;
@@ -51,10 +57,20 @@ public unsafe class UIUpdater : QuantumCallbacks {
 
     protected override void OnDisable() {
         base.OnDisable();
+        MarioAnimator.MarioPlayerInitialized -= OnMarioInitialized;
         MarioAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
         BigStarAnimator.BigStarInitialized -= OnStarInitialized;
         BigStarAnimator.BigStarDestroyed -= OnStarDestroyed;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    public void Initialize(Frame f) {
+        // Add existing MarioPlayer icons
+        MarioAnimator.AllMarioPlayers.RemoveWhere(ma => ma == null);
+
+        foreach (MarioAnimator mario in MarioAnimator.AllMarioPlayers) {
+            OnMarioInitialized(f, mario);
+        }
     }
 
     public void Awake() {
@@ -79,6 +95,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
         StartCoroutine(UpdatePingTextCoroutine());
 
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
     }
 
@@ -100,6 +117,10 @@ public unsafe class UIUpdater : QuantumCallbacks {
         ApplyUIColor(f, mario);
 
         previousTarget = Target;
+    }
+
+    private void OnMarioInitialized(Frame f, MarioAnimator mario) {
+        entityTrackIcons[mario] = CreateTrackIcon(f, mario.entity.EntityRef, mario.transform);
     }
 
     private void OnMarioDestroyed(Frame f, MarioAnimator mario) {
@@ -268,6 +289,14 @@ public unsafe class UIUpdater : QuantumCallbacks {
         itemColor.color = color;
     }
 
+    private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger) {
+        // Wait one second before playing the music 
+        yield return new WaitForSecondsRealtime(1);
+
+        GlobalController.Instance.sfx.PlayOneShot(resultMusic);
+        winTextAnimator.SetTrigger(resultAnimationTrigger);
+    }
+
     //---Callbacks
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Starting) {
@@ -277,33 +306,64 @@ public unsafe class UIUpdater : QuantumCallbacks {
         }
     }
 
-    private void OnLanguageChanged(TranslationManager tm) {
-        UpdatePingText();
-    }
+    private void OnGameEnded(EventGameEnded e) {
+        Frame f = e.Frame;
+        bool teamMode = f.Global->Rules.TeamsEnabled;
+        bool hasWinner = e.HasWinner;
 
-    private void OnAllPlayersLoaded() {
-        /*
-        teams = SessionData.Instance.Teams;
-        teamManager = GameManager.Instance.teamManager;
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        TeamAsset[] allTeams = f.SimulationConfig.Teams;
+        string resultText;
+        string winner = null;
+        bool local;
 
-        localPlayer = Runner.LocalPlayer;
+        if (hasWinner) {
+            if (teamMode) {
+                // Winning team
+                winner = tm.GetTranslation(allTeams[e.WinningTeam].nameTranslationKey);
+                resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
+            } else {
+                // Winning player
+                var allPlayers = f.Filter<PlayerData>();
+                while (allPlayers.NextUnsafe(out _, out PlayerData* data)) {
+                    if (data->Team == e.WinningTeam) {
+                        RuntimePlayer runtimePlayer = f.GetPlayerData(data->PlayerRef);
+                        winner = (runtimePlayer?.PlayerNickname ?? "noname").ToValidUsername();
+                    }
+                }
+                resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", color: ChatManager.Red, "playername", winner);
+            }
+            local = PlayerElements.AllPlayerElements.Any(pe => f.Unsafe.TryGetPointer(pe.Entity, out MarioPlayer* marioPlayer) && marioPlayer->Team == e.WinningTeam);
+        } else {
+            resultText = tm.GetTranslation("ui.result.draw");
+            ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
+            local = false;
+        }
+        winText.text = resultText;
 
-        ApplyUIColor();
-        teamsParent.SetActive(teams);
-        GameManager.Instance.teamScoreboardElement.gameObject.SetActive(teams);
+        float secondsUntilMenu = hasWinner ? 4.25f : 5.25f;
 
-        if (!Runner.IsServer) {
-            StartCoroutine(UpdatePingTextCoroutine());
+        SoundEffect resultMusic;
+        string resultAnimationTrigger;
+
+        if (!hasWinner) {
+            resultMusic = SoundEffect.UI_Match_Draw;
+            resultAnimationTrigger = "startNegative";
+        } else if (hasWinner && local) {
+            resultMusic = SoundEffect.UI_Match_Win;
+            resultAnimationTrigger = "start";
+        } else {
+            resultMusic = SoundEffect.UI_Match_Lose;
+            resultAnimationTrigger = "startNegative";
         }
 
-        UpdatePingText();
+        StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger));
+    }
 
-        stars = -1;
-        lives = -1;
-        teamStars = -1;
-        coins = -1;
-        UpdateTextUI();
-        */
+    private void OnLanguageChanged(TranslationManager tm) {
+        UpdatePingText();
     }
 
     public void OnReserveItemIconClicked() {

@@ -14,23 +14,23 @@ public class MasterCanvas : MonoBehaviour {
             && (f = QuantumRunner.DefaultGame.Frames.Predicted) != null
             && f.Global->GameState > GameState.WaitingForPlayers) {
 
-            CheckForSpectatorUI();
+            CheckForSpectatorUI(f);
         }
     }
 
-    public unsafe void CheckForSpectatorUI() {
+    public unsafe void CheckForSpectatorUI(Frame f) {
         if (PlayerElements.AllPlayerElements.Any(pe => pe)) {
             return;
         }
 
         // Create a new spectator-only PlayerElement
         PlayerElements newPlayerElements = Instantiate(playerElementsPrefab, transform);
-        newPlayerElements.Initialize(EntityRef.None, PlayerRef.None);
+        newPlayerElements.Initialize(f, EntityRef.None, PlayerRef.None);
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Starting) {
-            CheckForSpectatorUI();
+            CheckForSpectatorUI(e.Frame);
         }
     }
 }

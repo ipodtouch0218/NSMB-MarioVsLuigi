@@ -38,7 +38,11 @@ namespace NSMB.Entities.World {
         }
 
         public void Start() {
-            QuantumEvent.Subscribe<EventLiquidSplashed>(this, OnLiquidSplashed);
+            if (entity == null) {
+                Initialize(Mathf.RoundToInt(spriteRenderer.size.x * 2), Mathf.RoundToInt(spriteRenderer.size.y * 2) - 1);
+            } 
+
+            QuantumEvent.Subscribe<EventLiquidSplashed>(this, OnLiquidSplashed, NetworkHandler.FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
         }
 
         public void Initialize(QuantumGame game) {
@@ -83,6 +87,9 @@ namespace NSMB.Entities.World {
         public void Update() {
             animTimer += animationSpeed * Time.deltaTime;
             animTimer %= 8;
+
+            properties.SetFloat("TextureIndex", animTimer);
+            spriteRenderer.SetPropertyBlock(properties);
         }
 
         public void FixedUpdate() {
@@ -119,9 +126,6 @@ namespace NSMB.Entities.World {
                 heightTex.SetPixels32(colors);
                 heightTex.Apply(false);
             }
-
-            properties.SetFloat("TextureIndex", animTimer);
-            spriteRenderer.SetPropertyBlock(properties);
         }
 
         private void OnLiquidSplashed(EventLiquidSplashed e) {
@@ -136,180 +140,5 @@ namespace NSMB.Entities.World {
                 pointVelocities[pointsX] = -splashVelocity * e.Force.AsFloat;
             }
         }
-
-
-
-        /*
-
-
-        private void Awake() {
-            Initialize();
-        }
-
-        private void OnValidate() {
-            ValidationUtility.SafeOnValidate(Initialize);
-            if (!splashExitPrefab) {
-                splashExitPrefab = splashPrefab;
-            }
-        }
-
-
-
-        public override void FixedUpdateNetwork() {
-            // Find entities inside our collider
-            int collisionCount = Runner.GetPhysicsScene2D().OverlapBox((Vector2) transform.position + hitbox.offset, hitbox.size, 0, CollisionBuffer);
-
-            for (int i = 0; i < collisionCount; i++) {
-                var obj = CollisionBuffer[i];
-                HandleEntityCollision(obj);
-            }
-
-            foreach (var obj in splashedEntities) {
-
-                BasicEntity entity = obj.GetComponentInParent<BasicEntity>();
-                if (!entity || !entity.Object || !entity.IsActive) {
-                    continue;
-                }
-
-                float height = entity.body.Position.y + entity.Height * 0.5f;
-                bool underwater = height <= SurfaceHeight;
-
-                if (underwater || entity.body.Velocity.y < 0) {
-                    // Swam out the side of the water
-                    entity.InWater = this;
-
-                } else if (entity.InWater) {
-                    // Jumped out of the water
-                    entity.InWater = null;
-                    if (entity is PlayerController player) {
-                        player.SwimJump = true;
-                        player.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
-                    }
-                    if (Runner.IsServer) {
-                        Rpc_Splash(new(entity.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, entity.body.Velocity.y)), ParticleType.Exit);
-                    }
-                }
-            }
-
-            Utils.Utils.IntersectWithBuffer(splashedEntities, CollisionBuffer, collisionCount);
-        }
-
-        private void HandleEntityCollision(Collider2D obj) {
-            if (!obj || obj.GetComponentInParent<BasicEntity>() is not BasicEntity entity) {
-                return;
-            }
-
-            // Don't splash stationary stars
-            if (entity is BigStar sb && sb.IsStationary) {
-                return;
-            }
-
-            // Don't splash stationary coins
-            if (entity is FloatingCoin) {
-                return;
-            }
-
-            // Dont splash newly created powerups (bug fix)
-            if (entity is Powerup powerup && powerup.SpawnAnimationTimer.IsActive(Runner)) {
-                return;
-            }
-
-            PlayerController pl = entity as PlayerController;
-
-            if (liquidType == LiquidType.Water && entity is PlayerController player && player.State == Enums.PowerupState.MiniMushroom) {
-                if (!player.InWater && Mathf.Abs(player.body.Velocity.x) > 0.3f && player.body.Velocity.y < 0) {
-                    // Player is running on the water
-                    player.body.Position = new(player.body.Position.x, hitbox.bounds.max.y);
-                    player.IsOnGround = true;
-                    player.IsWaterWalking = true;
-                    return;
-                }
-            }
-
-            bool contains = splashedEntities.Contains(obj);
-            if (Runner.IsServer && !contains) {
-                bool splash = entity.body.Position.y > SurfaceHeight - 0.5f;
-                if (pl) {
-                    splash &= !pl.IsDead;
-                    splash &= liquidType == LiquidType.Water;
-                    splash &= pl.State != Enums.PowerupState.MiniMushroom || pl.body.Velocity.y < -2f;
-                }
-
-                if (splash && entity.IsActive && Mathf.Abs(entity.body.Velocity.y) > 1) {
-                    Rpc_Splash(new(entity.body.Position.x, SurfaceHeight), -Mathf.Abs(Mathf.Min(-5, entity.body.Velocity.y)), ParticleType.Enter);
-                }
-            }
-
-            if (!contains) {
-                splashedEntities.Add(obj);
-            }
-
-            // Kill entity if they're below the surface of the posion/lava
-            if (liquidType != LiquidType.Water && entity is not PlayerController) {
-                bool underSurface = entity.GetComponentInChildren<Renderer>()?.bounds.max.y < SurfaceHeight;
-                if (underSurface) {
-                    // Don't let fireballs "poof"
-                    if (entity is Fireball fm) {
-                        if (fm.body.Position.y < SurfaceHeight - 0.2f) {
-                            fm.DespawnEntity(false);
-                        }
-                    } else if (entity is not BigStar) {
-                        if (entity is KillableEntity ke) {
-                            ke.Crushed();
-                        } else {
-                            if (!entity.DespawnTimer.IsRunning) {
-                                entity.DespawnTimer = TickTimer.CreateFromSeconds(Runner, 1f);
-                            }
-                            //entity.DespawnEntity();
-                        }
-                    }
-                }
-            }
-
-            if (pl && (pl.IsDead || pl.CurrentPipe)) {
-                return;
-            }
-
-            float height = entity.body.Position.y + (entity.Height * 0.5f);
-            bool underwater = height <= SurfaceHeight;
-
-            if (liquidType == LiquidType.Water) {
-                if (entity.InWater && !underwater && entity.body.Velocity.y > 0) {
-                    // Jumped out of the water
-                    entity.InWater = null;
-                    if (pl) {
-                        pl.SwimJump = true;
-                        pl.SwimLeaveForceHoldJumpTime = Runner.SimulationTime + 0.3f;
-                    }
-                    if (Runner.IsServer && Mathf.Abs(entity.body.Velocity.y) > 1) {
-                        Rpc_Splash(new(entity.body.Position.x, SurfaceHeight), Mathf.Abs(Mathf.Max(5, entity.body.Velocity.y)), ParticleType.Exit);
-                    }
-                } else {
-                    // Entered water
-                    entity.InWater = underwater ? this : null;
-                    if (pl) {
-                        pl.IsWaterWalking = false;
-                    }
-                }
-            } else {
-                if (Runner.IsServer) {
-                    Rpc_Splash(new(entity.body.Position.x, SurfaceHeight), -Mathf.Abs(-Mathf.Max(5, entity.body.Velocity.y)), ParticleType.Enter);
-                }
-
-                if (pl) {
-                    pl.Death(false, liquidType == LiquidType.Lava);
-                }
-                return;
-            }
-        }
-
-
-        //---Helpers
-        public enum ParticleType : byte {
-            None,
-            Enter,
-            Exit,
-        }
-        */
     }
 }

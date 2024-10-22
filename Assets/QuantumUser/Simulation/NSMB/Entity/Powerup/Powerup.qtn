@@ -17,7 +17,25 @@ component Powerup {
 	[ExcludeFromPrototype] EntityRef ParentMarioPlayer;
 }
 
+enum PowerupState : Byte {
+    NoPowerup,
+    MiniMushroom,
+    Mushroom,
+    FireFlower,
+    IceFlower,
+    PropellerMushroom,
+    BlueShell,
+    MegaMushroom
+}
+
+enum PowerupReserveResult : Byte {
+    None,
+    NoneButPlaySound,
+    ReserveOldPowerup,
+    ReserveNewPowerup,
+}
+
 event PowerupBecameActive {
-	Frame Frame;
+	nothashed Frame Frame;
 	entity_ref Entity;
 }

@@ -1,10 +1,8 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using Quantum.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
@@ -22,7 +20,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            mask = ~f.Layers.GetLayerMask("Entity");
+            mask = ~f.Layers.GetLayerMask("Entity", "Player");
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -512,6 +510,10 @@ namespace Quantum {
         }
 
         public static bool Raycast(Frame f, VersusStageData stage, FPVector2 position, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
+
+            if (stage == null) {
+                stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            }
 
             contact = default;
             FPVector2 stepSize = new(

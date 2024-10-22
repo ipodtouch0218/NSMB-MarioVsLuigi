@@ -6437,17 +6437,17 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
-    AutoBreakFrames: 0
-    AutoBreakGrabAdditionalFrames: 0
+    AutoBreakFrames: 90
+    AutoBreakGrabAdditionalFrames: 60
     AutoBreakWhileHeld:
-      Value: 0
+      Value: 1
     Offset:
       X:
         RawValue: 0
       Y:
         RawValue: 0
     IsCarryable:
-      Value: 0
+      Value: 1
     IsFlying:
       Value: 0
 --- !u!1 &4849018367852568596
@@ -11565,7 +11565,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b73da02d946c92409564fcf9c2a6aa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  system: {fileID: 1460410883163997951}
+  systems:
+  - {fileID: 1460410883163997951}
   sfx: {fileID: 8378724675999537702}
 --- !u!114 &8378724675999537702
 MonoBehaviour:
