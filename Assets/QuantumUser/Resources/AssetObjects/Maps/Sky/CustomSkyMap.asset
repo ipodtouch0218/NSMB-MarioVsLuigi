@@ -1075,7 +1075,7 @@ MonoBehaviour:
       type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         OriginalHeight:
-          RawValue: 524288
+          RawValue: 589824
         MinimumHeight:
           RawValue: 131072
         IsStompable:
