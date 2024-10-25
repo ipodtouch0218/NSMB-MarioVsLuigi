@@ -33,7 +33,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             if (f.Number % 2 == 0
-                && PhysicsObjectSystem.BoxInsideTile(f, transform->Position, filter.PhysicsCollider->Shape, stage)) {
+                && PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.PhysicsCollider->Shape, stage)) {
 
                 Destroy(f, entity, IceBlockBreakReason.HitWall);
                 return;

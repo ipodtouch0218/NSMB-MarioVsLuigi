@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 583447005726554375}
   - component: {fileID: 4429105053950663285}
   - component: {fileID: -6652070002619640731}
+  - component: {fileID: 9168676210325572332}
   m_Layer: 0
   m_Name: Boo
   m_TagString: Untagged
@@ -96,67 +97,6 @@ MonoBehaviour:
       IsPersistent: 1
       CompoundShapes: []
     Shape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 4
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 16384
-        Y:
-          RawValue: 16384
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape3D:
       ShapeType: 0
       SphereRadius:
         RawValue: 0
@@ -299,8 +239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    CurrentTarget: {fileID: 0}
-    UnscaredFrames: 0
+    _empty_prototype_dummy_field_: 0
 --- !u!114 &7332006103014348897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,12 +258,6 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
-    IsActive:
-      Value: 0
-    IsDead:
-      Value: 0
-    FacingRight:
-      Value: 0
     IgnorePlayerWhenRespawning:
       Value: 0
 --- !u!114 &5623453289331559766
@@ -340,16 +273,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -361,21 +284,6 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 1
-    IsTouchingLeftWall:
-      Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
 --- !u!114 &583447005726554375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,6 +332,28 @@ MonoBehaviour:
   Prototype:
     ColliderDisabled:
       Value: 0
+--- !u!114 &9168676210325572332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3813481168314615756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a5b2dd50d714a40812a36b547124b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    DisableCulling:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    BroadRadius:
+      RawValue: 32768
 --- !u!1 &7589329121707926406
 GameObject:
   m_ObjectHideFlags: 0

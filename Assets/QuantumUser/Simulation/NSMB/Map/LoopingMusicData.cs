@@ -1,4 +1,3 @@
-using UnityEngine.Serialization;
 using UnityEngine;
 using Quantum;
 

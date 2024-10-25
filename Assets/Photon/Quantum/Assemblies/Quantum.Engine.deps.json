@@ -7,10 +7,10 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "Quantum.Engine/3.0.0.1548-UnityDebug": {
+      "Quantum.Engine/3.0.0.1548-UnityRelease": {
         "dependencies": {
           "JetBrains.Annotations": "2023.3.0",
-          "Quantum.Deterministic": "3.0.0.1548-UnityDebug"
+          "Quantum.Deterministic": "3.0.0.1548-UnityRelease"
         },
         "runtime": {
           "Quantum.Engine.dll": {}
@@ -24,21 +24,21 @@
           }
         }
       },
-      "Quantum.Deterministic/3.0.0.1548-UnityDebug": {
+      "Quantum.Deterministic/3.0.0.1548-UnityRelease": {
         "dependencies": {
-          "Quantum.Log": "3.0.0.1548-UnityDebug"
+          "Quantum.Log": "3.0.0.1548-UnityRelease"
         },
         "runtime": {
           "Quantum.Deterministic.dll": {
-            "assemblyVersion": "3.0.0.1548-UnityDebug",
+            "assemblyVersion": "3.0.0.1548-UnityRelease",
             "fileVersion": "3.0.0.1548"
           }
         }
       },
-      "Quantum.Log/3.0.0.1548-UnityDebug": {
+      "Quantum.Log/3.0.0.1548-UnityRelease": {
         "runtime": {
           "Quantum.Log.dll": {
-            "assemblyVersion": "3.0.0.1548-UnityDebug",
+            "assemblyVersion": "3.0.0.1548-UnityRelease",
             "fileVersion": "3.0.0.1548"
           }
         }
@@ -46,7 +46,7 @@
     }
   },
   "libraries": {
-    "Quantum.Engine/3.0.0.1548-UnityDebug": {
+    "Quantum.Engine/3.0.0.1548-UnityRelease": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -58,12 +58,12 @@
       "path": "jetbrains.annotations/2023.3.0",
       "hashPath": "jetbrains.annotations.2023.3.0.nupkg.sha512"
     },
-    "Quantum.Deterministic/3.0.0.1548-UnityDebug": {
+    "Quantum.Deterministic/3.0.0.1548-UnityRelease": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Quantum.Log/3.0.0.1548-UnityDebug": {
+    "Quantum.Log/3.0.0.1548-UnityRelease": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -13,6 +13,7 @@ namespace Quantum {
 
             systems.Add(new EntityPrototypeSystem());
             systems.Add(new PlayerConnectedSystem());
+            systems.Add(new MvLCullingSystem());
             systems.Add(new GameLogicSystem());
             systems.Add(new PhysicsSystem2D());
 

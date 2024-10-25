@@ -227,6 +227,25 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Cullable))]
+  public unsafe partial class CullablePrototype : ComponentPrototype<Quantum.Cullable> {
+    public QBoolean DisableCulling;
+    public FPVector2 Offset;
+    public FP BroadRadius;
+    partial void MaterializeUser(Frame frame, ref Quantum.Cullable result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.Cullable component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.Cullable result, in PrototypeMaterializationContext context = default) {
+        result.DisableCulling = this.DisableCulling;
+        result.Offset = this.Offset;
+        result.BroadRadius = this.BroadRadius;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Enemy))]
   public unsafe partial class EnemyPrototype : ComponentPrototype<Quantum.Enemy> {
     public FPVector2 Spawnpoint;

@@ -286,7 +286,7 @@ TextureImporter:
         width: 7
         height: 7
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -307,7 +307,7 @@ TextureImporter:
         width: 5
         height: 5
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -328,7 +328,7 @@ TextureImporter:
         width: 1
         height: 1
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -336,6 +336,69 @@ TextureImporter:
       bones: []
       spriteID: 973eb0cfb39d13649ae2d5566ce8459c
       internalID: -2137436251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sparkles_11
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 21
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0feca81879886ef4ebbc506bff71d226
+      internalID: -1433951746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sparkles_12
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 22
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed51142524918a5478f7f91221ef9deb
+      internalID: -516770683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sparkles_13
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 24
+        width: 1
+        height: 1
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a08965cff109fad459cff28f796faf63
+      internalID: -1636642453
       vertices: []
       indices: 
       edges: []
@@ -354,6 +417,9 @@ TextureImporter:
       sparkles_0: -1457884201
       sparkles_1: -496640141
       sparkles_10: -2137436251
+      sparkles_11: -1433951746
+      sparkles_12: -516770683
+      sparkles_13: -1636642453
       sparkles_2: -1647192220
       sparkles_3: -1245148009
       sparkles_4: 1692892886

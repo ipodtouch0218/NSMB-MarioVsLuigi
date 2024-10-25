@@ -695,7 +695,7 @@ namespace Quantum {
             shape.Box.Extents = new(FP.FromString("0.175"), physics.LargeHitboxHeight / 2);
             shape.Centroid.Y = shape.Box.Extents.Y;
 
-            return PhysicsObjectSystem.BoxInsideTile(f, transform->Position, shape);
+            return PhysicsObjectSystem.BoxInGround(f, transform->Position, shape);
         }
 
         public void HandleGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
@@ -953,7 +953,7 @@ namespace Quantum {
 
                 } else {
                     // Still growing...
-                    if (f.Number % 4 == 0 && PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape, false, stage)) {
+                    if (f.Number % 4 == 0 && PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, false, stage)) {
                         // Cancel growing
                         mario->CurrentPowerupState = PowerupState.Mushroom;
                         mario->MegaMushroomEndFrames = (byte) (90 - mario->MegaMushroomStartFrames);
@@ -1478,6 +1478,7 @@ namespace Quantum {
             // Respawn players
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var filter = f.Filter<MarioPlayer>();
+            filter.UseCulling = false;
             while (filter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
                 mario->Lives = f.Global->Rules.Lives;
                 mario->PreRespawn(f, entity, stage);

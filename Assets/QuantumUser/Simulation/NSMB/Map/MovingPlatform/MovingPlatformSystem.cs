@@ -1,8 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> { 
-        private static int EntityMask;
+    public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
 
         public struct Filter {
             public EntityRef Entity;
@@ -12,7 +11,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            EntityMask = f.Layers.GetLayerMask("Entity", "Player");
+            f.Context.EntityPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -70,7 +69,7 @@ namespace Quantum {
                 return;
             }
 
-            var vertical = f.Physics2D.ShapeCastAll(position, 0, &shape, yMovement, EntityMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+            var vertical = f.Physics2D.ShapeCastAll(position, 0, &shape, yMovement, f.Context.EntityPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
             for (int i = 0; i < vertical.Count; i++) {
                 var hit = vertical[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
@@ -165,7 +164,7 @@ namespace Quantum {
                 return;
             }
 
-            var horizontal = f.Physics2D.ShapeCastAll(position, 0, &shape, xMovement, EntityMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+            var horizontal = f.Physics2D.ShapeCastAll(position, 0, &shape, xMovement, f.Context.EntityPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
             for (int i = 0; i < horizontal.Count; i++) {
                 var hit = horizontal[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)

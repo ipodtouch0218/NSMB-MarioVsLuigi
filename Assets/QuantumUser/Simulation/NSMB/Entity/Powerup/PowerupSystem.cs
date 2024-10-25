@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using System.Diagnostics;
 
 namespace Quantum {
 
@@ -69,10 +68,13 @@ namespace Quantum {
 
             if (asset.AvoidPlayers && physicsObject->IsTouchingGround) {
                 FPVector2? closestMarioPosition = null;
+                FP? closestDistance = null;
                 var allPlayers = f.Filter<Transform2D, MarioPlayer>();
                 while (allPlayers.Next(out _, out Transform2D marioTransform, out _)) {
-                    if (closestMarioPosition == null || QuantumUtils.WrappedDistance(f, marioTransform.Position, transform->Position) < QuantumUtils.WrappedDistance(f, closestMarioPosition.Value, transform->Position)) {
+                    FP distance = QuantumUtils.WrappedDistance(f, marioTransform.Position, transform->Position);
+                    if (closestDistance == null || distance < closestDistance) {
                         closestMarioPosition = marioTransform.Position;
+                        closestDistance = distance;
                     }
                 }
 
@@ -93,7 +95,7 @@ namespace Quantum {
 
             if (powerup->SpawnAnimationFrames == 0 && physicsObject->DisableCollision) {
                 // Test that we're not in a wall anymore
-                if (!PhysicsObjectSystem.BoxInsideTile(f, transform->Position, filter.Collider->Shape)) {
+                if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.Collider->Shape)) {
                     physicsObject->DisableCollision = false;
                 }
             }
@@ -209,7 +211,7 @@ namespace Quantum {
 
                 Draw.Shape(f, ref shape, transform->Position);
 
-                if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, shape)) {
+                if (PhysicsObjectSystem.BoxInGround(f, transform->Position, shape)) {
                     return PowerupReserveResult.ReserveNewPowerup;
                 }
             }

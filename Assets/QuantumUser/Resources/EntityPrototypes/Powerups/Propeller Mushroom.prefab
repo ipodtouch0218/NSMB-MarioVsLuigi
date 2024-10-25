@@ -158,6 +158,7 @@ GameObject:
   - component: {fileID: 6636258648682946604}
   - component: {fileID: 1106072449869673961}
   - component: {fileID: 8611491811130374641}
+  - component: {fileID: 7282818765540506302}
   m_Layer: 9
   m_Name: Propeller Mushroom
   m_TagString: Powerup
@@ -237,67 +238,6 @@ MonoBehaviour:
       IsPersistent: 1
       CompoundShapes: []
     Shape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 4
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 11468
-        Y:
-          RawValue: 13107
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 14745
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape3D:
       ShapeType: 0
       SphereRadius:
         RawValue: 0
@@ -561,24 +501,6 @@ MonoBehaviour:
     FacingRight:
       Value: 1
     Lifetime: 900
-    BlockSpawn:
-      Value: 0
-    LaunchSpawn:
-      Value: 0
-    BlockSpawnOrigin:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    BlockSpawnDestination:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    BlockSpawnAnimationLength: 0
-    SpawnAnimationFrames: 0
-    IgnorePlayerFrames: 0
-    ParentMarioPlayer: {fileID: 0}
     AnimationCurveOrigin:
       X:
         RawValue: 0
@@ -613,16 +535,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    Velocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    PreviousVelocity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
     Gravity:
       X:
         RawValue: 0
@@ -634,18 +546,25 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
-    IsTouchingLeftWall:
+--- !u!114 &7282818765540506302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5334425534174023786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a5b2dd50d714a40812a36b547124b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    DisableCulling:
       Value: 0
-    IsTouchingRightWall:
-      Value: 0
-    IsTouchingCeiling:
-      Value: 0
-    IsTouchingGround:
-      Value: 0
-    FloorAngle:
-      RawValue: 0
-    IsOnSlipperyGround:
-      Value: 0
-    IsOnSlideableGround:
-      Value: 0
-    Contacts: []
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 16384
+    BroadRadius:
+      RawValue: 32768

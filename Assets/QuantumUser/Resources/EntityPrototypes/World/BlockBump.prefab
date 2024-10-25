@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -7945987463487596907}
   - component: {fileID: 2456925674553834749}
   - component: {fileID: -3568204047339294810}
+  - component: {fileID: -5113133810989481609}
   m_Layer: 8
   m_Name: BlockBump
   m_TagString: Untagged
@@ -449,3 +450,25 @@ MonoBehaviour:
     Powerup:
       Id:
         Value: 0
+--- !u!114 &-5113133810989481609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6769544900703878166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a5b2dd50d714a40812a36b547124b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    DisableCulling:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    BroadRadius:
+      RawValue: 49152

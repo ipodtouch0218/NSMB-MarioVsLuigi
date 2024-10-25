@@ -1,3 +1,4 @@
+using Photon.Deterministic;
 using Quantum;
 using System.Linq;
 using UnityEngine;
@@ -15,6 +16,26 @@ public class MasterCanvas : MonoBehaviour {
             && f.Global->GameState > GameState.WaitingForPlayers) {
 
             CheckForSpectatorUI(f);
+        }
+    }
+
+    public void Update() {
+        Frame f;
+        if (QuantumRunner.DefaultGame == null
+            || (f = QuantumRunner.DefaultGame.Frames.Predicted) == null) {
+            return;
+        }
+        var context = f.Context;
+        context.CullingCameraPositions.Clear();
+        context.MaxCameraOrthoSize = 0;
+
+        foreach (PlayerElements pe in PlayerElements.AllPlayerElements) {
+            Camera camera = pe.Camera;
+            FPVector2 position = camera.transform.position.ToFPVector2();
+            FP size = camera.orthographicSize.ToFP();
+
+            context.CullingCameraPositions.Add(position);
+            context.MaxCameraOrthoSize = FPMath.Max(context.MaxCameraOrthoSize, size);
         }
     }
 

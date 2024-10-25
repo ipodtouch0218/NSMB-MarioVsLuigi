@@ -155,6 +155,7 @@ GameObject:
   - component: {fileID: 9053290319332969542}
   - component: {fileID: 2115189598253090278}
   - component: {fileID: -4892106406039443480}
+  - component: {fileID: 8774640590014395009}
   m_Layer: 0
   m_Name: FloatingCoin
   m_TagString: Untagged
@@ -266,8 +267,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
-    Layer: 0
+    LayerSource: 1
+    Layer: 9
     CallbackFlags:
       Value: 0
   PhysicsBody:
@@ -543,6 +544,28 @@ MonoBehaviour:
   Prototype:
     ColliderDisabled:
       Value: 0
+--- !u!114 &8774640590014395009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780648777663731097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a5b2dd50d714a40812a36b547124b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    DisableCulling:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 0
+    BroadRadius:
+      RawValue: 26214
 --- !u!1001 &3879286009771224341
 PrefabInstance:
   m_ObjectHideFlags: 0

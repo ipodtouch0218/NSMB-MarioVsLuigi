@@ -5797,6 +5797,7 @@ GameObject:
   - component: {fileID: 987974179557327879}
   - component: {fileID: 6466318334079728413}
   - component: {fileID: -9141778606858110872}
+  - component: {fileID: 1077691219588648767}
   m_Layer: 6
   m_Name: PlayerLuigi
   m_TagString: Untagged
@@ -6450,6 +6451,28 @@ MonoBehaviour:
       Value: 1
     IsFlying:
       Value: 0
+--- !u!114 &1077691219588648767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824223341387914446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a5b2dd50d714a40812a36b547124b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    DisableCulling:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 147456
+    BroadRadius:
+      RawValue: 196608
 --- !u!1 &4849018367852568596
 GameObject:
   m_ObjectHideFlags: 0

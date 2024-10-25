@@ -1164,6 +1164,32 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct Cullable : Quantum.IComponent {
+    public const Int32 SIZE = 32;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(0)]
+    public QBoolean DisableCulling;
+    [FieldOffset(16)]
+    public FPVector2 Offset;
+    [FieldOffset(8)]
+    public FP BroadRadius;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 7759;
+        hash = hash * 31 + DisableCulling.GetHashCode();
+        hash = hash * 31 + Offset.GetHashCode();
+        hash = hash * 31 + BroadRadius.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (Cullable*)ptr;
+        QBoolean.Serialize(&p->DisableCulling, serializer);
+        FP.Serialize(&p->BroadRadius, serializer);
+        FPVector2.Serialize(&p->Offset, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Enemy : Quantum.IComponent {
     public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
@@ -2566,6 +2592,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<CharacterController3D>();
       BuildSignalsArrayOnComponentAdded<Quantum.Coin>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Coin>();
+      BuildSignalsArrayOnComponentAdded<Quantum.Cullable>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.Cullable>();
       BuildSignalsArrayOnComponentAdded<Quantum.Enemy>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Enemy>();
       BuildSignalsArrayOnComponentAdded<Quantum.EnterablePipe>();
@@ -2890,6 +2918,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(ColorRGBA), ColorRGBA.SIZE);
       typeRegistry.Register(typeof(ComponentPrototypeRef), ComponentPrototypeRef.SIZE);
       typeRegistry.Register(typeof(ComponentTypeRef), ComponentTypeRef.SIZE);
+      typeRegistry.Register(typeof(Quantum.Cullable), Quantum.Cullable.SIZE);
       typeRegistry.Register(typeof(DistanceJoint), DistanceJoint.SIZE);
       typeRegistry.Register(typeof(DistanceJoint3D), DistanceJoint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.Enemy), Quantum.Enemy.SIZE);
@@ -2984,7 +3013,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 30)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 31)
         .AddBuiltInComponents()
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
@@ -2995,6 +3024,7 @@ namespace Quantum {
         .Add<Quantum.BulletBillLauncher>(Quantum.BulletBillLauncher.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.CameraController>(Quantum.CameraController.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Coin>(Quantum.Coin.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.Cullable>(Quantum.Cullable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Enemy>(Quantum.Enemy.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.EnterablePipe>(Quantum.EnterablePipe.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Freezable>(Quantum.Freezable.Serialize, null, null, ComponentFlags.None)

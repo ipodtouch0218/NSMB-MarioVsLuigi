@@ -24,7 +24,7 @@ namespace Quantum {
             }
 
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
-                if (PhysicsObjectSystem.BoxInsideTile(f, transform->Position, collider->Shape)) {
+                if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape)) {
                     Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                     return;
                 }
@@ -49,7 +49,7 @@ namespace Quantum {
                 || physicsObject->IsTouchingRightWall
                 || physicsObject->IsTouchingCeiling
                 || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
-                || PhysicsObjectSystem.BoxInsideTile(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
+                || PhysicsObjectSystem.BoxInGround(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
 
                 Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                 return;

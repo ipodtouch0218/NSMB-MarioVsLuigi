@@ -4995,6 +4995,7 @@ GameObject:
   - component: {fileID: -2707382414775849669}
   - component: {fileID: 9160283603330728788}
   - component: {fileID: -9012748332886022531}
+  - component: {fileID: 4061144589790746280}
   m_Layer: 0
   m_Name: BulletBill
   m_TagString: Untagged
@@ -5076,67 +5077,6 @@ MonoBehaviour:
       IsPersistent: 1
       CompoundShapes: []
     Shape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 4
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 16711
-        Y:
-          RawValue: 9830
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 9830
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape3D:
       ShapeType: 0
       SphereRadius:
         RawValue: 0
@@ -5534,6 +5474,28 @@ MonoBehaviour:
       Value: 1
     IsFlying:
       Value: 0
+--- !u!114 &4061144589790746280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627485830306083579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a5b2dd50d714a40812a36b547124b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    DisableCulling:
+      Value: 0
+    Offset:
+      X:
+        RawValue: 0
+      Y:
+        RawValue: 13107
+    BroadRadius:
+      RawValue: 49152
 --- !u!1 &2855663874240651994
 GameObject:
   m_ObjectHideFlags: 0

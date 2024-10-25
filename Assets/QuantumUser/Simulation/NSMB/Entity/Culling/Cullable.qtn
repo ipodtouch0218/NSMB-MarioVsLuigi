@@ -1,0 +1,5 @@
+component Cullable {
+	bool DisableCulling;
+	FPVector2 Offset;
+	FP BroadRadius;
+}

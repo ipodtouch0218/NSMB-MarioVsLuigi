@@ -130,6 +130,16 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3093743753026942761, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: Prototype.Offset.Y.RawValue
+      value: 32768
+      objectReference: {fileID: 0}
+    - target: {fileID: 3093743753026942761, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
+        type: 3}
+      propertyPath: Prototype.BroadRadius.RawValue
+      value: 49152
+      objectReference: {fileID: 0}
     - target: {fileID: 3502658418062677356, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: Flags

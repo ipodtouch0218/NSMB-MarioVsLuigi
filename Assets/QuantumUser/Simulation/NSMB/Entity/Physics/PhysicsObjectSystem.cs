@@ -10,7 +10,6 @@ namespace Quantum {
         public static readonly FP RaycastSkin = FP.FromString("0.15");
         public static readonly FP Skin = FP.FromString("0.001");
         public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
-        private static int mask;
 
         public struct Filter {
             public EntityRef Entity;
@@ -20,7 +19,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            mask = ~f.Layers.GetLayerMask("Entity", "Player");
+            f.Context.EntityPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -137,14 +136,14 @@ namespace Quantum {
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(0, velocityY) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
                     // Left edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -152,7 +151,7 @@ namespace Quantum {
                     // Right edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X -= stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -323,14 +322,14 @@ namespace Quantum {
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(velocityX, 0) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
                     // Left edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -338,7 +337,7 @@ namespace Quantum {
                     // Right edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X -= stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -510,7 +509,6 @@ namespace Quantum {
         }
 
         public static bool Raycast(Frame f, VersusStageData stage, FPVector2 position, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
-
             if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
@@ -568,7 +566,7 @@ namespace Quantum {
             }
 
             finish:
-            var nullableHit = f.Physics2D.Raycast(position, direction, maxDistance, mask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+            var nullableHit = f.Physics2D.Raycast(position, direction, maxDistance, f.Context.EntityPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
             if (nullableHit.HasValue) {
                 var hit = nullableHit.Value;
                 FP hitDistance = hit.CastDistanceNormalized * maxDistance;
@@ -731,7 +729,12 @@ namespace Quantum {
             return PointIsInsidePolygon(testPosition, boxCorners);
         }
 
-        public static bool BoxInsideTile(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null) {
+        public static bool BoxInGround(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null) {
+            // In a solid hitbox
+            if (f.Physics2D.OverlapShape(position, 0, shape, f.Context.EntityPlayerMask).Count > 0) {
+                return true;
+            }
+
             if (!stage) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }

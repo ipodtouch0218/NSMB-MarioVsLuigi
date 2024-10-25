@@ -42,4 +42,10 @@ public unsafe class WrappingEntityView : QuantumEntityView {
         transform.position = unityResult;
     }
 
+    public void OnDrawGizmosSelected() {
+        if (TryGetComponent(out QPrototypeCullable cullable)) {
+            Gizmos.color = new Color(1, 0, 0, 0.5f);
+            Gizmos.DrawSphere(transform.position + cullable.Prototype.Offset.ToUnityVector3(), cullable.Prototype.BroadRadius.AsFloat);
+        }
+    }
 }

@@ -1,8 +1,11 @@
 namespace Quantum {
     public unsafe abstract class SystemMainThreadFilterStage<T> : SystemMainThread where T : unmanaged {
-        public override void Update(Frame f) {
+        public virtual bool UseCulling => true;
 
+        public override void Update(Frame f) {
             var filtered = f.Unsafe.FilterStruct<T>();
+            filtered.UseCulling = UseCulling;
+
             VersusStageData stage = null;
             T filterStruct = default;
             while (filtered.Next(&filterStruct)) {
