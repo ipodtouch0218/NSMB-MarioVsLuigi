@@ -63,6 +63,7 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamFireDeath = Animator.StringToHash("firedeath");
         private static readonly int ParamFireballKnockback = Animator.StringToHash("fireballKnockback");
         private static readonly int ParamKnockforwards = Animator.StringToHash("knockforwards");
+        private static readonly int ParamPushing = Animator.StringToHash("pushing");
         #endregion
 
         //---Public Variables
@@ -409,6 +410,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamAHeld, inputs.Jump.IsDown);
             animator.SetBool(ParamFireballKnockback, mario->IsInWeakKnockback);
             animator.SetBool(ParamFireDeath, mario->FireDeath);
+            animator.SetBool(ParamPushing, mario->LastPushingFrame + 5 >= f.Number);
             //animator.SetBool(ParamKnockforwards, mario->IsInForwardsKnockback);
 
             float animatedVelocity = /* physicsObject.IsTouchingGround ? physicsObject.Velocity.Magnitude.AsFloat : */ Mathf.Abs(physicsObject->Velocity.X.AsFloat);

@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using System;
-using System.Collections.Generic;
 
 namespace Quantum {
     public unsafe class InteractionSystem : SystemMainThreadFilterStage<InteractionSystem.Filter> {
@@ -15,12 +14,8 @@ namespace Quantum {
         public delegate void HitboxInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
         public delegate void PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
 
-        private static readonly Dictionary<(Type, Type), HitboxInteractor> hitboxInteractors = new();
-        private static readonly Dictionary<(Type, Type), PlatformInteractor> platformInteractors = new();
-        private static readonly HashSet<(EntityRef, EntityRef)> alreadyCollided = new(new UnorderedTupleEqualityComparer<EntityRef>());
-
         public override void BeforeUpdate(Frame f, VersusStageData stage) {
-            alreadyCollided.Clear();
+            f.Context.alreadyCollided.Clear();
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -77,8 +72,7 @@ namespace Quantum {
 
         private void TryCollideWithEntity(Frame f, EntityRef entityA, in EntityRef entityB) {
             var entities = (entityA, entityB);
-            if (entityA == entityB
-                || alreadyCollided.Contains(entities)) {
+            if (entityA == entityB || f.Context.alreadyCollided.Contains(entities)) {
                 return;
             }
 
@@ -93,7 +87,7 @@ namespace Quantum {
                 return;
             }
 
-            foreach ((var key, var interactor) in hitboxInteractors) {
+            foreach ((var key, var interactor) in f.Context.hitboxInteractors) {
                 int componentIdA = ComponentTypeId.GetComponentIndex(key.Item1);
                 int componentIdB = ComponentTypeId.GetComponentIndex(key.Item2);
 
@@ -101,14 +95,14 @@ namespace Quantum {
                     && f.Has(entityB, componentIdB)) {
 
                     interactor(f, entityA, entityB);
-                    alreadyCollided.Add(entities);
+                    f.Context.alreadyCollided.Add(entities);
                     break;
 
                 } else if (f.Has(entityB, componentIdA)
                     && f.Has(entityA, componentIdB)) {
 
                     interactor(f, entityB, entityA);
-                    alreadyCollided.Add(entities);
+                    f.Context.alreadyCollided.Add(entities);
                     break;
                 }
             }
@@ -117,7 +111,7 @@ namespace Quantum {
         private void TryCollideWithEntity(Frame f, EntityRef entityA, EntityRef entityB, in PhysicsContact contact) {
             var entities = (entityA, entityB);
             if (entityA == entityB
-                || alreadyCollided.Contains(entities)) {
+                || f.Context.alreadyCollided.Contains(entities)) {
                 return;
             }
 
@@ -132,7 +126,7 @@ namespace Quantum {
                 return;
             }
 
-            foreach ((var key, var interactor) in platformInteractors) {
+            foreach ((var key, var interactor) in f.Context.platformInteractors) {
                 int componentIdA = ComponentTypeId.GetComponentIndex(key.Item1);
                 int componentIdB = ComponentTypeId.GetComponentIndex(key.Item2);
 
@@ -140,36 +134,16 @@ namespace Quantum {
                     && f.Has(entityB, componentIdB)) {
 
                     interactor(f, entityA, entityB, contact);
-                    alreadyCollided.Add(entities);
+                    f.Context.alreadyCollided.Add(entities);
                     break;
 
                 } else if (f.Has(entityB, componentIdA)
                     && f.Has(entityA, componentIdB)) {
 
                     interactor(f, entityB, entityA, contact);
-                    alreadyCollided.Add(entities);
+                    f.Context.alreadyCollided.Add(entities);
                     break;
                 }
-            }
-        }
-
-        public static void RegisterInteraction<X, Y>(HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
-            var key = (typeof(X), typeof(Y));
-
-            if (hitboxInteractors.ContainsKey(key)) {
-                //Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}.");
-            } else {
-                hitboxInteractors[key] = interactor;
-            }
-        }
-
-        public static void RegisterInteraction<X, Y>(PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
-            var key = (typeof(X), typeof(Y));
-
-            if (platformInteractors.ContainsKey(key)) {
-                //Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}.");
-            } else {
-                platformInteractors[key] = interactor;
             }
         }
     }

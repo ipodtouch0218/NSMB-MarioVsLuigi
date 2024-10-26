@@ -5236,7 +5236,7 @@ MonoBehaviour:
   shootParticles: {fileID: 7693979224894144423}
   sfx: {fileID: 5407584048357268515}
   legacyAnimation: {fileID: 5184426367989315057}
-  specialKillParticles: {fileID: 8258044260612326560, guid: d0dec86b8ad08184d9da50d1f76fc7bd,
+  specialKillParticles: {fileID: 761201321277025702, guid: d0dec86b8ad08184d9da50d1f76fc7bd,
     type: 3}
 --- !u!114 &6793168269546059589
 MonoBehaviour:

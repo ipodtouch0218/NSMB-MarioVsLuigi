@@ -1,4 +1,3 @@
-using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,6 @@ using UnityEngine;
 public class SingleParticleManager : Singleton<SingleParticleManager> {
 
     //---Serialized Variables
-    [SerializeField] private TemporarySoundSource temporarySoundPrefab;
     [SerializeField] private ParticlePair[] serializedSystems;
 
     //---Private Variables

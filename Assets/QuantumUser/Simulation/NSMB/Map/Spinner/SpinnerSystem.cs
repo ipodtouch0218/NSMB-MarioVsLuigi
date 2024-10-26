@@ -13,7 +13,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<Spinner, MarioPlayer>(OnSpinnerMarioPlayerInteraction);
+            f.Context.RegisterInteraction<Spinner, MarioPlayer>(OnSpinnerMarioPlayerInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {

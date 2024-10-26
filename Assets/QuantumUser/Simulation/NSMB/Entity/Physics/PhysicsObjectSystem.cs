@@ -46,8 +46,8 @@ namespace Quantum {
             physicsObject->IsOnSlideableGround = false;
             physicsObject->IsOnSlipperyGround = false;
 
-            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
             physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, entity, stage, contacts);
+            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
             ResolveContacts(physicsObject, contacts);
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
@@ -729,10 +729,14 @@ namespace Quantum {
             return PointIsInsidePolygon(testPosition, boxCorners);
         }
 
-        public static bool BoxInGround(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null) {
+        public static bool BoxInGround(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default) {
             // In a solid hitbox
-            if (f.Physics2D.OverlapShape(position, 0, shape, f.Context.EntityPlayerMask).Count > 0) {
-                return true;
+            var hits = f.Physics2D.OverlapShape(position, 0, shape, f.Context.EntityPlayerMask);
+            for (int i = 0; i < hits.Count; i++) {
+                var hit = hits.HitsBuffer[i];
+                if (hit.Entity != entity) {
+                    return true;
+                }
             }
 
             if (!stage) {

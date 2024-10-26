@@ -222,24 +222,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e33c0d39bc8139e47b46c512e5bfdca3, type: 2}
   - {fileID: 11400000, guid: 437c1b4891fe12346ba9d84056d0a671, type: 2}
   - {fileID: 11400000, guid: 8ce2d81bba3ca02408b028c0fb6fed8f, type: 2}
-  FireballPrototype:
-    Id:
-      Value: 1460912212237464861
-  IceballPrototype:
-    Id:
-      Value: 1531419298539715423
-  BigStarPrototype:
-    Id:
-      Value: 1295981493910502871
-  BlockBumpPrototype:
-    Id:
-      Value: 1308320651839637093
-  LooseCoinPrototype:
-    Id:
-      Value: 1464681621458001613
-  IceBlockPrototype:
-    Id:
-      Value: 1386525317044462577
+  FireballPrototype: {fileID: 3097001405596171208, guid: ec7f94c7576907a44b50eb692bdf439d,
+    type: 3}
+  IceballPrototype: {fileID: 3097001405596171208, guid: f34a1c8377d923742858185e987aa0c6,
+    type: 3}
+  BigStarPrototype: {fileID: 3097001405596171208, guid: f4614a9d678f440429280d54866b33cc,
+    type: 3}
+  BlockBumpPrototype: {fileID: 3097001405596171208, guid: bccc5bdeb7a9b96419ace83dcddd92e6,
+    type: 3}
+  LooseCoinPrototype: {fileID: 3097001405596171208, guid: 5ad0ca873a0bce64fba5692545b6c450,
+    type: 3}
+  IceBlockPrototype: {fileID: 3097001405596171208, guid: c71bb37b419b1164e96d12c17c294c79,
+    type: 3}
   DefaultRules:
     Level:
       Id:

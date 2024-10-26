@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
 
@@ -15,9 +14,9 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<IceBlock, Projectile>(OnIceBlockProjectileInteraction);
-            InteractionSystem.RegisterInteraction<IceBlock, MarioPlayer>(OnIceBlockMarioInteraction);
-            InteractionSystem.RegisterInteraction<IceBlock, Coin>(OnIceBlockCoinInteraction);
+            f.Context.RegisterInteraction<IceBlock, Projectile>(OnIceBlockProjectileInteraction);
+            f.Context.RegisterInteraction<IceBlock, MarioPlayer>(OnIceBlockMarioInteraction);
+            f.Context.RegisterInteraction<IceBlock, Coin>(OnIceBlockCoinInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -32,9 +31,7 @@ namespace Quantum {
             var childFreezable = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
             var physicsObject = filter.PhysicsObject;
 
-            if (f.Number % 2 == 0
-                && PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.PhysicsCollider->Shape, stage)) {
-
+            if (f.Number % 2 == 0 && PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.PhysicsCollider->Shape, true, stage, entity)) {
                 Destroy(f, entity, IceBlockBreakReason.HitWall);
                 return;
             }

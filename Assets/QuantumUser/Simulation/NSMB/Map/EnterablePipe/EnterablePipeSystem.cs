@@ -2,7 +2,7 @@ namespace Quantum {
     public unsafe class EnterablePipeSystem : SystemSignalsOnly {
 
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<EnterablePipe, MarioPlayer>(OnPipeMarioInteraction);
+            f.Context.RegisterInteraction<EnterablePipe, MarioPlayer>(OnPipeMarioInteraction);
         }
 
         public static void OnPipeMarioInteraction(Frame f, EntityRef pipeEntity, EntityRef marioEntity) {

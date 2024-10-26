@@ -49,6 +49,7 @@ component MarioPlayer {
     [ExcludeFromPrototype] bool IsTurnaround;
     [ExcludeFromPrototype] byte FastTurnaroundFrames;
     [ExcludeFromPrototype] byte SlowTurnaroundFrames;
+	[ExcludeFromPrototype] int LastPushingFrame;
 
 	// Jumping
 	[ExcludeFromPrototype] JumpState JumpState;

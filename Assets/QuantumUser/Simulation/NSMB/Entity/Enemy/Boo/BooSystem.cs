@@ -13,8 +13,8 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<Boo, MarioPlayer>(OnBooMarioPlayerInteraction);
-            InteractionSystem.RegisterInteraction<Boo, Projectile>(OnBooProjectileInteraction);
+            f.Context.RegisterInteraction<Boo, MarioPlayer>(OnBooMarioPlayerInteraction);
+            f.Context.RegisterInteraction<Boo, Projectile>(OnBooProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {

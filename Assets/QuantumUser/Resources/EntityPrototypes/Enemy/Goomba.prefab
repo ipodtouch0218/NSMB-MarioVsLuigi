@@ -358,7 +358,7 @@ MonoBehaviour:
   sRenderer: {fileID: 7821411591339125535}
   deadSprite: {fileID: -728934508601558331, guid: b455056ca00f84e48a8040f94ae8170d,
     type: 3}
-  specialKillParticle: {fileID: 8258044260612326560, guid: d0dec86b8ad08184d9da50d1f76fc7bd,
+  specialKillParticle: {fileID: 761201321277025702, guid: d0dec86b8ad08184d9da50d1f76fc7bd,
     type: 3}
   legacyAnimation: {fileID: 2072787540995169967}
   sfx: {fileID: 5674404523704379184}

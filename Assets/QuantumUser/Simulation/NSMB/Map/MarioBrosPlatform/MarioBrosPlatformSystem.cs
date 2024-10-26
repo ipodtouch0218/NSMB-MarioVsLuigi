@@ -3,7 +3,7 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe class MarioBrosPlatformSystem : SystemSignalsOnly {
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<MarioBrosPlatform, MarioPlayer>(OnMarioBrosPlatformMarioPlayerInteraction);
+            f.Context.RegisterInteraction<MarioBrosPlatform, MarioPlayer>(OnMarioBrosPlatformMarioPlayerInteraction);
         }
 
         public void OnMarioBrosPlatformMarioPlayerInteraction(Frame f, EntityRef platformEntity, EntityRef marioEntity, PhysicsContact contact) {

@@ -1,13 +1,12 @@
 using Photon.Deterministic;
-using UnityEngine.UIElements;
 
 namespace Quantum {
     public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill>, ISignalOnIceBlockBroken {
 
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
-            InteractionSystem.RegisterInteraction<BulletBill, Projectile>(OnBulletBillProjectileInteraction);
-            InteractionSystem.RegisterInteraction<BulletBill, IceBlock>(OnBulletBillIceBlockInteraction);
+            f.Context.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
+            f.Context.RegisterInteraction<BulletBill, Projectile>(OnBulletBillProjectileInteraction);
+            f.Context.RegisterInteraction<BulletBill, IceBlock>(OnBulletBillIceBlockInteraction);
         }
 
         public override void Update(Frame f) {

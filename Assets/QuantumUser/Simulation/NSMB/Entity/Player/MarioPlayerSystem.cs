@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -20,9 +19,9 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<MarioPlayer, MarioPlayer>(OnMarioMarioInteraction);
-            InteractionSystem.RegisterInteraction<MarioPlayer, Projectile>(OnMarioProjectileInteraction);
-            InteractionSystem.RegisterInteraction<MarioPlayer, Coin>(OnMarioCoinInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, MarioPlayer>(OnMarioMarioInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, Projectile>(OnMarioProjectileInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, Coin>(OnMarioCoinInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -391,7 +390,7 @@ namespace Quantum {
                 PowerupState.MiniMushroom => physics.JumpMiniVelocity + FPMath.Lerp(0, physics.JumpMiniSpeedBonusVelocity, alpha),
                 _ => physics.JumpVelocity + FPMath.Lerp(0, physics.JumpSpeedBonusVelocity, alpha),
             };
-            if (FPMath.Sign(physicsObject->Velocity.X) == FPMath.Sign(physicsObject->FloorAngle)) {
+            if (FPMath.Sign(physicsObject->Velocity.X) != 0 && FPMath.Sign(physicsObject->Velocity.X) != FPMath.Sign(physicsObject->FloorAngle)) {
                 // TODO: what.
                 newY += FPMath.Abs(physicsObject->FloorAngle) * FP._0_01 * alpha;
             }
@@ -665,7 +664,7 @@ namespace Quantum {
                 (
                     (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding) 
                     || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !mario->IsInWater)
-                    || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics))
+                    /* || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics)) */
                 ) 
                 && !mario->HeldEntity.IsValid 
                 && !mario->IsInShell;
@@ -1033,7 +1032,7 @@ namespace Quantum {
                 mario->CurrentVolley = 0;
             }
 
-            mario->UsedPropellerThisJump &= physicsObject->IsTouchingGround;
+            mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
             mario->IsPropellerFlying &= !mario->IsInWater;
             if (mario->IsPropellerFlying) {
                 if (!QuantumUtils.Decrement(ref mario->PropellerLaunchFrames)) {
@@ -1822,9 +1821,17 @@ namespace Quantum {
                         PhysicsObjectSystem.MoveHorizontally(f, overlap * -directionToOtherPlayer * f.UpdateRate, marioBEntity, stage);
 
                         // Transfer velocity
-                        FP avgVelocityX = (marioAPhysics->Velocity.X + marioBPhysics->Velocity.X) / 2;
-                        marioAPhysics->Velocity.X = avgVelocityX;
-                        marioBPhysics->Velocity.X = avgVelocityX;
+                        FP avgVelocityX = (marioAPhysics->Velocity.X + marioBPhysics->Velocity.X) * FP._0_75;
+
+                        if (FPMath.Abs(marioAPhysics->Velocity.X) > 1) {
+                            marioA->LastPushingFrame = f.Number;
+                            marioAPhysics->Velocity.X = avgVelocityX;
+                        }
+                        if (FPMath.Abs(marioBPhysics->Velocity.X) > 1) {
+                            marioB->LastPushingFrame = f.Number;
+                            marioBPhysics->Velocity.X = avgVelocityX;
+                        }
+
                     }
                 }
             }

@@ -20,15 +20,15 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            InteractionSystem.RegisterInteraction<Koopa, Goomba>(OnKoopaGoombaInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, Boo>(OnKoopaBooInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, Projectile>(OnKoopaProjectileInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, Coin>(OnKoopaCoinInteraction);
-            InteractionSystem.RegisterInteraction<Koopa, IceBlock>(OnKoopaIceBlockInteraction);
+            f.Context.RegisterInteraction<Koopa, Goomba>(OnKoopaGoombaInteraction);
+            f.Context.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
+            f.Context.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
+            f.Context.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
+            f.Context.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
+            f.Context.RegisterInteraction<Koopa, Boo>(OnKoopaBooInteraction);
+            f.Context.RegisterInteraction<Koopa, Projectile>(OnKoopaProjectileInteraction);
+            f.Context.RegisterInteraction<Koopa, Coin>(OnKoopaCoinInteraction);
+            f.Context.RegisterInteraction<Koopa, IceBlock>(OnKoopaIceBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
