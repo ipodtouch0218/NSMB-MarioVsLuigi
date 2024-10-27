@@ -58,8 +58,6 @@ namespace Quantum {
                 }
             }
 
-            // Clear after since we are a super early system.
-            // It will be ready by next frame.
             marios.Clear();
         }
 

@@ -278,3 +278,8 @@ event MarioPlayerUsedSpinner {
 	entity_ref Entity;
 	entity_ref Spinner;
 }
+
+event MarioPlayerStompedByTeammate {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}

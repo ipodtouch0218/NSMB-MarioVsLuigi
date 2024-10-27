@@ -690,7 +690,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 1720;
+    public const Int32 SIZE = 1728;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -719,30 +719,32 @@ namespace Quantum {
     public BitSet10 PlayerLastConnectionState;
     [FieldOffset(1644)]
     public UInt16 BigStarSpawnTimer;
-    [FieldOffset(1672)]
+    [FieldOffset(1680)]
     public EntityRef MainBigStar;
-    [FieldOffset(1664)]
+    [FieldOffset(1672)]
     public BitSet64 UsedStarSpawns;
-    [FieldOffset(1656)]
+    [FieldOffset(1660)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1688)]
+    [FieldOffset(1696)]
     public GameRules Rules;
     [FieldOffset(1642)]
     public GameState GameState;
     [FieldOffset(1652)]
     public Int32 StartFrame;
+    [FieldOffset(1656)]
+    public Int32 TotalGamesPlayed;
     [FieldOffset(1646)]
     public UInt16 GameStartFrames;
     [FieldOffset(1648)]
     public UInt16 PlayerLoadFrames;
-    [FieldOffset(1660)]
+    [FieldOffset(1664)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
     [FieldOffset(1640)]
     public Byte RealPlayers;
     [FieldOffset(1641)]
     public Byte TotalMarios;
-    [FieldOffset(1680)]
+    [FieldOffset(1688)]
     public FP Timer;
     public FixedArray<Input> input {
       get {
@@ -771,6 +773,7 @@ namespace Quantum {
         hash = hash * 31 + Rules.GetHashCode();
         hash = hash * 31 + (Byte)GameState;
         hash = hash * 31 + StartFrame.GetHashCode();
+        hash = hash * 31 + TotalGamesPlayed.GetHashCode();
         hash = hash * 31 + GameStartFrames.GetHashCode();
         hash = hash * 31 + PlayerLoadFrames.GetHashCode();
         hash = hash * 31 + PlayerDatas.GetHashCode();
@@ -807,6 +810,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->GameStartFrames);
         serializer.Stream.Serialize(&p->PlayerLoadFrames);
         serializer.Stream.Serialize(&p->StartFrame);
+        serializer.Stream.Serialize(&p->TotalGamesPlayed);
         serializer.Stream.Serialize(&p->UsedStarSpawnCount);
         QDictionary.Serialize(&p->PlayerDatas, serializer, Statics.SerializePlayerRef, Statics.SerializeEntityRef);
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);

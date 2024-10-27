@@ -76,14 +76,8 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (mario->WalljumpFrames > 0) {
-                mario->WalljumpFrames--;
-                if (mario->WalljumpFrames < 12 && (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall)) {
-                    mario->WalljumpFrames = 0;
-                } else {
-                    physicsObject->Velocity.X = physics.WalljumpHorizontalVelocity * (mario->FacingRight ? 1 : -1);
-                    return;
-                }
+            if (!QuantumUtils.Decrement(ref mario->WalljumpFrames)) {
+                return;
             }
 
             if (mario->GroundpoundStandFrames > 0) {
@@ -354,6 +348,7 @@ namespace Quantum {
                 mario->CoyoteTimeFrames = 0;
 
                 f.Events.MarioPlayerUsedSpinner(f, filter.Entity, mario->CurrentSpinner);
+
                 mario->CurrentSpinner = EntityRef.None;
                 return;
             }
@@ -1185,9 +1180,9 @@ namespace Quantum {
             if (physicsObject->IsOnSlideableGround 
                 && validFloorAngle
                 && !f.Exists(mario->HeldEntity)
-                && (!((mario->FacingRight && physicsObject->IsTouchingRightWall) || (!mario->FacingRight && physicsObject->IsTouchingLeftWall))
+                && !((mario->FacingRight && physicsObject->IsTouchingRightWall) || (!mario->FacingRight && physicsObject->IsTouchingLeftWall))
                 && (mario->IsCrouching || inputs.Down.IsDown)
-                && !mario->IsInShell /* && mario->CurrentPowerupState != PowerupState.MegaMushroom*/)) {
+                && !mario->IsInShell /* && mario->CurrentPowerupState != PowerupState.MegaMushroom*/) {
 
                 mario->IsSliding = true;
                 mario->IsCrouching = false;
@@ -1896,10 +1891,16 @@ namespace Quantum {
                 defenderMario->DoKnockback(f, defender, fromRight, dropStars ? 3 : 0, false, attacker);
                 attackerMario->DoEntityBounce = false;
             } else {
+                // Normal knockbacks
                 if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {
                     defenderMario->Powerdown(f, defender, false);
                 } else {
-                    defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, false, attacker);
+                    if (!groundpounded && !dropStars) {
+                        // Bounce
+                        f.Events.MarioPlayerStompedByTeammate(f, defender);
+                    } else {
+                        defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, false, attacker);
+                    }
                 }
             }
         }

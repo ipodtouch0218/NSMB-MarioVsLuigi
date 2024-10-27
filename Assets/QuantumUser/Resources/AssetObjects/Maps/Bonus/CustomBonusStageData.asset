@@ -39,7 +39,7 @@ MonoBehaviour:
     X:
       RawValue: 91750
     Y:
-      RawValue: 52429
+      RawValue: 42598
   OverrideAutomaticCameraSettings: 1
   CameraMinPosition:
     X:
@@ -51,11 +51,12 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 458752
-  UIColor: {r: 24, g: 178, b: 170, a: 1}
+  UIColor: {r: 0.85, g: 0.1, b: 1, a: 1}
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1
-  MainMusic: {fileID: 11400000, guid: 48add5d4adb34ec43992f4723abd1d00, type: 2}
+  MainMusic:
+  - {fileID: 11400000, guid: 48add5d4adb34ec43992f4723abd1d00, type: 2}
   InvincibleMusic: {fileID: 11400000, guid: 628804e165b231243abe39caa050a76c, type: 2}
   MegaMushroomMusic: {fileID: 11400000, guid: d2c80d3a80e82cb4b988278210db3bb9, type: 2}
   TileData:

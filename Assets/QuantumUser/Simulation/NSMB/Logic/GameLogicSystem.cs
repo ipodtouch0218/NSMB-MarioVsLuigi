@@ -331,6 +331,7 @@ namespace Quantum {
                 }
             }
 
+            f.Global->TotalGamesPlayed++;
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(f, GameState.Ended);
             f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);
@@ -405,7 +406,7 @@ namespace Quantum {
             // Debug: give existing mario players the same team
             var sceneMarios = f.Filter<MarioPlayer>();
             while (sceneMarios.NextUnsafe(out _, out MarioPlayer* mario)) {
-                mario->Team = byte.MaxValue;
+                mario->Team = 255;
             }
 
             var playerDatas = f.Filter<PlayerData>();

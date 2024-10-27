@@ -75,7 +75,7 @@ public class MusicManager : MonoBehaviour {
         } else if (invincible) {
             musicPlayer.Play(stage.InvincibleMusic);
         } else {
-            musicPlayer.Play(stage.MainMusic);
+            musicPlayer.Play(stage.MainMusic[f.Global->TotalGamesPlayed % stage.MainMusic.Length]);
         }
 
         musicPlayer.FastMusic = speedup;

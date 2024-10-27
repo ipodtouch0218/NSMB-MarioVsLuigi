@@ -1,10 +1,10 @@
 using NSMB.Extensions;
-using Org.BouncyCastle.Cms;
 using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Input = Quantum.Input;
 
@@ -67,7 +67,7 @@ namespace NSMB.Entities.Player {
         #endregion
 
         //---Public Variables
-        public bool wasTurnaround, enableGlow;
+        public bool wasTurnaround;
         public GameObject models;
 
         //---Serialized Variables
@@ -90,6 +90,7 @@ namespace NSMB.Entities.Player {
 
         //---Properties
         public Color GlowColor { get; private set; }
+        public bool IsCameraFocus => PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity.EntityRef);
 
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
@@ -99,6 +100,7 @@ namespace NSMB.Entities.Player {
         private PlayerColors skin;
         private float lastBumpSound;
         private MaterialPropertyBlock materialBlock;
+        private float teammateStompTimer;
 
         private VersusStageData stage;
 
@@ -149,6 +151,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerDeathUp>(this, OnMarioPlayerDeathUp);
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
         }
 
         public void Initialize(QuantumGame game) {
@@ -453,6 +456,13 @@ namespace NSMB.Entities.Player {
                     _ => Vector3.one,
                 };
             }
+
+            teammateStompTimer -= Time.deltaTime;
+            if (teammateStompTimer < 0) {
+                teammateStompTimer = 0;
+            }
+
+            scale.y -= Mathf.Sin(teammateStompTimer * Mathf.PI / 0.15f) * 0.175f;
             models.transform.SetLossyScale(scale);
 
             // Shader effects
@@ -467,6 +477,8 @@ namespace NSMB.Entities.Player {
             materialBlock.SetFloat(ParamPowerupState, ps);
             materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead ? Enums.PlayerEyeState.Death : eyeState));
             materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x);
+            materialBlock.SetColor(ParamGlowColor, IsCameraFocus ? Color.clear : GlowColor);
+
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = mario->MegaMushroomFrames / 60f;
@@ -542,15 +554,10 @@ namespace NSMB.Entities.Player {
             materialBlock.SetVector(ParamOverallsColor, skin?.overallsColor.linear ?? Color.clear);
             materialBlock.SetVector(ParamShirtColor, skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
             materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
-
-            // Glow Color
-            if (enableGlow) {
-                materialBlock.SetColor(ParamGlowColor, GlowColor);
-            }
         }
 
         public void PlaySoundEverywhere(SoundEffect soundEffect) {
-            // GameManager.Instance.sfx.PlayOneShot(sound, character);
+             //GameManager.Instance.sfx.PlayOneShot(sound, character);
         }
         public void PlaySound(SoundEffect soundEffect, CharacterAsset characterData = null, byte variant = 0, float volume = 1) {
             characterData ??= character;
@@ -722,6 +729,14 @@ namespace NSMB.Entities.Player {
             }
 
             animator.ResetTrigger("throw");
+        }
+
+        private void OnMarioPlayerStompedByTeammate(EventMarioPlayerStompedByTeammate e) {
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            teammateStompTimer = 0.15f;
         }
 
         private void OnPlayBumpSound(EventPlayBumpSound e) {
@@ -903,11 +918,14 @@ namespace NSMB.Entities.Player {
             case PowerupReserveResult.ReserveOldPowerup:
             case PowerupReserveResult.NoneButPlaySound: {
                 // Just play the collect sound
+                /*
                 if (powerup.SoundPlaysEverywhere) {
                     PlaySoundEverywhere(powerup.SoundEffect);
                 } else {
                     PlaySound(powerup.SoundEffect);
                 }
+                */
+                PlaySound(powerup.SoundEffect);
 
                 if (powerup.State == PowerupState.MegaMushroom) {
                     animator.Play("mega-scale");

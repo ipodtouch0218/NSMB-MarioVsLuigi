@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Quantum {
@@ -43,19 +44,22 @@ namespace Quantum {
                     i--;
                 }
             }
-            physicsObject->IsOnSlideableGround = false;
-            physicsObject->IsOnSlipperyGround = false;
 
-            physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, entity, stage, contacts);
-            physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
-            ResolveContacts(physicsObject, contacts);
+            if (FPMath.Abs(physicsObject->Velocity.X) > FPMath.Abs(physicsObject->Velocity.Y)) {
+                physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
+                physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, entity, stage, contacts);
+            } else {
+                physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, entity, stage, contacts);
+                physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
+            }
+            ResolveContacts(f, stage, physicsObject, contacts);
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
                 FPVector2 previousPosition = transform->Position;
                 
                 MoveVertically(f, -FP._0_25 * f.UpdateRate, entity, stage, contacts);
-                ResolveContacts(physicsObject, contacts);
+                ResolveContacts(f, stage, physicsObject, contacts);
 
                 if (!physicsObject->IsTouchingGround) {
                     transform->Position = previousPosition;
@@ -96,20 +100,11 @@ namespace Quantum {
                 }
             }
 
-            if (!maxVelocity.HasValue) {
-                // exclusion: jumping off downwards platform eating velocity.
-                FPVector2 adjustment = physicsObject->ParentVelocity;
-                if (physicsObject->Velocity.Y > 0 && adjustment.Y < 0) {
-                    adjustment.Y = 0;
-                }
+            FPVector2 adjustment = physicsObject->ParentVelocity - (maxVelocity ?? FPVector2.Zero);
+            adjustment.Y = 0;
 
-                physicsObject->Velocity += adjustment;
-                physicsObject->ParentVelocity = FPVector2.Zero;
-                return;
-            }
-
-            physicsObject->Velocity -= (maxVelocity.Value - physicsObject->ParentVelocity);
-            physicsObject->ParentVelocity = maxVelocity.Value;
+            physicsObject->Velocity += adjustment;
+            physicsObject->ParentVelocity = maxVelocity ?? FPVector2.Zero;
         }
 
         public static FPVector2 MoveVertically(Frame f, FP relativeVelocityY, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = default) {
@@ -258,13 +253,6 @@ namespace Quantum {
                             min ??= contact.Distance;
                             avgNormal += contact.Normal;
                             contactCount++;
-
-                            if (contact.TileX != -1 && contact.TileY != -1
-                                && f.TryFindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile, out StageTile tile)) {
-
-                                physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
-                                physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
-                            }
                         } else {
                             removedContacts.Add(contact);
                         }
@@ -476,13 +464,15 @@ namespace Quantum {
             return physicsObject->Velocity;
         }
 
-        private void ResolveContacts(PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
+        private void ResolveContacts(Frame f, VersusStageData stage, PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
 
             physicsObject->FloorAngle = 0;
             physicsObject->IsTouchingGround = false;
             physicsObject->IsTouchingCeiling = false;
             physicsObject->IsTouchingLeftWall = false;
             physicsObject->IsTouchingRightWall = false;
+            physicsObject->IsOnSlideableGround = false;
+            physicsObject->IsOnSlipperyGround = false;
 
             foreach (var contact in contacts) {
                 FP horizontalDot = FPVector2.Dot(contact.Normal, FPVector2.Right);
@@ -500,6 +490,11 @@ namespace Quantum {
                     FP angle = FPVector2.RadiansSignedSkipNormalize(contact.Normal, FPVector2.Up) * FP.Rad2Deg;
                     if (FPMath.Abs(physicsObject->FloorAngle) < FPMath.Abs(angle)) {
                         physicsObject->FloorAngle = angle;
+                    }
+
+                    if (contact.TileX != -1 && contact.TileY != -1 && f.TryFindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile, out StageTile tile)) {
+                        physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
+                        physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
                     }
 
                 } else if (verticalDot < -GroundMaxAngle) {

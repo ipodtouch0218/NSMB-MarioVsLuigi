@@ -4,6 +4,7 @@ global {
 	GameRules Rules;	
 	GameState GameState;
 	int StartFrame;
+	int TotalGamesPlayed;
 	ushort GameStartFrames;
 	ushort PlayerLoadFrames;
 
