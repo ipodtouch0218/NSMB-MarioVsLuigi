@@ -1,21 +1,17 @@
 using NSMB.Extensions;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class ParticleSound : MonoBehaviour {
 
     //---Serialized Variables
-    [SerializeField] private ParticleSystem[] systems;
+    [SerializeField] private List<ParticleSystem> systems;
     [SerializeField] private LoopingSoundPlayer sfx;
 
     public void OnValidate() {
         this.SetIfNull(ref sfx);
-
-        if (systems == null) {
-            List<ParticleSystem> particles = new();
-            particles.AddRange(GetComponentsInChildren<ParticleSystem>());
-            systems = particles.ToArray();
+        if (systems == null || systems.Count == 0) {
+            GetComponentsInChildren(systems);
         }
     }
 
@@ -29,10 +25,15 @@ public class ParticleSound : MonoBehaviour {
             return;
         }
 
-        if (systems.Any(ps => ps.isEmitting) && !sfx.IsPlaying) {
-            sfx.Play();
+        foreach (ParticleSystem system in systems) {
+            if (system.isEmitting) {
+                if (!sfx.IsPlaying) {
+                    sfx.Play();
+                }
+                return;
+            }
         }
-        if (systems.All(ps => !ps.isEmitting) && sfx.IsPlaying) {
+        if (sfx.IsPlaying) {
             sfx.Stop();
         }
     }

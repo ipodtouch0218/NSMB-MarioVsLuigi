@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Profiling;
 using UnityEngine;
 using Input = Quantum.Input;
 
@@ -90,7 +91,6 @@ namespace NSMB.Entities.Player {
 
         //---Properties
         public Color GlowColor { get; private set; }
-        public bool IsCameraFocus => PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity.EntityRef);
 
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
@@ -188,13 +188,6 @@ namespace NSMB.Entities.Player {
         }
 
         public override void OnUpdateView(QuantumGame game) {
-            /*
-            if (GameManager.Instance.GameStartTimer.IsRunning) {
-                DisableAllModels();
-                return;
-            }
-            */
-
             Frame f = game.Frames.Predicted;
             if (!f.Exists(entity.EntityRef)) {
                 return;
@@ -207,7 +200,11 @@ namespace NSMB.Entities.Player {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity.EntityRef);
             var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+
+            ProfilerMarker x = new("MarioAnimator.OnUpdateView.HandleMiscStates");
+            x.Begin();
             HandleMiscStates(f, mario, freezable);
+            x.End();
 
             if (freezable->IsFrozen(f)) {
                 animator.speed = 0;
@@ -222,10 +219,22 @@ namespace NSMB.Entities.Player {
                 inputs = *f.GetPlayerInput(mario->PlayerRef);
             }
 
+            x = new("MarioAnimator.OnUpdateView.HandleAnimations");
+            x.Begin();
             HandleAnimations(f, mario, physicsObject);
+            x.End();
+            x = new("MarioAnimator.OnUpdateView.SetFacingDirection");
+            x.Begin();
             SetFacingDirection(f, mario, physicsObject);
+            x.End();
+            x = new("MarioAnimator.OnUpdateView.InterpolateFacingDirection");
+            x.Begin();
             InterpolateFacingDirection(mario);
+            x.End();
+            x = new("MarioAnimator.OnUpdateView.UpdateAnimatorVariables");
+            x.Begin();
             UpdateAnimatorVariables(f, mario, physicsObject, ref inputs);
+            x.End();
         }
 
         public void HandleAnimations(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject) {
@@ -477,8 +486,6 @@ namespace NSMB.Entities.Player {
             materialBlock.SetFloat(ParamPowerupState, ps);
             materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead ? Enums.PlayerEyeState.Death : eyeState));
             materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x);
-            materialBlock.SetColor(ParamGlowColor, IsCameraFocus ? Color.clear : GlowColor);
-
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = mario->MegaMushroomFrames / 60f;
@@ -495,7 +502,7 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
-            models.SetActive(mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f))));
+            models.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;
@@ -554,6 +561,14 @@ namespace NSMB.Entities.Player {
             materialBlock.SetVector(ParamOverallsColor, skin?.overallsColor.linear ?? Color.clear);
             materialBlock.SetVector(ParamShirtColor, skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
             materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
+        }
+
+        private void OnPreRender() {
+            materialBlock.SetColor(ParamGlowColor, IsCameraFocus(Camera.current) ? Color.clear : GlowColor);
+        }
+
+        private bool IsCameraFocus(Camera camera) {
+            return PlayerElements.AllPlayerElements.Any(pe => pe.Camera == camera);
         }
 
         public void PlaySoundEverywhere(SoundEffect soundEffect) {

@@ -1,3 +1,7 @@
+#define _3_50 3.5
+#define SixteenOverNine 1.777777778
+#define _2_50 2.5
+
 component CameraController {
 	[ExcludeFromPrototype] FPVector2 CurrentPosition;
 	[ExcludeFromPrototype] FP LastFloorHeight;

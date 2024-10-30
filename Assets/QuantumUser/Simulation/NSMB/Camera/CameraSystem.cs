@@ -27,8 +27,8 @@ namespace Quantum {
                 camera->LastPlayerPosition = transform->Position;
             }
 
-            FP vOrtho = FP.FromString("3.5");
-            FP xOrtho = vOrtho * FP.FromString("1.777777");
+            FP vOrtho = Constants._3_50;
+            FP xOrtho = vOrtho * Constants.SixteenOverNine;
             FPVector2 newCameraPosition = camera->CurrentPosition;
 
             // Lagging camera movements
@@ -64,7 +64,7 @@ namespace Quantum {
             FP playerHeight = filter.Collider->Shape.Box.Extents.Y * 2;
             FP cameraTop = newCameraPosition.Y + vOrtho;
             FP cameraTopDistanceToPlayer = cameraTop - (camera->LastPlayerPosition.Y + playerHeight);
-            FP cameraTopMinDistance = (FP.FromString("2.5") / 7) * vOrtho;
+            FP cameraTopMinDistance = (FP._5 / 14) * vOrtho;
 
             if (cameraTopDistanceToPlayer < cameraTopMinDistance) {
                 newCameraPosition.Y += (cameraTopMinDistance - cameraTopDistanceToPlayer);
@@ -100,8 +100,8 @@ namespace Quantum {
         }
 
         public static FPVector2 Clamp(VersusStageData stage, FPVector2 position) {
-            FP vOrtho = FP.FromString("3.5");
-            FP xOrtho = vOrtho * FP.FromString("1.777777");
+            FP vOrtho = Constants._3_50;
+            FP xOrtho = vOrtho * Constants.SixteenOverNine;
 
             // Clamping to within level bounds
             FPVector2 cameraMin = stage.CameraMinPosition;

@@ -6,6 +6,8 @@ using static Quantum.InteractionSystem;
 namespace Quantum {
     public partial class FrameContextUser {
 
+        public PhysicsContact[] ContactBuffer = new PhysicsContact[32];
+
         public int EntityPlayerMask;
         public List<FPVector2> CullingCameraPositions = new();
         public FP MaxCameraOrthoSize = 7;

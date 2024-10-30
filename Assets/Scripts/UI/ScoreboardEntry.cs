@@ -1,5 +1,7 @@
 using NSMB.Utils;
 using Quantum;
+using System.Drawing.Drawing2D;
+using System.Net.NetworkInformation;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -16,16 +18,25 @@ public class ScoreboardEntry : MonoBehaviour {
 
     //---Private Variables
     private ScoreboardUpdater updater;
+    private string nickname = "noname";
+    private bool isValidPlayer;
 
     public void Start() {
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
     }
 
-    public void Initialize(Frame f, EntityRef target, ScoreboardUpdater updater) {
+    public unsafe void Initialize(Frame f, EntityRef target, ScoreboardUpdater updater) {
         Target = target;
         this.updater = updater;
 
+        if (f.Unsafe.TryGetPointer(target, out MarioPlayer* mario)) {
+            RuntimePlayer runtimeData = f.GetPlayerData(mario->PlayerRef);
+            if (runtimeData != null) {
+                nickname = runtimeData.PlayerNickname;
+                isValidPlayer = true;
+            }
+        }
         UpdateEntry(f);
         gameObject.SetActive(true);
     }
@@ -38,12 +49,8 @@ public class ScoreboardEntry : MonoBehaviour {
         var mario = f.Unsafe.GetPointer<MarioPlayer>(Target);
         var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
 
-        if (playerData == null) {
-            return;
-        }
-
-        RuntimePlayer runtimeData = f.GetPlayerData(mario->PlayerRef);
-        nicknameText.text = Utils.GetPingSymbol(playerData->Ping) + runtimeData.PlayerNickname.ToValidUsername();
+        int ping = playerData != null ? playerData->Ping : (isValidPlayer ? -1 : 0);
+        nicknameText.text = Utils.GetPingSymbol(ping) + nickname.ToValidUsername();
 
         StringBuilder scoreBuilder = new();
         if (f.Global->Rules.IsLivesEnabled) {

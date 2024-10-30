@@ -1,4 +1,3 @@
-using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
 
@@ -8,11 +7,19 @@ public unsafe class WrappingEntityView : QuantumEntityView {
     private VersusStageData stage;
 
     protected override void ApplyTransform(ref UpdatePositionParameter param) {
+        float previousZ = transform.position.z;
+
+        base.ApplyTransform(ref param);
+
+        Vector3 newPosition = transform.position;
+        newPosition.z = previousZ;
+        transform.position = newPosition;
+        /*
         Frame f = Game.Frames.Predicted;
         if (!stage) {
             stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(f.Map.UserAsset);
         }
-
+        Frame fpup = Game.Frames.PreviousUpdatePredicted;
         Frame fp = Game.Frames.PredictedPrevious;
         if (!fp.Has<Transform2D>(EntityRef)
             || !fp.Has<Transform2D>(EntityRef)) {
@@ -21,9 +28,7 @@ public unsafe class WrappingEntityView : QuantumEntityView {
 
         // TODO: FIX ME DADDY!!
         FPVector2 previousPosition = fp.Unsafe.GetPointer<Transform2D>(EntityRef)->Position;
-        FPVector2 targetPosition = f.Unsafe.GetPointer<Transform2D>(EntityRef)->Position + param.ErrorVisualVector.ToFPVector2();
-
-        //Debug.Log(param.ErrorVisualVector);
+        FPVector2 targetPosition = f.Unsafe.GetPointer<Transform2D>(EntityRef)->Position;
 
         QuantumUtils.UnwrapWorldLocations(stage, previousPosition, targetPosition, out FPVector2 oldUnwrapped, out FPVector2 newUnwrapped);
         FPVector2 change = newUnwrapped - oldUnwrapped;
@@ -40,6 +45,7 @@ public unsafe class WrappingEntityView : QuantumEntityView {
         Vector3 unityResult = result.ToUnityVector3();
         unityResult.z = transform.position.z;
         transform.position = unityResult;
+        */
     }
 
     public void OnDrawGizmosSelected() {

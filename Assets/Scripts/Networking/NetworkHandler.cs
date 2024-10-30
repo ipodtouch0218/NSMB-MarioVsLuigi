@@ -220,6 +220,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         Runner.Game.AddPlayer(new RuntimePlayer {
             PlayerNickname = Settings.Instance.generalNickname,
             UserId = Guid.Parse(Client.UserId),
+            UseColoredNickname = Settings.Instance.generalUseNicknameColor,
         });
 
         GlobalController.Instance.connecting.SetActive(false);

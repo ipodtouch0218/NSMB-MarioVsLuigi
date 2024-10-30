@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.Loading;
 using NSMB.Utils;
 using Quantum;
 using System.Linq;
@@ -51,8 +52,15 @@ public class MusicManager : MonoBehaviour {
             }
             playerCount++;
 
-            if (!game.PlayerIsLocal(mario->PlayerRef)
-                && !PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity)) {
+            bool isSpectateTarget = false;
+            foreach (var playerElement in PlayerElements.AllPlayerElements) {
+                if (playerElement.Entity == entity) {
+                    isSpectateTarget = true;
+                    break;
+                }
+            }
+
+            if (!game.PlayerIsLocal(mario->PlayerRef) && !isSpectateTarget) {
                 continue;
             }
 

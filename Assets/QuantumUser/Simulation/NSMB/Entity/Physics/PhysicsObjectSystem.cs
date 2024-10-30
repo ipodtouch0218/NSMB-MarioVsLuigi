@@ -2,7 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
-using UnityEditor.SceneManagement;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace Quantum {
@@ -176,12 +176,11 @@ namespace Quantum {
                         StageTile tile = f.FindAsset(tileInstance.Tile);
                         FPVector2[][] polygons = tileInstance.GetWorldPolygons(tile, worldPos);
                         foreach (FPVector2[] polygon in polygons) {
-                            HashSet<PhysicsContact> polygonContacts = LineSweepPolygonIntersection(
-                                leftWorldCheckPoint,
-                                rightWorldCheckPoint, directionVector, polygon, tile.IsPolygon);
+                            int polygonContacts = LineSweepPolygonIntersection(f.Context.ContactBuffer,
+                                leftWorldCheckPoint, rightWorldCheckPoint, directionVector, polygon, tile.IsPolygon);
 
-                            foreach (var contact in polygonContacts) {
-                                PhysicsContact newContact = contact;
+                            for (int i = 0; i < polygonContacts; i++) {
+                                PhysicsContact newContact = f.Context.ContactBuffer[i];
                                 newContact.Frame = f.Number;
                                 newContact.TileX = tilePos.x;
                                 newContact.TileY = tilePos.y;
@@ -354,11 +353,11 @@ namespace Quantum {
                         Vector2Int tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
                         FPVector2[][] polygons = tile.GetWorldPolygons(f, out StageTile stageTile, worldPos);
                         foreach (FPVector2[] polygon in polygons) {
-                            HashSet<PhysicsContact> polygonContacts = LineSweepPolygonIntersection(bottomWorldCheckPoint,
+                            int polygonContacts = LineSweepPolygonIntersection(f.Context.ContactBuffer, bottomWorldCheckPoint,
                                 topWorldCheckPoint, directionVector, polygon, stageTile.IsPolygon);
 
-                            foreach (var contact in polygonContacts) {
-                                PhysicsContact newContact = contact;
+                            for (int i = 0; i < polygonContacts; i++) {
+                                PhysicsContact newContact = f.Context.ContactBuffer[i];
                                 newContact.TileX = tilePos.x;
                                 newContact.TileY = tilePos.y;
 
@@ -580,7 +579,7 @@ namespace Quantum {
             return contact.Distance > 0 && contact.Distance <= maxDistance;
         }
 
-        private static HashSet<PhysicsContact> LineSweepPolygonIntersection(FPVector2 a, FPVector2 b, FPVector2 direction, FPVector2[] polygon, bool isPolygon) {
+        private static int LineSweepPolygonIntersection(PhysicsContact[] contactBuffer, FPVector2 a, FPVector2 b, FPVector2 direction, FPVector2[] polygon, bool isPolygon) {
             if (polygon.Length <= 1) {
                 throw new ArgumentException("Polygon must have at least 2 points!");
             }
@@ -589,19 +588,18 @@ namespace Quantum {
                 (a, b) = (b, a);
             }
 
-            // TODO change to nonalloc-ing
-            HashSet<PhysicsContact> possibleContacts = new();
+            int count = 0;
 
             // Raycast in the direction for both a and b first
             if (TryRayPolygonIntersection(a, direction, polygon, isPolygon, out var contact)) {
                 if (FPVector2.Dot(contact.Normal, (b - contact.Position).Normalized) > 0) {
-                    possibleContacts.Add(contact);
+                    contactBuffer[count++] = contact;
                 }
             }
 
             if (TryRayPolygonIntersection(b, direction, polygon, isPolygon, out contact)) {
                 if (FPVector2.Dot(contact.Normal, (a - contact.Position).Normalized) > 0) {
-                    possibleContacts.Add(contact);
+                    contactBuffer[count++] = contact;
                 }
             }
 
@@ -629,11 +627,11 @@ namespace Quantum {
 
                 if (valid) {
                     contact.Normal *= -1; // Inverted normals
-                    possibleContacts.Add(contact);
+                    contactBuffer[count++] = contact;
                 }
             }
 
-            return possibleContacts;
+            return count;
         }
 
         private static FPVector2 GetNormal(FPVector2 a, FPVector2 b) {

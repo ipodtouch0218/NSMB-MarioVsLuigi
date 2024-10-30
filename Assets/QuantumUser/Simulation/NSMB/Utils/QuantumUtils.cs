@@ -353,10 +353,10 @@ public static unsafe class QuantumUtils {
     }
 
     public static FPVector2 SmoothDamp(FPVector2 current, FPVector2 target, ref FPVector2 currentVelocity, FP smoothTime, FP maxSpeed, FP deltaTime) {
-        smoothTime = FPMath.Max(FP.FromString("0.0001"), smoothTime);
+        smoothTime = FPMath.Max(Constants._0_0001, smoothTime);
         FP num = 2 / smoothTime;
         FP num2 = num * deltaTime;
-        FP num3 = (FP) 1 / (1 + num2 + FP.FromString("0.48") * num2 * num2 + FP.FromString("0.235") * num2 * num2 * num2);
+        FP num3 = (FP) 1 / (1 + num2 + Constants._0_48 * num2 * num2 + Constants._0_235 * num2 * num2 * num2);
         FP num4 = current.X - target.X;
         FP num5 = current.Y - target.Y;
         FPVector2 vector = target;

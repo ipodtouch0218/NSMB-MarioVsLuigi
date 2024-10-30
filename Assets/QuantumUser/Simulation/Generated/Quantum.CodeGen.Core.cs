@@ -1450,20 +1450,30 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Interactable : Quantum.IComponent {
-    public const Int32 SIZE = 4;
-    public const Int32 ALIGNMENT = 4;
+    public const Int32 SIZE = 24;
+    public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public QBoolean ColliderDisabled;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
+    public PhysicsQueryRef OverlapQueryRef;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public PhysicsQueryRef OverlapLevelSeamQueryRef;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 2039;
         hash = hash * 31 + ColliderDisabled.GetHashCode();
+        hash = hash * 31 + OverlapQueryRef.GetHashCode();
+        hash = hash * 31 + OverlapLevelSeamQueryRef.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Interactable*)ptr;
         QBoolean.Serialize(&p->ColliderDisabled, serializer);
+        PhysicsQueryRef.Serialize(&p->OverlapLevelSeamQueryRef, serializer);
+        PhysicsQueryRef.Serialize(&p->OverlapQueryRef, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -2524,6 +2534,109 @@ namespace Quantum {
   }
   public static unsafe partial class Constants {
     public const Int32 maxplayers = 10;
+    /// <summary>3.5</summary>
+    public static FP _3_50 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 229376;
+        return result;
+      }
+    }
+    /// <summary>1.77777</summary>
+    public static FP SixteenOverNine {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 116508;
+        return result;
+      }
+    }
+    /// <summary>2.5</summary>
+    public static FP _2_50 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 163840;
+        return result;
+      }
+    }
+    /// <summary>0.85</summary>
+    public static FP _0_85 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 55706;
+        return result;
+      }
+    }
+    /// <summary>-0.03047</summary>
+    public static FP WeirdSlopeConstant {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = -1997;
+        return result;
+      }
+    }
+    /// <summary>0.9</summary>
+    public static FP _0_90 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 58982;
+        return result;
+      }
+    }
+    /// <summary>0.175</summary>
+    public static FP _0_175 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 11469;
+        return result;
+      }
+    }
+    /// <summary>0.0001</summary>
+    public static FP _0_0001 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 7;
+        return result;
+      }
+    }
+    /// <summary>0.48</summary>
+    public static FP _0_48 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 31457;
+        return result;
+      }
+    }
+    /// <summary>0.235</summary>
+    public static FP _0_235 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 15401;
+        return result;
+      }
+    }
+
+    public static unsafe partial class Raw {
+      /// <summary>3.5</summary>
+      public const Int64 _3_50 = 229376;
+      /// <summary>1.77777</summary>
+      public const Int64 SixteenOverNine = 116508;
+      /// <summary>2.5</summary>
+      public const Int64 _2_50 = 163840;
+      /// <summary>0.85</summary>
+      public const Int64 _0_85 = 55706;
+      /// <summary>-0.03047</summary>
+      public const Int64 WeirdSlopeConstant = -1997;
+      /// <summary>0.9</summary>
+      public const Int64 _0_90 = 58982;
+      /// <summary>0.175</summary>
+      public const Int64 _0_175 = 11469;
+      /// <summary>0.0001</summary>
+      public const Int64 _0_0001 = 7;
+      /// <summary>0.48</summary>
+      public const Int64 _0_48 = 31457;
+      /// <summary>0.235</summary>
+      public const Int64 _0_235 = 15401;
+    }
   }
   public unsafe partial class Frame {
     private ISignalOnMarioPlayerCollectedStar[] _ISignalOnMarioPlayerCollectedStarSystems;

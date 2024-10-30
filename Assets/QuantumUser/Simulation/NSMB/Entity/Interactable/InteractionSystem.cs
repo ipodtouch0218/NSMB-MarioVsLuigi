@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using Quantum.Physics2D;
 using System;
 
 namespace Quantum {
@@ -36,24 +37,16 @@ namespace Quantum {
             var transform = filter.Transform;
 
             // Collide with hitboxes
-            var hits = f.Physics2D.OverlapShape(*transform, shape);
-
-            FP center = transform->Position.X + shape.Centroid.X;
-            if (center - shape.Box.Extents.X < stage.StageWorldMin.X) {
-                // Left edge
-                Transform2D transformCopy = *transform;
-                transformCopy.Position.X += stage.TileDimensions.x / (FP) 2;
-                f.Physics2D.OverlapShape(&hits, transformCopy, shape);
-
-            } else if (center + shape.Box.Extents.X > stage.StageWorldMax.X) {
-                // Right edge
-                Transform2D transformCopy = *transform;
-                transformCopy.Position.X -= stage.TileDimensions.x / (FP) 2;
-                f.Physics2D.OverlapShape(&hits, transformCopy, shape);
+            if (f.Physics2D.TryGetQueryHits(interactable->OverlapQueryRef, out HitCollection hits)) {
+                for (int i = 0; i < hits.Count; i++) {
+                    TryCollideWithEntity(f, entity, hits[i].Entity);
+                }
             }
 
-            for (int i = 0; i < hits.Count; i++) {
-                TryCollideWithEntity(f, entity, hits[i].Entity);
+            if (f.Physics2D.TryGetQueryHits(interactable->OverlapQueryRef, out hits)) {
+                for (int i = 0; i < hits.Count; i++) {
+                    TryCollideWithEntity(f, entity, hits[i].Entity);
+                }
             }
 
             // Collide with physical objects

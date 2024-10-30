@@ -11,6 +11,7 @@ namespace Quantum {
             f.Global->Rules = f.SimulationConfig.DefaultRules;
             if (!config.IsRealGame) {
                 f.Global->GameState = GameState.WaitingForPlayers;
+                f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
             }
         }
 
@@ -150,7 +151,7 @@ namespace Quantum {
                         if (f.IsVerified) {
                             f.MapAssetRef = f.Global->Rules.Level;
                         }
-                        f.Global->PlayerLoadFrames = (ushort) (25 * f.UpdateRate);
+                        f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
                         f.Global->GameState = GameState.WaitingForPlayers;
                         f.Events.GameStateChanged(f, GameState.WaitingForPlayers);
                     } else if (f.Global->GameStartFrames % 60 == 0) {
@@ -192,7 +193,7 @@ namespace Quantum {
                     break;
                 }
 
-                if (!f.RuntimeConfig.IsRealGame || allPlayersLoaded) {
+                if (QuantumUtils.Decrement(ref f.Global->PlayerLoadFrames) || !f.RuntimeConfig.IsRealGame || allPlayersLoaded) {
                     // Progress to next stage.
                     f.Global->GameState = GameState.Starting;
                     f.Global->GameStartFrames = 3 * 60 + 120;
@@ -200,8 +201,6 @@ namespace Quantum {
 
                     f.Signals.OnLoadingComplete();
                     f.Events.GameStateChanged(f, GameState.Starting);
-                } else {
-                    // TODO Time out if players don't send a "ready" command in time
                 }
                 break;
             case GameState.Starting:
@@ -411,6 +410,12 @@ namespace Quantum {
 
             var playerDatas = f.Filter<PlayerData>();
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                if (!data->IsLoaded) {
+                    // Force spectator, didn't load in time
+                    data->IsSpectator = true;
+                    continue;
+                }
+
                 if (data->IsSpectator) {
                     continue;
                 }
@@ -428,14 +433,16 @@ namespace Quantum {
             }
 
             // Assign random spawnpoints
+            f.Global->TotalMarios = (byte) f.ComponentCount<MarioPlayer>();
             List<int> spawnpoints = Enumerable.Range(0, f.ComponentCount<MarioPlayer>()).ToList();
             var allMarios = f.Filter<MarioPlayer>();
-            while (allMarios.NextUnsafe(out _, out MarioPlayer* mario)) {
+            while (allMarios.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
                 int randomIndex = FPMath.FloorToInt(f.RNG->Next() * spawnpoints.Count);
                 mario->SpawnpointIndex = (byte) spawnpoints[randomIndex];
                 spawnpoints.RemoveAt(randomIndex);
 
-                f.Global->TotalMarios++;
+                var camera = f.Unsafe.GetPointer<CameraController>(entity);
+                camera->Recenter(stage, stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios));
             }
         }
 

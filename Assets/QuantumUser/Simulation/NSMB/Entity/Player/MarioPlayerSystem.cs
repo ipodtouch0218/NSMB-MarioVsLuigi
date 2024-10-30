@@ -212,7 +212,7 @@ namespace Quantum {
                         }
                     } else {
                         // TODO: change 0.85 to a constant?
-                        acc = physics.WalkAcceleration[0] * FP.FromString("0.85");
+                        acc = physics.WalkAcceleration[0] * Constants._0_85;
                     }
                 } else {
                     mario->SlowTurnaroundFrames = 0;
@@ -277,7 +277,7 @@ namespace Quantum {
             bool wasInShell = mario->IsInShell;
             mario->IsInShell |= mario->CurrentPowerupState == PowerupState.BlueShell && !mario->IsSliding && physicsObject->IsTouchingGround
                                 && run && !mario->HeldEntity.IsValid
-                                && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * FP.FromString("0.9")
+                                && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * Constants._0_90
                                 && (physicsObject->Velocity.X > 0) == mario->FacingRight;
 
             mario->IsCrouching &= !mario->IsSliding;
@@ -289,7 +289,7 @@ namespace Quantum {
 
         private static FP CalculateSlopeMaxSpeedOffset(FP floorAngle) {
             // TODO remove magic constant
-            return FP.FromString("-0.0304687") * floorAngle;
+            return Constants.WeirdSlopeConstant * floorAngle;
         }
 
         private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
@@ -325,7 +325,8 @@ namespace Quantum {
                 return;
             }
 
-            if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75 && !f.Exists(mario->HeldEntity)) {
+            if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
+                && !f.Exists(mario->HeldEntity) && !mario->IsInShell) {
                 // Jump of spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
                 spinner->PlatformWaitFrames = 6;
@@ -1290,7 +1291,7 @@ namespace Quantum {
                 newHeight *= mario->CurrentPowerupState <= PowerupState.MiniMushroom ? FP._0_75 : FP._0_50;
             }
 
-            FPVector2 newExtents = new(FP.FromString("0.175"), newHeight / 2);
+            FPVector2 newExtents = new(Constants._0_175, newHeight / 2);
             if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                 newExtents /= 2;
             }
@@ -1303,7 +1304,7 @@ namespace Quantum {
             } else if (mario->MegaMushroomFrames > 0) {
                 megaPercentage = 1;
             }
-            newExtents *= FPMath.Lerp(1, FP.FromString("3.5"), megaPercentage);
+            newExtents *= FPMath.Lerp(1, Constants._3_50, megaPercentage);
 
             collider->Shape.Box.Extents = newExtents;
             collider->Shape.Centroid = FPVector2.Up * newExtents.Y;

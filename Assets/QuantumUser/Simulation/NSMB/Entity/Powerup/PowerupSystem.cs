@@ -2,7 +2,11 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadFilter<PowerupSystem.Filter>, ISignalOnTrigger2D, ISignalOnEntityBumped {
+    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnTrigger2D, ISignalOnEntityBumped {
+
+        private static readonly FP CameraYOffset = FP.FromString("1.68");
+        private static readonly FP BumpForce = FP.FromString("5.5");
+
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -11,7 +15,7 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var powerup = filter.Powerup;
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
@@ -22,7 +26,7 @@ namespace Quantum {
                 var marioCamera = f.Unsafe.GetPointer<CameraController>(powerup->ParentMarioPlayer);
 
                 // TODO magic value
-                transform->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + FP.FromString("1.68"));
+                transform->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + CameraYOffset);
 
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                     powerup->ParentMarioPlayer = EntityRef.None;
@@ -71,7 +75,7 @@ namespace Quantum {
                 FP? closestDistance = null;
                 var allPlayers = f.Filter<Transform2D, MarioPlayer>();
                 while (allPlayers.Next(out _, out Transform2D marioTransform, out _)) {
-                    FP distance = QuantumUtils.WrappedDistance(f, marioTransform.Position, transform->Position);
+                    FP distance = QuantumUtils.WrappedDistance(stage, marioTransform.Position, transform->Position);
                     if (closestDistance == null || distance < closestDistance) {
                         closestMarioPosition = marioTransform.Position;
                         closestDistance = distance;
@@ -79,7 +83,7 @@ namespace Quantum {
                 }
 
                 if (closestMarioPosition.HasValue) {
-                    powerup->FacingRight = QuantumUtils.WrappedDirectionSign(f, closestMarioPosition.Value, transform->Position) == -1;
+                    powerup->FacingRight = QuantumUtils.WrappedDirectionSign(stage, closestMarioPosition.Value, transform->Position) == -1;
                 }
             }
 
@@ -95,7 +99,7 @@ namespace Quantum {
 
             if (powerup->SpawnAnimationFrames == 0 && physicsObject->DisableCollision) {
                 // Test that we're not in a wall anymore
-                if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.Collider->Shape)) {
+                if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.Collider->Shape, stage: stage)) {
                     physicsObject->DisableCollision = false;
                 }
             }
@@ -273,7 +277,7 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
                 f.FindAsset(powerup->Scriptable).Speed * (ourPos.X > theirPos.X ? 1 : -1),
-                FP.FromString("5.5")
+                BumpForce
             );
             physicsObject->IsTouchingGround = false;
             powerup->FacingRight = ourPos.X > theirPos.X;

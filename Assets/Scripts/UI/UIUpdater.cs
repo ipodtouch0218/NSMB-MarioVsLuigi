@@ -101,7 +101,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
 
     public override void OnUpdateView(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        UpdateTrackIcons(f);
+        //UpdateTrackIcons(f);
 
         if (!Target.IsValid
             || !f.TryGet(Target, out MarioPlayer mario)) {
@@ -139,6 +139,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
         }
     }
 
+    /*
     private void UpdateTrackIcons(Frame f) {
         HashSet<EntityRef> validEntities = new();
 
@@ -148,6 +149,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
         }
 
     }
+    */
 
     private unsafe void ToggleUI(Frame f, bool hidden) {
         uiHidden = hidden;
