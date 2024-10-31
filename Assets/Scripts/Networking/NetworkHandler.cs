@@ -87,13 +87,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     public IEnumerator PingUpdateCoroutine() {
         WaitForSeconds seconds = new(1);
+        CommandUpdatePing pingCommand = new();
         while (true) {
             QuantumGame game;
             if (Runner && (game = Runner.Game) != null) {
+                pingCommand.PingMs = (int) Ping.Value;
                 foreach (int slot in game.GetLocalPlayerSlots()) {
-                    Runner.Game.SendCommand(slot, new CommandUpdatePing {
-                        PingMs = (int) Ping.Value,
-                    });
+                    game.SendCommand(slot, pingCommand);
                 }
             }
             yield return seconds;

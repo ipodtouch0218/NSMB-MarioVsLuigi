@@ -5,22 +5,33 @@ namespace Quantum {
     [Serializable]
     public unsafe partial struct StageTileInstance {
 
-        public FPVector2[][] GetWorldPolygons(Frame f, out StageTile tile, FPVector2? worldPos = null) {
-            return GetWorldPolygons(tile = f.FindAsset(Tile), worldPos ?? FPVector2.Zero);
+        public bool HasWorldPolygons(Frame f) {
+            return HasWorldPolygons(f.FindAsset(Tile));
         }
 
-        public FPVector2[][] GetWorldPolygons(StageTile stageTile, FPVector2? worldPos = null) {
+        public bool HasWorldPolygons(StageTile stageTile) {
+            return stageTile != null && stageTile.CollisionData.Shapes != null && stageTile.CollisionData.Shapes.Length > 0;
+        }
+
+        public void GetWorldPolygons(Frame f, FPVector2[] vertexBuffer, int[] shapeVertexCountBuffer, out StageTile tile, FPVector2? worldPos = null) {
+            GetWorldPolygons(tile = f.FindAsset(Tile), vertexBuffer, shapeVertexCountBuffer, worldPos ?? FPVector2.Zero);
+        }
+
+        public void GetWorldPolygons(StageTile stageTile, FPVector2[] vertexBuffer, int[] shapeVertexCountBuffer, FPVector2? worldPos = null) {
             if (!stageTile || stageTile.CollisionData.Shapes == null) {
-                return Array.Empty<FPVector2[]>();
+                shapeVertexCountBuffer[0] = 0;
+                return;
             }
 
             worldPos ??= FPVector2.Zero;
-            FPVector2[][] polygons = new FPVector2[stageTile.CollisionData.Shapes.Length][];
 
-            for (int shape = 0; shape < polygons.Length; shape++) {
-                polygons[shape] = new FPVector2[stageTile.CollisionData.Shapes[shape].Vertices.Length];
+            var polygons = stageTile.CollisionData.Shapes;
+            int vertexIndex = 0;
 
-                int shapePointCount = polygons[shape].Length;
+            for (int shapeIndex = 0; shapeIndex < polygons.Length; shapeIndex++) {
+                int shapePointCount = polygons[shapeIndex].Vertices.Length;
+                shapeVertexCountBuffer[shapeIndex] = shapePointCount;
+
                 for (int point = 0; point < shapePointCount; point++) {
                     int index = point;
                     if (Scale.X < 0 ^ Scale.Y < 0) {
@@ -29,18 +40,17 @@ namespace Quantum {
                         index = shapePointCount - point - 1;
                     }
 
-                    FPVector2 p = stageTile.CollisionData.Shapes[shape].Vertices[index];
+                    FPVector2 p = stageTile.CollisionData.Shapes[shapeIndex].Vertices[index];
                     // Scale
                     p = FPVector2.Scale(p, Scale) / 2;
                     // Rotate
                     p = RotateAroundOrigin(p, Rotation);
                     // Translate
                     p += worldPos.Value;
-                    polygons[shape][point] = p;
+
+                    vertexBuffer[vertexIndex++] = p;
                 }
             }
-
-            return polygons;
         }
 
         private static FPVector2 RotateAroundOrigin(FPVector2 point, FP rotationDegrees) {

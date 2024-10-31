@@ -130,8 +130,8 @@ public class GlobalController : Singleton<GlobalController> {
         }
 #endif
 
-        if ((int) (Time.time + Time.deltaTime) > (int) Time.time) {
-            // Update discord every second for now
+        if ((int) (Time.unscaledTime + Time.unscaledDeltaTime) > (int) Time.unscaledTime) {
+            // Update discord every second
             discordController.UpdateActivity();
         }
     }

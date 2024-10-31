@@ -46,7 +46,7 @@ namespace Quantum {
                 if (f.Unsafe.TryGetPointer(newPowerup, out Powerup* powerup)) {
                     // Launch if downwards bump and theres a (solid) block below us
                     StageTileInstance tileInstance = stage.GetTileRelative(f, blockBump->TileX, blockBump->TileY - 1);
-                    bool launch = blockBump->IsDownwards && tileInstance.GetWorldPolygons(f, out _).Length != 0;
+                    bool launch = blockBump->IsDownwards && tileInstance.HasWorldPolygons(f);
 
                     FP height = f.Unsafe.GetPointer<PhysicsCollider2D>(newPowerup)->Shape.Box.Extents.Y * 2;
                     FPVector2 origin = filter.Transform->Position + FPVector2.Down * FP._0_25;

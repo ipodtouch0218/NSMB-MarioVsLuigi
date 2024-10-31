@@ -1,10 +1,14 @@
 using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
-using System.Linq;
+using System;
 using UnityEngine;
 
 public class VersusStageGizmos : MonoBehaviour {
+
+    private static readonly Vector3[] UnityVertexBuffer = new Vector3[128];
+    private static readonly FPVector2[] VertexBuffer = new FPVector2[128];
+    private static readonly int[] ShapeVertexCountBuffer = new int[16];
 
     //---Serialized
     [SerializeField] private QuantumMapData mapData;
@@ -48,20 +52,29 @@ public class VersusStageGizmos : MonoBehaviour {
                 if (stage.TileData.Length <= (x + y * stage.TileDimensions.x)) {
                     break;
                 }
-                StageTileInstance ti = stage.TileData[x + y * stage.TileDimensions.x];
-                StageTile t = QuantumUnityDB.GetGlobalAsset(ti.Tile);
-                if (!t) {
+                StageTileInstance tile = stage.TileData[x + y * stage.TileDimensions.x];
+                StageTile stageTile = QuantumUnityDB.GetGlobalAsset(tile.Tile);
+                if (!stageTile) {
                     continue;
                 }
-                FPVector2 worldPos = new FPVector2(((FP) x + stage.TileOrigin.x) / 2, ((FP) y + stage.TileOrigin.y) / 2) + stage.TilemapWorldPosition + (FPVector2.One / 4);
-                FPVector2[][] polygons = ti.GetWorldPolygons(t, worldPos);
+                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y));
+                tile.GetWorldPolygons(stageTile, VertexBuffer, ShapeVertexCountBuffer, worldPos);
 
-                foreach (FPVector2[] polygon in polygons) {
-                    Gizmos.DrawLineStrip(polygon.Select(point => point.ToUnityVector3()).ToArray(), t.IsPolygon);
+                int shapeIndex = 0;
+                int vertexIndex = 0;
+                int shapeVertexCount;
+                while ((shapeVertexCount = ShapeVertexCountBuffer[shapeIndex++]) > 0) {
+                    for (int i = 0; i < shapeVertexCount; i++) {
+                        UnityVertexBuffer[i] = VertexBuffer[vertexIndex + i].ToUnityVector3();
+                    }
+
+                    Gizmos.DrawLineStrip(UnityVertexBuffer.AsSpan(0, shapeVertexCount), stageTile.IsPolygon);
+                    vertexIndex += shapeVertexCount;
                 }
-                if (t is CoinTile) {
+
+                if (stageTile is CoinTile) {
                     Gizmos.DrawIcon(worldPos.ToUnityVector3(), "Coin");
-                } else if (t is PowerupTile) {
+                } else if (stageTile is PowerupTile) {
                     Gizmos.DrawIcon(worldPos.ToUnityVector3(), "Powerup");
                 }
             }

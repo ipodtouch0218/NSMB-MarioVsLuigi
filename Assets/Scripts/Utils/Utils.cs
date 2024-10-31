@@ -155,18 +155,23 @@ namespace NSMB.Utils {
             }
 
             // Then id based color
-            List<PlayerData> players = new();
+            PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
+            int ourIndex = 0;
+            int totalPlayers = 0;
+
             var playerFilter = f.Filter<PlayerData>();
             while (playerFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
                 if (otherPlayerData->IsSpectator) {
                     continue;
                 }
 
-                players.Add(*otherPlayerData);
+                totalPlayers++;
+                if (otherPlayerData->JoinTick < ourPlayerData->JoinTick) {
+                    ourIndex++;
+                }
             }
-            int ourIndex = players.OrderBy(pd => pd.JoinTick).IndexOf(pd => pd.PlayerRef == player);
-            
-            return Color.HSVToRGB(ourIndex / (players.Count + 1f), s, v);
+
+            return Color.HSVToRGB(ourIndex / (totalPlayers + 1f), s, v);
         }
 
         public static Color GetTeamColor(Frame f, int team, float s = 1, float v = 1) {

@@ -5,6 +5,25 @@ namespace Quantum {
 
         public StageTileInstance[] StageTiles;
 
+        /* IDK if this is valid
+        private AssetRef<Map> cachedMap;
+        private VersusStageData cachedUserAsset;
+        public VersusStageData StageAsset {
+            get {
+                if (!MapAssetRef.Equals(cachedMap)) {
+                    cachedMap = MapAssetRef;
+                    if (Map == null) {
+                        cachedUserAsset = null;
+                    } else {
+                        cachedUserAsset = FindAsset<VersusStageData>(Map.UserAsset);
+                    }
+                }
+
+                return cachedUserAsset;
+            }
+        }
+        */
+
         partial void InitUser() {
             StageTiles = Array.Empty<StageTileInstance>();
         }

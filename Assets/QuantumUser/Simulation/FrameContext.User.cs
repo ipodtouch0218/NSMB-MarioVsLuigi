@@ -6,7 +6,9 @@ using static Quantum.InteractionSystem;
 namespace Quantum {
     public partial class FrameContextUser {
 
-        public PhysicsContact[] ContactBuffer = new PhysicsContact[32];
+        public readonly PhysicsContact[] ContactBuffer = new PhysicsContact[32];
+        public readonly FPVector2[] VertexBuffer = new FPVector2[128];
+        public readonly int[] ShapeVertexCountBuffer = new int[16];
 
         public int EntityPlayerMask;
         public List<FPVector2> CullingCameraPositions = new();

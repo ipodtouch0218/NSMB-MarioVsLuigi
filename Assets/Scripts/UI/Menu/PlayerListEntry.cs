@@ -52,8 +52,8 @@ namespace NSMB.UI.MainMenu {
         public void Start() {
             nameText.color = NicknameColor.color;
 
-            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
-            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged, onlyIfActiveAndEnabled: true);
+            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
@@ -70,7 +70,7 @@ namespace NSMB.UI.MainMenu {
                 typingCounter = 0;
             }
 
-            UpdateText(e.Game.Frames.Predicted);
+            // UpdateText(e.Game.Frames.Predicted);
         }
 
         public unsafe void UpdateText(Frame f) {
