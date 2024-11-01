@@ -1,8 +1,6 @@
 ﻿namespace Quantum {
     public partial class SimulationConfig : AssetObject {
 
-        public Map LobbyMap;
-
         public StageTile InvisibleSolidTile;
 
         public PowerupAsset[] AllPowerups;

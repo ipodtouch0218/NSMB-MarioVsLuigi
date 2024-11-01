@@ -2533,7 +2533,6 @@ namespace Quantum {
     void OnTileChanged(Frame f, Int32 tileX, Int32 tileY, StageTileInstance newTile);
   }
   public static unsafe partial class Constants {
-    public const Int32 maxplayers = 10;
     /// <summary>3.5</summary>
     public static FP _3_50 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 

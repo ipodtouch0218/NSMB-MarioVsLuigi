@@ -1120,9 +1120,11 @@ namespace Quantum {
         throw new ArgumentException(nameof(previousSceneName));
       }
 
+      /*
       if (string.IsNullOrEmpty(newSceneName)) {
         throw new ArgumentException(nameof(newSceneName));
       }
+      */
 
       VerboseLog($"Switching scenes from {previousSceneName} to {newSceneName} (unloadFirst: {unloadFirst})");
 
@@ -1144,10 +1146,13 @@ namespace Quantum {
         }
 
         PublishCallback(_callbackUnitySceneLoadBegin, newSceneName);
-        yield return SceneManager.LoadSceneAsync(newSceneName, loadSceneMode);
-        var newScene = SceneManager.GetSceneByName(newSceneName);
-        if (newScene.IsValid()) {
-          SceneManager.SetActiveScene(newScene);
+        if (SceneUtility.GetBuildIndexByScenePath(newSceneName) != -1) {
+
+          yield return SceneManager.LoadSceneAsync(newSceneName, loadSceneMode);
+          var newScene = SceneManager.GetSceneByName(newSceneName);
+          if (newScene.IsValid()) {
+            SceneManager.SetActiveScene(newScene);
+          }
         }
 
         PublishCallback(_callbackUnitySceneLoadDone, newSceneName);
@@ -1208,7 +1213,7 @@ namespace Quantum {
       Debug.Assert(coroHost != null);
 
       string previousScene = _currentMap?.Scene ?? string.Empty;
-      string newScene = map.Scene;
+      string newScene = map?.Scene ?? string.Empty;
 
       bool isNewSceneLoaded = SceneManager.GetSceneByName(newScene).IsValid();
       if (isNewSceneLoaded) {
@@ -1229,14 +1234,14 @@ namespace Quantum {
       if (SceneManager.GetSceneByName(previousScene).IsValid()) {
         VerboseLog($"Previous scene \"{previousScene}\" was loaded, starting transition with mode {loadMode}");
         if (loadMode == SimulationConfig.AutoLoadSceneFromMapMode.LoadThenUnloadPreviousScene) {
-          _coroutine  = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: false));
+          _coroutine = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: false));
           _currentMap = map;
         } else if (loadMode == SimulationConfig.AutoLoadSceneFromMapMode.UnloadPreviousSceneThenLoad) {
-          _coroutine  = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: true));
+          _coroutine = coroHost.StartCoroutine(SwitchScene(previousScene, newScene, unloadFirst: true));
           _currentMap = map;
         } else {
           // legacy mode
-          _coroutine  = coroHost.StartCoroutine(UnloadScene(previousScene));
+          _coroutine = coroHost.StartCoroutine(UnloadScene(previousScene));
           _currentMap = null;
         }
       } else {

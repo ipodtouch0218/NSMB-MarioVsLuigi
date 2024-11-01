@@ -2,7 +2,6 @@ using NSMB.Extensions;
 using NSMB.Loading;
 using NSMB.Utils;
 using Quantum;
-using System.Linq;
 using UnityEngine;
 
 public class MusicManager : MonoBehaviour {
@@ -25,10 +24,21 @@ public class MusicManager : MonoBehaviour {
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+        LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
+    }
+
+    public void OnDestroy() {
+        LoadingCanvas.OnLoadingEnded -= OnLoadingEnded;
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
         HandleMusic(e.Game, false);
+    }
+
+    private void OnLoadingEnded(bool validPlayer) {
+        if (!validPlayer) {
+            HandleMusic(QuantumRunner.DefaultGame, true);
+        }
     }
 
     private unsafe void HandleMusic(QuantumGame game, bool force) {

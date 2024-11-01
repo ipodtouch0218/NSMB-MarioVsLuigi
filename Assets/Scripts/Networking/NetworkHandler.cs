@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using NSMB.UI.MainMenu;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -50,6 +51,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         realtimeClient.AddCallbackTarget(this);
 
         QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
@@ -266,6 +269,20 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 #endif
     }
 
+    private void OnGameStateChanged(EventGameStateChanged e) {
+        if (!Client.IsConnectedAndReady
+            || !Client.LocalPlayer.IsMasterClient) {
+            return;
+        }
+
+        BooleanProperties props = (int) Client.CurrentRoom.CustomProperties[Enums.NetRoomProperties.BoolProperties];
+        props.GameStarted = e.NewState != GameState.PreGameRoom;
+
+        Client.OpSetCustomPropertiesOfRoom(new Photon.Client.PhotonHashtable {
+            { Enums.NetRoomProperties.BoolProperties, (int) props }
+        });
+    }
+
     int initialFrame;
     byte[] initialFrameData;
     private void OnRecordingStarted(EventRecordingStarted e) {
@@ -307,6 +324,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         ReplayFrameCache.Clear();
         ReplayFrameCache.Add(arguments.FrameData);
         Runner = (QuantumRunner) await SessionRunner.StartAsync(arguments);
+    }
+
+    private unsafe void OnGameResynced(CallbackGameResynced e) {
+        if (e.Game.Frames.Verified.Global->GameState == GameState.Playing) {
+            Frame startFrame = e.Game.Frames.Verified;
+
+            e.Game.StartRecordingInput(startFrame.Number);
+            initialFrameData = startFrame.Serialize(DeterministicFrameSerializeMode.Serialize);
+            initialFrame = startFrame.Number;
+        }
     }
 
     private void OnSimulateFinished(CallbackSimulateFinished e) {

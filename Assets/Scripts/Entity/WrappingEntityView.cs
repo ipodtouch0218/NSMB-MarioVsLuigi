@@ -3,17 +3,21 @@ using UnityEngine;
 
 public unsafe class WrappingEntityView : QuantumEntityView {
 
+    /*
     //---Private Variables
     private VersusStageData stage;
+    */
 
     protected override void ApplyTransform(ref UpdatePositionParameter param) {
         float previousZ = transform.position.z;
+        Quaternion previousRotation = transform.rotation;
 
         base.ApplyTransform(ref param);
 
         Vector3 newPosition = transform.position;
         newPosition.z = previousZ;
-        transform.position = newPosition;
+        transform.SetPositionAndRotation(newPosition, previousRotation);
+
         /*
         Frame f = Game.Frames.Predicted;
         if (!stage) {

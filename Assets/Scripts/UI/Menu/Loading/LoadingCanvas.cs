@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,8 @@ using UnityEngine.UI;
 
 namespace NSMB.Loading {
     public class LoadingCanvas : MonoBehaviour {
+
+        public static event Action<bool> OnLoadingEnded;
 
         //---Serialized Variables
         [SerializeField] private AudioListener audioListener;
@@ -29,7 +32,8 @@ namespace NSMB.Loading {
         }
 
         public void Awake() {
-            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged, onlyIfActiveAndEnabled: true);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted, onlyIfActiveAndEnabled: true);
         }
 
         public unsafe void Initialize(QuantumGame game) {
@@ -78,6 +82,10 @@ namespace NSMB.Loading {
             //audioListener.enabled = true;
         }
 
+        private void OnGameStarted(CallbackGameStarted e) {
+            EndLoading(e.Game);
+        }
+
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.Starting) {
                 EndLoading(e.Game);
@@ -100,6 +108,8 @@ namespace NSMB.Loading {
 
             fadeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             //audioListener.enabled = false;
+
+            OnLoadingEnded?.Invoke(validPlayer);
         }
 
         public void EndAnimation() {

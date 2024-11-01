@@ -16,9 +16,13 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
+            if (!f.TryResolveDictionary(f.Global->PlayerDatas, out var playerDataDictionary)) {
+                return;
+            }
+
             // Ping command is always accepted
             for (int i = 0; i < f.PlayerCount; i++) {
-                var playerData = QuantumUtils.GetPlayerData(f, i);
+                var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
                 if (playerData != null) {
                     switch (f.GetPlayerCommand(i)) {
                     case CommandUpdatePing updatePing:
@@ -36,7 +40,7 @@ namespace Quantum {
             switch (f.Global->GameState) {
             case GameState.PreGameRoom:
                 for (int i = 0; i < f.PlayerCount; i++) {
-                    var playerData = QuantumUtils.GetPlayerData(f, i);
+                    var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
 
                     switch (f.GetPlayerCommand(i)) {
                     case CommandChangePlayerData changeData:
@@ -90,7 +94,7 @@ namespace Quantum {
                             // Only the host can give it to another player.
                             break;
                         }
-                        var newHostPlayerData = QuantumUtils.GetPlayerData(f, changeHost.NewHost);
+                        var newHostPlayerData = QuantumUtils.GetPlayerData(f, changeHost.NewHost, playerDataDictionary);
                         if (newHostPlayerData == null) {
                             return;
                         }
@@ -153,6 +157,7 @@ namespace Quantum {
                         }
                         f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
                         f.Global->GameState = GameState.WaitingForPlayers;
+
                         f.Events.GameStateChanged(f, GameState.WaitingForPlayers);
                     } else if (f.Global->GameStartFrames % 60 == 0) {
                         f.Events.CountdownTick(f, f.Global->GameStartFrames / 60);
@@ -162,7 +167,7 @@ namespace Quantum {
                 break;
             case GameState.WaitingForPlayers:
                 for (int i = 0; i < f.PlayerCount; i++) {
-                    var playerData = QuantumUtils.GetPlayerData(f, i);
+                    var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
                     if (f.GetPlayerCommand(i) is CommandPlayerLoaded) {
                         bool wasLoaded = playerData->IsLoaded;
                         playerData->IsLoaded = true;
@@ -239,8 +244,10 @@ namespace Quantum {
             case GameState.Ended:
                 if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                     // Move back to lobby.
+                    f.Global->TotalGamesPlayed++;
                     if (f.IsVerified) {
-                        f.MapAssetRef = f.SimulationConfig.LobbyMap;
+                        //f.MapAssetRef = f.SimulationConfig.LobbyMap;
+                        f.Map = null;
                     }
                     f.SystemEnable<GameplaySystemGroup>();
                     f.Signals.OnReturnToRoom();
@@ -330,7 +337,6 @@ namespace Quantum {
                 }
             }
 
-            f.Global->TotalGamesPlayed++;
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(f, GameState.Ended);
             f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);

@@ -54,8 +54,13 @@ namespace NSMB.UI.Pause {
             ControlSystem.controls.UI.Pause.performed -= OnPause;
         }
 
-        private void OnPause(InputAction.CallbackContext context) {
+        private unsafe void OnPause(InputAction.CallbackContext context) {
             if (isPaused || unpauseTime == Time.unscaledTime) {
+                return;
+            }
+
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (game != null && game.Frames.Predicted.Global->GameState != GameState.Playing) {
                 return;
             }
 

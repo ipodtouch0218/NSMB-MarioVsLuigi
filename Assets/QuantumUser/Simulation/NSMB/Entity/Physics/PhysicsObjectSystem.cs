@@ -1,9 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using Quantum.Physics2D;
 using System;
-using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace Quantum {
@@ -573,7 +570,7 @@ namespace Quantum {
                 }
 
                 StageTileInstance tile = stage.GetTileRelative(f, tilePosition.x, tilePosition.y);
-                tile.GetWorldPolygons(f, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, out StageTile stageTile, worldPos);
+                tile.GetWorldPolygons(f, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, out StageTile stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition));
 
                 int shapeIndex = 0;
                 int vertexIndex = 0;

@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum;
+using Quantum.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,9 +18,18 @@ public static unsafe class QuantumUtils {
         SoundEffect.Enemy_Shell_Combo7,
     };
 
-    public static unsafe PlayerData* GetPlayerData(Frame f, PlayerRef player) {
-        if (!f.TryResolveDictionary(f.Global->PlayerDatas, out var playerDataDictionary)
-            || !playerDataDictionary.TryGetValue(player, out EntityRef playerDataEntity)
+    public static unsafe PlayerData* GetPlayerData(Frame f, PlayerRef player, QDictionary<PlayerRef, EntityRef>? dictionary = default) {
+
+        QDictionary<PlayerRef, EntityRef> playerDataDictionary; 
+        if (dictionary == null) {
+            if (!f.TryResolveDictionary(f.Global->PlayerDatas, out playerDataDictionary)) {
+                return null;
+            }
+        } else {
+            playerDataDictionary = dictionary.Value;
+        }
+
+        if (!playerDataDictionary.TryGetValue(player, out EntityRef playerDataEntity)
             || !f.Unsafe.TryGetPointer(playerDataEntity, out PlayerData* data)) {
 
             return null;

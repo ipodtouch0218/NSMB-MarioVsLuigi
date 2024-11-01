@@ -109,6 +109,12 @@ public class PlayerElements : MonoBehaviour {
         if (!NetworkHandler.IsReplay) {
             spectationUI.SetActive(true);
         }
+
+        if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
+            GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
+        }
+
+        SpectateNextPlayer();
     }
 
     public void SpectateNextPlayer(InputAction.CallbackContext context) {

@@ -72,17 +72,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEnable() {
-            // Register callbacks
-            //PlayerData.OnPlayerDataReady += OnPlayerDataReady;
-            //PlayerData.OnPlayerDataDespawned += OnPlayerDataDespawned;
-            //NetworkHandler.OnLobbyConnect += OnLobbyConnect;
-            //NetworkHandler.OnShutdown += OnShutdown;
-            //NetworkHandler.OnDisconnectedFromServer += OnDisconnect;
-            //NetworkHandler.OnConnectFailed += OnConnectFailed;
-            //NetworkHandler.OnRegionPingsUpdated += OnRegionPingsUpdated;
-            //MvLSceneManager.OnSceneLoadStart += OnSceneLoadStart;
             NetworkHandler.StateChanged += OnClientStateChanged;
-
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -91,17 +81,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisable() {
-            // Unregister callbacks
-            //PlayerData.OnPlayerDataReady -= OnPlayerDataReady;
-            //PlayerData.OnPlayerDataDespawned -= OnPlayerDataDespawned;
-            //NetworkHandler.OnLobbyConnect -= OnLobbyConnect;
-            //NetworkHandler.OnShutdown -= OnShutdown;
-            //NetworkHandler.OnDisconnectedFromServer -= OnDisconnect;
-            //NetworkHandler.OnConnectFailed -= OnConnectFailed;
-            //NetworkHandler.OnRegionPingsUpdated -= OnRegionPingsUpdated;
-            //MvLSceneManager.OnSceneLoadStart -= OnSceneLoadStart;
             NetworkHandler.StateChanged -= OnClientStateChanged;
-
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
@@ -810,7 +790,7 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        private void OnGameStateChanged(EventGameStateChanged e) {
+        public void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.WaitingForPlayers) {
                 GameStart(e.Game);
             } else if (e.NewState == GameState.PreGameRoom) {
@@ -824,7 +804,6 @@ namespace NSMB.UI.MainMenu {
 
             if (NetworkHandler.IsReplay) {
                 GameStart(e.Game);
-                GlobalController.Instance.loadingCanvas.EndLoading(e.Game);
             }
         }
 
