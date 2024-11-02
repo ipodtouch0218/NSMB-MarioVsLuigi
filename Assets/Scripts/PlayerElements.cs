@@ -1,4 +1,5 @@
-﻿using NSMB.Extensions;
+﻿using NSMB.Entities.Player;
+using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
 using Quantum;
@@ -30,6 +31,7 @@ public class PlayerElements : MonoBehaviour {
 
     [SerializeField] private GameObject spectationUI;
     [SerializeField] private TMP_Text spectatingText;
+    [SerializeField] private PlayerNametag nametagPrefab;
 
     //---Private Variables
     private PlayerRef player;
@@ -68,14 +70,28 @@ public class PlayerElements : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
-    public void Initialize(Frame f, EntityRef entity, PlayerRef player) {
+    public void Initialize(QuantumGame game, Frame f, EntityRef entity, PlayerRef player) {
         this.player = player;
         this.entity = entity;
 
         Camera.transform.SetParent(null);
         Camera.transform.localScale = Vector3.one;
-        uiUpdater.Initialize(f);
+        uiUpdater.Initialize(game, f);
         scoreboardUpdater.Initialize();
+
+        foreach (var mario in MarioAnimator.AllMarioPlayers) {
+            MarioPlayerInitialized(game, f, mario);
+        }
+        MarioAnimator.MarioPlayerInitialized += MarioPlayerInitialized;
+    }
+
+    public void OnDestroy() {
+        MarioAnimator.MarioPlayerInitialized -= MarioPlayerInitialized;
+    }
+
+    private void MarioPlayerInitialized(QuantumGame game, Frame f, MarioAnimator mario) {
+        PlayerNametag newNametag = Instantiate(nametagPrefab, nametagPrefab.transform.parent);
+        newNametag.Initialize(game, f, this, mario);
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
@@ -90,6 +106,10 @@ public class PlayerElements : MonoBehaviour {
                 SpectateNextPlayer();
             }
         }
+    }
+
+    private void CreateNametags() {
+
     }
 
     public unsafe void UpdateSpectateUI() {

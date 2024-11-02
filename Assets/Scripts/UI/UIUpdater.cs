@@ -64,12 +64,12 @@ public unsafe class UIUpdater : QuantumCallbacks {
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
-    public void Initialize(Frame f) {
+    public void Initialize(QuantumGame game, Frame f) {
         // Add existing MarioPlayer icons
         MarioAnimator.AllMarioPlayers.RemoveWhere(ma => ma == null);
 
         foreach (MarioAnimator mario in MarioAnimator.AllMarioPlayers) {
-            OnMarioInitialized(f, mario);
+            OnMarioInitialized(game, f, mario);
         }
     }
 
@@ -119,11 +119,11 @@ public unsafe class UIUpdater : QuantumCallbacks {
         previousTarget = Target;
     }
 
-    private void OnMarioInitialized(Frame f, MarioAnimator mario) {
+    private void OnMarioInitialized(QuantumGame game, Frame f, MarioAnimator mario) {
         entityTrackIcons[mario] = CreateTrackIcon(f, mario.entity.EntityRef, mario.transform);
     }
 
-    private void OnMarioDestroyed(Frame f, MarioAnimator mario) {
+    private void OnMarioDestroyed(QuantumGame game, Frame f, MarioAnimator mario) {
         if (entityTrackIcons.TryGetValue(mario, out TrackIcon icon)) {
             Destroy(icon.gameObject);
         }
@@ -200,7 +200,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
         int starRequirement = rules.StarsToWin;
         int coinRequirement = rules.CoinsForPowerup;
         bool teamsEnabled = rules.TeamsEnabled;
-        bool livesEnabled = rules.IsLivesEnabled;
+        bool livesEnabled = rules.LivesEnabled;
         bool timerEnabled = rules.TimerSeconds > 0;
 
         if (rules.TeamsEnabled) {

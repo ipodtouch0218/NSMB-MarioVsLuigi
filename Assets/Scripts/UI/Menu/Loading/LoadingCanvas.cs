@@ -93,9 +93,17 @@ namespace NSMB.Loading {
         }
 
         public unsafe void EndLoading(QuantumGame game) {
+            StartCoroutine(EndLoadingRoutine(game));
+        } 
+
+        public IEnumerator EndLoadingRoutine(QuantumGame game) {
+            if (!NetworkHandler.IsReplay) {
+                yield return new WaitForSeconds(1);
+            }
+
             Frame f = game.Frames.Predicted;
 
-            bool validPlayer = game.GetLocalPlayers().Any(p => !QuantumUtils.GetPlayerData(f, p)->IsSpectator);
+            bool validPlayer = game.GetLocalPlayers().Any(p => !(QuantumUtils.GetPlayerDataSafe(f, p)?.IsSpectator ?? true));
             
             readyGroup.gameObject.SetActive(true);
             animator.SetTrigger(validPlayer ? "loaded" : "spectating");

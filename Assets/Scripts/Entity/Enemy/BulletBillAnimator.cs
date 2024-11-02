@@ -7,10 +7,15 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
-    [SerializeField] private ParticleSystem trailParticles, shootParticles;
+    [SerializeField] private ParticleSystem trailParticles;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private LegacyAnimateSpriteRenderer legacyAnimation;
     [SerializeField] private GameObject specialKillParticles;
+
+    [SerializeField] private float fireballScaleSize = 0.075f;
+
+    //---Private Variables
+    private float fireballScaleTimer;
 
     public void OnValidate() {
         this.SetIfNull(ref entity);
@@ -23,6 +28,7 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventBulletBillHitByProjectile>(this, OnBulletBillHitByProjectile, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public void Initialize(QuantumGame game) {
@@ -33,13 +39,9 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
         Vector2 pos = trailParticles.transform.localPosition;
         pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
         trailParticles.transform.localPosition = pos;
-
-        ParticleSystem.ShapeModule shape = shootParticles.shape;
-        shape.rotation = new Vector3(0, 0, enemy->FacingRight ? -33 : 147);
-
         trailParticles.Play();
+
         if (!NetworkHandler.IsReplayFastForwarding) {
-            shootParticles.Play();
             sfx.Play();
         }
         legacyAnimation.enabled = true;
@@ -68,6 +70,18 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
         } else {
             transform.rotation = Quaternion.identity;
         }
+
+        float scale = 1 + Mathf.Abs(Mathf.Sin(fireballScaleTimer * 10 * Mathf.PI)) * fireballScaleSize;
+        transform.localScale = Vector3.one * scale;
+        fireballScaleTimer = Mathf.Max(0, fireballScaleTimer - Time.deltaTime);
+    }
+
+    private void OnBulletBillHitByProjectile(EventBulletBillHitByProjectile e) {
+        if (e.Entity != entity.EntityRef) {
+            return;
+        }
+
+        fireballScaleTimer = 0.3f;
     }
 
     private void OnEnemyKilled(EventEnemyKilled e) {

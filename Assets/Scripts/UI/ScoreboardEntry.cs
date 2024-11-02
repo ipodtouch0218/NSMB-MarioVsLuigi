@@ -53,7 +53,7 @@ public class ScoreboardEntry : MonoBehaviour {
         nicknameText.text = Utils.GetPingSymbol(ping) + nickname.ToValidUsername();
 
         StringBuilder scoreBuilder = new();
-        if (f.Global->Rules.IsLivesEnabled) {
+        if (f.Global->Rules.LivesEnabled) {
             var character = f.FindAsset(mario->CharacterAsset);
             scoreBuilder.Append(character.UiString).Append(mario->Lives);
         }

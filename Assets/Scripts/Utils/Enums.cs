@@ -4,24 +4,6 @@ using System.Reflection;
 using UnityEngine;
 
 public static class Enums {
-
-    /*
-    public static PowerupScriptable GetPowerupScriptable(this PowerupState state) {
-        if (state == PowerupState.NoPowerup) {
-            return null;
-        }
-
-        return ScriptableManager.Instance.powerups.FirstOrDefault(powerup => powerup.state == state);
-    }
-    */
-
-    public enum GameState : byte {
-        Loading = 0,  // Waiting for all players to finish loading the game
-        Starting = 1, // All players are loaded, starting animation is playing
-        Playing = 2,  // Game is actively playing
-        Ended = 3     // Game ended, returning to the room menu soon
-    }
-
     #region ANIMATION & MUSIC
     //---Animation enums
     public enum PlayerEyeState {

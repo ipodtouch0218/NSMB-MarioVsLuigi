@@ -10,12 +10,13 @@ public class MasterCanvas : MonoBehaviour {
 
     public unsafe void Start() {
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+        QuantumGame game;
         Frame f;
-        if (QuantumRunner.DefaultGame != null
-            && (f = QuantumRunner.DefaultGame.Frames.Predicted) != null
+        if ((game = QuantumRunner.DefaultGame) != null
+            && (f = game.Frames.Predicted) != null
             && f.Global->GameState > GameState.WaitingForPlayers) {
 
-            CheckForSpectatorUI(f);
+            CheckForSpectatorUI(game, f);
         }
     }
 
@@ -39,19 +40,19 @@ public class MasterCanvas : MonoBehaviour {
         }
     }
 
-    public unsafe void CheckForSpectatorUI(Frame f) {
+    public unsafe void CheckForSpectatorUI(QuantumGame game, Frame f) {
         if (PlayerElements.AllPlayerElements.Any(pe => pe)) {
             return;
         }
 
         // Create a new spectator-only PlayerElement
         PlayerElements newPlayerElements = Instantiate(playerElementsPrefab, transform);
-        newPlayerElements.Initialize(f, EntityRef.None, PlayerRef.None);
+        newPlayerElements.Initialize(game, f, EntityRef.None, PlayerRef.None);
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Starting) {
-            CheckForSpectatorUI(e.Frame);
+            CheckForSpectatorUI(e.Game, e.Frame);
         }
     }
 }

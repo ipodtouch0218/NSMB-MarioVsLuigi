@@ -1,7 +1,10 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill>, ISignalOnIceBlockBroken {
+
+        private static readonly FPVector2 SpawnOffset = new FPVector2(0, FP.FromString("-0.45"));
 
         public override void OnInit(Frame f) {
             f.Context.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
@@ -25,7 +28,7 @@ namespace Quantum {
                 }
                 launcher->TimeToShootFrames = launcher->TimeToShoot;
 
-                FPVector2 spawnpoint = transform->Position + FPVector2.Up * (collider->Shape.Box.Extents.Y * 2) + (FPVector2.Down * FP.FromString("0.45"));
+                FPVector2 spawnpoint = transform->Position + FPVector2.Up * (collider->Shape.Box.Extents.Y * 2) + SpawnOffset;
                 var allPlayers = f.Filter<MarioPlayer, Transform2D>();
                 FP absDistance = 0;
                 FP minDistance = FP.MaxValue;
@@ -148,6 +151,8 @@ namespace Quantum {
 
             if (projectileAsset.Effect == ProjectileEffectType.Freeze) {
                 IceBlockSystem.Freeze(f, bulletBillEntity, true);
+            } else {
+                f.Events.BulletBillHitByProjectile(f, bulletBillEntity);
             }
 
             if (projectileAsset.DestroyOnHit) {

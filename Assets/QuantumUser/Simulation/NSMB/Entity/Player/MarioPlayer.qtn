@@ -97,6 +97,7 @@ component MarioPlayer {
 	// Block Interactions
     [ExcludeFromPrototype] bool IsSpinnerFlying;
 	[ExcludeFromPrototype] bool IsDrilling;
+	[ExcludeFromPrototype] bool IsStuckInBlock;
 
 	// Powerups
 	[ExcludeFromPrototype] byte Combo;

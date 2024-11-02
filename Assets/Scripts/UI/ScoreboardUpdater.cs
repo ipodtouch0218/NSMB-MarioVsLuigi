@@ -46,15 +46,10 @@ public class ScoreboardUpdater : MonoBehaviour {
     public unsafe void Start() {
         // Populate the scoreboard if we're a late joiner
         QuantumGame game = QuantumRunner.DefaultGame;
-        Frame f;
-        if (game != null
-            && (f = game.Frames.Predicted) != null
-            && f.Global->GameState >= GameState.Starting) {
-
-            PopulateScoreboard(f);
+        if (game != null) {
+            PopulateScoreboard(game.Frames.Predicted);
         }
 
-        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
         QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
@@ -201,13 +196,6 @@ public class ScoreboardUpdater : MonoBehaviour {
         }
 
         Toggle();
-    }
-
-    private void OnGameStateChanged(EventGameStateChanged e) {
-        if (e.NewState == GameState.Starting) {
-            // Ready to go.
-            PopulateScoreboard(e.Frame);
-        }
     }
 
     private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {

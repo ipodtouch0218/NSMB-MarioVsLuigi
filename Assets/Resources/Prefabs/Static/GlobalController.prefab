@@ -1222,7 +1222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text: {fileID: 6539198191644455915}
   key: ui.loading.levelcreator
-  field: levelDesigner
+  type: 0
 --- !u!1 &433754342107903847
 GameObject:
   m_ObjectHideFlags: 0
@@ -3016,7 +3016,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text: {fileID: 6167585292052371362}
   key: ui.loading.musiccreator
-  field: composer
+  type: 1
 --- !u!1 &926399072709085026
 GameObject:
   m_ObjectHideFlags: 0
@@ -27006,7 +27006,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18.8
+  m_fontSize: 22.85
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

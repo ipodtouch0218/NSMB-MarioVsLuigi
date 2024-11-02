@@ -201,7 +201,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref f.Global->PlayerLoadFrames) || !f.RuntimeConfig.IsRealGame || allPlayersLoaded) {
                     // Progress to next stage.
                     f.Global->GameState = GameState.Starting;
-                    f.Global->GameStartFrames = 3 * 60 + 120;
+                    f.Global->GameStartFrames = 3 * 60 + 120 + 60;
                     f.Global->Timer = f.Global->Rules.TimerSeconds;
 
                     f.Signals.OnLoadingComplete();
@@ -268,7 +268,7 @@ namespace Quantum {
             
             // End Condition: only one team alive
             var marioFilter = f.Filter<MarioPlayer>();
-            bool livesGame = f.Global->Rules.IsLivesEnabled;
+            bool livesGame = f.Global->Rules.LivesEnabled;
 
             bool oneOrNoTeamAlive = true;
             int aliveTeam = -1;

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 
 namespace NSMB.UI.MainMenu {
     public class PlayerListHandler : MonoBehaviour {
@@ -30,6 +31,7 @@ namespace NSMB.UI.MainMenu {
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
         public unsafe void PopulatePlayerEntries(Frame f) {
@@ -137,6 +139,12 @@ namespace NSMB.UI.MainMenu {
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
             RemovePlayerEntry(e.Frame, e.Player);
+        }
+
+        private void OnGameStateChanged(EventGameStateChanged e) {
+            if (e.NewState == GameState.PreGameRoom) {
+                UpdateAllPlayerEntries(e.Frame);
+            }
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {

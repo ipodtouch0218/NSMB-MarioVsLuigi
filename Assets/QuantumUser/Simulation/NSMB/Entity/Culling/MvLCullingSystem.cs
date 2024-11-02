@@ -45,15 +45,18 @@ namespace Quantum {
                 }
 
                 bool cull = minDistanceToCamera - cullable->BroadRadius - cameraRadius > 0;
+                /*
 #if DEBUG
                 bool originalCull = cull;
-                cull &= f.IsPredicted;
 #endif 
+                */
+                cull &= f.IsPredicted;
                 if (cull) {
                     // Far enough, cull.
                     f.Cull(entity);
                 }
 
+                /*
 #if DEBUG
                 if (f.IsVerified) {
                     ColorRGBA color;
@@ -68,6 +71,7 @@ namespace Quantum {
                     Draw.Circle(transform->Position + cullable->Offset, cullable->BroadRadius, color, true);
                 }
 #endif
+                */
             }
         }
     }

@@ -272,12 +272,12 @@ MonoBehaviour:
             X:
               RawValue: 24576
             Y:
-              RawValue: 13107
+              RawValue: 9830
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 6554
+              RawValue: 9830
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -820,12 +820,12 @@ MonoBehaviour:
             X:
               RawValue: 24576
             Y:
-              RawValue: 8192
+              RawValue: 9830
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: -9830
+              RawValue: -2621
           RotationOffset:
             RawValue: 0
           UserTag: 0

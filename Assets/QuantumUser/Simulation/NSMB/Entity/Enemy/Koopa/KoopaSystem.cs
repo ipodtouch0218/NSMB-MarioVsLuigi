@@ -197,13 +197,14 @@ namespace Quantum {
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
-            if (mario->InstakillsEnemies(marioPhysicsObject, true)) {
+            bool isSpiny = koopa->IsSpiny && !koopa->IsFlipped;
+
+            if (!isSpiny && mario->InstakillsEnemies(marioPhysicsObject, true)) {
                 koopa->Kill(f, koopaEntity, marioEntity, true);
                 return;
             }
 
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
-            bool isSpiny = koopa->IsSpiny && !koopa->IsFlipped;
             if (isSpiny) {
                 // Do damage
                 if (mario->IsCrouchedInShell) {

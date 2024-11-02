@@ -52,6 +52,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+        QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
@@ -185,6 +186,36 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         return await Client.JoinRoomAsync(args, false);
     }
 
+    public void SaveReplay(QuantumGame game) {
+#if UNITY_STANDALONE
+        if (IsReplay || game.RecordInputStream == null) {
+            return;
+        }
+
+        // JSON-friendly replay
+        QuantumReplayFile jsonReplay = game.GetRecordedReplay();
+        jsonReplay.InitialTick = initialFrame;
+        jsonReplay.InitialFrameData = initialFrameData;
+        initialFrame = 0;
+        initialFrameData = null;
+
+        // Create directories and open file
+        string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
+        Directory.CreateDirectory(replayFolder);
+        string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".mvlreplay");
+        using FileStream outputStream = new FileStream(finalFilePath, FileMode.Create);
+
+        // Write binary replay
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay);
+        long writtenBytes = binaryReplay.WriteToStream(outputStream);
+
+        // Complete
+        game.RecordInputStream.Dispose();
+        game.RecordInputStream = null;
+        Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
+#endif
+    }
+
     public void OnFriendListUpdate(List<FriendInfo> friendList) { }
 
     public void OnCreatedRoom() {
@@ -240,33 +271,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
     }
 
+    private void OnGameDestroyed(CallbackGameDestroyed e) {
+        SaveReplay(e.Game);
+    }
+
     private void OnGameEnded(EventGameEnded e) {
-#if UNITY_STANDALONE
-        if (IsReplay) {
-            return;
-        }
-
-        // JSON-friendly repla
-        QuantumGame game = e.Game;
-        QuantumReplayFile jsonReplay = game.GetRecordedReplay();
-        jsonReplay.InitialTick = initialFrame;
-        jsonReplay.InitialFrameData = initialFrameData;
-        initialFrame = 0;
-        initialFrameData = null;
-
-        // Create directories and open file
-        string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
-        Directory.CreateDirectory(replayFolder);
-        string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".mvlreplay");
-        using FileStream outputStream = new FileStream(finalFilePath, FileMode.Create);
-
-        // Write binary replay
-        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay);
-        long writtenBytes = binaryReplay.WriteToStream(outputStream);
-
-        // Complete
-        Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
-#endif
+        SaveReplay(e.Game);
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {

@@ -45,7 +45,9 @@ namespace Quantum {
             var freezable = f.Unsafe.GetPointer<Freezable>(mario);
             bool forceHold = false;
             if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
-                forceHold = holdable->HoldAboveHead && (f.Number - HoldStartFrame) < 25;
+                if (holdable->HoldAboveHead) {
+                    forceHold = (f.Number - HoldStartFrame) < 25;
+                }
             }
 
             return (input.Sprint.IsDown || forceHold) 
@@ -60,7 +62,10 @@ namespace Quantum {
         }
 
         public bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {
-            return CurrentPowerupState == PowerupState.MegaMushroom || IsStarmanInvincible || IsInShell || (includeSliding && IsSliding && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
+            return CurrentPowerupState == PowerupState.MegaMushroom
+                || IsStarmanInvincible
+                || IsInShell
+                || (includeSliding && ((IsSliding || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10));
         }
 
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
@@ -136,7 +141,7 @@ namespace Quantum {
             PreRespawnFrames = 180;
             RespawnFrames = 78;
 
-            if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
+            if ((f.Global->Rules.LivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
                 // Last death - drop all stars at 0.5s each
                 // TODO if (!GameManager.Instance.CheckForWinner()) {
                     SpawnStars(f, entity, 1);
@@ -243,7 +248,7 @@ namespace Quantum {
                 }
             }
 
-            if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
+            if (f.Global->Rules.LivesEnabled && Lives == 0) {
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
                 starDirection = NoLivesStarDirection;
@@ -293,7 +298,7 @@ namespace Quantum {
 
             RespawnFrames = 78;
 
-            if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
+            if (f.Global->Rules.LivesEnabled && Lives == 0) {
                 f.Destroy(entity);
                 return;
             }

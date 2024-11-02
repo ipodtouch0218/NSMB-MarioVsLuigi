@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using Quantum;
 
 namespace NSMB.Loading {
 
@@ -7,7 +8,8 @@ namespace NSMB.Loading {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text text;
-        [SerializeField] private string key = "ui.loading.levelcreator", field = "levelDesigner";
+        [SerializeField] private string key = "ui.loading.levelcreator";
+        [SerializeField] private FieldType type;
 
         public void OnEnable() {
             string value = GetValueFromField();
@@ -20,10 +22,22 @@ namespace NSMB.Loading {
         }
 
         private string GetValueFromField() {
-            /* TODO
-            return GameManager.Instance.GetType().GetField(field, BindingFlags.Public | BindingFlags.Instance).GetValue(GameManager.Instance) as string;
-            */
-            return null;
+            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            if (stage == null) {
+                return "";
+            }
+
+            return type switch {
+                FieldType.Author => stage.StageAuthor,
+                FieldType.Composer => stage.MusicComposer,
+                _ => ""
+            };
+        }
+
+        public enum FieldType {
+            Author,
+            Composer,
         }
     }
 }

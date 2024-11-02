@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using System;
 using UnityEngine;
 using static IInteractableTile;
 
@@ -49,6 +50,9 @@ namespace Quantum {
             }
             if (HandleMegaMushroom(f, ref filter, physics, stage)) {
                 HandleHitbox(f, ref filter, physics);
+                return;
+            }
+            if (HandleStuckInBlock(f, ref filter)) {
                 return;
             }
             HandlePowerups(f, ref filter, physics, input, stage);
@@ -154,12 +158,12 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref mario->FastTurnaroundFrames)) {
                     mario->IsTurnaround = true;
                 }
-            } else if (mario->IsTurnaround) {
+            } else if (mario->IsTurnaround && !physicsObject->IsOnSlipperyGround) {
+                // Can't fast turnaround on ice.
                 mario->IsTurnaround = physicsObject->IsTouchingGround && !mario->IsCrouching && xVelAbs < physics.WalkMaxVelocity[1] && !physicsObject->IsTouchingLeftWall && !physicsObject->IsTouchingRightWall;
                 mario->IsSkidding = mario->IsTurnaround;
 
                 physicsObject->Velocity.X += (physics.FastTurnaroundAcceleration * (mario->FacingRight ? -1 : 1) * f.DeltaTime);
-
             } else if ((inputs.Left ^ inputs.Right)
                        && (!mario->IsCrouching || (mario->IsCrouching && !physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.BlueShell))
                        && !mario->IsInKnockback
@@ -1315,6 +1319,72 @@ namespace Quantum {
             filter.Freezable->IceBlockSize.X += FP._0_25;
         }
 
+        private bool HandleStuckInBlock(Frame f, ref Filter filter) {
+            var mario = filter.MarioPlayer;
+            var freezable = filter.Freezable;
+
+            if (freezable->IsFrozen(f) || f.Exists(mario->CurrentPipe) || mario->MegaMushroomStartFrames > 0 || (mario->MegaMushroomEndFrames > 0 && mario->MegaMushroomStationaryEnd)) {
+                return false;
+            }
+
+            var physicsObject = filter.PhysicsObject;
+            var transform = filter.Transform;
+            Shape2D shape = filter.PhysicsCollider->Shape;
+
+            if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, shape)) {
+                if (mario->IsStuckInBlock) {
+                    physicsObject->DisableCollision = false;
+                    physicsObject->Velocity = FPVector2.Zero;
+                } 
+                mario->IsStuckInBlock = false;
+                return false;
+            }
+
+            bool wasStuckLastTick = mario->IsStuckInBlock;
+
+            mario->IsStuckInBlock = true;
+            mario->IsGroundpounding = false;
+            mario->IsPropellerFlying = false;
+            mario->IsDrilling = false;
+            mario->IsSpinnerFlying = false;
+            physicsObject->IsTouchingGround = false;
+            mario->WaterColliderCount = 0;
+
+            if (!wasStuckLastTick) {
+                // Code for mario to instantly teleport to the closest free position when he gets stuck
+                int angle = 45;
+                int increments = 360 / angle;
+                FP distIncrement = FP._0_10;
+                FP distMax = FP._0_50 + FP._0_10;
+
+                Span<FPVector2> offsets = stackalloc FPVector2[8];
+                for (int i = 0; i < increments; i++) {
+                    FP radAngle = ((i * angle * 2) + ((i / 4) * angle) % 360) * FP.Deg2Rad;
+                    offsets[i] = new FPVector2(FPMath.Sin(radAngle), FPMath.Cos(radAngle));
+                }
+
+                FP dist = 0;
+                while ((dist += distIncrement) < distMax) {
+                    for (int i = 0; i < increments; i++) {
+                        FPVector2 checkPos = transform->Position + (offsets[i] * dist);
+                        if (PhysicsObjectSystem.BoxInGround(f, checkPos, shape)) {
+                            continue;
+                        }
+
+                        // Valid spot.
+                        transform->Position = checkPos;
+                        mario->IsStuckInBlock = false;
+                        return false;
+                    }
+                }
+            }
+
+            physicsObject->Gravity = FPVector2.Zero;
+            physicsObject->Velocity = FPVector2.Right * 2;
+            physicsObject->DisableCollision = true;
+            return true;
+        }
+
         private void HandleBreakingBlocks(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -1414,7 +1484,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
                     mario->PreRespawn(f, filter.Entity, stage);
                 } else if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
-                    bool spawnAgain = !((f.Global->Rules.IsLivesEnabled && mario->Lives == 0) || mario->Disconnected);
+                    bool spawnAgain = !((f.Global->Rules.LivesEnabled && mario->Lives == 0) || mario->Disconnected);
                     if (!spawnAgain && mario->Stars > 0) {
                         // Try to drop more stars
                         mario->SpawnStars(f, filter.Entity, 1);
@@ -1556,7 +1626,6 @@ namespace Quantum {
 
             if (exit) {
                 if (liquid->LiquidType == LiquidType.Water) {
-                    mario->WaterColliderCount--;
                     if (QuantumUtils.Decrement(ref mario->WaterColliderCount)) {
                         // Jump
                         mario->SwimExitForceJump = true;

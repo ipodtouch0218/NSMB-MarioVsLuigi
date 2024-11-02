@@ -38,6 +38,26 @@ public static unsafe class QuantumUtils {
         return data;
     }
 
+    public static PlayerData? GetPlayerDataSafe(Frame f, PlayerRef player, QDictionary<PlayerRef, EntityRef>? dictionary = default) {
+
+        QDictionary<PlayerRef, EntityRef> playerDataDictionary;
+        if (dictionary == null) {
+            if (!f.TryResolveDictionary(f.Global->PlayerDatas, out playerDataDictionary)) {
+                return null;
+            }
+        } else {
+            playerDataDictionary = dictionary.Value;
+        }
+
+        if (!playerDataDictionary.TryGetValue(player, out EntityRef playerDataEntity)
+            || !f.TryGet(playerDataEntity, out PlayerData data)) {
+
+            return null;
+        }
+
+        return data;
+    }
+
     public static unsafe PlayerRef GetHostPlayer(Frame f, out PlayerData* data) {
         var filter = f.Filter<PlayerData>();
         while (filter.NextUnsafe(out _, out PlayerData* playerData)) {
@@ -215,7 +235,7 @@ public static unsafe class QuantumUtils {
                 stars[mario->Team] = 0;
             }
 
-            if (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+            if (mario->Lives <= 0 && f.Global->Rules.LivesEnabled) {
                 continue;
             }
 
@@ -230,7 +250,7 @@ public static unsafe class QuantumUtils {
         var allPlayers = f.Filter<MarioPlayer>();
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
             if (mario->Team != team
-                || mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+                || mario->Lives <= 0 && f.Global->Rules.LivesEnabled) {
                 continue;
             }
 

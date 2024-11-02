@@ -15,8 +15,8 @@ namespace NSMB.Entities.Player {
 
         //---Static
         public static readonly HashSet<MarioAnimator> AllMarioPlayers = new();
-        public static event Action<Frame, MarioAnimator> MarioPlayerInitialized;
-        public static event Action<Frame, MarioAnimator> MarioPlayerDestroyed;
+        public static event Action<QuantumGame, Frame, MarioAnimator> MarioPlayerInitialized;
+        public static event Action<QuantumGame, Frame, MarioAnimator> MarioPlayerDestroyed;
 
         //---Static Variables
         private static readonly WaitForSeconds BlinkDelay = new(0.1f);
@@ -78,7 +78,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
-        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle;
+        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
@@ -171,16 +171,16 @@ namespace NSMB.Entities.Player {
 
             if (game.PlayerIsLocal(mario->PlayerRef)) {
                 PlayerElements elements = Instantiate(playerElementsPrefab, GameObject.FindGameObjectWithTag("MasterCanvas").transform);
-                elements.Initialize(f, entity.EntityRef, mario->PlayerRef);
+                elements.Initialize(game, f, entity.EntityRef, mario->PlayerRef);
             }
 
             AllMarioPlayers.RemoveWhere(ma => ma == null);
             AllMarioPlayers.Add(this);
-            MarioPlayerInitialized?.Invoke(f, this);
+            MarioPlayerInitialized?.Invoke(game, f, this);
         }
 
         public void Destroy(QuantumGame game) {
-            MarioPlayerDestroyed?.Invoke(game.Frames.Verified, this);
+            MarioPlayerDestroyed?.Invoke(game, game.Frames.Verified, this);
         }
 
         public void Update() {
@@ -256,7 +256,8 @@ namespace NSMB.Entities.Player {
             // Particles
             SetParticleEmission(drillParticle, !mario->IsDead && mario->IsDrilling);
             SetParticleEmission(sparkles, !mario->IsDead && mario->IsStarmanInvincible);
-            SetParticleEmission(dust, !mario->IsDead && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || mario->IsCrouching) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f))  || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
+            SetParticleEmission(iceSkiddingParticle, !mario->IsDead && physicsObject->IsOnSlipperyGround && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
+            SetParticleEmission(dust, !iceSkiddingParticle.isPlaying && !mario->IsDead && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || mario->IsCrouching) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
             SetParticleEmission(giantParticle, !mario->IsDead && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
             SetParticleEmission(bubblesParticle, !mario->IsDead && mario->IsInWater);
@@ -267,6 +268,7 @@ namespace NSMB.Entities.Player {
             } else if (mario->IsWallsliding) {
                 dust.transform.localPosition = hitbox->Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario->WallslideLeft ? new Vector2(-1, 1) : Vector2.one);
             }
+            iceSkiddingParticle.transform.localScale = mario->FacingRight ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
 
             dustPlayer.SetSoundData((mario->IsInShell || mario->IsSliding || mario->IsCrouchedInShell) ? shellSlideData : wallSlideData);
             drillPlayer.SetSoundData(mario->IsPropellerFlying ? propellerDrillData : spinnerDrillData);
@@ -356,7 +358,7 @@ namespace NSMB.Entities.Player {
 
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((mario->IsSpinnerFlying || mario->IsPropellerFlying || mario->UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
 
-            wasTurnaround = animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround");
+            wasTurnaround = mario->IsTurnaround;
         }
 
         private void InterpolateFacingDirection(MarioPlayer* mario) {
@@ -394,7 +396,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamDead, mario->IsDead);
             animator.SetBool(ParamOnLeft, mario->WallslideLeft);
             animator.SetBool(ParamOnRight, mario->WallslideRight);
-            animator.SetBool(ParamOnGround, physicsObject->IsTouchingGround /* || controller.IsStuckInBlock */ || mario->CoyoteTimeFrames > 0);
+            animator.SetBool(ParamOnGround, physicsObject->IsTouchingGround || mario->IsStuckInBlock || mario->CoyoteTimeFrames > 0);
             animator.SetBool(ParamInvincible, mario->IsStarmanInvincible);
             animator.SetBool(ParamSkidding, mario->IsSkidding);
             animator.SetBool(ParamPropeller, mario->IsPropellerFlying);
@@ -426,10 +428,9 @@ namespace NSMB.Entities.Player {
             //animator.SetBool(ParamKnockforwards, mario->IsInForwardsKnockback);
 
             float animatedVelocity = /* physicsObject.IsTouchingGround ? physicsObject.Velocity.Magnitude.AsFloat : */ Mathf.Abs(physicsObject->Velocity.X.AsFloat);
-            /*
-            if (controller.IsStuckInBlock) {
+            if (mario->IsStuckInBlock) {
                 animatedVelocity = 0;
-            } else */if (mario->IsPropellerFlying) {
+            } else if (mario->IsPropellerFlying) {
                 animatedVelocity = 2f;
             } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom && (left || right)) {
                 animatedVelocity = 4.5f;
@@ -737,9 +738,9 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
+            animator.ResetTrigger("fireball");
             if (f.Unsafe.GetPointer<Holdable>(e.OtherEntity)->HoldAboveHead) {
                 animator.Play("head-pickup");
-                animator.ResetTrigger("fireball");
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);
             }
 
@@ -963,7 +964,9 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            PlaySound(e.Mario.CurrentPowerupState == PowerupState.BlueShell ? SoundEffect.Powerup_BlueShell_Enter : SoundEffect.Player_Sound_Crouch);
+            if (!e.Mario.IsInShell) {
+                PlaySound(e.Mario.CurrentPowerupState == PowerupState.BlueShell ? SoundEffect.Powerup_BlueShell_Enter : SoundEffect.Player_Sound_Crouch);
+            }
         }
 
         private void OnMarioPlayerGroundpoundStarted(EventMarioPlayerGroundpoundStarted e) {

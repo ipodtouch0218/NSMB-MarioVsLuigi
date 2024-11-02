@@ -13,3 +13,8 @@ component BulletBillLauncher {
 	byte BulletBillCount;
 	ushort TimeToShootFrames;
 }
+
+event BulletBillHitByProjectile {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}
