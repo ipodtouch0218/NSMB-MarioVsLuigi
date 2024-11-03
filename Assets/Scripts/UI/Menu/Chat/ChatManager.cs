@@ -1,10 +1,9 @@
+using NSMB.Utils;
+using NSMB.UI.MainMenu;
+using Quantum;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using NSMB.Utils;
-using NSMB.UI.MainMenu;
-using Photon.Realtime;
-using Quantum;
 
 public class ChatManager : MonoBehaviour {
 
@@ -32,6 +31,7 @@ public class ChatManager : MonoBehaviour {
 
     public void Start() {
         QuantumEvent.Subscribe<EventPlayerSentChatMessage>(this, OnPlayerSentChatMessage);
+        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
     }
@@ -162,6 +162,12 @@ public class ChatManager : MonoBehaviour {
             if (ple) {
                 ple.typingCounter = 0;
             }
+        }
+    }
+
+    private void OnGameStateChanged(EventGameStateChanged e) {
+        if (e.NewState == GameState.WaitingForPlayers) {
+            AddSystemMessage("ui.inroom.chat.server.started", Red);
         }
     }
 

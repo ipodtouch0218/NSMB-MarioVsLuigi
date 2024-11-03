@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
+using System.Collections;
 using UnityEngine;
 
 public unsafe class BulletBillAnimator : MonoBehaviour {
@@ -45,6 +46,7 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
             sfx.Play();
         }
         legacyAnimation.enabled = true;
+        StartCoroutine(ChangeSpriteSortingOrder());
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
@@ -74,6 +76,14 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
         float scale = 1 + Mathf.Abs(Mathf.Sin(fireballScaleTimer * 10 * Mathf.PI)) * fireballScaleSize;
         transform.localScale = Vector3.one * scale;
         fireballScaleTimer = Mathf.Max(0, fireballScaleTimer - Time.deltaTime);
+    }
+
+    private static WaitForSeconds wait = new(0.33f);
+    private IEnumerator ChangeSpriteSortingOrder() {
+        int originalSortingOrder = sRenderer.sortingOrder;
+        sRenderer.sortingOrder = -1001;
+        yield return wait;
+        sRenderer.sortingOrder = originalSortingOrder;
     }
 
     private void OnBulletBillHitByProjectile(EventBulletBillHitByProjectile e) {

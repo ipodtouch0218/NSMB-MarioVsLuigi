@@ -8,3 +8,13 @@ component CameraController {
 	[ExcludeFromPrototype] FPVector2 LastPlayerPosition;
 	[ExcludeFromPrototype] FPVector2 SmoothDampVelocity;
 }
+
+event StartCameraFadeOut {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}
+
+event StartCameraFadeIn {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}

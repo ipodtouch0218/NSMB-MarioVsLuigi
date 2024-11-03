@@ -257,7 +257,7 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(drillParticle, !mario->IsDead && mario->IsDrilling);
             SetParticleEmission(sparkles, !mario->IsDead && mario->IsStarmanInvincible);
             SetParticleEmission(iceSkiddingParticle, !mario->IsDead && physicsObject->IsOnSlipperyGround && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
-            SetParticleEmission(dust, !iceSkiddingParticle.isPlaying && !mario->IsDead && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || mario->IsCrouching) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
+            SetParticleEmission(dust, !iceSkiddingParticle.isPlaying && !mario->IsDead && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || (mario->IsCrouching && !physicsObject->IsOnSlipperyGround)) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
             SetParticleEmission(giantParticle, !mario->IsDead && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
             SetParticleEmission(bubblesParticle, !mario->IsDead && mario->IsInWater);

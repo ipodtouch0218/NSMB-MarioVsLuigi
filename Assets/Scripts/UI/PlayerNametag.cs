@@ -22,19 +22,24 @@ public class PlayerNametag : MonoBehaviour {
 
     private PlayerElements elements;
     private string cachedNickname = "noname";
-    private NicknameColor nicknameColor;
+    private string nicknameColor = "#FFFFFF";
+    private bool constantNicknameColor = false;
     private QuantumGame game;
 
     public unsafe void Initialize(QuantumGame game, Frame f, PlayerElements elements, MarioAnimator parent) {
         this.game = game;
         this.elements = elements;
         this.parent = parent;
-        this.character = f.FindAsset(f.Unsafe.GetPointer<MarioPlayer>(parent.entity.EntityRef)->CharacterAsset);
+
+        var mario = f.Unsafe.GetPointer<MarioPlayer>(parent.entity.EntityRef);
+        this.character = f.FindAsset(mario->CharacterAsset);
         stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-        nicknameColor = NicknameColor.White;
+        RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
+        nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+
         arrow.color = parent.GlowColor;
-        text.color = nicknameColor.color;
+        text.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
         gameObject.SetActive(true);
     }
 
@@ -95,11 +100,8 @@ public class PlayerNametag : MonoBehaviour {
         newText += Utils.GetSymbolString("Sx" + mario->Stars);
 
         text.text = newText;
-
-        //nicknameColor = Data.NicknameColor;
-        
-        if (nicknameColor.isRainbow) {
-            text.color = Utils.GetRainbowColor();
+        if (!constantNicknameColor) {
+            text.color = Utils.SampleNicknameColor(nicknameColor, out _);
         }
     }
 }

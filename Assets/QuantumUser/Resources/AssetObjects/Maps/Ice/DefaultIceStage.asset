@@ -1305,6 +1305,8 @@ MonoBehaviour:
             RawValue: 45875
         IgnorePlayerWhenRespawning:
           Value: 0
+        IsRespawnable:
+          Value: 1
     - rid: 4372145401587826693
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2310,6 +2312,8 @@ MonoBehaviour:
             RawValue: 340787
         IgnorePlayerWhenRespawning:
           Value: 0
+        IsRespawnable:
+          Value: 1
     - rid: 8707424676512530437
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

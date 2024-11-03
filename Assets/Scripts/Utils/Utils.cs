@@ -210,7 +210,7 @@ namespace NSMB.Utils {
         public static string BytesToString(long byteCount) {
             string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; // Longs run out around EB
             if (byteCount == 0) {
-                return "0" + suf[0];
+                return "0B";
             }
 
             long bytes = Math.Abs(byteCount);
@@ -219,50 +219,29 @@ namespace NSMB.Utils {
             return (Math.Sign(byteCount) * num).ToString() + suf[place];
         }
 
+        public static Color SampleNicknameColor(string color, out bool constant) {
+            if (color == null) {
+                constant = true;
+                return Color.white;
+            }
+
+            if (color[0] == '#') {
+                constant = true;
+                ReadOnlySpan<char> span = color.AsSpan();
+                return new Color32(byte.Parse(span[1..3], System.Globalization.NumberStyles.HexNumber), byte.Parse(span[3..5], System.Globalization.NumberStyles.HexNumber), byte.Parse(span[5..7], System.Globalization.NumberStyles.HexNumber), 255);
+            } else if (color == "rainbow") {
+                constant = false;
+                return GetRainbowColor();
+            } else {
+                constant = true;
+                return Color.white;
+            }
+        }
+
         public static Color GetRainbowColor() {
             // Four seconds per revolution
             double time = (Time.timeAsDouble * 0.25d) % 1d;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
-        }
-
-        public static int ParseTimeToSeconds(string time) {
-            int minutes;
-            int seconds;
-
-            if (time.Contains(":")) {
-                string[] split = time.Split(":");
-                int.TryParse(split[0], out minutes);
-                int.TryParse(split[1], out seconds);
-            } else {
-                minutes = 0;
-                int.TryParse(time, out seconds);
-            }
-
-            if (seconds >= 60) {
-                minutes += seconds / 60;
-                seconds %= 60;
-            }
-
-            seconds = minutes * 60 + seconds;
-
-            return seconds;
-        }
-
-        public static bool BufferContains<T>(T[] buffer, int bufferLength, T element) {
-            for (int i = 0; i < bufferLength; i++) {
-                if (element.Equals(buffer[i])) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static void IntersectWithBuffer<T>(IList<T> collection, T[] buffer, int bufferLength) {
-            for (int i = collection.Count - 1; i >= 0; i--) {
-                if (!BufferContains(buffer, bufferLength, collection[i])) {
-                    collection.RemoveAt(i);
-                }
-            }
         }
     }
 }

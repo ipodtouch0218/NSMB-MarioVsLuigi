@@ -10,6 +10,9 @@ namespace Quantum {
         ISignalOnGameStarting, ISignalOnBeforePhysicsCollision, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped,
         ISignalOnBeforeInteraction, ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken {
 
+        private static readonly FPVector2 DeathUpForce = new FPVector2(0, 7);
+        private static readonly FPVector2 DeathUpGravity = new FPVector2(0, FP.FromString("-11.75"));
+
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -614,7 +617,9 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (f.Exists(mario->CurrentPipe) || mario->IsInShell || mario->IsCrouchedInShell || mario->IsInKnockback || (mario->IsGroundpounding && !physicsObject->IsTouchingGround)) {
+            if (f.Exists(mario->CurrentPipe) || mario->IsInShell || mario->IsCrouchedInShell || mario->IsInKnockback 
+                || (mario->IsGroundpounding && !physicsObject->IsTouchingGround) 
+                || (mario->IsCrouching && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05)) {
                 return;
             }
 
@@ -627,12 +632,11 @@ namespace Quantum {
                     mario->FacingRight = inputs.Right.IsDown;
                 }
             } else if (mario->MegaMushroomStartFrames == 0 && mario->MegaMushroomEndFrames == 0 && !mario->IsSkidding && !mario->IsTurnaround) {
-                if (mario->IsInKnockback || (physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
+                if (!mario->IsInShell && ((FPMath.Abs(physicsObject->Velocity.X) < FP._0_50 && mario->IsCrouching) || physicsObject->IsOnSlipperyGround) && (rightOrLeft)) {
+                    mario->FacingRight = inputs.Right.IsDown;
+                } else if (mario->IsInKnockback || (physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
                     mario->FacingRight = physicsObject->Velocity.X > 0;
                 } else if ((!mario->IsInShell || mario->MegaMushroomStartFrames > 0) && (rightOrLeft)) {
-                    mario->FacingRight = inputs.Right.IsDown;
-                }
-                if (!mario->IsInShell && ((FPMath.Abs(physicsObject->Velocity.X) < FP._0_50 && mario->IsCrouching) || physicsObject->IsOnSlipperyGround) && (rightOrLeft)) {
                     mario->FacingRight = inputs.Right.IsDown;
                 }
             }
@@ -1464,43 +1468,56 @@ namespace Quantum {
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
             var collider = filter.PhysicsCollider;
+            var entity = filter.Entity;
 
             if (!mario->IsDead) {
                 if (transform->Position.Y + (collider->Shape.Box.Extents.Y * 2) < stage.StageWorldMin.Y) {
                     // Death via pit
-                    mario->Death(f, filter.Entity, false);
+                    mario->Death(f, entity, false);
                 } else {
                     return false;
                 }
             }
 
             // Respawn timers
+            // Actually respawning
             if (mario->IsRespawning) {
                 if (QuantumUtils.Decrement(ref mario->RespawnFrames)) {
-                    mario->Respawn(f, filter.Entity);
+                    mario->Respawn(f, entity);
                     return false;
                 }
-            } else {
-                if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
-                    mario->PreRespawn(f, filter.Entity, stage);
-                } else if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
-                    bool spawnAgain = !((f.Global->Rules.LivesEnabled && mario->Lives == 0) || mario->Disconnected);
-                    if (!spawnAgain && mario->Stars > 0) {
-                        // Try to drop more stars
-                        mario->SpawnStars(f, filter.Entity, 1);
-                        mario->DeathAnimationFrames = 30;
-                    } else {
-                        // Play the animation as normal
-                        if (transform->Position.Y > stage.StageWorldMin.Y) {
-                            physicsObject->Gravity = FPVector2.Down * FP.FromString("11.75");
-                            physicsObject->Velocity = FPVector2.Up * 7;
-                            physicsObject->IsFrozen = false;
-                            physicsObject->DisableCollision = true;
-                            f.Events.MarioPlayerDeathUp(f, filter.Entity);
-                        }
-                        if (!spawnAgain) {
-                            mario->PreRespawnFrames = 144;
-                        }
+                return true;
+            }
+
+            // Waiting to prerespawn
+            if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
+                mario->PreRespawn(f, entity, stage);
+                f.Events.StartCameraFadeIn(f, entity);
+                return true;
+
+            } else if (mario->PreRespawnFrames == 20) {
+                f.Events.StartCameraFadeOut(f, entity);
+                return true;
+            }
+            
+            // Death up
+            if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
+                bool doRespawn = !((f.Global->Rules.LivesEnabled && mario->Lives == 0) || mario->Disconnected);
+                if (!doRespawn && mario->Stars > 0) {
+                    // Try to drop more stars
+                    mario->SpawnStars(f, entity, 1);
+                    mario->DeathAnimationFrames = 30;
+                } else {
+                    // Play the animation as normal
+                    if (transform->Position.Y > stage.StageWorldMin.Y) {
+                        physicsObject->Gravity = DeathUpGravity;
+                        physicsObject->Velocity = DeathUpForce;
+                        physicsObject->IsFrozen = false;
+                        physicsObject->DisableCollision = true;
+                        f.Events.MarioPlayerDeathUp(f, filter.Entity);
+                    }
+                    if (!doRespawn) {
+                        mario->PreRespawnFrames = 144;
                     }
                 }
             }

@@ -61,7 +61,7 @@ namespace Quantum {
             var layerMask = f.Layers.GetLayerMask("Player");
 
             while (filter.NextUnsafe(out EntityRef entity, out Enemy* enemy)) {
-                if (!enemy->IsActive) {
+                if (!enemy->DisableRespawning && !enemy->IsActive) {
                     if (!enemy->IgnorePlayerWhenRespawning) {
                         Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(enemy->Spawnpoint, 0, shape, layerMask);
                         if (playerHits.Count > 0) {

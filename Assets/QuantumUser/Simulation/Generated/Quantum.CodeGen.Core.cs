@@ -1195,19 +1195,21 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Enemy : Quantum.IComponent {
-    public const Int32 SIZE = 32;
+    public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(16)]
+    [FieldOffset(24)]
     public FPVector2 Spawnpoint;
-    [FieldOffset(4)]
-    public QBoolean IgnorePlayerWhenRespawning;
     [FieldOffset(8)]
-    [ExcludeFromPrototype()]
-    public QBoolean IsActive;
+    public QBoolean IgnorePlayerWhenRespawning;
+    [FieldOffset(0)]
+    public QBoolean DisableRespawning;
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
+    public QBoolean IsActive;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public QBoolean IsDead;
-    [FieldOffset(0)]
+    [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
     public override Int32 GetHashCode() {
@@ -1215,6 +1217,7 @@ namespace Quantum {
         var hash = 11071;
         hash = hash * 31 + Spawnpoint.GetHashCode();
         hash = hash * 31 + IgnorePlayerWhenRespawning.GetHashCode();
+        hash = hash * 31 + DisableRespawning.GetHashCode();
         hash = hash * 31 + IsActive.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
@@ -1223,6 +1226,7 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Enemy*)ptr;
+        QBoolean.Serialize(&p->DisableRespawning, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IgnorePlayerWhenRespawning, serializer);
         QBoolean.Serialize(&p->IsActive, serializer);

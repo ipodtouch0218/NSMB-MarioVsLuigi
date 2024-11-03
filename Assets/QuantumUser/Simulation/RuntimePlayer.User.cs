@@ -5,6 +5,7 @@ namespace Quantum {
 
         public Guid UserId;
         public bool UseColoredNickname;
+        public string NicknameColor;
 
     }
 }

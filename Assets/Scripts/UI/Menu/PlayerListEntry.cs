@@ -25,14 +25,13 @@ namespace NSMB.UI.MainMenu {
         //---Private Variables
         private GameObject blockerInstance;
         private EntityRef playerDataEntity;
-        // TODO private NicknameColor NicknameColor => player.NicknameColor;
-        private NicknameColor NicknameColor => NicknameColor.White;
+        private string nicknameColor;
+        private bool constantNicknameColor;
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
             // TODO
             // player.OnInOptionsChangedEvent += OnInSettingsChanged;
-            // player.OnIsReadyChangedEvent += OnIsReadyChanged;
             // OnInSettingsChanged(player.IsInOptions);
         }
 
@@ -40,7 +39,6 @@ namespace NSMB.UI.MainMenu {
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
             // TODO
             // player.OnInOptionsChangedEvent -= OnInSettingsChanged;
-            // player.OnIsReadyChangedEvent -= OnIsReadyChanged;
         }
 
         public void OnDestroy() {
@@ -50,16 +48,18 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Start() {
-            nameText.color = NicknameColor.color;
+            RuntimePlayer runtimePlayer = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(player);
+            nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+            nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
 
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged, onlyIfActiveAndEnabled: true);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
-            nameText.color = NicknameColor.color;
-            if (NicknameColor.isRainbow) {
-                nameText.color = Utils.Utils.GetRainbowColor();
+            if (!constantNicknameColor) {
+                nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out _);
             }
 
             if (typingCounter > 0 /* TODO && !player.IsMuted */) {
@@ -174,7 +174,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void PromotePlayer() {
-            // TODO MainMenuManager.Instance.Promote(player);
+            QuantumRunner.DefaultGame.SendCommand(new CommandChangeHost {
+                NewHost = player,
+            });
             HideDropdown(true);
         }
 
@@ -193,6 +195,12 @@ namespace NSMB.UI.MainMenu {
         //---Callbacks
         private void OnColorblindModeChanged() {
             UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
+        }
+
+        private void OnGameStateChanged(EventGameStateChanged e) {
+            if (e.NewState == GameState.PreGameRoom) {
+                UpdateText(e.Frame);
+            }
         }
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {

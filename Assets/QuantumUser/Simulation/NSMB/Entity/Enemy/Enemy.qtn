@@ -1,6 +1,7 @@
 component Enemy {
 	FPVector2 Spawnpoint;
 	bool IgnorePlayerWhenRespawning;
+	bool DisableRespawning;
 
 	[ExcludeFromPrototype] bool IsActive;
 	[ExcludeFromPrototype] bool IsDead;

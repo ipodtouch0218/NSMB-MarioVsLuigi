@@ -260,6 +260,8 @@ MonoBehaviour:
         RawValue: 0
     IgnorePlayerWhenRespawning:
       Value: 0
+    IsRespawnable:
+      Value: 1
 --- !u!114 &5623453289331559766
 MonoBehaviour:
   m_ObjectHideFlags: 0

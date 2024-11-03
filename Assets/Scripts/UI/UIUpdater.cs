@@ -25,7 +25,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
     [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
     [SerializeField] private Sprite storedItemNull;
     [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
-    [SerializeField] private Image itemReserve, itemColor;
+    [SerializeField] private Image itemReserve, itemColor, deathFade;
     [SerializeField] private GameObject boos;
     [SerializeField] private Animator reserveAnimator;
 
@@ -44,6 +44,9 @@ public unsafe class UIUpdater : QuantumCallbacks {
     private PowerupAsset previousPowerup;
     private VersusStageData stage;
     private EntityRef previousTarget;
+
+    private float fadeTarget;
+    private int fadeStartFrame;
 
     protected override void OnEnable() {
         base.OnEnable();
@@ -97,6 +100,8 @@ public unsafe class UIUpdater : QuantumCallbacks {
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
+        QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
+        QuantumEvent.Subscribe<EventStartCameraFadeIn>(this, OnStartCameraFadeIn);
     }
 
     public override void OnUpdateView(QuantumGame game) {
@@ -115,6 +120,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
         UpdateStoredItemUI(mario, previousTarget == Target);
         UpdateTextUI(f, mario);
         ApplyUIColor(f, mario);
+        UpdateFadeInOut(f);
 
         previousTarget = Target;
     }
@@ -187,10 +193,26 @@ public unsafe class UIUpdater : QuantumCallbacks {
         itemReserve.sprite = storedItemNull;
     }
 
-    public void OnTimerExpired(EventTimerExpired e) {
+    private void OnStartCameraFadeIn(EventStartCameraFadeIn e) {
+        fadeStartFrame = e.Frame.Number;
+        fadeTarget = 0;
+    }
+
+    private void OnStartCameraFadeOut(EventStartCameraFadeOut e) {
+        fadeStartFrame = e.Frame.Number;
+        fadeTarget = 1;
+    }
+
+    private void OnTimerExpired(EventTimerExpired e) {
         CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
         cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
         timerMaterial.SetColor("_Color", Color.red);
+    }
+
+    private void UpdateFadeInOut(Frame f) {
+        Color newColor = deathFade.color;
+        newColor.a = Mathf.Lerp(1 - fadeTarget, fadeTarget, (float) (f.Number - fadeStartFrame) / (f.UpdateRate / 4));
+        deathFade.color = newColor;
     }
 
     private unsafe void UpdateTextUI(Frame f, MarioPlayer mario) {
