@@ -32,6 +32,7 @@ public class PlayerElements : MonoBehaviour {
     [SerializeField] private GameObject spectationUI;
     [SerializeField] private TMP_Text spectatingText;
     [SerializeField] private PlayerNametag nametagPrefab;
+    [SerializeField] public GameObject nametagCanvas;
 
     //---Private Variables
     private PlayerRef player;
@@ -67,6 +68,7 @@ public class PlayerElements : MonoBehaviour {
     }
 
     public void Start() {
+        nametagCanvas.SetActive(Settings.Instance.GraphicsPlayerNametags);
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 

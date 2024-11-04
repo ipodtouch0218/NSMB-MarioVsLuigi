@@ -69,40 +69,6 @@ public class ChatManager : MonoBehaviour {
         });
     }
 
-    /* TODO
-    public void IncomingPlayerMessage(string message, RpcInfo info) {
-        NetworkRunner runner = NetworkHandler.Runner;
-        PlayerRef player = info.Source;
-
-        if (!player.IsRealPlayer) {
-            return;
-        }
-
-        if (!player.TryGetPlayerData(out PlayerData data)) {
-            return;
-        }
-
-        // Spam prevention & Muted
-        if (data.IsMuted || data.MessageCooldownTimer.IsActive(runner)) {
-            return;
-        }
-
-        // Validate message format
-        message = message[..Mathf.Min(128, message.Length)];
-        message = message.Replace("\n", " ").Trim();
-
-        // Empty message
-        if (string.IsNullOrWhiteSpace(message)) {
-            return;
-        }
-
-        data.MessageCooldownTimer = TickTimer.CreateFromSeconds(runner, 0.5f);
-
-        // Message seems fine, send to rest of lobby.
-        SessionData.Instance.Rpc_ChatDisplayMessage(message, player);
-    }
-    */
-
     public void ClearChat() {
         chatHistory.Clear();
         if (MainMenuManager.Instance) {
@@ -111,24 +77,6 @@ public class ChatManager : MonoBehaviour {
     }
 
     //---Callbacks
-    /* TODO
-    private void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
-        foreach (ChatMessage.ChatMessageData data in chatHistory) {
-            if (data.player == player) {
-                data.player = PlayerRef.None;
-            }
-        }
-    }
-
-    private void OnPlayerDataReady(PlayerData pd) {
-        if (pd.Owner == pd.Runner.LocalPlayer && pd.IsRoomOwner) {
-            AddSystemMessage("ui.inroom.chat.hostreminder", Red);
-        }
-
-        AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", pd.GetNickname());
-    }
-    */
-
     private void OnChatMessageCallback(ChatMessage.ChatMessageData data) {
         if (data.isSystemMessage) {
             Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");

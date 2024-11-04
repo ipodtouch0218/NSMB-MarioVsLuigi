@@ -143,11 +143,12 @@ public class Settings : Singleton<Settings> {
     private bool _graphicsPlayerNametags;
     public bool GraphicsPlayerNametags {
         get => _graphicsPlayerNametags;
-        set => _graphicsPlayerNametags = value;/* TODO
-            if (GameManager.Instance) {
-                GameManager.Instance.nametagCanvas.gameObject.SetActive(value);
+        set {
+            _graphicsPlayerNametags = value;
+            foreach (var element in PlayerElements.AllPlayerElements) {
+                element.nametagCanvas.SetActive(value);
             }
-            */
+        }
     }
 
     private bool _graphicsColorblind;
