@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
-using TMPro;
-using NSMB.Extensions;
+﻿using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Prompts;
 using NSMB.Utils;
 using Photon.Realtime;
 using Quantum;
-using System.Threading.Tasks;
-using Button = UnityEngine.UI.Button;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
+using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuManager : Singleton<MainMenuManager> {
@@ -156,9 +156,9 @@ namespace NSMB.UI.MainMenu {
 
             if (regionDropdown.options.Count == 0) {
                 // Create brand-new options
-                for (int i = 0; i < NetworkHandler.Regions.Count; i++) {
-                    Region region = NetworkHandler.Regions[i];
-                    regionDropdown.options.Add(new RegionOption(i, region.Code, region.Ping));
+                int i = 0;
+                foreach (var region in NetworkHandler.Regions) {
+                    regionDropdown.options.Add(new RegionOption(i++, region.Code, region.Ping));
                 }
                 regionDropdown.options.Sort();
             } else {
@@ -168,7 +168,7 @@ namespace NSMB.UI.MainMenu {
                 if (NetworkHandler.Regions != null) {
                     foreach (var option in regionDropdown.options) {
                         if (option is RegionOption ro) {
-                            ro.Ping = NetworkHandler.Regions[ro.Index].Ping;
+                            ro.Ping = NetworkHandler.Regions.ElementAt(ro.Index).Ping;
                         }
                     }
                 }

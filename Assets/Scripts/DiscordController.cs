@@ -156,17 +156,11 @@ public unsafe class DiscordController : MonoBehaviour {
     }
 
     public void TryJoinGame(string secret) {
-        /* 
-        // TODO: MainMenu jank...
-        if (GameManager.Instance) {
-            return;
-        }
-
+        // TODO: test
         Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
-
-        // TODO: add "disconnect" prompt if we're already in a game.
-        _ = NetworkHandler.JoinRoom(secret);
-        */
+        _ = NetworkHandler.JoinRoom(new EnterRoomArgs {
+            RoomName = secret,
+        });
     }
 
     //TODO this doesn't work???

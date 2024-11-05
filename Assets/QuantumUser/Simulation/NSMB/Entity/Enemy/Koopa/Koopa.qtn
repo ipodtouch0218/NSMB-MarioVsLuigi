@@ -15,7 +15,7 @@ component Koopa {
 	[ExcludeFromPrototype] ushort WakeupFrames;
 }
 
-event KoopaEnteredShell {
+event KoopaKicked {
 	nothashed Frame Frame;
 	EntityRef Entity;
 	bool Groundpounded;

@@ -808,23 +808,25 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: 
+    Android: QUANTUM_XY
     CloudRendering: 
-    EmbeddedLinux: 
-    GameCoreScarlett: 
-    GameCoreXboxOne: 
+    EmbeddedLinux: QUANTUM_XY
+    GameCoreScarlett: QUANTUM_XY
+    GameCoreXboxOne: QUANTUM_XY
+    LinuxHeadlessSimulation: QUANTUM_XY
     Lumin: 
-    Nintendo Switch: 
-    PS4: 
-    PS5: 
-    QNX: 
-    Stadia: 
-    Standalone: QUANTUM_XY;QUANTUM_DISABLE_AI
-    WebGL: FUSION_WEAVER;FUSION2
-    Windows Store Apps: FUSION_WEAVER
-    XboxOne: 
-    iPhone: 
-    tvOS: 
+    Nintendo Switch: QUANTUM_XY
+    PS4: QUANTUM_XY
+    PS5: QUANTUM_XY
+    QNX: QUANTUM_XY
+    Stadia: QUANTUM_XY
+    Standalone: QUANTUM_DISABLE_AI;QUANTUM_XY
+    VisionOS: QUANTUM_XY
+    WebGL: FUSION_WEAVER;FUSION2;QUANTUM_XY
+    Windows Store Apps: FUSION_WEAVER;QUANTUM_XY
+    XboxOne: QUANTUM_XY
+    iPhone: QUANTUM_XY
+    tvOS: QUANTUM_XY
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

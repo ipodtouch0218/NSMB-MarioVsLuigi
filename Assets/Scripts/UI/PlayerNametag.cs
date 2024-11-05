@@ -52,6 +52,10 @@ public class PlayerNametag : MonoBehaviour {
 
         EntityRef entity = parent.entity.EntityRef;
         Frame f = game.Frames.Predicted;
+
+        if (!f.Exists(entity)) {
+            return;
+        }
         var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
 
         if (!character) {

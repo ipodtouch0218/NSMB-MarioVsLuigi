@@ -19,7 +19,7 @@ namespace Quantum {
             systems.Add(new PhysicsSystem2D());
 
             systems.Add(
-                new GameplaySystemGroup(
+                new StartDisabledSystemGroup("gameplay",
                     new GenericMoverSystem(),
                     new SpinnerSystem(),
                     new MovingPlatformSystem(),

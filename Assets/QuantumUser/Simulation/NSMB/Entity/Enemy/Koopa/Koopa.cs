@@ -18,11 +18,11 @@ namespace Quantum {
         public void EnterShell(Frame f, EntityRef entity, EntityRef initiator, bool flipped, bool groundpounded) {
             var holdable = f.Unsafe.GetPointer<Holdable>(entity);
             holdable->PreviousHolder = initiator;
-
+            /*
             if (!IsInShell || IsKicked || groundpounded) {
                 f.Events.KoopaEnteredShell(f, entity, groundpounded);
             }
-
+            */
             CurrentSpeed = 0;
             Combo = 0;
             IsInShell = true;
@@ -43,6 +43,7 @@ namespace Quantum {
             CurrentSpeed = KickSpeed + speed;
 
             f.Events.PlayComboSound(f, entity, 0);
+            f.Events.KoopaKicked(f, entity, false);
         }
 
         public void Kill(Frame f, EntityRef entity, EntityRef killerEntity, bool special) {

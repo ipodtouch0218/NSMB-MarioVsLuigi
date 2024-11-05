@@ -4,6 +4,7 @@ using Photon.Realtime;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -27,22 +28,18 @@ namespace NSMB.UI.MainMenu {
             ChatManager.OnChatMessage += OnChatMessage;
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            PlayerListEntry.PlayerMuteStateChanged += OnPlayerMuteStateChanged;
             OnDisableChatChanged();
 
             QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping, onlyIfActiveAndEnabled: true);
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
         }
 
         public void OnDestroy() {
             ChatManager.OnChatMessage -= OnChatMessage;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
-        }
-
-        public void ReplayChatMessages() {
-            foreach (ChatMessage.ChatMessageData message in ChatManager.Instance.chatHistory) {
-                OnChatMessage(message);
-            }
-            Canvas.ForceUpdateCanvases();
         }
 
         public void UpdatePlayerColors() {
@@ -98,14 +95,27 @@ namespace NSMB.UI.MainMenu {
         //---Callbacks
         public void OnChatMessage(ChatMessage.ChatMessageData data) {
             ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
-            chat.gameObject.SetActive(true);
+
+            bool active;
+            if (data.isSystemMessage) {
+                active = true;
+            } else {
+                RuntimePlayer player = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(data.player);
+                if (player == null) {
+                    active = true;
+                } else {
+                    active = !ChatManager.Instance.mutedPlayers.Contains(player.UserId);
+                }
+            }
+            chat.gameObject.SetActive(active);
+
             chat.Initialize(data);
             chatMessages.Add(chat);
         }
 
         public void OnDisableChatChanged() {
             foreach (ChatMessage msg in chatMessages) {
-                msg.UpdateVisibleState(!Settings.Instance.GeneralDisableChat);
+                msg.UpdateVisibleState();
             }
 
             sendBtn.interactable = chatbox.interactable = !Settings.Instance.GeneralDisableChat;
@@ -115,6 +125,12 @@ namespace NSMB.UI.MainMenu {
             }
 
             OnLanguageChanged(GlobalController.Instance.translationManager);
+        }
+
+        private void OnPlayerMuteStateChanged(PlayerListEntry player) {
+            foreach (ChatMessage msg in chatMessages) {
+                msg.UpdateVisibleState();
+            }
         }
 
         public void OnLanguageChanged(TranslationManager tm) {
@@ -152,6 +168,25 @@ namespace NSMB.UI.MainMenu {
             }
 
             QuantumRunner.DefaultGame.SendCommand(new CommandStartTyping());
+        }
+
+        private void OnPlayerAdded(EventPlayerAdded e) {
+            RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+            foreach (var chatMessage in chatMessages) {
+                if (chatMessage.data.userId == runtimePlayer.UserId) {
+                    // Reassign this chat message
+                    chatMessage.data.player = e.Player;
+                }
+            }
+        }
+
+        private void OnPlayerRemoved(EventPlayerRemoved e) {
+            // Disassociate chat messages
+            foreach (var chatMessage in chatMessages) {
+                if (chatMessage.data.player == e.Player) {
+                    chatMessage.data.player = PlayerRef.None;
+                }
+            }
         }
 
         private void OnPlayerStartedTyping(EventPlayerStartedTyping e) {

@@ -1,6 +1,8 @@
 using NSMB.Extensions;
 using NSMB.Utils;
 using Quantum;
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,36 +11,35 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu {
     public class PlayerListEntry : MonoBehaviour {
 
+        //---Static Variables
+        public static event Action<PlayerListEntry> PlayerMuteStateChanged;
+
         //---Public Variables
         public PlayerRef player;
         public float typingCounter;
 
         //---Serialized Variables
-        [SerializeField] private TMP_Text nameText, pingText, winsText;
+        [SerializeField] private TMP_Text nameText, pingText, winsText, muteButtonText;
         [SerializeField] private Image colorStrip;
-        [SerializeField] private RectTransform background, options;
+        [SerializeField] private RectTransform background, optionsTransform;
         [SerializeField] private GameObject blockerTemplate, firstButton, chattingIcon, settingsIcon, readyIcon;
         [SerializeField] private Canvas rootCanvas;
         [SerializeField] private LayoutElement layout;
-        [SerializeField] private GameObject[] adminOnlyOptions;
+        [SerializeField] private GameObject[] allOptions, adminOnlyOptions, othersOnlyOptions;
 
         //---Private Variables
         private GameObject blockerInstance;
         private EntityRef playerDataEntity;
+        private string userId;
         private string nicknameColor;
         private bool constantNicknameColor;
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
-            // TODO
-            // player.OnInOptionsChangedEvent += OnInSettingsChanged;
-            // OnInSettingsChanged(player.IsInOptions);
         }
 
         public void OnDisable() {
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
-            // TODO
-            // player.OnInOptionsChangedEvent -= OnInSettingsChanged;
         }
 
         public void OnDestroy() {
@@ -50,6 +51,7 @@ namespace NSMB.UI.MainMenu {
         public void Start() {
             RuntimePlayer runtimePlayer = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(player);
             nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+            userId = runtimePlayer?.UserId;
             nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
 
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged, onlyIfActiveAndEnabled: true);
@@ -62,7 +64,7 @@ namespace NSMB.UI.MainMenu {
                 nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out _);
             }
 
-            if (typingCounter > 0 /* TODO && !player.IsMuted */) {
+            if (typingCounter > 0 && !ChatManager.Instance.mutedPlayers.Contains(userId)) {
                 chattingIcon.SetActive(true);
                 typingCounter -= Time.deltaTime;
             } else {
@@ -108,7 +110,13 @@ namespace NSMB.UI.MainMenu {
             }
 
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            nameText.text = permissionSymbol + characterSymbol + teamSymbol + runtimePlayer.PlayerNickname.ToValidUsername();
+
+            string additionalSymbols = "";
+            if (ChatManager.Instance.mutedPlayers.Contains(runtimePlayer.UserId)) {
+                additionalSymbols += "<sprite name=player_muted>";
+            }
+
+            nameText.text = additionalSymbols + permissionSymbol + characterSymbol + teamSymbol + runtimePlayer.PlayerNickname.ToValidUsername();
 
             Transform parent = transform.parent;
             int childIndex = 0;
@@ -124,15 +132,35 @@ namespace NSMB.UI.MainMenu {
             layout.layoutPriority = transform.parent.childCount - childIndex;
         }
 
-        public void ShowDropdown() {
+        public unsafe void ShowDropdown() {
             if (blockerInstance) {
                 Destroy(blockerInstance);
             }
 
+            foreach (var option in allOptions) {
+                option.SetActive(true);
+            }
+
             QuantumGame game = QuantumRunner.DefaultGame;
-            bool adminOptions = NetworkHandler.Client.LocalPlayer.IsMasterClient && !game.PlayerIsLocal(player);
-            foreach (GameObject option in adminOnlyOptions) {
-                option.SetActive(adminOptions);
+            bool adminOptions = false;
+            foreach (PlayerRef localPlayer in game.GetLocalPlayers()) {
+                if (QuantumUtils.GetPlayerData(game.Frames.Predicted, localPlayer)->IsRoomHost) {
+                    adminOptions = true;
+                    break;
+                }
+            }
+
+            if (!adminOptions) {
+                foreach (var option in adminOnlyOptions) {
+                    option.SetActive(false);
+                }
+            }
+
+            bool othersOptions = !game.PlayerIsLocal(player);
+            if (!othersOptions) {
+                foreach (var option in othersOnlyOptions) {
+                    option.SetActive(false);
+                }
             }
 
             Canvas.ForceUpdateCanvases();
@@ -142,8 +170,8 @@ namespace NSMB.UI.MainMenu {
             blockerTransform.offsetMax = blockerTransform.offsetMin = Vector2.zero;
             blockerInstance.SetActive(true);
 
-            background.offsetMin = new(background.offsetMin.x, -options.rect.height);
-            options.anchoredPosition = new(options.anchoredPosition.x, -options.rect.height);
+            background.offsetMin = new(background.offsetMin.x, -optionsTransform.rect.height);
+            optionsTransform.anchoredPosition = new(optionsTransform.anchoredPosition.x, -optionsTransform.rect.height);
 
             EventSystem.current.SetSelectedGameObject(firstButton);
             MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Cursor);
@@ -153,7 +181,7 @@ namespace NSMB.UI.MainMenu {
             Destroy(blockerInstance);
 
             background.offsetMin = new(background.offsetMin.x, 0);
-            options.anchoredPosition = new(options.anchoredPosition.x, 0);
+            optionsTransform.anchoredPosition = new(optionsTransform.anchoredPosition.x, 0);
 
             MainMenuManager.Instance.sfx.PlayOneShot(didAction ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
         }
@@ -169,7 +197,23 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void MutePlayer() {
-            // TODO MainMenuManager.Instance.Mute(player);
+            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+            if (runtimePlayer != null) {
+                HashSet<string> mutedPlayers = ChatManager.Instance.mutedPlayers;
+                if (mutedPlayers.Contains(userId)) {
+                    mutedPlayers.Remove(userId);
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.unmuted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername());
+                    muteButtonText.text = GlobalController.Instance.translationManager.GetTranslation("ui.inroom.player.mute");
+                } else {
+                    mutedPlayers.Add(userId);
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.muted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername());
+                    muteButtonText.text = GlobalController.Instance.translationManager.GetTranslation("ui.inroom.player.unmute");
+                }
+            }
+
+            PlayerMuteStateChanged?.Invoke(this);
+            UpdateText(f);
             HideDropdown(true);
         }
 
@@ -177,6 +221,11 @@ namespace NSMB.UI.MainMenu {
             QuantumRunner.DefaultGame.SendCommand(new CommandChangeHost {
                 NewHost = player,
             });
+            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+            if (runtimePlayer != null) {
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername());
+            }
             HideDropdown(true);
         }
 

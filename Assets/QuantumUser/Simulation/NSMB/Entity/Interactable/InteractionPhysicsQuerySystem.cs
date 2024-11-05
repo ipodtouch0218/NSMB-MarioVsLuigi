@@ -13,12 +13,12 @@ namespace Quantum {
             FP center = transformCopy.Position.X + shape.Centroid.X;
             if (center - shape.Box.Extents.X < stage.StageWorldMin.X) {
                 // Left edge
-                transformCopy.Position.X += stage.TileDimensions.x / FP._2;
+                transformCopy.Position.X += stage.TileDimensions.x * FP._0_50;
                 interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
 
             } else if (center + shape.Box.Extents.X > stage.StageWorldMax.X) {
                 // Right edge
-                transformCopy.Position.X -= stage.TileDimensions.x / FP._2;
+                transformCopy.Position.X -= stage.TileDimensions.x * FP._0_50;
                 interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
             }
         }

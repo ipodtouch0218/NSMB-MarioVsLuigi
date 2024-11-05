@@ -16,6 +16,7 @@ public class ChatManager : MonoBehaviour {
 
     //---Public Variables
     public readonly List<ChatMessage.ChatMessageData> chatHistory = new();
+    public readonly HashSet<string> mutedPlayers = new();
 
     public void Awake() {
         Instance = this;
@@ -36,7 +37,7 @@ public class ChatManager : MonoBehaviour {
         QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
     }
 
-    public void AddChatMessage(string message, PlayerRef player, Color? color = null, bool filter = false) {
+    public void AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
         if (filter) {
             message = message.Filter();
         }
@@ -44,10 +45,10 @@ public class ChatManager : MonoBehaviour {
         ChatMessage.ChatMessageData data = new() {
             isSystemMessage = false,
             player = player,
+            userId = f.GetPlayerData(player).UserId,
             color = color ?? Color.black,
             message = message,
         };
-        chatHistory.Add(data);
         OnChatMessage?.Invoke(data);
     }
 
@@ -59,7 +60,6 @@ public class ChatManager : MonoBehaviour {
             message = key,
             replacements = replacements,
         };
-        chatHistory.Add(data);
         OnChatMessage?.Invoke(data);
     }
 
@@ -67,13 +67,6 @@ public class ChatManager : MonoBehaviour {
         QuantumRunner.DefaultGame.SendCommand(new CommandSendChatMessage {
             Message = text
         });
-    }
-
-    public void ClearChat() {
-        chatHistory.Clear();
-        if (MainMenuManager.Instance) {
-            MainMenuManager.Instance.chat.ClearChat();
-        }
     }
 
     //---Callbacks
@@ -88,12 +81,6 @@ public class ChatManager : MonoBehaviour {
 
     public void OnPlayerSentChatMessage(EventPlayerSentChatMessage e) {
 
-        /* TODO
-        if (data.IsMuted) {
-            return;
-        }
-        */
-
         // Format message, in case we can't trust the host to do it for us.
         string message = e.Message;
         message = message[..Mathf.Min(128, message.Length)];
@@ -103,7 +90,7 @@ public class ChatManager : MonoBehaviour {
         RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
         message = runtimeData.PlayerNickname.ToValidUsername() + ": " + message.Filter();
 
-        AddChatMessage(message, e.Player);
+        AddChatMessage(message, e.Player, e.Frame);
 
         if (MainMenuManager.Instance) {
             PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(e.Player);

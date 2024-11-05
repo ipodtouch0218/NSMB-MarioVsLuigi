@@ -92,7 +92,7 @@ namespace Quantum {
           case EventGameStarted.ID: result = typeof(EventGameStarted); return;
           case EventGameEnded.ID: result = typeof(EventGameEnded); return;
           case EventIceBlockSinking.ID: result = typeof(EventIceBlockSinking); return;
-          case EventKoopaEnteredShell.ID: result = typeof(EventKoopaEnteredShell); return;
+          case EventKoopaKicked.ID: result = typeof(EventKoopaKicked); return;
           case EventLiquidSplashed.ID: result = typeof(EventLiquidSplashed); return;
           case EventMarioBrosPlatformBumped.ID: result = typeof(EventMarioBrosPlatformBumped); return;
           case EventMarioPlayerJumped.ID: result = typeof(EventMarioPlayerJumped); return;
@@ -377,8 +377,8 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventKoopaEnteredShell KoopaEnteredShell(Frame Frame, EntityRef Entity, QBoolean Groundpounded) {
-        var ev = _f.Context.AcquireEvent<EventKoopaEnteredShell>(EventKoopaEnteredShell.ID);
+      public EventKoopaKicked KoopaKicked(Frame Frame, EntityRef Entity, QBoolean Groundpounded) {
+        var ev = _f.Context.AcquireEvent<EventKoopaKicked>(EventKoopaKicked.ID);
         ev.Frame = Frame;
         ev.Entity = Entity;
         ev.Groundpounded = Groundpounded;
@@ -1516,15 +1516,15 @@ namespace Quantum {
       }
     }
   }
-  public unsafe partial class EventKoopaEnteredShell : EventBase {
+  public unsafe partial class EventKoopaKicked : EventBase {
     public new const Int32 ID = 32;
     public Frame Frame;
     public EntityRef Entity;
     public QBoolean Groundpounded;
-    protected EventKoopaEnteredShell(Int32 id, EventFlags flags) : 
+    protected EventKoopaKicked(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
-    public EventKoopaEnteredShell() : 
+    public EventKoopaKicked() : 
         base(32, EventFlags.Server|EventFlags.Client) {
     }
     public new QuantumGame Game {

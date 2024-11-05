@@ -220,7 +220,7 @@ namespace Quantum {
 
                 } if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
-                    f.SystemEnable<GameplaySystemGroup>();
+                    f.SystemEnable<StartDisabledSystemGroup>();
                     f.Signals.OnGameStarting();
                     f.Events.GameStarted(f);
                 }
@@ -249,11 +249,11 @@ namespace Quantum {
                         //f.MapAssetRef = f.SimulationConfig.LobbyMap;
                         f.Map = null;
                     }
-                    f.SystemEnable<GameplaySystemGroup>();
+                    f.SystemEnable<StartDisabledSystemGroup>();
                     f.Signals.OnReturnToRoom();
                     f.Global->GameState = GameState.PreGameRoom;
                     f.Events.GameStateChanged(f, GameState.PreGameRoom);
-                    f.SystemDisable<GameplaySystemGroup>();
+                    f.SystemDisable<StartDisabledSystemGroup>();
                 }
                 break;
             }
@@ -328,19 +328,18 @@ namespace Quantum {
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
             f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
 
-            if (winningTeam != null) {
-                var playerDatas = f.Filter<PlayerData>();
-                while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
-                    if (winningTeam == data->Team) {
-                        data->Wins++;
-                    }
+            var playerDatas = f.Filter<PlayerData>();
+            while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                data->IsSpectator = data->ManualSpectator;
+                if (winningTeam == data->Team) {
+                    data->Wins++;
                 }
             }
 
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(f, GameState.Ended);
             f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);
-            f.SystemDisable<GameplaySystemGroup>();
+            f.SystemDisable<StartDisabledSystemGroup>();
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {

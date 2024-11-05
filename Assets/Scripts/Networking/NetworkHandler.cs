@@ -11,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using NSMB.UI.MainMenu;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -26,7 +25,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
     public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
-    public static List<Region> Regions => Client.RegionHandler.EnabledRegions;
+    public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay { get; private set; }
     public static int ReplayStart { get; private set; }
@@ -54,6 +53,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+        QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
@@ -85,7 +85,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
                 or ClientState.JoiningLobby
                 or ClientState.Leaving
                 or ClientState.ConnectedToNameServer // Include this since we can't do anything and will auto-disconnect anyway
-                || Client.State == ClientState.Joined && !Runner
+                || (Client.State == ClientState.Joined && (!Runner || (Runner.Game == null) || Runner.Game.GetLocalPlayers().Count == 0))
         );
     }
 
@@ -141,7 +141,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     public static async Task ConnectToRoomsRegion(string roomId) {
         int regionIndex = RoomIdValidChars.IndexOf(roomId[0]);
-        string targetRegion = Regions[regionIndex].Code;
+        string targetRegion = Regions.ElementAt(regionIndex).Code;
 
         if (Client.CurrentRegion != targetRegion) {
             // await Client.DisconnectAsync();
@@ -154,7 +154,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         StringBuilder idBuilder = new();
 
         // First char should correspond to region.
-        int index = Regions.Select(r => r.Code).ToList().IndexOf(Region); // Dirty linq hack
+        int index = Regions.Select(r => r.Code).IndexOf(r => r.Equals(Region, StringComparison.InvariantCultureIgnoreCase)); // Dirty linq hack
         idBuilder.Append(RoomIdValidChars[index >= 0 ? index : 0]);
 
         // Fill rest of the string with random chars
@@ -256,6 +256,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             UseColoredNickname = Settings.Instance.generalUseNicknameColor,
         });
 
+        ChatManager.Instance.mutedPlayers.Clear();
         GlobalController.Instance.connecting.SetActive(false);
     }
 
@@ -276,6 +277,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private void OnGameEnded(EventGameEnded e) {
         SaveReplay(e.Game);
+    }
+
+    private void OnPlayerAdded(EventPlayerAdded e) {
+        RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+        Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) joined the game.");
+    }
+
+    private void OnPlayerRemoved(EventPlayerRemoved e) {
+        RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+        Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) left the game.");
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {
@@ -372,7 +383,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public void OnRegionListReceived(RegionHandler regionHandler) { }
 
     public void OnCustomAuthenticationResponse(Dictionary<string, object> data) {
-
         PlayerPrefs.SetString("id", Client.AuthValues.UserId);
 
         if (data.TryGetValue("Token", out object token) && token is string tokenString) {
@@ -380,25 +390,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
 
         PlayerPrefs.Save();
-
-        /*
-        if (data.TryGetValue("SignedData", out object value)) {
-            SignedResultData signedData = JsonConvert.DeserializeObject<SignedResultData>((string) value);
-            ConnectionToken connectionToken = new() {
-                signedData = signedData,
-                signature = (string) data["Signature"],
-            };
-            if (connectionToken.HasValidSignature()) {
-                // Good to go :)
-                Debug.Log($"[Network] Authenication successful ({signedData.UserId}), server signature verified");
-                GlobalController.Instance.connectionToken = connectionToken;
-            } else {
-                Debug.LogWarning("[Network] Authentication server responded with signed data, but it had an invalid signature. Possible server spoofing?");
-            }
-        } else {
-            Debug.LogWarning("[Network] Authentication server did not respond with any signed data, ID Spoofing is possible");
-        }
-        */
     }
 
     public void OnCustomAuthenticationFailed(string debugMessage) { }

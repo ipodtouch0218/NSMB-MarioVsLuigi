@@ -256,7 +256,6 @@ namespace Quantum {
                             koopaEnemy->IsActive = false;
                             koopaEnemy->IsDead = true;
                             koopaPhysicsObject->IsFrozen = true;
-                            f.Events.KoopaEnteredShell(f, koopaEntity, mario->IsGroundpoundActive);
 
                         } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->IsGroundpoundActive) {
                             koopa->EnterShell(f, koopaEntity, marioEntity, false, false);

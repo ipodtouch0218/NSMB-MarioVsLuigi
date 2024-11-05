@@ -6379,6 +6379,7 @@ MonoBehaviour:
   spectationUI: {fileID: 6512350293295303382}
   spectatingText: {fileID: 8230197844002157990}
   nametagPrefab: {fileID: 6437727245195064506}
+  nametagCanvas: {fileID: 153129573199356250}
 --- !u!114 &6689543478587193701
 MonoBehaviour:
   m_ObjectHideFlags: 0

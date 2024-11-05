@@ -17,7 +17,7 @@ public class IntroManager : MonoBehaviour {
     private IEnumerator IntroSequence() {
         yield return new WaitForSeconds(0.75f);
         sfx.Play();
-        yield return FadeImageToValue(fullscreenImage, 0, 0.5f);
+        yield return FadeImageToValue(fullscreenImage, 0, 0.33f);
         yield return new WaitForSeconds(0.5f);
 
         AsyncOperation sceneLoad = SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
@@ -25,7 +25,7 @@ public class IntroManager : MonoBehaviour {
 
         yield return new WaitForSeconds(0.75f);
         fullscreenImage.color = new Color(0,0,0,0);
-        yield return FadeImageToValue(fullscreenImage, 1, 0.5f);
+        yield return FadeImageToValue(fullscreenImage, 1, 0.33f);
         yield return new WaitForSeconds(0.75f);
 
         while (sceneLoad.progress < 0.9f) {
@@ -44,7 +44,7 @@ public class IntroManager : MonoBehaviour {
             yield return null;
         } while (Time.deltaTime >= Time.maximumDeltaTime);
         
-        yield return FadeImageToValue(fullscreenImage, 0,+ 0.5f);
+        yield return FadeImageToValue(fullscreenImage, 0, 0.33f);
         yield return new WaitForSeconds(0.5f);
         SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
         //SceneManager.SetActiveScene(SceneManager.GetSceneByName("MainMenu"));

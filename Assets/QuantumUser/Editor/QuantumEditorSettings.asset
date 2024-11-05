@@ -16,13 +16,11 @@ MonoBehaviour:
   - Assets
   DefaultNewAssetsLocation: Assets/QuantumUser/Resources
   UseQuantumUnityDBAssetPostprocessor: 1
-  UseQuantumToolbarUtilities: 0
+  UseQuantumToolbarUtilities: 1
   QuantumToolbarZone: 0
   UsePhotonAppVersionsPostprocessor: 1
   EntityComponentInspectorMode: 2
   AutoBuildOnSceneSave: 96
   AutoBuildOnPlaymodeChanged: 96
   AutoBuildOnBuild: 96
-  AutoRunQtnCodeGen: 0
   AssetGuidOverrides: []
-  QuantumSolutionPath: 

@@ -1,12 +1,11 @@
-using System;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-
 using NSMB.Extensions;
 using NSMB.Translation;
-using Quantum;
 using NSMB.Utils;
+using Quantum;
+using System;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class ChatMessage : MonoBehaviour {
 
@@ -43,12 +42,12 @@ public class ChatMessage : MonoBehaviour {
             chatText.text = data.message;
         }
 
-        UpdateVisibleState(!Settings.Instance.GeneralDisableChat);
+        UpdateVisibleState();
         UpdatePlayerColor();
     }
 
-    public void UpdateVisibleState(bool enable) {
-        gameObject.SetActive(data.isSystemMessage || enable);
+    public void UpdateVisibleState() {
+        gameObject.SetActive(data.isSystemMessage || (!Settings.Instance.GeneralDisableChat && !ChatManager.Instance.mutedPlayers.Contains(data.userId)));
     }
 
     public void UpdatePlayerColor() {
@@ -61,6 +60,7 @@ public class ChatMessage : MonoBehaviour {
 
     public class ChatMessageData {
         public PlayerRef player;
+        public string userId;
         public Color color;
         public bool isSystemMessage;
         public string message;

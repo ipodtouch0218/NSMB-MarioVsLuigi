@@ -43,6 +43,7 @@ namespace Quantum {
                 }
             }
 
+            FPVector2 previousPosition = transform->Position;
             if (FPMath.Abs(physicsObject->Velocity.X) > FPMath.Abs(physicsObject->Velocity.Y)) {
                 physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
                 physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, entity, stage, contacts);
@@ -54,15 +55,14 @@ namespace Quantum {
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
-                FPVector2 previousPosition = transform->Position;
                 
                 MoveVertically(f, -FP._0_25 * f.UpdateRate, entity, stage, contacts);
                 ResolveContacts(f, stage, physicsObject, contacts);
 
                 if (!physicsObject->IsTouchingGround) {
-                    transform->Position = previousPosition;
+                    transform->Position.Y = previousPosition.Y;
                     physicsObject->Velocity.Y = 0;
-                    physicsObject->HoverFrames = 2;
+                    physicsObject->HoverFrames = 3;
                 }
             }
 #if DEBUG
@@ -72,6 +72,7 @@ namespace Quantum {
 #endif
 
             if (QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
+                // Apply gravity
                 physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
             }
 
