@@ -252,7 +252,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         IsReplay = false;
         Runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
         Runner.Game.AddPlayer(new RuntimePlayer {
-            PlayerNickname = Settings.Instance.generalNickname,
+            PlayerNickname = Settings.Instance.generalNickname ?? "noname",
+            UserId = default(Guid).ToString(),
             UseColoredNickname = Settings.Instance.generalUseNicknameColor,
         });
 

@@ -37,9 +37,10 @@ namespace Quantum {
                     if (Scale.X < 0 ^ Scale.Y < 0) {
                         // Flipping produced counter-clockwise points;
                         // Invert order for proper normals
+
                         index = shapePointCount - point - 1;
                     }
-
+                    
                     FPVector2 p = stageTile.CollisionData.Shapes[shapeIndex].Vertices[index];
                     // Scale
                     p = FPVector2.Scale(p, Scale) / 2;

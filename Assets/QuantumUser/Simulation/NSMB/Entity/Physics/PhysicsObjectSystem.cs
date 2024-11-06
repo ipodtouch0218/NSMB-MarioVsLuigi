@@ -751,10 +751,12 @@ namespace Quantum {
 
         public static bool BoxInGround(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default) {
             // In a solid hitbox
-            var hits = f.Physics2D.OverlapShape(position, 0, shape, f.Context.EntityPlayerMask);
+            var hits = f.Physics2D.OverlapShape(position, 0, shape, f.Context.EntityPlayerMask, ~QueryOptions.HitTriggers);
+            f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario);
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits.HitsBuffer[i];
-                if (hit.Entity != entity) {
+                if (hit.Entity != entity
+                    && (mario == null || hit.Entity != mario->HeldEntity)) {
                     return true;
                 }
             }

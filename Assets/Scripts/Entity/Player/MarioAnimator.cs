@@ -427,7 +427,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamPushing, mario->LastPushingFrame + 5 >= f.Number);
             //animator.SetBool(ParamKnockforwards, mario->IsInForwardsKnockback);
 
-            float animatedVelocity = /* physicsObject.IsTouchingGround ? physicsObject.Velocity.Magnitude.AsFloat : */ Mathf.Abs(physicsObject->Velocity.X.AsFloat);
+            float animatedVelocity = Mathf.Abs(physicsObject->Velocity.X.AsFloat);
             if (mario->IsStuckInBlock) {
                 animatedVelocity = 0;
             } else if (mario->IsPropellerFlying) {
@@ -439,7 +439,7 @@ namespace NSMB.Entities.Player {
             } else if (physicsObject->IsOnSlipperyGround) {
                 animatedVelocity = 0;
             }
-            if (animatedVelocity < 0.01f) {
+            if (animatedVelocity < 0.03f) {
                 animatedVelocity = 0;
             }
 

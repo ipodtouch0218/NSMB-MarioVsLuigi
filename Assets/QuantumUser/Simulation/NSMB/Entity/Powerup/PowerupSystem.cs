@@ -208,6 +208,7 @@ namespace Quantum {
                 return PowerupReserveResult.ReserveNewPowerup;
             }
 
+            /*
             if (mario->CurrentPowerupState == PowerupState.MiniMushroom && marioPhysicsObject->IsTouchingGround) {
                 Shape2D shape = collider->Shape;
                 shape.Box.Extents *= 2;
@@ -219,6 +220,7 @@ namespace Quantum {
                     return PowerupReserveResult.ReserveNewPowerup;
                 }
             }
+            */
 
             sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.StatePriority : (sbyte) -1;
             sbyte newPowerupItemPriority = newPowerup ? newPowerup.ItemPriority : (sbyte) -1;
@@ -249,7 +251,6 @@ namespace Quantum {
             mario->PreviousPowerupState = mario->CurrentPowerupState;
             mario->CurrentPowerupState = newState;
             //mario->powerupFlash = 2;
-            mario->IsCrouching |= MarioPlayerSystem.ForceCrouchCheck(f, ref fakeFilter, f.FindAsset(mario->PhysicsAsset));
             mario->IsPropellerFlying = false;
             mario->UsedPropellerThisJump = false;
             mario->IsDrilling &= mario->IsSpinnerFlying;

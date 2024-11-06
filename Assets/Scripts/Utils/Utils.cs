@@ -220,7 +220,7 @@ namespace NSMB.Utils {
         }
 
         public static Color SampleNicknameColor(string color, out bool constant) {
-            if (color == null) {
+            if (string.IsNullOrEmpty(color)) {
                 constant = true;
                 return Color.white;
             }
