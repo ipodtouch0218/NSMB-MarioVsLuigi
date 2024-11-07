@@ -185,6 +185,9 @@ namespace Quantum {
                 FP maxAcceleration = FPMath.Abs(max - xVelAbs) * f.UpdateRate;
                 acc = FPMath.Clamp(acc, -maxAcceleration, maxAcceleration);
                 if (xVelAbs > max) {
+                    if (mario->IsInWater) {
+                        acc = physics.WalkAcceleration[^1];
+                    }
                     acc = -acc;
                 }
 
@@ -1033,7 +1036,7 @@ namespace Quantum {
                     if (mario->PropellerLaunchFrames > 52) {
                         physicsObject->Velocity.Y = physics.PropellerLaunchVelocity;
                     } else {
-                        FP targetVelocity = physics.PropellerLaunchVelocity - (remainingTime < FP.FromString("0.4") ? (1 - (remainingTime * FP.FromString("2.5"))) * physics.PropellerLaunchVelocity : 0);
+                        FP targetVelocity = physics.PropellerLaunchVelocity - (remainingTime < Constants._0_40 ? (1 - (remainingTime * Constants._2_50)) * physics.PropellerLaunchVelocity : 0);
                         physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (24 * f.DeltaTime), targetVelocity);
                     }
                 } else {
@@ -1090,7 +1093,7 @@ namespace Quantum {
                 mario->ProjectileDelayFrames = physics.ProjectileDelayFrames;
                 mario->ProjectileVolleyFrames = physics.ProjectileVolleyFrames;
 
-                FPVector2 spawnPos = filter.Transform->Position + new FPVector2(mario->FacingRight ? FP.FromString("0.4") : FP.FromString("-0.4"), FP.FromString("0.35"));
+                FPVector2 spawnPos = filter.Transform->Position + new FPVector2(mario->FacingRight ? Constants._0_40 : -Constants._0_40, Constants._0_35);
 
                 EntityRef newEntity = f.Create(mario->CurrentPowerupState == PowerupState.IceFlower
                     ? f.SimulationConfig.IceballPrototype
@@ -1491,7 +1494,7 @@ namespace Quantum {
             
             // Death up
             if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
-                bool doRespawn = !((f.Global->Rules.LivesEnabled && mario->Lives == 0) || mario->Disconnected);
+                bool doRespawn = !((f.Global->Rules.IsLivesEnabled && mario->Lives == 0) || mario->Disconnected);
                 if (!doRespawn && mario->Stars > 0) {
                     // Try to drop more stars
                     mario->SpawnStars(f, entity, 1);

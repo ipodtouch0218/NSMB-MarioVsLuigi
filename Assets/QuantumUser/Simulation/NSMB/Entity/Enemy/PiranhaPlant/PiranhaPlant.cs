@@ -17,7 +17,7 @@ namespace Quantum {
             var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
             var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
             coinTransform->Position = f.Unsafe.GetPointer<Transform2D>(entity)->Position;
-            coinPhysicsObject->Velocity.Y = f.RNG->Next(FP.FromString("4.5"), 5);
+            coinPhysicsObject->Velocity.Y = f.RNG->Next(Constants._4_50, 5);
 
             // Combo sound
             byte combo;

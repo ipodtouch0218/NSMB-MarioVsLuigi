@@ -54,6 +54,9 @@ public unsafe class PowerupAnimator : QuantumCallbacks {
         } else if (powerup->LaunchSpawn) {
             // Spawn with velocity
             sRenderer.sortingOrder = -1000;
+            if (!NetworkHandler.IsReplayFastForwarding) {
+                sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
+            }
         } else {
             // Spawned by any other means (blue koopa, usually.)
             if (!NetworkHandler.IsReplayFastForwarding) {

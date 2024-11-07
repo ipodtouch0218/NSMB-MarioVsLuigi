@@ -42,9 +42,8 @@ namespace Quantum {
                 // Not chomping, run the countdown timer.
                 if (QuantumUtils.Decrement(ref piranhaPlant->WaitingFrames)) {
                     var playerOverlapShape = Shape2D.CreateCircle(FP._0_50, FPVector2.Up);
-                    var playerOverlapMask = f.Layers.GetLayerMask("Player");
 
-                    Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(*transform, playerOverlapShape, playerOverlapMask);
+                    Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(*transform, playerOverlapShape, f.Context.PlayerOnlyMask);
                     if (playerHits.Count == 0) {
                         // No players nearby. pop up.
                         piranhaPlant->ChompFrames = 90;
@@ -59,7 +58,7 @@ namespace Quantum {
             FPVector2 offset = FPVector2.Up * (FP._0_25 + (piranhaPlant->PopupAnimationTime - 1) * FP._0_75);
             transform->Position = enemy->Spawnpoint + offset;
 
-            freezable->IceBlockSize.Y = FP.FromString("1.1") * piranhaPlant->PopupAnimationTime; 
+            freezable->IceBlockSize.Y = Constants._1_10 * piranhaPlant->PopupAnimationTime; 
         }
 
         public void OnPiranhaPlantIceBlockInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef iceBlockEntity) {

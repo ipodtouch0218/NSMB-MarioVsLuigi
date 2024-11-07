@@ -421,7 +421,7 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
                 ourPos.X > theirPos.X ? 1 : -1,
-                FP.FromString("5.5")
+                Constants._5_50
             );
             physicsObject->IsTouchingGround = false;
         }

@@ -2542,6 +2542,38 @@ namespace Quantum {
     void OnTileChanged(Frame f, Int32 tileX, Int32 tileY, StageTileInstance newTile);
   }
   public static unsafe partial class Constants {
+    /// <summary>0.95</summary>
+    public static FP _0_95 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 62259;
+        return result;
+      }
+    }
+    /// <summary>4.5</summary>
+    public static FP _4_50 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 294912;
+        return result;
+      }
+    }
+    /// <summary>5.5</summary>
+    public static FP _5_50 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 360448;
+        return result;
+      }
+    }
+    /// <summary>14.75</summary>
+    public static FP _14_75 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 966656;
+        return result;
+      }
+    }
     /// <summary>3.5</summary>
     public static FP _3_50 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -2598,6 +2630,30 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>0.4</summary>
+    public static FP _0_40 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 26214;
+        return result;
+      }
+    }
+    /// <summary>0.35</summary>
+    public static FP _0_35 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 22938;
+        return result;
+      }
+    }
+    /// <summary>1.1</summary>
+    public static FP _1_10 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 72090;
+        return result;
+      }
+    }
     /// <summary>0.0001</summary>
     public static FP _0_0001 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -2624,6 +2680,14 @@ namespace Quantum {
     }
 
     public static unsafe partial class Raw {
+      /// <summary>0.95</summary>
+      public const Int64 _0_95 = 62259;
+      /// <summary>4.5</summary>
+      public const Int64 _4_50 = 294912;
+      /// <summary>5.5</summary>
+      public const Int64 _5_50 = 360448;
+      /// <summary>14.75</summary>
+      public const Int64 _14_75 = 966656;
       /// <summary>3.5</summary>
       public const Int64 _3_50 = 229376;
       /// <summary>1.77777</summary>
@@ -2638,6 +2702,12 @@ namespace Quantum {
       public const Int64 _0_90 = 58982;
       /// <summary>0.1875</summary>
       public const Int64 _0_1875 = 12288;
+      /// <summary>0.4</summary>
+      public const Int64 _0_40 = 26214;
+      /// <summary>0.35</summary>
+      public const Int64 _0_35 = 22938;
+      /// <summary>1.1</summary>
+      public const Int64 _1_10 = 72090;
       /// <summary>0.0001</summary>
       public const Int64 _0_0001 = 7;
       /// <summary>0.48</summary>

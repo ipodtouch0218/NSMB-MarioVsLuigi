@@ -268,7 +268,7 @@ namespace Quantum {
             
             // End Condition: only one team alive
             var marioFilter = f.Filter<MarioPlayer>();
-            bool livesGame = f.Global->Rules.LivesEnabled;
+            bool livesGame = f.Global->Rules.IsLivesEnabled;
 
             bool oneOrNoTeamAlive = true;
             int aliveTeam = -1;

@@ -11,7 +11,7 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter) {
-            FP bumpSize = FP.FromString("0.35");
+            FP bumpSize = Constants._0_35;
             FP bumpScale = FP._0_25;
             FP bumpDuration = FP._0_25;
 
@@ -55,7 +55,7 @@ namespace Quantum {
                     if (powerupScriptable.State == PowerupState.MegaMushroom) {
                         powerup->Initialize(f, newPowerup, 90, origin + FPVector2.Up * FP._0_50, origin + FPVector2.Up * FP._0_50, false);
                     } else {
-                        powerup->Initialize(f, newPowerup, 60, origin,
+                        powerup->Initialize(f, newPowerup, (byte) (launch ? 20 : 60), origin,
                             origin + (blockBump->IsDownwards ? FPVector2.Down * height : FPVector2.Up * FP._0_50), launch);
                     }
                 }

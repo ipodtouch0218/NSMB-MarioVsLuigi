@@ -1,12 +1,18 @@
 namespace Quantum {
 
-    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction {
+    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction,
+        ISignalOnEnemyDespawned, ISignalOnEnemyRespawned {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
             public Enemy* Enemy;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
+        }
+
+        public override void OnInit(Frame f) {
+            f.Context.PlayerOnlyMask = f.Layers.GetLayerMask("Player");
+            f.Context.CircleRadiusTwo = Shape2D.CreateCircle(2);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -57,13 +63,11 @@ namespace Quantum {
 
         public void OnStageReset(Frame f, QBoolean full) {
             var filter = f.Filter<Enemy>();
-            var shape = Shape2D.CreateCircle(2);
-            var layerMask = f.Layers.GetLayerMask("Player");
 
             while (filter.NextUnsafe(out EntityRef entity, out Enemy* enemy)) {
                 if (!enemy->DisableRespawning && !enemy->IsActive) {
                     if (!enemy->IgnorePlayerWhenRespawning) {
-                        Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(enemy->Spawnpoint, 0, shape, layerMask);
+                        Physics2D.HitCollection playerHits = f.Physics2D.OverlapShape(enemy->Spawnpoint, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
                         if (playerHits.Count > 0) {
                             continue;
                         }
@@ -84,6 +88,18 @@ namespace Quantum {
         public void OnBeforeInteraction(Frame f, EntityRef entity, bool* allowInteraction) {
             if (f.Unsafe.TryGetPointer(entity, out Enemy* enemy)) {
                 *allowInteraction &= enemy->IsAlive;
+            }
+        }
+
+        public void OnEnemyDespawned(Frame f, EntityRef entity) {
+            if (f.Has<Enemy>(entity) && f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
+                collider->Enabled = false;
+            }
+        }
+
+        public void OnEnemyRespawned(Frame f, EntityRef entity) {
+            if (f.Has<Enemy>(entity) && f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
+                collider->Enabled = true;
             }
         }
     }

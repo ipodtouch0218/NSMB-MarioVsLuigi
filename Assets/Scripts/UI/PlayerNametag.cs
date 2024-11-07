@@ -97,7 +97,7 @@ public class PlayerNametag : MonoBehaviour {
         }
         newText += cachedNickname + "\n";
 
-        if (f.Global->Rules.LivesEnabled) {
+        if (f.Global->Rules.IsLivesEnabled) {
             newText += character.UiString + Utils.GetSymbolString("x" + mario->Lives + " ");
         }
 

@@ -141,7 +141,7 @@ namespace Quantum {
             PreRespawnFrames = 180;
             RespawnFrames = 78;
 
-            if ((f.Global->Rules.LivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
+            if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
                 // Last death - drop all stars at 0.5s each
                 // TODO if (!GameManager.Instance.CheckForWinner()) {
                     SpawnStars(f, entity, 1);
@@ -248,7 +248,7 @@ namespace Quantum {
                 }
             }
 
-            if (f.Global->Rules.LivesEnabled && Lives == 0) {
+            if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
                 starDirection = NoLivesStarDirection;
@@ -298,7 +298,7 @@ namespace Quantum {
 
             RespawnFrames = 78;
 
-            if (f.Global->Rules.LivesEnabled && Lives == 0) {
+            if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
                 f.Destroy(entity);
                 return;
             }
@@ -328,6 +328,7 @@ namespace Quantum {
             MegaMushroomFrames = 0;
             MegaMushroomStartFrames = 0;
             MegaMushroomEndFrames = 0;
+            WaterColliderCount = 0;
             IsCrouching = false;
             IsSliding = false;
             IsTurnaround = false;
@@ -402,11 +403,11 @@ namespace Quantum {
                     ((starsToDrop + 1) * FP._0_50) *
                     4 *
                     (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
-                    (CurrentPowerupState == PowerupState.MiniMushroom ? FP.FromString("2.5") : 1) *
+                    (CurrentPowerupState == PowerupState.MiniMushroom ? Constants._2_50 : 1) *
                     (weak ? FP._0_50 : 1),
 
                 // Don't go upwards if we got hit by a fireball
-                f.Has<Projectile>(attacker) ? 0 : FP.FromString("4.5")
+                f.Has<Projectile>(attacker) ? 0 : Constants._4_50
             );
 
             //IsOnGround = false;

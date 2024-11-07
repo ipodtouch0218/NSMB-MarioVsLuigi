@@ -57,7 +57,7 @@ namespace Quantum {
 
             // Friction
             if (physicsObject->IsTouchingGround && lit) {
-                physicsObject->Velocity.X *= FP.FromString("0.95");
+                physicsObject->Velocity.X *= Constants._0_95;
             }
 
             // Walking
@@ -250,7 +250,7 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
                 ourPos.X > theirPos.X ? 1 : -1,
-                FP.FromString("5.5")
+                Constants._5_50
             );
             physicsObject->IsTouchingGround = false;
 
@@ -279,7 +279,7 @@ namespace Quantum {
             } else if (crouching) {
                 physicsObject->Velocity.X = mario->FacingRight ? 1 : -1;
             } else {
-                physicsObject->Velocity.X = (FP.FromString("4.5") + FPMath.Abs(marioPhysics->Velocity.X / 3)) * (mario->FacingRight ? 1 : -1);
+                physicsObject->Velocity.X = (Constants._4_50 + FPMath.Abs(marioPhysics->Velocity.X / 3)) * (mario->FacingRight ? 1 : -1);
                 f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
             }
             enemy->FacingRight = mario->FacingRight;

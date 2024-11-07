@@ -65,7 +65,7 @@ namespace Quantum {
             var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
             var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
             coinTransform->Position = koopaTransform->Position;
-            coinPhysicsObject->Velocity.Y = f.RNG->Next(FP.FromString("4.5"), 5);
+            coinPhysicsObject->Velocity.Y = f.RNG->Next(Constants._4_50, 5);
 
             // Fall off screen
             var killerTransform = f.Unsafe.GetPointer<Transform2D>(killerEntity);
@@ -75,9 +75,9 @@ namespace Quantum {
             physicsObject->DisableCollision = true;
             physicsObject->Velocity = new FPVector2(
                 2 * (enemy->FacingRight ? 1 : -1),
-                FP.FromString("2.5")
+                Constants._2_50
             );
-            physicsObject->Gravity = FPVector2.Down * FP.FromString("14.75");
+            physicsObject->Gravity = new FPVector2(0, -Constants._14_75);
 
             byte combo;
             if (f.Unsafe.TryGetPointer(killerEntity, out MarioPlayer* mario)) {

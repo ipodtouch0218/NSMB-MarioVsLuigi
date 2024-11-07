@@ -4,8 +4,8 @@ namespace Quantum {
 
     public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnTrigger2D, ISignalOnEntityBumped {
 
-        private static readonly FP CameraYOffset = FP.FromString("1.68");
-        private static readonly FP BumpForce = FP.FromString("5.5");
+        public static readonly FP CameraYOffset = FP.FromString("1.68");
+        private static readonly FP BumpForce = Constants._5_50;
 
         public struct Filter {
             public EntityRef Entity;
@@ -20,7 +20,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
 
-            if (powerup->ParentMarioPlayer.IsValid) {
+            if (f.Exists(powerup->ParentMarioPlayer)) {
                 // Attached to a player. Don't interact, and follow the player.
                 var marioTransform = f.Unsafe.GetPointer<Transform2D>(powerup->ParentMarioPlayer);
                 var marioCamera = f.Unsafe.GetPointer<CameraController>(powerup->ParentMarioPlayer);
@@ -41,12 +41,11 @@ namespace Quantum {
                 transform->Position = FPVector2.Lerp(powerup->BlockSpawnOrigin, powerup->BlockSpawnDestination, t);
 
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                    /* TODO
-                    if (Utils.Utils.IsTileSolidAtWorldLocation(body.Position + hitbox.offset)) {
-                        DespawnEntity();
+                    if (PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.Collider->Shape, false, stage, filter.Entity)) {
+                        // TODO: poof effect.
+                        f.Destroy(filter.Entity);
                         return;
                     }
-                    */
                     powerup->BlockSpawn = false;
                     physicsObject->IsFrozen = false;
                 } else {
@@ -58,14 +57,11 @@ namespace Quantum {
                 // Back to normal layers
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                     powerup->LaunchSpawn = false;
+                    physicsObject->DisableCollision = false;
                     f.Events.PowerupBecameActive(f, filter.Entity);
                 }
             } else {
                 QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames);
-                //if () {
-                //    powerup->LaunchSpawn = false;
-                //    f.Events.PowerupBecameActive(f, filter.Entity);
-                //}
             }
 
             var asset = f.FindAsset(powerup->Scriptable);

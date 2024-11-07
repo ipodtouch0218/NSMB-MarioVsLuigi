@@ -56,7 +56,7 @@ namespace Quantum {
             if (iceBlock->WaterColliderCount > 0) {
                 iceBlock->IsSliding = false;
                 if (iceBlock->InLiquidType != LiquidType.Water) {
-                    physicsObject->Velocity.X *= FP.FromString(".85");
+                    physicsObject->Velocity.X *= Constants._0_85;
                     physicsObject->Velocity.Y = FPMath.Max(-FP._0_50, physicsObject->Velocity.Y);
 
                 } else {
@@ -67,7 +67,7 @@ namespace Quantum {
                     newVelocity += (25 * f.DeltaTime);
                     newVelocity = FPMath.Min(1, newVelocity);
 
-                    physicsObject->Velocity.X *= FP.FromString(".85");
+                    physicsObject->Velocity.X *= Constants._0_85;
                     physicsObject->Velocity.Y = newVelocity;
                 }
             }

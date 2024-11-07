@@ -21,7 +21,6 @@ namespace Quantum {
             f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = spawnOrigin;
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(thisEntity);
-            physicsObject->IsFrozen = true;
 
             if (launch) {
                 // TODO magic number
@@ -39,7 +38,7 @@ namespace Quantum {
             var marioCamera = f.Unsafe.GetPointer<CameraController>(playerToFollow);
 
             // TODO magic value
-            f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + FP.FromString("1.68"));
+            f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + PowerupSystem.CameraYOffset);
             f.Unsafe.GetPointer<PhysicsObject>(thisEntity)->IsFrozen = true;
         }
     }

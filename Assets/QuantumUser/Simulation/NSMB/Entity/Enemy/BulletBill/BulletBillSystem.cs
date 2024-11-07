@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill>, ISignalOnIceBlockBroken {

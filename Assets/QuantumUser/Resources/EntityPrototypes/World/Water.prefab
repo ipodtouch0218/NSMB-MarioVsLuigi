@@ -382,9 +382,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be3935f17c1a77d49a93a9700cd01d1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splashPrefab: {fileID: 3187578607683521796, guid: 1ee607c8f8f772742ab6024341752ba9,
+  splashPrefab: {fileID: 4581350238868416347, guid: 463495772270e1d4d94eb7695a30a040,
     type: 3}
-  splashExitPrefab: {fileID: 3187578607683521796, guid: 1ee607c8f8f772742ab6024341752ba9,
+  splashExitPrefab: {fileID: 4581350238868416347, guid: 3db5d024d60c19c4ea8c69ecdb380e69,
     type: 3}
   mask: {fileID: 0}
   pointsPerTile: 4

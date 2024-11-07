@@ -235,7 +235,7 @@ public static unsafe class QuantumUtils {
                 stars[mario->Team] = 0;
             }
 
-            if (mario->Lives <= 0 && f.Global->Rules.LivesEnabled) {
+            if (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
                 continue;
             }
 
@@ -250,7 +250,7 @@ public static unsafe class QuantumUtils {
         var allPlayers = f.Filter<MarioPlayer>();
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
             if (mario->Team != team
-                || mario->Lives <= 0 && f.Global->Rules.LivesEnabled) {
+                || mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
                 continue;
             }
 
@@ -286,14 +286,13 @@ public static unsafe class QuantumUtils {
 
         // "Losing" variable based on ln(x+1), x being the # of stars we're behind
 
-        //gm.teamManager.GetTeamStars(player.Data.Team, out int ourStars);
         int ourStars = GetTeamStars(f, mario.Team);
         int leaderStars = GetFirstPlaceStars(f);
 
         var rules = f.Global->Rules;
         int starsToWin = rules.StarsToWin;
         bool custom = rules.CustomPowerupsEnabled;
-        bool lives = rules.Lives > 0;
+        bool lives = rules.IsLivesEnabled;
 
         bool big = stage.SpawnBigPowerups;
         bool vertical = stage.SpawnVerticalPowerups;

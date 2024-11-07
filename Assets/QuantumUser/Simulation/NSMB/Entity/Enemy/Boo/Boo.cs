@@ -21,9 +21,9 @@ namespace Quantum {
             physicsObject->DisableCollision = true;
             physicsObject->Velocity = new FPVector2(
                 2 * (enemy->FacingRight ? 1 : -1),
-                FP.FromString("2.5")
+                Constants._2_50
             );
-            physicsObject->Gravity = FPVector2.Down * FP.FromString("14.75");
+            physicsObject->Gravity = new FPVector2(0, -Constants._14_75);
 
             // Play combo sound
             byte combo;

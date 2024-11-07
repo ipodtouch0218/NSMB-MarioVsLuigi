@@ -37,7 +37,7 @@ namespace Quantum {
                     2 * (enemy->FacingRight ? 1 : -1),
                     0
                 );
-                physicsObject->Gravity = FPVector2.Down * FP.FromString("14.75");
+                physicsObject->Gravity = new FPVector2(0, -Constants._14_75);
             }
 
             enemy->IsDead = true;
