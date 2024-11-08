@@ -1,11 +1,15 @@
 using NSMB.Entities.Player;
 using NSMB.Utils;
 using Quantum;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerNametag : MonoBehaviour {
+
+    //---Properties
+    public EntityRef Entity => parent.entity.EntityRef;
 
     //---Serailzied Variables
     [SerializeField] private GameObject nametag;
@@ -23,7 +27,7 @@ public class PlayerNametag : MonoBehaviour {
     private PlayerElements elements;
     private string cachedNickname = "noname";
     private string nicknameColor = "#FFFFFF";
-    private bool constantNicknameColor = false;
+    private bool constantNicknameColor = true;
     private QuantumGame game;
 
     public unsafe void Initialize(QuantumGame game, Frame f, PlayerElements elements, MarioAnimator parent) {
@@ -37,10 +41,19 @@ public class PlayerNametag : MonoBehaviour {
 
         RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
         nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+        cachedNickname = runtimePlayer?.PlayerNickname.ToValidUsername() ?? "noname";
 
         arrow.color = parent.GlowColor;
         text.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
         gameObject.SetActive(true);
+
+        UpdateText(f);
+    }
+
+    public void Start() {
+        QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
+        QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
+        QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
     }
 
     public unsafe void LateUpdate() {
@@ -50,26 +63,17 @@ public class PlayerNametag : MonoBehaviour {
             return;
         }
 
-        EntityRef entity = parent.entity.EntityRef;
         Frame f = game.Frames.Predicted;
-
-        if (!f.Exists(entity)) {
+        if (!f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
             return;
         }
-        var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
 
-        if (!character) {
-            character = f.FindAsset(mario->CharacterAsset);
-        }
-
-        nametag.SetActive(elements.Entity != entity && !(mario->IsDead && mario->IsRespawning) && f.Global->GameState >= GameState.Playing);
-
+        nametag.SetActive(elements.Entity != Entity && !(mario->IsDead && mario->IsRespawning) && f.Global->GameState >= GameState.Playing);
         if (!nametag.activeSelf) {
             return;
         }
 
-        var shape = f.Unsafe.GetPointer<PhysicsCollider2D>(entity)->Shape;
-
+        var shape = f.Unsafe.GetPointer<PhysicsCollider2D>(Entity)->Shape;
         Vector2 worldPos = parent.models.transform.position;
         worldPos.y += shape.Box.Extents.Y.AsFloat * 2.4f + 0.5f;
 
@@ -84,28 +88,55 @@ public class PlayerNametag : MonoBehaviour {
         transform.localPosition = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentTransform.rect.size;
         transform.localPosition -= (Vector3) (parentTransform.rect.size / 2);
 
-        RuntimePlayer player = f.GetPlayerData(mario->PlayerRef);
-        if (player != null) {
-            cachedNickname = player.PlayerNickname.ToValidUsername();
-        }
-        // TODO: this allocates every frame.
-        string newText = "";
-
-        if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
-            TeamAsset team = f.SimulationConfig.Teams[mario->Team];
-            newText += team.textSpriteColorblindBig;
-        }
-        newText += cachedNickname + "\n";
-
-        if (f.Global->Rules.IsLivesEnabled) {
-            newText += character.UiString + Utils.GetSymbolString("x" + mario->Lives + " ");
-        }
-
-        newText += Utils.GetSymbolString("Sx" + mario->Stars);
-
-        text.text = newText;
         if (!constantNicknameColor) {
             text.color = Utils.SampleNicknameColor(nicknameColor, out _);
         }
+    }
+
+    private static readonly StringBuilder stringBuilder = new();
+    public unsafe void UpdateText(Frame f) {
+        if (!f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
+            return;
+        }
+
+        stringBuilder.Clear();
+
+        if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
+            TeamAsset team = f.SimulationConfig.Teams[mario->Team];
+            stringBuilder.Append(team.textSpriteColorblindBig);
+        }
+        stringBuilder.AppendLine(cachedNickname);
+
+        if (f.Global->Rules.IsLivesEnabled) {
+            stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
+        }
+
+        stringBuilder.Append(Utils.GetSymbolString("Sx" + mario->Stars));
+
+        text.text = stringBuilder.ToString();
+    }
+
+    private void OnMarioPlayerDied(EventMarioPlayerDied e) {
+        if (e.Entity != Entity) {
+            return;
+        }
+
+        UpdateText(e.Frame);
+    }
+
+    private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
+        if (e.Entity != Entity) {
+            return;
+        }
+
+        UpdateText(e.Frame);
+    }
+
+    private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {
+        if (e.Entity != Entity) {
+            return;
+        }
+
+        UpdateText(e.Frame);
     }
 }

@@ -24,12 +24,10 @@ public unsafe class SpinnerAnimator : MonoBehaviour {
         Frame f = game.Frames.Predicted;
         Frame fp = game.Frames.PredictedPrevious;
 
-        if (!f.Exists(entity.EntityRef)) {
+        if (!f.Unsafe.TryGetPointer(entity.EntityRef, out Spinner* spinner)
+            || !fp.Unsafe.TryGetPointer(entity.EntityRef, out Spinner* spinnerPrev)) {
             return;
         }
-
-        var spinner = f.Unsafe.GetPointer<Spinner>(entity.EntityRef);
-        var spinnerPrev = fp.Unsafe.GetPointer<Spinner>(entity.EntityRef);
 
         float rotation = Mathf.LerpAngle(spinnerPrev->Rotation.AsFloat, spinner->Rotation.AsFloat, game.InterpolationFactor); 
         rotator.localRotation = Quaternion.Euler(0, rotation, 0);

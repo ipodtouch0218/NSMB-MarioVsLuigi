@@ -5736,7 +5736,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 93.55
+  m_fontSize: 93.4
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6416,16 +6416,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf0e493508cdc2428819484b6e5c099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementAction: {fileID: -3070869374810219304, guid: d29805f34fe91da4e94010a38823fab7,
-    type: 3}
-  jumpAction: {fileID: 3180410258177908949, guid: d29805f34fe91da4e94010a38823fab7,
-    type: 3}
-  sprintAction: {fileID: 2731097349482814759, guid: d29805f34fe91da4e94010a38823fab7,
-    type: 3}
-  powerupAction: {fileID: -7367289943076693815, guid: d29805f34fe91da4e94010a38823fab7,
-    type: 3}
-  reservePowerupAction: {fileID: 3867584101952322721, guid: d29805f34fe91da4e94010a38823fab7,
-    type: 3}
 --- !u!114 &6913355771123443145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7184,7 +7174,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

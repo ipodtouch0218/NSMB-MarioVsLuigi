@@ -2505,6 +2505,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnEnemyEnemyCollision : ISignal {
     void OnEnemyEnemyCollision(Frame f, EntityRef a, EntityRef b);
   }
+  public unsafe partial interface ISignalOnEnemyKilledByStageReset : ISignal {
+    void OnEnemyKilledByStageReset(Frame f, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnLoadingComplete : ISignal {
     void OnLoadingComplete(Frame f);
   }
@@ -2725,6 +2728,7 @@ namespace Quantum {
     private ISignalOnEnemyDespawned[] _ISignalOnEnemyDespawnedSystems;
     private ISignalOnEnemyRespawned[] _ISignalOnEnemyRespawnedSystems;
     private ISignalOnEnemyEnemyCollision[] _ISignalOnEnemyEnemyCollisionSystems;
+    private ISignalOnEnemyKilledByStageReset[] _ISignalOnEnemyKilledByStageResetSystems;
     private ISignalOnLoadingComplete[] _ISignalOnLoadingCompleteSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
     private ISignalOnGameEnding[] _ISignalOnGameEndingSystems;
@@ -2756,6 +2760,7 @@ namespace Quantum {
       _ISignalOnEnemyDespawnedSystems = BuildSignalsArray<ISignalOnEnemyDespawned>();
       _ISignalOnEnemyRespawnedSystems = BuildSignalsArray<ISignalOnEnemyRespawned>();
       _ISignalOnEnemyEnemyCollisionSystems = BuildSignalsArray<ISignalOnEnemyEnemyCollision>();
+      _ISignalOnEnemyKilledByStageResetSystems = BuildSignalsArray<ISignalOnEnemyKilledByStageReset>();
       _ISignalOnLoadingCompleteSystems = BuildSignalsArray<ISignalOnLoadingComplete>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
       _ISignalOnGameEndingSystems = BuildSignalsArray<ISignalOnGameEnding>();
@@ -2967,6 +2972,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnEnemyEnemyCollision(_f, a, b);
+          }
+        }
+      }
+      public void OnEnemyKilledByStageReset(EntityRef entity) {
+        var array = _f._ISignalOnEnemyKilledByStageResetSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEnemyKilledByStageReset(_f, entity);
           }
         }
       }

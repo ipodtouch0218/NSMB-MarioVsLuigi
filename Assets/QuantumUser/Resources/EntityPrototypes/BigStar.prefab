@@ -4860,6 +4860,7 @@ GameObject:
   - component: {fileID: 5641718087526033968}
   - component: {fileID: 5279632371919351669}
   - component: {fileID: 5501024112843099950}
+  - component: {fileID: 2599661224704062266}
   m_Layer: 9
   m_Name: BigStar
   m_TagString: Untagged
@@ -5444,6 +5445,21 @@ MonoBehaviour:
         RawValue: 0
     BroadRadius:
       RawValue: 39322
+--- !u!114 &2599661224704062266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5e18d9c39ba740adf6c085821a1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    ColliderDisabled:
+      Value: 0
 --- !u!1 &6306428316705399139
 GameObject:
   m_ObjectHideFlags: 0

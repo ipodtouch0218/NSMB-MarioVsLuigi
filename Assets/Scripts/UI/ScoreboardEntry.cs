@@ -1,7 +1,5 @@
 using NSMB.Utils;
 using Quantum;
-using System.Drawing.Drawing2D;
-using System.Net.NetworkInformation;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -20,10 +18,13 @@ public class ScoreboardEntry : MonoBehaviour {
     private ScoreboardUpdater updater;
     private string nickname = "noname";
     private bool isValidPlayer;
+    private string nicknameColor = "#FFFFFF";
+    private bool constantNicknameColor = true;
 
     public void Start() {
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
+        QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
     }
 
     public unsafe void Initialize(Frame f, EntityRef target, ScoreboardUpdater updater) {
@@ -31,22 +32,29 @@ public class ScoreboardEntry : MonoBehaviour {
         this.updater = updater;
 
         if (f.Unsafe.TryGetPointer(target, out MarioPlayer* mario)) {
-            RuntimePlayer runtimeData = f.GetPlayerData(mario->PlayerRef);
-            if (runtimeData != null) {
-                nickname = runtimeData.PlayerNickname;
+            RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
+            if (runtimePlayer != null) {
+                nickname = runtimePlayer.PlayerNickname;
                 isValidPlayer = true;
+                nicknameColor = runtimePlayer.NicknameColor;
+                nicknameText.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
             }
         }
         UpdateEntry(f);
         gameObject.SetActive(true);
     }
 
+    public void Update() {
+        if (!constantNicknameColor) {
+            nicknameText.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+        }
+    }
+
     public unsafe void UpdateEntry(Frame f) {
-        if (!f.Exists(Target)) {
+        if (!f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
             return;
         }
 
-        var mario = f.Unsafe.GetPointer<MarioPlayer>(Target);
         var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
 
         int ping = playerData != null ? playerData->Ping : (isValidPlayer ? -1 : 0);
@@ -55,7 +63,7 @@ public class ScoreboardEntry : MonoBehaviour {
         StringBuilder scoreBuilder = new();
         if (f.Global->Rules.IsLivesEnabled) {
             var character = f.FindAsset(mario->CharacterAsset);
-            scoreBuilder.Append(character.UiString).Append(mario->Lives);
+            scoreBuilder.Append(character.UiString).Append(Utils.GetSymbolString(mario->Lives.ToString()));
         }
         scoreBuilder.Append(Utils.GetSymbolString("S" + mario->Stars));
 
@@ -76,6 +84,14 @@ public class ScoreboardEntry : MonoBehaviour {
     }
 
     private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
+        if (e.Entity != Target) {
+            return;
+        }
+
+        UpdateEntry(e.Frame);
+    }
+
+    private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {
         if (e.Entity != Target) {
             return;
         }

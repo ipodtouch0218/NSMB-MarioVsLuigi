@@ -41,14 +41,12 @@ public unsafe class BlockBumpAnimator : QuantumCallbacks {
 
     public override void OnUpdateView(QuantumGame game) {
         Frame f = game.Frames.Predicted;
-        if (!f.Exists(entity.EntityRef)) {
+        if (!f.Unsafe.TryGetPointer(entity.EntityRef, out BlockBump* blockBump)) {
             return;
         }
     
         float bumpScale = 0.35f;
         float bumpDuration = 0.25f;
-
-        var blockBump = game.Frames.Predicted.Unsafe.GetPointer<BlockBump>(entity.EntityRef);
 
         float remainingTime = blockBump->Lifetime / 60f;
         float size = Mathf.Sin((remainingTime / bumpDuration) * Mathf.PI) * bumpScale * 0.5f;

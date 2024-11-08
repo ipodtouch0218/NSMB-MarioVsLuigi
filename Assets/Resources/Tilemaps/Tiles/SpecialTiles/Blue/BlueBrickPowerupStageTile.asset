@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8963c1eb6bcbe445abee72055f6918d, type: 3}
-  m_Name: BluePowerupStageTile
+  m_Name: BlueBrickPowerupStageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/SpecialTiles/Blue/BluePowerupStageTile
+    Path: Resources/Tilemaps/Tiles/SpecialTiles/Blue/BlueBrickPowerupStageTile
     Guid:
-      Value: 300455806277301968
-  Tile: {fileID: 11400000, guid: 7833a44a5c5ede241bf057e9e7ecc82f, type: 2}
+      Value: 372209327834354533
+  Tile: {fileID: 11400000, guid: 435964e6679ad794995ec38a55c58d07, type: 2}
   CollisionData:
     Shapes:
     - Vertices:

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Quantum {
 
     public unsafe class BobombSystem : SystemMainThreadFilter<BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
-        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken {
+        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset {
         
         public struct Filter {
             public EntityRef Entity;
@@ -296,6 +296,12 @@ namespace Quantum {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
             if (f.Unsafe.TryGetPointer(iceBlock->Entity, out Bobomb* bobomb)) {
                 bobomb->Kill(f, iceBlock->Entity, brokenIceBlock, true);
+            }
+        }
+
+        public void OnEnemyKilledByStageReset(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
+                bobomb->Kill(f, entity, EntityRef.None, true);
             }
         }
     }

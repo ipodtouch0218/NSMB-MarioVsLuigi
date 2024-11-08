@@ -320,7 +320,7 @@ namespace NSMB.UI.MainMenu {
 
         public void OpenCredits() {
             string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "replays"));
-            string filepath = files.Where(file => file.EndsWith(".mvlreplay")).First();
+            string filepath = files.Where(file => file.EndsWith(".mvlreplay")).Last();
 
             using FileStream inputStream = new FileStream(filepath, FileMode.Open);
             if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile)) {
@@ -541,7 +541,8 @@ namespace NSMB.UI.MainMenu {
             Settings.Instance.generalCharacter = character;
             Settings.Instance.SaveSettings();
 
-            currentCharacter = GlobalController.Instance.config.CharacterDatas[character];
+            var characters = GlobalController.Instance.config.CharacterDatas;
+            currentCharacter = characters[character % characters.Length];
             colorManager.ChangeCharacter(currentCharacter);
             SwapPlayerSkin(currentSkin, false);
         }

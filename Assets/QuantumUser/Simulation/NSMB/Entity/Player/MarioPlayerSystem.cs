@@ -1693,7 +1693,9 @@ namespace Quantum {
             }
 
             if (!mario->IsInKnockback
-                && mario->CurrentPowerupState != PowerupState.MegaMushroom) {
+                && mario->CurrentPowerupState != PowerupState.MegaMushroom
+                && mario->IsDamageable
+                && !mario->IsCrouchedInShell && !mario->IsInShell) {
 
                 switch (projectileAsset.Effect) {
                 case ProjectileEffectType.Knockback:

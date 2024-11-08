@@ -99,19 +99,15 @@ public class PlayerElements : MonoBehaviour {
     public void OnUpdateView(CallbackUpdateView e) {
         Frame f = e.Game.Frames.Predicted;
 
-        if (!f.Exists(entity)) {
+        if (!spectating && !f.Exists(entity)) {
             // Spectating
             StartSpectating();
-
-            if (!f.Exists(spectatingEntity)) {
-                // Find a new player to spectate
-                SpectateNextPlayer();
-            }
         }
-    }
 
-    private void CreateNametags() {
-
+        if (spectating && !f.Exists(spectatingEntity)) {
+            // Find a new player to spectate
+            SpectateNextPlayer();
+        }
     }
 
     public unsafe void UpdateSpectateUI() {

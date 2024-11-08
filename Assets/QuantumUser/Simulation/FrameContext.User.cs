@@ -10,7 +10,7 @@ namespace Quantum {
         public readonly FPVector2[] VertexBuffer = new FPVector2[128];
         public readonly int[] ShapeVertexCountBuffer = new int[16];
 
-        public LayerMask EntityPlayerMask;
+        public LayerMask EntityAndPlayerMask;
         public LayerMask PlayerOnlyMask;
         public Shape2D CircleRadiusTwo;
         public List<FPVector2> CullingCameraPositions = new();

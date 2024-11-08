@@ -278,12 +278,12 @@ namespace Quantum {
                 var newStar = f.Unsafe.GetPointer<BigStar>(newStarEntity);
                 var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newStarEntity);
                 newStarTransform->Position = transform->Position;
-
                 newStar->InitializeMovingStar(f, newStarEntity, starDirection);
 
                 Stars--;
                 amount--;
                 droppedStars++;
+                starDirection++;
             }
 
             if (droppedStars > 0) {

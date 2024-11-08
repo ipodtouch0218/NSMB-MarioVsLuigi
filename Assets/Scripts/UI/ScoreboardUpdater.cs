@@ -88,25 +88,16 @@ public class ScoreboardUpdater : MonoBehaviour {
             var mario1 = f.Unsafe.GetPointer<MarioPlayer>(se1.Target);
             var mario2 = f.Unsafe.GetPointer<MarioPlayer>(se2.Target);
 
-            if (mario1->Lives != 0 && mario2->Lives == 0) {
-                return 1;
-            } else if (mario1->Lives == 0 && mario2->Lives != 0) {
-                return -1;
+            if (f.Global->Rules.IsLivesEnabled && (mario1->Lives == 0 ^ mario2->Lives == 0)) {
+                return mario2->Lives - mario1->Lives;
             }
 
-            if (mario1->Stars > mario2->Stars) {
-                return 1;
-            } else if (mario1->Stars < mario2->Stars) {
-                return -1;
+            int starDiff = mario2->Stars - mario1->Stars;
+            if (starDiff != 0) {
+                return starDiff;
             }
 
-            if (mario1->Lives > mario2->Lives) {
-                return 1;
-            } else if (mario1->Lives < mario2->Lives) {
-                return -1;
-            }
-
-            return (mario1->PlayerRef > mario2->PlayerRef) ? 1 : -1;
+            return mario2->PlayerRef - mario1->PlayerRef;
         });
 
         foreach (var entry in entries) {

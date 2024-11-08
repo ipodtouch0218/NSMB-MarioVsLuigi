@@ -2,7 +2,11 @@ using Photon.Deterministic;
 using Quantum.Physics2D;
 
 namespace Quantum {
-    public unsafe class BigStarSystem : SystemMainThread, ISignalOnTrigger2D, ISignalOnReturnToRoom {
+    public unsafe class BigStarSystem : SystemMainThread, ISignalOnReturnToRoom {
+
+        public override void OnInit(Frame f) {
+            f.Context.RegisterInteraction<BigStar, MarioPlayer>(OnBigStarMarioInteraction);
+        }
 
         public override void Update(Frame f) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -31,8 +35,7 @@ namespace Quantum {
 
                     // Spawn a star.
                     FPVector2 position = stage.BigStarSpawnpoints[index];
-                    Shape2D shape = Shape2D.CreateCircle(FP.FromString("2.5"));
-                    HitCollection hits = f.Physics2D.OverlapShape(position, 0, shape, f.Layers.GetLayerMask("Player"));
+                    HitCollection hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
 
                     if (hits.Count == 0) {
                         // Hit no players
@@ -83,22 +86,27 @@ namespace Quantum {
             }
 
             if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
-                var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
-                if ((f.Number % 4) == 0 && !PhysicsObjectSystem.BoxInGround(f, transform->Position, physicsCollider->Shape, true, stage)) {
-                    physicsObject->DisableCollision = false;
+                if ((f.Number + entity.Index) % 3 == 0) {
+                    var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+                    if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, physicsCollider->Shape, true, stage)) {
+                        physicsObject->DisableCollision = false;
+                    }
                 }
             }
             QuantumUtils.Decrement(ref bigStar->UncollectableFrames);
         }
 
-        public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (f.DestroyPending(info.Other)
-                || !f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)
-                || !f.Unsafe.TryGetPointer(info.Other, out BigStar* star)
-                || star->UncollectableFrames > 0) {
+        public void OnBigStarMarioInteraction(Frame f, EntityRef starEntity, EntityRef marioEntity) {
+            if (f.DestroyPending(starEntity)) {
                 return;
             }
 
+            var star = f.Unsafe.GetPointer<BigStar>(starEntity);
+            if (star->UncollectableFrames > 0) {
+                return;
+            }
+
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             if (mario->IsDead) {
                 return;
             }
@@ -108,12 +116,12 @@ namespace Quantum {
 
             if (star->IsStationary) {
                 stage.ResetStage(f, false);
+                f.Global->BigStarSpawnTimer = (ushort) (624 - (f.Global->RealPlayers * 12));
             }
 
-            f.Signals.OnMarioPlayerCollectedStar(info.Entity);
-            f.Events.MarioPlayerCollectedStar(f, info.Entity, *mario, f.Unsafe.GetPointer<Transform2D>(info.Other)->Position);
-            f.Global->BigStarSpawnTimer = (ushort) (624 - (f.Global->RealPlayers * 12));
-            f.Destroy(info.Other);
+            f.Signals.OnMarioPlayerCollectedStar(marioEntity);
+            f.Events.MarioPlayerCollectedStar(f, marioEntity, *mario, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position);
+            f.Destroy(starEntity);
         }
 
         public void OnReturnToRoom(Frame f) {

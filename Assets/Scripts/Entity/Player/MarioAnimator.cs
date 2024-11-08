@@ -564,12 +564,18 @@ namespace NSMB.Entities.Player {
             materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
         }
 
-        private void OnPreRender() {
-            materialBlock.SetColor(ParamGlowColor, IsCameraFocus(Camera.current) ? Color.clear : GlowColor);
+        private unsafe void OnPreRender() {
+            bool teams = QuantumRunner.DefaultGame.Frames.Predicted.Global->Rules.TeamsEnabled;
+            materialBlock.SetColor(ParamGlowColor, teams || !IsCameraFocus(Camera.current) ? GlowColor : Color.clear);
         }
 
         private bool IsCameraFocus(Camera camera) {
-            return PlayerElements.AllPlayerElements.Any(pe => pe.Camera == camera);
+            foreach (var playerElement in PlayerElements.AllPlayerElements) {
+                if (playerElement.Camera == camera && entity.EntityRef == playerElement.Entity) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void PlaySoundEverywhere(SoundEffect soundEffect) {

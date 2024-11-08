@@ -45,9 +45,6 @@ public unsafe class UIUpdater : QuantumCallbacks {
     private VersusStageData stage;
     private EntityRef previousTarget;
 
-    private float fadeTarget;
-    private int fadeStartFrame;
-
     protected override void OnEnable() {
         base.OnEnable();
         MarioAnimator.MarioPlayerInitialized += OnMarioInitialized;
@@ -100,8 +97,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
-        QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
-        QuantumEvent.Subscribe<EventStartCameraFadeIn>(this, OnStartCameraFadeIn);
+        QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public override void OnUpdateView(QuantumGame game) {
@@ -120,7 +116,6 @@ public unsafe class UIUpdater : QuantumCallbacks {
         UpdateStoredItemUI(mario, previousTarget == Target);
         UpdateTextUI(f, mario);
         ApplyUIColor(f, mario);
-        UpdateFadeInOut(f);
 
         previousTarget = Target;
     }
@@ -193,26 +188,36 @@ public unsafe class UIUpdater : QuantumCallbacks {
         itemReserve.sprite = storedItemNull;
     }
 
-    private void OnStartCameraFadeIn(EventStartCameraFadeIn e) {
-        fadeStartFrame = e.Frame.Number;
-        fadeTarget = 0;
+    private void OnStartCameraFadeOut(EventStartCameraFadeOut e) {
+        if (e.Entity != Target) {
+            return;
+        }
+        StartCoroutine(FadeOutThenInCoroutine());
     }
 
-    private void OnStartCameraFadeOut(EventStartCameraFadeOut e) {
-        fadeStartFrame = e.Frame.Number;
-        fadeTarget = 1;
+    private IEnumerator FadeOutThenInCoroutine() {
+        yield return FadeCoroutine(1, 0.25f);
+        yield return new WaitForSeconds(0.1f);
+        yield return FadeCoroutine(0, 0.25f);
+    }
+
+    private IEnumerator FadeCoroutine(float target, float duration) {
+        float totalDuration = duration;
+        Color color = deathFade.color;
+        float startAlpha = color.a;
+
+        while (duration > 0) {
+            duration -= Time.deltaTime;
+            color.a = Mathf.Lerp(target, startAlpha, duration / totalDuration);
+            deathFade.color = color;
+            yield return null;
+        }
     }
 
     private void OnTimerExpired(EventTimerExpired e) {
         CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
         cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
         timerMaterial.SetColor("_Color", Color.red);
-    }
-
-    private void UpdateFadeInOut(Frame f) {
-        Color newColor = deathFade.color;
-        newColor.a = Mathf.Lerp(1 - fadeTarget, fadeTarget, (float) (f.Number - fadeStartFrame) / (f.UpdateRate / 4));
-        deathFade.color = newColor;
     }
 
     private unsafe void UpdateTextUI(Frame f, MarioPlayer mario) {

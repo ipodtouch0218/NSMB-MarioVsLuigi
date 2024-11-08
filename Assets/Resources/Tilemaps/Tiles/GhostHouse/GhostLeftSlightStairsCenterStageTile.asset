@@ -29,10 +29,6 @@ MonoBehaviour:
         Y:
           RawValue: 0
       - X:
-          RawValue: -32768
-        Y:
-          RawValue: 0
-      - X:
           RawValue: 32768
         Y:
           RawValue: 32768
@@ -42,5 +38,6 @@ MonoBehaviour:
           RawValue: -32768
   IsSlipperyGround: 0
   IsSlideableGround: 0
+  IsPolygon: 1
   FootstepSound: 31
   FootstepParticle: 0
