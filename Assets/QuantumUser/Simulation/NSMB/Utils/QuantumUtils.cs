@@ -250,7 +250,7 @@ public static unsafe class QuantumUtils {
         var allPlayers = f.Filter<MarioPlayer>();
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
             if (mario->Team != team
-                || mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+                || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
                 continue;
             }
 

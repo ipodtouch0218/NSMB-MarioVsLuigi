@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
+
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
@@ -31,7 +32,7 @@ namespace Quantum {
             } else {
                 return new FPVector2(
                     (FacingRight ? 1 : -1) * FP._0_25,
-                    (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : FP.FromString("0.09")) + holdableYOffset
+                    (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : Constants._0_09) + holdableYOffset
                 );
             }
         }
@@ -50,9 +51,9 @@ namespace Quantum {
                 }
             }
 
-            return (input.Sprint.IsDown || forceHold) 
+            return (input.Sprint.IsDown || forceHold)
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
-                && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !IsInShell 
+                && !IsInKnockback && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !IsInShell 
                 && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
                 && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
         }
@@ -242,9 +243,9 @@ namespace Quantum {
             // If the level doesn't loop, don't have stars go towards the edges of the map
             if (!stage.IsWrappingLevel) {
                 if (transform->Position.X > stage.StageWorldMin.X - 3) {
-                    starDirection = 1;
-                } else if (transform->Position.X < stage.StageWorldMax.X + 3) {
                     starDirection = 2;
+                } else if (transform->Position.X < stage.StageWorldMax.X + 3) {
+                    starDirection = 1;
                 }
             }
 
@@ -400,8 +401,8 @@ namespace Quantum {
 
             physicsObject->Velocity = new FPVector2(
                 (fromRight ? -1 : 1) *
-                    ((starsToDrop + 1) * FP._0_50) *
-                    4 *
+                    (starsToDrop + 1) *
+                    FP._1_50 *
                     (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
                     (CurrentPowerupState == PowerupState.MiniMushroom ? Constants._2_50 : 1) *
                     (weak ? FP._0_50 : 1),

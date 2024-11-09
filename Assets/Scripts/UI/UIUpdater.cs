@@ -140,18 +140,6 @@ public unsafe class UIUpdater : QuantumCallbacks {
         }
     }
 
-    /*
-    private void UpdateTrackIcons(Frame f) {
-        HashSet<EntityRef> validEntities = new();
-
-        var filter = f.Filter<BigStar>();
-        while (filter.NextUnsafe(out EntityRef entity, out _)) {
-            validEntities.Add(entity);
-        }
-
-    }
-    */
-
     private unsafe void ToggleUI(Frame f, bool hidden) {
         uiHidden = hidden;
 

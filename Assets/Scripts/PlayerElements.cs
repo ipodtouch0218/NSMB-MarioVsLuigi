@@ -16,6 +16,7 @@ public class PlayerElements : MonoBehaviour {
     //---Properties
     public PlayerRef Player => player;
     public EntityRef Entity => spectating ? spectatingEntity : entity;
+    public Camera ScrollCamera => scrollCamera;
     public Camera Camera => ourCamera;
     public CameraAnimator CameraAnimator => cameraAnimator;
     public ReplayUI ReplayUi => replayUi;
@@ -24,7 +25,7 @@ public class PlayerElements : MonoBehaviour {
     [SerializeField] private RawImage image;
     [SerializeField] private UIUpdater uiUpdater;
     [SerializeField] private CameraAnimator cameraAnimator;
-    [SerializeField] private Camera ourCamera;
+    [SerializeField] private Camera ourCamera, scrollCamera;
     [SerializeField] private InputCollector inputCollector;
     [SerializeField] private ScoreboardUpdater scoreboardUpdater;
     [SerializeField] private ReplayUI replayUi;

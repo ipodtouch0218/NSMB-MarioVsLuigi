@@ -96,7 +96,7 @@ namespace Quantum {
                 }
             }
 
-            if (mario->IsGroundpounding || mario->IsInShell || mario->CurrentPipe.IsValid || mario->JumpLandingFrames > 0
+            if (mario->IsGroundpounding || mario->IsInShell || f.Exists(mario->CurrentPipe) || mario->JumpLandingFrames > 0
                 || !(mario->WalljumpFrames <= 0 || physicsObject->IsTouchingGround || physicsObject->Velocity.Y < 0)) {
                 return;
             }
@@ -229,7 +229,7 @@ namespace Quantum {
                     mario->IsSkidding &= !mario->IsTurnaround;
                 }
 
-                FP newX = xVel + acc * f.DeltaTime * direction;
+                FP newX = xVel + (acc * f.DeltaTime * direction);
 
                 if ((xVel < max && newX > max) || (xVel > -max && newX < -max)) {
                     newX = FPMath.Clamp(newX, -max, max);
@@ -249,7 +249,9 @@ namespace Quantum {
                 mario->IsTurnaround = false;
 
                 FP angle = FPMath.Abs(physicsObject->FloorAngle);
-                if (mario->IsInWater) {
+                if (mario->IsInKnockback) {
+                    acc = -physics.KnockbackDeceleration;
+                } else if (mario->IsInWater) {
                     acc = -physics.SwimDeceleration;
                 } else if (mario->IsSliding) {
                     if (angle > physics.SlideMinimumAngle) {
@@ -261,8 +263,6 @@ namespace Quantum {
                     }
                 } else if (physicsObject->IsOnSlipperyGround) {
                     acc = -physics.WalkButtonReleaseIceDeceleration[stage];
-                } else if (mario->IsInKnockback) {
-                    acc = -physics.KnockbackDeceleration;
                 } else {
                     acc = -physics.WalkButtonReleaseDeceleration;
                 }
@@ -314,7 +314,8 @@ namespace Quantum {
 
             if (physicsObject->IsTouchingGround) {
                 // Coyote Time
-                mario->CoyoteTimeFrames = physics.CoyoteTimeFrames;
+                // Disable since we're using physicsobject hoverframes now
+                //mario->CoyoteTimeFrames = physics.CoyoteTimeFrames;
             }
 
             if (!mario->WasTouchingGroundLastFrame && physicsObject->IsTouchingGround) {
@@ -402,14 +403,14 @@ namespace Quantum {
             }
 
             if (canSpecialJump && mario->JumpState == JumpState.SingleJump) {
-                //Double jump
+                // Double jump
                 mario->JumpState = JumpState.DoubleJump;
             } else if (canSpecialJump && mario->JumpState == JumpState.DoubleJump) {
-                //Triple Jump
+                // Triple Jump
                 mario->JumpState = JumpState.TripleJump;
                 newY += physics.JumpTripleBonusVelocity;
             } else {
-                //Normal jump
+                // Normal jump
                 mario->JumpState = JumpState.SingleJump;
             }
 
@@ -419,6 +420,9 @@ namespace Quantum {
             physicsObject->Velocity.Y = newY;
 
             f.Events.MarioPlayerJumped(f, filter.Entity, *filter.MarioPlayer, mario->JumpState, mario->DoEntityBounce);
+            if (mario->DoEntityBounce) {
+                mario->IsCrouching = false;
+            }
             mario->DoEntityBounce = false;
         }
 
@@ -620,7 +624,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (f.Exists(mario->CurrentPipe) || mario->IsInShell || mario->IsCrouchedInShell || mario->IsInKnockback 
+            if (f.Exists(mario->CurrentPipe) || mario->IsInShell || mario->IsCrouchedInShell
                 || (mario->IsGroundpounding && !physicsObject->IsTouchingGround) 
                 || (mario->IsCrouching && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05)) {
                 return;
@@ -732,9 +736,11 @@ namespace Quantum {
                 return;
             }
 
+            /* intentional: remove left/right requirement when groundpounding
             if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && (inputs.Left.IsDown || inputs.Right.IsDown)) {
                 return;
             }
+            */
 
             if (mario->IsSpinnerFlying) {
                 // Start drill
@@ -2006,7 +2012,9 @@ namespace Quantum {
 
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
+            Debug.Log("ice block broken " + breakReason);
             if (!f.Unsafe.TryGetPointer(iceBlock->Entity, out MarioPlayer* mario)) {
+                Debug.Log("no mario");
                 return;
             }
 
@@ -2026,6 +2034,7 @@ namespace Quantum {
             case IceBlockBreakReason.Timer:
             default:
                 // Do nothing
+                mario->DamageInvincibilityFrames = 30;
                 break;
             }
         }

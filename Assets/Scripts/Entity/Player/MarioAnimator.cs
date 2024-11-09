@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
@@ -101,7 +102,6 @@ namespace NSMB.Entities.Player {
         private float lastBumpSound;
         private MaterialPropertyBlock materialBlock;
         private float teammateStompTimer;
-
         private VersusStageData stage;
 
         public void OnValidate() {
@@ -124,6 +124,8 @@ namespace NSMB.Entities.Player {
             modelRotationTarget = models.transform.rotation;
 
             StartCoroutine(BlinkRoutine());
+
+            RenderPipelineManager.beginCameraRendering += URPOnPreRender;
 
             QuantumEvent.Subscribe<EventMarioPlayerJumped>(this, OnMarioPlayerJumped, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerGroundpounded>(this, OnMarioPlayerGroundpounded, NetworkHandler.FilterOutReplayFastForward);
@@ -181,6 +183,10 @@ namespace NSMB.Entities.Player {
 
         public void Destroy(QuantumGame game) {
             MarioPlayerDestroyed?.Invoke(game, game.Frames.Verified, this);
+        }
+
+        public void OnDestroy() {
+            RenderPipelineManager.beginCameraRendering -= URPOnPreRender;
         }
 
         public void Update() {
@@ -564,14 +570,17 @@ namespace NSMB.Entities.Player {
             materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
         }
 
-        private unsafe void OnPreRender() {
+        private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
+            if (materialBlock == null) {
+                return;
+            }
             bool teams = QuantumRunner.DefaultGame.Frames.Predicted.Global->Rules.TeamsEnabled;
-            materialBlock.SetColor(ParamGlowColor, teams || !IsCameraFocus(Camera.current) ? GlowColor : Color.clear);
+            materialBlock.SetColor(ParamGlowColor, teams || !IsCameraFocus(camera) ? GlowColor : Color.clear);
         }
 
         private bool IsCameraFocus(Camera camera) {
             foreach (var playerElement in PlayerElements.AllPlayerElements) {
-                if (playerElement.Camera == camera && entity.EntityRef == playerElement.Entity) {
+                if (entity.EntityRef == playerElement.Entity && (playerElement.Camera == camera || playerElement.ScrollCamera == camera)) {
                     return true;
                 }
             }
@@ -665,7 +674,6 @@ namespace NSMB.Entities.Player {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity.EntityRef);
             if (mario->IsInWater) {
                 return;
-
             }
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity.EntityRef);
 
@@ -675,20 +683,6 @@ namespace NSMB.Entities.Player {
             GlobalController.Instance.rumbleManager.RumbleForSeconds(0.5f, 0f, 0.1f, RumbleManager.RumbleSetting.High);
             footstepVariant = !footstepVariant;
         }
-
-        /*
-        private void OnAllPlayersLoaded() {
-            enableGlow = SessionData.Instance.Teams || !Object.HasControlAuthority();
-            GlowColor = Utils.Utils.GetPlayerColor(controller.Data.Owner);
-
-            if (!Object.HasControlAuthority()) {
-                GameManager.Instance.CreateNametag(controller);
-            }
-
-            icon = UIUpdater.Instance.CreateTrackIcon(controller);
-            TryCreateMaterialBlock();
-        }
-        */
 
         private void OnMarioPlayerReceivedKnockback(EventMarioPlayerReceivedKnockback e) {
             if (e.Entity != entity.EntityRef) {

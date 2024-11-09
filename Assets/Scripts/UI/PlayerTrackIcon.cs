@@ -53,6 +53,7 @@ public unsafe class PlayerTrackIcon : TrackIcon {
         transform.localScale = controllingCamera ? FlipY : TwoThirds;
 
         Frame f = game.Frames.Predicted;
+        image.enabled &= controllingCamera || !stage.HidePlayersOnMinimap;
         teamIcon.gameObject.SetActive(Settings.Instance.GraphicsColorblind && f.Global->Rules.TeamsEnabled && !controllingCamera);
     }
 

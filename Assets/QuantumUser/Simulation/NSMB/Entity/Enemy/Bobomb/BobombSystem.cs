@@ -268,11 +268,18 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
                 || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                || !f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)
+                || !f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario)
                 || !f.Unsafe.TryGetPointer(marioEntity, out PhysicsObject* marioPhysics)) {
                 return;
             }
-            
+
+            if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
+                bobomb->Kill(f, entity, marioEntity, true);
+                return;
+            }
+
             physicsObject->Velocity.Y = 0;
             if (dropped) {
                 physicsObject->Velocity.X = 0;
@@ -301,6 +308,11 @@ namespace Quantum {
 
         public void OnEnemyKilledByStageReset(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
+                if (f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
+                    && f.Exists(holdable->Holder)) {
+                    // Don't die if being held
+                    return;
+                }
                 bobomb->Kill(f, entity, EntityRef.None, true);
             }
         }

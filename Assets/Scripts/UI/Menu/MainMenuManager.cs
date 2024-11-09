@@ -854,9 +854,19 @@ namespace NSMB.UI.MainMenu {
             OnCountdownTick(e.Game, e.SecondsRemaining);
         }
 
-        private void OnHostChanged(EventHostChanged e) {
+        private unsafe void OnHostChanged(EventHostChanged e) {
             SendHostReminder();
             hostControlsGroup.interactable = e.Game.PlayerIsLocal(e.NewHost);
+            UpdateRoomHeader(e.Frame, e.NewHost);
+
+            if (e.Game.PlayerIsLocal(e.NewHost) && NetworkHandler.Client != null && NetworkHandler.Client.InRoom) {
+                RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.NewHost);
+                if (runtimePlayer != null) {
+                    NetworkHandler.Client.CurrentRoom.SetCustomProperties(new Photon.Client.PhotonHashtable {
+                        [Enums.NetRoomProperties.HostName] = runtimePlayer.PlayerNickname
+                    });
+                }
+            }
         }
 
         //---Debug

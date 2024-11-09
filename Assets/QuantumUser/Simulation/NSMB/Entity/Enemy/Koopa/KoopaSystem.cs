@@ -199,7 +199,7 @@ namespace Quantum {
 
             bool isSpiny = koopa->IsSpiny && !koopa->IsFlipped;
 
-            if (!isSpiny && mario->InstakillsEnemies(marioPhysicsObject, true)) {
+            if (mario->InstakillsEnemies(marioPhysicsObject, false) || (!isSpiny && mario->InstakillsEnemies(marioPhysicsObject, true))) {
                 koopa->Kill(f, koopaEntity, marioEntity, true);
                 return;
             }
@@ -373,8 +373,15 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
                 || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                || !f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)
+                || !f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario)
                 || !f.Unsafe.TryGetPointer(marioEntity, out PhysicsObject* marioPhysics)) {
+                return;
+            }
+
+            if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
+                koopa->Kill(f, entity, marioEntity, true);
                 return;
             }
 
@@ -441,6 +448,11 @@ namespace Quantum {
 
         public void OnEnemyKilledByStageReset(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Koopa* koopa)) {
+                if (f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
+                    && f.Exists(holdable->Holder)) {
+                    // Don't die if being held
+                    return;
+                }
                 koopa->Kill(f, entity, EntityRef.None, true);
             }
         }

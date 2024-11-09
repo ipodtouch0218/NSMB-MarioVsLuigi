@@ -68,10 +68,13 @@ namespace Quantum {
             coinPhysicsObject->Velocity.Y = f.RNG->Next(Constants._4_50, 5);
 
             // Fall off screen
-            var killerTransform = f.Unsafe.GetPointer<Transform2D>(killerEntity);
+            if (f.Unsafe.TryGetPointer(killerEntity, out Transform2D* killerTransform)) {
+                QuantumUtils.UnwrapWorldLocations(f, koopaTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
+                enemy->FacingRight = ourPos.X > theirPos.X;
+            } else {
+                enemy->FacingRight = false;
+            }
 
-            QuantumUtils.UnwrapWorldLocations(f, koopaTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
-            enemy->FacingRight = ourPos.X > theirPos.X;
             physicsObject->DisableCollision = true;
             physicsObject->Velocity = new FPVector2(
                 2 * (enemy->FacingRight ? 1 : -1),

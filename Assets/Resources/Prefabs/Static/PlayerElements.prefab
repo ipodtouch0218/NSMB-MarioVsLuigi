@@ -742,7 +742,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite=60>88888888888888888888
+  m_text: <sprite name=connection_great>88888888888888888888
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03bd50bb8343d1d4dbb0873e4c9abb95, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 89b0d01365bdebe41af2f263f3dd02fc, type: 2}
@@ -6373,6 +6373,7 @@ MonoBehaviour:
   uiUpdater: {fileID: 7396989138894499337}
   cameraAnimator: {fileID: 6689543478587193701}
   ourCamera: {fileID: 9216439077095524751}
+  scrollCamera: {fileID: 3031707850400707342}
   inputCollector: {fileID: 4572094016511153426}
   scoreboardUpdater: {fileID: 1764676025845282627}
   replayUi: {fileID: 5941196596781928969}

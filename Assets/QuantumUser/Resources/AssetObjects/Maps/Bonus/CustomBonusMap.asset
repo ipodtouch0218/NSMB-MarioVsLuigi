@@ -1489,6 +1489,8 @@ MonoBehaviour:
             RawValue: 242483
         IgnorePlayerWhenRespawning:
           Value: 0
+        DisableRespawning:
+          Value: 0
     - rid: 4294874483904217093
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1635,6 +1637,8 @@ MonoBehaviour:
           Y:
             RawValue: 32768
         IgnorePlayerWhenRespawning:
+          Value: 0
+        DisableRespawning:
           Value: 0
     - rid: 4604645057348239365
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -2053,6 +2057,8 @@ MonoBehaviour:
           Y:
             RawValue: 32768
         IgnorePlayerWhenRespawning:
+          Value: 0
+        DisableRespawning:
           Value: 0
     - rid: 6225276388681711621
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -2759,6 +2765,8 @@ MonoBehaviour:
           Y:
             RawValue: 308019
         IgnorePlayerWhenRespawning:
+          Value: 0
+        DisableRespawning:
           Value: 0
     - rid: 8452806171105951749
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

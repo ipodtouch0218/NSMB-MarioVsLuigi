@@ -5,6 +5,7 @@
 #define _0_1875 0.1875
 #define _0_40 0.4
 #define _0_35 0.35
+#define _0_09 0.09
 
 input {
 	button Up;
