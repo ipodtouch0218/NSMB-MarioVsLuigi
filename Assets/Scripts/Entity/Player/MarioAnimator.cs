@@ -244,8 +244,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void HandleAnimations(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject) {
-            /*
-            if (GameManager.Instance.GameEnded) {
+            if (f.Global->GameState == GameState.Ended) {
                 models.SetActive(true);
 
                 // Disable Particles
@@ -257,7 +256,6 @@ namespace NSMB.Entities.Player {
                 SetParticleEmission(bubblesParticle, false);
                 return;
             }
-            */
 
             // Particles
             SetParticleEmission(drillParticle, !mario->IsDead && mario->IsDrilling);

@@ -58,28 +58,27 @@ namespace Quantum {
             if (HandleStuckInBlock(f, ref filter, stage)) {
                 return;
             }
-            HandlePowerups(f, ref filter, physics, input, stage);
-            HandleBreakingBlocks(f, ref filter, physics, input, stage);
+            HandlePowerups(f, ref filter, physics, ref input, stage);
+            HandleBreakingBlocks(f, ref filter, physics, ref input, stage);
             HandleKnockback(f, ref filter);
-            HandleCrouching(f, ref filter, physics, input);
-            HandleGroundpound(f, ref filter, physics, input, stage);
-            HandleSliding(f, ref filter, physics, input);
-            HandleWalkingRunning(f, ref filter, physics, input);
+            HandleCrouching(f, ref filter, physics, ref input);
+            HandleGroundpound(f, ref filter, physics, ref input, stage);
+            HandleSliding(f, ref filter, physics, ref input);
+            HandleWalkingRunning(f, ref filter, physics, ref input);
             HandleSpinners(f, ref filter, stage);
-            HandleJumping(f, ref filter, physics, input);
-            HandleSwimming(f, ref filter, physics, input);
-            HandleBlueShell(f, ref filter, physics, input, stage);
-            HandleWallslide(f, ref filter, physics, input);
-            HandleGravity(f, ref filter, physics, input);
-            HandleTerminalVelocity(f, ref filter, physics, input);
-            HandleFacingDirection(f, ref filter, physics, input);
+            HandleJumping(f, ref filter, physics, ref input);
+            HandleSwimming(f, ref filter, physics, ref input);
+            HandleBlueShell(f, ref filter, physics, ref input, stage);
+            HandleWallslide(f, ref filter, physics, ref input);
+            HandleGravity(f, ref filter, physics, ref input);
+            HandleTerminalVelocity(f, ref filter, physics, ref input);
+            HandleFacingDirection(f, ref filter, physics, ref input);
             HandlePipes(f, ref filter, physics, stage);
             HandleHitbox(f, ref filter, physics);
             mario->WasTouchingGroundLastFrame = physicsObject->IsTouchingGround;
         }
 
-        public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
-
+        public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -302,7 +301,7 @@ namespace Quantum {
             return Constants.WeirdSlopeConstant * floorAngle;
         }
 
-        private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
 
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -426,7 +425,7 @@ namespace Quantum {
             mario->DoEntityBounce = false;
         }
 
-        public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
 
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -460,7 +459,7 @@ namespace Quantum {
             physicsObject->Gravity = FPVector2.Up * gravity;
         }
 
-        public void HandleTerminalVelocity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        public void HandleTerminalVelocity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
 
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -501,7 +500,7 @@ namespace Quantum {
             physicsObject->TerminalVelocity = terminalVelocity;
         }
 
-        public void HandleWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        public void HandleWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
 
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -527,7 +526,7 @@ namespace Quantum {
                 return;
             }
 
-            HandleWallslideStopChecks(filter, inputs, currentWallDirection);
+            HandleWallslideStopChecks(ref filter, ref inputs, currentWallDirection);
 
             if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
                 mario->WallslideRight = false;
@@ -596,7 +595,7 @@ namespace Quantum {
         }
 
         private static readonly FPVector2 WallslideLowerHeightOffset = new(0, FP._0_20);
-        private void HandleWallslideStopChecks(Filter filter, Input inputs, FPVector2 wallDirection) {
+        private void HandleWallslideStopChecks(ref Filter filter, ref Input inputs, FPVector2 wallDirection) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -620,7 +619,7 @@ namespace Quantum {
         }
 
 
-        public void HandleFacingDirection(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        public void HandleFacingDirection(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -649,7 +648,7 @@ namespace Quantum {
             }
         }
 
-        public void HandleCrouching(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        public void HandleCrouching(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -685,7 +684,7 @@ namespace Quantum {
             }
         }
 
-        public void HandleGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
+        public void HandleGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -693,7 +692,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 
             if (inputs.Down.WasPressed || (mario->IsPropellerFlying && inputs.Down.IsDown)) {
-                TryStartGroundpound(f, ref filter, physics, inputs);
+                TryStartGroundpound(f, ref filter, physics, ref inputs);
             }
 
             HandleGroundpoundStartAnimation(ref filter, physics);
@@ -724,7 +723,7 @@ namespace Quantum {
             mario->IsGroundpoundActive &= mario->IsGroundpounding;
         }
 
-        private void TryStartGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        private void TryStartGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
 
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -877,7 +876,7 @@ namespace Quantum {
             }
         }
 
-        public void HandleBlueShell(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
+        public void HandleBlueShell(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
@@ -1021,7 +1020,7 @@ namespace Quantum {
             return false;
         }
 
-        private void HandlePowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
+        private void HandlePowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -1137,7 +1136,7 @@ namespace Quantum {
             }
         }
 
-        private void HandleSwimming(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        private void HandleSwimming(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -1176,7 +1175,7 @@ namespace Quantum {
             }
         }
 
-        private void HandleSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs) {
+        private void HandleSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -1286,7 +1285,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
 
             FP newHeight;
-            bool crouchHitbox = mario->CurrentPowerupState != PowerupState.MiniMushroom && !mario->CurrentPipe.IsValid && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
+            bool crouchHitbox = mario->CurrentPowerupState != PowerupState.MiniMushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
             if (mario->CurrentPowerupState <= PowerupState.MiniMushroom || (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->IsGroundpounding) {
                 newHeight = physics.SmallHitboxHeight;
             } else {
@@ -1316,9 +1315,9 @@ namespace Quantum {
             collider->Shape.Centroid = FPVector2.Up * newExtents.Y;
             collider->IsTrigger = mario->IsDead;
 
-            filter.Freezable->IceBlockSize = collider->Shape.Box.Extents * (2 + FP._0_50);
+            filter.Freezable->IceBlockSize = collider->Shape.Box.Extents * Constants._2_50;
             filter.Freezable->IceBlockSize.Y += FP._0_10;
-            filter.Freezable->IceBlockSize.X += FP._0_25;
+            filter.Freezable->IceBlockSize.X += FP._0_10;
         }
 
         private bool HandleStuckInBlock(Frame f, ref Filter filter, VersusStageData stage) {
@@ -1354,30 +1353,9 @@ namespace Quantum {
 
             if (!wasStuckLastTick) {
                 // Code for mario to instantly teleport to the closest free position when he gets stuck
-                int angle = 45;
-                int increments = 360 / angle;
-                FP distIncrement = FP._0_10;
-                FP distMax = FP._0_50 + FP._0_10;
-
-                Span<FPVector2> offsets = stackalloc FPVector2[8];
-                for (int i = 0; i < increments; i++) {
-                    FP radAngle = ((i * angle * 2) + ((i / 4) * angle) % 360) * FP.Deg2Rad;
-                    offsets[i] = new FPVector2(FPMath.Sin(radAngle), FPMath.Cos(radAngle));
-                }
-
-                FP dist = 0;
-                while ((dist += distIncrement) < distMax) {
-                    for (int i = 0; i < increments; i++) {
-                        FPVector2 checkPos = transform->Position + (offsets[i] * dist);
-                        if (PhysicsObjectSystem.BoxInGround(f, checkPos, shape, stage: stage, entity: filter.Entity)) {
-                            continue;
-                        }
-
-                        // Valid spot.
-                        transform->Position = checkPos;
-                        mario->IsStuckInBlock = false;
-                        return false;
-                    }
+                if (PhysicsObjectSystem.TryEject(f, filter.Entity, stage)) {
+                    mario->IsStuckInBlock = false;
+                    return false;
                 }
             }
 
@@ -1387,7 +1365,7 @@ namespace Quantum {
             return true;
         }
 
-        private void HandleBreakingBlocks(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, Input inputs, VersusStageData stage) {
+        private void HandleBreakingBlocks(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -1726,12 +1704,7 @@ namespace Quantum {
             var marioA = f.Unsafe.GetPointer<MarioPlayer>(marioAEntity);
             var marioB = f.Unsafe.GetPointer<MarioPlayer>(marioBEntity);
 
-            // Don't damage players with I-Frames
-            if (marioA->DamageInvincibilityFrames > 0 || marioB->DamageInvincibilityFrames > 0) {
-                return;
-            }
-
-            // Or players in the Mega Mushroom grow animation
+            // Don't damage players in the Mega Mushroom grow animation
             if (marioA->MegaMushroomStartFrames > 0 || marioB->MegaMushroomFrames > 0) {
                 return;
             }
@@ -1752,10 +1725,6 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, marioATransform->Position, marioBTransform->Position, out FPVector2 marioAPosition, out FPVector2 marioBPosition);
             bool fromRight = marioAPosition.X < marioBPosition.X;
 
-            FP dot = FPVector2.Dot((marioAPosition - marioBPosition).Normalized, FPVector2.Up);
-            bool marioAAbove = dot > FP._0_33 * 2;
-            bool marioBAbove = dot < -FP._0_33 * 2;
-
             // Starman cases
             bool marioAStarman = marioA->IsStarmanInvincible;
             bool marioBStarman = marioB->IsStarmanInvincible;
@@ -1770,6 +1739,12 @@ namespace Quantum {
                 MarioMarioAttackStarman(f, marioBEntity, marioAEntity, !fromRight, dropStars);
                 return;
             }
+
+            FP dot = FPVector2.Dot((marioAPosition - marioBPosition).Normalized, FPVector2.Up);
+            bool marioAAbove = dot > FP._0_33 * Constants._0_66;
+            bool marioBAbove = dot < -Constants._0_66;
+
+            Debug.Log("mario A: " + marioAAbove + " - mario B: " + marioBAbove);
 
             // Mega mushroom cases
             bool marioAMega = marioA->CurrentPowerupState == PowerupState.MegaMushroom;
@@ -1882,13 +1857,13 @@ namespace Quantum {
                     if (marioAPhysics->IsTouchingGround) {
                         marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, true, marioBEntity);
                     } else {
-                        marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
+                        marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
                     }
 
                     if (marioBPhysics->IsTouchingGround) {
                         marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, true, marioAEntity);
                     } else {
-                        marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (!fromRight ? 1 : -1);
+                        marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
                     }
                 } else {
                     // Collide
@@ -1913,7 +1888,6 @@ namespace Quantum {
                             marioB->LastPushingFrame = f.Number;
                             marioBPhysics->Velocity.X = avgVelocityX;
                         }
-
                     }
                 }
             }
@@ -2012,23 +1986,25 @@ namespace Quantum {
 
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
-            Debug.Log("ice block broken " + breakReason);
-            if (!f.Unsafe.TryGetPointer(iceBlock->Entity, out MarioPlayer* mario)) {
-                Debug.Log("no mario");
+            EntityRef entity = iceBlock->Entity;
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
+                || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
                 return;
             }
+
+            physicsObject->Velocity = FPVector2.Zero;
 
             switch (breakReason) {
             case IceBlockBreakReason.BlockBump:
             case IceBlockBreakReason.HitWall:
             case IceBlockBreakReason.Fireball:
                 // Soft knockback, 1 star
-                mario->DoKnockback(f, iceBlock->Entity, mario->FacingRight, 1, true, brokenIceBlock);
+                mario->DoKnockback(f, entity, mario->FacingRight, 1, true, brokenIceBlock);
                 break;
 
             case IceBlockBreakReason.Groundpounded:
                 // Hard knockback, 2 stars
-                mario->DoKnockback(f, iceBlock->Entity, mario->FacingRight, 2, false, brokenIceBlock);
+                mario->DoKnockback(f, entity, mario->FacingRight, 2, false, brokenIceBlock);
                 break;
 
             case IceBlockBreakReason.Timer:

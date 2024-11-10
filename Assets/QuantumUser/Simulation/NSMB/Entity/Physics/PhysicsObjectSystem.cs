@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using System;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Quantum {
@@ -815,6 +816,46 @@ namespace Quantum {
                             }
                         }
                     }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool TryEject(Frame f, EntityRef entity, VersusStageData stage = null) {
+            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+
+            if (!stage) {
+                stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            }
+
+            if (!BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+                return false;
+            }
+
+            int angle = 45;
+            int increments = 360 / angle;
+            FP distIncrement = FP._0_10;
+            FP distMax = FP._0_50 + FP._0_10;
+
+            Span<FPVector2> offsets = stackalloc FPVector2[8];
+            for (int i = 0; i < increments; i++) {
+                FP radAngle = ((i * angle * 2) + ((i / 4) * angle) % 360) * FP.Deg2Rad;
+                offsets[i] = new FPVector2(FPMath.Sin(radAngle), FPMath.Cos(radAngle));
+            }
+
+            FP dist = 0;
+            while ((dist += distIncrement) < distMax) {
+                for (int i = 0; i < increments; i++) {
+                    FPVector2 checkPos = transform->Position + (offsets[i] * dist);
+                    if (PhysicsObjectSystem.BoxInGround(f, checkPos, collider->Shape, stage: stage, entity: entity)) {
+                        continue;
+                    }
+
+                    // Valid spot.
+                    transform->Position = checkPos;
+                    return true;
                 }
             }
 

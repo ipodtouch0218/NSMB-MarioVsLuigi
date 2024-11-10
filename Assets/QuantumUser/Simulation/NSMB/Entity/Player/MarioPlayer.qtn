@@ -6,6 +6,7 @@
 #define _0_40 0.4
 #define _0_35 0.35
 #define _0_09 0.09
+#define _0_66 0.66666
 
 input {
 	button Up;

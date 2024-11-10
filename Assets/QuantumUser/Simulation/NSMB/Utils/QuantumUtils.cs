@@ -60,6 +60,7 @@ public static unsafe class QuantumUtils {
 
     public static unsafe PlayerRef GetHostPlayer(Frame f, out PlayerData* data) {
         var filter = f.Filter<PlayerData>();
+        filter.UseCulling = false;
         while (filter.NextUnsafe(out _, out PlayerData* playerData)) {
             if (playerData->IsRoomHost) {
                 data = playerData;
@@ -230,6 +231,7 @@ public static unsafe class QuantumUtils {
         Dictionary<int, int> stars = new();
 
         var allPlayers = f.Filter<MarioPlayer>();
+        allPlayers.UseCulling = false;
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
             if (!stars.ContainsKey(mario->Team)) {
                 stars[mario->Team] = 0;
@@ -248,6 +250,7 @@ public static unsafe class QuantumUtils {
     public static int GetTeamStars(Frame f, int team) {
         int sum = 0;
         var allPlayers = f.Filter<MarioPlayer>();
+        allPlayers.UseCulling = false;
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
             if (mario->Team != team
                 || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
@@ -264,6 +267,7 @@ public static unsafe class QuantumUtils {
         Span<int> teamStars = stackalloc int[10];
 
         var allPlayers = f.Filter<MarioPlayer>();
+        allPlayers.UseCulling = false;
         while (allPlayers.Next(out _, out MarioPlayer mario)) {
             if (mario.Team < teamStars.Length) {
                 teamStars[mario.Team] += mario.Stars;
@@ -484,16 +488,21 @@ public static unsafe class QuantumUtils {
             return true;
         }
 
-        PlayerData*[] allPlayerDatas = new PlayerData*[f.ComponentCount<PlayerData>()];
+        int playerDataCount = f.ComponentCount<PlayerData>();
+        PlayerData** allPlayerDatas = stackalloc PlayerData*[playerDataCount];
+
         int index = 0;
         var playerDataFilter = f.Filter<PlayerData>();
+        playerDataFilter.UseCulling = false;
+
         while (playerDataFilter.NextUnsafe(out _, out PlayerData* pd)) {
             allPlayerDatas[index++] = pd;
         }
 
         // Check that at least one non-spectator exists
         bool nonSpectator = false;
-        foreach (PlayerData* pd in allPlayerDatas) {
+        for (int i = 0; i < playerDataCount; i++) {
+            PlayerData* pd = allPlayerDatas[i];
             if (!pd->IsSpectator) {
                 nonSpectator = true;
                 break;
@@ -504,9 +513,10 @@ public static unsafe class QuantumUtils {
         }
 
         // Check that at least two teams exist
-        if (f.Global->Rules.TeamsEnabled && allPlayerDatas.Length > 1) {
+        if (f.Global->Rules.TeamsEnabled && playerDataCount > 1) {
             HashSet<int> teams = new();
-            foreach (PlayerData* pd in allPlayerDatas) {
+            for (int i = 0; i < playerDataCount; i++) {
+                PlayerData* pd = allPlayerDatas[i];
                 teams.Add(pd->Team);
             }
 

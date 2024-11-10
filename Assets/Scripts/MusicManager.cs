@@ -54,6 +54,8 @@ public class MusicManager : MonoBehaviour {
         bool speedup = false;
 
         var allPlayers = f.Filter<MarioPlayer>();
+        allPlayers.UseCulling = false;
+
         int playersWithOneLife = 0;
         int playerCount = 0;
         while (allPlayers.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {

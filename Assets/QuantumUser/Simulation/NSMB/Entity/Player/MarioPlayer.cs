@@ -368,7 +368,7 @@ namespace Quantum {
             }
 
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
-            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || freezable->IsFrozen(f) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
+            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
                 return;
             }
 

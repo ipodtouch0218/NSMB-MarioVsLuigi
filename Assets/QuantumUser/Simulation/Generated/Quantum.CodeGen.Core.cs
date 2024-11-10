@@ -2657,6 +2657,14 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>0.66666</summary>
+    public static FP _0_66 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 43690;
+        return result;
+      }
+    }
     /// <summary>1.1</summary>
     public static FP _1_10 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -2719,6 +2727,8 @@ namespace Quantum {
       public const Int64 _0_35 = 22938;
       /// <summary>0.09</summary>
       public const Int64 _0_09 = 5898;
+      /// <summary>0.66666</summary>
+      public const Int64 _0_66 = 43690;
       /// <summary>1.1</summary>
       public const Int64 _1_10 = 72090;
       /// <summary>0.0001</summary>
