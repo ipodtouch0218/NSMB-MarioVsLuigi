@@ -74,6 +74,7 @@ public class ScoreboardUpdater : MonoBehaviour {
         UpdateSpectatorCount(f);
 
         var playerFilter = f.Filter<MarioPlayer>();
+        playerFilter.UseCulling = false;
         while (playerFilter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
             ScoreboardEntry newEntry = Instantiate(entryTemplate, entryTemplate.transform.parent);
             newEntry.Initialize(f, entity, this);
@@ -85,6 +86,12 @@ public class ScoreboardUpdater : MonoBehaviour {
 
     public unsafe void SortScoreboard(Frame f) {
         entries.Sort((se1, se2) => {
+            if (f.Exists(se1.Target) && !f.Exists(se2.Target)) {
+                return 1;
+            } else if (f.Exists(se2.Target) && !f.Exists(se1.Target)) {
+                return -1;
+            }
+
             var mario1 = f.Unsafe.GetPointer<MarioPlayer>(se1.Target);
             var mario2 = f.Unsafe.GetPointer<MarioPlayer>(se2.Target);
 

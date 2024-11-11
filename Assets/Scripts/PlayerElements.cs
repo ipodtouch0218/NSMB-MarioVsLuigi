@@ -3,6 +3,7 @@ using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
 using Quantum;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -41,6 +42,7 @@ public class PlayerElements : MonoBehaviour {
 
     private bool spectating;
     private EntityRef spectatingEntity;
+    private Vector2 previousNavigate;
 
     public void OnValidate() {
         this.SetIfNull(ref image);
@@ -54,6 +56,7 @@ public class PlayerElements : MonoBehaviour {
 
     public void OnEnable() {
         AllPlayerElements.Add(this);
+        ControlSystem.controls.UI.Navigate.performed += OnNavigate;
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
         ControlSystem.controls.UI.Next.performed += SpectateNextPlayer;
         ControlSystem.controls.UI.Previous.performed += SpectatePreviousPlayer;
@@ -62,6 +65,7 @@ public class PlayerElements : MonoBehaviour {
 
     public void OnDisable() {
         AllPlayerElements.Remove(this);
+        ControlSystem.controls.UI.Navigate.performed -= OnNavigate;
         ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
         ControlSystem.controls.UI.Next.performed -= SpectateNextPlayer;
         ControlSystem.controls.UI.Previous.performed -= SpectatePreviousPlayer;
@@ -146,19 +150,23 @@ public class PlayerElements : MonoBehaviour {
 
     public unsafe void SpectateNextPlayer() {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
-        List<EntityRef> marios = new();
 
-        var marioFilter = f.Filter<MarioPlayer>();
-        while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
-            marios.Add(entity);
-        }
-
-        if (marios.Count <= 0) {
+        int marioCount = f.ComponentCount<MarioPlayer>();
+        if (marioCount <= 0) {
             return;
         }
 
+        Span<EntityRef> marios = stackalloc EntityRef[marioCount];
+        var marioFilter = f.Filter<MarioPlayer>();
+        marioFilter.UseCulling = false;
+
+        int index = 0;
+        while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
+            marios[index++] = entity;
+        }
+
         int currentIndex = -1;
-        for (int i = 0; i < marios.Count; i++) {
+        for (int i = 0; i < marioCount; i++) {
             if (spectatingEntity == marios[i]
                 || marios[i].Index > spectatingEntity.Index) {
 
@@ -166,7 +174,7 @@ public class PlayerElements : MonoBehaviour {
                 break;
             }
         }
-        spectatingEntity = marios[(currentIndex + 1) % marios.Count];
+        spectatingEntity = marios[(currentIndex + 1) % marioCount];
         UpdateSpectateUI();
     }
 
@@ -180,19 +188,23 @@ public class PlayerElements : MonoBehaviour {
 
     public unsafe void SpectatePreviousPlayer() {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
-        List<EntityRef> marios = new();
 
-        var marioFilter = f.Filter<MarioPlayer>();
-        while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
-            marios.Add(entity);
-        }
-
-        if (marios.Count <= 0) {
+        int marioCount = f.ComponentCount<MarioPlayer>();
+        if (marioCount <= 0) {
             return;
         }
 
+        Span<EntityRef> marios = stackalloc EntityRef[marioCount];
+        var marioFilter = f.Filter<MarioPlayer>();
+        marioFilter.UseCulling = false;
+
+        int index = 0;
+        while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
+            marios[index++] = entity;
+        }
+
         int currentIndex = -1;
-        for (int i = marios.Count - 1; i >= 0; i--) {
+        for (int i = marioCount - 1; i >= 0; i--) {
             if (spectatingEntity == marios[i]
                 || marios[i].Index < spectatingEntity.Index) {
 
@@ -200,8 +212,20 @@ public class PlayerElements : MonoBehaviour {
                 break;
             }
         }
-        spectatingEntity = marios[(currentIndex - 1 + marios.Count) % marios.Count];
+        spectatingEntity = marios[(currentIndex - 1 + marioCount) % marioCount];
         UpdateSpectateUI();
+    }
+
+    private void OnNavigate(InputAction.CallbackContext context) {
+        Vector2 newPosition = context.ReadValue<Vector2>();
+        if (previousNavigate.x > -0.3f && newPosition.x <= -0.3f) {
+            // Left
+            SpectatePreviousPlayer();
+        }
+        if (previousNavigate.x < 0.3f && newPosition.x >= 0.3f) {
+            // Right
+            SpectateNextPlayer();
+        }
     }
 
     private void SpectatePlayerIndex(InputAction.CallbackContext context) {

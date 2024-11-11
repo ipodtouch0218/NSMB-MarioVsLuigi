@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public class CommandChangePlayerData : DeterministicCommand {
+    public class CommandChangePlayerData : DeterministicCommand, ILobbyCommand {
 
         public Changes EnabledChanges;
 
@@ -19,6 +19,34 @@ namespace Quantum {
             stream.Serialize(ref Skin);
             stream.Serialize(ref Team);
             stream.Serialize(ref Spectating);
+        }
+
+        public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
+            if (f.Global->GameState != GameState.PreGameRoom && !playerData->IsSpectator) {
+                return;
+            }
+
+            Changes playerChanges = EnabledChanges;
+
+            if (playerChanges.HasFlag(Changes.Character)) {
+                playerData->Character = Character;
+            }
+            if (playerChanges.HasFlag(Changes.Skin)) {
+                playerData->Skin = Skin;
+            }
+            if (playerChanges.HasFlag(Changes.Team)) {
+                playerData->Team = Team;
+            }
+            if (playerChanges.HasFlag(Changes.Spectating)) {
+                playerData->ManualSpectator = Spectating;
+                playerData->IsSpectator = Spectating;
+            }
+
+            if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
+                GameLogicSystem.StopCountdown(f);
+            }
+
+            f.Events.PlayerDataChanged(f, playerData->PlayerRef);
         }
 
         public enum Changes : byte {

@@ -2,34 +2,62 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnBeforePhysicsCollision, ISignalOnStageReset {
+
+        public override void OnInit(Frame f) {
+            f.Context.RegisterInteraction<BreakableObject, MarioPlayer>(OnBreakableObjectMarioInteraction);
+        }
+
         public void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
-            if (!f.Unsafe.TryGetPointer(contact->Entity, out BreakableObject* breakable)
-                || breakable->IsDestroyed
-                || breakable->CurrentHeight <= breakable->MinimumHeight
-                || !f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
-                || mario->CurrentPowerupState != PowerupState.MegaMushroom) {
-                return;
+            if (f.Has<MarioPlayer>(entity) && f.Has<BreakableObject>(contact->Entity)) {
+                *allowCollision &= !TryInteraction(f, contact->Entity, entity, *contact);
+            }
+        }
+
+        private void OnBreakableObjectMarioInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity) {
+            TryInteraction(f, breakableObjectEntity, marioEntity);
+        }
+
+        private bool TryInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact? contact = null) {
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            if (mario->CurrentPowerupState != PowerupState.MegaMushroom || mario->IsDead) {
+                return false;
             }
 
-            var breakableCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(contact->Entity);
-            var breakableTransform = f.Unsafe.GetPointer<Transform2D>(contact->Entity);
+            var breakable = f.Unsafe.GetPointer<BreakableObject>(breakableObjectEntity);
+            if (breakable->IsDestroyed || breakable->CurrentHeight <= breakable->MinimumHeight) {
+                return false;
+            }
+
+            var breakableCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(breakableObjectEntity);
+            var breakableTransform = f.Unsafe.GetPointer<Transform2D>(breakableObjectEntity);
             FPVector2 breakableUp = FPVector2.Rotate(FPVector2.Up, breakableTransform->Rotation);
 
-            FP dot = FPVector2.Dot(contact->Normal, breakableUp);
+            FPVector2 effectiveNormal;
+            if (contact != null) {
+                effectiveNormal = contact.Value.Normal;
+            } else {
+                var marioTransform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
+                int direction = QuantumUtils.WrappedDirectionSign(f, breakableTransform->Position, marioTransform->Position);
+                effectiveNormal = (direction == 1) ? FPVector2.Right : FPVector2.Left;
+            }
+
+            FP dot = FPVector2.Dot(effectiveNormal, breakableUp);
             if (dot > PhysicsObjectSystem.GroundMaxAngle) {
                 // Hit the top of a pipe
                 // Shrink by 1, if we can.
                 if (breakable->IsStompable && breakable->CurrentHeight >= breakable->MinimumHeight + 1 && mario->JumpState != JumpState.None) {
-                    ChangeHeight(f, contact->Entity, breakable, breakableCollider, breakable->CurrentHeight - 1, null);
+                    ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->CurrentHeight - 1, null);
                     mario->JumpState = JumpState.None;
                 }
             } else if (dot > -PhysicsObjectSystem.GroundMaxAngle) {
                 // Hit the side of a pipe
-                f.Events.BreakableObjectBroken(f, contact->Entity, entity, -contact->Normal, breakable->CurrentHeight - breakable->MinimumHeight);
-                ChangeHeight(f, contact->Entity, breakable, breakableCollider, breakable->MinimumHeight, true);
-                *allowCollision = false;
+                f.Events.BreakableObjectBroken(f, breakableObjectEntity, marioEntity, -effectiveNormal, breakable->CurrentHeight - breakable->MinimumHeight);
+                ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->MinimumHeight, true);
                 breakable->IsDestroyed = true;
+                return true;
             }
+
+            return false;
         }
 
         public void OnStageReset(Frame f, QBoolean full) {

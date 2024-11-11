@@ -11,17 +11,17 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
-            var projectile = filter.Projectile;
             var collider = filter.PhysicsCollider;
             var transform = filter.Transform;
-            var physicsObject = filter.PhysicsObject;
-
-            var asset = f.FindAsset(projectile->Asset);
 
             if (filter.Transform->Position.Y + collider->Shape.Centroid.Y + collider->Shape.Box.Extents.Y < stage.StageWorldMin.Y) {
                 Destroy(f, filter.Entity, ParticleEffect.None);
                 return;
             }
+
+            var projectile = filter.Projectile;
+            var physicsObject = filter.PhysicsObject;
+            var asset = f.FindAsset(projectile->Asset);
 
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape)) {

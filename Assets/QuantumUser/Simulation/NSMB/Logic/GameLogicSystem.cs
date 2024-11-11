@@ -16,139 +16,22 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
-            if (!f.TryResolveDictionary(f.Global->PlayerDatas, out var playerDataDictionary)) {
-                return;
-            }
-
-            // Ping command is always accepted
+            // Parse lobby commands
+            var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
             for (int i = 0; i < f.PlayerCount; i++) {
-                var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
-                if (playerData != null) {
-                    switch (f.GetPlayerCommand(i)) {
-                    case CommandUpdatePing updatePing:
-                        playerData->Ping = updatePing.PingMs;
-                        f.Events.PlayerDataChanged(f, i);
-                        break;
-                    case CommandSetInSettings setInSettings:
-                        playerData->IsInSettings = setInSettings.InSettings;
-                        f.Events.PlayerDataChanged(f, i);
-                        break;
+                if (f.GetPlayerCommand(i) is ILobbyCommand lobbyCommand) {
+                    var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
+                    if (playerData == null) {
+                        continue;
                     }
+
+                    lobbyCommand.Execute(f, i, playerData);
                 }
             }
 
+            // Gaem state logic
             switch (f.Global->GameState) {
             case GameState.PreGameRoom:
-                for (int i = 0; i < f.PlayerCount; i++) {
-                    var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
-
-                    switch (f.GetPlayerCommand(i)) {
-                    case CommandChangePlayerData changeData:
-                        CommandChangePlayerData.Changes playerChanges = changeData.EnabledChanges;
-
-                        if (playerChanges.HasFlag(CommandChangePlayerData.Changes.Character)) {
-                            playerData->Character = changeData.Character;
-                        }
-                        if (playerChanges.HasFlag(CommandChangePlayerData.Changes.Skin)) {
-                            playerData->Skin = changeData.Skin;
-                        }
-                        if (playerChanges.HasFlag(CommandChangePlayerData.Changes.Team)) {
-                            playerData->Team = changeData.Team;
-                        }
-                        if (playerChanges.HasFlag(CommandChangePlayerData.Changes.Spectating)) {
-                            playerData->ManualSpectator = changeData.Spectating;
-                            playerData->IsSpectator = changeData.Spectating;
-                        }
-
-                        if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
-                            StopCountdown(f);
-                        }
-
-                        f.Events.PlayerDataChanged(f, playerData->PlayerRef);
-                        break;
-                    case CommandStartTyping:
-                        f.Events.PlayerStartedTyping(f, i);
-                        break;
-                    case CommandSendChatMessage chatMessage:
-                        if (!playerData->CanSendChatMessage(f)) {
-                            break;
-                        }
-                        playerData->LastChatMessage = f.Number;
-                        f.Events.PlayerSentChatMessage(f, i, chatMessage.Message);
-                        break;
-                    case CommandToggleReady:
-                        playerData->IsReady = !playerData->IsReady;
-                        f.Events.PlayerDataChanged(f, i);
-                        break;
-                    case CommandToggleCountdown:
-                        if (!playerData->IsRoomHost) {
-                            // Only the host can start the countdown.
-                            break;
-                        }
-                        bool gameStarting = f.Global->GameStartFrames == 0;
-                        f.Global->GameStartFrames = (ushort) (gameStarting ? 3 * 60 : 0);
-                        f.Events.StartingCountdownChanged(f, gameStarting);
-                        break;
-                    case CommandChangeHost changeHost:
-                        if (!playerData->IsRoomHost) {
-                            // Only the host can give it to another player.
-                            break;
-                        }
-                        var newHostPlayerData = QuantumUtils.GetPlayerData(f, changeHost.NewHost, playerDataDictionary);
-                        if (newHostPlayerData == null) {
-                            return;
-                        }
-
-                        playerData->IsRoomHost = false;
-                        newHostPlayerData->IsRoomHost = true;
-                        f.Events.HostChanged(f, changeHost.NewHost);
-                        break;
-                    case CommandChangeRules changeRules:
-                        if (!playerData->IsRoomHost) {
-                            // Only the host can change rules.
-                            break;
-                        }
-
-                        CommandChangeRules.Changes rulesChanges = changeRules.EnabledChanges;
-                        var rules = f.Global->Rules;
-                        bool levelChanged = false;
-
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.Level)) {
-                            levelChanged = rules.Level != changeRules.Level;
-                            rules.Level = changeRules.Level;
-                        }
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.StarsToWin)) {
-                            rules.StarsToWin = changeRules.StarsToWin;
-                        }
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.CoinsForPowerup)) {
-                            rules.CoinsForPowerup = changeRules.CoinsForPowerup;
-                        }
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.Lives)) {
-                            rules.Lives = changeRules.Lives;
-                        }
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.TimerSeconds)) {
-                            rules.TimerSeconds = changeRules.TimerSeconds;
-                        }
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.TeamsEnabled)) {
-                            rules.TeamsEnabled = changeRules.TeamsEnabled;
-                        }
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.CustomPowerupsEnabled)) {
-                            rules.CustomPowerupsEnabled = changeRules.CustomPowerupsEnabled;
-                        }
-                        if (rulesChanges.HasFlag(CommandChangeRules.Changes.DrawOnTimeUp)) {
-                            rules.DrawOnTimeUp = changeRules.DrawOnTimeUp;
-                        }
-
-                        f.Global->Rules = rules;
-                        f.Events.RulesChanged(f, levelChanged);
-
-                        if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
-                            StopCountdown(f);
-                        }
-                        break;
-                    }
-                }
-
                 if (f.Global->GameStartFrames > 0) {
                     if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                         // Start the game!
@@ -163,21 +46,8 @@ namespace Quantum {
                         f.Events.CountdownTick(f, f.Global->GameStartFrames / 60);
                     }
                 }
-
                 break;
             case GameState.WaitingForPlayers:
-                for (int i = 0; i < f.PlayerCount; i++) {
-                    var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
-                    if (f.GetPlayerCommand(i) is CommandPlayerLoaded) {
-                        bool wasLoaded = playerData->IsLoaded;
-                        playerData->IsLoaded = true;
-                        
-                        if (!wasLoaded) {
-                            f.Events.PlayerLoaded(f, i);
-                        }
-                    }
-                }
-                
                 bool allPlayersLoaded = true;
                 var playerDataFilter = f.Filter<PlayerData>();
                 byte players = 0;
@@ -265,11 +135,11 @@ namespace Quantum {
         }
 
         public static void CheckForGameEnd(Frame f) {
-            
             // End Condition: only one team alive
             var marioFilter = f.Filter<MarioPlayer>();
-            bool livesGame = f.Global->Rules.IsLivesEnabled;
+            marioFilter.UseCulling = false;
 
+            bool livesGame = f.Global->Rules.IsLivesEnabled;
             bool oneOrNoTeamAlive = true;
             int aliveTeam = -1;
             while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
@@ -329,6 +199,7 @@ namespace Quantum {
             f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
 
             var playerDatas = f.Filter<PlayerData>();
+            playerDatas.UseCulling = false;
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
                 data->IsSpectator = data->ManualSpectator;
                 if (winningTeam == data->Team) {

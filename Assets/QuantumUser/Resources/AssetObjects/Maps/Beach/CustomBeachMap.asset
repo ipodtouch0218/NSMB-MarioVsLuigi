@@ -665,7 +665,7 @@ MonoBehaviour:
           X:
             RawValue: 131072
           Y:
-            RawValue: -32768
+            RawValue: -98304
         Rotation:
           RawValue: 0
     - rid: 2726619114809327617
@@ -716,7 +716,7 @@ MonoBehaviour:
         LiquidType: 0
         WidthTiles: 64
         HeightTiles:
-          RawValue: 262144
+          RawValue: 393216
     - rid: 3002951718586548224
       type: {class: Transform2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:

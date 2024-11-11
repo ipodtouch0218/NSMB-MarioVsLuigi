@@ -54,6 +54,7 @@ public class PlayerNametag : MonoBehaviour {
         QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
         QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
+        QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
     }
 
     public unsafe void LateUpdate() {
@@ -133,6 +134,14 @@ public class PlayerNametag : MonoBehaviour {
     }
 
     private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {
+        if (e.Entity != Entity) {
+            return;
+        }
+
+        UpdateText(e.Frame);
+    }
+
+    private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
         if (e.Entity != Entity) {
             return;
         }

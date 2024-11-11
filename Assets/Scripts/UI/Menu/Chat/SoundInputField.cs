@@ -1,9 +1,9 @@
+using NSMB.Extensions;
+using System.Collections.Generic;
 using System.Reflection;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using TMPro;
-
-using NSMB.Extensions;
 
 namespace NSMB.UI.MainMenu {
 
@@ -15,6 +15,7 @@ namespace NSMB.UI.MainMenu {
         private PropertyInfo compositionLength;
         private new FieldInfo wasCanceled;
         private FieldInfo isTextComponentUpdateRequired;
+        private bool validKeyPress;
 
         protected override void Start() {
             // This is bs, why are they not protected...
@@ -40,16 +41,15 @@ namespace NSMB.UI.MainMenu {
                 switch (processingEvent.rawType) {
                 case EventType.KeyUp:
                     // TODO: Figure out way to handle navigation during IME Composition.
-                    MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyUp, null, 0, 0.3f);
+                    if (validKeyPress) {
+                        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyUp, volume: 0.3f);
+                        validKeyPress = false;
+                    }
 
                     break;
-
-
                 case EventType.KeyDown:
+                    KeyCode key = processingEvent.keyCode;
                     consumedEvent = true;
-                    if (processingEvent.keyCode != KeyCode.Return) {
-                        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyDown, null, 0, 0.3f);
-                    }
 
                     // Special handling on OSX which produces more events which need to be suppressed.
                     if ((bool) compositionActive.GetValue(this) && (int) compositionLength.GetValue(this) == 0) {
@@ -70,7 +70,15 @@ namespace NSMB.UI.MainMenu {
                         }
                     }
 
+                    string previousText = text;
+
                     shouldContinue = KeyPressed(processingEvent);
+
+                    if (previousText != text && key != KeyCode.Return) {
+                        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyDown, volume: 0.3f);
+                        validKeyPress = true;
+                    }
+
                     if (shouldContinue == EditState.Finish) {
                         if (!(bool) wasCanceled.GetValue(this)) {
                             SendOnSubmit();

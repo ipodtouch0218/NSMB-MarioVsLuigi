@@ -84,7 +84,7 @@ component MarioPlayer {
 
 	// Swimming
 	[ExcludeFromPrototype] byte WaterColliderCount;
-	[ExcludeFromPrototype] bool SwimExitForceJump;
+	[ExcludeFromPrototype] byte SwimForceJumpTimer;
 
 	// Knockback
     [ExcludeFromPrototype] bool IsInKnockback;

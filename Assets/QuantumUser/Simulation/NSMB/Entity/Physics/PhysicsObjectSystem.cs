@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using System;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Quantum {
@@ -756,9 +755,12 @@ namespace Quantum {
             f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario);
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits.HitsBuffer[i];
-                if (hit.Entity != entity
-                    && (mario == null || hit.Entity != mario->HeldEntity)
-                    && !(includeMegaBreakable && f.Has<IceBlock>(hit.Entity))) {
+                Shape2D* hitShape = hit.GetShape(f);
+
+                if (!(hit.Entity == entity
+                    || (mario != null && hit.Entity == mario->HeldEntity)
+                    || (includeMegaBreakable && f.Has<IceBlock>(hit.Entity))
+                    || hitShape->Type == Shape2DType.Edge)) {
                     return true;
                 }
             }
@@ -782,44 +784,69 @@ namespace Quantum {
             Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents);
             Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents);
 
-            for (int x = min.x; x <= max.x; x++) {
-                for (int y = min.y; y <= max.y; y++) {
-                    StageTileInstance tile = stage.GetTileRelative(f, x, y);
-                    StageTile stageTile = f.FindAsset(tile.Tile);
-                    if (!stageTile
-                        || !stageTile.IsPolygon
-                        || (!includeMegaBreakable && stageTile is BreakableBrickTile breakable && breakable.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.MegaMario))) {
+            foreach (var tileTuple in GetTilesOverlappingHitbox(f, origin, shape, stage)) {
+                StageTileInstance tile = tileTuple.Item2;
+                StageTile stageTile = f.FindAsset(tile.Tile);
+                if (!stageTile
+                    || !stageTile.IsPolygon
+                    || (!includeMegaBreakable && stageTile is BreakableBrickTile breakable && breakable.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.MegaMario))) {
+                    continue;
+                }
+                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, tileTuple.Item1);
+                tile.GetWorldPolygons(stageTile, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, worldPos);
+
+                int shapeIndex = 0;
+                int vertexIndex = 0;
+                int shapeVertexCount;
+                while ((shapeVertexCount = f.Context.ShapeVertexCountBuffer[shapeIndex++]) > 0) {
+                    Span<FPVector2> polygon = f.Context.VertexBuffer.AsSpan(vertexIndex, shapeVertexCount);
+                    vertexIndex += shapeVertexCount;
+
+                    if (polygon.Length <= 2) {
                         continue;
                     }
-                    FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y));
-                    tile.GetWorldPolygons(stageTile, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, worldPos);
 
-                    int shapeIndex = 0;
-                    int vertexIndex = 0;
-                    int shapeVertexCount;
-                    while ((shapeVertexCount = f.Context.ShapeVertexCountBuffer[shapeIndex++]) > 0) {
-                        Span<FPVector2> polygon = f.Context.VertexBuffer.AsSpan(vertexIndex, shapeVertexCount);
-                        vertexIndex += shapeVertexCount;
-
-                        if (polygon.Length <= 2) {
-                            continue;
+                    foreach (var corner in boxCorners) {
+                        if (PointIsInsidePolygon(corner, polygon)) {
+                            return true;
                         }
-
-                        foreach (var corner in boxCorners) {
-                            if (PointIsInsidePolygon(corner, polygon)) {
-                                return true;
-                            }
-                        }
-                        for (int i = 0; i < polygon.Length; i++) {
-                            if (LineIntersectsBox(polygon[i], polygon[(i + 1) % polygon.Length], boxMin, boxMax)) {
-                                return true;
-                            }
+                    }
+                    for (int i = 0; i < polygon.Length; i++) {
+                        if (LineIntersectsBox(polygon[i], polygon[(i + 1) % polygon.Length], boxMin, boxMax)) {
+                            return true;
                         }
                     }
                 }
             }
 
             return false;
+        }
+
+        public static System.Collections.Generic.IEnumerator<(Vector2Int, StageTileInstance)> GetTilesOverlappingHitbox(Frame f, FPVector2 position, Shape2D shape, VersusStageData stage = null) {
+            if (!stage) {
+                stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            }
+            var extents = shape.Box.Extents;
+
+            FPVector2 origin = position + shape.Centroid;
+            FPVector2 boxMin = origin - extents;
+            FPVector2 boxMax = origin + extents;
+
+            FPVector2[] boxCorners = {
+                new(origin.X - extents.X, origin.Y + extents.Y),
+                boxMax,
+                new(origin.X + extents.X, origin.Y - extents.Y),
+                boxMin,
+            };
+
+            Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents);
+            Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents);
+
+            for (int x = min.x; x <= max.x; x++) {
+                for (int y = min.y; y <= max.y; y++) {
+                    yield return (new Vector2Int(x, y), stage.GetTileRelative(f, x, y));
+                }
+            }
         }
 
         public static bool TryEject(Frame f, EntityRef entity, VersusStageData stage = null) {

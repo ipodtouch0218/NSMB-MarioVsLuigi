@@ -351,6 +351,7 @@ namespace Quantum {
             IsDead = false;
             IsRespawning = false;
             DamageInvincibilityFrames = 120;
+            CoyoteTimeFrames = 0;
 
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = false;

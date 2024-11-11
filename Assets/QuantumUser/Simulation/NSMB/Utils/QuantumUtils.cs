@@ -285,12 +285,12 @@ public static unsafe class QuantumUtils {
     }
 
     // MAX(0,$B15+(IF(stars behind >0,LOG(B$1+1, 2.71828),0)*$C15*(1-(($M$15-$M$14))/$M$15)))
-    public static PowerupAsset GetRandomItem(Frame f, MarioPlayer mario) {
+    public static PowerupAsset GetRandomItem(Frame f, MarioPlayer* mario) {
         var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
         // "Losing" variable based on ln(x+1), x being the # of stars we're behind
 
-        int ourStars = GetTeamStars(f, mario.Team);
+        int ourStars = GetTeamStars(f, mario->Team);
         int leaderStars = GetFirstPlaceStars(f);
 
         var rules = f.Global->Rules;
@@ -303,6 +303,7 @@ public static unsafe class QuantumUtils {
 
         bool canSpawnMega = true;
         var allPlayers = f.Filter<MarioPlayer>();
+        allPlayers.UseCulling = false;
         while (allPlayers.Next(out _, out MarioPlayer otherPlayer)) {
             if (otherPlayer.CurrentPowerupState == PowerupState.MegaMushroom) {
                 canSpawnMega = false;
@@ -551,4 +552,8 @@ public static unsafe class QuantumUtils {
 
         return true;
     }
+}
+
+public static class Extensions {
+    public static IEnumerator<T> GetEnumerator<T>(this IEnumerator<T> enumerator) => enumerator;
 }

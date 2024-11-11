@@ -3,8 +3,7 @@ using UnityEngine;
 using NSMB.Utils;
 using Photon.Deterministic;
 using Quantum;
-using NSMB.Extensions;
-using System.Linq;
+using NSMB.Extensions; 
 
 public class VolumeWithDistance : MonoBehaviour {
 
@@ -28,7 +27,7 @@ public class VolumeWithDistance : MonoBehaviour {
         this.SetIfNull(ref soundOrigin);
     }
 
-    public void Awake() {
+    public void Start() {
         soundRangeInverse = 1f / soundRange;
         originalVolumes = new float[audioSources.Length];
 
@@ -36,25 +35,11 @@ public class VolumeWithDistance : MonoBehaviour {
             originalVolumes[i] = audioSources[i].volume;
         }
 
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+        Update();
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        /*
-        bool anyPlaying = false;
-        foreach (var item in audioSources) {
-            if (item.isPlaying) {
-                anyPlaying = true;
-                break;
-            }
-        }
-
-        if (!anyPlaying) {
-            return;
-        }
-        */
-
+    public void Update() {
         float minDistance = float.MaxValue;
         FP xDifference = 0;
         foreach (var pe in PlayerElements.AllPlayerElements) {

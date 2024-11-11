@@ -24,7 +24,6 @@ namespace NSMB.Loading {
         [SerializeField] private CharacterAsset defaultCharacterAsset;
 
         //---Private Variables
-        private bool initialized;
         private Coroutine fadeCoroutine;
 
         public void OnValidate() {
@@ -37,8 +36,6 @@ namespace NSMB.Loading {
         }
 
         public unsafe void Initialize(QuantumGame game) {
-            initialized = true;
-
             int characterIndex = 0;
             CharacterAsset character = defaultCharacterAsset;
             if (game != null) {
@@ -108,8 +105,6 @@ namespace NSMB.Loading {
             readyGroup.gameObject.SetActive(true);
             animator.SetTrigger(validPlayer ? "loaded" : "spectating");
 
-            initialized = false;
-
             if (fadeCoroutine != null) {
                 StopCoroutine(fadeCoroutine);
             }
@@ -122,7 +117,6 @@ namespace NSMB.Loading {
 
         public void EndAnimation() {
             gameObject.SetActive(false);
-            initialized = false;
         }
 
         private IEnumerator FadeVolume(float fadeTime, bool fadeIn) {

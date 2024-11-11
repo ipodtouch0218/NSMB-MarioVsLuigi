@@ -25,6 +25,7 @@ public class ScoreboardEntry : MonoBehaviour {
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
         QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
+        QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
     }
 
     public unsafe void Initialize(Frame f, EntityRef target, ScoreboardUpdater updater) {
@@ -52,6 +53,9 @@ public class ScoreboardEntry : MonoBehaviour {
 
     public unsafe void UpdateEntry(Frame f) {
         if (!f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
+            Color dcColor = Utils.GetPlayerColor(f, PlayerRef.None);
+            dcColor.a = 0.2f;
+            background.color = dcColor;
             return;
         }
 
@@ -92,6 +96,14 @@ public class ScoreboardEntry : MonoBehaviour {
     }
 
     private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {
+        if (e.Entity != Target) {
+            return;
+        }
+
+        UpdateEntry(e.Frame);
+    }
+
+    private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
         if (e.Entity != Target) {
             return;
         }

@@ -4,10 +4,10 @@ using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static Unity.Collections.Unicode;
 using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
@@ -201,6 +201,14 @@ namespace NSMB.Entities.Player {
 
             if (f.Global->GameState >= GameState.Ended) {
                 animator.speed = 0;
+                animator.Update(Time.deltaTime);
+                models.SetActive(true);
+                SetParticleEmission(drillParticle, false);
+                SetParticleEmission(sparkles, false);
+                SetParticleEmission(dust, false);
+                SetParticleEmission(giantParticle, false);
+                SetParticleEmission(fireParticle, false);
+                SetParticleEmission(bubblesParticle, false);
                 return;
             }
 
@@ -214,6 +222,8 @@ namespace NSMB.Entities.Player {
 
             if (freezable->IsFrozen(f)) {
                 animator.speed = 0;
+                animator.Play("idle", 1, 0);
+                animator.Update(0);
                 return;
             } else {
                 animator.speed = 1;
@@ -244,19 +254,6 @@ namespace NSMB.Entities.Player {
         }
 
         public void HandleAnimations(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject) {
-            if (f.Global->GameState == GameState.Ended) {
-                models.SetActive(true);
-
-                // Disable Particles
-                SetParticleEmission(drillParticle, false);
-                SetParticleEmission(sparkles, false);
-                SetParticleEmission(dust, false);
-                SetParticleEmission(giantParticle, false);
-                SetParticleEmission(fireParticle, false);
-                SetParticleEmission(bubblesParticle, false);
-                return;
-            }
-
             // Particles
             SetParticleEmission(drillParticle, !mario->IsDead && mario->IsDrilling);
             SetParticleEmission(sparkles, !mario->IsDead && mario->IsStarmanInvincible);
@@ -404,8 +401,8 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamInvincible, mario->IsStarmanInvincible);
             animator.SetBool(ParamSkidding, mario->IsSkidding);
             animator.SetBool(ParamPropeller, mario->IsPropellerFlying);
-            animator.SetBool(ParamPropellerSpin, mario->PropellerSpinFrames > 0);
-            animator.SetBool(ParamPropellerStart, mario->PropellerLaunchFrames > 0);
+            animator.SetBool(ParamPropellerSpin, mario->IsPropellerFlying && mario->PropellerSpinFrames > 0);
+            animator.SetBool(ParamPropellerStart, mario->IsPropellerFlying && mario->PropellerLaunchFrames > 0);
             animator.SetBool(ParamCrouching, mario->IsCrouching);
             animator.SetBool(ParamGroundpound, mario->IsGroundpounding);
             animator.SetBool(ParamSliding, mario->IsSliding);
@@ -476,7 +473,7 @@ namespace NSMB.Entities.Player {
                 teammateStompTimer = 0;
             }
 
-            scale.y -= Mathf.Sin(teammateStompTimer * Mathf.PI / 0.15f) * 0.175f;
+            scale.y -= Mathf.Sin(teammateStompTimer * Mathf.PI / 0.15f) * 0.2f;
             models.transform.SetLossyScale(scale);
 
             // Shader effects
@@ -586,15 +583,18 @@ namespace NSMB.Entities.Player {
         }
 
         public void PlaySoundEverywhere(SoundEffect soundEffect) {
-             //GameManager.Instance.sfx.PlayOneShot(sound, character);
+             GlobalController.Instance.sfx.PlayOneShot(soundEffect);
         }
+
         public void PlaySound(SoundEffect soundEffect, CharacterAsset characterData = null, byte variant = 0, float volume = 1) {
             characterData ??= character;
             sfx.PlayOneShot(soundEffect, characterData, variant, volume);
         }
+
         public GameObject SpawnParticle(string particle, Vector3 worldPos, Quaternion? rot = null) {
             return Instantiate(Resources.Load(particle), worldPos, rot ?? Quaternion.identity) as GameObject;
         }
+
         public GameObject SpawnParticle(GameObject particle, Vector3 worldPos, Quaternion? rot = null) {
             return Instantiate(particle, worldPos, rot ?? Quaternion.identity);
         }
@@ -687,8 +687,8 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (e.Frame.TryGet(e.Attacker, out Transform2D attackerTransform)) {
-                SpawnParticle("Prefabs/Particle/PlayerBounce", attackerTransform.Position.ToUnityVector3());
+            if (e.Frame.Unsafe.TryGetPointer(e.Attacker, out Transform2D* attackerTransform)) {
+                SpawnParticle("Prefabs/Particle/PlayerBounce", attackerTransform->Position.ToUnityVector3());
             }
 
             PlaySound(e.Weak ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
@@ -703,7 +703,10 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (!e.Cancelled) {
+            if (e.Cancelled) {
+                var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+                animator.Play("mega-cancel", 0, 1f - (mario->MegaMushroomEndFrames / 90f));
+            } else {
                 PlaySound(SoundEffect.Powerup_MegaMushroom_End);
             }
         }
@@ -831,8 +834,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            PlaySound(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
+            PlaySoundEverywhere(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
             Instantiate(starCollectParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 

@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public class CommandChangeRules : DeterministicCommand {
+    public class CommandChangeRules : DeterministicCommand, ILobbyCommand {
 
         public Changes EnabledChanges;
 
@@ -27,6 +27,50 @@ namespace Quantum {
             stream.Serialize(ref TeamsEnabled);
             stream.Serialize(ref CustomPowerupsEnabled);
             stream.Serialize(ref DrawOnTimeUp);
+        }
+
+        public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
+            if (f.Global->GameState != GameState.PreGameRoom || !playerData->IsRoomHost) {
+                // Only the host can change rules.
+                return;
+            }
+
+            Changes rulesChanges = EnabledChanges;
+            var rules = f.Global->Rules;
+            bool levelChanged = false;
+
+            if (rulesChanges.HasFlag(Changes.Level)) {
+                levelChanged = rules.Level != Level;
+                rules.Level = Level;
+            }
+            if (rulesChanges.HasFlag(Changes.StarsToWin)) {
+                rules.StarsToWin = StarsToWin;
+            }
+            if (rulesChanges.HasFlag(Changes.CoinsForPowerup)) {
+                rules.CoinsForPowerup = CoinsForPowerup;
+            }
+            if (rulesChanges.HasFlag(Changes.Lives)) {
+                rules.Lives = Lives;
+            }
+            if (rulesChanges.HasFlag(Changes.TimerSeconds)) {
+                rules.TimerSeconds = TimerSeconds;
+            }
+            if (rulesChanges.HasFlag(Changes.TeamsEnabled)) {
+                rules.TeamsEnabled = TeamsEnabled;
+            }
+            if (rulesChanges.HasFlag(Changes.CustomPowerupsEnabled)) {
+                rules.CustomPowerupsEnabled = CustomPowerupsEnabled;
+            }
+            if (rulesChanges.HasFlag(Changes.DrawOnTimeUp)) {
+                rules.DrawOnTimeUp = DrawOnTimeUp;
+            }
+
+            f.Global->Rules = rules;
+            f.Events.RulesChanged(f, levelChanged);
+
+            if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
+                GameLogicSystem.StopCountdown(f);
+            }
         }
 
         public enum Changes : ushort {

@@ -24,6 +24,7 @@ public class TilemapAnimator : MonoBehaviour {
     public void Start() {
         QuantumEvent.Subscribe<EventTileChanged>(this, OnTileChanged);
         QuantumEvent.Subscribe<EventTileBroken>(this, OnTileBroken, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumCallback.Subscribe<CallbackGameResynced>(this, e => RefreshMap(e.Game.Frames.Predicted));
         QuantumCallback.Subscribe<CallbackEventCanceled>(this, OnEventCanceled);
         QuantumCallback.Subscribe<CallbackEventConfirmed>(this, OnEventConfirmed);
@@ -31,6 +32,12 @@ public class TilemapAnimator : MonoBehaviour {
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         if (QuantumRunner.DefaultGame != null) {
             RefreshMap(QuantumRunner.DefaultGame.Frames.Verified);
+        }
+    }
+
+    private void OnGameStateChanged(EventGameStateChanged e) {
+        if (e.NewState == GameState.Playing) {
+            tilemap.RefreshAllTiles();
         }
     }
 

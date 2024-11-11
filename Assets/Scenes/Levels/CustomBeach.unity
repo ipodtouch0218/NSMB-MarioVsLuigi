@@ -2533,7 +2533,7 @@ PrefabInstance:
     - target: {fileID: 1060841653561283886, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_Size.y
-      value: 2.5
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 3150085164645429832, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -2543,7 +2543,7 @@ PrefabInstance:
     - target: {fileID: 3150085164645429832, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: Prototype.HeightTiles.RawValue
-      value: 262144
+      value: 393216
       objectReference: {fileID: 0}
     - target: {fileID: 4157375552812710484, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -2578,7 +2578,7 @@ PrefabInstance:
     - target: {fileID: 8572227882836430078, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.5
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430078, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}

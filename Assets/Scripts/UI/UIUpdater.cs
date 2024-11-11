@@ -343,6 +343,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
             } else {
                 // Winning player
                 var allPlayers = f.Filter<PlayerData>();
+                allPlayers.UseCulling = false;
                 while (allPlayers.NextUnsafe(out _, out PlayerData* data)) {
                     if (data->Team == e.WinningTeam) {
                         RuntimePlayer runtimePlayer = f.GetPlayerData(data->PlayerRef);

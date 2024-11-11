@@ -1,18 +1,12 @@
-using Photon.Realtime;
 using Quantum;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 
 namespace NSMB.Utils {
     public class Utils {
-
-        //---Buffers
-        private static readonly List<Vector2> PhysicsShapeBuffer = new(8);
-        private static readonly Vector2[] BoxPointsBuffer = new Vector2[4];
 
         public static bool BitTest(long v, int index) {
             return (v & (1L << index)) != 0;
@@ -55,7 +49,9 @@ namespace NSMB.Utils {
         }
 
         public static string SecondsToMinuteSeconds(int number) {
-            return (number / 60) + ":" + (number % 60).ToString("00");
+            StringBuilder builder = new StringBuilder();
+            builder.Append(number / 60).Append(':').AppendFormat((number % 60).ToString("00"));
+            return builder.ToString();
         }
 
         public static float QuadraticEaseOut(float v) {
@@ -104,18 +100,20 @@ namespace NSMB.Utils {
             ['8'] = "room_smallnumber_8",
             ['9'] = "room_smallnumber_9",
         };
-        public static string GetSymbolString(string str, Dictionary<char, string> dict = null) {
+
+        private static StringBuilder symbolStringBuilder = new();
+        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null) {
             dict ??= uiSymbols;
 
-            StringBuilder ret = new();
+            symbolStringBuilder.Clear();
             foreach (char c in str) {
                 if (dict.TryGetValue(c, out string name)) {
-                    ret.Append("<sprite name=").Append(name).Append(">");
+                    symbolStringBuilder.Append("<sprite name=").Append(name).Append('>');
                 } else {
-                    ret.Append(c);
+                    symbolStringBuilder.Append(c);
                 }
             }
-            return ret.ToString();
+            return symbolStringBuilder.ToString();
         }
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
@@ -127,8 +125,8 @@ namespace NSMB.Utils {
             // Prioritize spectator status
             if (!f.TryResolveDictionary(f.Global->PlayerDatas, out var playerDataDict)
                 || !playerDataDict.TryGetValue(player, out EntityRef playerDataEntity)
-                || !f.TryGet(playerDataEntity, out PlayerData playerData)
-                || playerData.IsSpectator) {
+                || !f.Unsafe.TryGetPointer(playerDataEntity, out PlayerData* playerData)
+                || playerData->IsSpectator) {
 
                 return spectatorColor;
             }
@@ -136,6 +134,7 @@ namespace NSMB.Utils {
             // Or dead marios
             if (f.Global->GameState > GameState.WaitingForPlayers) {
                 var marioFilter = f.Filter<MarioPlayer>();
+                marioFilter.UseCulling = false;
                 bool hasMario = false;
                 while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
                     if (mario->PlayerRef == player) {
@@ -151,7 +150,7 @@ namespace NSMB.Utils {
 
             // Then team
             if (f.Global->Rules.TeamsEnabled) {
-                return GetTeamColor(f, playerData.Team, s, v);
+                return GetTeamColor(f, playerData->Team, s, v);
             }
 
             // Then id based color
@@ -160,6 +159,7 @@ namespace NSMB.Utils {
             int totalPlayers = 0;
 
             var playerFilter = f.Filter<PlayerData>();
+            playerFilter.UseCulling = false;
             while (playerFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
                 if (otherPlayerData->IsSpectator) {
                     continue;
@@ -195,11 +195,11 @@ namespace NSMB.Utils {
                 pingSymbol = "<sprite name=connection_disconnected>";
             } else if (ping == 0) {
                 pingSymbol = "<sprite name=connection_host>";
-            } else if (ping < 60) {
+            } else if (ping < 80) {
                 pingSymbol = "<sprite name=connection_great>";
-            } else if (ping < 110) {
+            } else if (ping < 130) {
                 pingSymbol = "<sprite name=connection_good>";
-            } else if (ping < 150) {
+            } else if (ping < 180) {
                 pingSymbol = "<sprite name=connection_fair>";
             } else {
                 pingSymbol = "<sprite name=connection_bad>";
@@ -219,16 +219,15 @@ namespace NSMB.Utils {
             return (Math.Sign(byteCount) * num).ToString() + suf[place];
         }
 
-        public static Color SampleNicknameColor(string color, out bool constant) {
-            if (string.IsNullOrEmpty(color)) {
+        public static Color SampleNicknameColor(ReadOnlySpan<char> color, out bool constant) {
+            if (color == null || color.IsEmpty) {
                 constant = true;
                 return Color.white;
             }
 
             if (color[0] == '#') {
                 constant = true;
-                ReadOnlySpan<char> span = color.AsSpan();
-                return new Color32(byte.Parse(span[1..3], System.Globalization.NumberStyles.HexNumber), byte.Parse(span[3..5], System.Globalization.NumberStyles.HexNumber), byte.Parse(span[5..7], System.Globalization.NumberStyles.HexNumber), 255);
+                return new Color32(byte.Parse(color[1..3], System.Globalization.NumberStyles.HexNumber), byte.Parse(color[3..5], System.Globalization.NumberStyles.HexNumber), byte.Parse(color[5..7], System.Globalization.NumberStyles.HexNumber), 255);
             } else if (color == "rainbow") {
                 constant = false;
                 return GetRainbowColor();
