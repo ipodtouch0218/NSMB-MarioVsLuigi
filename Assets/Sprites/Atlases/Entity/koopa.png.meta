@@ -60,7 +60,7 @@ TextureImporter:
       213: 8142920918973580088
     second: koopa_18
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -82,7 +82,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -122,6 +122,7 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -133,6 +134,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -145,6 +147,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -157,6 +160,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -169,6 +173,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -181,6 +186,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -193,6 +199,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -202,9 +209,9 @@ TextureImporter:
       name: koopa_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 64
-        width: 17
+        x: 1
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -224,8 +231,8 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 19
-        y: 64
-        width: 17
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -245,8 +252,8 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 37
-        y: 64
-        width: 17
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -265,9 +272,9 @@ TextureImporter:
       name: koopa_3
       rect:
         serializedVersion: 2
-        x: 56
-        y: 64
-        width: 17
+        x: 55
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -286,9 +293,9 @@ TextureImporter:
       name: koopa_4
       rect:
         serializedVersion: 2
-        x: 74
-        y: 64
-        width: 17
+        x: 73
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -307,9 +314,9 @@ TextureImporter:
       name: koopa_5
       rect:
         serializedVersion: 2
-        x: 92
-        y: 64
-        width: 17
+        x: 91
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -328,9 +335,9 @@ TextureImporter:
       name: koopa_6
       rect:
         serializedVersion: 2
-        x: 1
-        y: 32
-        width: 17
+        x: 109
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -349,9 +356,9 @@ TextureImporter:
       name: koopa_7
       rect:
         serializedVersion: 2
-        x: 21
-        y: 32
-        width: 17
+        x: 127
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -370,9 +377,9 @@ TextureImporter:
       name: koopa_8
       rect:
         serializedVersion: 2
-        x: 39
-        y: 32
-        width: 17
+        x: 145
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -391,9 +398,9 @@ TextureImporter:
       name: koopa_9
       rect:
         serializedVersion: 2
-        x: 57
-        y: 32
-        width: 17
+        x: 163
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -412,9 +419,9 @@ TextureImporter:
       name: koopa_10
       rect:
         serializedVersion: 2
-        x: 75
-        y: 32
-        width: 17
+        x: 181
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -433,9 +440,9 @@ TextureImporter:
       name: koopa_11
       rect:
         serializedVersion: 2
-        x: 92
-        y: 32
-        width: 17
+        x: 199
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -454,9 +461,9 @@ TextureImporter:
       name: koopa_12
       rect:
         serializedVersion: 2
-        x: 1
-        y: 2
-        width: 17
+        x: 217
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -475,9 +482,9 @@ TextureImporter:
       name: koopa_13
       rect:
         serializedVersion: 2
-        x: 19
-        y: 2
-        width: 17
+        x: 235
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -496,9 +503,9 @@ TextureImporter:
       name: koopa_14
       rect:
         serializedVersion: 2
-        x: 38
-        y: 2
-        width: 17
+        x: 253
+        y: 1
+        width: 16
         height: 30
       alignment: 9
       pivot: {x: 0.5, y: 0.25}
@@ -517,12 +524,12 @@ TextureImporter:
       name: koopa_15
       rect:
         serializedVersion: 2
-        x: 56
-        y: 0
+        x: 271
+        y: 1
         width: 16
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        height: 30
+      alignment: 9
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -538,12 +545,12 @@ TextureImporter:
       name: koopa_16
       rect:
         serializedVersion: 2
-        x: 74
-        y: 0
+        x: 289
+        y: 1
         width: 16
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        height: 30
+      alignment: 9
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -559,12 +566,12 @@ TextureImporter:
       name: koopa_17
       rect:
         serializedVersion: 2
-        x: 92
-        y: 0
+        x: 307
+        y: 1
         width: 16
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        height: 30
+      alignment: 9
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -580,12 +587,12 @@ TextureImporter:
       name: koopa_18
       rect:
         serializedVersion: 2
-        x: 56
-        y: 16
+        x: 325
+        y: 1
         width: 16
-        height: 15
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        height: 30
+      alignment: 9
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -593,6 +600,69 @@ TextureImporter:
       bones: []
       spriteID: 8338489ce67710170800000000000000
       internalID: 8142920918973580088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: koopa_19
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 1
+        width: 16
+        height: 15
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c863e7f7fe5db044db32fdb62abae3de
+      internalID: 1254869696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: koopa_20
+      rect:
+        serializedVersion: 2
+        x: 361
+        y: 1
+        width: 16
+        height: 15
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8aa5d71e9dd578d4db264fb2a630c5e4
+      internalID: -515341110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: koopa_21
+      rect:
+        serializedVersion: 2
+        x: 379
+        y: 1
+        width: 16
+        height: 15
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b7630873dab94a48990bbb6cf63dd35
+      internalID: -478387707
       vertices: []
       indices: 
       edges: []
@@ -608,26 +678,29 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      koopa_17: 1442830302793572469
-      koopa_2: -3966593706297187526
-      koopa_4: 8572152143462053791
-      koopa_10: 5951328475962723995
-      koopa_14: -1746415005138656647
-      koopa_18: 8142920918973580088
-      koopa_7: -7432191900083801292
-      koopa_16: -6972548539716038296
-      koopa_5: -3963764653610603637
-      koopa_15: 5077748761105158669
       koopa_0: 943534445077230785
-      koopa_12: 4722527895939228505
       koopa_1: 1337390760429553993
-      koopa_9: 2690275285955935170
-      koopa_8: 5960605468379894945
-      koopa_6: 8775610451068496206
-      koopa_3: -5416829733762683457
+      koopa_10: 5951328475962723995
       koopa_11: 6372126376101158406
+      koopa_12: 4722527895939228505
       koopa_13: -2847754504431488654
-  spritePackingTag: 
+      koopa_14: -1746415005138656647
+      koopa_15: 5077748761105158669
+      koopa_16: -6972548539716038296
+      koopa_17: 1442830302793572469
+      koopa_18: 8142920918973580088
+      koopa_19: 1254869696
+      koopa_2: -3966593706297187526
+      koopa_20: -515341110
+      koopa_21: -478387707
+      koopa_3: -5416829733762683457
+      koopa_4: 8572152143462053791
+      koopa_5: -3963764653610603637
+      koopa_6: 8775610451068496206
+      koopa_7: -7432191900083801292
+      koopa_8: 5960605468379894945
+      koopa_9: 2690275285955935170
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
   assetBundleName: 

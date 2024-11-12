@@ -13,6 +13,7 @@ component Koopa {
 	[ExcludeFromPrototype] bool IsFlipped;
 	[ExcludeFromPrototype] bool IsKicked;
 	[ExcludeFromPrototype] ushort WakeupFrames;
+	[ExcludeFromPrototype] byte TurnaroundWaitFrames;
 }
 
 event KoopaKicked {

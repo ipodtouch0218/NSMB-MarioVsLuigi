@@ -12,6 +12,7 @@ signal OnEnemyDespawned(entity_ref entity);
 signal OnEnemyRespawned(entity_ref entity);
 signal OnEnemyEnemyCollision(entity_ref a, entity_ref b);
 signal OnEnemyKilledByStageReset(entity_ref entity);
+signal OnEnemyTurnaround(entity_ref entity);
 
 event EnemyDespawned {
 	nothashed Frame Frame;

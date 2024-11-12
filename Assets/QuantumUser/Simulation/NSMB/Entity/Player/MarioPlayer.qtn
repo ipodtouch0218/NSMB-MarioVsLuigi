@@ -83,7 +83,8 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte GroundpoundStandFrames;
 
 	// Swimming
-	[ExcludeFromPrototype] byte WaterColliderCount;
+	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<entity_ref> WaterColliders;
+	[ExcludeFromPrototype] byte UnderwaterCounter;
 	[ExcludeFromPrototype] byte SwimForceJumpTimer;
 
 	// Knockback

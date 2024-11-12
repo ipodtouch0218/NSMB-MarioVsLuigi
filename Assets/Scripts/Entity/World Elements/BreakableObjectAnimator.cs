@@ -54,7 +54,7 @@ public unsafe class BreakableObjectAnimator : MonoBehaviour {
         float angularVelocity = (a.x * b.y) - (b.x * a.y);
         particle.angularVelocity = angularVelocity * -(400f/5);
 
-        Destroy(particle.gameObject, 10f);
+        Destroy(particle.gameObject, 3f);
     }
 
 #if UNITY_EDITOR

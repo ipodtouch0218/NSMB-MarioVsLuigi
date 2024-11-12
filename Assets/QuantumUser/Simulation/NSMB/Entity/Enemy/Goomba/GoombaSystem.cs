@@ -45,7 +45,7 @@ namespace Quantum {
 
             // Turn around when hitting a wall.
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                enemy->FacingRight = physicsObject->IsTouchingLeftWall;
+                enemy->ChangeFacingRight(f, filter.Entity, physicsObject->IsTouchingLeftWall);
             }
 
             // Move
@@ -95,7 +95,7 @@ namespace Quantum {
 
             } else if (mario->IsDamageable) {
                 mario->Powerdown(f, marioEntity, false);
-                goombaEnemy->FacingRight = damageDirection.X > 0;
+                goombaEnemy->ChangeFacingRight(f, goombaEntity, damageDirection.X > 0);
             }
         }
 

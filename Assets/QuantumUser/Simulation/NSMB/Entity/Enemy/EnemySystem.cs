@@ -55,9 +55,9 @@ namespace Quantum {
             if (ourPos.X == theirPos.X) {
                 right = ourPos.Y < theirPos.Y;
             }
-            enemyA->FacingRight = right;
+            enemyA->ChangeFacingRight(f, entityA, right);
             if (turnBoth) {
-                enemyB->FacingRight = !right;
+                enemyB->ChangeFacingRight(f, entityB, !right);
             }
         }
 

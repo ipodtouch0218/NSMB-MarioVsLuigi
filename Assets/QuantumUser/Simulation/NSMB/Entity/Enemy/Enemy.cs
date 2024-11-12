@@ -16,5 +16,12 @@ namespace Quantum {
             physicsObject->Velocity = FPVector2.Zero;
             physicsObject->DisableCollision = false;
         }
+
+        public void ChangeFacingRight(Frame f, EntityRef entity, bool newFacingRight) {
+            if (FacingRight != newFacingRight) {
+                FacingRight = newFacingRight;
+                f.Signals.OnEnemyTurnaround(entity);
+            }
+        }
     }
 }

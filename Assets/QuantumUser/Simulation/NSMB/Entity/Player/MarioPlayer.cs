@@ -7,8 +7,8 @@ namespace Quantum {
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
-        public bool IsInWater => WaterColliderCount > 0;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+        public bool IsSwimming => UnderwaterCounter > 0;
 
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef mario) {
             if (!f.Exists(HeldEntity)) {
@@ -37,13 +37,13 @@ namespace Quantum {
             }
         }
 
-        public bool CanHoldItem(Frame f, EntityRef mario) {
+        public bool CanHoldItem(Frame f, EntityRef entity) {
             Input input = default;
             if (PlayerRef.IsValid) {
                 input = *f.GetPlayerInput(PlayerRef);
             }
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(mario);
-            var freezable = f.Unsafe.GetPointer<Freezable>(mario);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            var freezable = f.Unsafe.GetPointer<Freezable>(entity);
             bool forceHold = false;
             if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
                 if (holdable->HoldAboveHead) {
@@ -55,7 +55,7 @@ namespace Quantum {
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
                 && !IsInKnockback && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !IsInShell 
                 && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
-                && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsInWater && input.Jump.IsDown);
+                && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsSwimming && input.Jump.IsDown);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario) {
@@ -72,7 +72,7 @@ namespace Quantum {
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP xVel = FPMath.Abs(physicsObject->Velocity.X) - FP._0_01;
             FP[] arr;
-            if (IsInWater) {
+            if (IsSwimming) {
                 if (physicsObject->IsTouchingGround) {
                     arr = CurrentPowerupState == PowerupState.BlueShell ? physicsInfo.SwimWalkShellMaxVelocity : physicsInfo.SwimWalkMaxVelocity;
                 } else {
@@ -92,9 +92,9 @@ namespace Quantum {
             return arr.Length - 1;
         }
 
-        public int GetGravityStage(PhysicsObject physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
-            FP yVel = physicsObject.Velocity.Y;
-            FP[] maxArray = IsInWater ? physicsInfo.GravitySwimmingVelocity : (CurrentPowerupState == PowerupState.MegaMushroom ? physicsInfo.GravityMegaVelocity : (CurrentPowerupState == PowerupState.MiniMushroom ? physicsInfo.GravityMiniVelocity : physicsInfo.GravityVelocity));
+        public int GetGravityStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
+            FP yVel = physicsObject->Velocity.Y;
+            FP[] maxArray = IsSwimming ? physicsInfo.GravitySwimmingVelocity : (CurrentPowerupState == PowerupState.MegaMushroom ? physicsInfo.GravityMegaVelocity : (CurrentPowerupState == PowerupState.MiniMushroom ? physicsInfo.GravityMiniVelocity : physicsInfo.GravityVelocity));
             for (int i = 0; i < maxArray.Length; i++) {
                 if (yVel >= maxArray[i]) {
                     return i;
@@ -267,8 +267,9 @@ namespace Quantum {
                     break;
                 }
 
+                int actualStarDirection = starDirection % 4;
                 if (!fastStars) {
-                    starDirection = starDirection switch {
+                    actualStarDirection = starDirection switch {
                         0 => 2,
                         3 => 1,
                         _ => starDirection
@@ -279,7 +280,7 @@ namespace Quantum {
                 var newStar = f.Unsafe.GetPointer<BigStar>(newStarEntity);
                 var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newStarEntity);
                 newStarTransform->Position = transform->Position;
-                newStar->InitializeMovingStar(f, newStarEntity, starDirection);
+                newStar->InitializeMovingStar(f, newStarEntity, actualStarDirection);
 
                 Stars--;
                 amount--;
@@ -329,7 +330,7 @@ namespace Quantum {
             MegaMushroomFrames = 0;
             MegaMushroomStartFrames = 0;
             MegaMushroomEndFrames = 0;
-            WaterColliderCount = 0;
+            // f.ResolveHashSet(WaterColliders).Clear();
             IsCrouching = false;
             IsSliding = false;
             IsTurnaround = false;
@@ -338,6 +339,7 @@ namespace Quantum {
             IsSkidding = false;
             IsInShell = false;
             IsTurnaround = false;
+            SwimForceJumpTimer = 0;
 
             physicsObject->IsFrozen = true;
             physicsObject->Velocity = FPVector2.Zero;
@@ -360,7 +362,7 @@ namespace Quantum {
         }
 
         public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker) {
-            if (IsInWater) {
+            if (IsSwimming) {
                 weak = false;
             }
 
@@ -430,8 +432,7 @@ namespace Quantum {
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
-
-            KnockbackGetupFrames = (byte) (IsInWeakKnockback || IsInWater ? 0 : 25);
+            KnockbackGetupFrames = (byte) (IsInWeakKnockback || IsSwimming ? 0 : 25);
             DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
             ////DoEntityBounce = false;
             IsInKnockback = false;

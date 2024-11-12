@@ -20,13 +20,13 @@ namespace Quantum {
             var transform = filter.Transform;
 
             bool kill = QuantumUtils.Decrement(ref blockBump->Lifetime);
-            FP size = FPMath.Sin(((FP) blockBump->Lifetime / 60 / bumpDuration) * FP.Pi) * bumpScale;
+            FP size = FPMath.Sin(blockBump->Lifetime * f.DeltaTime / bumpDuration * FP.Pi) * bumpScale;
 
             collider->Shape.Box.Extents = new FPVector2(FP._0_25 + (size / 3), FP._0_25 + (size / 3));
             transform->Position = blockBump->Origin + new FPVector2(0, size * (blockBump->IsDownwards ? -1 : 1));
 
             if (!blockBump->HasBumped) {
-                Bump(f, transform->Position, blockBump->Owner);
+                Bump(f, transform->Position, blockBump->Owner, blockBump->AllowSelfDamage);
                 blockBump->HasBumped = true;
             }
 
@@ -86,7 +86,7 @@ namespace Quantum {
             f.Destroy(filter.Entity);
         }
 
-        public static void Bump(Frame f, FPVector2 position, EntityRef bumpee) {
+        public static void Bump(Frame f, FPVector2 position, EntityRef bumpee, bool allowSelfDamage) {
             // TODO change extents to be customizable
             FPVector2 extents = new(FP._0_25, FP._0_10);
             Transform2D transform = new() {
@@ -98,7 +98,7 @@ namespace Quantum {
             var hits = f.Physics2D.OverlapShape(transform, Shape2D.CreateBox(extents, FPVector2.Up * (extents.Y + FP._0_25)));
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits[i];
-                if (bumpee == hit.Entity) {
+                if (bumpee == hit.Entity && !allowSelfDamage) {
                     continue;
                 }
 

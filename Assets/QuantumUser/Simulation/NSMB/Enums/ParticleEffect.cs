@@ -6,4 +6,5 @@ public enum ParticleEffect : byte {
     Walk_Snow_Right = 4,
     Break_Fireball = 5,
     Break_Iceball = 6,
+    Water_Splash_Surface = 7,
 }

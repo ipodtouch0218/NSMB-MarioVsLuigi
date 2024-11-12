@@ -6,7 +6,7 @@ using static IInteractableTile;
 namespace Quantum {
 
     public unsafe class KoopaSystem : SystemMainThreadFilterStage<KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
-        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset {
+        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEnemyTurnaround {
        
         public struct Filter {
             public EntityRef Entity;
@@ -66,7 +66,7 @@ namespace Quantum {
 
             // Turn around when hitting a wall.
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                enemy->FacingRight = physicsObject->IsTouchingLeftWall;
+                enemy->ChangeFacingRight(f, filter.Entity, physicsObject->IsTouchingLeftWall);
 
                 if (koopa->IsKicked) {
                     QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
@@ -91,11 +91,14 @@ namespace Quantum {
             }
 
             // Move
-            if (koopa->IsKicked
-                || !koopa->IsInShell
-                || physicsObject->IsTouchingLeftWall
-                || physicsObject->IsTouchingRightWall
-                || physicsObject->IsTouchingGround) {
+            if (!QuantumUtils.Decrement(ref koopa->TurnaroundWaitFrames)) {
+                physicsObject->Velocity.X = 0;
+
+            } else if (koopa->IsKicked
+                       || !koopa->IsInShell
+                       || physicsObject->IsTouchingLeftWall
+                       || physicsObject->IsTouchingRightWall
+                       || physicsObject->IsTouchingGround) {
 
                 physicsObject->Velocity.X = koopa->CurrentSpeed * (enemy->FacingRight ? 1 : -1);
             }
@@ -103,7 +106,28 @@ namespace Quantum {
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
                 FPVector2 checkPosition = transform->Position + (FPVector2.Right * FP._0_05 * (enemy->FacingRight ? 1 : -1));
                 if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_33, out var hit)) {
-                    enemy->FacingRight = !enemy->FacingRight;
+                    // Failed to hit a raycast, but check to make sure we don't have a contact point instead.
+
+                    bool turnaround = true;
+                    QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+                    foreach (var contact in contacts) {
+                        if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+                            // Not on the ground
+                            continue;
+                        }
+
+                        // Is a ground contact
+                        QuantumUtils.UnwrapWorldLocations(stage, transform->Position, contact.Position, out FPVector2 ourPos, out FPVector2 contactPos);
+                        if ((enemy->FacingRight && ourPos.X < contactPos.X)
+                            || (!enemy->FacingRight && ourPos.X > contactPos.X)) {
+                            turnaround = false;
+                            break;
+                        }
+                    }
+
+                    if (turnaround) {
+                        enemy->ChangeFacingRight(f, filter.Entity, !enemy->FacingRight);
+                    }
                 }
             }
         }
@@ -214,7 +238,7 @@ namespace Quantum {
                 } else if (mario->IsDamageable) {
                     mario->Powerdown(f, marioEntity, false);
                     if (!koopa->IsInShell) {
-                        koopaEnemy->FacingRight = damageDirection.X > 0;
+                        koopaEnemy->ChangeFacingRight(f, koopaEntity, damageDirection.X > 0);
                     }
                 }
             } else {
@@ -223,17 +247,17 @@ namespace Quantum {
                     if (koopa->SpawnPowerupWhenStomped.IsValid
                         && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
                         // Powerup (for blue koopa): give to mario immediately
-                        PowerupReserveResult reserve = PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
+                        PowerupReserveResult result = PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
                         koopaEnemy->IsActive = false;
                         koopaEnemy->IsDead = true;
                         koopaPhysicsObject->IsFrozen = true;
-                        f.Events.MarioPlayerCollectedPowerup(f, marioEntity, *mario, reserve, powerup);
+                        f.Events.MarioPlayerCollectedPowerup(f, marioEntity, *mario, result, powerup);
 
                     } else {
                         // Kick
                         koopa->IsInShell = true;
                         koopa->IsKicked = false;
-                        koopaEnemy->FacingRight = ourPos.X > theirPos.X;
+                        koopaEnemy->ChangeFacingRight(f, koopaEntity, ourPos.X > theirPos.X);
                         koopa->EnterShell(f, koopaEntity, marioEntity, false, true);
                         koopa->Kick(f, koopaEntity, marioEntity, 3);
                         koopaPhysicsObject->Velocity.Y = 2;
@@ -273,7 +297,7 @@ namespace Quantum {
                         } else if (mario->IsDamageable) {
                             mario->Powerdown(f, marioEntity, false);
                             if (!koopa->IsInShell) {
-                                koopaEnemy->FacingRight = damageDirection.X > 0;
+                                koopaEnemy->ChangeFacingRight(f, koopaEntity, damageDirection.X > 0);
                             }
                         }
                     }
@@ -283,7 +307,7 @@ namespace Quantum {
                         koopaHoldable->Pickup(f, koopaEntity, marioEntity);
                     } else {
                         koopa->Kick(f, koopaEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
-                        koopaEnemy->FacingRight = ourPos.X > theirPos.X;
+                        koopaEnemy->ChangeFacingRight(f, koopaEntity, ourPos.X > theirPos.X);
                     }
                 }
             }
@@ -385,7 +409,6 @@ namespace Quantum {
                 return;
             }
 
-            koopa->WakeupFrames = 15 * 60;
             physicsObject->Velocity.Y = 0;
             if (dropped) {
                 physicsObject->Velocity.X = 0;
@@ -394,11 +417,12 @@ namespace Quantum {
                 physicsObject->Velocity.X = mario->FacingRight ? 1 : -1;
                 koopa->CurrentSpeed = 0;
             } else {
+                koopa->WakeupFrames = 15 * 60;
                 koopa->IsKicked = true;
                 koopa->CurrentSpeed = koopa->KickSpeed + FPMath.Abs(marioPhysics->Velocity.X / 3);
                 f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
             }
-            enemy->FacingRight = mario->FacingRight;
+            enemy->ChangeFacingRight(f, entity, mario->FacingRight);
             holdable->IgnoreOwnerFrames = 15;
         }
 
@@ -454,6 +478,12 @@ namespace Quantum {
                     return;
                 }
                 koopa->Kill(f, entity, EntityRef.None, true);
+            }
+        }
+
+        public void OnEnemyTurnaround(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Koopa* koopa) && !koopa->IsInShell && !koopa->IsKicked) {
+                koopa->TurnaroundWaitFrames = 9;
             }
         }
     }

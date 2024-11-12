@@ -17,7 +17,7 @@ namespace Quantum {
             var killerTransform = f.Unsafe.GetPointer<Transform2D>(killerEntity);
 
             QuantumUtils.UnwrapWorldLocations(f, booTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
-            enemy->FacingRight = ourPos.X > theirPos.X;
+            enemy->ChangeFacingRight(f, entity, ourPos.X > theirPos.X);
             physicsObject->DisableCollision = true;
             physicsObject->Velocity = new FPVector2(
                 2 * (enemy->FacingRight ? 1 : -1),

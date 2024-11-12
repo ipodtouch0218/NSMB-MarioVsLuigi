@@ -61,7 +61,7 @@ namespace Quantum {
                 physicsObject->Velocity = FPVector2.Zero;
             } else {
                 // Target player
-                enemy->FacingRight = targetOnRight;
+                enemy->ChangeFacingRight(f, filter.Entity, targetOnRight);
 
                 FPVector2 directionToTarget = (marioPosition - ourPosition).Normalized;
                 FPVector2 newVelocity;

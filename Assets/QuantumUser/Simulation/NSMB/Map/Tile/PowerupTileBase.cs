@@ -12,6 +12,7 @@ public unsafe abstract class PowerupTileBase : BreakableBrickTile {
             return true;
         }
 
+        bool allowSelfDamage = false;
         if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
             && f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
             && koopa->IsKicked
@@ -21,6 +22,7 @@ public unsafe abstract class PowerupTileBase : BreakableBrickTile {
             // Talk to my dad, his name is mario :)
             f.Unsafe.TryGetPointer(holdable->PreviousHolder, out mario);
             entity = holdable->PreviousHolder;
+            allowSelfDamage = true;
         }
 
         if (mario == null) {
@@ -28,7 +30,7 @@ public unsafe abstract class PowerupTileBase : BreakableBrickTile {
             return false;
         }
 
-        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, entity, GetPowerupAsset(f, entity, mario).Prefab);
+        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, entity, allowSelfDamage, GetPowerupAsset(f, entity, mario).Prefab);
         playBumpSound = false;
         return false;
     }

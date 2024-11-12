@@ -9,6 +9,7 @@ public class KoopaAnimator : MonoBehaviour {
     private static readonly int ParamShell = Animator.StringToHash("shell");
     private static readonly int ParamXVel = Animator.StringToHash("xVel");
     private static readonly int ParamDead = Animator.StringToHash("dead");
+    private static readonly int ParamTurnaround = Animator.StringToHash("turnaround");
 
     //---Serialized Variables
     [SerializeField] private QuantumEntityView entity;
@@ -16,11 +17,11 @@ public class KoopaAnimator : MonoBehaviour {
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private Transform rotation;
-
     [SerializeField] private bool mirrorSprite, dontFlip;
 
     //---Private Variables
     private float dampVelocity;
+    private bool facingRight;
 
     public void OnValidate() {
         this.SetIfNull(ref animator, GetComponentType.Children);
@@ -34,7 +35,6 @@ public class KoopaAnimator : MonoBehaviour {
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventKoopaKicked>(this, OnKoopaKicked, NetworkHandler.FilterOutReplayFastForward);
-        //QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
     }
 
     private unsafe void OnUpdateView(CallbackUpdateView e) {
@@ -57,17 +57,23 @@ public class KoopaAnimator : MonoBehaviour {
         var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
 
         // Animation
+        bool isShell = koopa->IsInShell || f.Exists(holdable->Holder);
         animator.speed = freezable->IsFrozen(f) ? 0 : 1;
-        animator.SetBool(ParamShell, koopa->IsInShell || f.Exists(holdable->Holder));
+        animator.SetBool(ParamShell, isShell);
         animator.SetFloat(ParamXVel, (koopa->IsInShell && !koopa->IsKicked) ? 0 : Mathf.Abs(physicsObject->Velocity.X.AsFloat));
         animator.SetBool(ParamDead, enemy->IsDead);
+
+        if (enemy->FacingRight != facingRight && !isShell) {
+            animator.SetTrigger(ParamTurnaround);
+        }
+        facingRight = enemy->FacingRight;
 
         // "Flip" rotation
         float remainingWakeupTimer = koopa->WakeupFrames / 60f;
         if (enemy->IsDead) {
             transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
 
-        } else if (koopa->IsInShell && !koopa->IsKicked) {
+        } else if (koopa->IsInShell) {
             if (!freezable->IsFrozen(f)) {
                 if (koopa->IsFlipped && !dontFlip) {
                     dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);

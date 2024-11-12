@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using static UnityEngine.Networking.UnityWebRequest;
 
 namespace Quantum {
 
@@ -164,31 +165,17 @@ namespace Quantum {
                 return;
             }
 
-            var currentScriptable = QuantumUtils.FindPowerupAsset(f, mario->CurrentPowerupState);
             var newScriptable = f.FindAsset(powerup->Scriptable);
 
             // Change the player's powerup state
             PowerupReserveResult result = CollectPowerup(f, info.Entity, mario, physicsObject, newScriptable);
-
-            switch (result) {
-            case PowerupReserveResult.ReserveOldPowerup: {
-                if (mario->CurrentPowerupState != PowerupState.NoPowerup) {
-                    mario->SetReserveItem(f, currentScriptable);
-                }
-                break;
-            }
-            case PowerupReserveResult.ReserveNewPowerup: {
-                mario->SetReserveItem(f, newScriptable);
-                break;
-            }
-            }
 
             f.Destroy(info.Other);
             f.Events.MarioPlayerCollectedPowerup(f, info.Entity, *mario, result, newScriptable);
         }
 
         public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {
-            
+
             if (newPowerup.Type == PowerupType.Starman) {
                 mario->InvincibilityFrames = 600;
                 return PowerupReserveResult.NoneButPlaySound;
@@ -201,6 +188,7 @@ namespace Quantum {
 
             // Reserve if it's the same item
             if (mario->CurrentPowerupState == newState) {
+                mario->SetReserveItem(f, newPowerup);
                 return PowerupReserveResult.ReserveNewPowerup;
             }
 
@@ -223,6 +211,7 @@ namespace Quantum {
 
             // Reserve if we have a higher priority item
             if (currentPowerupStatePriority > newPowerupItemPriority) {
+                mario->SetReserveItem(f, newPowerup);
                 return PowerupReserveResult.ReserveNewPowerup;
             }
 
@@ -259,6 +248,9 @@ namespace Quantum {
                 return PowerupReserveResult.NoneButPlaySound;
             }
 
+            if (mario->CurrentPowerupState != PowerupState.NoPowerup) {
+                mario->SetReserveItem(f, currentPowerup);
+            }
             return PowerupReserveResult.ReserveOldPowerup;
         }
 

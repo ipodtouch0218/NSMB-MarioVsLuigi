@@ -9,7 +9,8 @@ component BlockBump {
 	[ExcludeFromPrototype] int TileX;
 	[ExcludeFromPrototype] int TileY;
 	[ExcludeFromPrototype] entity_ref Owner;
-
+	
+	[ExcludeFromPrototype] bool AllowSelfDamage;
 	[ExcludeFromPrototype] bool HasBumped;
 }
 

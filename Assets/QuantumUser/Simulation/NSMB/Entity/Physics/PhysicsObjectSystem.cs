@@ -44,7 +44,7 @@ namespace Quantum {
             }
 
             FPVector2 previousPosition = transform->Position;
-            if (FPMath.Abs(physicsObject->Velocity.X) > FPMath.Abs(physicsObject->Velocity.Y)) {
+            if (FPMath.Abs(physicsObject->Velocity.X + physicsObject->ParentVelocity.X) > FPMath.Abs(physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y)) {
                 physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);
                 physicsObject->Velocity = MoveVertically(f, physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y, entity, stage, contacts);
             } else {
@@ -55,12 +55,13 @@ namespace Quantum {
 
             if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
                 // Try snapping
-                
-                MoveVertically(f, -FP._0_25 * f.UpdateRate, entity, stage, contacts);
+                FPVector2 previousVelocity = physicsObject->Velocity;
+                physicsObject->Velocity = MoveVertically(f, -FP._0_25 * f.UpdateRate, entity, stage, contacts);
                 ResolveContacts(f, stage, physicsObject, contacts);
 
                 if (!physicsObject->IsTouchingGround) {
                     transform->Position.Y = previousPosition.Y;
+                    physicsObject->Velocity = previousVelocity;
                     physicsObject->Velocity.Y = 0;
                     physicsObject->HoverFrames = 3;
                 }
@@ -86,7 +87,7 @@ namespace Quantum {
             FP maxDot = -2;
             FPVector2? maxVelocity = null;
             foreach (var contact in contacts) {
-                if (FPVector2.Dot(contact.Normal, -physicsObject->Gravity.Normalized) < FP._0_33
+                if (FPVector2.Dot(contact.Normal, -physicsObject->Gravity.Normalized) < GroundMaxAngle
                     || !f.Unsafe.TryGetPointer(contact.Entity, out MovingPlatform* platform)) {
                     continue;
                 }
@@ -284,7 +285,6 @@ namespace Quantum {
                     // Only care about the Y aspect to not slide up/down hills via gravity
                     FPVector2 newVelocity = physicsObject->Velocity;
                     newVelocity.Y = Project(physicsObject->Velocity.Normalized * remainingVelocity, newDirection).Y;
-
                     return newVelocity;
                 }
             }

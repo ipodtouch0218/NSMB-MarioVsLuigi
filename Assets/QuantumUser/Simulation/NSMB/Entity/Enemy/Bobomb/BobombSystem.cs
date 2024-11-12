@@ -51,7 +51,7 @@ namespace Quantum {
             // Turn around when hitting a wall.
             var physicsObject = filter.PhysicsObject;
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                enemy->FacingRight = physicsObject->IsTouchingLeftWall;
+                enemy->ChangeFacingRight(f, filter.Entity, physicsObject->IsTouchingLeftWall);
                 physicsObject->Velocity.X = (lit ? FPMath.Abs(physicsObject->PreviousFrameVelocity.X) : bobomb->Speed) * (enemy->FacingRight ? 1 : -1);
             }
 
@@ -121,7 +121,7 @@ namespace Quantum {
                 } else if (mario->IsCrouchedInShell) {
                     // Bounce off blue shell crouched player
                     var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
-                    bobombEnemy->FacingRight = damageDirection.X < 0;
+                    bobombEnemy->ChangeFacingRight(f, bobombEntity, damageDirection.X < 0);
                     marioPhysicsObject->Velocity.X = 0;
                     return;
 
@@ -129,7 +129,7 @@ namespace Quantum {
                     // Damage
                     var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
                     mario->Powerdown(f, marioEntity, false);
-                    bobombEnemy->FacingRight = damageDirection.X > 0;
+                    bobombEnemy->ChangeFacingRight(f, bobombEntity, damageDirection.X > 0);
                 }
             } 
         }

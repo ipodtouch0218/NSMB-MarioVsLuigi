@@ -13,6 +13,7 @@ public unsafe class CoinTile : BreakableBrickTile {
             return true;
         }
 
+        bool allowSelfDamage = false;
         if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario) 
             && f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
             && koopa->IsKicked
@@ -22,6 +23,7 @@ public unsafe class CoinTile : BreakableBrickTile {
             // Talk to my dad, his name is mario :)
             f.Unsafe.TryGetPointer(holdable->PreviousHolder, out mario);
             entity = holdable->PreviousHolder;
+            allowSelfDamage = true;
         }
 
         if (mario == null) {
@@ -30,7 +32,7 @@ public unsafe class CoinTile : BreakableBrickTile {
 
         // Give coin to player
         f.Signals.OnMarioPlayerCollectedCoin(entity, mario, QuantumUtils.RelativeTileToWorld(f, tilePosition) + FPVector2.One * FP._0_25, true, direction == InteractionDirection.Down);
-        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, entity);
+        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, entity, allowSelfDamage);
         playBumpSound = false;
 
         return false;
