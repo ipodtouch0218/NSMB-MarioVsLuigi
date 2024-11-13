@@ -261,7 +261,7 @@ PrefabInstance:
     - target: {fileID: 1004745928310103790, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 45875
+      value: 32768
       objectReference: {fileID: 0}
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
@@ -296,7 +296,7 @@ PrefabInstance:
     - target: {fileID: 7426856683177255955, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.7
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255955, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
@@ -2175,7 +2175,7 @@ PrefabInstance:
     - target: {fileID: 2074886471065804748, guid: 66003d5404cd23b469d9ff540b488311,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2074886471065804748, guid: 66003d5404cd23b469d9ff540b488311,
         type: 3}
@@ -2245,7 +2245,7 @@ PrefabInstance:
     - target: {fileID: 8515066184495899953, guid: 66003d5404cd23b469d9ff540b488311,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 340787
+      value: 327680
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

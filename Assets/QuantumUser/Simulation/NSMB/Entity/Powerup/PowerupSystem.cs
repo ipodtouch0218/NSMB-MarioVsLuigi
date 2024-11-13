@@ -1,9 +1,9 @@
 using Photon.Deterministic;
-using static UnityEngine.Networking.UnityWebRequest;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnTrigger2D, ISignalOnEntityBumped {
+    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnTrigger2D, ISignalOnEntityBumped,
+        ISignalOnEntityChangeUnderwaterState {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
         private static readonly FP BumpForce = Constants._5_50;
@@ -270,6 +270,19 @@ namespace Quantum {
             );
             physicsObject->IsTouchingGround = false;
             powerup->FacingRight = ourPos.X > theirPos.X;
+        }
+
+        public void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {
+            if (!f.Has<Powerup>(entity)
+                || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
+                return;
+            }
+
+            if (underwater) {
+                physicsObject->TerminalVelocity = -Constants._1_875;
+            } else {
+                physicsObject->TerminalVelocity = -8;
+            }
         }
     }
 }

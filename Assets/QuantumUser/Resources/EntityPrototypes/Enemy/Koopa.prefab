@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 5700038489105066207}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.235, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -200,7 +200,7 @@ MonoBehaviour:
         X:
           RawValue: 0
         Y:
-          RawValue: 1966
+          RawValue: 14811
       RotationOffset:
         RawValue: 0
       UserTag: 0
@@ -586,8 +586,8 @@ MonoBehaviour:
         RawValue: 0
     IgnorePlayerWhenRespawning:
       Value: 0
-    IsRespawnable:
-      Value: 1
+    DisableRespawning:
+      Value: 0
 --- !u!114 &-2274893890168952915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -653,6 +653,6 @@ MonoBehaviour:
       X:
         RawValue: 0
       Y:
-        RawValue: 13107
+        RawValue: 26214
     BroadRadius:
       RawValue: 39322

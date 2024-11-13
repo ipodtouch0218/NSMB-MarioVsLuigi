@@ -50,11 +50,11 @@ namespace Quantum {
             if (isEntityUnderwater && !underwater.Contains(info.Entity)) {
                 // Enter state
                 underwater.Add(info.Entity);
-                f.Signals.OnEntityChangeUnderwaterState(info.Entity, info.Other, true);
+                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, true);
             } else if (!isEntityUnderwater && underwater.Contains(info.Entity)) {
                 // Exit state
                 underwater.Remove(info.Entity);
-                f.Signals.OnEntityChangeUnderwaterState(info.Entity, info.Other, false);
+                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Quantum {
 
             if (underwater.Remove(info.Entity)) {
                 // Exit state
-                f.Signals.OnEntityChangeUnderwaterState(info.Entity, info.Other, false);
+                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
             }
         }
 

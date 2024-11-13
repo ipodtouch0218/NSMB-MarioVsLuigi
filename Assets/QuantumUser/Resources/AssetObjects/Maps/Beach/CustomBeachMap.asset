@@ -282,7 +282,7 @@ MonoBehaviour:
           X:
             RawValue: -278528
           Y:
-            RawValue: 570163
+            RawValue: 557056
         Rotation:
           RawValue: 0
     - rid: 1186335098186760193
@@ -311,7 +311,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 1966
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -336,7 +336,7 @@ MonoBehaviour:
           X:
             RawValue: 0
           Y:
-            RawValue: 13107
+            RawValue: 26214
         BroadRadius:
           RawValue: 39322
     - rid: 1186335098186760196
@@ -346,7 +346,7 @@ MonoBehaviour:
           X:
             RawValue: -278528
           Y:
-            RawValue: 570163
+            RawValue: 557056
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -1488,7 +1488,7 @@ MonoBehaviour:
           X:
             RawValue: 1163264
           Y:
-            RawValue: 242483
+            RawValue: 229376
         Rotation:
           RawValue: 0
     - rid: 8543784960098566145
@@ -1517,7 +1517,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 1966
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -1542,7 +1542,7 @@ MonoBehaviour:
           X:
             RawValue: 0
           Y:
-            RawValue: 13107
+            RawValue: 26214
         BroadRadius:
           RawValue: 39322
     - rid: 8543784960098566148
@@ -1552,7 +1552,7 @@ MonoBehaviour:
           X:
             RawValue: 1163264
           Y:
-            RawValue: 242483
+            RawValue: 229376
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -1637,7 +1637,7 @@ MonoBehaviour:
           X:
             RawValue: 1064960
           Y:
-            RawValue: 242483
+            RawValue: 229376
         Rotation:
           RawValue: 0
     - rid: 8754394810376257537
@@ -1666,7 +1666,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 1966
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -1691,7 +1691,7 @@ MonoBehaviour:
           X:
             RawValue: 0
           Y:
-            RawValue: 13107
+            RawValue: 26214
         BroadRadius:
           RawValue: 39322
     - rid: 8754394810376257540
@@ -1701,7 +1701,7 @@ MonoBehaviour:
           X:
             RawValue: 1064960
           Y:
-            RawValue: 242483
+            RawValue: 229376
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:

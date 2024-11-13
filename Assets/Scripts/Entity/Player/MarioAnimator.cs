@@ -265,24 +265,23 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(dust, !iceSkiddingParticle.isPlaying && !mario->IsDead && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || (mario->IsCrouching && !physicsObject->IsOnSlipperyGround)) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
             SetParticleEmission(giantParticle, !mario->IsDead && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
-            SetParticleEmission(bubblesParticle, !mario->IsDead && mario->IsSwimming);
+            SetParticleEmission(bubblesParticle, !mario->IsDead && physicsObject->IsUnderwater);
 
-            var hitbox = f.Unsafe.GetPointer<PhysicsCollider2D>(entity.EntityRef);
+            var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity.EntityRef);
             if (mario->IsCrouching || mario->IsSliding || mario->IsSkidding || mario->IsInShell) {
                 dust.transform.localPosition = Vector2.zero;
             } else if (mario->IsWallsliding) {
-                dust.transform.localPosition = hitbox->Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario->WallslideLeft ? new Vector2(-1, 1) : Vector2.one);
+                dust.transform.localPosition = physicsCollider->Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario->WallslideLeft ? new Vector2(-1, 1) : Vector2.one);
             }
             iceSkiddingParticle.transform.localScale = mario->FacingRight ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
 
             dustPlayer.SetSoundData((mario->IsInShell || mario->IsSliding || mario->IsCrouchedInShell) ? shellSlideData : wallSlideData);
             drillPlayer.SetSoundData(mario->IsPropellerFlying ? propellerDrillData : spinnerDrillData);
-            bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, hitbox->Shape.Box.Extents.Y.AsFloat * 2);
+            bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, physicsCollider->Shape.Box.Extents.Y.AsFloat * 2);
 
 
-            var waterColliders = f.ResolveHashSet(mario->WaterColliders);
-            var marioCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity.EntityRef);
-            float marioTop = transform.position.y + marioCollider->Shape.Centroid.Y.AsFloat + marioCollider->Shape.Box.Extents.Y.AsFloat;
+            var waterColliders = f.ResolveHashSet(physicsObject->LiquidContacts);
+            float marioTop = transform.position.y + physicsCollider->Shape.Centroid.Y.AsFloat + physicsCollider->Shape.Box.Extents.Y.AsFloat;
             foreach (EntityRef water in waterColliders) {
                 var liquidCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(water);
                 var liquidTransform = f.Unsafe.GetPointer<Transform2D>(water);
@@ -290,9 +289,9 @@ namespace NSMB.Entities.Player {
                 float waterTop = liquidTransform->Position.Y.AsFloat + liquidCollider->Shape.Centroid.Y.AsFloat + liquidCollider->Shape.Box.Extents.Y.AsFloat;
                 if (marioTop >= waterTop - 0.125f) {
                     waterSurfaceMovementDistance += Mathf.Abs(transform.position.x - previousPosition.x);
-                    if (waterSurfaceMovementDistance > 0.2f) {
+                    if (waterSurfaceMovementDistance > 0.4f) {
                         SingleParticleManager.Instance.Play(ParticleEffect.Water_Splash_Surface, new Vector3(transform.position.x, waterTop));
-                        waterSurfaceMovementDistance %= 0.2f;
+                        waterSurfaceMovementDistance %= 0.4f;
                     }
 
                     break;
@@ -332,7 +331,7 @@ namespace NSMB.Entities.Player {
 
             if (mario->IsInKnockback || freezable->IsFrozen(f)) {
                 bool right = mario->FacingRight;
-                if (mario->IsInKnockback && (mario->IsSwimming || mario->IsInWeakKnockback)) {
+                if (mario->IsInKnockback && (physicsObject->IsUnderwater || mario->IsInWeakKnockback)) {
                     right = mario->KnockbackWasOriginallyFacingRight;
                 }
                 modelRotationTarget = Quaternion.Euler(-15, right ? 110 : 250, 0);
@@ -439,7 +438,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamMega, mario->CurrentPowerupState == PowerupState.MegaMushroom);
             animator.SetBool(ParamInShell, mario->IsInShell || (mario->CurrentPowerupState == PowerupState.BlueShell && (mario->IsCrouching || mario->IsGroundpounding || mario->IsSliding) && mario->GroundpoundStartFrames <= 9));
             animator.SetBool(ParamTurnaround, mario->IsTurnaround);
-            animator.SetBool(ParamSwimming, mario->IsSwimming && !mario->IsGroundpounding && !mario->IsDrilling /*&& !marioIsFrozen*/);
+            animator.SetBool(ParamSwimming, physicsObject->IsUnderwater && !mario->IsGroundpounding && !mario->IsDrilling /*&& !marioIsFrozen*/);
             animator.SetBool(ParamAHeld, inputs.Jump.IsDown);
             animator.SetBool(ParamFireballKnockback, mario->IsInWeakKnockback);
             animator.SetBool(ParamFireDeath, mario->FireDeath);
@@ -631,7 +630,7 @@ namespace NSMB.Entities.Player {
                 input = default;
             }
 
-            if (mario->IsSwimming || mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+            if (physicsObject->IsUnderwater || mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 return;
             }
 
@@ -687,10 +686,11 @@ namespace NSMB.Entities.Player {
 
         public void PlayMegaFootstep() {
             Frame f = entity.Game.Frames.Predicted;
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity.EntityRef);
-            if (mario->IsSwimming) {
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
+            if (physicsObject->IsUnderwater) {
                 return;
             }
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity.EntityRef);
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity.EntityRef);
 
             // CameraController.ScreenShake = 0.15f;
@@ -1037,7 +1037,8 @@ namespace NSMB.Entities.Player {
             }
 
             var mario = e.Mario;
-            if (mario.IsSwimming) {
+            var physicsObject = e.Frame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
+            if (physicsObject->IsUnderwater) {
                 // Paddle
                 if (!e.WasBounce) {
                     PlaySound(SoundEffect.Player_Sound_Swim);

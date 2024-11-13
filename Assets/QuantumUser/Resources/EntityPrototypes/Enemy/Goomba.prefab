@@ -201,12 +201,12 @@ MonoBehaviour:
         X:
           RawValue: 9830
         Y:
-          RawValue: 12451
+          RawValue: 13107
       PositionOffset:
         X:
           RawValue: 0
         Y:
-          RawValue: 13762
+          RawValue: 13173
       RotationOffset:
         RawValue: 0
       UserTag: 0
@@ -559,8 +559,8 @@ MonoBehaviour:
         RawValue: 0
     IgnorePlayerWhenRespawning:
       Value: 0
-    IsRespawnable:
-      Value: 1
+    DisableRespawning:
+      Value: 0
 --- !u!114 &4848679844973023050
 MonoBehaviour:
   m_ObjectHideFlags: 0

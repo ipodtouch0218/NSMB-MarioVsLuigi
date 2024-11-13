@@ -63,7 +63,7 @@ public class KoopaAnimator : MonoBehaviour {
         animator.SetFloat(ParamXVel, (koopa->IsInShell && !koopa->IsKicked) ? 0 : Mathf.Abs(physicsObject->Velocity.X.AsFloat));
         animator.SetBool(ParamDead, enemy->IsDead);
 
-        if (enemy->FacingRight != facingRight && !isShell) {
+        if (enemy->FacingRight != facingRight && !isShell && koopa->TurnaroundWaitFrames < 12) {
             animator.SetTrigger(ParamTurnaround);
         }
         facingRight = enemy->FacingRight;
@@ -71,27 +71,27 @@ public class KoopaAnimator : MonoBehaviour {
         // "Flip" rotation
         float remainingWakeupTimer = koopa->WakeupFrames / 60f;
         if (enemy->IsDead) {
-            transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
+            sRenderer.transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
 
         } else if (koopa->IsInShell) {
             if (!freezable->IsFrozen(f)) {
                 if (koopa->IsFlipped && !dontFlip) {
                     dampVelocity = Mathf.Min(dampVelocity + Time.deltaTime * 3, 1);
-                    transform.eulerAngles = new Vector3(
+                    sRenderer.transform.eulerAngles = new Vector3(
                         rotation.eulerAngles.x,
                         rotation.eulerAngles.y,
                         Mathf.Lerp(rotation.eulerAngles.z, 180f, dampVelocity) + (remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0));
 
                 } else {
                     dampVelocity = 0;
-                    transform.eulerAngles = new Vector3(
+                    sRenderer.transform.eulerAngles = new Vector3(
                         rotation.eulerAngles.x,
                         rotation.eulerAngles.y,
                         remainingWakeupTimer < 3 && remainingWakeupTimer > 0 ? (Mathf.Sin(remainingWakeupTimer * 120f) * 15f) : 0);
                 }
             }
         } else {
-            transform.rotation = Quaternion.identity;
+            sRenderer.transform.rotation = Quaternion.identity;
         }
 
         sRenderer.enabled = enemy->IsActive;

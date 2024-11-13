@@ -8,8 +8,7 @@ namespace Quantum {
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
-        public bool IsSwimming => UnderwaterCounter > 0;
-
+        
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef mario) {
             if (!f.Exists(HeldEntity)) {
                 return default;
@@ -55,7 +54,7 @@ namespace Quantum {
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
                 && !IsInKnockback && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !IsInShell 
                 && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
-                && !IsGroundpounding && !(!f.Exists(HeldEntity) && IsSwimming && input.Jump.IsDown);
+                && !IsGroundpounding && !(!f.Exists(HeldEntity) && physicsObject->IsUnderwater && input.Jump.IsDown);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario) {
@@ -72,7 +71,7 @@ namespace Quantum {
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP xVel = FPMath.Abs(physicsObject->Velocity.X) - FP._0_01;
             FP[] arr;
-            if (IsSwimming) {
+            if (physicsObject->IsUnderwater) {
                 if (physicsObject->IsTouchingGround) {
                     arr = CurrentPowerupState == PowerupState.BlueShell ? physicsInfo.SwimWalkShellMaxVelocity : physicsInfo.SwimWalkMaxVelocity;
                 } else {
@@ -94,7 +93,7 @@ namespace Quantum {
 
         public int GetGravityStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP yVel = physicsObject->Velocity.Y;
-            FP[] maxArray = IsSwimming ? physicsInfo.GravitySwimmingVelocity : (CurrentPowerupState == PowerupState.MegaMushroom ? physicsInfo.GravityMegaVelocity : (CurrentPowerupState == PowerupState.MiniMushroom ? physicsInfo.GravityMiniVelocity : physicsInfo.GravityVelocity));
+            FP[] maxArray = physicsObject->IsUnderwater ? physicsInfo.GravitySwimmingVelocity : (CurrentPowerupState == PowerupState.MegaMushroom ? physicsInfo.GravityMegaVelocity : (CurrentPowerupState == PowerupState.MiniMushroom ? physicsInfo.GravityMiniVelocity : physicsInfo.GravityVelocity));
             for (int i = 0; i < maxArray.Length; i++) {
                 if (yVel >= maxArray[i]) {
                     return i;
@@ -170,6 +169,7 @@ namespace Quantum {
             IsInKnockback = false;
             WallslideRight = false;
             WallslideLeft = false;
+            SwimForceJumpTimer = 0;
             
             /*
             IsWaterWalking = false;
@@ -354,6 +354,7 @@ namespace Quantum {
             IsRespawning = false;
             DamageInvincibilityFrames = 120;
             CoyoteTimeFrames = 0;
+            SwimForceJumpTimer = 0;
 
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = false;
@@ -362,7 +363,8 @@ namespace Quantum {
         }
 
         public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker) {
-            if (IsSwimming) {
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            if (physicsObject->IsUnderwater) {
                 weak = false;
             }
 
@@ -395,7 +397,6 @@ namespace Quantum {
 
             // Don't go into walls
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
 
             if (!weak && PhysicsObjectSystem.Raycast(f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
@@ -432,7 +433,8 @@ namespace Quantum {
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
-            KnockbackGetupFrames = (byte) (IsInWeakKnockback || IsSwimming ? 0 : 25);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            KnockbackGetupFrames = (byte) (IsInWeakKnockback || physicsObject->IsUnderwater ? 0 : 25);
             DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
             ////DoEntityBounce = false;
             IsInKnockback = false;
@@ -440,8 +442,6 @@ namespace Quantum {
             //IsForwardsKnockback = false;
             FacingRight = KnockbackWasOriginallyFacingRight;
             
-
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             physicsObject->Velocity.X = 0;
         }
 

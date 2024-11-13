@@ -29,7 +29,9 @@ namespace Quantum {
 
             if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape)) {
                 var marioTransform = f.Unsafe.GetPointer<Transform2D>(Holder);
-                transform->Position.X = marioTransform->Position.X;
+                transform->Position = marioTransform->Position;
+                transform->Position.Y -= collider->Shape.Centroid.Y;
+                transform->Position.Y += collider->Shape.Box.Extents.Y;
             }
 
             PreviousHolder = Holder;

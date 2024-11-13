@@ -39,7 +39,7 @@ namespace Quantum {
 
             IsKicked = true;
             IsInShell = true;
-            Combo = 0;
+            Combo = 1;
             CurrentSpeed = KickSpeed + speed;
 
             f.Events.PlayComboSound(f, entity, 0);

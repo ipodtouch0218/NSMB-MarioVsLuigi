@@ -1980,7 +1980,7 @@ PrefabInstance:
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 242483
+      value: 229376
       objectReference: {fileID: 0}
     - target: {fileID: 4462257224907729137, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -1995,7 +1995,7 @@ PrefabInstance:
     - target: {fileID: 8836298984178612587, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.7
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 8836298984178612587, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -2920,7 +2920,7 @@ PrefabInstance:
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 242483
+      value: 229376
       objectReference: {fileID: 0}
     - target: {fileID: 4462257224907729137, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -2935,7 +2935,7 @@ PrefabInstance:
     - target: {fileID: 8836298984178612587, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.7
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 8836298984178612587, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -10658,7 +10658,7 @@ PrefabInstance:
     - target: {fileID: 1004745928310103790, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 570163
+      value: 557056
       objectReference: {fileID: 0}
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
@@ -10673,7 +10673,7 @@ PrefabInstance:
     - target: {fileID: 7426856683177255955, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.7
+      value: 8.5
       objectReference: {fileID: 0}
     - target: {fileID: 7426856683177255955, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}

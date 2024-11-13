@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 
 namespace Quantum {
-    public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter> {
+    public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
 
         public static readonly FP RaycastSkin = FP.FromString("0.15");
         public static readonly FP Skin = FP.FromString("0.001");
@@ -1044,6 +1044,35 @@ namespace Quantum {
             int num2 = num;
             QuickSortSpan(span, lo, num2 - 1);
             QuickSortSpan(span, num2 + 1, hi);
+        }
+
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
+            if (!f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
+                return;
+            }
+
+            var colliders = f.ResolveHashSet(physicsObject->LiquidContacts);
+            if (exit) {
+                colliders.Remove(liquidEntity);
+            } else {
+                colliders.Add(liquidEntity);
+            }
+        }
+
+        public void OnEntityEnterExitLiquid(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {
+            if (!f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
+                return;
+            }
+
+            if (underwater) {
+                if (physicsObject->UnderwaterCounter++ == 0) {
+                    f.Signals.OnEntityChangeUnderwaterState(entity, liquid, true);
+                }
+            } else {
+                if (QuantumUtils.Decrement(ref physicsObject->UnderwaterCounter)) {
+                    f.Signals.OnEntityChangeUnderwaterState(entity, liquid, false);
+                }
+            }
         }
     }
 }

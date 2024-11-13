@@ -108,7 +108,7 @@ namespace Quantum {
                 mario->IsSkidding = false;
             }
 
-            bool swimming = mario->IsSwimming;
+            bool swimming = physicsObject->IsUnderwater;
             bool run = (inputs.Sprint.IsDown || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->IsPropellerFlying) & !mario->IsSpinnerFlying;
             int maxStage;
             if (swimming) {
@@ -330,13 +330,13 @@ namespace Quantum {
                 mario->PreviousJumpState = mario->JumpState;
             }
 
-            bool doJump = (mario->JumpBufferFrames > 0 && (physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0)) || (!mario->IsSwimming && mario->SwimForceJumpTimer == 10);
+            bool doJump = (mario->JumpBufferFrames > 0 && (physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0)) || (!physicsObject->IsUnderwater && mario->SwimForceJumpTimer == 10);
 
             QuantumUtils.Decrement(ref mario->SwimForceJumpTimer);
             QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
 
-            if (!mario->DoEntityBounce && (mario->IsSwimming || !doJump || mario->IsInKnockback || (mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->JumpState == JumpState.SingleJump) || mario->IsWallsliding)) {
+            if (!mario->DoEntityBounce && (physicsObject->IsUnderwater || !doJump || mario->IsInKnockback || (mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->JumpState == JumpState.SingleJump) || mario->IsWallsliding)) {
                 return;
             }
 
@@ -416,7 +416,7 @@ namespace Quantum {
                 mario->JumpState = JumpState.SingleJump;
             }
 
-            if (mario->IsSwimming) {
+            if (physicsObject->IsUnderwater) {
                 newY *= FP._0_33;
             }
             physicsObject->Velocity.Y = newY;
@@ -440,7 +440,7 @@ namespace Quantum {
             FP gravity;
 
             // Slow-rise check
-            bool swimming = mario->IsSwimming;
+            bool swimming = physicsObject->IsUnderwater;
             if (!swimming && (mario->IsSpinnerFlying || mario->IsPropellerFlying)) {
                 gravity = mario->IsDrilling ? physics.GravityAcceleration[^1] : physics.GravityFlyingAcceleration;
             } else if ((mario->IsGroundpounding && !swimming) || physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0) {
@@ -470,7 +470,7 @@ namespace Quantum {
             FP maxWalkSpeed = physics.WalkMaxVelocity[physics.WalkSpeedStage];
             FP terminalVelocity;
 
-            if (mario->IsSwimming && !(mario->IsGroundpounding || mario->IsDrilling)) {
+            if (physicsObject->IsUnderwater && !(mario->IsGroundpounding || mario->IsDrilling)) {
                 terminalVelocity = inputs.Jump.IsDown ? physics.SwimTerminalVelocityButtonHeld : physics.SwimTerminalVelocity;
                 physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y, physics.SwimMaxVerticalVelocity);
             } else if (mario->IsSpinnerFlying) {
@@ -509,7 +509,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             if (mario->IsInShell || mario->IsGroundpounding || mario->IsCrouching || mario->IsDrilling 
-                || mario->IsSpinnerFlying || mario->IsInKnockback || mario->IsSwimming) {
+                || mario->IsSpinnerFlying || mario->IsInKnockback || physicsObject->IsUnderwater) {
                 return;
             }
 
@@ -669,7 +669,7 @@ namespace Quantum {
             }
 
             // TODO: magic number
-            if (!mario->IsCrouching && mario->IsSwimming && FPMath.Abs(physicsObject->Velocity.X) > FP._0_03) {
+            if (!mario->IsCrouching && physicsObject->IsUnderwater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_03) {
                 return;
             }
 
@@ -677,7 +677,7 @@ namespace Quantum {
             mario->IsCrouching = 
                 (
                     (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding) 
-                    || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !mario->IsSwimming)
+                    || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
                     /* || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics)) */
                 ) 
                 && !mario->HeldEntity.IsValid 
@@ -702,7 +702,7 @@ namespace Quantum {
             HandleGroundpoundStartAnimation(ref filter, physics);
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage);
 
-            if (mario->IsSwimming && (mario->IsGroundpounding || mario->IsDrilling)) {
+            if (physicsObject->IsUnderwater && (mario->IsGroundpounding || mario->IsDrilling)) {
                 physicsObject->Velocity.Y += physics.SwimGroundpoundDeceleration * f.DeltaTime;
                 if (physicsObject->Velocity.Y >= physics.SwimTerminalVelocityButtonHeld) {
                     mario->IsGroundpounding = false;
@@ -734,7 +734,7 @@ namespace Quantum {
 
             if (physicsObject->IsTouchingGround || mario->IsInKnockback || mario->IsGroundpounding || mario->IsDrilling
                 || mario->HeldEntity.IsValid || mario->IsCrouching || mario->IsSliding || mario->IsInShell
-                || mario->IsWallsliding || mario->GroundpoundCooldownFrames > 0 || mario->IsSwimming
+                || mario->IsWallsliding || mario->GroundpoundCooldownFrames > 0 || physicsObject->IsUnderwater
                 || f.Exists(mario->CurrentPipe)) {
                 return;
             }
@@ -859,7 +859,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             if (mario->IsInKnockback) {
-                bool swimming = mario->IsSwimming;
+                bool swimming = physicsObject->IsUnderwater;
                 int framesInKnockback = f.Number - mario->KnockbackTick;
                 if (mario->DoEntityBounce
                     || (swimming && framesInKnockback > 90)
@@ -1043,7 +1043,7 @@ namespace Quantum {
             }
 
             mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
-            mario->IsPropellerFlying &= !mario->IsSwimming;
+            mario->IsPropellerFlying &= !physicsObject->IsUnderwater;
             if (mario->IsPropellerFlying) {
                 if (!QuantumUtils.Decrement(ref mario->PropellerLaunchFrames)) {
                     FP remainingTime = (FP) mario->PropellerLaunchFrames / 60;
@@ -1123,7 +1123,7 @@ namespace Quantum {
                 break;
             }
             case PowerupState.PropellerMushroom: {
-                if (mario->UsedPropellerThisJump || mario->IsSwimming || (mario->IsSpinnerFlying && mario->IsDrilling) || mario->IsPropellerFlying || mario->WalljumpFrames > 0) {
+                if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || (mario->IsSpinnerFlying && mario->IsDrilling) || mario->IsPropellerFlying || mario->WalljumpFrames > 0) {
                     return;
                 }
 
@@ -1149,7 +1149,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (!mario->IsSwimming) {
+            if (!physicsObject->IsUnderwater) {
                 return;
             }
 
@@ -1358,7 +1358,6 @@ namespace Quantum {
             mario->IsPropellerFlying = false;
             mario->IsDrilling = false;
             mario->IsSpinnerFlying = false;
-            f.ResolveHashSet(mario->WaterColliders).Clear();
             physicsObject->IsTouchingGround = false;
 
             if (!wasStuckLastTick) {
@@ -1398,7 +1397,7 @@ namespace Quantum {
                     }
                 }
 
-                if (mario->IsSwimming) {
+                if (physicsObject->IsUnderwater) {
                     // TODO: magic value
                     physicsObject->Velocity.Y = -2;
                 }
@@ -1614,20 +1613,6 @@ namespace Quantum {
             }
         }
 
-        public void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {
-            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
-                return;
-            }
-
-            if (underwater) {
-                mario->UnderwaterCounter++;
-            } else {
-                if (QuantumUtils.Decrement(ref mario->UnderwaterCounter)) {
-                    mario->SwimForceJumpTimer = 10;
-                }
-            }
-        }
-
         public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
             if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
                 return;
@@ -1637,15 +1622,8 @@ namespace Quantum {
 
             var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
             if (exit) {
-                if (liquid->LiquidType == LiquidType.Water) {
-                    var colliders = f.ResolveHashSet(mario->WaterColliders);
-                    colliders.Remove(liquidEntity);
-                }
-            } else {
                 switch (liquid->LiquidType) {
                 case LiquidType.Water:
-                    var colliders = f.ResolveHashSet(mario->WaterColliders);
-                    colliders.Add(liquidEntity);
                     break;
                 case LiquidType.Lava:
                     // Kill, fire death
@@ -2075,6 +2053,12 @@ namespace Quantum {
                         it.Interact(f, entity, InteractionDirection.Up, position, tile, out _);
                     }
                 }
+            }
+        }
+
+        public void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {
+            if (!underwater && f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                mario->SwimForceJumpTimer = 10;
             }
         }
     }

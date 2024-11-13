@@ -81,7 +81,7 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
-    IsTrigger: 1
+    IsTrigger: 0
     Material:
       Id:
         Value: 0
@@ -151,7 +151,7 @@ MonoBehaviour:
     LayerSource: 0
     Layer: 9
     CallbackFlags:
-      Value: 0
+      Value: 4095
   PhysicsBody:
     IsEnabled: 0
     Config2D: 116

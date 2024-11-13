@@ -19,6 +19,8 @@ component PhysicsObject {
     [ExcludeFromPrototype] bool IsOnSlideableGround;
 
     [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
+    [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<EntityRef> LiquidContacts;
+    [ExcludeFromPrototype] byte UnderwaterCounter;
 }
 
 struct PhysicsContact {
@@ -32,3 +34,4 @@ struct PhysicsContact {
 }
 
 signal OnBeforePhysicsCollision(VersusStageData stage, entity_ref entity, PhysicsContact* contact, bool* allowCollision);
+signal OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, bool underwater);

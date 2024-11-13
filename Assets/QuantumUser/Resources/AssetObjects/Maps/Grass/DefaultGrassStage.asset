@@ -179,12 +179,12 @@ MonoBehaviour:
             X:
               RawValue: 9830
             Y:
-              RawValue: 12451
+              RawValue: 13107
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 13762
+              RawValue: 13173
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -382,12 +382,12 @@ MonoBehaviour:
             X:
               RawValue: 9830
             Y:
-              RawValue: 12451
+              RawValue: 13107
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 13762
+              RawValue: 13173
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -819,12 +819,12 @@ MonoBehaviour:
             X:
               RawValue: 9830
             Y:
-              RawValue: 12451
+              RawValue: 13107
           PositionOffset:
             X:
               RawValue: 0
             Y:
-              RawValue: 13762
+              RawValue: 13173
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -998,7 +998,7 @@ MonoBehaviour:
           X:
             RawValue: -180224
           Y:
-            RawValue: 45875
+            RawValue: 32768
         Rotation:
           RawValue: 0
     - rid: 7515263985617207297
@@ -1027,7 +1027,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 1966
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -1052,7 +1052,7 @@ MonoBehaviour:
           X:
             RawValue: 0
           Y:
-            RawValue: 13107
+            RawValue: 26214
         BroadRadius:
           RawValue: 39322
     - rid: 7515263985617207300
@@ -1062,7 +1062,7 @@ MonoBehaviour:
           X:
             RawValue: -180224
           Y:
-            RawValue: 45875
+            RawValue: 32768
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:

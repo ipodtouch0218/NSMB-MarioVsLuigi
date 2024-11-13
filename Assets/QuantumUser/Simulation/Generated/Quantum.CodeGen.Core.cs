@@ -1658,11 +1658,11 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 240;
+    public const Int32 SIZE = 232;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(184)]
-    public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     [FieldOffset(176)]
+    public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+    [FieldOffset(168)]
     public AssetRef<CharacterAsset> CharacterAsset;
     [FieldOffset(60)]
     [ExcludeFromPrototype()]
@@ -1673,13 +1673,13 @@ namespace Quantum {
     [FieldOffset(32)]
     [ExcludeFromPrototype()]
     public Byte Team;
-    [FieldOffset(38)]
+    [FieldOffset(37)]
     [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
-    [FieldOffset(39)]
+    [FieldOffset(38)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
-    [FieldOffset(192)]
+    [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
     [FieldOffset(30)]
@@ -1733,10 +1733,10 @@ namespace Quantum {
     [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public Int32 LastPushingFrame;
-    [FieldOffset(36)]
+    [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public JumpState JumpState;
-    [FieldOffset(37)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public JumpState PreviousJumpState;
     [FieldOffset(12)]
@@ -1763,10 +1763,10 @@ namespace Quantum {
     [FieldOffset(160)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
-    [FieldOffset(35)]
+    [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public Byte WallslideEndFrames;
-    [FieldOffset(34)]
+    [FieldOffset(33)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
     [FieldOffset(96)]
@@ -1784,14 +1784,6 @@ namespace Quantum {
     [FieldOffset(9)]
     [ExcludeFromPrototype()]
     public Byte GroundpoundStandFrames;
-    [FieldOffset(168)]
-    [ExcludeFromPrototype()]
-    [AllocateOnComponentAdded()]
-    [FreeOnComponentRemoved()]
-    public QHashSetPtr<EntityRef> WaterColliders;
-    [FieldOffset(33)]
-    [ExcludeFromPrototype()]
-    public Byte UnderwaterCounter;
     [FieldOffset(31)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
@@ -1879,16 +1871,16 @@ namespace Quantum {
     [FieldOffset(23)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillCooldown;
-    [FieldOffset(216)]
+    [FieldOffset(208)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
     [FieldOffset(44)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
-    [FieldOffset(200)]
+    [FieldOffset(192)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentPipe;
-    [FieldOffset(224)]
+    [FieldOffset(216)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
     [FieldOffset(148)]
@@ -1900,7 +1892,7 @@ namespace Quantum {
     [FieldOffset(18)]
     [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
-    [FieldOffset(208)]
+    [FieldOffset(200)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentSpinner;
     public override Int32 GetHashCode() {
@@ -1948,8 +1940,6 @@ namespace Quantum {
         hash = hash * 31 + GroundpoundStartFrames.GetHashCode();
         hash = hash * 31 + GroundpoundCooldownFrames.GetHashCode();
         hash = hash * 31 + GroundpoundStandFrames.GetHashCode();
-        hash = hash * 31 + WaterColliders.GetHashCode();
-        hash = hash * 31 + UnderwaterCounter.GetHashCode();
         hash = hash * 31 + SwimForceJumpTimer.GetHashCode();
         hash = hash * 31 + IsInKnockback.GetHashCode();
         hash = hash * 31 + IsInWeakKnockback.GetHashCode();
@@ -1990,20 +1980,6 @@ namespace Quantum {
         return hash;
       }
     }
-    public void ClearPointers(FrameBase f, EntityRef entity) {
-      if (WaterColliders != default) f.FreeHashSet(ref WaterColliders);
-    }
-    public static void OnRemoved(FrameBase frame, EntityRef entity, void* ptr) {
-      var p = (Quantum.MarioPlayer*)ptr;
-      p->ClearPointers((Frame)frame, entity);
-    }
-    public void AllocatePointers(FrameBase f, EntityRef entity) {
-      f.TryAllocateHashSet(ref WaterColliders);
-    }
-    public static void OnAdded(FrameBase frame, EntityRef entity, void* ptr) {
-      var p = (Quantum.MarioPlayer*)ptr;
-      p->AllocatePointers((Frame)frame, entity);
-    }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (MarioPlayer*)ptr;
         serializer.Stream.Serialize(&p->Coins);
@@ -2039,7 +2015,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Stars);
         serializer.Stream.Serialize(&p->SwimForceJumpTimer);
         serializer.Stream.Serialize(&p->Team);
-        serializer.Stream.Serialize(&p->UnderwaterCounter);
         serializer.Stream.Serialize(&p->WalljumpFrames);
         serializer.Stream.Serialize(&p->WallslideEndFrames);
         serializer.Stream.Serialize((Byte*)&p->JumpState);
@@ -2079,7 +2054,6 @@ namespace Quantum {
         QBoolean.Serialize(&p->WallslideLeft, serializer);
         QBoolean.Serialize(&p->WallslideRight, serializer);
         QBoolean.Serialize(&p->WasTouchingGroundLastFrame, serializer);
-        QHashSet.Serialize(&p->WaterColliders, serializer, Statics.SerializeEntityRef);
         AssetRef.Serialize(&p->CharacterAsset, serializer);
         AssetRef.Serialize(&p->PhysicsAsset, serializer);
         AssetRef.Serialize(&p->ReserveItem, serializer);
@@ -2113,26 +2087,26 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PhysicsObject : Quantum.IComponent {
-    public const Int32 SIZE = 136;
+    public const Int32 SIZE = 144;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(56)]
+    [FieldOffset(64)]
     public FPVector2 Gravity;
-    [FieldOffset(48)]
+    [FieldOffset(56)]
     public FP TerminalVelocity;
     [FieldOffset(8)]
     public QBoolean IsFrozen;
     [FieldOffset(4)]
     public QBoolean DisableCollision;
-    [FieldOffset(120)]
+    [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public FPVector2 Velocity;
-    [FieldOffset(72)]
+    [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public FPVector2 ParentVelocity;
-    [FieldOffset(104)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public FPVector2 PreviousVelocity;
-    [FieldOffset(88)]
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public FPVector2 PreviousFrameVelocity;
     [FieldOffset(0)]
@@ -2150,7 +2124,7 @@ namespace Quantum {
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public QBoolean IsTouchingGround;
-    [FieldOffset(40)]
+    [FieldOffset(48)]
     [ExcludeFromPrototype()]
     public FP FloorAngle;
     [FieldOffset(16)]
@@ -2159,11 +2133,19 @@ namespace Quantum {
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsOnSlideableGround;
-    [FieldOffset(36)]
+    [FieldOffset(40)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
     public QListPtr<PhysicsContact> Contacts;
+    [FieldOffset(36)]
+    [ExcludeFromPrototype()]
+    [AllocateOnComponentAdded()]
+    [FreeOnComponentRemoved()]
+    public QHashSetPtr<EntityRef> LiquidContacts;
+    [FieldOffset(1)]
+    [ExcludeFromPrototype()]
+    public Byte UnderwaterCounter;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 8311;
@@ -2184,11 +2166,14 @@ namespace Quantum {
         hash = hash * 31 + IsOnSlipperyGround.GetHashCode();
         hash = hash * 31 + IsOnSlideableGround.GetHashCode();
         hash = hash * 31 + Contacts.GetHashCode();
+        hash = hash * 31 + LiquidContacts.GetHashCode();
+        hash = hash * 31 + UnderwaterCounter.GetHashCode();
         return hash;
       }
     }
     public void ClearPointers(FrameBase f, EntityRef entity) {
       if (Contacts != default) f.FreeList(ref Contacts);
+      if (LiquidContacts != default) f.FreeHashSet(ref LiquidContacts);
     }
     public static void OnRemoved(FrameBase frame, EntityRef entity, void* ptr) {
       var p = (Quantum.PhysicsObject*)ptr;
@@ -2196,6 +2181,7 @@ namespace Quantum {
     }
     public void AllocatePointers(FrameBase f, EntityRef entity) {
       f.TryAllocateList(ref Contacts);
+      f.TryAllocateHashSet(ref LiquidContacts);
     }
     public static void OnAdded(FrameBase frame, EntityRef entity, void* ptr) {
       var p = (Quantum.PhysicsObject*)ptr;
@@ -2204,6 +2190,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (PhysicsObject*)ptr;
         serializer.Stream.Serialize(&p->HoverFrames);
+        serializer.Stream.Serialize(&p->UnderwaterCounter);
         QBoolean.Serialize(&p->DisableCollision, serializer);
         QBoolean.Serialize(&p->IsFrozen, serializer);
         QBoolean.Serialize(&p->IsOnSlideableGround, serializer);
@@ -2212,6 +2199,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsTouchingGround, serializer);
         QBoolean.Serialize(&p->IsTouchingLeftWall, serializer);
         QBoolean.Serialize(&p->IsTouchingRightWall, serializer);
+        QHashSet.Serialize(&p->LiquidContacts, serializer, Statics.SerializeEntityRef);
         QList.Serialize(&p->Contacts, serializer, Statics.SerializePhysicsContact);
         FP.Serialize(&p->FloorAngle, serializer);
         FP.Serialize(&p->TerminalVelocity, serializer);
@@ -2583,14 +2571,17 @@ namespace Quantum {
   public unsafe partial interface ISignalOnTryLiquidSplash : ISignal {
     void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, QBoolean exit, bool* doSplash);
   }
-  public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
-    void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
+  public unsafe partial interface ISignalOnEntityEnterExitLiquid : ISignal {
+    void OnEntityEnterExitLiquid(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
   public unsafe partial interface ISignalOnMarioPlayerDied : ISignal {
     void OnMarioPlayerDied(Frame f, EntityRef entity);
   }
   public unsafe partial interface ISignalOnBeforePhysicsCollision : ISignal {
     void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision);
+  }
+  public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
+    void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
   public unsafe partial interface ISignalOnStageReset : ISignal {
     void OnStageReset(Frame f, QBoolean full);
@@ -2727,6 +2718,14 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>1.875</summary>
+    public static FP _1_875 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 122880;
+        return result;
+      }
+    }
     /// <summary>0.0001</summary>
     public static FP _0_0001 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -2785,6 +2784,8 @@ namespace Quantum {
       public const Int64 _0_66 = 43690;
       /// <summary>1.1</summary>
       public const Int64 _1_10 = 72090;
+      /// <summary>1.875</summary>
+      public const Int64 _1_875 = 122880;
       /// <summary>0.0001</summary>
       public const Int64 _0_0001 = 7;
       /// <summary>0.48</summary>
@@ -2812,9 +2813,10 @@ namespace Quantum {
     private ISignalOnIceBlockBroken[] _ISignalOnIceBlockBrokenSystems;
     private ISignalOnBeforeInteraction[] _ISignalOnBeforeInteractionSystems;
     private ISignalOnTryLiquidSplash[] _ISignalOnTryLiquidSplashSystems;
-    private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
+    private ISignalOnEntityEnterExitLiquid[] _ISignalOnEntityEnterExitLiquidSystems;
     private ISignalOnMarioPlayerDied[] _ISignalOnMarioPlayerDiedSystems;
     private ISignalOnBeforePhysicsCollision[] _ISignalOnBeforePhysicsCollisionSystems;
+    private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
     private ISignalOnTileChanged[] _ISignalOnTileChangedSystems;
     partial void AllocGen() {
@@ -2846,9 +2848,10 @@ namespace Quantum {
       _ISignalOnIceBlockBrokenSystems = BuildSignalsArray<ISignalOnIceBlockBroken>();
       _ISignalOnBeforeInteractionSystems = BuildSignalsArray<ISignalOnBeforeInteraction>();
       _ISignalOnTryLiquidSplashSystems = BuildSignalsArray<ISignalOnTryLiquidSplash>();
-      _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
+      _ISignalOnEntityEnterExitLiquidSystems = BuildSignalsArray<ISignalOnEntityEnterExitLiquid>();
       _ISignalOnMarioPlayerDiedSystems = BuildSignalsArray<ISignalOnMarioPlayerDied>();
       _ISignalOnBeforePhysicsCollisionSystems = BuildSignalsArray<ISignalOnBeforePhysicsCollision>();
+      _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
       _ISignalOnTileChangedSystems = BuildSignalsArray<ISignalOnTileChanged>();
       _ComponentSignalsOnAdded = new ComponentReactiveCallbackInvoker[ComponentTypeId.Type.Length];
@@ -3143,12 +3146,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, QBoolean underwater) {
-        var array = _f._ISignalOnEntityChangeUnderwaterStateSystems;
+      public void OnEntityEnterExitLiquid(EntityRef entity, EntityRef liquid, QBoolean underwater) {
+        var array = _f._ISignalOnEntityEnterExitLiquidSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnEntityChangeUnderwaterState(_f, entity, liquid, underwater);
+            s.OnEntityEnterExitLiquid(_f, entity, liquid, underwater);
           }
         }
       }
@@ -3167,6 +3170,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnBeforePhysicsCollision(_f, stage, entity, contact, allowCollision);
+          }
+        }
+      }
+      public void OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, QBoolean underwater) {
+        var array = _f._ISignalOnEntityChangeUnderwaterStateSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEntityChangeUnderwaterState(_f, entity, liquid, underwater);
           }
         }
       }
@@ -3347,7 +3359,7 @@ namespace Quantum {
         .Add<Quantum.Koopa>(Quantum.Koopa.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Liquid>(Quantum.Liquid.Serialize, Quantum.Liquid.OnAdded, Quantum.Liquid.OnRemoved, ComponentFlags.None)
         .Add<Quantum.MarioBrosPlatform>(Quantum.MarioBrosPlatform.Serialize, null, null, ComponentFlags.None)
-        .Add<Quantum.MarioPlayer>(Quantum.MarioPlayer.Serialize, Quantum.MarioPlayer.OnAdded, Quantum.MarioPlayer.OnRemoved, ComponentFlags.None)
+        .Add<Quantum.MarioPlayer>(Quantum.MarioPlayer.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.MovingPlatform>(Quantum.MovingPlatform.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.PhysicsObject>(Quantum.PhysicsObject.Serialize, Quantum.PhysicsObject.OnAdded, Quantum.PhysicsObject.OnRemoved, ComponentFlags.None)
         .Add<Quantum.PiranhaPlant>(Quantum.PiranhaPlant.Serialize, null, null, ComponentFlags.None)

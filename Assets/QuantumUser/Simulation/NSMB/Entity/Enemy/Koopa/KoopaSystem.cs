@@ -24,6 +24,7 @@ namespace Quantum {
             f.Context.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
             f.Context.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
             f.Context.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
+            f.Context.RegisterInteraction<Koopa, BulletBill>(OnKoopaBulletBillInteraction);
             f.Context.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
             f.Context.RegisterInteraction<Koopa, Boo>(OnKoopaBooInteraction);
             f.Context.RegisterInteraction<Koopa, Projectile>(OnKoopaProjectileInteraction);
@@ -53,6 +54,7 @@ namespace Quantum {
                     koopa->IsFlipped = false;
                     koopa->CurrentSpeed = koopa->Speed;
                     enemy->FacingRight = false;
+                    koopa->TurnaroundWaitFrames = 18;
 
                     var holdable = filter.Holdable;
                     if (f.Exists(holdable->Holder)) {
@@ -389,6 +391,23 @@ namespace Quantum {
             } else {
                 // Turn
                 EnemySystem.EnemyBumpTurnaround(f, koopaEntity, piranhaPlantEntity, false);
+            }
+        }
+
+        public void OnKoopaBulletBillInteraction(Frame f, EntityRef koopaEntity, EntityRef bulletBillEntity) {
+            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
+            var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
+
+            bool beingHeld = f.Exists(holdable->Holder);
+            if (koopa->IsKicked || beingHeld) {
+                // Kill bullet bill
+                var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
+                bulletBill->Kill(f, bulletBillEntity, koopaEntity, true);
+
+                if (beingHeld) {
+                    // Kill self, too.
+                    koopa->Kill(f, koopaEntity, bulletBillEntity, true);
+                }
             }
         }
 

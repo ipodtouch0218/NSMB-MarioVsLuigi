@@ -234,7 +234,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         pingUpdateCoroutine = StartCoroutine(PingUpdateCoroutine());
 
         var sessionRunnerArguments = new SessionRunner.Arguments {
-            RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
             GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
             ClientId = Client.UserId,
             RuntimeConfig = new RuntimeConfig {
@@ -250,7 +249,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         };
 
         IsReplay = false;
-        Runner = (QuantumRunner) await SessionRunner.StartAsync(sessionRunnerArguments);
+        Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
         Runner.Game.AddPlayer(new RuntimePlayer {
             PlayerNickname = Settings.Instance.generalNickname ?? "noname",
             UserId = default(Guid).ToString(),
@@ -328,7 +327,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);
 
         var arguments = new SessionRunner.Arguments {
-            RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
             GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
             RuntimeConfig = runtimeConfig,
             SessionConfig = deterministicConfig,
@@ -344,7 +342,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         GlobalController.Instance.loadingCanvas.Initialize(null);
         ReplayFrameCache.Clear();
         ReplayFrameCache.Add(arguments.FrameData);
-        Runner = (QuantumRunner) await SessionRunner.StartAsync(arguments);
+        Runner = await QuantumRunner.StartGameAsync(arguments);
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {

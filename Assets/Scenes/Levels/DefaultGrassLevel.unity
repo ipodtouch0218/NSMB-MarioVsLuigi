@@ -4673,7 +4673,7 @@ PrefabInstance:
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 45875
+      value: 32768
       objectReference: {fileID: 0}
     - target: {fileID: 1005979406138123112, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -4718,7 +4718,7 @@ PrefabInstance:
     - target: {fileID: 8836298984178612587, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.7
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8836298984178612587, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}

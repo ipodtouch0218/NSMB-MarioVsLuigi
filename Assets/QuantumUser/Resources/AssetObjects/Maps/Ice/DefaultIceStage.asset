@@ -1238,7 +1238,7 @@ MonoBehaviour:
           X:
             RawValue: 1589248
           Y:
-            RawValue: 45875
+            RawValue: 32768
         Rotation:
           RawValue: 0
     - rid: 4372145401587826689
@@ -1267,7 +1267,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 1966
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -1292,7 +1292,7 @@ MonoBehaviour:
           X:
             RawValue: 0
           Y:
-            RawValue: 13107
+            RawValue: 26214
         BroadRadius:
           RawValue: 39322
     - rid: 4372145401587826692
@@ -1302,7 +1302,7 @@ MonoBehaviour:
           X:
             RawValue: 1589248
           Y:
-            RawValue: 45875
+            RawValue: 32768
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -2245,7 +2245,7 @@ MonoBehaviour:
           X:
             RawValue: 81920
           Y:
-            RawValue: 340787
+            RawValue: 327680
         Rotation:
           RawValue: 0
     - rid: 8707424676512530433
@@ -2274,7 +2274,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 1966
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -2299,7 +2299,7 @@ MonoBehaviour:
           X:
             RawValue: 0
           Y:
-            RawValue: 13107
+            RawValue: 26214
         BroadRadius:
           RawValue: 39322
     - rid: 8707424676512530436
@@ -2309,7 +2309,7 @@ MonoBehaviour:
           X:
             RawValue: 81920
           Y:
-            RawValue: 340787
+            RawValue: 327680
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
