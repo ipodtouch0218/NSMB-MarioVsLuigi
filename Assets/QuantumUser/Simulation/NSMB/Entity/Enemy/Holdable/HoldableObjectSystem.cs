@@ -2,7 +2,9 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter>, ISignalOnBeforePhysicsCollision, ISignalOnComponentRemoved<Holdable> {
+    public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter>, ISignalOnBeforePhysicsCollision,
+        ISignalOnComponentRemoved<Holdable>, ISignalOnTryLiquidSplash {
+        
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -45,6 +47,16 @@ namespace Quantum {
         public void OnRemoved(Frame f, EntityRef entity, Holdable* component) {
             if (f.Unsafe.TryGetPointer(component->Holder, out MarioPlayer* mario)) {
                 mario->HeldEntity = EntityRef.None;
+            }
+        }
+
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquid, QBoolean exit, bool* doSplash) {
+            if (!f.Unsafe.TryGetPointer(entity, out Holdable* holdable)) {
+                return;
+            }
+
+            if (f.Exists(holdable->Holder)) {
+                *doSplash = false;
             }
         }
     }

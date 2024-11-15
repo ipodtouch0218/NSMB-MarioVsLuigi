@@ -62,7 +62,7 @@ public class ScoreboardEntry : MonoBehaviour {
         var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
 
         int ping = playerData != null ? playerData->Ping : (isValidPlayer ? -1 : 0);
-        nicknameText.text = Utils.GetPingSymbol(ping) + nickname.ToValidUsername();
+        nicknameText.text = Utils.GetPingSymbol(ping) + nickname.ToValidUsername(f, mario->PlayerRef);
 
         StringBuilder scoreBuilder = new();
         if (f.Global->Rules.IsLivesEnabled) {

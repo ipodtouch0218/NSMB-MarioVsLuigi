@@ -427,8 +427,8 @@ MonoBehaviour:
         RawValue: 0
     IgnorePlayerWhenRespawning:
       Value: 0
-    IsRespawnable:
-      Value: 1
+    DisableRespawning:
+      Value: 0
 --- !u!114 &8889607602468363306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -467,6 +467,8 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
+    SlowInLiquids:
+      Value: 1
 --- !u!114 &5305366232122907052
 MonoBehaviour:
   m_ObjectHideFlags: 0

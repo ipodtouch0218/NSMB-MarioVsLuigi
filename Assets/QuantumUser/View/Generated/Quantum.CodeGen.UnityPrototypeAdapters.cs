@@ -95,6 +95,7 @@ namespace Quantum.Prototypes.Unity {
     public FP TerminalVelocity;
     public QBoolean IsFrozen;
     public QBoolean DisableCollision;
+    public QBoolean SlowInLiquids;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PhysicsObjectPrototype prototype);
     public override Quantum.Prototypes.PhysicsObjectPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.PhysicsObjectPrototype();
@@ -102,6 +103,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.TerminalVelocity, out result.TerminalVelocity);
       converter.Convert(this.IsFrozen, out result.IsFrozen);
       converter.Convert(this.DisableCollision, out result.DisableCollision);
+      converter.Convert(this.SlowInLiquids, out result.SlowInLiquids);
       ConvertUser(converter, ref result);
       return result;
     }

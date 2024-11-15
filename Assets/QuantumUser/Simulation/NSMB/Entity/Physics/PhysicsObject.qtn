@@ -1,8 +1,11 @@
+#define OnePixelPerFrame 1.875
+
 component PhysicsObject {
     FPVector2 Gravity;
     FP TerminalVelocity;
     bool IsFrozen;
     bool DisableCollision;
+    bool SlowInLiquids;
     
     [ExcludeFromPrototype] FPVector2 Velocity;
     [ExcludeFromPrototype] FPVector2 ParentVelocity;

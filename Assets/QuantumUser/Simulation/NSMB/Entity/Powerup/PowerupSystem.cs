@@ -2,8 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnTrigger2D, ISignalOnEntityBumped,
-        ISignalOnEntityChangeUnderwaterState {
+    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnEntityBumped {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
         private static readonly FP BumpForce = Constants._5_50;
@@ -14,6 +13,10 @@ namespace Quantum {
             public Powerup* Powerup;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
+        }
+
+        public override void OnInit(Frame f) {
+            f.Context.RegisterInteraction<Powerup, MarioPlayer>(OnPowerupMarioInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -49,10 +52,10 @@ namespace Quantum {
                     }
                     powerup->BlockSpawn = false;
                     physicsObject->IsFrozen = false;
+                    f.Events.PowerupBecameActive(f, filter.Entity);
                 } else {
                     return;
                 }
-
                 return;
             } else if (powerup->LaunchSpawn) {
                 // Back to normal layers
@@ -141,18 +144,13 @@ namespace Quantum {
             }
         }
 
-        public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Entity, out MarioPlayer* mario)
-                || mario->IsDead
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* physicsObject)
-                || !f.Unsafe.TryGetPointer(info.Other, out Powerup* powerup)) {
-                return;
-            }
-
-            if (f.DestroyPending(info.Other)) {
+        public void OnPowerupMarioInteraction(Frame f, EntityRef powerupEntity, EntityRef marioEntity) {
+            if (f.DestroyPending(powerupEntity)) {
                 // Already collected
                 return;
             }
+
+            var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
 
             // Don't be collectable if we're following a player / spawning
             if ((powerup->BlockSpawn && (powerup->SpawnAnimationFrames) > 6) || (!powerup->BlockSpawn && powerup->SpawnAnimationFrames > 0)) {
@@ -165,13 +163,15 @@ namespace Quantum {
                 return;
             }
 
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
             var newScriptable = f.FindAsset(powerup->Scriptable);
 
             // Change the player's powerup state
-            PowerupReserveResult result = CollectPowerup(f, info.Entity, mario, physicsObject, newScriptable);
+            PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
 
-            f.Destroy(info.Other);
-            f.Events.MarioPlayerCollectedPowerup(f, info.Entity, *mario, result, newScriptable);
+            f.Destroy(powerupEntity);
+            f.Events.MarioPlayerCollectedPowerup(f, marioEntity, *mario, result, newScriptable);
         }
 
         public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {
@@ -270,19 +270,6 @@ namespace Quantum {
             );
             physicsObject->IsTouchingGround = false;
             powerup->FacingRight = ourPos.X > theirPos.X;
-        }
-
-        public void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {
-            if (!f.Has<Powerup>(entity)
-                || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
-                return;
-            }
-
-            if (underwater) {
-                physicsObject->TerminalVelocity = -Constants._1_875;
-            } else {
-                physicsObject->TerminalVelocity = -8;
-            }
         }
     }
 }

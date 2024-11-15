@@ -118,9 +118,9 @@ public class PlayerElements : MonoBehaviour {
     public unsafe void UpdateSpectateUI() {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
         var mario = f.Unsafe.GetPointer<MarioPlayer>(spectatingEntity);
-        RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
 
-        string username = runtimePlayer.PlayerNickname.ToValidUsername();
+        RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
+        string username = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
 
         TranslationManager tm = GlobalController.Instance.translationManager;
         spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);

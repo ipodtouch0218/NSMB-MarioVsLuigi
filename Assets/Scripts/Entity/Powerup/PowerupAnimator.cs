@@ -27,10 +27,10 @@ public unsafe class PowerupAnimator : QuantumCallbacks {
 
     public void Start() {
         QuantumEvent.Subscribe<EventPowerupBecameActive>(this, OnPowerupBecameActive);
-        originalSortingOrder = sRenderer.sortingOrder;
     }
 
     public void Initialize(QuantumGame game) {
+        originalSortingOrder = sRenderer.sortingOrder;
         sRenderer.GetPropertyBlock(mpb = new());
         var powerup = game.Frames.Predicted.Unsafe.GetPointer<Powerup>(entity.EntityRef);
         var scriptable = QuantumUnityDB.GetGlobalAsset(powerup->Scriptable);

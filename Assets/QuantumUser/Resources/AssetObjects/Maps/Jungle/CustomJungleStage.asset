@@ -793,7 +793,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 14746
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -1010,7 +1010,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 13107
+              RawValue: 13173
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -1525,7 +1525,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 14746
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0

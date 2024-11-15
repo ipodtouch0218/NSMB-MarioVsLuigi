@@ -8,7 +8,7 @@ namespace Quantum {
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
-        
+
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef mario) {
             if (!f.Exists(HeldEntity)) {
                 return default;

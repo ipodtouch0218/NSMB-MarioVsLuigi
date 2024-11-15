@@ -41,7 +41,7 @@ public class PlayerNametag : MonoBehaviour {
 
         RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
         nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
-        cachedNickname = runtimePlayer?.PlayerNickname.ToValidUsername() ?? "noname";
+        cachedNickname = runtimePlayer?.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
 
         arrow.color = parent.GlowColor;
         text.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);

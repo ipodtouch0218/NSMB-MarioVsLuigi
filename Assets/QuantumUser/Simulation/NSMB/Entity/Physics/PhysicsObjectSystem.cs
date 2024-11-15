@@ -43,6 +43,12 @@ namespace Quantum {
                 }
             }
 
+            if (physicsObject->SlowInLiquids && physicsObject->IsUnderwater) {
+                physicsObject->Velocity = FPVector2.Clamp(physicsObject->Velocity, 
+                    new FPVector2(-Constants.OnePixelPerFrame, -Constants.OnePixelPerFrame),
+                    new FPVector2(Constants.OnePixelPerFrame, Constants.OnePixelPerFrame));
+            }
+
             FPVector2 previousPosition = transform->Position;
             if (FPMath.Abs(physicsObject->Velocity.X + physicsObject->ParentVelocity.X) > FPMath.Abs(physicsObject->Velocity.Y + physicsObject->ParentVelocity.Y)) {
                 physicsObject->Velocity = MoveHorizontally(f, physicsObject->Velocity.X + physicsObject->ParentVelocity.X, entity, stage, contacts);

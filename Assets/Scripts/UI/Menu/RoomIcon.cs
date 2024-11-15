@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using static NSMB.Utils.NetworkUtils;
 using NSMB.Extensions;
+using Quantum;
 
 namespace NSMB.UI.MainMenu {
     public class RoomIcon : MonoBehaviour {
@@ -32,7 +33,7 @@ namespace NSMB.UI.MainMenu {
             TranslationManager tm = GlobalController.Instance.translationManager;
 
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.HostName, out string hostname);
-            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
+            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername(null, PlayerRef.None, false));
 
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int packedIntProperties);
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);

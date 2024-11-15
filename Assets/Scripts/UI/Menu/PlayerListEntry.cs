@@ -3,6 +3,7 @@ using NSMB.Utils;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -50,7 +51,7 @@ namespace NSMB.UI.MainMenu {
 
         public void Start() {
             RuntimePlayer runtimePlayer = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(player);
-            nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+            nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF"; 
             userId = runtimePlayer?.UserId;
             nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
 
@@ -75,48 +76,48 @@ namespace NSMB.UI.MainMenu {
             // UpdateText(e.Game.Frames.Predicted);
         }
 
+        private static readonly StringBuilder Builder = new();
         public unsafe void UpdateText(Frame f) {
             colorStrip.color = Utils.Utils.GetPlayerColor(f, player);
-
             var playerData = QuantumUtils.GetPlayerData(f, player);
 
             if (playerData == null) {
                 return;
             }
 
+            // Wins text
             if (playerData->Wins == 0) {
                 winsText.text = "";
             } else {
                 winsText.text = "<sprite name=room_wins>" + playerData->Wins;
             }
 
+            // Ping text
             pingText.text = playerData->Ping + " " + Utils.Utils.GetPingSymbol(playerData->Ping);
 
-            string permissionSymbol = "";
+            // Name text
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+            Builder.Clear();
+
+            if (ChatManager.Instance.mutedPlayers.Contains(runtimePlayer.UserId)) {
+                Builder.Append("<sprite name=player_muted>");
+            }
+
             if (playerData->IsRoomHost) {
-                permissionSymbol += "<sprite name=room_host>";
+                Builder.Append("<sprite name=room_host>");
             }
 
             int characterIndex = playerData->Character;
             characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
-            string characterSymbol = GlobalController.Instance.config.CharacterDatas[characterIndex].UiString;
+            Builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
 
-            string teamSymbol;
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
                 TeamAsset team = f.SimulationConfig.Teams[playerData->Team];
-                teamSymbol = team.textSpriteColorblindBig;
-            } else {
-                teamSymbol = "";
+                Builder.Append(team.textSpriteColorblindBig);
             }
 
-            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-
-            string additionalSymbols = "";
-            if (ChatManager.Instance.mutedPlayers.Contains(runtimePlayer.UserId)) {
-                additionalSymbols += "<sprite name=player_muted>";
-            }
-
-            nameText.text = additionalSymbols + permissionSymbol + characterSymbol + teamSymbol + runtimePlayer.PlayerNickname.ToValidUsername();
+            Builder.Append(runtimePlayer.PlayerNickname.ToValidUsername(f, player));
+            nameText.text = Builder.ToString();
 
             Transform parent = transform.parent;
             int childIndex = 0;
@@ -203,11 +204,11 @@ namespace NSMB.UI.MainMenu {
                 HashSet<string> mutedPlayers = ChatManager.Instance.mutedPlayers;
                 if (mutedPlayers.Contains(userId)) {
                     mutedPlayers.Remove(userId);
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.unmuted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername());
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.unmuted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername(f, player));
                     muteButtonText.text = GlobalController.Instance.translationManager.GetTranslation("ui.inroom.player.mute");
                 } else {
                     mutedPlayers.Add(userId);
-                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.muted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername());
+                    ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.muted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername(f, player));
                     muteButtonText.text = GlobalController.Instance.translationManager.GetTranslation("ui.inroom.player.unmute");
                 }
             }
@@ -224,7 +225,7 @@ namespace NSMB.UI.MainMenu {
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             if (runtimePlayer != null) {
-                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername());
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername(f, player));
             }
             HideDropdown(true);
         }

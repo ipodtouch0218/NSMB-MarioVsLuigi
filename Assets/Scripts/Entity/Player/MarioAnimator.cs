@@ -216,10 +216,11 @@ namespace NSMB.Entities.Player {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity.EntityRef);
             var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
 
             ProfilerMarker x = new("MarioAnimator.OnUpdateView.HandleMiscStates");
             x.Begin();
-            HandleMiscStates(f, mario, freezable);
+            HandleMiscStates(f, mario, physicsObject, freezable);
             x.End();
 
             if (freezable->IsFrozen(f)) {
@@ -231,7 +232,6 @@ namespace NSMB.Entities.Player {
                 animator.speed = 1;
             }
 
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
             Input inputs = default;
             if (mario->PlayerRef.IsValid) {
                 inputs = *f.GetPlayerInput(mario->PlayerRef);
@@ -279,6 +279,7 @@ namespace NSMB.Entities.Player {
             drillPlayer.SetSoundData(mario->IsPropellerFlying ? propellerDrillData : spinnerDrillData);
             bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, physicsCollider->Shape.Box.Extents.Y.AsFloat * 2);
 
+            animator.SetLayerWeight(3, physicsObject->IsUnderwater ? 1 : 0);
 
             var waterColliders = f.ResolveHashSet(physicsObject->LiquidContacts);
             float marioTop = transform.position.y + physicsCollider->Shape.Centroid.Y.AsFloat + physicsCollider->Shape.Box.Extents.Y.AsFloat;
@@ -288,7 +289,11 @@ namespace NSMB.Entities.Player {
 
                 float waterTop = liquidTransform->Position.Y.AsFloat + liquidCollider->Shape.Centroid.Y.AsFloat + liquidCollider->Shape.Box.Extents.Y.AsFloat;
                 if (marioTop >= waterTop - 0.125f) {
-                    waterSurfaceMovementDistance += Mathf.Abs(transform.position.x - previousPosition.x);
+                    FPVector2 current = transform.position.ToFPVector2();
+                    current.Y = 0;
+                    FPVector2 prev = previousPosition.ToFPVector2();
+                    prev.Y = 0;
+                    waterSurfaceMovementDistance += QuantumUtils.WrappedDistance(f, prev, current).AsFloat;
                     if (waterSurfaceMovementDistance > 0.4f) {
                         SingleParticleManager.Instance.Play(ParticleEffect.Water_Splash_Surface, new Vector3(transform.position.x, waterTop));
                         waterSurfaceMovementDistance %= 0.4f;
@@ -465,7 +470,7 @@ namespace NSMB.Entities.Player {
             animator.SetFloat(ParamVelocityY, physicsObject->Velocity.Y.AsFloat);
         }
 
-        private void HandleMiscStates(Frame f, MarioPlayer* mario, Freezable* freezable) {
+        private void HandleMiscStates(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable) {
             // Scale
             Vector3 scale;
             if (mario->MegaMushroomEndFrames > 0) {
@@ -559,7 +564,11 @@ namespace NSMB.Entities.Player {
 
             float newZ = -4;
             if (mario->IsDead) {
-                newZ = -6;
+                if (physicsObject->IsUnderwater) {
+                    newZ = -2;
+                } else {
+                    newZ = -6;
+                }
             } else if (freezable->IsFrozen(f)) {
                 newZ = -2;
             } else if (f.Exists(mario->CurrentPipe)) {
@@ -824,6 +833,7 @@ namespace NSMB.Entities.Player {
             }
 
             animator.Play("deadstart");
+            animator.Play("deadstart", 3);
 
             if (!NetworkHandler.IsReplayFastForwarding) {
                 PlaySound(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);

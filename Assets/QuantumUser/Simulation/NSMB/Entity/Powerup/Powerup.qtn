@@ -1,5 +1,3 @@
-#define _1_875 1.875
-
 component Powerup {
 	asset_ref<PowerupAsset> Scriptable;
 	bool FacingRight;

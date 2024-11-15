@@ -9,8 +9,8 @@ namespace Quantum {
         ISignalOnGameStarting, ISignalOnBeforePhysicsCollision, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped,
         ISignalOnBeforeInteraction, ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState {
 
-        private static readonly FPVector2 DeathUpForce = new FPVector2(0, 7);
-        private static readonly FPVector2 DeathUpGravity = new FPVector2(0, FP.FromString("-11.75"));
+        private static readonly FPVector2 DeathUpForce = new FPVector2(0, FP.FromString("6.5"));
+        private static readonly FPVector2 DeathUpGravity = new FPVector2(0, FP.FromString("-12.75"));
 
         public struct Filter {
             public EntityRef Entity;
@@ -44,6 +44,7 @@ namespace Quantum {
             var physics = f.FindAsset(filter.MarioPlayer->PhysicsAsset);
             var freezable = filter.Freezable;
             if (HandleDeathAndRespawning(f, ref filter, stage)) {
+                HandleTerminalVelocity(f, ref filter, physics, ref input);
                 return;
             }
             if (HandleMegaMushroom(f, ref filter, physics, stage)) {
@@ -470,7 +471,13 @@ namespace Quantum {
             FP maxWalkSpeed = physics.WalkMaxVelocity[physics.WalkSpeedStage];
             FP terminalVelocity;
 
-            if (physicsObject->IsUnderwater && !(mario->IsGroundpounding || mario->IsDrilling)) {
+            if (mario->IsDead) {
+                if (physicsObject->IsUnderwater) {
+                    terminalVelocity = -Constants.OnePixelPerFrame;
+                } else {
+                    terminalVelocity = -8;
+                }
+            } else if (physicsObject->IsUnderwater && !(mario->IsGroundpounding || mario->IsDrilling)) {
                 terminalVelocity = inputs.Jump.IsDown ? physics.SwimTerminalVelocityButtonHeld : physics.SwimTerminalVelocity;
                 physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y, physics.SwimMaxVerticalVelocity);
             } else if (mario->IsSpinnerFlying) {
@@ -696,7 +703,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 
             if (inputs.Down.WasPressed || (mario->IsPropellerFlying && inputs.Down.IsDown)) {
-                TryStartGroundpound(f, ref filter, physics, ref inputs);
+                TryStartGroundpound(f, ref filter, physics, ref inputs, stage);
             }
 
             HandleGroundpoundStartAnimation(ref filter, physics);
@@ -727,8 +734,7 @@ namespace Quantum {
             mario->IsGroundpoundActive &= mario->IsGroundpounding;
         }
 
-        private void TryStartGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
-
+        private void TryStartGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -749,31 +755,28 @@ namespace Quantum {
                 // Start drill
                 if (physicsObject->Velocity.Y < 0) {
                     mario->IsDrilling = true;
-                    mario->IsGroundpoundActive = true;
                     physicsObject->Velocity.X = 0;
+                    mario->IsGroundpoundActive = true;
                 }
             } else if (mario->IsPropellerFlying) {
                 // Start propeller drill
-                if (mario->PropellerLaunchFrames < 12 && physicsObject->Velocity.Y < 0 && mario->PropellerDrillCooldown == 0) {
+                if (mario->PropellerLaunchFrames < 12 && physicsObject->Velocity.Y < 0) {
                     mario->IsDrilling = true;
                     mario->PropellerLaunchFrames = 0;
                     mario->IsGroundpoundActive = true;
-                    mario->PropellerDrillCooldown = 12;
                 }
             } else {
                 // Start groundpound
                 // Check if high enough above ground
-                /* TODO
-                if (Runner.GetPhysicsScene().BoxCast(body.Position, WorldHitboxSize * Vector2.right * 0.5f, Vector3.down, out _, Quaternion.identity, 0.15f * (State == Enums.PowerupState.MegaMushroom ? 2.5f : 1), Layers.MaskAnyGround)) {
+                var transform = filter.Transform;
+                if (PhysicsObjectSystem.Raycast(f, stage, transform->Position, FPVector2.Down, FP._0_50, out _)) {
                     return;
                 }
-                */
 
                 mario->WallslideLeft = false;
                 mario->WallslideRight = false;
                 mario->IsGroundpounding = true;
                 mario->JumpState = JumpState.None;
-                mario->IsGroundpoundActive = true;
                 mario->IsSliding = false;
                 physicsObject->Velocity = physics.GroundpoundStartVelocity;
                 mario->GroundpoundStartFrames = mario->CurrentPowerupState == PowerupState.MegaMushroom ? physics.GroundpoundStartMegaFrames : physics.GroundpoundStartFrames;
@@ -790,7 +793,11 @@ namespace Quantum {
                 return;
             }
 
-            physicsObject->Velocity = --mario->GroundpoundStartFrames switch {
+            if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
+                mario->IsGroundpoundActive = true;
+            }
+
+            physicsObject->Velocity = mario->GroundpoundStartFrames switch {
                    0 => FPVector2.Up * physics.TerminalVelocityGroundpound,
                 >= 4 => physics.GroundpoundStartVelocity,
                    _ => FPVector2.Zero
@@ -1618,10 +1625,10 @@ namespace Quantum {
                 return;
             }
 
-            *doSplash = !mario->IsDead && !f.Exists(mario->CurrentPipe);
-
             var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
-            if (exit) {
+            *doSplash &= (!mario->IsDead || liquid->LiquidType == LiquidType.Water) && !f.Exists(mario->CurrentPipe);
+
+            if (!exit) {
                 switch (liquid->LiquidType) {
                 case LiquidType.Water:
                     break;
@@ -2057,7 +2064,12 @@ namespace Quantum {
         }
 
         public void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {
-            if (!underwater && f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
+                || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
+                return;
+            }
+
+            if (!underwater && physicsObject->Velocity.Y > 0) {
                 mario->SwimForceJumpTimer = 10;
             }
         }

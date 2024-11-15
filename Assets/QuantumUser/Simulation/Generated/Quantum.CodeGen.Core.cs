@@ -2097,6 +2097,8 @@ namespace Quantum {
     public QBoolean IsFrozen;
     [FieldOffset(4)]
     public QBoolean DisableCollision;
+    [FieldOffset(36)]
+    public QBoolean SlowInLiquids;
     [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public FPVector2 Velocity;
@@ -2133,12 +2135,12 @@ namespace Quantum {
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsOnSlideableGround;
-    [FieldOffset(40)]
+    [FieldOffset(44)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
     public QListPtr<PhysicsContact> Contacts;
-    [FieldOffset(36)]
+    [FieldOffset(40)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
@@ -2153,6 +2155,7 @@ namespace Quantum {
         hash = hash * 31 + TerminalVelocity.GetHashCode();
         hash = hash * 31 + IsFrozen.GetHashCode();
         hash = hash * 31 + DisableCollision.GetHashCode();
+        hash = hash * 31 + SlowInLiquids.GetHashCode();
         hash = hash * 31 + Velocity.GetHashCode();
         hash = hash * 31 + ParentVelocity.GetHashCode();
         hash = hash * 31 + PreviousVelocity.GetHashCode();
@@ -2199,6 +2202,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsTouchingGround, serializer);
         QBoolean.Serialize(&p->IsTouchingLeftWall, serializer);
         QBoolean.Serialize(&p->IsTouchingRightWall, serializer);
+        QBoolean.Serialize(&p->SlowInLiquids, serializer);
         QHashSet.Serialize(&p->LiquidContacts, serializer, Statics.SerializeEntityRef);
         QList.Serialize(&p->Contacts, serializer, Statics.SerializePhysicsContact);
         FP.Serialize(&p->FloorAngle, serializer);
@@ -2710,19 +2714,19 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>1.875</summary>
+    public static FP OnePixelPerFrame {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 122880;
+        return result;
+      }
+    }
     /// <summary>1.1</summary>
     public static FP _1_10 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
         FP result;
         result.RawValue = 72090;
-        return result;
-      }
-    }
-    /// <summary>1.875</summary>
-    public static FP _1_875 {
-      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
-        FP result;
-        result.RawValue = 122880;
         return result;
       }
     }
@@ -2782,10 +2786,10 @@ namespace Quantum {
       public const Int64 _0_09 = 5898;
       /// <summary>0.66666</summary>
       public const Int64 _0_66 = 43690;
+      /// <summary>1.875</summary>
+      public const Int64 OnePixelPerFrame = 122880;
       /// <summary>1.1</summary>
       public const Int64 _1_10 = 72090;
-      /// <summary>1.875</summary>
-      public const Int64 _1_875 = 122880;
       /// <summary>0.0001</summary>
       public const Int64 _0_0001 = 7;
       /// <summary>0.48</summary>

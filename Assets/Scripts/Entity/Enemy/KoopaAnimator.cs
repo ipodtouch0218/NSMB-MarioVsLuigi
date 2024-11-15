@@ -69,7 +69,7 @@ public class KoopaAnimator : MonoBehaviour {
         facingRight = enemy->FacingRight;
 
         // "Flip" rotation
-        float remainingWakeupTimer = koopa->WakeupFrames / 60f;
+        float remainingWakeupTimer = koopa->IsKicked ? 0 : (koopa->WakeupFrames / 60f);
         if (enemy->IsDead) {
             sRenderer.transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
 

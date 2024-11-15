@@ -12,54 +12,59 @@ namespace Quantum {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
             if (!f.Exists(f.Global->MainBigStar) && QuantumUtils.Decrement(ref f.Global->BigStarSpawnTimer)) {
-                int spawnpoints = stage.BigStarSpawnpoints.Length;
-                ref BitSet64 usedSpawnpoints = ref f.Global->UsedStarSpawns;
-                for (int i = 0; i < spawnpoints; i++) {
-                    // Find a spot...
-                    if (f.Global->UsedStarSpawnCount == spawnpoints) {
-                        usedSpawnpoints.ClearAll();
-                        f.Global->UsedStarSpawnCount = 0;
-                    }
-
-                    int count = f.RNG->Next(0, spawnpoints - f.Global->UsedStarSpawnCount);
-                    int index = 0;
-                    for (int j = 0; j < spawnpoints; j++) {
-                        if (!usedSpawnpoints.IsSet(j) && --count == 0) {
-                            // This is the index to use
-                            index = j;
-                            break;
-                        }
-                    }
-                    usedSpawnpoints.Set(index);
-                    f.Global->UsedStarSpawnCount++;
-
-                    // Spawn a star.
-                    FPVector2 position = stage.BigStarSpawnpoints[index];
-                    HitCollection hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
-
-                    if (hits.Count == 0) {
-                        // Hit no players
-                        EntityRef newEntity = f.Create(f.SimulationConfig.BigStarPrototype);
-                        f.Global->MainBigStar = newEntity;
-                        var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
-                        var newStar = f.Unsafe.GetPointer<BigStar>(newEntity);
-                        var newStarPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newEntity);
-
-                        newStarTransform->Position = position;
-                        newStar->IsStationary = true;
-                        newStarPhysicsObject->DisableCollision = true;
-                        break;
-                    }
-                }
-
-                if (!f.Exists(f.Global->MainBigStar)) {
-                    f.Global->BigStarSpawnTimer = 30;
-                }
+                HandleSpawningNewStar(f, stage);
             }
 
             var allStars = f.Filter<BigStar>();
             while (allStars.NextUnsafe(out EntityRef entity, out BigStar* bigStar)) {
                 HandleStar(f, stage, entity, bigStar);
+            }
+        }
+
+        private void HandleSpawningNewStar(Frame f, VersusStageData stage) {
+            int spawnpoints = stage.BigStarSpawnpoints.Length;
+            ref BitSet64 usedSpawnpoints = ref f.Global->UsedStarSpawns;
+
+            for (int i = 0; i < spawnpoints; i++) {
+                // Find a spot...
+                if (f.Global->UsedStarSpawnCount == spawnpoints) {
+                    usedSpawnpoints.ClearAll();
+                    f.Global->UsedStarSpawnCount = 0;
+                }
+
+                int count = f.RNG->Next(0, spawnpoints - f.Global->UsedStarSpawnCount);
+                int index = 0;
+                for (int j = 0; j < spawnpoints; j++) {
+                    if (!usedSpawnpoints.IsSet(j) && --count == 0) {
+                        // This is the index to use
+                        index = j;
+                        break;
+                    }
+                }
+                usedSpawnpoints.Set(index);
+                f.Global->UsedStarSpawnCount++;
+
+                // Spawn a star.
+                FPVector2 position = stage.BigStarSpawnpoints[index];
+                HitCollection hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
+
+                if (hits.Count == 0) {
+                    // Hit no players
+                    EntityRef newEntity = f.Create(f.SimulationConfig.BigStarPrototype);
+                    f.Global->MainBigStar = newEntity;
+                    var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
+                    var newStar = f.Unsafe.GetPointer<BigStar>(newEntity);
+                    var newStarPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newEntity);
+
+                    newStarTransform->Position = position;
+                    newStar->IsStationary = true;
+                    newStarPhysicsObject->DisableCollision = true;
+                    break;
+                }
+            }
+
+            if (!f.Exists(f.Global->MainBigStar)) {
+                f.Global->BigStarSpawnTimer = 30;
             }
         }
 
@@ -86,12 +91,12 @@ namespace Quantum {
             }
 
             if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
-                if ((f.Number + entity.Index) % 3 == 0) {
+                // if ((f.Number + entity.Index) % 3 == 0) {
                     var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
                     if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, physicsCollider->Shape, true, stage)) {
                         physicsObject->DisableCollision = false;
                     }
-                }
+                // }
             }
             QuantumUtils.Decrement(ref bigStar->UncollectableFrames);
         }

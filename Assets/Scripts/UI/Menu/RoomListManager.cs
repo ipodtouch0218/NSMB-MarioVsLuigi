@@ -60,7 +60,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             SelectedRoomIcon = room;
-            joinRoomButton.interactable = SelectedRoomIcon && Settings.Instance.generalNickname.IsValidUsername(false);
+            joinRoomButton.interactable = SelectedRoomIcon && Settings.Instance.generalNickname.IsValidUsername();
             lastSelectTime = Time.time;
         }
 

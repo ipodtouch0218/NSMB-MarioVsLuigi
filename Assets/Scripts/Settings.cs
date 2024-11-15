@@ -182,8 +182,6 @@ public class Settings : Singleton<Settings> {
         set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
     }
 
-    public bool ValidNickname => generalNickname.IsValidUsername(false);
-
     //---Public Variables
     public string generalNickname;
     public int generalCharacter, generalSkin;

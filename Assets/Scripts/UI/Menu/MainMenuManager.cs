@@ -22,7 +22,7 @@ namespace NSMB.UI.MainMenu {
     public class MainMenuManager : Singleton<MainMenuManager> {
 
         //---Static Variables
-        public static readonly int NicknameMin = 2, NicknameMax = 20;
+        public const int NicknameMin = 2, NicknameMax = 20;
 
         //---Public Variables
         public bool nonNetworkShutdown;
@@ -225,12 +225,12 @@ namespace NSMB.UI.MainMenu {
             string hostname;
 
             if (playerData == null) {
-                hostname = Settings.Instance.generalNickname.ToValidUsername();
+                hostname = Settings.Instance.generalNickname.ToValidUsername(f, host);
             } else {
-                hostname = playerData.PlayerNickname.ToValidUsername();
+                hostname = playerData.PlayerNickname.ToValidUsername(f, host);
             }
 
-            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername());
+            lobbyHeaderText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname);
             UnityEngine.Random.InitState(hostname.GetHashCode() + rngSeed);
             colorBar.color = UnityEngine.Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
         }
@@ -270,6 +270,7 @@ namespace NSMB.UI.MainMenu {
 
             EventSystem.current.SetSelectedGameObject(titleSelected);
         }
+
         public void OpenMainMenu() {
             DisableAllMenus();
             bg.SetActive(true);
@@ -277,6 +278,7 @@ namespace NSMB.UI.MainMenu {
 
             EventSystem.current.SetSelectedGameObject(mainMenuSelected);
         }
+
         public void OpenRoomListMenu() {
             DisableAllMenus();
             bg.SetActive(true);

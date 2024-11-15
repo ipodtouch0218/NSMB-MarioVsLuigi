@@ -1,6 +1,5 @@
 ﻿using Quantum.Core;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Quantum {
     public static partial class DeterministicSystemSetup {
@@ -24,8 +23,8 @@ namespace Quantum {
                     new SpinnerSystem(),
                     new MovingPlatformSystem(),
                     new EnemySystem(),
-                    new PhysicsObjectSystem(),
                     new InteractionSystem(),
+                    new PhysicsObjectSystem(),
                     new GoombaSystem(),
                     new KoopaSystem(),
                     new BobombSystem(),

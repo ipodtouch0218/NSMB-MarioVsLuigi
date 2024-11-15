@@ -552,6 +552,8 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
+    SlowInLiquids:
+      Value: 1
 --- !u!114 &715936171356774739
 MonoBehaviour:
   m_ObjectHideFlags: 0

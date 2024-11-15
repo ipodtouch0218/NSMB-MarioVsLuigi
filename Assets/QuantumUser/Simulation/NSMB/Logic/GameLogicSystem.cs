@@ -195,6 +195,10 @@ namespace Quantum {
         }
 
         public static void EndGame(Frame f, int? winningTeam) {
+            if (f.Global->GameState != GameState.Playing) {
+                return;
+            }
+
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
             f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
 
@@ -223,7 +227,7 @@ namespace Quantum {
             newData->PlayerRef = player;
             newData->JoinTick = f.Number;
             newData->IsSpectator = f.Global->GameState != GameState.PreGameRoom;
-            
+
             var datas = f.ResolveDictionary(f.Global->PlayerDatas);
             if (datas.Count == 0) {
                 // First player is host

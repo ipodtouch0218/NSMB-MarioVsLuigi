@@ -88,7 +88,7 @@ public class ChatManager : MonoBehaviour {
 
         // Add username
         RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
-        message = runtimeData.PlayerNickname.ToValidUsername() + ": " + message.Filter();
+        message = runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player) + ": " + message.Filter();
 
         AddChatMessage(message, e.Player, e.Frame);
 
@@ -108,11 +108,11 @@ public class ChatManager : MonoBehaviour {
 
     private void OnPlayerAdded(EventPlayerAdded e) {
         RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
-        AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername());
+        AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player));
     }
 
     private void OnPlayerRemoved(EventPlayerRemoved e) {
         RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
-        AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername());
+        AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player));
     }
 }

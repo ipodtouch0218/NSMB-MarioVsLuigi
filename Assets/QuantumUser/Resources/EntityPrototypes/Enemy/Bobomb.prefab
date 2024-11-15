@@ -502,6 +502,8 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
+    SlowInLiquids:
+      Value: 1
 --- !u!114 &5295556553734674634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -555,8 +557,8 @@ MonoBehaviour:
         RawValue: 0
     IgnorePlayerWhenRespawning:
       Value: 0
-    IsRespawnable:
-      Value: 1
+    DisableRespawning:
+      Value: 0
 --- !u!114 &724652125925019376
 MonoBehaviour:
   m_ObjectHideFlags: 0

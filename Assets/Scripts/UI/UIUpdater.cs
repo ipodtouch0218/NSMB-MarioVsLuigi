@@ -347,7 +347,7 @@ public unsafe class UIUpdater : QuantumCallbacks {
                 while (allPlayers.NextUnsafe(out _, out PlayerData* data)) {
                     if (data->Team == e.WinningTeam) {
                         RuntimePlayer runtimePlayer = f.GetPlayerData(data->PlayerRef);
-                        winner = (runtimePlayer?.PlayerNickname ?? "noname").ToValidUsername();
+                        winner = runtimePlayer?.PlayerNickname.ToValidUsername(f, data->PlayerRef);
                     }
                 }
                 resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);

@@ -18,7 +18,7 @@ public class VersusStageGizmos : MonoBehaviour {
     }
 
 
-    public void OnDrawGizmos() {
+    public unsafe void OnDrawGizmos() {
         if (!mapData || !mapData.Asset) {
             return;
         }
@@ -80,26 +80,22 @@ public class VersusStageGizmos : MonoBehaviour {
             }
         }
 
-        Gizmos.color = new Color(1, 1, 0, 0.4f);
+        var game = QuantumRunner.DefaultGame;
+        Frame f;
         foreach (GameObject starSpawn in GameObject.FindGameObjectsWithTag("StarSpawn")) {
-            Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
-            Gizmos.DrawIcon(starSpawn.transform.position, "star", true);
-        }
-
-
-        /* TODO
-        for (int x = 0; x < levelWidthTile; x++) {
-            for (int y = 0; y < levelHeightTile; y++) {
-                Vector2Int loc = new(x + levelMinTileX, y + levelMinTileY);
-                TileBase tile = tilemap.GetTile((Vector3Int) loc);
-
-                if (tile is CoinTile) {
-                    Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "coin");
-                } else if (tile is PowerupTile) {
-                    Gizmos.DrawIcon(Utils.Utils.TilemapToWorldPosition(loc, this) + OneFourth, "powerup");
+            Gizmos.color = new Color(0, 1, 0, 0.4f);
+            if (game != null) {
+                f = game.Frames.Predicted;
+                int index = Array.IndexOf(stage.BigStarSpawnpoints, starSpawn.transform.position.ToRoundedFPVector2());
+                if (index != -1) {
+                    if (f.Global->UsedStarSpawns.IsSet(index)) {
+                        Gizmos.color = new Color(1, 0, 0, 0.4f);
+                    }
                 }
             }
+            Gizmos.DrawCube(starSpawn.transform.position, Vector3.one);
+            Gizmos.DrawWireSphere(starSpawn.transform.position, 2);
+            Gizmos.DrawIcon(starSpawn.transform.position, "star", true);
         }
-        */
     }
 }
