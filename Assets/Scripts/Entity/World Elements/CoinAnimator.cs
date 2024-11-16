@@ -2,45 +2,41 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public unsafe class CoinAnimator : MonoBehaviour {
+public unsafe class CoinAnimator : QuantumEntityViewComponent {
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private LegacyAnimateSpriteRenderer defaultCoinAnimate, dottedCoinAnimate;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private ParticleSystem sparkles;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer);
         this.SetIfNull(ref sparkles, UnityExtensions.GetComponentType.Children);
     }
 
     public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType);
         QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected);
         QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    public void Initialize(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        var coin = f.Unsafe.GetPointer<Coin>(entity.EntityRef);
+    public override void OnActivate(Frame f) {
+        var coin = f.Unsafe.GetPointer<Coin>(EntityRef);
 
         bool dotted = coin->IsCurrentlyDotted;
         defaultCoinAnimate.isDisplaying = !dotted;
         dottedCoinAnimate.isDisplaying = dotted;
     }
 
-    private void OnUpdateView(CallbackUpdateView e) {
-        Frame f = e.Game.Frames.Predicted;
-        if (!f.Exists(entity.EntityRef)) {
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
-        var coin = f.Unsafe.GetPointer<Coin>(entity.EntityRef);
+        var coin = f.Unsafe.GetPointer<Coin>(EntityRef);
         if (coin->IsFloating) {
             // Bodge: OnCoinChangedCollected doesnt work when collecting a coin at the exact same time as a level reset 
             sRenderer.enabled = !coin->IsCollected;
@@ -51,7 +47,7 @@ public unsafe class CoinAnimator : MonoBehaviour {
     }
 
     private void OnCoinBounced(EventCoinBounced e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -59,7 +55,7 @@ public unsafe class CoinAnimator : MonoBehaviour {
     }
 
     private void OnCoinChangedCollected(EventCoinChangeCollected e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -70,7 +66,7 @@ public unsafe class CoinAnimator : MonoBehaviour {
     }
 
     private void OnCoinChangedType(EventCoinChangedType e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 

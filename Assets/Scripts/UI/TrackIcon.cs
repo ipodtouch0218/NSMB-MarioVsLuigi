@@ -3,7 +3,7 @@ using Quantum;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class TrackIcon : QuantumCallbacks {
+public abstract class TrackIcon : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private float trackMinX, trackMaxX;

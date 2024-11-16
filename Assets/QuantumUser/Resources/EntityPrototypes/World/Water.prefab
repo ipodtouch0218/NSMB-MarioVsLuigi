@@ -27,7 +27,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 9.375, y: 8.25, z: 1}
+  m_LocalScale: {x: 12.5, y: 4.6875, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8572227882836430078}
@@ -93,11 +93,11 @@ GameObject:
   m_Component:
   - component: {fileID: 8572227882836430078}
   - component: {fileID: -40322239282908238}
-  - component: {fileID: 434523407577855762}
   - component: {fileID: 1060841653561283886}
   - component: {fileID: 2728533984175912727}
   - component: {fileID: 3150085164645429832}
-  - component: {fileID: 8317685059518623307}
+  - component: {fileID: 5377348487338848431}
+  - component: {fileID: 2586611310233273419}
   m_Layer: 10
   m_Name: Water
   m_TagString: water
@@ -275,49 +275,6 @@ MonoBehaviour:
   View:
     Id:
       Value: 0
---- !u!114 &434523407577855762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8572227882836430048}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0008c51fe3af00b4da5d44f02d9b3dff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BindBehaviour: 0
-  ManualDisposal: 0
-  ViewFlags: 2
-  InterpolationMode: 0
-  ErrorCorrectionRateMin: 3.3
-  ErrorCorrectionRateMax: 10
-  ErrorPositionBlendStart: 0.25
-  ErrorPositionBlendEnd: 1
-  ErrorRotationBlendStart: 0.1
-  ErrorRotationBlendEnd: 0.5
-  ErrorPositionMinCorrection: 0.025
-  ErrorPositionTeleportDistance: 2
-  ErrorRotationTeleportDistance: 0.5
-  OnEntityInstantiated:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2728533984175912727}
-        m_TargetAssemblyTypeName: NSMB.Entities.World.WaterAnimator, Assembly-CSharp
-        m_MethodName: Initialize
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnEntityDestroyed:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!212 &1060841653561283886
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -386,7 +343,7 @@ MonoBehaviour:
     type: 3}
   splashExitPrefab: {fileID: 4581350238868416347, guid: 3db5d024d60c19c4ea8c69ecdb380e69,
     type: 3}
-  mask: {fileID: 0}
+  mask: {fileID: 5790814903443358490}
   pointsPerTile: 4
   splashWidth: 1
   tension: 3
@@ -395,7 +352,7 @@ MonoBehaviour:
   splashVelocity: 30
   animationSpeed: 9
   spriteRenderer: {fileID: 1060841653561283886}
-  entity: {fileID: 434523407577855762}
+  entity: {fileID: 5377348487338848431}
 --- !u!114 &3150085164645429832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,7 +370,38 @@ MonoBehaviour:
     WidthTiles: 4
     HeightTiles:
       RawValue: 131072
---- !u!114 &8317685059518623307
+--- !u!114 &5377348487338848431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8572227882836430048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0008c51fe3af00b4da5d44f02d9b3dff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BindBehaviour: 0
+  ManualDisposal: 0
+  ViewFlags: 0
+  InterpolationMode: 0
+  ErrorCorrectionRateMin: 3.3
+  ErrorCorrectionRateMax: 10
+  ErrorPositionBlendStart: 0.25
+  ErrorPositionBlendEnd: 1
+  ErrorRotationBlendStart: 0.1
+  ErrorRotationBlendEnd: 0.5
+  ErrorPositionMinCorrection: 0.025
+  ErrorPositionTeleportDistance: 2
+  ErrorRotationTeleportDistance: 0.5
+  OnEntityInstantiated:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEntityDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &2586611310233273419
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -54,6 +54,7 @@ namespace Quantum {
                 newBillTransform->Position = spawnpoint;
 
                 launcher->BulletBillCount++;
+                f.Events.BulletBillLauncherShoot(f, entity, newBillEntity);
             }
 
             var bulletBills = f.Filter<BulletBill, Transform2D, Enemy, PhysicsObject, Freezable>();

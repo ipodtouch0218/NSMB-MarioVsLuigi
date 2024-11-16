@@ -171,7 +171,7 @@ namespace Quantum {
             PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
 
             f.Destroy(powerupEntity);
-            f.Events.MarioPlayerCollectedPowerup(f, marioEntity, *mario, result, newScriptable);
+            f.Events.MarioPlayerCollectedPowerup(f, marioEntity, result, newScriptable);
         }
 
         public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {

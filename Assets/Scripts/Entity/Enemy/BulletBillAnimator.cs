@@ -3,10 +3,9 @@ using Quantum;
 using System.Collections;
 using UnityEngine;
 
-public unsafe class BulletBillAnimator : MonoBehaviour {
+public unsafe class BulletBillAnimator : QuantumEntityViewComponent {
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private ParticleSystem trailParticles;
     [SerializeField] private AudioSource sfx;
@@ -19,29 +18,18 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
     private float fireballScaleTimer;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref legacyAnimation, UnityExtensions.GetComponentType.Children);
     }
 
     public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventBulletBillHitByProjectile>(this, OnBulletBillHitByProjectile, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    public void Initialize(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
-
-        sRenderer.flipX = enemy->FacingRight;
-        Vector2 pos = trailParticles.transform.localPosition;
-        pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
-        trailParticles.transform.localPosition = pos;
-        trailParticles.Play();
-
+    public override void OnActivate(Frame f) {
         if (!NetworkHandler.IsReplayFastForwarding) {
             sfx.Play();
         }
@@ -49,16 +37,15 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
         StartCoroutine(ChangeSpriteSortingOrder());
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        QuantumGame game = e.Game;
-        Frame f = game.Frames.Predicted;
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
 
-        if (!f.Exists(entity.EntityRef)) {
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
-        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
-        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(EntityRef);
+        var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
         bool frozen = freezable->IsFrozen(f);
 
         sRenderer.enabled = enemy->IsActive;
@@ -76,6 +63,12 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
         float scale = 1 + Mathf.Abs(Mathf.Sin(fireballScaleTimer * 10 * Mathf.PI)) * fireballScaleSize;
         transform.localScale = Vector3.one * scale;
         fireballScaleTimer = Mathf.Max(0, fireballScaleTimer - Time.deltaTime);
+
+        sRenderer.flipX = enemy->FacingRight;
+        Vector2 pos = trailParticles.transform.localPosition;
+        pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
+        trailParticles.transform.localPosition = pos;
+        trailParticles.Play();
     }
 
     private static WaitForSeconds wait = new(0.33f);
@@ -87,7 +80,7 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
     }
 
     private void OnBulletBillHitByProjectile(EventBulletBillHitByProjectile e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -95,7 +88,7 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
     }
 
     private void OnEnemyKilled(EventEnemyKilled e) {
-        if (e.Enemy != entity.EntityRef) {
+        if (e.Enemy != EntityRef) {
             return;
         }
 
@@ -107,7 +100,7 @@ public unsafe class BulletBillAnimator : MonoBehaviour {
     }
 
     private void OnPlayComboSound(EventPlayComboSound e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 

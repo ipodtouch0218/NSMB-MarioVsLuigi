@@ -54,7 +54,7 @@ public class ScoreboardEntry : MonoBehaviour {
     public unsafe void UpdateEntry(Frame f) {
         if (!f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
             Color dcColor = Utils.GetPlayerColor(f, PlayerRef.None);
-            dcColor.a = 0.2f;
+            dcColor.a = 0.5f;
             background.color = dcColor;
             return;
         }

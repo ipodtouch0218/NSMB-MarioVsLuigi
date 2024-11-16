@@ -752,6 +752,8 @@ MonoBehaviour:
           Value: 1
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 0
     - rid: 1987491028835237896
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -902,6 +904,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 2646313237942894602
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1095,6 +1099,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 3804419343601631241
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1634,6 +1640,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 8298140632090673162
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

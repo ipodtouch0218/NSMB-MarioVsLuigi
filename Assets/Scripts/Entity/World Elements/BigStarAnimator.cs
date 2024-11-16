@@ -3,7 +3,7 @@ using Quantum;
 using System;
 using UnityEngine;
 
-public class BigStarAnimator : QuantumCallbacks {
+public class BigStarAnimator : QuantumEntityViewComponent {
 
     //---Static Variables
     public static event Action<Frame, BigStarAnimator> BigStarInitialized;
@@ -17,7 +17,6 @@ public class BigStarAnimator : QuantumCallbacks {
     [SerializeField] private GameObject starCollectPrefab;
 
     //---Components
-    [SerializeField] public QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private BoxCollider2D worldCollider;
     [SerializeField] private Animation legacyAnimation;
@@ -32,13 +31,11 @@ public class BigStarAnimator : QuantumCallbacks {
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref worldCollider);
         this.SetIfNull(ref legacyAnimation);
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
     }
-
-    public unsafe void Initialize(QuantumGame game) {
-        Frame f = game.Frames.Verified;
-        var star = f.Unsafe.GetPointer<BigStar>(entity.EntityRef);
+    
+    public override unsafe void OnActivate(Frame f) {
+        var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
 
         stationary = star->IsStationary;
         if (f.Global->GameState == GameState.Playing && !NetworkHandler.IsReplayFastForwarding) {
@@ -51,8 +48,8 @@ public class BigStarAnimator : QuantumCallbacks {
         BigStarInitialized?.Invoke(f, this);
     }
 
-    public void Destroy(QuantumGame game) {
-        BigStarDestroyed?.Invoke(game.Frames.Verified, this);
+    public override void OnDeactivate() {
+        BigStarDestroyed?.Invoke(VerifiedFrame, this);
     }
 
     public void Update() {
@@ -63,14 +60,14 @@ public class BigStarAnimator : QuantumCallbacks {
         }
     }
 
-    public unsafe override void OnUpdateView(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        if (!f.Exists(entity.EntityRef)
+    public unsafe override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        if (!f.Exists(EntityRef)
             || f.Global->GameState >= GameState.Ended) {
             return;
         }
 
-        var star = f.Unsafe.GetPointer<BigStar>(entity.EntityRef);
+        var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
 
         if (!stationary) {
             graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);

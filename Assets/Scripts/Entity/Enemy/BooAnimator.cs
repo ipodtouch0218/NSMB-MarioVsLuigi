@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public unsafe class BooAnimator : MonoBehaviour {
+public unsafe class BooAnimator : QuantumEntityViewComponent {
 
     //---Static Variables
     private static readonly int ParamFacingRight = Animator.StringToHash("FacingRight");
@@ -11,13 +11,11 @@ public unsafe class BooAnimator : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private Transform bobber;
     [SerializeField] private SpriteRenderer sRenderer;
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private Animator animator;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private float sinSpeed = 1f, sinAmplitude = 0.0875f;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref sfx, UnityExtensions.GetComponentType.Children);
@@ -27,20 +25,18 @@ public unsafe class BooAnimator : MonoBehaviour {
     }
 
     public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventBooBecomeActive>(this, OnBooBecameActive, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        QuantumGame game = e.Game;
-        Frame f = game.Frames.Predicted;
-        float time = (f.Number + game.InterpolationFactor) * f.DeltaTime.AsFloat;
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        float time = (f.Number + Game.InterpolationFactor) * f.DeltaTime.AsFloat;
 
         bobber.localPosition = new(0, Mathf.Sin(2 * Mathf.PI * time * sinSpeed) * sinAmplitude);
 
-        var boo = f.Unsafe.GetPointer<Boo>(entity.EntityRef);
-        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
+        var boo = f.Unsafe.GetPointer<Boo>(EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(EntityRef);
 
         animator.SetBool(ParamFacingRight, enemy->FacingRight);
         animator.SetBool(ParamScared, boo->UnscaredFrames > 0);
@@ -54,7 +50,7 @@ public unsafe class BooAnimator : MonoBehaviour {
     }
 
     private void OnBooBecameActive(EventBooBecomeActive e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -62,7 +58,7 @@ public unsafe class BooAnimator : MonoBehaviour {
     }
 
     private void OnPlayComboSound(EventPlayComboSound e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 

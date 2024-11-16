@@ -298,7 +298,7 @@ namespace Quantum {
             mario->IsCrouching &= !mario->IsSliding;
 
             if (!wasInShell && mario->IsInShell) {
-                f.Events.MarioPlayerCrouched(f, filter.Entity, *mario);
+                f.Events.MarioPlayerCrouched(f, filter.Entity);
             }
         }
 
@@ -422,7 +422,7 @@ namespace Quantum {
             }
             physicsObject->Velocity.Y = newY;
 
-            f.Events.MarioPlayerJumped(f, filter.Entity, *filter.MarioPlayer, mario->JumpState, mario->DoEntityBounce);
+            f.Events.MarioPlayerJumped(f, filter.Entity, mario->JumpState, mario->DoEntityBounce);
             if (mario->DoEntityBounce) {
                 mario->IsCrouching = false;
             }
@@ -557,7 +557,7 @@ namespace Quantum {
                     mario->DoEntityBounce = false;
                     // timeSinceLastBumpSound = 0;
 
-                    f.Events.MarioPlayerWalljumped(f, filter.Entity, *filter.MarioPlayer, filter.Transform->Position, mario->WallslideRight);
+                    f.Events.MarioPlayerWalljumped(f, filter.Entity, filter.Transform->Position, mario->WallslideRight);
                     mario->WalljumpFrames = 16;
                     mario->WallslideRight = false;
                     mario->WallslideLeft = false;
@@ -691,7 +691,7 @@ namespace Quantum {
                 && !mario->IsInShell;
 
             if (!wasCrouching && mario->IsCrouching) {
-                f.Events.MarioPlayerCrouched(f, filter.Entity, *mario);
+                f.Events.MarioPlayerCrouched(f, filter.Entity);
             }
         }
 
@@ -781,7 +781,7 @@ namespace Quantum {
                 physicsObject->Velocity = physics.GroundpoundStartVelocity;
                 mario->GroundpoundStartFrames = mario->CurrentPowerupState == PowerupState.MegaMushroom ? physics.GroundpoundStartMegaFrames : physics.GroundpoundStartFrames;
 
-                f.Events.MarioPlayerGroundpoundStarted(f, filter.Entity, *mario);
+                f.Events.MarioPlayerGroundpoundStarted(f, filter.Entity);
             }
         }
 
@@ -813,7 +813,7 @@ namespace Quantum {
             }
 
             if (!mario->IsDrilling) {
-                f.Events.MarioPlayerGroundpounded(f, filter.Entity, *mario);
+                f.Events.MarioPlayerGroundpounded(f, filter.Entity);
             }
 
             bool interactedAny = false;
@@ -1069,7 +1069,7 @@ namespace Quantum {
                         }
                     } else if (inputs.PowerupAction.IsDown && !mario->IsDrilling && physicsObject->Velocity.Y < -FP._0_10 && mario->PropellerSpinFrames < physics.PropellerSpinFrames / 4) {
                         mario->PropellerSpinFrames = physics.PropellerSpinFrames;
-                        f.Events.MarioPlayerPropellerSpin(f, filter.Entity, *mario);
+                        f.Events.MarioPlayerPropellerSpin(f, filter.Entity);
                     }
                 }
             }
@@ -1123,7 +1123,7 @@ namespace Quantum {
                 if (f.Unsafe.TryGetPointer(newEntity, out Projectile* projectile)) {
                     projectile->Initialize(f, newEntity, filter.Entity, spawnPos, mario->FacingRight);
                 }
-                f.Events.MarioPlayerShotProjectile(f, filter.Entity, *mario, *projectile);
+                f.Events.MarioPlayerShotProjectile(f, filter.Entity, *projectile);
 
                 // Weird interaction in the main game...
                 mario->WalljumpFrames = 0;
@@ -1146,7 +1146,7 @@ namespace Quantum {
 
                 mario->WasTouchingGroundLastFrame = false;
                 filter.PhysicsObject->IsTouchingGround = false;
-                f.Events.MarioPlayerUsedPropeller(f, filter.Entity, *mario);
+                f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
                 break;
             }
             }
@@ -1187,7 +1187,7 @@ namespace Quantum {
                 mario->JumpBufferFrames = 0;
                 mario->IsCrouching = false;
 
-                f.Events.MarioPlayerJumped(f, filter.Entity, *mario, JumpState.None, false);
+                f.Events.MarioPlayerJumped(f, filter.Entity, JumpState.None, false);
             }
         }
 
@@ -1494,7 +1494,7 @@ namespace Quantum {
             
             // Death up
             if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
-                bool doRespawn = !((f.Global->Rules.IsLivesEnabled && mario->Lives == 0) || mario->Disconnected);
+                bool doRespawn = !mario->Disconnected && (!f.Global->Rules.IsLivesEnabled || mario->Lives > 0);
                 if (!doRespawn && mario->Stars > 0) {
                     // Try to drop more stars
                     mario->SpawnStars(f, entity, 1);
@@ -1533,13 +1533,13 @@ namespace Quantum {
             var reserveItem = f.FindAsset(mario->ReserveItem);
 
             if (!reserveItem || mario->IsDead || mario->MegaMushroomStartFrames > 0 || (mario->MegaMushroomStationaryEnd && mario->MegaMushroomEndFrames > 0)) {
-                f.Events.MarioPlayerUsedReserveItem(f, filter.Entity, *mario, false);
+                f.Events.MarioPlayerUsedReserveItem(f, filter.Entity, false);
                 return;
             }
 
             SpawnItem(f, filter.Entity, mario, reserveItem.Prefab);
             mario->ReserveItem = default;
-            f.Events.MarioPlayerUsedReserveItem(f, filter.Entity, *mario, true);
+            f.Events.MarioPlayerUsedReserveItem(f, filter.Entity, true);
         }
 
         public void OnRemoved(Frame f, EntityRef entity, Projectile* component) {

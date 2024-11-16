@@ -3,7 +3,7 @@ using Quantum;
 using UnityEngine;
 using static NSMB.Extensions.UnityExtensions;
 
-public class KoopaAnimator : MonoBehaviour {
+public class KoopaAnimator : QuantumEntityViewComponent {
 
     //---Static Variables
     private static readonly int ParamShell = Animator.StringToHash("shell");
@@ -12,7 +12,6 @@ public class KoopaAnimator : MonoBehaviour {
     private static readonly int ParamTurnaround = Animator.StringToHash("turnaround");
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private Animator animator;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
@@ -25,23 +24,20 @@ public class KoopaAnimator : MonoBehaviour {
 
     public void OnValidate() {
         this.SetIfNull(ref animator, GetComponentType.Children);
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer, GetComponentType.Children);
     }
 
     public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventKoopaKicked>(this, OnKoopaKicked, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    private unsafe void OnUpdateView(CallbackUpdateView e) {
-        QuantumGame game = e.Game;
-        Frame f = game.Frames.Predicted;
-
-        if (!f.Exists(entity.EntityRef)) {
+    public override unsafe void OnUpdateView() {
+        Frame f = PredictedFrame;
+        
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
@@ -50,11 +46,11 @@ public class KoopaAnimator : MonoBehaviour {
             return;
         }
 
-        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
-        var koopa = f.Unsafe.GetPointer<Koopa>(entity.EntityRef);
-        var holdable = f.Unsafe.GetPointer<Holdable>(entity.EntityRef);
-        var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
-        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(EntityRef);
+        var koopa = f.Unsafe.GetPointer<Koopa>(EntityRef);
+        var holdable = f.Unsafe.GetPointer<Holdable>(EntityRef);
+        var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(EntityRef);
+        var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
 
         // Animation
         bool isShell = koopa->IsInShell || f.Exists(holdable->Holder);
@@ -105,7 +101,7 @@ public class KoopaAnimator : MonoBehaviour {
     }
 
     private void OnPlayBumpSound(EventPlayBumpSound e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -113,7 +109,7 @@ public class KoopaAnimator : MonoBehaviour {
     }
 
     private void OnPlayComboSound(EventPlayComboSound e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -121,7 +117,7 @@ public class KoopaAnimator : MonoBehaviour {
     }
 
     private unsafe void OnKoopaKicked(EventKoopaKicked e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -133,7 +129,7 @@ public class KoopaAnimator : MonoBehaviour {
 
     /*
     private void OnEnemyKilled(EventEnemyKilled e) {
-        if (e.Enemy != entity.EntityRef) {
+        if (e.Enemy != EntityRef) {
             return;
         }
     }

@@ -849,7 +849,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 14746
+              RawValue: 14811
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -958,6 +958,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 7591444679539818506
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1154,7 +1156,7 @@ MonoBehaviour:
             X:
               RawValue: 0
             Y:
-              RawValue: 13107
+              RawValue: 13173
           RotationOffset:
             RawValue: 0
           UserTag: 0
@@ -1239,6 +1241,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 8968679368100413449
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

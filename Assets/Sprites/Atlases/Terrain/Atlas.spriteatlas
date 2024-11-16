@@ -618,8 +618,10 @@ SpriteAtlas:
     - f4b7221be8b79c94c9c8919163014cb0: 6700115880502462848
     - f4b7221be8b79c94c9c8919163014cb0: 4366118933763392549
     - f4b7221be8b79c94c9c8919163014cb0: 5563996254464901877
-    - 0496f6bcff5e6bc4fb118ff705cfef52: 883784342
     - 0496f6bcff5e6bc4fb118ff705cfef52: -1732289050
+    - 0496f6bcff5e6bc4fb118ff705cfef52: -1195157291
+    - 0496f6bcff5e6bc4fb118ff705cfef52: 883784342
+    - 0496f6bcff5e6bc4fb118ff705cfef52: 1268902598
     - 34660a1de22c6a34aac084333e781433: 2111862159
     - 34660a1de22c6a34aac084333e781433: -697328687
     - 34660a1de22c6a34aac084333e781433: 2065498208
@@ -1396,8 +1398,10 @@ SpriteAtlas:
   - {fileID: 6700115880502462848, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: 4366118933763392549, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: 5563996254464901877, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
-  - {fileID: 883784342, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
   - {fileID: -1732289050, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
+  - {fileID: -1195157291, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
+  - {fileID: 883784342, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
+  - {fileID: 1268902598, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
   - {fileID: 2111862159, guid: 34660a1de22c6a34aac084333e781433, type: 3}
   - {fileID: -697328687, guid: 34660a1de22c6a34aac084333e781433, type: 3}
   - {fileID: 2065498208, guid: 34660a1de22c6a34aac084333e781433, type: 3}
@@ -2173,8 +2177,10 @@ SpriteAtlas:
   - animation_21
   - animation_22
   - animation_23
-  - launcher_
   - launcher_2
+  - launcher_3
+  - launcher_0
+  - launcher_1
   - 31 Volcano (yellow)_8
   - 31 Volcano (yellow)_20
   - 31 Volcano (yellow)_7

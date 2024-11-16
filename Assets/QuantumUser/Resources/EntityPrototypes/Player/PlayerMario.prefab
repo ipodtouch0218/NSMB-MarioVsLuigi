@@ -6136,6 +6136,8 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 0
+    SlowInLiquids:
+      Value: 0
 --- !u!114 &-2541758970786198444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12506,16 +12508,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Bubbles
-      objectReference: {fileID: 0}
-    - target: {fileID: 5283455114949125859, guid: 18aedb0cd9e0c224681a437988b3928c,
-        type: 3}
-      propertyPath: m_Layer
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 5283455114949125859, guid: 18aedb0cd9e0c224681a437988b3928c,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8144481336456451618, guid: 18aedb0cd9e0c224681a437988b3928c,
         type: 3}

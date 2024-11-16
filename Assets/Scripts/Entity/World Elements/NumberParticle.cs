@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using TMPro;
+using NSMB.Extensions;
 
 public class NumberParticle : MonoBehaviour {
 
@@ -21,13 +22,8 @@ public class NumberParticle : MonoBehaviour {
     private bool final;
 
     public void OnValidate() {
-        if (!text) {
-            text = GetComponentInChildren<TMP_Text>();
-        }
-
-        if (!legacyAnimation) {
-            legacyAnimation = GetComponentInChildren<Animation>();
-        }
+        this.SetIfNull(ref text, UnityExtensions.GetComponentType.Children);
+        this.SetIfNull(ref legacyAnimation, UnityExtensions.GetComponentType.Children);
     }
 
     public void Initialize(string newText, Color color, bool final) {

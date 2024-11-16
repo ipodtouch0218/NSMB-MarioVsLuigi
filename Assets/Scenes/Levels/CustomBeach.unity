@@ -2563,7 +2563,7 @@ PrefabInstance:
     - target: {fileID: 6257058125082474392, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 18
+      value: 17.1875
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430048, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -2652,7 +2652,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 9d1829544a867764ea85ac4428593208, type: 3}
 --- !u!114 &1450338564 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 434523407577855762, guid: 9d1829544a867764ea85ac4428593208,
+  m_CorrespondingSourceObject: {fileID: 5377348487338848431, guid: 9d1829544a867764ea85ac4428593208,
     type: 3}
   m_PrefabInstance: {fileID: 1450338563}
   m_PrefabAsset: {fileID: 0}

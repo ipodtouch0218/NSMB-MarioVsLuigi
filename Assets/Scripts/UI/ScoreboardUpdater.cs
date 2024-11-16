@@ -87,9 +87,11 @@ public class ScoreboardUpdater : MonoBehaviour {
     public unsafe void SortScoreboard(Frame f) {
         entries.Sort((se1, se2) => {
             if (f.Exists(se1.Target) && !f.Exists(se2.Target)) {
-                return 1;
-            } else if (f.Exists(se2.Target) && !f.Exists(se1.Target)) {
                 return -1;
+            } else if (f.Exists(se2.Target) && !f.Exists(se1.Target)) {
+                return 1;
+            } else if (!f.Exists(se1.Target) && !f.Exists(se2.Target)) {
+                return 0;
             }
 
             var mario1 = f.Unsafe.GetPointer<MarioPlayer>(se1.Target);

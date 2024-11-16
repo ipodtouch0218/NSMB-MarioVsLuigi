@@ -4,7 +4,7 @@ using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 
-public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
+public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent {
 
     //---Static Variables
     private static readonly Color BlankColor = new(0, 0, 0, 255);
@@ -13,7 +13,6 @@ public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
     private static readonly int ParamDisplacementMap = Shader.PropertyToID("DisplacementMap");
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField, Delayed] private int samplesPerTile = 8, bumpWidthPoints = 3, bumpBlurPoints = 6;
     [SerializeField] private float bumpDuration = 0.4f;
@@ -23,7 +22,6 @@ public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
     private Color32[] pixels;
     private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
-    private bool initialized; 
 
     private readonly List<BumpInfo> bumps = new();
     private VersusStageData stage;
@@ -33,13 +31,11 @@ public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
     }
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
     }
 
-    public void Initialize(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity.EntityRef);
+    public override void OnActivate(Frame f) {
+        var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(EntityRef);
 
         platformWidth = collider->Shape.Box.Extents.X.AsFloat * 2f;
 
@@ -52,15 +48,10 @@ public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
         mpb.SetFloat(ParamPlatformWidth, platformWidth);
         mpb.SetFloat(ParamPointsPerTile, samplesPerTile);
 
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-        initialized = true;
+        stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
     }
 
-    public void Update() {
-        if (!initialized) {
-            return;
-        }
-
+    public override void OnUpdateView() {
         for (int i = 0; i < platformWidth * samplesPerTile; i++) {
             pixels[i] = BlankColor;
         }
@@ -96,7 +87,7 @@ public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
     }
 
     private void OnMarioBrosPlatformBumped(EventMarioBrosPlatformBumped e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -105,7 +96,7 @@ public unsafe class MarioBrosPlatformAnimator : MonoBehaviour {
         var qCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(e.Entity);
 
         FPVector2 localPos = qTransform->InverseTransformPoint(e.Position);
-        localPos = QuantumUtils.WrapWorld(stage, localPos, out _ );
+        localPos = QuantumUtils.WrapWorld(stage, localPos, out _);
 
         float posX = localPos.X.AsFloat;
         float width = qCollider->Shape.Box.Extents.X.AsFloat * 2;

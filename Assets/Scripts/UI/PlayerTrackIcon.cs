@@ -19,13 +19,11 @@ public unsafe class PlayerTrackIcon : TrackIcon {
     //---Private Variables
     private Coroutine flashRoutine;
 
-    protected override void OnEnable() {
-        base.OnEnable();
+    public void OnEnable() {
         image.enabled = true;
     }
 
-    protected override void OnDisable() {
-        base.OnDisable();
+    public void OnDisable() {
         if (flashRoutine != null) {
             StopCoroutine(flashRoutine);
             flashRoutine = null;
@@ -42,13 +40,13 @@ public unsafe class PlayerTrackIcon : TrackIcon {
             teamIcon.sprite = f.SimulationConfig.Teams[mario->Team].spriteColorblind;
         }
 
+        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
     }
 
-    public override void OnUpdateView(QuantumGame game) {
-        base.OnUpdateView(game);
-
+    public void OnUpdateView(CallbackUpdateView e) {
+        QuantumGame game = e.Game;
         bool controllingCamera = playerElements.CameraAnimator.Target == targetEntity;
         transform.localScale = controllingCamera ? FlipY : TwoThirds;
 

@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public unsafe class BobombAnimator : MonoBehaviour {
+public unsafe class BobombAnimator : QuantumEntityViewComponent {
 
     //---Static Variables
     private static readonly int ParamLit = Animator.StringToHash("lit");
@@ -10,7 +10,6 @@ public unsafe class BobombAnimator : MonoBehaviour {
     private static readonly int ParamFlashAmount = Shader.PropertyToID("FlashAmount");
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private Animator animator;
@@ -20,14 +19,12 @@ public unsafe class BobombAnimator : MonoBehaviour {
     private MaterialPropertyBlock mpb;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
     }
 
     public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventBobombExploded>(this, OnBobombExploded, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventBobombLit>(this, OnBobombLit, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventEntityBlockBumped>(this, OnEntityBlockBumped, NetworkHandler.FilterOutReplayFastForward);
@@ -36,14 +33,13 @@ public unsafe class BobombAnimator : MonoBehaviour {
         sRenderer.GetPropertyBlock(mpb = new());
     }
 
-    private void OnUpdateView(CallbackUpdateView e) {
-        QuantumGame game = e.Game;
-        Frame f = game.Frames.Predicted;
-        if (!f.Exists(entity.EntityRef)) {
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
-        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
         if (freezable->IsFrozen(f)) {
             animator.speed = 0;
             sfx.Stop();
@@ -52,9 +48,9 @@ public unsafe class BobombAnimator : MonoBehaviour {
             animator.speed = 1;
         }
 
-        var bobomb = f.Unsafe.GetPointer<Bobomb>(entity.EntityRef);
-        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
-        var holdable = f.Unsafe.GetPointer<Holdable>(entity.EntityRef);
+        var bobomb = f.Unsafe.GetPointer<Bobomb>(EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(EntityRef);
+        var holdable = f.Unsafe.GetPointer<Holdable>(EntityRef);
 
         bool lit = bobomb->CurrentDetonationFrames > 0;
         animator.SetBool(ParamLit, lit);
@@ -90,7 +86,7 @@ public unsafe class BobombAnimator : MonoBehaviour {
     }
 
     private void OnPlayComboSound(EventPlayComboSound e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -98,7 +94,7 @@ public unsafe class BobombAnimator : MonoBehaviour {
     }
 
     private void OnEntityBlockBumped(EventEntityBlockBumped e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -106,7 +102,7 @@ public unsafe class BobombAnimator : MonoBehaviour {
     }
 
     private void OnBobombExploded(EventBobombExploded e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -115,7 +111,7 @@ public unsafe class BobombAnimator : MonoBehaviour {
     }
 
     private void OnBobombLit(EventBobombLit e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 

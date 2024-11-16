@@ -58,7 +58,10 @@ namespace NSMB.Utils {
                             continue;
                         }
 
-                        discriminator++;
+                        RuntimePlayer otherRuntimePlayer = f.GetPlayerData(otherPlayerData->PlayerRef);
+                        if (otherRuntimePlayer.PlayerNickname.Filter().Equals(input)) {
+                            discriminator++;
+                        }
                     }
 
                     if (discriminator > 0) {

@@ -86,17 +86,17 @@ public class PlayerElements : MonoBehaviour {
         uiUpdater.Initialize(game, f);
         scoreboardUpdater.Initialize();
 
-        foreach (var mario in MarioAnimator.AllMarioPlayers) {
+        foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
             MarioPlayerInitialized(game, f, mario);
         }
-        MarioAnimator.MarioPlayerInitialized += MarioPlayerInitialized;
+        MarioPlayerAnimator.MarioPlayerInitialized += MarioPlayerInitialized;
     }
 
     public void OnDestroy() {
-        MarioAnimator.MarioPlayerInitialized -= MarioPlayerInitialized;
+        MarioPlayerAnimator.MarioPlayerInitialized -= MarioPlayerInitialized;
     }
 
-    private void MarioPlayerInitialized(QuantumGame game, Frame f, MarioAnimator mario) {
+    private void MarioPlayerInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
         PlayerNametag newNametag = Instantiate(nametagPrefab, nametagPrefab.transform.parent);
         newNametag.Initialize(game, f, this, mario);
     }

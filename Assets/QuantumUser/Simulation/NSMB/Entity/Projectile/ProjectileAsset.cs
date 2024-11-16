@@ -18,6 +18,7 @@ public class ProjectileAsset : AssetObject {
     public byte BlueShellSlowdownFrames = 40;
 
     public ParticleEffect DestroyParticleEffect = ParticleEffect.None;
+    public SoundEffect ShootSound = SoundEffect.Powerup_Fireball_Shoot;
 }
 
 public enum ProjectileEffectType {

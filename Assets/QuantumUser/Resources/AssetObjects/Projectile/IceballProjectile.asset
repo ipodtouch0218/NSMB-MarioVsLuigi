@@ -35,3 +35,4 @@ MonoBehaviour:
   DoesntEffectBlueShell: 1
   BlueShellSlowdownFrames: 40
   DestroyParticleEffect: 6
+  ShootSound: 47

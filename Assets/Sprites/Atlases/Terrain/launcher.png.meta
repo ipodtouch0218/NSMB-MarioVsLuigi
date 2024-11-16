@@ -155,7 +155,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: launcher_
+      name: launcher_0
       rect:
         serializedVersion: 2
         x: 0
@@ -196,6 +196,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: launcher_1
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 32
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 95fc3bf289beb7245a53e884ae3b940c
+      internalID: 1268902598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: launcher_3
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 16
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 31}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78148374ece52364fbc52dd13041a7e6
+      internalID: -1195157291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -207,10 +249,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      launcher_: 883784342
-      launcher_0: -2170712247897187164
-      launcher_1: -2189475840094043951
+      launcher_0: 883784342
+      launcher_1: 1268902598
       launcher_2: -1732289050
+      launcher_3: -1195157291
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

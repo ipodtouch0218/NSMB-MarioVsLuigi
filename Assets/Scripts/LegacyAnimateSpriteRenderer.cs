@@ -41,7 +41,7 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
     private void SetSprite() {
 
-        if (!isDisplaying || frames.Length == 0)
+        if (!isDisplaying || frames == null || frames.Length == 0)
             return;
 
         frame = Mathf.Repeat(frame, frames.Length);

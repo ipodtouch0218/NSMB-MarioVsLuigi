@@ -74,8 +74,7 @@ namespace NSMB.Entities.World {
 
             spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
             if (mask) {
-                mask.transform.localScale = new((widthTiles - 2) * mask.sprite.pixelsPerUnit / 32f, (heightTiles - 1) * mask.sprite.pixelsPerUnit / 8f, 1f);
-                Debug.Log(mask.transform.localScale);
+                mask.transform.localScale = new(widthTiles * mask.sprite.pixelsPerUnit / 32f, (heightTiles - 0.5f) * mask.sprite.pixelsPerUnit / 32f, 1f);
             }
 
             properties = new();

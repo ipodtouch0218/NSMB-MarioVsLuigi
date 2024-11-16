@@ -37,6 +37,9 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+            if (QuantumRunner.DefaultGame != null) {
+                UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
+            }
         }
 
         public void OnDisable() {

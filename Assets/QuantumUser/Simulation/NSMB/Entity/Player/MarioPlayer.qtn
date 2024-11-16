@@ -137,10 +137,13 @@ component MarioPlayer {
 	[ExcludeFromPrototype] entity_ref CurrentSpinner;
 }
 
+
+signal OnMarioPlayerDied(EntityRef entity);
+
+
 event MarioPlayerJumped {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 	nothashed JumpState JumpState;
 	nothashed bool WasBounce;
 }
@@ -148,25 +151,21 @@ event MarioPlayerJumped {
 event MarioPlayerGroundpoundStarted {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerGroundpounded {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerCrouched {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 }
 
 synced event MarioPlayerCollectedPowerup {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 	nothashed PowerupReserveResult Result;
 	nothashed PowerupAsset Scriptable;
 }
@@ -174,14 +173,12 @@ synced event MarioPlayerCollectedPowerup {
 event MarioPlayerUsedReserveItem {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 	nothashed bool Success;
 }
 
 event MarioPlayerWalljumped {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 	nothashed FPVector2 Position;
 	nothashed bool WasOnRightWall;
 }
@@ -189,30 +186,24 @@ event MarioPlayerWalljumped {
 event MarioPlayerShotProjectile {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 	nothashed Projectile Projectile;
 }
 
 event MarioPlayerUsedPropeller {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerPropellerSpin {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 }
 
 synced event MarioPlayerDied {
 	Frame Frame;
 	entity_ref Entity;
 	bool IsLava;
-	MarioPlayer Mario;
 }
-
-signal OnMarioPlayerDied(EntityRef entity);
 
 event MarioPlayerDeathUp {
 	nothashed Frame Frame;
@@ -222,32 +213,27 @@ event MarioPlayerDeathUp {
 synced event MarioPlayerTookDamage {
 	Frame Frame;
 	entity_ref Entity;
-	MarioPlayer Mario;
 }
 
 event MarioPlayerPreRespawned {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerRespawned {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer Mario;
 }
 
 event MarioPlayerPickedUpObject {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer* Mario;
 	entity_ref OtherEntity;
 }
 
 event MarioPlayerThrewObject {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed MarioPlayer* Mario;
 	entity_ref OtherEntity;
 }
 

@@ -287,7 +287,7 @@ namespace Quantum {
                 physicsObject->Velocity.X = mario->FacingRight ? 1 : -1;
             } else {
                 physicsObject->Velocity.X = (Constants._4_50 + FPMath.Abs(marioPhysics->Velocity.X / 3)) * (mario->FacingRight ? 1 : -1);
-                f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
+                f.Events.MarioPlayerThrewObject(f, marioEntity, entity);
             }
             enemy->FacingRight = mario->FacingRight;
             holdable->IgnoreOwnerFrames = 15;

@@ -1,12 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
-public class ReserveAnimationEvents : MonoBehaviour
-{
+public class ReserveAnimationEvents : MonoBehaviour {
+
+    //---Serailized Variables
     [SerializeField] private UnityEvent staticStartedCallback;
 
     public void OnStaticStarted() {

@@ -106,7 +106,7 @@ namespace Quantum {
             }
 
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
-                FPVector2 checkPosition = transform->Position + (FPVector2.Right * FP._0_05 * (enemy->FacingRight ? 1 : -1));
+                FPVector2 checkPosition = transform->Position + filter.Collider->Shape.Centroid + (FPVector2.Right * FP._0_05 * (enemy->FacingRight ? 1 : -1));
                 if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_33, out var hit)) {
                     // Failed to hit a raycast, but check to make sure we don't have a contact point instead.
 
@@ -253,7 +253,7 @@ namespace Quantum {
                         koopaEnemy->IsActive = false;
                         koopaEnemy->IsDead = true;
                         koopaPhysicsObject->IsFrozen = true;
-                        f.Events.MarioPlayerCollectedPowerup(f, marioEntity, *mario, result, powerup);
+                        f.Events.MarioPlayerCollectedPowerup(f, marioEntity, result, powerup);
 
                     } else {
                         // Kick
@@ -275,7 +275,7 @@ namespace Quantum {
                             var powerup = f.Unsafe.GetPointer<Powerup>(newPowerup);
                             var powerupPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newPowerup);
 
-                            powerupTransform->Position = koopaTransform->Position + FPVector2.Down * FP._0_20;
+                            powerupTransform->Position = koopaTransform->Position;
                             powerup->Initialize(f, newPowerup, 15);
                             powerupPhysicsObject->DisableCollision = false;
 
@@ -439,7 +439,7 @@ namespace Quantum {
                 koopa->WakeupFrames = 15 * 60;
                 koopa->IsKicked = true;
                 koopa->CurrentSpeed = koopa->KickSpeed + FPMath.Abs(marioPhysics->Velocity.X / 3);
-                f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
+                f.Events.MarioPlayerThrewObject(f, marioEntity, entity);
             }
             enemy->ChangeFacingRight(f, entity, mario->FacingRight);
             holdable->IgnoreOwnerFrames = 15;

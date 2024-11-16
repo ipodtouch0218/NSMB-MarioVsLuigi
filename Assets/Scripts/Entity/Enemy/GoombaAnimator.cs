@@ -2,10 +2,9 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public unsafe class GoombaAnimator : MonoBehaviour {
+public unsafe class GoombaAnimator : QuantumEntityViewComponent {
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private Sprite deadSprite;
     [SerializeField] private GameObject specialKillParticle;
@@ -13,23 +12,20 @@ public unsafe class GoombaAnimator : MonoBehaviour {
     [SerializeField] private AudioSource sfx;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref legacyAnimation, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref sfx);
     }
 
     public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    private unsafe void OnUpdateView(CallbackUpdateView view) {
-        QuantumGame game = view.Game;
-        Frame f = game.Frames.Predicted;
+    public override unsafe void OnUpdateView() {
+        Frame f = PredictedFrame;
 
-        if (!f.Exists(entity.EntityRef)) {
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
@@ -38,9 +34,9 @@ public unsafe class GoombaAnimator : MonoBehaviour {
             return;
         }
 
-        var enemy = f.Unsafe.GetPointer<Enemy>(entity.EntityRef);
-        var goomba = f.Unsafe.GetPointer<Goomba>(entity.EntityRef);
-        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        var enemy = f.Unsafe.GetPointer<Enemy>(EntityRef);
+        var goomba = f.Unsafe.GetPointer<Goomba>(EntityRef);
+        var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
 
         sRenderer.enabled = enemy->IsActive;
         legacyAnimation.enabled = enemy->IsAlive && !freezable->IsFrozen(f);
@@ -60,7 +56,7 @@ public unsafe class GoombaAnimator : MonoBehaviour {
     }
 
     private void OnPlayComboSound(EventPlayComboSound e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 
@@ -68,7 +64,7 @@ public unsafe class GoombaAnimator : MonoBehaviour {
     }
 
     private void OnEnemyKilled(EventEnemyKilled e) {
-        if (e.Enemy != entity.EntityRef) {
+        if (e.Enemy != EntityRef) {
             return;
         }
 

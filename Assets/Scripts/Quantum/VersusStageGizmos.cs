@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class VersusStageGizmos : MonoBehaviour {
 
+#if UNITY_EDITOR
+
     private static readonly Vector3[] UnityVertexBuffer = new Vector3[128];
     private static readonly FPVector2[] VertexBuffer = new FPVector2[128];
     private static readonly int[] ShapeVertexCountBuffer = new int[16];
@@ -16,7 +18,6 @@ public class VersusStageGizmos : MonoBehaviour {
     public void OnValidate() {
         this.SetIfNull(ref mapData);
     }
-
 
     public unsafe void OnDrawGizmos() {
         if (!mapData || !mapData.Asset) {
@@ -98,4 +99,6 @@ public class VersusStageGizmos : MonoBehaviour {
             Gizmos.DrawIcon(starSpawn.transform.position, "star", true);
         }
     }
+
+#endif
 }

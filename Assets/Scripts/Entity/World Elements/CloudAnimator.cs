@@ -5,16 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public unsafe class CloudAnimator : MonoBehaviour {
+public unsafe class CloudAnimator : QuantumEntityViewComponent {
 
     //---Static Variables
     private static readonly int ParamDisplacementMap = Shader.PropertyToID("DisplacementMap");
     private static readonly int ParamPlatformWidth = Shader.PropertyToID("PlatformWidth");
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
-
     [SerializeField, Delayed] private int samplesPerTile = 8;
     [SerializeField] private float time = 0.25f;
 
@@ -25,18 +23,11 @@ public unsafe class CloudAnimator : MonoBehaviour {
     private Texture2D displacementMap;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer);
     }
 
-    public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
-    }
-
-    public void Initialize(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-
-        FP width = f.Unsafe.GetPointer<PhysicsCollider2D>(entity.EntityRef)->Shape.Edge.Extent * 2;
+    public override void OnActivate(Frame f) {
+        FP width = f.Unsafe.GetPointer<PhysicsCollider2D>(EntityRef)->Shape.Edge.Extent * 2;
         int samples = (int) (width * samplesPerTile);
 
         displacementMap = new(samples, 1) {
@@ -56,10 +47,9 @@ public unsafe class CloudAnimator : MonoBehaviour {
         sRenderer.SetPropertyBlock(mpb);
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        QuantumGame game = e.Game;
-        Frame f = game.Frames.Predicted;
-        Frame fp = game.Frames.PredictedPrevious;
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        Frame fp = PredictedPreviousFrame;
 
         var filter = f.Filter<PhysicsObject>();
         while (filter.Next(out EntityRef filteredEntity, out PhysicsObject physicsObject)) {
@@ -67,7 +57,7 @@ public unsafe class CloudAnimator : MonoBehaviour {
 
             if (!physicsObject.DisableCollision
                 && f.TryResolveList(physicsObject.Contacts, out var contacts)
-                && contacts.Any(c => c.Entity == entity.EntityRef)) {
+                && contacts.Any(c => c.Entity == EntityRef)) {
 
                 // Touching
                 if (cloudContact == null) {
@@ -109,7 +99,7 @@ public unsafe class CloudAnimator : MonoBehaviour {
             if (!contact.Exit) {
                 FPVector2 currentPosition = f.Unsafe.GetPointer<Transform2D>(contact.Entity)->Position;
                 FPVector2 previousPosition = fp.Unsafe.GetPointer<Transform2D>(contact.Entity)->Position;
-                lerpedPosition = QuantumUtils.WrappedLerp(f, previousPosition, currentPosition, FP.FromFloat_UNSAFE(game.InterpolationFactor));
+                lerpedPosition = QuantumUtils.WrappedLerp(f, previousPosition, currentPosition, FP.FromFloat_UNSAFE(Game.InterpolationFactor));
             }
 
             int point = contact.Point(lerpedPosition.ToUnityVector3(), this);

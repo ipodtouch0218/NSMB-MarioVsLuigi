@@ -194,7 +194,7 @@ namespace Quantum {
             holdable->IgnoreOwnerFrames = 15;
 
             if (!dropped) {
-                f.Events.MarioPlayerThrewObject(f, marioEntity, mario, entity);
+                f.Events.MarioPlayerThrewObject(f, marioEntity, entity);
             }
         }
 

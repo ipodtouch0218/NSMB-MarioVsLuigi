@@ -4,21 +4,19 @@ using Quantum;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public unsafe class BlockBumpAnimator : QuantumCallbacks {
+public unsafe class BlockBumpAnimator : QuantumEntityViewComponent {
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private AudioSource sfx;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer);
         this.SetIfNull(ref sfx);
     }
 
-    public void Initialize(QuantumGame game) {
-        var blockBump = game.Frames.Predicted.Unsafe.GetPointer<BlockBump>(entity.EntityRef);
+    public override void OnActivate(Frame f) {
+        var blockBump = f.Unsafe.GetPointer<BlockBump>(EntityRef);
 
         StageTile stageTile = QuantumUnityDB.GetGlobalAsset(blockBump->StartTile);
         TileBase tile = stageTile.Tile;
@@ -39,9 +37,9 @@ public unsafe class BlockBumpAnimator : QuantumCallbacks {
         }
     }
 
-    public override void OnUpdateView(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        if (!f.Unsafe.TryGetPointer(entity.EntityRef, out BlockBump* blockBump)) {
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        if (!f.Unsafe.TryGetPointer(EntityRef, out BlockBump* blockBump)) {
             return;
         }
     

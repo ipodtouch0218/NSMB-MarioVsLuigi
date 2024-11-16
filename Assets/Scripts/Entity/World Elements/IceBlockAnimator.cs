@@ -2,10 +2,9 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public unsafe class IceBlockAnimator : MonoBehaviour {
+public unsafe class IceBlockAnimator : QuantumEntityViewComponent {
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private GameObject breakPrefab;
@@ -13,19 +12,16 @@ public unsafe class IceBlockAnimator : MonoBehaviour {
     [SerializeField] private float shakeSpeed = 120, shakeAmount = 0.03f;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
     }
 
     public void Start() {
         QuantumEvent.Subscribe<EventIceBlockSinking>(this, OnIceBlockSinking);
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
-    public void Initialize(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        var cube = f.Unsafe.GetPointer<IceBlock>(entity.EntityRef);
+    public override void OnActivate(Frame f) {
+        var cube = f.Unsafe.GetPointer<IceBlock>(EntityRef);
 
         sfx.PlayOneShot(SoundEffect.Enemy_Generic_Freeze);
         sRenderer.size = cube->Size.ToUnityVector2() * 2;
@@ -35,19 +31,19 @@ public unsafe class IceBlockAnimator : MonoBehaviour {
         transform.position = position;
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        Frame f = e.Game.Frames.Predicted;
-        if (!f.Exists(entity.EntityRef)) {
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
-        var cube = f.Unsafe.GetPointer<IceBlock>(entity.EntityRef);
+        var cube = f.Unsafe.GetPointer<IceBlock>(EntityRef);
 
         if (cube->AutoBreakFrames > 0 && cube->AutoBreakFrames < 60
-            && cube->TimerEnabled(f, entity.EntityRef)) {
+            && cube->TimerEnabled(f, EntityRef)) {
 
             Vector3 position = transform.position;
-            float time = (cube->AutoBreakFrames - e.Game.InterpolationFactor) / 60f;
+            float time = (cube->AutoBreakFrames - Game.InterpolationFactor) / 60f;
             position.x += Mathf.Sin(time * shakeSpeed) * shakeAmount;
             transform.position = position;
         }
@@ -58,7 +54,7 @@ public unsafe class IceBlockAnimator : MonoBehaviour {
     }
 
     private void OnIceBlockSinking(EventIceBlockSinking e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 

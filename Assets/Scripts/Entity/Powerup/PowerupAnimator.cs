@@ -2,10 +2,9 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public unsafe class PowerupAnimator : QuantumCallbacks {
+public unsafe class PowerupAnimator : QuantumEntityViewComponent {
 
     //---Serialized
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private Animator childAnimator;
     [SerializeField] private Animation childAnimation;
@@ -18,7 +17,6 @@ public unsafe class PowerupAnimator : QuantumCallbacks {
     private MaterialPropertyBlock mpb;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref childAnimator, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref childAnimation, UnityExtensions.GetComponentType.Children);
@@ -29,10 +27,10 @@ public unsafe class PowerupAnimator : QuantumCallbacks {
         QuantumEvent.Subscribe<EventPowerupBecameActive>(this, OnPowerupBecameActive);
     }
 
-    public void Initialize(QuantumGame game) {
+    public override void OnActivate(Frame f) {
         originalSortingOrder = sRenderer.sortingOrder;
         sRenderer.GetPropertyBlock(mpb = new());
-        var powerup = game.Frames.Predicted.Unsafe.GetPointer<Powerup>(entity.EntityRef);
+        var powerup = f.Unsafe.GetPointer<Powerup>(EntityRef);
         var scriptable = QuantumUnityDB.GetGlobalAsset(powerup->Scriptable);
 
         if (powerup->ParentMarioPlayer.IsValid) {
@@ -69,14 +67,14 @@ public unsafe class PowerupAnimator : QuantumCallbacks {
         }
     }
 
-    public override void OnUpdateView(QuantumGame game) {
-        Frame f = game.Frames.Predicted;
-        if (!f.Exists(entity.EntityRef)) {
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
-        var powerup = f.Unsafe.GetPointer<Powerup>(entity.EntityRef);
-        var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity.EntityRef);
+        var powerup = f.Unsafe.GetPointer<Powerup>(EntityRef);
+        var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(EntityRef);
 
         if (childAnimator) {
             childAnimator.SetBool("onGround", physicsObject->IsTouchingGround);
@@ -114,7 +112,7 @@ public unsafe class PowerupAnimator : QuantumCallbacks {
     }
 
     private void OnPowerupBecameActive(EventPowerupBecameActive e) {
-        if (e.Entity != entity.EntityRef) {
+        if (e.Entity != EntityRef) {
             return;
         }
 

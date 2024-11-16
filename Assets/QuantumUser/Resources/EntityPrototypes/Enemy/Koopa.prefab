@@ -348,7 +348,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 205c3778517708b4da803049a01eb1ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 3939497445895134035}
   animator: {fileID: 3696720750550087088}
   sfx: {fileID: 3399800873378663516}
   sRenderer: {fileID: 8133877121043965814}

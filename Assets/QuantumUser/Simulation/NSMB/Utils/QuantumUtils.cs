@@ -504,7 +504,7 @@ public static unsafe class QuantumUtils {
         bool nonSpectator = false;
         for (int i = 0; i < playerDataCount; i++) {
             PlayerData* pd = allPlayerDatas[i];
-            if (!pd->IsSpectator) {
+            if (!pd->IsSpectator && !pd->ManualSpectator) {
                 nonSpectator = true;
                 break;
             }
@@ -518,7 +518,10 @@ public static unsafe class QuantumUtils {
             HashSet<int> teams = new();
             for (int i = 0; i < playerDataCount; i++) {
                 PlayerData* pd = allPlayerDatas[i];
-                teams.Add(pd->Team);
+
+                if (!pd->IsSpectator && !pd->ManualSpectator) {
+                    teams.Add(pd->Team);
+                }
             }
 
             if (teams.Count < 2) {

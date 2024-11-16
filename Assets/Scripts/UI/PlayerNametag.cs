@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class PlayerNametag : MonoBehaviour {
 
     //---Properties
-    public EntityRef Entity => parent.entity.EntityRef;
+    public EntityRef Entity => parent.EntityRef;
 
     //---Serailzied Variables
     [SerializeField] private GameObject nametag;
@@ -20,7 +20,7 @@ public class PlayerNametag : MonoBehaviour {
     [SerializeField] private Vector2 temp = Vector2.one;
 
     //---Private Variables
-    private MarioAnimator parent;
+    private MarioPlayerAnimator parent;
     private CharacterAsset character;
     private VersusStageData stage;
 
@@ -30,12 +30,12 @@ public class PlayerNametag : MonoBehaviour {
     private bool constantNicknameColor = true;
     private QuantumGame game;
 
-    public unsafe void Initialize(QuantumGame game, Frame f, PlayerElements elements, MarioAnimator parent) {
+    public unsafe void Initialize(QuantumGame game, Frame f, PlayerElements elements, MarioPlayerAnimator parent) {
         this.game = game;
         this.elements = elements;
         this.parent = parent;
 
-        var mario = f.Unsafe.GetPointer<MarioPlayer>(parent.entity.EntityRef);
+        var mario = f.Unsafe.GetPointer<MarioPlayer>(parent.EntityRef);
         this.character = f.FindAsset(mario->CharacterAsset);
         stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 

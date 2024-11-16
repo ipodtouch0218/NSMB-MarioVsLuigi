@@ -10,7 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public unsafe class UIUpdater : QuantumCallbacks {
+public unsafe class UIUpdater : MonoBehaviour {
 
     //---Static Variables
     private static readonly int ParamIn = Animator.StringToHash("in");
@@ -45,20 +45,18 @@ public unsafe class UIUpdater : QuantumCallbacks {
     private VersusStageData stage;
     private EntityRef previousTarget;
 
-    protected override void OnEnable() {
-        base.OnEnable();
-        MarioAnimator.MarioPlayerInitialized += OnMarioInitialized;
-        MarioAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
+    public void OnEnable() {
+        MarioPlayerAnimator.MarioPlayerInitialized += OnMarioInitialized;
+        MarioPlayerAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
         BigStarAnimator.BigStarInitialized += OnStarInitialized;
         BigStarAnimator.BigStarDestroyed += OnStarDestroyed;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
 
-    protected override void OnDisable() {
-        base.OnDisable();
-        MarioAnimator.MarioPlayerInitialized -= OnMarioInitialized;
-        MarioAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
+    public void OnDisable() {
+        MarioPlayerAnimator.MarioPlayerInitialized -= OnMarioInitialized;
+        MarioPlayerAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
         BigStarAnimator.BigStarInitialized -= OnStarInitialized;
         BigStarAnimator.BigStarDestroyed -= OnStarDestroyed;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
@@ -66,9 +64,9 @@ public unsafe class UIUpdater : QuantumCallbacks {
 
     public void Initialize(QuantumGame game, Frame f) {
         // Add existing MarioPlayer icons
-        MarioAnimator.AllMarioPlayers.RemoveWhere(ma => ma == null);
+        MarioPlayerAnimator.AllMarioPlayers.RemoveWhere(ma => ma == null);
 
-        foreach (MarioAnimator mario in MarioAnimator.AllMarioPlayers) {
+        foreach (MarioPlayerAnimator mario in MarioPlayerAnimator.AllMarioPlayers) {
             OnMarioInitialized(game, f, mario);
         }
     }
@@ -94,13 +92,15 @@ public unsafe class UIUpdater : QuantumCallbacks {
         boos.SetActive(stage.HidePlayersOnMinimap);
         StartCoroutine(UpdatePingTextCoroutine());
 
+        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
         QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    public override void OnUpdateView(QuantumGame game) {
+    public void OnUpdateView(CallbackUpdateView e) {
+        QuantumGame game = e.Game;
         Frame f = game.Frames.Predicted;
         //UpdateTrackIcons(f);
 
@@ -120,18 +120,18 @@ public unsafe class UIUpdater : QuantumCallbacks {
         previousTarget = Target;
     }
 
-    private void OnMarioInitialized(QuantumGame game, Frame f, MarioAnimator mario) {
-        entityTrackIcons[mario] = CreateTrackIcon(f, mario.entity.EntityRef, mario.transform);
+    private void OnMarioInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
+        entityTrackIcons[mario] = CreateTrackIcon(f, mario.EntityRef, mario.transform);
     }
 
-    private void OnMarioDestroyed(QuantumGame game, Frame f, MarioAnimator mario) {
+    private void OnMarioDestroyed(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
         if (entityTrackIcons.TryGetValue(mario, out TrackIcon icon)) {
             Destroy(icon.gameObject);
         }
     }
 
     private void OnStarInitialized(Frame f, BigStarAnimator star) {
-        entityTrackIcons[star] = CreateTrackIcon(f, star.entity.EntityRef, star.transform);
+        entityTrackIcons[star] = CreateTrackIcon(f, star.EntityRef, star.transform);
     }
 
     private void OnStarDestroyed(Frame f, BigStarAnimator star) {
@@ -317,8 +317,8 @@ public unsafe class UIUpdater : QuantumCallbacks {
     //---Callbacks
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Starting) {
-            foreach (var mario in FindObjectsOfType<MarioAnimator>()) {
-                entityTrackIcons[mario] = CreateTrackIcon(e.Frame, mario.entity.EntityRef, mario.transform);
+            foreach (var mario in FindObjectsOfType<MarioPlayerAnimator>()) {
+                entityTrackIcons[mario] = CreateTrackIcon(e.Frame, mario.EntityRef, mario.transform);
             }
         }
     }

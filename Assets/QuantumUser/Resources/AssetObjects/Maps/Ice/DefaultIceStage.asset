@@ -1376,6 +1376,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 4372145401587826698
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2383,6 +2385,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 8707424676512530442
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

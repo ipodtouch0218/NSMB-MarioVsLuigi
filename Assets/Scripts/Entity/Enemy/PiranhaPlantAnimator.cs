@@ -3,40 +3,45 @@ using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
 
-public unsafe class PiranhaPlantAnimator : MonoBehaviour {
+public unsafe class PiranhaPlantAnimator : QuantumEntityViewComponent {
+
+    //---Static Variables
+    private static readonly int ParamActive = Animator.StringToHash("active");
+    private static readonly int ParamChomping = Animator.StringToHash("chomping");
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private Animator animator;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
     }
 
     public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumEvent.Subscribe<EventEnemyKilled>(this, OnEnemyKilled, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        QuantumGame game = e.Game;
-        Frame f = game.Frames.Predicted;
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
 
-        if (!f.Exists(entity.EntityRef)) {
+        if (!f.Exists(EntityRef)) {
             return;
         }
 
-        var freezable = f.Unsafe.GetPointer<Freezable>(entity.EntityRef);
+        if (f.Global->GameState == GameState.Ended) {
+            animator.speed = 0;
+            return;
+        }
+
+        var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
         animator.speed = freezable->IsFrozen(f) ? 0 : 1;
 
-        var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(entity.EntityRef);
-        animator.SetBool("active", piranhaPlant->ChompFrames > 0);
-        animator.SetBool("chomping", piranhaPlant->PopupAnimationTime == 1);
+        var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(EntityRef);
+        animator.SetBool(ParamActive, piranhaPlant->ChompFrames > 0);
+        animator.SetBool(ParamChomping, piranhaPlant->PopupAnimationTime == 1);
         sRenderer.enabled = piranhaPlant->PopupAnimationTime != 0;
     }
 
@@ -45,7 +50,7 @@ public unsafe class PiranhaPlantAnimator : MonoBehaviour {
     }
 
     private void OnEnemyKilled(EventEnemyKilled e) {
-        if (e.Enemy != entity.EntityRef) {
+        if (e.Enemy != EntityRef) {
             return;
         }
 

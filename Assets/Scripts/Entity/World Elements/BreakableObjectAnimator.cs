@@ -2,39 +2,35 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public unsafe class BreakableObjectAnimator : MonoBehaviour {
+public unsafe class BreakableObjectAnimator : QuantumEntityViewComponent {
 
     //---Serialized Variables
-    [SerializeField] private QuantumEntityView entity;
-    [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] protected SpriteRenderer sRenderer;
     [SerializeField] private Sprite unbrokenSprite, brokenSprite;
     [SerializeField] private SimplePhysicsMover breakPrefab;
 
     public void OnValidate() {
-        this.SetIfNull(ref entity);
         this.SetIfNull(ref sRenderer);
     }
 
-    public void Start() {
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+    public virtual void Start() {
         QuantumEvent.Subscribe<EventBreakableObjectBroken>(this, OnBreakableObjectBroken, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    public unsafe void OnUpdateView(CallbackUpdateView e) {
-        QuantumGame game = e.Game;
-        Frame f = game.Frames.Verified;
-        if (!f.Exists(entity.EntityRef)
+    public override unsafe void OnUpdateView() {
+        Frame f = PredictedFrame;
+        if (!f.Exists(EntityRef)
             || f.Global->GameState < GameState.Playing) {
             return;
         }
 
-        var breakable = f.Unsafe.GetPointer<BreakableObject>(entity.EntityRef);
+        var breakable = f.Unsafe.GetPointer<BreakableObject>(EntityRef);
         sRenderer.size = new Vector2(sRenderer.size.x, breakable->CurrentHeight.AsFloat);
         sRenderer.sprite = breakable->IsBroken ? brokenSprite : unbrokenSprite;
     }
 
-    private void OnBreakableObjectBroken(EventBreakableObjectBroken e) {
-        if (e.Entity != entity.EntityRef) {
+    protected virtual void OnBreakableObjectBroken(EventBreakableObjectBroken e) {
+        if (e.Entity != EntityRef) {
             return;
         }
 

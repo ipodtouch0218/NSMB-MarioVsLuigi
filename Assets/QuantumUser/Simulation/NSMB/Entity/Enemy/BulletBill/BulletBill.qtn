@@ -18,3 +18,9 @@ event BulletBillHitByProjectile {
 	nothashed Frame Frame;
 	entity_ref Entity;
 }
+
+event BulletBillLauncherShoot {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	entity_ref NewBulletBill;
+}

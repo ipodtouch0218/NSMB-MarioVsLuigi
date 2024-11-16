@@ -17183,6 +17183,16 @@ PrefabInstance:
       propertyPath: initialShootTimer
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 7217384967070653821, guid: 48dd05d6e5db3a84e9abb9f5710a952f,
+        type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7781521729715181129, guid: 48dd05d6e5db3a84e9abb9f5710a952f,
+        type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7877647967856190049, guid: 48dd05d6e5db3a84e9abb9f5710a952f,
         type: 3}
       propertyPath: Flags
@@ -17248,6 +17258,11 @@ PrefabInstance:
     - target: {fileID: 8978542818860856465, guid: 48dd05d6e5db3a84e9abb9f5710a952f,
         type: 3}
       propertyPath: frame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9105883656725146616, guid: 48dd05d6e5db3a84e9abb9f5710a952f,
+        type: 3}
+      propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
