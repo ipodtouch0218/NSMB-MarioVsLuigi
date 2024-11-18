@@ -204,7 +204,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac4f2cfb76e05240a30775cb2032222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 6714667219562485223}
   sRenderer: {fileID: 5535595080187867665}
   unbrokenSprite: {fileID: -1195157291, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
   brokenSprite: {fileID: -1195157291, guid: 0496f6bcff5e6bc4fb118ff705cfef52, type: 3}
@@ -230,7 +229,7 @@ MonoBehaviour:
     BulletBillPrototype:
       Id:
         Value: 1440373003412769203
-    TimeToShoot: 300
+    TimeToShoot: 240
     MinimumShootRadius:
       RawValue: 26214
     MaximumShootRadius:

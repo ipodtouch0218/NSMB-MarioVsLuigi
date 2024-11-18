@@ -201,7 +201,7 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
-    IsTrigger: 1
+    IsTrigger: 0
     Material:
       Id:
         Value: 0
@@ -390,7 +390,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e40294c68e3fa947a5bb30addc2c56e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 6622605460125303163}
   defaultCoinAnimate: {fileID: 6153461050534851498}
   dottedCoinAnimate: {fileID: 1541163589079276198}
   sfx: {fileID: 6321124393289553252}

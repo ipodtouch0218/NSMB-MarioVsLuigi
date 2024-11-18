@@ -123,6 +123,16 @@ namespace NSMB.Extensions {
             }
         }
 
+        public static void SetIfNull<T>(this Component component, ref T[] var, GetComponentType children = GetComponentType.Self) where T : Component {
+            if (component && (var == null || var.Length <= 0)) {
+                var = children switch {
+                    GetComponentType.Children => component.GetComponentsInChildren<T>(),
+                    GetComponentType.Parent => component.GetComponentsInParent<T>(),
+                    _ => component.GetComponents<T>(),
+                };
+            }
+        }
+
         public enum GetComponentType {
             Self,
             Parent,

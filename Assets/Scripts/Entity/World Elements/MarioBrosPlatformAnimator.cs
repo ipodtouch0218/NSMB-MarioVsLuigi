@@ -4,7 +4,7 @@ using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 
-public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent {
+public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent<StageContext> {
 
     //---Static Variables
     private static readonly Color BlankColor = new(0, 0, 0, 255);
@@ -22,9 +22,7 @@ public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent {
     private Color32[] pixels;
     private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
-
     private readonly List<BumpInfo> bumps = new();
-    private VersusStageData stage;
 
     public void Start() {
         QuantumEvent.Subscribe<EventMarioBrosPlatformBumped>(this, OnMarioBrosPlatformBumped);
@@ -47,8 +45,6 @@ public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent {
         sRenderer.GetPropertyBlock(mpb = new());
         mpb.SetFloat(ParamPlatformWidth, platformWidth);
         mpb.SetFloat(ParamPointsPerTile, samplesPerTile);
-
-        stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
     }
 
     public override void OnUpdateView() {
@@ -96,7 +92,7 @@ public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent {
         var qCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(e.Entity);
 
         FPVector2 localPos = qTransform->InverseTransformPoint(e.Position);
-        localPos = QuantumUtils.WrapWorld(stage, localPos, out _);
+        localPos = QuantumUtils.WrapWorld(ViewContext.Stage, localPos, out _);
 
         float posX = localPos.X.AsFloat;
         float width = qCollider->Shape.Box.Extents.X.AsFloat * 2;

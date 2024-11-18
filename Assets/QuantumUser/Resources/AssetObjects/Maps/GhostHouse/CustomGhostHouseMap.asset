@@ -316,6 +316,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 2112854041804406794
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -933,6 +935,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
     - rid: 6128927690125737994
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1382,7 +1386,8 @@ MonoBehaviour:
     - rid: 7689850815606947843
       type: {class: BooPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        _empty_prototype_dummy_field_: 0
+        MaxRange:
+          RawValue: 0
     - rid: 7689850815606947844
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1426,6 +1431,8 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 1
+        SlowInLiquids:
+          Value: 0
     - rid: 7689850815606947848
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

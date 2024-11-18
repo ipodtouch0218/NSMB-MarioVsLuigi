@@ -105,7 +105,7 @@ public unsafe class UIUpdater : MonoBehaviour {
         //UpdateTrackIcons(f);
 
         if (!Target.IsValid
-            || !f.TryGet(Target, out MarioPlayer mario)) {
+            || !f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
             return;
         }
 
@@ -150,8 +150,8 @@ public unsafe class UIUpdater : MonoBehaviour {
         timerParent.SetActive(!hidden);
     }
 
-    private void UpdateStoredItemUI(MarioPlayer mario, bool playAnimation) {
-        PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario.ReserveItem);
+    private void UpdateStoredItemUI(MarioPlayer* mario, bool playAnimation) {
+        PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario->ReserveItem);
         reserveAnimator.SetBool(ParamHasItem, powerup && powerup.ReserveSprite);
 
         if (!powerup) {
@@ -208,7 +208,7 @@ public unsafe class UIUpdater : MonoBehaviour {
         timerMaterial.SetColor("_Color", Color.red);
     }
 
-    private unsafe void UpdateTextUI(Frame f, MarioPlayer mario) {
+    private unsafe void UpdateTextUI(Frame f, MarioPlayer* mario) {
 
         var rules = f.Global->Rules;
 
@@ -219,7 +219,7 @@ public unsafe class UIUpdater : MonoBehaviour {
         bool timerEnabled = rules.TimerSeconds > 0;
 
         if (rules.TeamsEnabled) {
-            int teamIndex = mario.Team;
+            int teamIndex = mario->Team;
             teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
             TeamAsset team = f.SimulationConfig.Teams[teamIndex];
 
@@ -228,8 +228,8 @@ public unsafe class UIUpdater : MonoBehaviour {
             teamsParent.SetActive(false);
         }
 
-        if (mario.Stars != cachedStars) {
-            cachedStars = mario.Stars;
+        if (mario->Stars != cachedStars) {
+            cachedStars = mario->Stars;
             string starString = "Sx" + cachedStars;
             if (!teamsEnabled) {
                 starString += "/" + starRequirement;
@@ -237,15 +237,15 @@ public unsafe class UIUpdater : MonoBehaviour {
 
             uiStars.text = Utils.GetSymbolString(starString);
         }
-        if (mario.Coins != cachedCoins) {
-            cachedCoins = mario.Coins;
+        if (mario->Coins != cachedCoins) {
+            cachedCoins = mario->Coins;
             uiCoins.text = Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
         }
 
         if (livesEnabled) {
-            if (mario.Lives != cachedLives) {
-                cachedLives = mario.Lives;
-                uiLives.text = QuantumUnityDB.GetGlobalAsset(mario.CharacterAsset).UiString + Utils.GetSymbolString("x" + cachedLives);
+            if (mario->Lives != cachedLives) {
+                cachedLives = mario->Lives;
+                uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.GetSymbolString("x" + cachedLives);
             }
         } else {
             livesParent.SetActive(false);
@@ -296,8 +296,8 @@ public unsafe class UIUpdater : MonoBehaviour {
         }
     }
 
-    private unsafe void ApplyUIColor(Frame f, MarioPlayer mario) {
-        Color color = f.Global->Rules.TeamsEnabled ? Utils.GetTeamColor(f, mario.Team, 0.8f, 1f) : stage.UIColor;
+    private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
+        Color color = f.Global->Rules.TeamsEnabled ? Utils.GetTeamColor(f, mario->Team, 0.8f, 1f) : stage.UIColor;
 
         foreach (Image bg in backgrounds) {
             bg.color = color;
@@ -317,7 +317,7 @@ public unsafe class UIUpdater : MonoBehaviour {
     //---Callbacks
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Starting) {
-            foreach (var mario in FindObjectsOfType<MarioPlayerAnimator>()) {
+            foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
                 entityTrackIcons[mario] = CreateTrackIcon(e.Frame, mario.EntityRef, mario.transform);
             }
         }

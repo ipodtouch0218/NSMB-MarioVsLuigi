@@ -1,9 +1,8 @@
-using UnityEngine;
-
+using NSMB.Extensions; 
 using NSMB.Utils;
 using Photon.Deterministic;
 using Quantum;
-using NSMB.Extensions; 
+using UnityEngine;
 
 public class VolumeWithDistance : MonoBehaviour {
 
@@ -20,10 +19,7 @@ public class VolumeWithDistance : MonoBehaviour {
     private VersusStageData stage;
 
     public void OnValidate() {
-        if (audioSources?.Length <= 0) {
-            audioSources = GetComponentsInChildren<AudioSource>();
-        }
-
+        this.SetIfNull(ref audioSources);
         this.SetIfNull(ref soundOrigin);
     }
 

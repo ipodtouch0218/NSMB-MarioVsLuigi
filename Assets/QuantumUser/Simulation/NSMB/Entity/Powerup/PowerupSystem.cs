@@ -73,11 +73,11 @@ namespace Quantum {
             if (asset.AvoidPlayers && physicsObject->IsTouchingGround) {
                 FPVector2? closestMarioPosition = null;
                 FP? closestDistance = null;
-                var allPlayers = f.Filter<Transform2D, MarioPlayer>();
-                while (allPlayers.Next(out _, out Transform2D marioTransform, out _)) {
-                    FP distance = QuantumUtils.WrappedDistance(stage, marioTransform.Position, transform->Position);
+                var allPlayers = f.Filter<MarioPlayer, Transform2D>();
+                while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
+                    FP distance = QuantumUtils.WrappedDistance(stage, marioTransform->Position, transform->Position);
                     if (closestDistance == null || distance < closestDistance) {
-                        closestMarioPosition = marioTransform.Position;
+                        closestMarioPosition = marioTransform->Position;
                         closestDistance = distance;
                     }
                 }

@@ -147,8 +147,8 @@ public unsafe class CloudAnimator : QuantumEntityViewComponent {
         }
 
         public int Width(Frame f, CloudAnimator cloud) {
-            if (f.TryGet(Entity, out PhysicsCollider2D collider)) {
-                return LastWidth = (int) (collider.Shape.Box.Extents.X.AsFloat * cloud.transform.lossyScale.x * 8f * cloud.samplesPerTile);
+            if (f.Unsafe.TryGetPointer(Entity, out PhysicsCollider2D* collider)) {
+                return LastWidth = (int) (collider->Shape.Box.Extents.X.AsFloat * cloud.transform.lossyScale.x * 8f * cloud.samplesPerTile);
             }
 
             return LastWidth;

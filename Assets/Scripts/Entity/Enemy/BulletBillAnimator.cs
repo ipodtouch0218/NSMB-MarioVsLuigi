@@ -35,6 +35,7 @@ public unsafe class BulletBillAnimator : QuantumEntityViewComponent {
         }
         legacyAnimation.enabled = true;
         StartCoroutine(ChangeSpriteSortingOrder());
+        trailParticles.Play();
     }
 
     public override void OnUpdateView() {
@@ -68,7 +69,6 @@ public unsafe class BulletBillAnimator : QuantumEntityViewComponent {
         Vector2 pos = trailParticles.transform.localPosition;
         pos.x = Mathf.Abs(pos.x) * (enemy->FacingRight ? -1 : 1);
         trailParticles.transform.localPosition = pos;
-        trailParticles.Play();
     }
 
     private static WaitForSeconds wait = new(0.33f);

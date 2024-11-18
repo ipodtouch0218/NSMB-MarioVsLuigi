@@ -95,19 +95,21 @@ namespace Quantum {
         }
 
         public EntityRef FindClosestPlayer(Frame f, ref Filter filter, VersusStageData stage) {
-            var allPlayers = f.Filter<Transform2D, MarioPlayer>();
+            var allPlayers = f.Filter<MarioPlayer, Transform2D>();
+            allPlayers.UseCulling = false;
+            var boo = filter.Boo;
             var booPosition = filter.Transform->Position;
 
-            FP closestDistance = FP.MaxValue;
-            EntityRef closestPlayer = default;
-            while (allPlayers.Next(out EntityRef marioEntity, out Transform2D marioTransform, out MarioPlayer mario)) {
-                if (mario.IsDead) {
+            FP closestDistance = boo->MaxRange;
+            EntityRef closestPlayer = EntityRef.None;
+            while (allPlayers.NextUnsafe(out EntityRef marioEntity, out MarioPlayer* mario, out Transform2D* marioTransform)) {
+                if (mario->IsDead) {
                     continue;
                 }
 
-                FP newDistance = QuantumUtils.WrappedDistance(stage, booPosition, marioTransform.Position);
+                FP newDistance = QuantumUtils.WrappedDistance(stage, booPosition, marioTransform->Position);
 
-                if (newDistance < closestDistance) {
+                if (newDistance <= closestDistance) {
                     closestPlayer = marioEntity;
                     closestDistance = newDistance;
                 }

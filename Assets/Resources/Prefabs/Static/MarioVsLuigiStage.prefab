@@ -586,6 +586,8 @@ GameObject:
   m_Component:
   - component: {fileID: 624931703209353252}
   - component: {fileID: 2550855901662361809}
+  - component: {fileID: 1990024770662139057}
+  - component: {fileID: 599652891852148525}
   m_Layer: 0
   m_Name: QuantumEntityViewUpdater
   m_TagString: Untagged
@@ -628,6 +630,39 @@ MonoBehaviour:
     ElasticWindowTicks: 0.5
     CurrentFrom: 0
     Alpha: 0
+--- !u!114 &1990024770662139057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8835350829400233188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3a8e2ca97a02d24789a50227980b9d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _hidePooledObjectsInHierarchy: 1
+  _resetGameObjectScale: 0
+  _precacheObjects: []
+  PoolablePrefabs:
+  - {fileID: 6307920351473437675, guid: 00a2ef66a322a694c837b29404f2af49, type: 3}
+  - {fileID: 6307920351473437675, guid: 8d3d3c8acd39a594c9077e49f837ec4a, type: 3}
+  - {fileID: 1973747262660636106, guid: d6c38f51091fae64fa27d92f9415b3ab, type: 3}
+--- !u!114 &599652891852148525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8835350829400233188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2be42ddbc3897246be488598b88a5d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MapData: {fileID: 7682502346014357760}
+  Stage: {fileID: 0}
 --- !u!1 &9097954689152686375
 GameObject:
   m_ObjectHideFlags: 0

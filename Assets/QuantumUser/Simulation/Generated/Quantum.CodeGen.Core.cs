@@ -960,8 +960,10 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Boo : Quantum.IComponent {
-    public const Int32 SIZE = 16;
+    public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(16)]
+    public FP MaxRange;
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentTarget;
@@ -971,6 +973,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 383;
+        hash = hash * 31 + MaxRange.GetHashCode();
         hash = hash * 31 + CurrentTarget.GetHashCode();
         hash = hash * 31 + UnscaredFrames.GetHashCode();
         return hash;
@@ -980,6 +983,7 @@ namespace Quantum {
         var p = (Boo*)ptr;
         serializer.Stream.Serialize(&p->UnscaredFrames);
         EntityRef.Serialize(&p->CurrentTarget, serializer);
+        FP.Serialize(&p->MaxRange, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -2594,6 +2598,14 @@ namespace Quantum {
     void OnTileChanged(Frame f, Int32 tileX, Int32 tileY, StageTileInstance newTile);
   }
   public static unsafe partial class Constants {
+    /// <summary>8.5</summary>
+    public static FP _8_50 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 557056;
+        return result;
+      }
+    }
     /// <summary>0.95</summary>
     public static FP _0_95 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -2647,6 +2659,14 @@ namespace Quantum {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
         FP result;
         result.RawValue = 163840;
+        return result;
+      }
+    }
+    /// <summary>1.18</summary>
+    public static FP _1_18 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 77332;
         return result;
       }
     }
@@ -2756,6 +2776,8 @@ namespace Quantum {
     }
 
     public static unsafe partial class Raw {
+      /// <summary>8.5</summary>
+      public const Int64 _8_50 = 557056;
       /// <summary>0.95</summary>
       public const Int64 _0_95 = 62259;
       /// <summary>4.5</summary>
@@ -2770,6 +2792,8 @@ namespace Quantum {
       public const Int64 SixteenOverNine = 116508;
       /// <summary>2.5</summary>
       public const Int64 _2_50 = 163840;
+      /// <summary>1.18</summary>
+      public const Int64 _1_18 = 77332;
       /// <summary>0.85</summary>
       public const Int64 _0_85 = 55706;
       /// <summary>-0.03047</summary>

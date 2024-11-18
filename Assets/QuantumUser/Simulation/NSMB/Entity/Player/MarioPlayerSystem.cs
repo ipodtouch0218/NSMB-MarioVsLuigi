@@ -331,7 +331,9 @@ namespace Quantum {
                 mario->PreviousJumpState = mario->JumpState;
             }
 
-            bool doJump = (mario->JumpBufferFrames > 0 && (physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0)) || (!physicsObject->IsUnderwater && mario->SwimForceJumpTimer == 10);
+            bool doJump =
+                (mario->JumpBufferFrames > 0 && (physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0)) 
+                || (!physicsObject->IsUnderwater && mario->SwimForceJumpTimer == 10);
 
             QuantumUtils.Decrement(ref mario->SwimForceJumpTimer);
             QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
@@ -341,7 +343,8 @@ namespace Quantum {
                 return;
             }
 
-            if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
+            if (!mario->DoEntityBounce
+                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
                 && !f.Exists(mario->HeldEntity) && !mario->IsInShell) {
                 // Jump of spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
@@ -487,9 +490,9 @@ namespace Quantum {
                     terminalVelocity = physics.TerminalVelocityDrilling;
                     physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -maxWalkSpeed * FP._0_25, maxWalkSpeed * FP._0_25);
                 } else {
-                    FP remainingTime = mario->PropellerLaunchFrames / 60;
+                    FP remainingTime = mario->PropellerLaunchFrames * f.DeltaTime;
                     // TODO remove magic number
-                    FP htv = maxWalkSpeed + (FP.FromString("1.18") * (remainingTime * 2));
+                    FP htv = maxWalkSpeed + (Constants._1_18 * (remainingTime * 2));
                     terminalVelocity = mario->PropellerSpinFrames > 0 ? physics.TerminalVelocityPropellerSpin : physics.TerminalVelocityPropeller;
                     physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -htv, htv);
                 }

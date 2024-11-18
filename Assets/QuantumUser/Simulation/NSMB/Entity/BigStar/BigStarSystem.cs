@@ -1,5 +1,8 @@
 using Photon.Deterministic;
 using Quantum.Physics2D;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class BigStarSystem : SystemMainThread, ISignalOnReturnToRoom {
@@ -25,6 +28,7 @@ namespace Quantum {
             int spawnpoints = stage.BigStarSpawnpoints.Length;
             ref BitSet64 usedSpawnpoints = ref f.Global->UsedStarSpawns;
 
+            bool spawnedStar = false;
             for (int i = 0; i < spawnpoints; i++) {
                 // Find a spot...
                 if (f.Global->UsedStarSpawnCount == spawnpoints) {
@@ -35,10 +39,12 @@ namespace Quantum {
                 int count = f.RNG->Next(0, spawnpoints - f.Global->UsedStarSpawnCount);
                 int index = 0;
                 for (int j = 0; j < spawnpoints; j++) {
-                    if (!usedSpawnpoints.IsSet(j) && --count == 0) {
-                        // This is the index to use
-                        index = j;
-                        break;
+                    if (!usedSpawnpoints.IsSet(j)) {
+                        if (count-- == 0) {
+                            // This is the index to use
+                            index = j;
+                            break;
+                        }
                     }
                 }
                 usedSpawnpoints.Set(index);
@@ -50,6 +56,7 @@ namespace Quantum {
 
                 if (hits.Count == 0) {
                     // Hit no players
+                    Debug.Log("spawned!");
                     EntityRef newEntity = f.Create(f.SimulationConfig.BigStarPrototype);
                     f.Global->MainBigStar = newEntity;
                     var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
@@ -59,11 +66,12 @@ namespace Quantum {
                     newStarTransform->Position = position;
                     newStar->IsStationary = true;
                     newStarPhysicsObject->DisableCollision = true;
+                    spawnedStar = true;
                     break;
                 }
             }
 
-            if (!f.Exists(f.Global->MainBigStar)) {
+            if (!spawnedStar) {
                 f.Global->BigStarSpawnTimer = 30;
             }
         }

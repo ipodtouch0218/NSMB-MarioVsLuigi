@@ -763,10 +763,11 @@ namespace Quantum {
                 var hit = hits.HitsBuffer[i];
                 Shape2D* hitShape = hit.GetShape(f);
 
-                if (!(hit.Entity == entity
-                    || (mario != null && hit.Entity == mario->HeldEntity)
-                    || (includeMegaBreakable && f.Has<IceBlock>(hit.Entity))
-                    || hitShape->Type == Shape2DType.Edge)) {
+                if (hit.Entity != entity
+                    && (mario == null || hit.Entity != mario->HeldEntity)
+                    && (!includeMegaBreakable || !f.Has<IceBlock>(hit.Entity))
+                    && (hitShape->Type != Shape2DType.Edge)) {
+
                     return true;
                 }
             }
@@ -787,10 +788,7 @@ namespace Quantum {
                 boxMin,
             };
 
-            Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents);
-            Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents);
-
-            foreach (var tileTuple in GetTilesOverlappingHitbox(f, origin, shape, stage)) {
+            foreach (var tileTuple in GetTilesOverlappingHitbox(f, position, shape, stage)) {
                 StageTileInstance tile = tileTuple.Item2;
                 StageTile stageTile = f.FindAsset(tile.Tile);
                 if (!stageTile
@@ -835,21 +833,12 @@ namespace Quantum {
             var extents = shape.Box.Extents;
 
             FPVector2 origin = position + shape.Centroid;
-            FPVector2 boxMin = origin - extents;
-            FPVector2 boxMax = origin + extents;
-
-            FPVector2[] boxCorners = {
-                new(origin.X - extents.X, origin.Y + extents.Y),
-                boxMax,
-                new(origin.X + extents.X, origin.Y - extents.Y),
-                boxMin,
-            };
-
             Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents);
             Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents);
 
             for (int x = min.x; x <= max.x; x++) {
                 for (int y = min.y; y <= max.y; y++) {
+                    // Draw.Rectangle(QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y)), new FPVector2(FP._0_50, FP._0_50), 0, new ColorRGBA(255, 0, 0, 128));
                     yield return (new Vector2Int(x, y), stage.GetTileRelative(f, x, y));
                 }
             }
@@ -864,7 +853,7 @@ namespace Quantum {
             }
 
             if (!BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
-                return false;
+                return true;
             }
 
             int angle = 45;

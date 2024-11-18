@@ -1,4 +1,5 @@
 #pragma maxplayers 10
+#define _1_18 1.18
 #define _0_85 0.85
 #define WeirdSlopeConstant -0.0304687 
 #define _0_90 0.9

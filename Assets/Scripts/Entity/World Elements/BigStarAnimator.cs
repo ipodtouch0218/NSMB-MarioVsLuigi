@@ -37,6 +37,8 @@ public class BigStarAnimator : QuantumEntityViewComponent {
     public override unsafe void OnActivate(Frame f) {
         var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
 
+        graphicTransform.rotation = Quaternion.identity;
+        sRenderer.enabled = true;
         stationary = star->IsStationary;
         if (f.Global->GameState == GameState.Playing && !NetworkHandler.IsReplayFastForwarding) {
             sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
@@ -52,14 +54,6 @@ public class BigStarAnimator : QuantumEntityViewComponent {
         BigStarDestroyed?.Invoke(VerifiedFrame, this);
     }
 
-    public void Update() {
-        if (stationary) {
-            pulseEffectCounter += Time.deltaTime;
-            float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
-            graphicTransform.localScale = Vector3.one * 3f + new Vector3(sin, sin, 0);
-        }
-    }
-
     public unsafe override void OnUpdateView() {
         Frame f = PredictedFrame;
         if (!f.Exists(EntityRef)
@@ -69,7 +63,11 @@ public class BigStarAnimator : QuantumEntityViewComponent {
 
         var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
 
-        if (!stationary) {
+        if (stationary) {
+            pulseEffectCounter += Time.deltaTime;
+            float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
+            graphicTransform.localScale = Vector3.one * 3f + new Vector3(sin, sin, 0);
+        } else if (!stationary) {
             graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
             float timeRemaining = star->Lifetime / 60f;
             sRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);

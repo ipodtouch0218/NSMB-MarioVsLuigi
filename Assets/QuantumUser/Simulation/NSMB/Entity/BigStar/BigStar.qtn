@@ -1,3 +1,5 @@
+#define _8_50 8.5
+
 global {
 	ushort BigStarSpawnTimer;
 	entity_ref MainBigStar;

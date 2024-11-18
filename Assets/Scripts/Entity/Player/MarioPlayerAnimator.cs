@@ -4,14 +4,13 @@ using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
 
-    public unsafe class MarioPlayerAnimator : QuantumEntityViewComponent {
+    public unsafe class MarioPlayerAnimator : QuantumEntityViewComponent<StageContext> {
 
         //---Static
         public static readonly HashSet<MarioPlayerAnimator> AllMarioPlayers = new();
@@ -107,7 +106,6 @@ namespace NSMB.Entities.Player {
         private float teammateStompTimer;
         private float lastStompSoundTime = -1;
         private float waterSurfaceMovementDistance;
-        private VersusStageData stage;
         private Vector3 previousPosition;
 
         public void OnValidate() {
@@ -165,7 +163,6 @@ namespace NSMB.Entities.Player {
             }
 
             GlowColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
-            stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
             if (Game.PlayerIsLocal(mario->PlayerRef)) {
                 PlayerElements elements = Instantiate(playerElementsPrefab, GameObject.FindGameObjectWithTag("MasterCanvas").transform);
@@ -212,11 +209,8 @@ namespace NSMB.Entities.Player {
             var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(EntityRef);
 
-            ProfilerMarker x = new("MarioAnimator.OnUpdateView.HandleMiscStates");
-            x.Begin();
             HandleMiscStates(f, mario, physicsObject, freezable);
-            x.End();
-
+            
             if (freezable->IsFrozen(f)) {
                 animator.speed = 0;
                 animator.Play("idle", 1, 0);
@@ -231,22 +225,10 @@ namespace NSMB.Entities.Player {
                 inputs = *f.GetPlayerInput(mario->PlayerRef);
             }
 
-            x = new("MarioAnimator.OnUpdateView.HandleAnimations");
-            x.Begin();
             HandleAnimations(f, mario, physicsObject);
-            x.End();
-            x = new("MarioAnimator.OnUpdateView.SetFacingDirection");
-            x.Begin();
             SetFacingDirection(f, mario, physicsObject);
-            x.End();
-            x = new("MarioAnimator.OnUpdateView.InterpolateFacingDirection");
-            x.Begin();
             InterpolateFacingDirection(mario);
-            x.End();
-            x = new("MarioAnimator.OnUpdateView.UpdateAnimatorVariables");
-            x.Begin();
             UpdateAnimatorVariables(f, mario, physicsObject, ref inputs);
-            x.End();
 
             previousPosition = transform.position;
         }
@@ -609,7 +591,9 @@ namespace NSMB.Entities.Player {
         }
 
         public void PlaySound(SoundEffect soundEffect, CharacterAsset characterData = null, byte variant = 0, float volume = 1) {
-            characterData ??= character;
+            if (!characterData) {
+                characterData = character;
+            }
             sfx.PlayOneShot(soundEffect, characterData, variant, volume);
         }
 
@@ -664,7 +648,7 @@ namespace NSMB.Entities.Player {
 
             foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
                 if (FPVector2.Dot(contact.Normal, FPVector2.Up) > FP._0_33) {
-                    StageTileInstance tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, contact.TileX, contact.TileY);
                     if (QuantumUnityDB.TryGetGlobalAsset(tileInstance.Tile, out StageTile tile)) {
                         if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
                             footstepSoundEffect = tile.FootstepSound;

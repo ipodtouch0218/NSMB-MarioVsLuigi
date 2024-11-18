@@ -162,7 +162,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         for (int i = 1; i < RoomIdLength; i++) {
             idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
         }
-
+        
         args.RoomName = idBuilder.ToString();
         args.Lobby = TypedLobby.Default;
         args.RoomOptions.PublishUserId = true;

@@ -22,17 +22,13 @@ namespace Quantum {
                 if (launcher->BulletBillCount >= 3) {
                     continue;
                 }
-                if (!QuantumUtils.Decrement(ref launcher->TimeToShootFrames)) {
-                    continue;
-                }
-                launcher->TimeToShootFrames = launcher->TimeToShoot;
 
                 FPVector2 spawnpoint = transform->Position + FPVector2.Up * (collider->Shape.Box.Extents.Y * 2) + SpawnOffset;
                 var allPlayers = f.Filter<MarioPlayer, Transform2D>();
                 FP absDistance = 0;
                 FP minDistance = FP.MaxValue;
-                while (allPlayers.Next(out _, out _, out Transform2D marioTransform)) {
-                    QuantumUtils.WrappedDistance(stage, spawnpoint, marioTransform.Position, out FP distance);
+                while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
+                    QuantumUtils.WrappedDistance(stage, spawnpoint, marioTransform->Position, out FP distance);
                     FP abs = FPMath.Abs(distance);
                     if (abs >= launcher->MinimumShootRadius && abs < minDistance) {
                         absDistance = abs;
@@ -41,20 +37,25 @@ namespace Quantum {
                 }
 
                 if (FPMath.Abs(minDistance) > launcher->MaximumShootRadius) {
+                    launcher->TimeToShootFrames = launcher->TimeToShoot;
                     continue;
                 }
 
-                // Attempt a shot
-                bool right = minDistance < 0;
+                if (QuantumUtils.Decrement(ref launcher->TimeToShootFrames)) {
+                    // Attempt a shot
+                    bool right = minDistance < 0;
 
-                EntityRef newBillEntity = f.Create(launcher->BulletBillPrototype);
-                var newBill = f.Unsafe.GetPointer<BulletBill>(newBillEntity);
-                var newBillTransform = f.Unsafe.GetPointer<Transform2D>(newBillEntity);
-                newBill->Initialize(f, newBillEntity, entity, right);
-                newBillTransform->Position = spawnpoint;
+                    EntityRef newBillEntity = f.Create(launcher->BulletBillPrototype);
+                    var newBill = f.Unsafe.GetPointer<BulletBill>(newBillEntity);
+                    var newBillTransform = f.Unsafe.GetPointer<Transform2D>(newBillEntity);
+                    newBill->Initialize(f, newBillEntity, entity, right);
+                    newBillTransform->Position = spawnpoint;
 
-                launcher->BulletBillCount++;
-                f.Events.BulletBillLauncherShoot(f, entity, newBillEntity);
+                    launcher->BulletBillCount++;
+                    launcher->TimeToShootFrames = launcher->TimeToShoot;
+
+                    f.Events.BulletBillLauncherShoot(f, entity, newBillEntity);
+                }
             }
 
             var bulletBills = f.Filter<BulletBill, Transform2D, Enemy, PhysicsObject, Freezable>();
@@ -85,8 +86,8 @@ namespace Quantum {
 
         public void DespawnCheck(Frame f, EntityRef entity, Transform2D* transform, BulletBill* bulletBill, VersusStageData stage) {
             var allPlayers = f.Filter<MarioPlayer, Transform2D>();
-            while (allPlayers.Next(out _, out _, out Transform2D marioTransform)) {
-                QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform.Position, out FP distance);
+            while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
+                QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform->Position, out FP distance);
                 if (FPMath.Abs(distance) < bulletBill->DespawnRadius) {
                     return;
                 }

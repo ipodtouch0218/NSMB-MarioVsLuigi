@@ -17,7 +17,7 @@ public unsafe class IceBlockAnimator : QuantumEntityViewComponent {
     }
 
     public void Start() {
-        QuantumEvent.Subscribe<EventIceBlockSinking>(this, OnIceBlockSinking);
+        QuantumEvent.Subscribe<EventIceBlockSinking>(this, OnIceBlockSinking, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public override void OnActivate(Frame f) {

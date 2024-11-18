@@ -116,7 +116,7 @@ public class TilemapAnimator : MonoBehaviour {
         tilemap.RefreshTile(coords);
     }
 
-    private void OnTileBroken(EventTileBroken e) {
+    private unsafe void OnTileBroken(EventTileBroken e) {
         ParticleSystem particle = Instantiate(tileBreakParticleSystem,
             QuantumUtils.RelativeTileToWorld(stage, new Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
 
@@ -131,7 +131,7 @@ public class TilemapAnimator : MonoBehaviour {
             }
 
             sfx.PlayOneShot(
-                e.Frame.TryGet(e.Entity, out MarioPlayer mario) && mario.CurrentPowerupState == PowerupState.MegaMushroom
+                e.Frame.Unsafe.TryGetPointer(e.Entity, out MarioPlayer* mario) && mario->CurrentPowerupState == PowerupState.MegaMushroom
                     ? SoundEffect.Powerup_MegaMushroom_Break_Block
                     : SoundEffect.World_Block_Break);
 
