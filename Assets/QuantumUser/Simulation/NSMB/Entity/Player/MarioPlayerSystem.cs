@@ -190,9 +190,11 @@ namespace Quantum {
                 FP maxAcceleration = FPMath.Abs(max - xVelAbs) * f.UpdateRate;
                 acc = FPMath.Clamp(acc, -maxAcceleration, maxAcceleration);
                 if (xVelAbs > max) {
+                    /*
                     if (swimming) {
                         acc = physics.WalkAcceleration[^1];
                     }
+                    */
                     acc = -acc;
                 }
 

@@ -10,26 +10,34 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
-  m_Name: BeachPlatformsStageTile
+  m_Name: BeachBlueGroundStageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/BeachYellow/BeachPlatformsStageTile
+    Path: Resources/Tilemaps/Tiles/BeachBlue/BeachBlueGroundStageTile
     Guid:
-      Value: 489492624515062745
-  Tile: {fileID: 11400000, guid: 35ed6fa382393104eb50ec5e97294323, type: 2}
+      Value: 489694104483446069
+  Tile: {fileID: 11400000, guid: 1e5c5e2f4f737204cba5abe97733c0d3, type: 2}
   CollisionData:
     Shapes:
     - Vertices:
       - X:
-          RawValue: -32768
+          RawValue: 32768
         Y:
           RawValue: 32768
       - X:
           RawValue: 32768
         Y:
+          RawValue: -32768
+      - X:
+          RawValue: -32768
+        Y:
+          RawValue: -32768
+      - X:
+          RawValue: -32768
+        Y:
           RawValue: 32768
   IsSlipperyGround: 0
   IsSlideableGround: 0
-  IsPolygon: 0
+  IsPolygon: 1
   FootstepSound: 31
   FootstepParticle: 0

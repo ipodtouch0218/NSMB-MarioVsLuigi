@@ -75,7 +75,7 @@ public class ScoreboardEntry : MonoBehaviour {
         updater.RequestSorting = true;
 
         Color backgroundColor = Utils.GetPlayerColor(f, mario->PlayerRef);
-        backgroundColor.a = 0.2f;
+        backgroundColor.a = 0.5f;
         background.color = backgroundColor;
     }
 

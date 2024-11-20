@@ -56,7 +56,6 @@ namespace Quantum {
 
                 if (hits.Count == 0) {
                     // Hit no players
-                    Debug.Log("spawned!");
                     EntityRef newEntity = f.Create(f.SimulationConfig.BigStarPrototype);
                     f.Global->MainBigStar = newEntity;
                     var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);

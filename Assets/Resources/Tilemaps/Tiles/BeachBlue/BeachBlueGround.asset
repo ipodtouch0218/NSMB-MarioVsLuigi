@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46e46a8425517b044a7157fe94384767, type: 3}
-  m_Name: BeachYellowGround
+  m_Name: BeachBlueGround
   m_EditorClassIdentifier: 
   m_DefaultSprite: {fileID: -877693491, guid: c5ce3e8a49a12a6448d6ab34f634e29c, type: 3}
   m_DefaultGameObject: {fileID: 0}
