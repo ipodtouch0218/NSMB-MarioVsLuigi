@@ -9,7 +9,7 @@ namespace NSMB.Entities.World {
         [SerializeField] private GameObject splashPrefab, splashExitPrefab;
         [SerializeField] private SpriteMask mask;
         [SerializeField] private int pointsPerTile = 8, splashWidth = 2;
-        [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, animationSpeed = 1f;
+        [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, animationSpeed = 1f, minimumSplashStrength = 2f;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private QuantumEntityView entity;
 
@@ -137,7 +137,7 @@ namespace NSMB.Entities.World {
                 int pointsX = px + i;
                 pointsX = (int) Mathf.Repeat(pointsX, totalPoints);
 
-                pointVelocities[pointsX] = -splashVelocity * e.Force.AsFloat;
+                pointVelocities[pointsX] = -splashVelocity * Mathf.Max(minimumSplashStrength, e.Force.AsFloat);
             }
         }
     }

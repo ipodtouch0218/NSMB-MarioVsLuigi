@@ -430,6 +430,7 @@ namespace Quantum {
             f.Events.MarioPlayerJumped(f, filter.Entity, mario->JumpState, mario->DoEntityBounce);
             if (mario->DoEntityBounce) {
                 mario->IsCrouching = false;
+                mario->PropellerDrillCooldown = 30;
             }
             mario->DoEntityBounce = false;
         }
@@ -711,6 +712,15 @@ namespace Quantum {
                 TryStartGroundpound(f, ref filter, physics, ref inputs, stage);
             }
 
+            if (mario->IsDrilling && mario->IsPropellerFlying && inputs.Down.IsDown) {
+                mario->PropellerDrillHoldFrames = 15;
+            }
+
+            if (QuantumUtils.Decrement(ref mario->PropellerDrillHoldFrames) && mario->IsPropellerFlying && mario->IsDrilling) {
+                mario->IsDrilling = false;
+                mario->PropellerDrillCooldown = 20;
+            }
+
             HandleGroundpoundStartAnimation(ref filter, physics);
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage);
 
@@ -765,7 +775,7 @@ namespace Quantum {
                 }
             } else if (mario->IsPropellerFlying) {
                 // Start propeller drill
-                if (mario->PropellerLaunchFrames < 12 && physicsObject->Velocity.Y < 0) {
+                if (mario->PropellerDrillCooldown == 0) {
                     mario->IsDrilling = true;
                     mario->PropellerLaunchFrames = 0;
                     mario->IsGroundpoundActive = true;
@@ -1141,6 +1151,7 @@ namespace Quantum {
 
                 mario->PropellerLaunchFrames = physics.PropellerLaunchFrames;
                 mario->UsedPropellerThisJump = true;
+                mario->PropellerDrillCooldown = 30;
 
                 mario->IsPropellerFlying = true;
                 mario->IsSpinnerFlying = false;
@@ -1182,10 +1193,6 @@ namespace Quantum {
             mario->IsInShell = false;
             mario->JumpState = JumpState.None;
 
-            if (physicsObject->IsTouchingGround) {
-                physicsObject->Velocity.Y = 0;
-            }
-
             if (!mario->IsInKnockback && mario->JumpBufferFrames > 0) {
                 physicsObject->Velocity.Y += physics.SwimJumpVelocity;
                 physicsObject->IsTouchingGround = false;
@@ -1199,7 +1206,6 @@ namespace Quantum {
         private void HandleSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
-
             bool validFloorAngle = FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle;
 
             mario->IsCrouching &= !mario->IsSliding;
@@ -1209,13 +1215,19 @@ namespace Quantum {
                 && !f.Exists(mario->HeldEntity)
                 && !((mario->FacingRight && physicsObject->IsTouchingRightWall) || (!mario->FacingRight && physicsObject->IsTouchingLeftWall))
                 && (mario->IsCrouching || inputs.Down.IsDown)
-                && !mario->IsInShell /* && mario->CurrentPowerupState != PowerupState.MegaMushroom*/) {
+                && !mario->IsInShell /* && mario->CurrentPowerupState != PowerupState.MegaMushroom*/
+                && !physicsObject->IsUnderwater) {
 
                 mario->IsSliding = true;
                 mario->IsCrouching = false;
             }
 
-            if (mario->IsSliding && physicsObject->IsTouchingGround && validFloorAngle) {
+            if (!mario->IsSliding) {
+                return;
+            }
+
+            if (physicsObject->IsTouchingGround && validFloorAngle) {
+                // Slide down slopes
                 FP runningMaxSpeed = physics.WalkMaxVelocity[physics.RunSpeedStage];
                 FP angleDeg = physicsObject->FloorAngle * FP.Deg2Rad;
 
@@ -1228,16 +1240,15 @@ namespace Quantum {
             }
 
             bool stationary = FPMath.Abs(physicsObject->Velocity.X) < FP._0_01 && physicsObject->IsTouchingGround;
-            if (mario->IsSliding) {
-                if (inputs.Up.IsDown
-                    || ((inputs.Left.IsDown ^ inputs.Right.IsDown) && !inputs.Down.IsDown)
-                    || (/*physicsObject->IsOnSlideableGround && FPMath.Abs(physicsObject->FloorAngle) < physics.SlideMinimumAngle && */physicsObject->IsTouchingGround && stationary && !inputs.Down.IsDown)
-                    || (mario->FacingRight && physicsObject->IsTouchingRightWall)
-                    || (!mario->FacingRight && physicsObject->IsTouchingLeftWall)) {
+            if (inputs.Up.IsDown
+                || ((inputs.Left.IsDown ^ inputs.Right.IsDown) && !inputs.Down.IsDown)
+                || (/*physicsObject->IsOnSlideableGround && FPMath.Abs(physicsObject->FloorAngle) < physics.SlideMinimumAngle && */physicsObject->IsTouchingGround && stationary && !inputs.Down.IsDown)
+                || (mario->FacingRight && physicsObject->IsTouchingRightWall)
+                || (!mario->FacingRight && physicsObject->IsTouchingLeftWall)) {
 
-                    mario->IsSliding = false;
-                    f.Events.MarioPlayerStoppedSliding(f, filter.Entity, stationary);
-                }
+                // End sliding
+                mario->IsSliding = false;
+                f.Events.MarioPlayerStoppedSliding(f, filter.Entity, stationary);
             }
         }
 
@@ -1984,6 +1995,10 @@ namespace Quantum {
                         // Bounce
                         f.Events.MarioPlayerStompedByTeammate(f, defender);
                     } else {
+                        if (attackerMario->IsPropellerFlying && attackerMario->IsDrilling) {
+                            attackerMario->IsDrilling = false;
+                            attackerMario->DoEntityBounce = true;
+                        }
                         defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, false, attacker);
                     }
                 }

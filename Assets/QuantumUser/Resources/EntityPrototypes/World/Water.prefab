@@ -351,6 +351,7 @@ MonoBehaviour:
   damping: 0.9
   splashVelocity: 30
   animationSpeed: 9
+  minimumSplashStrength: 5
   spriteRenderer: {fileID: 1060841653561283886}
   entity: {fileID: 5377348487338848431}
 --- !u!114 &3150085164645429832

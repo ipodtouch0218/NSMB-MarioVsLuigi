@@ -243,77 +243,82 @@ namespace Quantum {
                         koopaEnemy->ChangeFacingRight(f, koopaEntity, damageDirection.X > 0);
                     }
                 }
-            } else {
-                // Normal collision rules
-                if (groundpounded) {
-                    if (koopa->SpawnPowerupWhenStomped.IsValid
-                        && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
-                        // Powerup (for blue koopa): give to mario immediately
-                        PowerupReserveResult result = PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
+                return;
+            }
+            
+            if (groundpounded) {
+                if (koopa->SpawnPowerupWhenStomped.IsValid
+                    && f.TryFindAsset(koopa->SpawnPowerupWhenStomped, out PowerupAsset powerup)) {
+                    // Powerup (for blue koopa): give to mario immediately
+                    PowerupReserveResult result = PowerupSystem.CollectPowerup(f, marioEntity, mario, marioPhysicsObject, powerup);
+                    koopaEnemy->IsActive = false;
+                    koopaEnemy->IsDead = true;
+                    koopaPhysicsObject->IsFrozen = true;
+                    f.Events.MarioPlayerCollectedPowerup(f, marioEntity, result, powerup);
+
+                } else {
+                    // Kick
+                    koopa->IsInShell = true;
+                    koopa->IsKicked = false;
+                    koopaEnemy->ChangeFacingRight(f, koopaEntity, ourPos.X > theirPos.X);
+                    koopa->EnterShell(f, koopaEntity, marioEntity, false, true);
+                    koopa->Kick(f, koopaEntity, marioEntity, 3);
+                    koopaPhysicsObject->Velocity.Y = 2;
+                }
+                return;
+            }
+            
+            if (koopa->IsKicked || !koopa->IsInShell) {
+                // Moving (either in shell, or walking)
+                if (attackedFromAbove) {
+                    // Enter Shell
+                    if (!koopa->IsKicked && koopa->SpawnPowerupWhenStomped.IsValid) {
+                        PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
+                        EntityRef newPowerup = f.Create(powerupAsset.Prefab);
+                        var powerupTransform = f.Unsafe.GetPointer<Transform2D>(newPowerup);
+                        var powerup = f.Unsafe.GetPointer<Powerup>(newPowerup);
+                        var powerupPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newPowerup);
+
+                        powerupTransform->Position = koopaTransform->Position;
+                        powerup->Initialize(f, newPowerup, 15);
+                        powerupPhysicsObject->DisableCollision = false;
+
                         koopaEnemy->IsActive = false;
                         koopaEnemy->IsDead = true;
                         koopaPhysicsObject->IsFrozen = true;
-                        f.Events.MarioPlayerCollectedPowerup(f, marioEntity, result, powerup);
 
-                    } else {
-                        // Kick
-                        koopa->IsInShell = true;
-                        koopa->IsKicked = false;
-                        koopaEnemy->ChangeFacingRight(f, koopaEntity, ourPos.X > theirPos.X);
-                        koopa->EnterShell(f, koopaEntity, marioEntity, false, true);
-                        koopa->Kick(f, koopaEntity, marioEntity, 3);
-                        koopaPhysicsObject->Velocity.Y = 2;
+                    } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->IsGroundpoundActive) {
+                        koopa->EnterShell(f, koopaEntity, marioEntity, false, false);
                     }
-                } else if (koopa->IsKicked || !koopa->IsInShell) {
-                    // Moving (either in shell, or walking)
-                    if (attackedFromAbove) {
-                        // Enter Shell
-                        if (!koopa->IsKicked && koopa->SpawnPowerupWhenStomped.IsValid) {
-                            PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
-                            EntityRef newPowerup = f.Create(powerupAsset.Prefab);
-                            var powerupTransform = f.Unsafe.GetPointer<Transform2D>(newPowerup);
-                            var powerup = f.Unsafe.GetPointer<Powerup>(newPowerup);
-                            var powerupPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newPowerup);
-
-                            powerupTransform->Position = koopaTransform->Position;
-                            powerup->Initialize(f, newPowerup, 15);
-                            powerupPhysicsObject->DisableCollision = false;
-
-                            koopaEnemy->IsActive = false;
-                            koopaEnemy->IsDead = true;
-                            koopaPhysicsObject->IsFrozen = true;
-
-                        } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->IsGroundpoundActive) {
-                            koopa->EnterShell(f, koopaEntity, marioEntity, false, false);
-                        }
-                        mario->DoEntityBounce = true;
-                        koopaHoldable->PreviousHolder = marioEntity;
-                        koopaHoldable->IgnoreOwnerFrames = 5;
-                    } else {
-                        // Damage
-                        if (mario->IsCrouchedInShell) {
-                            //mario->FacingRight = damageDirection.X < 0;
-                            //marioPhysicsObject->Velocity.X = 0;
-                            koopa->Kill(f, koopaEntity, marioEntity, false);
-
-                        } else if (mario->IsDamageable) {
-                            mario->Powerdown(f, marioEntity, false);
-                            if (!koopa->IsInShell) {
-                                koopaEnemy->ChangeFacingRight(f, koopaEntity, damageDirection.X > 0);
-                            }
-                        }
-                    }
+                    mario->DoEntityBounce = true;
+                    koopaHoldable->PreviousHolder = marioEntity;
+                    koopaHoldable->IgnoreOwnerFrames = 5;
                 } else {
-                    // Stationary in shell, always kick (if we cant pick it up)
-                    if (mario->CanPickupItem(f, marioEntity)) {
-                        koopaHoldable->Pickup(f, koopaEntity, marioEntity);
-                    } else {
-                        koopa->Kick(f, koopaEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
-                        koopaEnemy->ChangeFacingRight(f, koopaEntity, ourPos.X > theirPos.X);
+                    // Damage
+                    if (mario->IsCrouchedInShell) {
+                        //mario->FacingRight = damageDirection.X < 0;
+                        //marioPhysicsObject->Velocity.X = 0;
+                        koopa->Kill(f, koopaEntity, marioEntity, false);
+
+                    } else if (mario->IsDamageable) {
+                        mario->Powerdown(f, marioEntity, false);
+                        if (!koopa->IsInShell) {
+                            koopaEnemy->ChangeFacingRight(f, koopaEntity, damageDirection.X > 0);
+                        }
                     }
                 }
+                return;
+            }
+            
+            // Stationary in shell, always kick (if we cant pick it up)
+            if (mario->CanPickupItem(f, marioEntity)) {
+                koopaHoldable->Pickup(f, koopaEntity, marioEntity);
+            } else {
+                koopa->Kick(f, koopaEntity, marioEntity, FPMath.Abs(marioPhysicsObject->Velocity.X) * FP._0_33);
+                koopaEnemy->ChangeFacingRight(f, koopaEntity, ourPos.X > theirPos.X);
             }
         }
+        
 
         public void OnKoopaIceBlockInteraction(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);

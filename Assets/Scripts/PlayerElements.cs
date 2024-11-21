@@ -217,6 +217,10 @@ public class PlayerElements : MonoBehaviour {
     }
 
     private void OnNavigate(InputAction.CallbackContext context) {
+        if (!spectating) {
+            return;
+        }
+
         Vector2 newPosition = context.ReadValue<Vector2>();
         if (previousNavigate.x > -0.3f && newPosition.x <= -0.3f) {
             // Left

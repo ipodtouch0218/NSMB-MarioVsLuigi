@@ -51,7 +51,7 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 917504
-  UIColor: {r: 0, g: 0.36380243, b: 1, a: 1}
+  UIColor: {r: 0.8784314, g: 0.8156863, b: 0.6, a: 1}
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 0
   SpawnVerticalPowerups: 1
@@ -8282,7 +8282,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 362633902293829697
+        Value: 342476424856818660
     Rotation:
       RawValue: 0
     Scale:
@@ -8342,7 +8342,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 362633902293829697
+        Value: 342476424856818660
     Rotation:
       RawValue: 0
     Scale:

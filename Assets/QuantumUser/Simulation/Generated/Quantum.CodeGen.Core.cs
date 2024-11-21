@@ -1671,22 +1671,22 @@ namespace Quantum {
     [FieldOffset(60)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
-    [FieldOffset(29)]
+    [FieldOffset(30)]
     [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
-    [FieldOffset(32)]
+    [FieldOffset(33)]
     [ExcludeFromPrototype()]
     public Byte Team;
-    [FieldOffset(37)]
+    [FieldOffset(38)]
     [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
-    [FieldOffset(38)]
+    [FieldOffset(39)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
     [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
-    [FieldOffset(30)]
+    [FieldOffset(31)]
     [ExcludeFromPrototype()]
     public Byte Stars;
     [FieldOffset(0)]
@@ -1713,7 +1713,7 @@ namespace Quantum {
     [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public Byte PreRespawnFrames;
-    [FieldOffset(26)]
+    [FieldOffset(27)]
     [ExcludeFromPrototype()]
     public Byte RespawnFrames;
     [FieldOffset(17)]
@@ -1731,16 +1731,16 @@ namespace Quantum {
     [FieldOffset(7)]
     [ExcludeFromPrototype()]
     public Byte FastTurnaroundFrames;
-    [FieldOffset(28)]
+    [FieldOffset(29)]
     [ExcludeFromPrototype()]
     public Byte SlowTurnaroundFrames;
     [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public Int32 LastPushingFrame;
-    [FieldOffset(35)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public JumpState JumpState;
-    [FieldOffset(36)]
+    [FieldOffset(37)]
     [ExcludeFromPrototype()]
     public JumpState PreviousJumpState;
     [FieldOffset(12)]
@@ -1767,10 +1767,10 @@ namespace Quantum {
     [FieldOffset(160)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
-    [FieldOffset(34)]
+    [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public Byte WallslideEndFrames;
-    [FieldOffset(33)]
+    [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
     [FieldOffset(96)]
@@ -1788,7 +1788,7 @@ namespace Quantum {
     [FieldOffset(9)]
     [ExcludeFromPrototype()]
     public Byte GroundpoundStandFrames;
-    [FieldOffset(31)]
+    [FieldOffset(32)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
     [FieldOffset(100)]
@@ -1857,16 +1857,16 @@ namespace Quantum {
     [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public QBoolean IsInShell;
-    [FieldOffset(27)]
+    [FieldOffset(28)]
     [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
     [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public QBoolean IsPropellerFlying;
-    [FieldOffset(24)]
+    [FieldOffset(25)]
     [ExcludeFromPrototype()]
     public Byte PropellerLaunchFrames;
-    [FieldOffset(25)]
+    [FieldOffset(26)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
     [FieldOffset(152)]
@@ -1875,6 +1875,9 @@ namespace Quantum {
     [FieldOffset(23)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillCooldown;
+    [FieldOffset(24)]
+    [ExcludeFromPrototype()]
+    public Byte PropellerDrillHoldFrames;
     [FieldOffset(208)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
@@ -1973,6 +1976,7 @@ namespace Quantum {
         hash = hash * 31 + PropellerSpinFrames.GetHashCode();
         hash = hash * 31 + UsedPropellerThisJump.GetHashCode();
         hash = hash * 31 + PropellerDrillCooldown.GetHashCode();
+        hash = hash * 31 + PropellerDrillHoldFrames.GetHashCode();
         hash = hash * 31 + HeldEntity.GetHashCode();
         hash = hash * 31 + HoldStartFrame.GetHashCode();
         hash = hash * 31 + CurrentPipe.GetHashCode();
@@ -2010,6 +2014,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->ProjectileDelayFrames);
         serializer.Stream.Serialize(&p->ProjectileVolleyFrames);
         serializer.Stream.Serialize(&p->PropellerDrillCooldown);
+        serializer.Stream.Serialize(&p->PropellerDrillHoldFrames);
         serializer.Stream.Serialize(&p->PropellerLaunchFrames);
         serializer.Stream.Serialize(&p->PropellerSpinFrames);
         serializer.Stream.Serialize(&p->RespawnFrames);

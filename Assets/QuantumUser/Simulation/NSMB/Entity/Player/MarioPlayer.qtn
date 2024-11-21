@@ -125,6 +125,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte PropellerSpinFrames;
 	[ExcludeFromPrototype] bool UsedPropellerThisJump;
 	[ExcludeFromPrototype] byte PropellerDrillCooldown;
+	[ExcludeFromPrototype] byte PropellerDrillHoldFrames;
 
     [ExcludeFromPrototype] entity_ref HeldEntity;
 	[ExcludeFromPrototype] int HoldStartFrame;
