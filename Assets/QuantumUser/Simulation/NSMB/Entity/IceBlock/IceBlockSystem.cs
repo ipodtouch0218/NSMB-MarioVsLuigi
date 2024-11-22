@@ -90,6 +90,11 @@ namespace Quantum {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
+            if (mario->IsStarmanInvincible) {
+                Destroy(f, iceBlockEntity, IceBlockBreakReason.Other);
+                return;
+            }
+
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
             if (upDot >= PhysicsObjectSystem.GroundMaxAngle) {
                 // Top
@@ -103,7 +108,7 @@ namespace Quantum {
                 return;
             } else {
                 // Side
-                if (iceBlock->IsSliding) {
+                if (iceBlock->IsSliding || mario->IsInShell) {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
                     bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->Team != holderMario->Team;
                     mario->DoKnockback(f, marioEntity, contact.Normal.X > 0, dropStars ? 1 : 0, !dropStars, iceBlockEntity);

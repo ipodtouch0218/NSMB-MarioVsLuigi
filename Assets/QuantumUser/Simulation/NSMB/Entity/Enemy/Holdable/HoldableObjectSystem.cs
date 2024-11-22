@@ -3,7 +3,7 @@ using Photon.Deterministic;
 namespace Quantum {
 
     public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter>, ISignalOnBeforePhysicsCollision,
-        ISignalOnComponentRemoved<Holdable>, ISignalOnTryLiquidSplash {
+        ISignalOnComponentRemoved<Holdable>, ISignalOnTryLiquidSplash, ISignalOnEntityFreeze {
         
         public struct Filter {
             public EntityRef Entity;
@@ -57,6 +57,17 @@ namespace Quantum {
 
             if (f.Exists(holdable->Holder)) {
                 *doSplash = false;
+            }
+        }
+
+        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock) {
+            if (!f.Unsafe.TryGetPointer(entity, out Holdable* holdable)) {
+                return;
+            }
+
+            if (f.Unsafe.TryGetPointer(holdable->Holder, out MarioPlayer* marioHolder)) {
+                marioHolder->HeldEntity = EntityRef.None;
+                holdable->Holder = EntityRef.None;
             }
         }
     }

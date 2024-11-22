@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using System.Security.Permissions;
 using UnityEngine;
 using static IInteractableTile;
 
@@ -7,7 +8,8 @@ namespace Quantum {
 
     public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
         ISignalOnGameStarting, ISignalOnBeforePhysicsCollision, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped,
-        ISignalOnBeforeInteraction, ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState {
+        ISignalOnBeforeInteraction, ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState,
+        ISignalOnEntityFreeze {
 
         private static readonly FPVector2 DeathUpForce = new FPVector2(0, FP.FromString("6.5"));
         private static readonly FPVector2 DeathUpGravity = new FPVector2(0, FP.FromString("-12.75"));
@@ -105,11 +107,11 @@ namespace Quantum {
                 return;
             }
 
-            if (!physicsObject->IsTouchingGround) {
+            bool swimming = physicsObject->IsUnderwater;
+            if (!physicsObject->IsTouchingGround || swimming) {
                 mario->IsSkidding = false;
             }
 
-            bool swimming = physicsObject->IsUnderwater;
             bool run = (inputs.Sprint.IsDown || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->IsPropellerFlying) & !mario->IsSpinnerFlying;
             int maxStage;
             if (swimming) {
@@ -422,9 +424,6 @@ namespace Quantum {
                 mario->JumpState = JumpState.SingleJump;
             }
 
-            if (physicsObject->IsUnderwater) {
-                newY *= FP._0_33;
-            }
             physicsObject->Velocity.Y = newY;
 
             f.Events.MarioPlayerJumped(f, filter.Entity, mario->JumpState, mario->DoEntityBounce);
@@ -439,7 +438,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (physicsObject->IsTouchingGround) {
+            if (physicsObject->IsTouchingGround && !physicsObject->IsUnderwater) {
                 physicsObject->Gravity = FPVector2.Up * physics.GravityAcceleration[0];
                 return;
             }
@@ -459,8 +458,8 @@ namespace Quantum {
 
                 FP[] accArr = swimming ? physics.GravitySwimmingAcceleration : (mega ? physics.GravityMegaAcceleration : (mini ? physics.GravityMiniAcceleration : physics.GravityAcceleration));
                 FP acc = accArr[stage];
-                if (stage == 0) {
-                    acc = (inputs.Jump.IsDown || swimming || (!swimming && mario->SwimForceJumpTimer > 0)) ? accArr[0] : accArr[^1];
+                if (stage == 0 && !(inputs.Jump.IsDown || swimming || (!swimming && mario->SwimForceJumpTimer > 0))) {
+                    acc = accArr[^1];
                 }
 
                 gravity = acc;
@@ -1186,6 +1185,7 @@ namespace Quantum {
 
             mario->WallslideLeft = false;
             mario->WallslideRight = false;
+            mario->IsSpinnerFlying = false;
             mario->IsSliding = false;
             mario->IsSkidding = false;
             mario->IsTurnaround = false;
@@ -1194,6 +1194,10 @@ namespace Quantum {
             mario->JumpState = JumpState.None;
 
             if (!mario->IsInKnockback && mario->JumpBufferFrames > 0) {
+                if (physicsObject->IsTouchingGround) {
+                    // 1.75x off the ground because reasons
+                    physicsObject->Velocity.Y = physics.SwimJumpVelocity * FP._0_75;
+                }
                 physicsObject->Velocity.Y += physics.SwimJumpVelocity;
                 physicsObject->IsTouchingGround = false;
                 mario->JumpBufferFrames = 0;
@@ -2091,6 +2095,17 @@ namespace Quantum {
 
             if (!underwater && physicsObject->Velocity.Y > 0) {
                 mario->SwimForceJumpTimer = 10;
+            }
+        }
+
+        public void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock) {
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                return;
+            }
+
+            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
+                mario->HeldEntity = EntityRef.None;
+                holdable->Holder = EntityRef.None;
             }
         }
     }

@@ -38,3 +38,8 @@ struct PhysicsContact {
 
 signal OnBeforePhysicsCollision(VersusStageData stage, entity_ref entity, PhysicsContact* contact, bool* allowCollision);
 signal OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, bool underwater);
+
+event PhysicsObjectLanded {
+    nothashed Frame Frame;
+    EntityRef Entity;
+}

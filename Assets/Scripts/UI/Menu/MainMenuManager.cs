@@ -15,6 +15,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -532,10 +533,12 @@ namespace NSMB.UI.MainMenu {
 
         public void SwapCharacter(int character, bool broadcast) {
             if (broadcast) {
-                QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
-                    EnabledChanges = CommandChangePlayerData.Changes.Character,
-                    Character = (byte) character
-                });
+                foreach (int slot in QuantumRunner.DefaultGame.GetLocalPlayerSlots()) {
+                    QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
+                        EnabledChanges = CommandChangePlayerData.Changes.Character,
+                        Character = (byte) character
+                    });
+                }
             } else {
                 characterDropdown.SetValueWithoutNotify(character);
             }
@@ -570,14 +573,23 @@ namespace NSMB.UI.MainMenu {
                 Settings.Instance.SaveSettings();
             }
 
+            foreach (int slot in QuantumRunner.DefaultGame.GetLocalPlayerSlots()) {
+                QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.Skin,
+                    Skin = (byte) index
+                });
+            }
+
             currentSkin = index;
         }
 
         public void EnableSpectator(Toggle toggle) {
-            QuantumRunner.DefaultGame.SendCommand(new CommandChangePlayerData {
-                EnabledChanges = CommandChangePlayerData.Changes.Spectating,
-                Spectating = toggle.isOn,
-            });
+            foreach (int slot in QuantumRunner.DefaultGame.GetLocalPlayerSlots()) {
+                QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.Spectating,
+                    Spectating = toggle.isOn,
+                });
+            }
         }
 
 

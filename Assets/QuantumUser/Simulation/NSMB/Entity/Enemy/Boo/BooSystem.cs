@@ -28,7 +28,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             // Avoid jittery movement (and some lag!): change targets less frequently
-            if (f.Number % 5 == 0) {
+            if ((f.Number + filter.Entity.Index) % 5 == 0) {
                 boo->CurrentTarget = FindClosestPlayer(f, ref filter, stage);
             }
 

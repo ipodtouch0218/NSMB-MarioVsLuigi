@@ -2560,6 +2560,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnEnemyTurnaround : ISignal {
     void OnEnemyTurnaround(Frame f, EntityRef entity);
   }
+  public unsafe partial interface ISignalOnEntityFreeze : ISignal {
+    void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock);
+  }
   public unsafe partial interface ISignalOnLoadingComplete : ISignal {
     void OnLoadingComplete(Frame f);
   }
@@ -2838,6 +2841,7 @@ namespace Quantum {
     private ISignalOnEnemyEnemyCollision[] _ISignalOnEnemyEnemyCollisionSystems;
     private ISignalOnEnemyKilledByStageReset[] _ISignalOnEnemyKilledByStageResetSystems;
     private ISignalOnEnemyTurnaround[] _ISignalOnEnemyTurnaroundSystems;
+    private ISignalOnEntityFreeze[] _ISignalOnEntityFreezeSystems;
     private ISignalOnLoadingComplete[] _ISignalOnLoadingCompleteSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
     private ISignalOnGameEnding[] _ISignalOnGameEndingSystems;
@@ -2873,6 +2877,7 @@ namespace Quantum {
       _ISignalOnEnemyEnemyCollisionSystems = BuildSignalsArray<ISignalOnEnemyEnemyCollision>();
       _ISignalOnEnemyKilledByStageResetSystems = BuildSignalsArray<ISignalOnEnemyKilledByStageReset>();
       _ISignalOnEnemyTurnaroundSystems = BuildSignalsArray<ISignalOnEnemyTurnaround>();
+      _ISignalOnEntityFreezeSystems = BuildSignalsArray<ISignalOnEntityFreeze>();
       _ISignalOnLoadingCompleteSystems = BuildSignalsArray<ISignalOnLoadingComplete>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
       _ISignalOnGameEndingSystems = BuildSignalsArray<ISignalOnGameEnding>();
@@ -3104,6 +3109,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnEnemyTurnaround(_f, entity);
+          }
+        }
+      }
+      public void OnEntityFreeze(EntityRef entity, EntityRef iceBlock) {
+        var array = _f._ISignalOnEntityFreezeSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEntityFreeze(_f, entity, iceBlock);
           }
         }
       }

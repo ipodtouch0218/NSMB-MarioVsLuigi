@@ -30,7 +30,8 @@ namespace Quantum {
             var transform = filter.Transform;
             var entity = filter.Entity;
 
-            bool wasOnGround = physicsObject->IsTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousVelocity.Y;
+            bool wasOnGround = physicsObject->IsTouchingGround;
+            bool canSnap = wasOnGround && physicsObject->Velocity.Y <= physicsObject->PreviousVelocity.Y;
             physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
 
             QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
@@ -59,7 +60,7 @@ namespace Quantum {
             }
             ResolveContacts(f, stage, physicsObject, contacts);
 
-            if (!physicsObject->DisableCollision && wasOnGround && !physicsObject->IsTouchingGround) {
+            if (!physicsObject->DisableCollision && canSnap && !physicsObject->IsTouchingGround) {
                 // Try snapping
                 FPVector2 previousVelocity = physicsObject->Velocity;
                 physicsObject->Velocity = MoveVertically(f, -FP._0_25 * f.UpdateRate, entity, stage, contacts);
@@ -72,11 +73,18 @@ namespace Quantum {
                     physicsObject->HoverFrames = 3;
                 }
             }
+
+            if (!wasOnGround && physicsObject->IsTouchingGround) {
+                f.Events.PhysicsObjectLanded(f, entity);
+            }
+
+            /*
 #if DEBUG
             foreach (var contact in contacts) {
                 Draw.Ray(contact.Position, contact.Normal, ColorRGBA.Red);
             }
 #endif
+            */
 
             if (QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
                 // Apply gravity

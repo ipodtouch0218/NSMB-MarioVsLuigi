@@ -60,7 +60,7 @@ namespace NSMB.UI.Pause {
             }
 
             QuantumGame game = QuantumRunner.DefaultGame;
-            if (game != null && game.Frames.Predicted.Global->GameState != GameState.Playing) {
+            if (game != null && game.Frames.Predicted.Global->GameState != GameState.Playing && !game.Session.IsReplay) {
                 return;
             }
 

@@ -151,6 +151,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerDeathUp>(this, OnMarioPlayerDeathUp);
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -769,6 +770,17 @@ namespace NSMB.Entities.Player {
 
             if (teammateStompTimer == 0) {
                 teammateStompTimer = 0.15f;
+            }
+        }
+
+        private void OnPhysicsObjectLanded(EventPhysicsObjectLanded e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            var physicsObject = e.Frame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
+            if (physicsObject->IsUnderwater && physicsObject->PreviousFrameVelocity.Y < -1) {
+                SpawnParticle(Enums.PrefabParticle.Player_WaterDust.GetGameObject(), transform.position + Vector3.back * 5);
             }
         }
 

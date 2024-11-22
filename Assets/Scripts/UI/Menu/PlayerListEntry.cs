@@ -114,7 +114,7 @@ namespace NSMB.UI.MainMenu {
             characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
             Builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
 
-            if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
+            if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
                 TeamAsset team = f.SimulationConfig.Teams[playerData->Team];
                 Builder.Append(team.textSpriteColorblindBig);
             }

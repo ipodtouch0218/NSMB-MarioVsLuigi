@@ -52,8 +52,8 @@ namespace Quantum {
 
             return (input.Sprint.IsDown || forceHold)
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
-                && !IsInKnockback && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead && !IsInShell 
-                && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
+                && !IsInKnockback && KnockbackGetupFrames == 0 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead
+                && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
                 && !IsGroundpounding && !(!f.Exists(HeldEntity) && physicsObject->IsUnderwater && input.Jump.IsDown);
         }
 
