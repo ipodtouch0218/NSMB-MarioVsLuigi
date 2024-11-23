@@ -5,9 +5,10 @@ namespace Quantum {
         public bool TimerEnabled(Frame f, EntityRef iceBlockEntity) {
             var childFreezable = f.Unsafe.GetPointer<Freezable>(Entity);
             var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(iceBlockEntity);
             
             return childFreezable->AutoBreakWhileHeld
-                || ((WaterColliderCount == 0 || InLiquidType != LiquidType.Water) && !IsSliding && !f.Exists(holdable->Holder));
+                || ((!physicsObject->IsUnderwater || InLiquidType == LiquidType.Water) && !IsSliding && !f.Exists(holdable->Holder));
         }
 
         public void Initialize(Frame f, EntityRef iceBlockEntity, EntityRef childEntity) {

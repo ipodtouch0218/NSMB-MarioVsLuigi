@@ -1,14 +1,14 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class CoinSystem : SystemMainThreadFilter<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin, ISignalOnEntityBumped {
+    public unsafe class CoinSystem : SystemMainThreadFilterStage<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin, ISignalOnEntityBumped {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
             public Coin* Coin;
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             if (f.DestroyPending(filter.Entity)) {
                 return;
             }
@@ -18,14 +18,16 @@ namespace Quantum {
             QuantumUtils.Decrement(ref coin->UncollectableFrames);
 
             if (!coin->IsFloating) {
-                if (QuantumUtils.Decrement(ref coin->Lifetime)) {
+                if (QuantumUtils.Decrement(ref coin->Lifetime)
+                    || filter.Transform->Position.Y < stage.StageWorldMin.Y) {
+
                     f.Destroy(filter.Entity);
                     return;
                 }
 
                 var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(filter.Entity);
                 foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < FP._0_33 * 2) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants._0_66) {
                         continue;
                     }
 

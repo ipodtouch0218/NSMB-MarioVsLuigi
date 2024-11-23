@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using System.Security.Permissions;
 using UnityEngine;
 using static IInteractableTile;
 
@@ -312,7 +311,6 @@ namespace Quantum {
         }
 
         private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
-
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -432,6 +430,17 @@ namespace Quantum {
                 mario->PropellerDrillCooldown = 30;
             }
             mario->DoEntityBounce = false;
+
+            if (physicsObject->IsWaterSolid) {
+                // Check if we jumped off the water
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (f.Has<Liquid>(contact.Entity)) {
+                        f.Events.LiquidSplashed(contact.Entity, -1, filter.Transform->Position, true);
+                        break;
+                    }
+                }
+            }
         }
 
         public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
@@ -675,7 +684,8 @@ namespace Quantum {
             }
 
             // Can't crouch while sliding, flying, or mega.
-            if (mario->IsSliding || mario->IsPropellerFlying || mario->IsSpinnerFlying || mario->IsInKnockback || mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+            if (mario->IsSliding || mario->IsPropellerFlying || mario->IsSpinnerFlying || mario->IsInKnockback || mario->CurrentPowerupState == PowerupState.MegaMushroom
+                || mario->IsWallsliding) {
                 mario->IsCrouching = false;
                 return;
             }
@@ -694,6 +704,16 @@ namespace Quantum {
                 ) 
                 && !mario->HeldEntity.IsValid 
                 && !mario->IsInShell;
+
+            if (mario->IsCrouching && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (f.Has<Liquid>(contact.Entity)) {
+                        mario->IsCrouching = false;
+                        break;
+                    }
+                }
+            }
 
             if (!wasCrouching && mario->IsCrouching) {
                 f.Events.MarioPlayerCrouched(f, filter.Entity);
@@ -1063,6 +1083,18 @@ namespace Quantum {
                 mario->CurrentVolley = 0;
             }
 
+            physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15;
+            if (physicsObject->IsWaterSolid && !mario->WasTouchingGroundLastFrame && physicsObject->IsTouchingGround) {
+                // Check if we landed on water
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (f.Has<Liquid>(contact.Entity)) {
+                        f.Events.LiquidSplashed(contact.Entity, 2, filter.Transform->Position, false);
+                        break;
+                    }
+                }
+            }
+
             mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
             mario->IsPropellerFlying &= !physicsObject->IsUnderwater;
             if (mario->IsPropellerFlying) {
@@ -1171,17 +1203,22 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
+            if (FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 || physicsObject->Velocity.Y > 0) {
+                mario->StationaryFrames = 0;
+            } else if (physicsObject->IsTouchingGround && mario->StationaryFrames < byte.MaxValue) {
+                mario->StationaryFrames++;
+            }
+
             if (!physicsObject->IsUnderwater) {
                 return;
             }
 
-            /*
-            if (HeldEntity is FrozenCube fc) {
-                fc.AutoBreakTimer = TickTimer.CreateFromSeconds(Runner, fc.autoBreak);
-                fc.Holder = null;
-                HeldEntity = null;
+            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
+                if (holdable->HoldAboveHead) {
+                    mario->HeldEntity = EntityRef.None;
+                    holdable->Holder = EntityRef.None;
+                }
             }
-            */
 
             mario->WallslideLeft = false;
             mario->WallslideRight = false;
@@ -1648,6 +1685,10 @@ namespace Quantum {
             var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
             *doSplash &= (!mario->IsDead || liquid->LiquidType == LiquidType.Water) && !f.Exists(mario->CurrentPipe);
 
+            if (!exit && mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding) {
+                *doSplash = false;
+            }
+
             if (!exit) {
                 switch (liquid->LiquidType) {
                 case LiquidType.Water:
@@ -2049,6 +2090,7 @@ namespace Quantum {
             case IceBlockBreakReason.BlockBump:
             case IceBlockBreakReason.HitWall:
             case IceBlockBreakReason.Fireball:
+            case IceBlockBreakReason.Other:
                 // Soft knockback, 1 star
                 mario->DoKnockback(f, entity, mario->FacingRight, 1, true, brokenIceBlock);
                 break;
@@ -2093,7 +2135,7 @@ namespace Quantum {
                 return;
             }
 
-            if (!underwater && physicsObject->Velocity.Y > 0) {
+            if (!underwater && physicsObject->Velocity.Y > 0 && !physicsObject->IsTouchingGround) {
                 mario->SwimForceJumpTimer = 10;
             }
         }

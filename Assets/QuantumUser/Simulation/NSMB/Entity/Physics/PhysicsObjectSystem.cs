@@ -145,14 +145,14 @@ namespace Quantum {
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(0, velocityY) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
                     // Left edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -160,7 +160,7 @@ namespace Quantum {
                     // Right edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X -= stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -219,6 +219,12 @@ namespace Quantum {
                             // Not a valid hit
                             continue;
                         }
+                        if (f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid) && liquid->LiquidType == LiquidType.Water) {
+                            if (!physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
+                                // Colliding with water and we cant interact
+                                continue;
+                            }
+                        }
                         if (hit.IsDynamic && hit.TryGetShape(f, out Shape2D* hitShape)) {
                             FPVector2 upDirection = FPVector2.Rotate(FPVector2.Up, hitShape->LocalTransform.Rotation);
                             if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= GroundMaxAngle) {
@@ -228,7 +234,7 @@ namespace Quantum {
                         }
 
                         potentialContacts[potentialContactCount++] = new PhysicsContact {
-                            Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.Y) - RaycastSkin,
+                            Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.Y) - (RaycastSkin + Skin),
                             Normal = hit.Normal,
                             Position = hit.Point,
                             Frame = f.Number,
@@ -333,14 +339,14 @@ namespace Quantum {
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(velocityX, 0) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
                     // Left edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -348,7 +354,7 @@ namespace Quantum {
                     // Right edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X -= stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -407,6 +413,12 @@ namespace Quantum {
                             // Not a valid hit (for this tile)
                             continue;
                         }
+                        if (f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid) && liquid->LiquidType == LiquidType.Water) {
+                            if (!physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
+                                // Colliding with water and we cant interact
+                                continue;
+                            }
+                        }
                         if (hit.IsDynamic && hit.TryGetShape(f, out Shape2D* hitShape)) {
                             FPVector2 upDirection = FPVector2.Rotate(FPVector2.Up, hitShape->LocalTransform.Rotation * FP.Deg2Rad);
                             if (hitShape->Type == Shape2DType.Edge && FPVector2.Dot(hit.Normal, upDirection) <= GroundMaxAngle) {
@@ -416,7 +428,7 @@ namespace Quantum {
                         }
 
                         potentialContacts[potentialContactCount++] = new PhysicsContact {
-                            Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.X) - RaycastSkin,
+                            Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.X) - (RaycastSkin + Skin),
                             Normal = hit.Normal,
                             Position = hit.Point,
                             Frame = f.Number,

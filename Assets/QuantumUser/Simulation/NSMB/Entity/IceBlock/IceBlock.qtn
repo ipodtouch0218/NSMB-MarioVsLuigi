@@ -10,7 +10,6 @@ component IceBlock {
 	[ExcludeFromPrototype] bool IsSliding;
 	[ExcludeFromPrototype] bool FacingRight;
 	[ExcludeFromPrototype] byte AutoBreakFrames;
-	[ExcludeFromPrototype] byte WaterColliderCount;
 	[ExcludeFromPrototype] LiquidType InLiquidType;
 }
 

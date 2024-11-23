@@ -64,13 +64,12 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamFireballKnockback = Animator.StringToHash("fireballKnockback");
         private static readonly int ParamKnockforwards = Animator.StringToHash("knockforwards");
         private static readonly int ParamPushing = Animator.StringToHash("pushing");
+        private static readonly int ParamFrozen = Animator.StringToHash("frozen");
 
         private static readonly int ParamPaddle = Animator.StringToHash("paddle");
         private static readonly int ParamThrow = Animator.StringToHash("throw");
-        private static readonly int ParamHeadPickup = Animator.StringToHash("head-carry");
+        private static readonly int ParamHeadPickup = Animator.StringToHash("head-pickup");
         private static readonly int ParamFireball = Animator.StringToHash("fireball");
-
-        private static readonly int AnimIdle = Animator.StringToHash("idle");
         #endregion
 
         //---Public Variables
@@ -83,7 +82,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
-        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle;
+        [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
@@ -202,28 +201,21 @@ namespace NSMB.Entities.Player {
                 models.SetActive(!mario->IsRespawning);
                 SetParticleEmission(drillParticle, false);
                 SetParticleEmission(sparkles, false);
+                SetParticleEmission(iceSkiddingParticle, false);
+                SetParticleEmission(waterSkiddingParticle, false);
                 SetParticleEmission(dust, false);
                 SetParticleEmission(giantParticle, false);
                 SetParticleEmission(fireParticle, false);
                 SetParticleEmission(bubblesParticle, false);
                 return;
             }
+            animator.speed = 1;
 
             var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(EntityRef);
 
             HandleMiscStates(f, mario, physicsObject, freezable);
             HandleAnimations(f, mario, physicsObject, freezable);
-            
-            if (freezable->IsFrozen(f)) {
-                animator.speed = 1;
-                animator.Play(AnimIdle, 1, 0);
-                animator.Update(0.01f);
-                animator.speed = 0;
-                return;
-            } else {
-                animator.speed = 1;
-            }
 
             Input inputs = default;
             if (mario->PlayerRef.IsValid) {
@@ -232,7 +224,7 @@ namespace NSMB.Entities.Player {
 
             SetFacingDirection(f, mario, physicsObject);
             InterpolateFacingDirection(mario);
-            UpdateAnimatorVariables(f, mario, physicsObject, ref inputs);
+            UpdateAnimatorVariables(f, mario, physicsObject, freezable, ref inputs);
 
             previousPosition = transform.position;
         }
@@ -241,10 +233,23 @@ namespace NSMB.Entities.Player {
             // Particles
             bool disableParticles = mario->IsDead || freezable->IsFrozen(f) || f.Global->GameState == GameState.Ended;
 
+            bool onWater = false;
+            if (physicsObject->IsTouchingGround && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (f.Has<Liquid>(contact.Entity)) {
+                        onWater = true;
+                        break;
+                    }
+                }
+            }
+
             SetParticleEmission(drillParticle, !disableParticles && mario->IsDrilling);
             SetParticleEmission(sparkles, !disableParticles && mario->IsStarmanInvincible);
             SetParticleEmission(iceSkiddingParticle, !disableParticles && physicsObject->IsOnSlipperyGround && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
-            SetParticleEmission(dust, !disableParticles && !iceSkiddingParticle.isPlaying && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || (mario->IsCrouching && !physicsObject->IsOnSlipperyGround)) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
+            SetParticleEmission(waterSkiddingParticle, !disableParticles && onWater && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
+            SetParticleEmission(waterRunningParticle, !disableParticles && !waterSkiddingParticle.isPlaying && onWater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
+            SetParticleEmission(dust, !disableParticles && !iceSkiddingParticle.isPlaying && !waterSkiddingParticle.isPlaying && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->IsSkidding || (mario->IsCrouching && !physicsObject->IsOnSlipperyGround)) && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->IsSliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->IsInShell) && physicsObject->IsTouchingGround)) && !mario->CurrentPipe.IsValid);
             SetParticleEmission(giantParticle, !disableParticles && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
             SetParticleEmission(bubblesParticle, !disableParticles && physicsObject->IsUnderwater);
@@ -255,7 +260,10 @@ namespace NSMB.Entities.Player {
             } else if (mario->IsWallsliding) {
                 dust.transform.localPosition = physicsCollider->Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario->WallslideLeft ? new Vector2(-1, 1) : Vector2.one);
             }
-            iceSkiddingParticle.transform.localScale = mario->FacingRight ? Vector3.one : new Vector3(-1, 1, 1);
+            Vector3 flip = mario->FacingRight ? Vector3.one : new Vector3(-1, 1, 1);
+            iceSkiddingParticle.transform.localScale = flip;
+            waterSkiddingParticle.transform.localScale = flip;
+            waterRunningParticle.transform.localScale = flip;
 
             dustPlayer.SetSoundData((mario->IsInShell || mario->IsSliding || mario->IsCrouchedInShell) ? shellSlideData : wallSlideData);
             drillPlayer.SetSoundData(mario->IsPropellerFlying ? propellerDrillData : spinnerDrillData);
@@ -325,7 +333,7 @@ namespace NSMB.Entities.Player {
                 if (mario->IsInKnockback && (physicsObject->IsUnderwater || mario->IsInWeakKnockback)) {
                     right = mario->KnockbackWasOriginallyFacingRight;
                 }
-                modelRotationTarget = Quaternion.Euler(-15, right ? 110 : 250, 0);
+                modelRotationTarget = Quaternion.Euler(0, right ? 110 : 250, 0);
                 modelRotateInstantly = true;
 
             } else if (mario->IsDead) {
@@ -395,7 +403,7 @@ namespace NSMB.Entities.Player {
             }
         }
 
-        public void UpdateAnimatorVariables(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, ref Input inputs) {
+        public void UpdateAnimatorVariables(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable, ref Input inputs) {
 
             bool right = inputs.Right.IsDown;
             bool left = inputs.Left.IsDown;
@@ -429,11 +437,12 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamMega, mario->CurrentPowerupState == PowerupState.MegaMushroom);
             animator.SetBool(ParamInShell, mario->IsInShell || (mario->CurrentPowerupState == PowerupState.BlueShell && (mario->IsCrouching || mario->IsGroundpounding || mario->IsSliding) && mario->GroundpoundStartFrames <= 9));
             animator.SetBool(ParamTurnaround, mario->IsTurnaround);
-            animator.SetBool(ParamSwimming, physicsObject->IsUnderwater && !mario->IsGroundpounding && !mario->IsDrilling /*&& !marioIsFrozen*/);
+            animator.SetBool(ParamSwimming, physicsObject->IsUnderwater && !mario->IsGroundpounding && !mario->IsDrilling && !freezable->IsFrozen(f));
             animator.SetBool(ParamAHeld, inputs.Jump.IsDown);
             animator.SetBool(ParamFireballKnockback, mario->IsInWeakKnockback);
             animator.SetBool(ParamFireDeath, mario->FireDeath);
             animator.SetBool(ParamPushing, mario->LastPushingFrame + 5 >= f.Number);
+            animator.SetBool(ParamFrozen, freezable->IsFrozen(f));
             //animator.SetBool(ParamKnockforwards, mario->IsInForwardsKnockback);
 
             float animatedVelocity = Mathf.Abs(physicsObject->Velocity.X.AsFloat);
@@ -643,21 +652,22 @@ namespace NSMB.Entities.Player {
                 PlaySound(SoundEffect.Powerup_PropellerMushroom_Kick);
                 return;
             }
-            /*
-            if (IsWaterWalking) {
-                footstepSound = Enums.Sounds.Player_Walk_Water;
-            }
-            if (footstepParticle != Enums.Particle.None) {
-                GameManager.Instance.particleManager.Play((Enums.Particle) ((int) footstepParticle + (FacingRight ? 1 : 0)), body.Position);
-            }
-            */
+
             SoundEffect footstepSoundEffect = SoundEffect.Player_Walk_Grass;
             ParticleEffect footstepParticleEffect = ParticleEffect.None;
 
             foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                if (FPVector2.Dot(contact.Normal, FPVector2.Up) > FP._0_33) {
+                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+                    continue;
+                }
+
+                if (f.Exists(contact.Entity)) {
+                    if (f.Has<Liquid>(contact.Entity) && mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsWaterSolid) {
+                        footstepSoundEffect = SoundEffect.Player_Walk_Water;
+                    }
+                } else {
                     StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, contact.TileX, contact.TileY);
-                    if (QuantumUnityDB.TryGetGlobalAsset(tileInstance.Tile, out StageTile tile)) {
+                    if (f.TryFindAsset(tileInstance.Tile, out StageTile tile)) {
                         if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
                             footstepSoundEffect = tile.FootstepSound;
                         }
@@ -668,7 +678,7 @@ namespace NSMB.Entities.Player {
                 }
             } 
 
-            if (/*!IsWaterWalking && */ FPMath.Abs(physicsObject->Velocity.X) < physics.WalkMaxVelocity[physics.WalkSpeedStage]) {
+            if (FPMath.Abs(physicsObject->Velocity.X) < physics.WalkMaxVelocity[physics.WalkSpeedStage]) {
                 return;
             }
 

@@ -6,6 +6,7 @@ component PhysicsObject {
     bool IsFrozen;
     bool DisableCollision;
     bool SlowInLiquids;
+    bool IsWaterSolid;
     
     [ExcludeFromPrototype] FPVector2 Velocity;
     [ExcludeFromPrototype] FPVector2 ParentVelocity;
@@ -20,8 +21,9 @@ component PhysicsObject {
     [ExcludeFromPrototype] FP FloorAngle;
     [ExcludeFromPrototype] bool IsOnSlipperyGround;
     [ExcludeFromPrototype] bool IsOnSlideableGround;
-
+    
     [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
+
     [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<EntityRef> LiquidContacts;
     [ExcludeFromPrototype] byte UnderwaterCounter;
 }

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using NSMB.Translation;
 using Photon.Client;
 using Photon.Realtime;
@@ -159,7 +160,7 @@ namespace NSMB.UI.MainMenu {
         #endregion
 
         #region Lives
-        public void SetLives() {
+        public unsafe void SetLives() {
             QuantumGame game = QuantumRunner.DefaultGame;
             if (!IsHostLocal(game, out int hostSlot)) {
                 // Only hosts can change.
@@ -167,6 +168,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (!int.TryParse(livesInputField.text, out int newValue)) {
+                livesInputField.text = ((int) game.Frames.Predicted.Global->Rules.Lives).ToString();
                 return;
             }
             newValue = Mathf.Clamp(newValue, 1, 25);
@@ -175,6 +177,7 @@ namespace NSMB.UI.MainMenu {
                 EnabledChanges = CommandChangeRules.Changes.Lives,
                 Lives = (byte) newValue,
             });
+            ChangeLives(newValue);
         }
 
         public void EnableLives() {
@@ -203,6 +206,13 @@ namespace NSMB.UI.MainMenu {
         #endregion
 
         #region Timer
+        public void ClickTime() {
+            int colon = timerInputField.text.IndexOf(':');
+            if (colon != -1) {
+                timerInputField.text = timerInputField.text[0..colon];
+            }
+        }
+
         public void SetTime() {
             QuantumGame game = QuantumRunner.DefaultGame;
             if (!IsHostLocal(game, out int hostSlot)) {
@@ -211,6 +221,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
+                livesInputField.text = ((int) game.Frames.Predicted.Global->Rules.TimerSeconds).ToString();
                 return;
             }
 
@@ -229,7 +240,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (!int.TryParse(timerInputField.text.Split(':')[0], out int newValue)) {
-                return;
+                newValue = 5;
             }
 
             newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : 0;

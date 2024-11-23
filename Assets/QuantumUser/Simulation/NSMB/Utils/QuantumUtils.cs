@@ -209,8 +209,8 @@ public static unsafe class QuantumUtils {
         bool tie = false;
 
         Dictionary<int, int> teamStars = GetTeamStars(f);
+        Debug.Log("team stars: " + string.Join(',', teamStars));
         foreach ((int team, int stars) in teamStars) {
-
             if (winningTeam == null) {
                 winningTeam = team;
                 winningStars = stars;
@@ -224,21 +224,23 @@ public static unsafe class QuantumUtils {
             }
         }
 
+        Debug.Log("tie? " + tie + " winning team: " + winningTeam);
         return tie ? null : winningTeam;
     }
 
     public static Dictionary<int,int> GetTeamStars(Frame f) {
-        Dictionary<int, int> stars = new();
+        Dictionary<int, int> stars = f.Context.TeamStarBuffer;
+        stars.Clear();
 
         var allPlayers = f.Filter<MarioPlayer>();
         allPlayers.UseCulling = false;
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
-            if (!stars.ContainsKey(mario->Team)) {
-                stars[mario->Team] = 0;
-            }
-
             if (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
                 continue;
+            }
+
+            if (!stars.ContainsKey(mario->Team)) {
+                stars[mario->Team] = 0;
             }
 
             stars[mario->Team] += mario->Stars;

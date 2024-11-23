@@ -91,8 +91,20 @@ namespace Quantum {
 
         public void OnAdded(Frame f, EntityRef entity, Liquid* component) {
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
-            collider->Shape.Centroid = new(0, component->HeightTiles * FP._0_25 - FP._0_10);
-            collider->Shape.Box.Extents = new(component->WidthTiles * FP._0_25, component->HeightTiles * FP._0_25);
+
+            Shape2D shape = Shape2D.CreatePersistentCompound();
+            FP totalWidth = component->WidthTiles * FP._0_50;
+            FP centroidY = component->HeightTiles * FP._0_25 - FP._0_10;
+
+            int sections = FPMath.CeilToInt(totalWidth / 4);
+            FPVector2 extents = new((totalWidth / sections) / 2, component->HeightTiles * FP._0_25);
+            for (int i = 0; i < sections; i++) {
+                FP centroidX = ((2 * i + 1) * extents.X) - (totalWidth / 2);
+                Shape2D newBox = Shape2D.CreateBox(extents, new FPVector2(centroidX, centroidY));
+                shape.Compound.AddShape(f, ref newBox);
+            }
+
+            collider->Shape = shape;
         }
     }
 }

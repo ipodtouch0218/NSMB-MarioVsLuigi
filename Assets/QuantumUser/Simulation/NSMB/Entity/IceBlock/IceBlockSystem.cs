@@ -1,9 +1,10 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
     public unsafe class IceBlockSystem : SystemMainThreadFilterStage<IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
-        ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash {
+        ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityChangeUnderwaterState, ISignalOnBeforePhysicsCollision {
 
         public struct Filter {
             public EntityRef Entity;
@@ -31,7 +32,7 @@ namespace Quantum {
             var childFreezable = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
             var physicsObject = filter.PhysicsObject;
 
-            if (f.Number % 2 == 0 && PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.PhysicsCollider->Shape, true, stage, entity)) {
+            if ((f.Number + entity.Index) % 2 == 0 && PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.PhysicsCollider->Shape, true, stage, entity)) {
                 Destroy(f, entity, IceBlockBreakReason.HitWall);
                 return;
             }
@@ -53,19 +54,18 @@ namespace Quantum {
                 physicsObject->IsFrozen = true;
             }
 
-            if (iceBlock->WaterColliderCount > 0) {
+            if (physicsObject->IsUnderwater) {
                 iceBlock->IsSliding = false;
                 if (iceBlock->InLiquidType != LiquidType.Water) {
                     physicsObject->Velocity.X *= Constants._0_85;
                     physicsObject->Velocity.Y = FPMath.Max(-FP._0_50, physicsObject->Velocity.Y);
-
                 } else {
                     FP newVelocity = physicsObject->Velocity.Y;
                     if (newVelocity < 0) {
-                        newVelocity *= FP._0_99;
+                        newVelocity *= Constants._0_90;
                     }
-                    newVelocity += (25 * f.DeltaTime);
-                    newVelocity = FPMath.Min(1, newVelocity);
+                    newVelocity += (35 * f.DeltaTime);
+                    newVelocity = FPMath.Min(Constants._0_90, newVelocity);
 
                     physicsObject->Velocity.X *= Constants._0_85;
                     physicsObject->Velocity.Y = newVelocity;
@@ -223,12 +223,6 @@ namespace Quantum {
             if (f.Unsafe.TryGetPointer(entity, out IceBlock* iceBlock)) {
                 *doSplash = true;
 
-                if (exit) {
-                    iceBlock->WaterColliderCount--;
-                } else {
-                    iceBlock->WaterColliderCount++;
-                }
-
                 var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
                 iceBlock->InLiquidType = liquid->LiquidType;
 
@@ -237,6 +231,32 @@ namespace Quantum {
                 }
             } else if (f.Unsafe.TryGetPointer(entity, out Freezable* freezable)) {
                 *doSplash &= !freezable->IsFrozen(f);
+            }
+        }
+
+        public void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean underwater) {
+            if (!underwater
+                || !f.Unsafe.TryGetPointer(entity, out IceBlock* iceBlock)
+                || !f.Unsafe.TryGetPointer(liquidEntity, out Liquid* liquid)) {
+                return;
+            }
+
+            iceBlock->InLiquidType = liquid->LiquidType;
+        }
+
+        public void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
+            if (!f.Unsafe.TryGetPointer(entity, out IceBlock* iceBlockA)
+                || !f.Unsafe.TryGetPointer(contact->Entity, out IceBlock* iceBlockB)
+                || FPMath.Abs(FPVector2.Dot(contact->Normal, FPVector2.Up)) > FP._0_33) {
+                return;
+            }
+
+            if (iceBlockA->IsSliding) {
+                if (iceBlockB->IsSliding) {
+                    Destroy(f, entity, IceBlockBreakReason.Other);
+                }
+                Destroy(f, contact->Entity, IceBlockBreakReason.Other);
+                *allowCollision = false;
             }
         }
     }

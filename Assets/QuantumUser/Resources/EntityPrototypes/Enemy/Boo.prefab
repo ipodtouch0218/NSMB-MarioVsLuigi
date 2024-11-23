@@ -240,7 +240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     MaxRange:
-      RawValue: 1638400
+      RawValue: 819200
 --- !u!114 &7332006103014348897
 MonoBehaviour:
   m_ObjectHideFlags: 0

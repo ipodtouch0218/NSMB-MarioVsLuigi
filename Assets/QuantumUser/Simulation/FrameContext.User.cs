@@ -16,6 +16,8 @@ namespace Quantum {
         public List<FPVector2> CullingCameraPositions = new();
         public FP MaxCameraOrthoSize = 7;
 
+        public Dictionary<int, int> TeamStarBuffer = new(10);
+
         public Dictionary<(Type, Type), HitboxInteractor> hitboxInteractors = new();
         public Dictionary<(Type, Type), PlatformInteractor> platformInteractors = new();
         public HashSet<(EntityRef, EntityRef)> alreadyCollided = new(new UnorderedTupleEqualityComparer<EntityRef>());

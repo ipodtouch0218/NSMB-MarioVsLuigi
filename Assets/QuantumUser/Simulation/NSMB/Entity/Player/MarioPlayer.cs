@@ -44,8 +44,10 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
             bool forceHold = false;
+            bool aboveHead = false;
             if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
-                if (holdable->HoldAboveHead) {
+                aboveHead = holdable->HoldAboveHead;
+                if (aboveHead) {
                     forceHold = (f.Number - HoldStartFrame) < 25;
                 }
             }
@@ -54,7 +56,8 @@ namespace Quantum {
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
                 && !IsInKnockback && KnockbackGetupFrames == 0 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead
                 && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
-                && !IsGroundpounding && !(!f.Exists(HeldEntity) && physicsObject->IsUnderwater && input.Jump.IsDown);
+                && !IsGroundpounding && !(!f.Exists(HeldEntity) && physicsObject->IsUnderwater && input.Jump.IsDown)
+                && !(aboveHead && physicsObject->IsUnderwater);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario) {
