@@ -15,7 +15,7 @@ namespace Quantum {
             }
 
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
-            FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y;
+            FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y - entityPhysicsObject->Velocity.Y;
             bool isEntityUnderwater = checkHeight <= surface;
 
             QHashSet<EntityRef> splashed = f.ResolveHashSet(liquid->SplashedEntities);
@@ -26,7 +26,7 @@ namespace Quantum {
                 bool doSplash = !isEntityUnderwater;
                 f.Signals.OnTryLiquidSplash(info.Entity, info.Other, false, &doSplash);
                 if (doSplash) {
-                    f.Events.LiquidSplashed(info.Entity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), false);
+                    f.Events.LiquidSplashed(f, info.Other, info.Entity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), false);
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace Quantum {
                 f.Signals.OnTryLiquidSplash(info.Entity, info.Other, true, &doSplash);
                 
                 if (doSplash) {
-                    f.Events.LiquidSplashed(info.Entity, FPMath.Abs(liquidPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
+                    f.Events.LiquidSplashed(f, info.Other, info.Entity, FPMath.Abs(liquidPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
                 }
             }
 

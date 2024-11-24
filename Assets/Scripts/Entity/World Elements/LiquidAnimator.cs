@@ -6,7 +6,7 @@ namespace NSMB.Entities.World {
     public unsafe class LiquidAnimator : MonoBehaviour {
 
         //---Serialized Variables
-        [SerializeField] private GameObject splashPrefab, splashExitPrefab;
+        [SerializeField] private GameObject splashPrefab, lightSplashPrefab, splashExitPrefab;
         [SerializeField] private SpriteMask mask;
         [SerializeField] private int pointsPerTile = 8, splashWidth = 2;
         [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, animationSpeed = 1f, minimumSplashStrength = 2f;
@@ -129,7 +129,29 @@ namespace NSMB.Entities.World {
         }
 
         private void OnLiquidSplashed(EventLiquidSplashed e) {
-            Instantiate(e.Exit ? splashExitPrefab : splashPrefab, e.Position.ToUnityVector3(), Quaternion.identity);
+            if (e.Entity != entity.EntityRef) {
+                return;
+            }
+
+            Frame f = e.Frame;
+            bool light = false;
+            if (lightSplashPrefab
+                && f.Unsafe.TryGetPointer(e.Splasher, out MarioPlayer* mario)
+                && mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding) {
+                // Mini mario splashed
+                //prefab = lightSplashPrefab;
+                light = true;
+            }
+
+            GameObject prefab = e.Exit ? splashExitPrefab : splashPrefab;
+            if (!e.Exit && light) {
+                prefab = lightSplashPrefab;
+            }
+
+            GameObject particle = Instantiate(prefab, e.Position.ToUnityVector3(), Quaternion.identity);
+            if (e.Exit && light) {
+                particle.GetComponent<AudioSource>().volume = 0;
+            }
 
             float tile = (transform.InverseTransformPoint(e.Position.ToUnityVector3()).x / widthTiles + 0.25f) * 2f;
             int px = (int) (tile * totalPoints);

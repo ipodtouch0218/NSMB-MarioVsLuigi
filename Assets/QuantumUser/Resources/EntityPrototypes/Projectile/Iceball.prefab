@@ -59,7 +59,7 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
-    IsTrigger: 1
+    IsTrigger: 0
     Material:
       Id:
         Value: 0
@@ -126,10 +126,10 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 9
     CallbackFlags:
-      Value: 0
+      Value: 448
   PhysicsBody:
     IsEnabled: 0
     Config2D: 116
@@ -247,6 +247,10 @@ MonoBehaviour:
     IsFrozen:
       Value: 0
     DisableCollision:
+      Value: 0
+    SlowInLiquids:
+      Value: 0
+    IsWaterSolid:
       Value: 0
 --- !u!114 &3977285621181604314
 MonoBehaviour:

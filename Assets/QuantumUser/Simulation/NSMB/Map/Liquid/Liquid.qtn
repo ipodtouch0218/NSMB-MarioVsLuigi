@@ -13,7 +13,9 @@ signal OnTryLiquidSplash(EntityRef entity, EntityRef liquid, bool exit, bool* do
 signal OnEntityEnterExitLiquid(EntityRef entity, EntityRef liquid, bool underwater);
 
 event LiquidSplashed {
+	nothashed Frame Frame;
 	entity_ref Entity;
+	entity_ref Splasher;
 	nothashed FP Force;
 	nothashed FPVector2 Position;
 	bool Exit;

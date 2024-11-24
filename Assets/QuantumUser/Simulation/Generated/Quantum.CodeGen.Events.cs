@@ -395,9 +395,11 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventLiquidSplashed LiquidSplashed(EntityRef Entity, FP Force, FPVector2 Position, QBoolean Exit) {
+      public EventLiquidSplashed LiquidSplashed(Frame Frame, EntityRef Entity, EntityRef Splasher, FP Force, FPVector2 Position, QBoolean Exit) {
         var ev = _f.Context.AcquireEvent<EventLiquidSplashed>(EventLiquidSplashed.ID);
+        ev.Frame = Frame;
         ev.Entity = Entity;
+        ev.Splasher = Splasher;
         ev.Force = Force;
         ev.Position = Position;
         ev.Exit = Exit;
@@ -1575,7 +1577,9 @@ namespace Quantum {
   }
   public unsafe partial class EventLiquidSplashed : EventBase {
     public new const Int32 ID = 34;
+    public Frame Frame;
     public EntityRef Entity;
+    public EntityRef Splasher;
     public FP Force;
     public FPVector2 Position;
     public QBoolean Exit;
@@ -1597,6 +1601,7 @@ namespace Quantum {
       unchecked {
         var hash = 199;
         hash = hash * 31 + Entity.GetHashCode();
+        hash = hash * 31 + Splasher.GetHashCode();
         hash = hash * 31 + Exit.GetHashCode();
         return hash;
       }

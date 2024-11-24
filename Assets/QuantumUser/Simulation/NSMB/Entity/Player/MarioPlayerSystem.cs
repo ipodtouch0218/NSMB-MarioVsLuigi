@@ -436,7 +436,7 @@ namespace Quantum {
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 foreach (var contact in contacts) {
                     if (f.Has<Liquid>(contact.Entity)) {
-                        f.Events.LiquidSplashed(contact.Entity, -1, filter.Transform->Position, true);
+                        f.Events.LiquidSplashed(f, contact.Entity, filter.Entity, -1, filter.Transform->Position, true);
                         break;
                     }
                 }
@@ -690,10 +690,12 @@ namespace Quantum {
                 return;
             }
 
+            /*
             // TODO: magic number
             if (!mario->IsCrouching && physicsObject->IsUnderwater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_03) {
                 return;
             }
+            */
 
             bool wasCrouching = mario->IsCrouching;
             mario->IsCrouching = 
@@ -855,7 +857,7 @@ namespace Quantum {
             bool? playBumpSound = null;
             QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
             foreach (var contact in contacts) {
-                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < FP._0_33 * 2) {
+                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
                     continue;
                 }
 
@@ -878,7 +880,7 @@ namespace Quantum {
             continueGroundpound &= interactedAny;
             mario->IsGroundpoundActive &= continueGroundpound;
 
-            if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle && physicsObject->IsOnSlideableGround) {
+            if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
                 mario->IsGroundpounding = false;
                 mario->IsSliding = true;
                 physicsObject->Velocity.X = FPMath.Sign(physicsObject->FloorAngle) * physics.SlideMaxVelocity;
@@ -1089,7 +1091,7 @@ namespace Quantum {
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 foreach (var contact in contacts) {
                     if (f.Has<Liquid>(contact.Entity)) {
-                        f.Events.LiquidSplashed(contact.Entity, 2, filter.Transform->Position, false);
+                        f.Events.LiquidSplashed(f, contact.Entity, filter.Entity, 2, filter.Transform->Position, false);
                         break;
                     }
                 }
@@ -1737,7 +1739,7 @@ namespace Quantum {
             bool dropStars = true;
 
             if (f.Unsafe.TryGetPointer(projectile->Owner, out MarioPlayer* ownerMario)) {
-                dropStars = ownerMario->Team == mario->Team;
+                dropStars = ownerMario->Team != mario->Team;
             }
 
             if (!mario->IsInKnockback
@@ -1747,21 +1749,19 @@ namespace Quantum {
 
                 switch (projectileAsset.Effect) {
                 case ProjectileEffectType.Knockback:
-                    bool dropStar = true;
-                    if (f.Unsafe.TryGetPointer(projectile->Owner, out MarioPlayer* marioOwner)) {
-                        dropStar = mario->Team != marioOwner->Team;
-                    }
-                    if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
+                    if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                         mario->Death(f, marioEntity, false);
                     } else {
-                        mario->DoKnockback(f, marioEntity, !projectile->FacingRight, 1, true, projectileEntity);
+                        mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, true, projectileEntity);
                     }
                     break;
                 case ProjectileEffectType.Freeze:
-                    if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
+                    if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                         mario->Death(f, marioEntity, false);
-                    } else {
+                    } else if (dropStars) {
                         IceBlockSystem.Freeze(f, marioEntity);
+                    } else {
+                        mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, true, projectileEntity);
                     }
                     break;
                 }
@@ -2135,6 +2135,9 @@ namespace Quantum {
                 return;
             }
 
+            if (underwater && mario->IsInKnockback) {
+                mario->KnockbackTick = f.Number;
+            }
             if (!underwater && physicsObject->Velocity.Y > 0 && !physicsObject->IsTouchingGround) {
                 mario->SwimForceJumpTimer = 10;
             }
