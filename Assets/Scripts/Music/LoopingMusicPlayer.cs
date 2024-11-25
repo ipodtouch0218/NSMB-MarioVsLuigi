@@ -1,4 +1,3 @@
-using UnityEngine.Serialization;
 using UnityEngine;
 
 public class LoopingMusicPlayer : MonoBehaviour {
@@ -89,7 +88,7 @@ public class LoopingMusicPlayer : MonoBehaviour {
     }
 
     public void Play(LoopingMusicData song, bool restartIfAlreadyPlaying = false) {
-        if (currentAudio == song && !restartIfAlreadyPlaying) {
+        if (currentAudio == song && audioSource.isPlaying && !restartIfAlreadyPlaying) {
             return;
         }
 

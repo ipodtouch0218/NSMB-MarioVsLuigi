@@ -69,7 +69,7 @@ public class ScoreboardEntry : MonoBehaviour {
             var character = f.FindAsset(mario->CharacterAsset);
             scoreBuilder.Append(character.UiString).Append(Utils.GetSymbolString(mario->Lives.ToString()));
         }
-        scoreBuilder.Append(Utils.GetSymbolString("S" + mario->Stars));
+        scoreBuilder.Append(Utils.GetSymbolString('S' + mario->Stars.ToString()));
 
         scoreText.text = scoreBuilder.ToString();
         updater.RequestSorting = true;

@@ -1,4 +1,5 @@
 using Photon.Client;
+using Photon.Realtime;
 using System.Collections.Generic;
 
 namespace NSMB.Utils {
@@ -10,38 +11,24 @@ namespace NSMB.Utils {
         };
 
         public static Dictionary<short, string> DisconnectMessages = new() {
-            [32758] = "ui.error.joinnotfound",
+            [ErrorCode.CustomAuthenticationFailed] = "ui.error.authentication",
+            [ErrorCode.MaxCcuReached] = "ui.error.ccu",
+
+            [ErrorCode.GameDoesNotExist] = "ui.error.join.notfound",
+            [ErrorCode.GameClosed] = "ui.error.join.closed",
+            [ErrorCode.GameFull] = "ui.error.join.full",
         };
 
-            /*
-        public static Dictionary<Enum, string> DisconnectMessages = new() {
-            [ShutdownReason.MaxCcuReached] = "ui.error.ccu",
-            [ShutdownReason.CustomAuthenticationFailed] = "ui.error.authentication",
-            [ShutdownReason.DisconnectedByPluginLogic] = "ui.error.hosttimeout",
-            [ShutdownReason.PhotonCloudTimeout] = "ui.error.photontimeout",
-            [ShutdownReason.ConnectionTimeout] = "ui.error.hosttimeout",
-            [ShutdownReason.Error] = "ui.error.unknown",
-            [ShutdownReason.GameClosed] = "ui.error.joinclosed",
-            [ShutdownReason.GameNotFound] = "ui.error.joinnotfound",
-            [ShutdownReason.GameIsFull] = "ui.error.joinfull",
-            [ShutdownReason.ConnectionRefused] = "ui.error.kicked",
-
-            [NetConnectFailedReason.Timeout] = "ui.error.jointimeout",
-            [NetConnectFailedReason.ServerFull] = "ui.error.joinfull",
-            [NetConnectFailedReason.ServerRefused] = "ui.error.joinrefused",
-
-            [NetDisconnectReason.Timeout] = "ui.error.hosttimeout",
-            [NetDisconnectReason.Unknown] = "ui.error.unknown"
+        public static Dictionary<DisconnectCause, string> DisconnectMessages2 = new() {
+            [DisconnectCause.CustomAuthenticationFailed] = "ui.error.authentication",
+            [DisconnectCause.MaxCcuReached] = "ui.error.ccu",
+            [DisconnectCause.DnsExceptionOnConnect] = "ui.error.connection",
+            [DisconnectCause.ExceptionOnConnect] = "ui.error.connection",
+            [DisconnectCause.ServerTimeout] = "ui.error.timeout",
+            [DisconnectCause.ClientTimeout] = "ui.error.timeout",
+            [DisconnectCause.Exception] = "ui.error.unknown",
+            [DisconnectCause.DisconnectByServerLogic] = "ui.error.plugin",
         };
-            */
-
-            /*
-        public static Dictionary<string, SessionProperty> DefaultRoomProperties = new() {
-            [Enums.NetRoomProperties.IntProperties] = (int) new IntegerProperties(),
-            [Enums.NetRoomProperties.BoolProperties] = (int) new BooleanProperties(),
-            [Enums.NetRoomProperties.HostName] = "noname",
-        };
-            */
 
         public struct IntegerProperties {
             public static readonly IntegerProperties Default = new() {

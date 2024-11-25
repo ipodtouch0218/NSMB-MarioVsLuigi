@@ -232,6 +232,7 @@ GameObject:
   - component: {fileID: 3866495607763378127}
   - component: {fileID: 1930001598682921039}
   - component: {fileID: 4917209735065614385}
+  - component: {fileID: 7931773572498726739}
   m_Layer: 0
   m_Name: Spinner
   m_TagString: Untagged
@@ -555,6 +556,24 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7931773572498726739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7648751058351671058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e996f15526c6efc41a2844bb5666b6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSources:
+  - {fileID: 4917209735065614385}
+  soundOrigin: {fileID: 7020551328166419880}
+  soundRange: 12
+  maxPanning: 0.8
+  useDistanceToCamera: 0
 --- !u!1 &7886301467451270129
 GameObject:
   m_ObjectHideFlags: 0

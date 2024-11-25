@@ -362,6 +362,10 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
+        IsWaterSolid:
+          Value: 0
     - rid: 68130286679883786
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1100,6 +1104,10 @@ MonoBehaviour:
         IsFrozen:
           Value: 0
         DisableCollision:
+          Value: 0
+        SlowInLiquids:
+          Value: 1
+        IsWaterSolid:
           Value: 0
     - rid: 3678451543402610698
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1882,6 +1890,10 @@ MonoBehaviour:
           Value: 0
         DisableCollision:
           Value: 0
+        SlowInLiquids:
+          Value: 1
+        IsWaterSolid:
+          Value: 0
     - rid: 8246143707158413322
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2162,7 +2174,7 @@ MonoBehaviour:
           UserTag: 0
           IsPersistent: 1
           CompoundShapes: []
-        Layer: 10
+        Layer: 9
         IsTrigger: 1
         PhysicsMaterial:
           Id:

@@ -17,7 +17,7 @@ MonoBehaviour:
     Guid:
       Value: 350428014609539980
   clip: {fileID: 8300000, guid: 88177899a83869d4c9c516f64eef1ebe, type: 3}
-  loopStartSeconds: 0
-  loopEndSeconds: 0
+  loopStartSeconds: 0.48
+  loopEndSeconds: 84.96
   fastClip: {fileID: 8300000, guid: 4af50ec441727c24d8216ba53eb38fc6, type: 3}
   speedupFactor: 1.25

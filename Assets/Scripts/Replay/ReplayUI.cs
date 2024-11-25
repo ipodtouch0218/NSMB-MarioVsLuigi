@@ -40,13 +40,11 @@ public class ReplayUI : MonoBehaviour {
         }
 
         trackArrowText.gameObject.SetActive(false);
-        PauseOptionMenuManager.OnOptionsOpenedToggled += OnOptionsOpenedToggled;
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
     public void OnDestroy() {
         Time.timeScale = 1;
-        PauseOptionMenuManager.OnOptionsOpenedToggled -= OnOptionsOpenedToggled;
     }
 
     public void Update() {
@@ -60,7 +58,7 @@ public class ReplayUI : MonoBehaviour {
         float currentFrameNumber = fp.Number + e.Game.InterpolationFactor;
         replayTimecode.text =
             Utils.SecondsToMinuteSeconds(Mathf.FloorToInt((currentFrameNumber - NetworkHandler.ReplayStart) / f.UpdateRate))
-            + "/"
+            + '/'
             + Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate);
 
         float width = maxTrackX - minTrackX;
@@ -100,9 +98,18 @@ public class ReplayUI : MonoBehaviour {
         int newIndex = Mathf.Max(currentIndex - 1, 0);
         int newFrame = (newIndex * (5 * f.UpdateRate)) + NetworkHandler.ReplayStart;
 
+        var session = QuantumRunner.Default.Session;
+
         // It's a private method. Because of course it is.
-        var resetMethod = QuantumRunner.Default.Session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
-        resetMethod.Invoke(QuantumRunner.Default.Session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
+        var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
+        resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
+
+        // Fix accumulated time applying
+        if (session.AccumulatedTime > 0) {
+            var simulator = session.GetType().GetField("_simulator", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(session);
+            var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
+            adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
+        }
     }
 
     public void FastForwardReplay() {
@@ -114,16 +121,17 @@ public class ReplayUI : MonoBehaviour {
         int currentIndex = (f.Number - NetworkHandler.ReplayStart) / (5 * f.UpdateRate);
         int newIndex = currentIndex + 1;
         int newFrame = Mathf.Min((newIndex * (5 * f.UpdateRate)) + NetworkHandler.ReplayStart, NetworkHandler.ReplayEnd);
-        
+
+        var session = QuantumRunner.Default.Session;
         if (newIndex < NetworkHandler.ReplayFrameCache.Count) {
             // We already have this frame
             // It's a private method. Because of course it is.
-            var resetMethod = QuantumRunner.Default.Session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
-            resetMethod.Invoke(QuantumRunner.Default.Session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
+            var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
+            resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
         } else {
             // We have to simulate up to this frame
             NetworkHandler.IsReplayFastForwarding = true;
-            QuantumRunner.Default.Session.Update((newFrame - f.Number) * f.DeltaTime.AsDouble);
+            session.Update((newFrame - f.Number) * f.DeltaTime.AsDouble);
         }
     }
 
@@ -170,19 +178,21 @@ public class ReplayUI : MonoBehaviour {
         int cachedFrame = (newFrameCacheIndex * (5 * f.UpdateRate)) + NetworkHandler.ReplayStart;
 
         // It's a private method. Because of course it is.
-        var resetMethod = QuantumRunner.Default.Session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
-        resetMethod.Invoke(QuantumRunner.Default.Session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, true });
+        var session = QuantumRunner.Default.Session;
+        var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
+        resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, true });
+
+        // Fix accumulated time applying
+        if (session.AccumulatedTime > 0) {
+            var simulator = session.GetType().GetField("_simulator", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(session);
+            var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
+            adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
+        }
 
         // Simulate up to the target frame
         if (newFrame != cachedFrame) {
             NetworkHandler.IsReplayFastForwarding = true;
-            QuantumRunner.Default.Session.Update((newFrame - cachedFrame) * f.DeltaTime.AsDouble);
-        }
-    }
-
-    private void OnOptionsOpenedToggled(bool isEnabled) {
-        // TODO: me
-        if (isEnabled) {
+            session.Update((newFrame - cachedFrame) * f.DeltaTime.AsDouble);
         }
     }
 }

@@ -71,6 +71,10 @@ public class ChatManager : MonoBehaviour {
 
     //---Callbacks
     private void OnChatMessageCallback(ChatMessage.ChatMessageData data) {
+        if (NetworkHandler.IsReplay) {
+            return;
+        }
+
         if (data.isSystemMessage) {
             Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
         } else {

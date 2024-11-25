@@ -45,11 +45,13 @@ public unsafe class UIUpdater : MonoBehaviour {
     private VersusStageData stage;
     private EntityRef previousTarget;
 
+    private Coroutine endGameSequenceCoroutine;
+
     public void OnEnable() {
         MarioPlayerAnimator.MarioPlayerInitialized += OnMarioInitialized;
         MarioPlayerAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
-        BigStarAnimator.BigStarInitialized += OnStarInitialized;
-        BigStarAnimator.BigStarDestroyed += OnStarDestroyed;
+        BigStarAnimator.BigStarInitialized += OnBigStarInitialized;
+        BigStarAnimator.BigStarDestroyed += OnBigStarDestroyed;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
         OnLanguageChanged(GlobalController.Instance.translationManager);
     }
@@ -57,8 +59,8 @@ public unsafe class UIUpdater : MonoBehaviour {
     public void OnDisable() {
         MarioPlayerAnimator.MarioPlayerInitialized -= OnMarioInitialized;
         MarioPlayerAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
-        BigStarAnimator.BigStarInitialized -= OnStarInitialized;
-        BigStarAnimator.BigStarDestroyed -= OnStarDestroyed;
+        BigStarAnimator.BigStarInitialized -= OnBigStarInitialized;
+        BigStarAnimator.BigStarDestroyed -= OnBigStarDestroyed;
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
@@ -93,6 +95,7 @@ public unsafe class UIUpdater : MonoBehaviour {
         StartCoroutine(UpdatePingTextCoroutine());
 
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
@@ -130,13 +133,16 @@ public unsafe class UIUpdater : MonoBehaviour {
         }
     }
 
-    private void OnStarInitialized(Frame f, BigStarAnimator star) {
+    private void OnBigStarInitialized(Frame f, BigStarAnimator star) {
         entityTrackIcons[star] = CreateTrackIcon(f, star.EntityRef, star.transform);
     }
 
-    private void OnStarDestroyed(Frame f, BigStarAnimator star) {
+    private void OnBigStarDestroyed(Frame f, BigStarAnimator star) {
         if (entityTrackIcons.TryGetValue(star, out TrackIcon icon)) {
-            Destroy(icon.gameObject);
+            if (icon) {
+                Destroy(icon.gameObject);
+            }
+            entityTrackIcons.Remove(star);
         }
     }
 
@@ -312,9 +318,23 @@ public unsafe class UIUpdater : MonoBehaviour {
 
         GlobalController.Instance.sfx.PlayOneShot(resultMusic);
         winTextAnimator.SetTrigger(resultAnimationTrigger);
+        winText.enabled = true;
     }
 
     //---Callbacks
+    private void OnGameResynced(CallbackGameResynced e) {
+        if (endGameSequenceCoroutine != null) {
+            StopCoroutine(endGameSequenceCoroutine);
+            endGameSequenceCoroutine = null;
+
+            // (Potentially) stop the win/loss
+            GlobalController.Instance.sfx.Stop();
+
+            winText.enabled = false;
+            winTextAnimator.Play("Empty");
+        }
+    }
+
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Starting) {
             foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
@@ -361,11 +381,8 @@ public unsafe class UIUpdater : MonoBehaviour {
         }
         winText.text = resultText;
 
-        float secondsUntilMenu = hasWinner ? 4.25f : 5.25f;
-
         SoundEffect resultMusic;
         string resultAnimationTrigger;
-
         if (!hasWinner) {
             resultMusic = SoundEffect.UI_Match_Draw;
             resultAnimationTrigger = "startNegative";
@@ -377,7 +394,7 @@ public unsafe class UIUpdater : MonoBehaviour {
             resultAnimationTrigger = "startNegative";
         }
 
-        StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger));
+        endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger));
     }
 
     private void OnLanguageChanged(TranslationManager tm) {
