@@ -7,7 +7,7 @@ using NSMB.Utils;
 using Photon.Realtime;
 
 namespace NSMB.UI.MainMenu {
-    public class RoomListManager : MonoBehaviour, ILobbyCallbacks {
+    public class RoomListManager : MonoBehaviour, ILobbyCallbacks, IConnectionCallbacks {
 
         //---Properties
         public string SelectedRoomCode {
@@ -137,69 +137,22 @@ namespace NSMB.UI.MainMenu {
                     }
                 }
             }
-
-
-            /*
-            List<string> invalidRooms = rooms.Keys.ToList();
-
-            foreach (SessionInfo session in sessionList) {
-
-                // Is this check really necessary anymore?
-
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.HostName, out string host);
-                NetworkUtils.GetSessionProperty(session, Enums.NetRoomProperties.IntProperties, out int packedIntProperties);
-                NetworkUtils.IntegerProperties intProperties = (NetworkUtils.IntegerProperties) packedIntProperties;
-
-                bool valid = true;
-                valid &= session.IsVisible && session.IsOpen;
-                valid &= session.MaxPlayers > 0 && session.MaxPlayers <= 10;
-                valid &= intProperties.maxPlayers > 0 && intProperties.maxPlayers <= 10;
-                valid &= intProperties.lives <= 25;
-                valid &= intProperties.starRequirement >= 1 && intProperties.starRequirement <= 25;
-                valid &= intProperties.coinRequirement >= 3 && intProperties.coinRequirement <= 25;
-                valid &= host.IsValidUsername();
-
-                if (valid) {
-                    invalidRooms.Remove(session.Name);
-                } else {
-                    continue;
-                }
-
-                RoomIcon roomIcon;
-                if (rooms.ContainsKey(session.Name)) {
-                    roomIcon = rooms[session.Name];
-                } else {
-                    roomIcon = Instantiate(roomIconPrefab, Vector3.zero, Quaternion.identity);
-                    roomIcon.name = session.Name;
-                    roomIcon.gameObject.SetActive(true);
-                    roomIcon.transform.SetParent(roomListScrollRect.transform, false);
-                    roomIcon.session = session;
-
-                    rooms[session.Name] = roomIcon;
-                }
-
-                roomIcon.UpdateUI(session);
-            }
-
-            foreach (string key in invalidRooms) {
-                if (!rooms.ContainsKey(key)) {
-                    continue;
-                }
-
-                Destroy(rooms[key].gameObject);
-                rooms.Remove(key);
-            }
-
-            //if (askedToJoin && selectedRoom != null) {
-            //    JoinSelectedRoom();
-            //    askedToJoin = false;
-            //    selectedRoom = null;
-            //}
-
-            //privateRoomIcon.transform.SetAsFirstSibling();
-            */
         }
 
         public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics) { }
+
+        public void OnConnected() { }
+
+        public void OnConnectedToMaster() { }
+
+        public void OnDisconnected(DisconnectCause cause) {
+            ClearRooms();
+        }
+
+        public void OnRegionListReceived(RegionHandler regionHandler) { }
+
+        public void OnCustomAuthenticationResponse(Dictionary<string, object> data) { }
+
+        public void OnCustomAuthenticationFailed(string debugMessage) { }
     }
 }

@@ -102,10 +102,6 @@ public class MusicManager : MonoBehaviour {
     }
 
     private void OnGameEnded(EventGameEnded e) {
-        if (NetworkHandler.IsReplay) {
-            return;
-        }
-
         musicPlayer.Stop();
     }
 
@@ -121,7 +117,9 @@ public class MusicManager : MonoBehaviour {
         }
     }
 
-    private void OnGameResynced(CallbackGameResynced e) {
-        HandleMusic(e.Game, true);
+    private unsafe void OnGameResynced(CallbackGameResynced e) {
+        if (e.Game.Frames.Predicted.Global->GameState == GameState.Playing) {
+            HandleMusic(e.Game, true);
+        }
     }
 }

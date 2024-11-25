@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using NSMB.UI.MainMenu;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -20,6 +21,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
+    private static readonly List<DisconnectCause> NonErrorDisconnectCauses = new() {
+        DisconnectCause.None, DisconnectCause.DisconnectByClientLogic
+    };
 
     //---Static
     public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
@@ -33,6 +37,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static int ReplayEnd => ReplayStart + ReplayLength;
     public static bool IsReplayFastForwarding { get; set; }
     public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
+    public static bool WasDisconnectedViaError { get; set; }
 
     //---Private
     private RealtimeClient realtimeClient;
@@ -52,6 +57,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+        QuantumCallback.Subscribe<CallbackPluginDisconnect>(this, OnPluginDisconnect);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
@@ -162,7 +168,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         for (int i = 1; i < RoomIdLength; i++) {
             idBuilder.Append(RoomIdValidChars[UnityEngine.Random.Range(0, RoomIdValidChars.Length)]);
         }
-        
+
         args.RoomName = idBuilder.ToString();
         args.Lobby = TypedLobby.Default;
         args.RoomOptions.PublishUserId = true;
@@ -271,6 +277,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
     }
 
+    private void OnPluginDisconnect(CallbackPluginDisconnect e) {
+        Debug.Log($"[Network] Disconnected via server plugin: {e.Reason}");
+        
+        WasDisconnectedViaError = true;
+        MainMenuManager.Instance.OpenNetworkErrorBox(DisconnectCause.DisconnectByServerLogic, "reason", e.Reason);
+
+        if (Runner) {
+            Runner.Shutdown(ShutdownCause.SimulationStopped);
+        }
+    }
+
     private void OnGameDestroyed(CallbackGameDestroyed e) {
         SaveReplay(e.Game);
     }
@@ -316,6 +333,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public async static void StartReplay(BinaryReplayFile replay) {
+        if (Client.IsConnected) {
+            await Client.DisconnectAsync();
+        }
+
         IsReplay = true;
         ReplayStart = replay.InitialFrameNumber;
         ReplayLength = replay.ReplayLengthInFrames;
@@ -377,7 +398,18 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     public void OnConnectedToMaster() { }
 
-    public void OnDisconnected(DisconnectCause cause) { }
+    public void OnDisconnected(DisconnectCause cause) {
+        Debug.Log($"[Network] Disconnected. Reason: {cause}");
+        WasDisconnectedViaError = true;
+
+        if (!NonErrorDisconnectCauses.Contains(cause)) {
+            MainMenuManager.Instance.OpenNetworkErrorBox(cause);
+        }
+
+        if (Runner) {
+            Runner.Shutdown(ShutdownCause.SimulationStopped);
+        }
+    }
 
     public void OnRegionListReceived(RegionHandler regionHandler) { }
 
@@ -391,7 +423,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         PlayerPrefs.Save();
     }
 
-    public void OnCustomAuthenticationFailed(string debugMessage) { }
+    public void OnCustomAuthenticationFailed(string debugMessage) {
+        Debug.Log(debugMessage);
+    }
 
 
     public static bool FilterOutReplayFastForward(IDeterministicGame game) {

@@ -118,7 +118,7 @@ namespace NSMB.Utils {
 
         private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
         public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1) {
-            if (f == null) {
+            if (f == null || player == PlayerRef.None) {
                 return spectatorColor;
             }
 
@@ -190,21 +190,14 @@ namespace NSMB.Utils {
         }
 
         public static string GetPingSymbol(int ping) {
-            string pingSymbol;
-            if (ping < 0) {
-                pingSymbol = "<sprite name=connection_disconnected>";
-            } else if (ping == 0) {
-                pingSymbol = "<sprite name=connection_host>";
-            } else if (ping < 80) {
-                pingSymbol = "<sprite name=connection_great>";
-            } else if (ping < 130) {
-                pingSymbol = "<sprite name=connection_good>";
-            } else if (ping < 180) {
-                pingSymbol = "<sprite name=connection_fair>";
-            } else {
-                pingSymbol = "<sprite name=connection_bad>";
-            }
-            return pingSymbol;
+            return ping switch {
+                < 0 => "<sprite name=connection_disconnected>",
+                0 => "<sprite name=connection_host>",
+                < 80 => "<sprite name=connection_great>",
+                < 130 => "<sprite name=connection_good>",
+                < 180 => "<sprite name=connection_fair>",
+                _ => "<sprite name=connection_bad>"
+            };
         }
 
         public static string BytesToString(long byteCount) {

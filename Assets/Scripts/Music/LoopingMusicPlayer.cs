@@ -89,7 +89,8 @@ public class LoopingMusicPlayer : MonoBehaviour {
     }
 
     public void Play(LoopingMusicData song, bool restartIfAlreadyPlaying = false) {
-        if (currentAudio == song && !restartIfAlreadyPlaying) {
+        Debug.Log($"{currentAudio == song} && {audioSource.isPlaying} && {!restartIfAlreadyPlaying}");
+        if (currentAudio == song && audioSource.isPlaying && !restartIfAlreadyPlaying) {
             return;
         }
 

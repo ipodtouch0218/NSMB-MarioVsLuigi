@@ -15,7 +15,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -26,7 +25,6 @@ namespace NSMB.UI.MainMenu {
         public const int NicknameMin = 2, NicknameMax = 20;
 
         //---Public Variables
-        public bool nonNetworkShutdown;
         public AudioSource sfx, music;
         public Toggle spectateToggle;
         public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
@@ -288,7 +286,7 @@ namespace NSMB.UI.MainMenu {
 
             // First connection on play game button.
             if (NetworkHandler.Client.State == ClientState.PeerCreated) {
-                _ = Reconnect();
+                Reconnect();
             }
 
             roomManager.RefreshRooms();
@@ -348,27 +346,24 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenErrorBox(short cause) {
-             OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
+            OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
         }
 
         public void OpenErrorBox(string key, params string[] replacements) {
             errorPrompt.OpenWithText(key, replacements);
-            nonNetworkShutdown = false;
             GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
-        public void OpenNetworkErrorBox(string key) {
-            networkErrorPrompt.OpenWithText(key);
-            GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
-        }
-
-        public void OpenNetworkErrorBox(short cause) {
-            if (nonNetworkShutdown) {
-                OpenErrorBox(cause);
-                return;
+        public void OpenNetworkErrorBox(DisconnectCause cause, params string[] replacements) {
+            if (replacements.Length == 0) {
+                replacements = new[] { "reason", GlobalController.Instance.translationManager.GetTranslation("ui.error.noreason") };
             }
+            OpenNetworkErrorBox(NetworkUtils.DisconnectMessages2.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"), replacements);
+        }
 
-            OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
+        public void OpenNetworkErrorBox(string key, params string[] replacements) {
+            networkErrorPrompt.OpenWithText(key, replacements);
+            GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         }
 
         public void BackSound() {
@@ -398,10 +393,10 @@ namespace NSMB.UI.MainMenu {
             _ = NetworkHandler.ConnectToRegion(targetRegion);
         }
 
-        public async Task<bool> Reconnect() {
+        public async void Reconnect() {
             GlobalController.Instance.connecting.SetActive(true);
             roomListCanvasGroup.interactable = false;
-            return await NetworkHandler.ConnectToRegion(null);
+            _ = await NetworkHandler.ConnectToRegion(null);
         }
 
         public void QuitRoom() {
@@ -827,7 +822,11 @@ namespace NSMB.UI.MainMenu {
             OpenRoomListMenu();
             GlobalController.Instance.discordController.UpdateActivity();
             alreadyInRoom = false;
-            _ = Reconnect();
+
+            if (!NetworkHandler.WasDisconnectedViaError) {
+                Reconnect();
+            }
+            NetworkHandler.WasDisconnectedViaError = false;
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {

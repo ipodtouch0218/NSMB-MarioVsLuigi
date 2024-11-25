@@ -54,7 +54,7 @@ public class AuthenticationHandler {
         if (webRequest.responseCode >= 300) {
             BanMessage ban = JsonConvert.DeserializeObject<BanMessage>(result);
             if (ban != null && MainMenuManager.Instance) {
-                string reason = string.IsNullOrWhiteSpace(ban.Message) ? GlobalController.Instance.translationManager.GetTranslation("ui.error.gamebanned.noreason") : ban.Message;
+                string reason = string.IsNullOrWhiteSpace(ban.Message) ? GlobalController.Instance.translationManager.GetTranslation("ui.error.noreason") : ban.Message;
                 string template = ban.Expiration.HasValue ? "ui.error.gamebanned.temporary" : "ui.error.gamebanned.permanent";
                 MainMenuManager.Instance.OpenErrorBox(template,
                     "banreason", reason, 

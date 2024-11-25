@@ -224,7 +224,7 @@ public static unsafe class QuantumUtils {
             }
         }
 
-        Debug.Log("tie? " + tie + " winning team: " + winningTeam);
+        Debug.Log($"winning team: {(tie ? null : winningTeam)}");
         return tie ? null : winningTeam;
     }
 

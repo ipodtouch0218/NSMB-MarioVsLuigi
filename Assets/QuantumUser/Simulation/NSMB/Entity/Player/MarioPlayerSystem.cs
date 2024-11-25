@@ -1085,7 +1085,7 @@ namespace Quantum {
                 mario->CurrentVolley = 0;
             }
 
-            physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15;
+            physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15 && (!mario->IsInKnockback || mario->IsInWeakKnockback);
             if (physicsObject->IsWaterSolid && !mario->WasTouchingGroundLastFrame && physicsObject->IsTouchingGround) {
                 // Check if we landed on water
                 var contacts = f.ResolveList(physicsObject->Contacts);
