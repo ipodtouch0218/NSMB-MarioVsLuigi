@@ -205,10 +205,10 @@ namespace Quantum {
             var playerDatas = f.Filter<PlayerData>();
             playerDatas.UseCulling = false;
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
-                data->IsSpectator = data->ManualSpectator;
-                if (winningTeam == data->Team) {
+                if (winningTeam == data->Team && !data->IsSpectator) {
                     data->Wins++;
                 }
+                data->IsSpectator = data->ManualSpectator;
             }
 
             f.Global->GameState = GameState.Ended;
