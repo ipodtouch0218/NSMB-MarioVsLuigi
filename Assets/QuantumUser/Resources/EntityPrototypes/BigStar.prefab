@@ -4904,7 +4904,7 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
-    IsTrigger: 1
+    IsTrigger: 0
     Material:
       Id:
         Value: 0
@@ -4974,7 +4974,7 @@ MonoBehaviour:
     LayerSource: 0
     Layer: 9
     CallbackFlags:
-      Value: 0
+      Value: 448
   PhysicsBody:
     IsEnabled: 0
     Config2D: 116
@@ -5113,7 +5113,6 @@ MonoBehaviour:
   particles: {fileID: 3060121057263043570}
   starCollectPrefab: {fileID: 817659606265668166, guid: 0d07cd0662b5f394fa4d95667c1d1814,
     type: 3}
-  entity: {fileID: 9002122264368128006}
   sRenderer: {fileID: 3409460790137144535}
   worldCollider: {fileID: 0}
   legacyAnimation: {fileID: 130453169333135730}
@@ -5422,6 +5421,10 @@ MonoBehaviour:
     IsFrozen:
       Value: 1
     DisableCollision:
+      Value: 0
+    SlowInLiquids:
+      Value: 0
+    IsWaterSolid:
       Value: 0
 --- !u!114 &5501024112843099950
 MonoBehaviour:

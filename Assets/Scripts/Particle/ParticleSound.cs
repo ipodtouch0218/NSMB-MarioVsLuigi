@@ -25,16 +25,20 @@ public class ParticleSound : MonoBehaviour {
             return;
         }
 
-        foreach (ParticleSystem system in systems) {
-            if (system.isEmitting) {
-                if (!sfx.IsPlaying) {
-                    sfx.Play();
+        sfx.Source.enabled = Time.deltaTime != 0;
+
+        if (sfx.Source.enabled) {
+            foreach (ParticleSystem system in systems) {
+                if (system.isEmitting) {
+                    if (!sfx.IsPlaying) {
+                        sfx.Play();
+                    }
+                    return;
                 }
-                return;
             }
-        }
-        if (sfx.IsPlaying) {
-            sfx.Stop();
+            if (sfx.IsPlaying) {
+                sfx.Stop();
+            }
         }
     }
 }

@@ -551,7 +551,9 @@ namespace Quantum {
                 return;
             }
 
-            HandleWallslideStopChecks(ref filter, ref inputs, currentWallDirection);
+            if (mario->IsWallsliding) {
+                HandleWallslideStopChecks(ref filter, ref inputs, currentWallDirection);
+            }
 
             if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
                 mario->WallslideRight = false;
@@ -637,6 +639,7 @@ namespace Quantum {
             if ((wallDirection == FPVector2.Left && (!inputs.Left.IsDown || !physicsObject->IsTouchingLeftWall)) || (wallDirection == FPVector2.Right && (!inputs.Right.IsDown || !physicsObject->IsTouchingRightWall))) {
                 if (mario->WallslideEndFrames == 0) {
                     mario->WallslideEndFrames = 16;
+                    filter.Transform->Position -= wallDirection * FP._0_01;
                 }
             } else {
                 mario->WallslideEndFrames = 0;

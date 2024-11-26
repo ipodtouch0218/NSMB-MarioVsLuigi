@@ -41,6 +41,7 @@ public unsafe class PlayerTrackIcon : TrackIcon {
         }
 
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
         QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
     }
@@ -53,6 +54,15 @@ public unsafe class PlayerTrackIcon : TrackIcon {
         Frame f = game.Frames.Predicted;
         image.enabled &= controllingCamera || !stage.HidePlayersOnMinimap;
         teamIcon.gameObject.SetActive(Settings.Instance.GraphicsColorblind && f.Global->Rules.TeamsEnabled && !controllingCamera);
+    }
+
+    private void OnGameResynced(CallbackGameResynced e) {
+        // TODO: do proper if statements to start the flashing if needed?
+        // eh. probably not needed.
+        if (flashRoutine != null) {
+            StopCoroutine(flashRoutine);
+            flashRoutine = null;
+        }
     }
 
     private IEnumerator Flash() {

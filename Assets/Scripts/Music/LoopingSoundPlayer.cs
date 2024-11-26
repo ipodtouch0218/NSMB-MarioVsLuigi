@@ -5,6 +5,7 @@ public class LoopingSoundPlayer : MonoBehaviour {
 
     //---Properties
     public bool IsPlaying => audioSource.isPlaying;
+    public AudioSource Source => audioSource;
     protected virtual float AudioStart => currentAudio.loopStartSeconds;
     protected virtual float AudioEnd => currentAudio.loopEndSeconds;
 
