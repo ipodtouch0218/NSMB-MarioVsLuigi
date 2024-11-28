@@ -817,7 +817,7 @@ namespace Quantum {
                     continue;
                 }
                 FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, tileTuple.Item1);
-                tile.GetWorldPolygons(stageTile, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, worldPos);
+                tile.GetWorldPolygons(f, stage, stageTile, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, worldPos);
 
                 int shapeIndex = 0;
                 int vertexIndex = 0;

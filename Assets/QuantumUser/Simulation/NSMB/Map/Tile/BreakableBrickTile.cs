@@ -9,6 +9,8 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
     public Color ParticleColor;
     public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioDrill | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs;
     public bool BumpIfNotBroken;
+    public FPVector2 BumpSize = new FPVector2(FP._0_50, FP._0_50);
+    public FPVector2 BumpOffset = FPVector2.Zero;
 
     // [SerializeField] private Vector2Int tileSize = Vector2Int.one;
 
@@ -64,7 +66,6 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
         } else if (BumpIfNotBroken && doBump) {
             Bump(f, stage, tilePosition, tileInstance, direction == InteractionDirection.Down, bumpOwner, allowSelfDamage);
-
         } else {
             playBumpSound = true;
         }

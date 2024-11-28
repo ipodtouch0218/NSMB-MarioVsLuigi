@@ -54,7 +54,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aff24fad35d79d24d8d4415d4f61750b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 9150257369006672343}
   sRenderer: {fileID: 1145319354374527610}
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 0}
@@ -243,19 +242,7 @@ MonoBehaviour:
   ErrorRotationTeleportDistance: 0.5
   OnEntityInstantiated:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 473443410690841455}
-        m_TargetAssemblyTypeName: PowerupAnimator, Assembly-CSharp
-        m_MethodName: Initialize
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   OnEntityDestroyed:
     m_PersistentCalls:
       m_Calls: []
@@ -382,6 +369,8 @@ MonoBehaviour:
       Value: 0
     SlowInLiquids:
       Value: 1
+    IsWaterSolid:
+      Value: 0
 --- !u!114 &1256801405142820976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -425,7 +414,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 1017215213198693199}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!114 &2210952625023297629
 MonoBehaviour:
   m_ObjectHideFlags: 0

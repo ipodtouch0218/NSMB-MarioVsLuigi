@@ -1,8 +1,12 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
     public unsafe class BlockBumpSystem : SystemMainThreadFilter<BlockBumpSystem.Filter> {
+
+        private static readonly FPVector2 BumpOffset = new FPVector2(0, -FP._0_25);
+
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -11,22 +15,32 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter) {
-            FP bumpSize = Constants._0_35;
-            FP bumpScale = FP._0_25;
-            FP bumpDuration = FP._0_25;
-
             var blockBump = filter.BlockBump;
             var collider = filter.Collider;
             var transform = filter.Transform;
 
-            bool kill = QuantumUtils.Decrement(ref blockBump->Lifetime);
-            FP size = FPMath.Sin(blockBump->Lifetime * f.DeltaTime / bumpDuration * FP.Pi) * bumpScale;
+            FP bumpSize = Constants._0_35;
+            FPVector2 bumpScale = new(FP._0_25, FP._0_25);
+            FP bumpDuration = FP._0_25;
+            FPVector2 bumpOffset = BumpOffset;
 
-            collider->Shape.Box.Extents = new FPVector2(FP._0_25 + (size / 3), FP._0_25 + (size / 3));
-            transform->Position = blockBump->Origin + new FPVector2(0, size * (blockBump->IsDownwards ? -1 : 1));
+            if (f.FindAsset(blockBump->StartTile) is BreakableBrickTile bbt) {
+                bumpScale = bbt.BumpSize / 2;
+                bumpOffset += bbt.BumpOffset;
+            }
+
+            bool kill = QuantumUtils.Decrement(ref blockBump->Lifetime);
+            FP sizeAmount = FPMath.Sin(blockBump->Lifetime * f.DeltaTime / bumpDuration * FP.Pi);
+            FPVector2 newSize = bumpScale + (bumpScale * sizeAmount) / 3;
+
+            collider->Shape.Box.Extents = newSize;
+            transform->Position =
+                blockBump->Origin
+                + bumpOffset
+                + new FPVector2(0, blockBump->IsDownwards ? (bumpScale.Y * 2 - newSize.Y) : newSize.Y);
 
             if (!blockBump->HasBumped) {
-                Bump(f, transform->Position, blockBump->Owner, blockBump->AllowSelfDamage);
+                Bump(f, transform->Position, blockBump->Owner, blockBump->AllowSelfDamage, bumpScale.X, -bumpOffset.Y / 2);
                 blockBump->HasBumped = true;
             }
 
@@ -45,57 +59,49 @@ namespace Quantum {
                 EntityRef newPowerup = f.Create(blockBump->Powerup);
                 if (f.Unsafe.TryGetPointer(newPowerup, out Powerup* powerup)) {
                     // Launch if downwards bump and theres a (solid) block below us
-                    StageTileInstance tileInstance = stage.GetTileRelative(f, blockBump->TileX, blockBump->TileY - 1);
-                    bool launch = blockBump->IsDownwards && tileInstance.HasWorldPolygons(f);
+                    BreakableBrickTile tile = (BreakableBrickTile) f.FindAsset(blockBump->StartTile);
+                    StageTileInstance belowTileInstance = stage.GetTileRelative(f, blockBump->TileX, blockBump->TileY - FPMath.RoundToInt(tile.BumpSize.Y * 2));
+                    bool launch = blockBump->IsDownwards && belowTileInstance.HasWorldPolygons(f);
 
-                    FP height = f.Unsafe.GetPointer<PhysicsCollider2D>(newPowerup)->Shape.Box.Extents.Y * 2;
-                    FPVector2 origin = filter.Transform->Position + FPVector2.Down * FP._0_25;
+                    FP powerupHeight = f.Unsafe.GetPointer<PhysicsCollider2D>(newPowerup)->Shape.Box.Extents.Y;
+                    FPVector2 origin = filter.Transform->Position;
 
                     var powerupScriptable = f.FindAsset(powerup->Scriptable);
                     if (powerupScriptable.State == PowerupState.MegaMushroom) {
-                        powerup->Initialize(f, newPowerup, 90, origin + FPVector2.Up * FP._0_50, origin + FPVector2.Up * FP._0_50, false);
+                        origin.Y += (tile.BumpSize.Y / 2) - FP._0_50;
+
+                        powerup->Initialize(f, newPowerup, 90, 
+                            origin + FPVector2.Up * FP._0_50, 
+                            origin + FPVector2.Up * FP._0_50, 
+                            false);
                     } else {
-                        powerup->Initialize(f, newPowerup, (byte) (launch ? 20 : 60), origin,
-                            origin + (blockBump->IsDownwards ? FPVector2.Down * height : FPVector2.Up * FP._0_50), launch);
+                        if (blockBump->IsDownwards) {
+                            origin.Y -= (tile.BumpSize.Y / 2);
+                        } else {
+                            origin.Y += (tile.BumpSize.Y / 2) - FP._0_50;
+                        }
+
+                        powerup->Initialize(f, newPowerup, (byte) (launch ? 20 : 60),
+                            origin, 
+                            origin + (blockBump->IsDownwards ? new FPVector2(0, -FP._0_50) : new FPVector2(0, FP._0_50)), 
+                            launch);
                     }
                 }
-
-                /*
-                bool mega = SpawnPrefab == PrefabList.Instance.Powerup_MegaMushroom;
-                Vector2 pos = (Vector2) transform.position + SpawnOffset;
-                Vector2 animOrigin = pos;
-                Vector2 animDestination;
-                float pickupDelay = 0.75f;
-
-                if (mega) {
-                    animOrigin += (Vector2.up * 0.5f);
-                    animDestination = animOrigin;
-                    pickupDelay = 1.5f;
-
-                } else if (IsDownwards) {
-                    float blockSize = sRenderer.sprite.bounds.size.y * 0.5f;
-                    animOrigin += (0.5f - blockSize) * Vector2.up;
-                    animDestination = animOrigin + (Vector2.down * 0.5f);
-
-                } else {
-                    animDestination = animOrigin + (Vector2.up * 0.5f);
-                }
-                */
             }
 
             f.Destroy(filter.Entity);
         }
 
-        public static void Bump(Frame f, FPVector2 position, EntityRef bumpee, bool allowSelfDamage) {
+        public static void Bump(Frame f, FPVector2 position, EntityRef bumpee, bool allowSelfDamage, FP? width = null, FP? height = null) {
             // TODO change extents to be customizable
-            FPVector2 extents = new(FP._0_25, FP._0_10);
+            FPVector2 extents = new(width ?? FP._0_25, FP._0_10);
             Transform2D transform = new() {
-                Position = position
+                Position = position + new FPVector2(0, (extents.Y * 2) + (height ?? FP._0_25))
             };
 
-            Draw.Rectangle(position + FPVector2.Up * (extents.Y + FP._0_25), extents * 2, 0);
+            Draw.Rectangle(transform.Position, extents * 2, 0);
 
-            var hits = f.Physics2D.OverlapShape(transform, Shape2D.CreateBox(extents, FPVector2.Up * (extents.Y + FP._0_25)));
+            var hits = f.Physics2D.OverlapShape(transform, Shape2D.CreateBox(extents));
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits[i];
                 if (bumpee == hit.Entity && !allowSelfDamage) {

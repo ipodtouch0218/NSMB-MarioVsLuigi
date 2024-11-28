@@ -151,6 +151,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5334425534174023778}
+  - component: {fileID: -5427717914333536940}
   - component: {fileID: 3377063373533538626}
   - component: {fileID: 442797515846176906}
   - component: {fileID: -6891361109405082350}
@@ -183,6 +184,25 @@ Transform:
   - {fileID: 7382415506076328421}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-5427717914333536940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5334425534174023786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aff24fad35d79d24d8d4415d4f61750b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sRenderer: {fileID: 5475970293224446295}
+  childAnimator: {fileID: 0}
+  childAnimation: {fileID: 5475970293224446293}
+  blinkingRate: 4
+  scaleRate: 0.1333
+  scaleSize: 0.3
+  sfx: {fileID: -6891361109405082350}
 --- !u!114 &3377063373533538626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -482,7 +502,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 5334425534174023778}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 1
 --- !u!114 &6636258648682946604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -546,6 +565,10 @@ MonoBehaviour:
     IsFrozen:
       Value: 0
     DisableCollision:
+      Value: 0
+    SlowInLiquids:
+      Value: 0
+    IsWaterSolid:
       Value: 0
 --- !u!114 &7282818765540506302
 MonoBehaviour:

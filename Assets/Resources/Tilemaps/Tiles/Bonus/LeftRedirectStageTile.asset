@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
-  m_Name: clown_17StageTile
+  m_Script: {fileID: 11500000, guid: b93d28497a61f0143858347120ac96a6, type: 3}
+  m_Name: LeftRedirectStageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/Bonus/clown_17StageTile
+    Path: Resources/Tilemaps/Tiles/Bonus/LeftRedirectStageTile
     Guid:
-      Value: 510893121922549689
-  Tile: {fileID: 11400000, guid: e5647f565f95cde4498d92078ecaade1, type: 2}
+      Value: 498908436178114117
+  Tile: {fileID: 11400000, guid: caa8ace0eefc8964a8e3a5401e9c473d, type: 2}
   CollisionData:
     Shapes:
     - Vertices:
@@ -31,13 +31,14 @@ MonoBehaviour:
       - X:
           RawValue: 32768
         Y:
-          RawValue: 4096
+          RawValue: -32768
       - X:
           RawValue: -32768
         Y:
-          RawValue: 4096
+          RawValue: -32768
   IsSlipperyGround: 0
   IsSlideableGround: 0
   IsPolygon: 1
   FootstepSound: 31
   FootstepParticle: 0
+  RelocateTo: {x: 39, y: 9}

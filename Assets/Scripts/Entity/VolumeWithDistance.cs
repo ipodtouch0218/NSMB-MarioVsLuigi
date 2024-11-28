@@ -11,7 +11,6 @@ public class VolumeWithDistance : MonoBehaviour {
     [SerializeField] private Transform soundOrigin;
     [SerializeField] private float soundRange = 12f;
     [SerializeField] private float maxPanning = 0.8f;
-    [SerializeField] private bool useDistanceToCamera;
 
     //---Private Variables
     private float soundRangeInverse;

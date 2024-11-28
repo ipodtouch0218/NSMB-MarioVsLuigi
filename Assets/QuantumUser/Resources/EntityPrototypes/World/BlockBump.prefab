@@ -81,9 +81,9 @@ MonoBehaviour:
         RawValue: 0
       BoxExtents:
         X:
-          RawValue: 16384
+          RawValue: 32768
         Y:
-          RawValue: 16384
+          RawValue: 32768
       PositionOffset:
         X:
           RawValue: 0
@@ -248,7 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c3cde99b64024641a20dee0ed9f7071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 7605061063240577649}
   sRenderer: {fileID: 1318658099548342143}
   sfx: {fileID: -7945987463487596907}
 --- !u!212 &1318658099548342143
