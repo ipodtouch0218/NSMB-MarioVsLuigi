@@ -23,7 +23,11 @@ namespace Quantum {
 
             // Chat
             factories.Add(new CommandSendChatMessage());
-            factories.Add(new CommandStartTyping()); 
+            factories.Add(new CommandStartTyping());
+
+            // Moderation
+            factories.Add(new CommandBanPlayer());
+            factories.Add(new CommandKickPlayer());
         }
     }
 }

@@ -195,8 +195,15 @@ namespace NSMB.UI.MainMenu {
             HideDropdown(true);
         }
 
-        public void KickPlayer() {
-            // TODO MainMenuManager.Instance.Kick(player);
+        public unsafe void KickPlayer() {
+            var game = QuantumRunner.DefaultGame;
+            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            if (game.PlayerIsLocal(host)) {
+                int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
+                game.SendCommand(slot, new CommandKickPlayer {
+                    Target = player
+                });
+            }
             HideDropdown(true);
         }
 

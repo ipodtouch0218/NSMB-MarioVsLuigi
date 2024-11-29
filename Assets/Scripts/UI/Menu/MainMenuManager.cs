@@ -9,7 +9,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -139,6 +138,7 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumEvent.Subscribe<EventCountdownTick>(this, OnCountdownTick);
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
+            QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerConfirmed);
@@ -857,6 +857,14 @@ namespace NSMB.UI.MainMenu {
                 startingGame = e.IsGameStarting;
             }
             lastCountdownStartFrame = f.Number;
+        }
+
+        private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
+            UpdateStartGameButton(e.Game);
+
+            if (e.Game.PlayerIsLocal(e.Player)) {
+                e.Game.Session.Destroy();
+            }
         }
 
         private void OnPlayerDataChanged(EventPlayerDataChanged e) {

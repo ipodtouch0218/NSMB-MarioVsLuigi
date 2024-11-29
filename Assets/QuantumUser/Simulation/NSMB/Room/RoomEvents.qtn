@@ -1,0 +1,16 @@
+
+event PlayerStartedTyping {
+	Frame Frame;
+	PlayerRef Player;
+}
+
+synced event PlayerSentChatMessage {
+	Frame Frame;
+	PlayerRef Player;
+	String Message;
+}
+
+synced event PlayerKickedFromRoom {
+	Frame Frame;
+	PlayerRef Player;
+}

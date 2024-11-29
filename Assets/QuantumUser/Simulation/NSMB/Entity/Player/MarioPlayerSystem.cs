@@ -784,11 +784,11 @@ namespace Quantum {
                 return;
             }
 
-            /* intentional: remove left/right requirement when groundpounding
+            /// * intentional: remove left/right requirement when groundpounding
             if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && (inputs.Left.IsDown || inputs.Right.IsDown)) {
                 return;
             }
-            */
+            // */
 
             if (mario->IsSpinnerFlying) {
                 // Start drill
