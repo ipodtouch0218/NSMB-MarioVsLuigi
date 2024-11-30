@@ -222,6 +222,7 @@ namespace Quantum {
                         if (f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid) && liquid->LiquidType == LiquidType.Water) {
                             if (!physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
                                 // Colliding with water and we cant interact
+                                Debug.Log('c');
                                 continue;
                             }
                         }

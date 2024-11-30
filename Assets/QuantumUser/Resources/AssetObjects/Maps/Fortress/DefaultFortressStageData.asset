@@ -20,6 +20,7 @@ MonoBehaviour:
   MusicComposer: 
   TranslationKey: level.default.fortress
   DiscordStageImage: level-fortress
+  Icon: {fileID: 21300000, guid: c8510af529294be40a5f09eeddf3d764, type: 3}
   OverrideAutomaticTilemapSettings: 0
   TileDimensions: {x: 64, y: 8}
   TileOrigin: {x: -38, y: -13}

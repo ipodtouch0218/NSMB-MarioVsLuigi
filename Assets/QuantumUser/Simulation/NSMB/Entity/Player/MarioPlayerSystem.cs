@@ -1362,12 +1362,20 @@ namespace Quantum {
 
             QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
 
+            FPVector2 iceBlockSize = collider->Shape.Box.Extents;
             FP newHeight;
             bool crouchHitbox = mario->CurrentPowerupState != PowerupState.MiniMushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
-            if (mario->CurrentPowerupState <= PowerupState.MiniMushroom || (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->IsGroundpounding) {
+            bool smallHitbox = (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->IsGroundpounding;
+            if (mario->CurrentPowerupState <= PowerupState.MiniMushroom || smallHitbox) {
                 newHeight = physics.SmallHitboxHeight;
+                if (smallHitbox) {
+                    iceBlockSize.Y = physics.LargeHitboxHeight;
+                } else {
+                    iceBlockSize.Y = physics.SmallHitboxHeight;
+                }
             } else {
                 newHeight = physics.LargeHitboxHeight;
+                iceBlockSize.Y = physics.LargeHitboxHeight;
             }
 
             if (crouchHitbox) {
@@ -1393,7 +1401,7 @@ namespace Quantum {
             collider->Shape.Centroid = FPVector2.Up * newExtents.Y;
             collider->IsTrigger = mario->IsDead;
 
-            filter.Freezable->IceBlockSize = collider->Shape.Box.Extents * Constants._2_50;
+            filter.Freezable->IceBlockSize = iceBlockSize * Constants._2_50;
             filter.Freezable->IceBlockSize.Y += FP._0_10;
             filter.Freezable->IceBlockSize.X += FP._0_10;
         }

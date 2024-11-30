@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &7019652663708293724
+--- !u!1001 &5026752308167325967
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -8,21 +8,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3545332386736821867, guid: 838c4efa2a70fd44d9414efed832ea97,
+    - target: {fileID: 1154580734366823496, guid: 838c4efa2a70fd44d9414efed832ea97,
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+      objectReference: {fileID: -123344264, guid: c55eba81d441d3f439e8289699cf72c8,
         type: 3}
     - target: {fileID: 4966771921777507886, guid: 838c4efa2a70fd44d9414efed832ea97,
         type: 3}
       propertyPath: m_Name
       value: RedPipe Variant
-      objectReference: {fileID: 0}
-    - target: {fileID: 6460915104767337924, guid: 838c4efa2a70fd44d9414efed832ea97,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6460915104767337924, guid: 838c4efa2a70fd44d9414efed832ea97,
         type: 3}
@@ -74,6 +69,23 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8802682422936085193, guid: 838c4efa2a70fd44d9414efed832ea97,
+        type: 3}
+      propertyPath: UVModule.sprites.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8802682422936085193, guid: 838c4efa2a70fd44d9414efed832ea97,
+        type: 3}
+      propertyPath: UVModule.sprites.Array.data[0].sprite
+      value: 
+      objectReference: {fileID: -1613487493, guid: 5ff55f5a682552a4587009a62749e4d6,
+        type: 3}
+    - target: {fileID: 8802682422936085193, guid: 838c4efa2a70fd44d9414efed832ea97,
+        type: 3}
+      propertyPath: UVModule.sprites.Array.data[1].sprite
+      value: 
+      objectReference: {fileID: 262850628, guid: 5ff55f5a682552a4587009a62749e4d6,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

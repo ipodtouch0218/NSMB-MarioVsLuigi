@@ -20,6 +20,7 @@ MonoBehaviour:
   MusicComposer: vincells
   TranslationKey: level.custom.beach
   DiscordStageImage: beach
+  Icon: {fileID: 21300000, guid: ca318a491eab4914286c260c3692e7b2, type: 3}
   OverrideAutomaticTilemapSettings: 0
   TileDimensions: {x: 64, y: 24}
   TileOrigin: {x: -28, y: -12}

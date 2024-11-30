@@ -23,8 +23,7 @@ namespace NSMB.Loading {
 
         private string GetValueFromField() {
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
-            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            if (stage == null) {
+            if (f == null || !f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
                 return "";
             }
 

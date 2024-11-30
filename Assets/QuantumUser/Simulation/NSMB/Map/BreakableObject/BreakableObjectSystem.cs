@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnBeforePhysicsCollision, ISignalOnStageReset {
@@ -45,7 +46,7 @@ namespace Quantum {
             if (dot > PhysicsObjectSystem.GroundMaxAngle) {
                 // Hit the top of a pipe
                 // Shrink by 1, if we can.
-                if (breakable->IsStompable && breakable->CurrentHeight >= breakable->MinimumHeight + 1 && mario->JumpState != JumpState.None) {
+                if (breakable->IsStompable && breakable->CurrentHeight >= breakable->MinimumHeight + 1 && mario->JumpState != JumpState.None && (breakable->CurrentHeight - 1 > 0)) {
                     ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->CurrentHeight - 1, null);
                     mario->JumpState = JumpState.None;
                 }

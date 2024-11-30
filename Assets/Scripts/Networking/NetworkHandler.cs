@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using NSMB.UI.MainMenu;
+using static ReplayListManager;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -206,13 +207,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         initialFrameData = null;
 
         // Create directories and open file
-        string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays");
+        string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays", "temp");
         Directory.CreateDirectory(replayFolder);
         string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".mvlreplay");
         using FileStream outputStream = new FileStream(finalFilePath, FileMode.Create);
 
         // Write binary replay
-        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay);
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, map, players);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
 
         // Complete
@@ -322,13 +323,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     int initialFrame;
     byte[] initialFrameData;
-    private void OnRecordingStarted(EventRecordingStarted e) {
+    AssetRef<Map> map;
+    byte players;
+    private unsafe void OnRecordingStarted(EventRecordingStarted e) {
         QuantumGame game = e.Game;
         Frame startFrame = e.Frame;
 
         game.StartRecordingInput(startFrame.Number);
         initialFrameData = startFrame.Serialize(DeterministicFrameSerializeMode.Serialize);
         initialFrame = startFrame.Number;
+        map = e.Frame.MapAssetRef;
+        players = e.Frame.Global->RealPlayers;
         Debug.Log("[Replay] Started recording a new replay.");
     }
 
@@ -423,10 +428,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         PlayerPrefs.Save();
     }
 
-    public void OnCustomAuthenticationFailed(string debugMessage) {
-        Debug.Log(debugMessage);
-    }
-
+    public void OnCustomAuthenticationFailed(string debugMessage) { }
 
     public static bool FilterOutReplayFastForward(IDeterministicGame game) {
         return !IsReplayFastForwarding;

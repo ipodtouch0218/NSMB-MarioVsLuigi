@@ -343,6 +343,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -358,6 +364,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 81920
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -500,6 +524,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -515,6 +545,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 131072
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -616,6 +664,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -631,6 +685,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 65536
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -967,6 +1039,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -982,6 +1060,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 49152
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1083,6 +1179,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -1098,6 +1200,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 16384
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2180,6 +2300,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -2195,6 +2321,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 16384
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2248,7 +2392,7 @@ PrefabInstance:
     - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: Prototype.MinimumHeight.RawValue
-      value: 0
+      value: 65536
       objectReference: {fileID: 0}
     - target: {fileID: 8809138527817545200, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -2291,6 +2435,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -2306,6 +2456,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 65536
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 1245028871697323521, guid: 653a72a1ba4dcac44ab324a5da6ed304,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: -2004387016, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2622,6 +2790,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -2637,6 +2811,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 98304
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2865,6 +3057,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -2880,6 +3078,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 16384
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 1245028871697323521, guid: 653a72a1ba4dcac44ab324a5da6ed304,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: -2004387016, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2976,6 +3192,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -2991,6 +3213,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 65536
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 1245028871697323521, guid: 653a72a1ba4dcac44ab324a5da6ed304,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: -2004387016, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3168,7 +3408,7 @@ GameObject:
   m_Component:
   - component: {fileID: 995198514}
   m_Layer: 0
-  m_Name: StarSpawn (10)
+  m_Name: StarSpawn (4)
   m_TagString: StarSpawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3685,12 +3925,12 @@ Transform:
   - {fileID: 1439357210}
   - {fileID: 1645174299}
   - {fileID: 1847650998}
+  - {fileID: 995198514}
   - {fileID: 1316954556}
   - {fileID: 285437915}
   - {fileID: 93947658}
   - {fileID: 638639613}
   - {fileID: 1767023589}
-  - {fileID: 995198514}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1294931946
@@ -4078,6 +4318,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -4093,6 +4339,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 65536
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 1245028871697323521, guid: 653a72a1ba4dcac44ab324a5da6ed304,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: -2004387016, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4766,6 +5030,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -4781,6 +5051,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 98304
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4882,6 +5170,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -4897,6 +5191,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 16384
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 1245028871697323521, guid: 653a72a1ba4dcac44ab324a5da6ed304,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: -2004387016, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5024,6 +5336,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -5039,6 +5357,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 81920
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5171,6 +5507,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -5186,6 +5528,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 65536
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 1245028871697323521, guid: 653a72a1ba4dcac44ab324a5da6ed304,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: -2004387016, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: -451536297, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10907,7 +11267,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1847650998}
   m_Layer: 0
-  m_Name: StarSpawn (4)
+  m_Name: StarSpawn (3)
   m_TagString: StarSpawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11577,6 +11937,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1450510929900931296, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_Name
@@ -11592,6 +11958,24 @@ PrefabInstance:
       propertyPath: PhysicsCollider.Shape2D.PositionOffset.Y.RawValue
       value: 65536
       objectReference: {fileID: 0}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: breakPrefab
+      value: 
+      objectReference: {fileID: 2492885072743571861, guid: c54f02e97e96f0c449244320bb02c140,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: brokenSprite
+      value: 
+      objectReference: {fileID: 561818379, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
+    - target: {fileID: 5260750400409825475, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: unbrokenSprite
+      value: 
+      objectReference: {fileID: 253505330, guid: c55eba81d441d3f439e8289699cf72c8,
+        type: 3}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x

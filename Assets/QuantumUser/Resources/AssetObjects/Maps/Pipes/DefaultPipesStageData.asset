@@ -20,6 +20,7 @@ MonoBehaviour:
   MusicComposer: 
   TranslationKey: level.default.pipes
   DiscordStageImage: level-pipes
+  Icon: {fileID: 21300000, guid: c82b36c5c4874c44d9e79480880ddc16, type: 3}
   OverrideAutomaticTilemapSettings: 0
   TileDimensions: {x: 64, y: 27}
   TileOrigin: {x: -39, y: -11}

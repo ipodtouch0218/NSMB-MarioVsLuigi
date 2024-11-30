@@ -280,7 +280,8 @@ namespace NSMB.Entities.Player {
                 isInWaterLiquid |= liquid->LiquidType == LiquidType.Water;
 
                 if (!mario->IsDead) {
-                    float waterTop = liquidTransform->Position.Y.AsFloat + liquidCollider->Shape.Centroid.Y.AsFloat + liquidCollider->Shape.Box.Extents.Y.AsFloat;
+                    liquidCollider->Shape.Compound.GetShapes(f, out Shape2D* shapes, out _);
+                    float waterTop = liquidTransform->Position.Y.AsFloat + liquidCollider->Shape.Centroid.Y.AsFloat + shapes[0].Box.Extents.Y.AsFloat;
                     if (marioTop >= waterTop - 0.125f) {
                         FPVector2 current = transform.position.ToFPVector2();
                         current.Y = 0;

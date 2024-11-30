@@ -20,6 +20,7 @@ MonoBehaviour:
   MusicComposer: 
   TranslationKey: level.default.grass
   DiscordStageImage: level-grassland
+  Icon: {fileID: 21300000, guid: e65b552347cbc084fae4f7174a2f115e, type: 3}
   OverrideAutomaticTilemapSettings: 0
   TileDimensions: {x: 64, y: 12}
   TileOrigin: {x: -48, y: -13}

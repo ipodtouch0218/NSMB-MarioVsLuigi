@@ -7,7 +7,6 @@ using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -27,7 +26,7 @@ namespace NSMB.UI.MainMenu {
         public AudioSource sfx, music;
         public Toggle spectateToggle;
         public GameObject playersContent, playersPrefab, chatContent, chatPrefab;
-        public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, creditsSelected, updateBoxSelected, ColorName;
+        public GameObject titleSelected, mainMenuSelected, lobbySelected, currentLobbySelected, replaysSelected, updateBoxSelected, ColorName;
         public int currentSkin;
 
         //---Serialized Fields
@@ -41,7 +40,7 @@ namespace NSMB.UI.MainMenu {
 
         [Header("UI Elements")]
         [SerializeField] private GameObject title;
-        [SerializeField] private GameObject bg, mainMenu, lobbyMenu, createLobbyPrompt, webglCreateLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox;
+        [SerializeField] private GameObject bg, mainMenu, lobbyMenu, replayMenu, createLobbyPrompt, privateRoomIdPrompt, inLobbyMenu, creditsMenu, updateBox;
         [SerializeField] private GameObject sliderText, currentMaxPlayers, settingsPanel;
         [SerializeField] private TMP_Dropdown levelDropdown, characterDropdown, regionDropdown;
         [SerializeField] private Button createRoomBtn, joinRoomBtn, joinPrivateRoomBtn, reconnectBtn, startGameBtn;
@@ -256,9 +255,9 @@ namespace NSMB.UI.MainMenu {
             mainMenu.SetActive(false);
             lobbyMenu.SetActive(false);
             createLobbyPrompt.SetActive(false);
-            webglCreateLobbyPrompt.SetActive(false);
             inLobbyMenu.SetActive(false);
             creditsMenu.SetActive(false);
+            replayMenu.SetActive(false);
             privateRoomIdPrompt.SetActive(false);
             updateBox.SetActive(false);
         }
@@ -319,22 +318,12 @@ namespace NSMB.UI.MainMenu {
             GlobalController.Instance.optionsManager.OpenMenu();
         }
 
-        public void OpenCredits() {
-            string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "replays"));
-            string filepath = files.Where(file => file.EndsWith(".mvlreplay")).Last();
-
-            using FileStream inputStream = new FileStream(filepath, FileMode.Open);
-            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile)) {
-                NetworkHandler.StartReplay(replayFile);
-            }
-
-            return;
-
+        public void OpenReplays() {
             DisableAllMenus();
             bg.SetActive(true);
-            creditsMenu.SetActive(true);
+            replayMenu.SetActive(true);
 
-            EventSystem.current.SetSelectedGameObject(creditsSelected);
+            EventSystem.current.SetSelectedGameObject(replaysSelected);
         }
 
         public void OpenInRoomMenu() {
@@ -772,7 +761,7 @@ namespace NSMB.UI.MainMenu {
         private unsafe void OnLanguageChanged(TranslationManager tm) {
             int selectedLevel = levelDropdown.value;
             levelDropdown.ClearOptions();
-            levelDropdown.AddOptions(maps.Select(map => tm.GetTranslation(map.translationKey)).ToList());
+            levelDropdown.AddOptions(maps.Select(map => (map.isCustom ? "<sprite name=room_customlevel> " : "") + tm.GetTranslation(map.translationKey)).ToList());
             levelDropdown.SetValueWithoutNotify(selectedLevel);
 
             int selectedCharacter = characterDropdown.value;
@@ -863,7 +852,7 @@ namespace NSMB.UI.MainMenu {
             UpdateStartGameButton(e.Game);
 
             if (e.Game.PlayerIsLocal(e.Player)) {
-                e.Game.Session.Destroy();
+                QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
             }
         }
 
@@ -910,6 +899,7 @@ namespace NSMB.UI.MainMenu {
             public string translationKey;
             public GameObject levelPreviewPosition;
             public AssetRef<Map> mapAsset;
+            public bool isCustom;
         }
 
         public class RegionOption : TMP_Dropdown.OptionData, IComparable {

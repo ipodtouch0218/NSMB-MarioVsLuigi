@@ -1828,7 +1828,7 @@ MonoBehaviour:
         OriginalHeight:
           RawValue: 65536
         MinimumHeight:
-          RawValue: 0
+          RawValue: 65536
         IsStompable:
           Value: 1
     - rid: 6243389144089755648

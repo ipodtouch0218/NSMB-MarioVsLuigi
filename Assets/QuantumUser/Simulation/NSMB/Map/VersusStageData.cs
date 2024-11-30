@@ -14,6 +14,7 @@ public unsafe class VersusStageData : AssetObject {
     public string MusicComposer;
     public string TranslationKey;
     public string DiscordStageImage;
+    public Sprite Icon;
 
     [Header("-- Tilemap")]
     public bool OverrideAutomaticTilemapSettings;

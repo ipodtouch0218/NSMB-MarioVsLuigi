@@ -20,6 +20,7 @@ MonoBehaviour:
   MusicComposer: 
   TranslationKey: level.default.bricks
   DiscordStageImage: level-brick
+  Icon: {fileID: 21300000, guid: 65555cf07e4679c4aa3fa452beea4d47, type: 3}
   OverrideAutomaticTilemapSettings: 1
   TileDimensions: {x: 32, y: 14}
   TileOrigin: {x: -26, y: -13}

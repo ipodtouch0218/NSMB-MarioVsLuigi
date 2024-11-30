@@ -20,6 +20,7 @@ MonoBehaviour:
   MusicComposer: 
   TranslationKey: level.default.ice
   DiscordStageImage: level-ice
+  Icon: {fileID: 21300000, guid: 4a19e608bfb8d1f41966b099fe265f46, type: 3}
   OverrideAutomaticTilemapSettings: 0
   TileDimensions: {x: 128, y: 19}
   TileOrigin: {x: -44, y: -14}
