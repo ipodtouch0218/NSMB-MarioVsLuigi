@@ -132,7 +132,7 @@ public unsafe class DiscordController : MonoBehaviour {
 
                 activity.Assets = new ActivityAssets {
                     LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
-                    LargeText = tm.GetTranslation(stage.TranslationKey).Replace("<sprite name=room_customlevel>", "")
+                    LargeText = tm.GetTranslation(stage.TranslationKey)
                 };
 
                 long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();

@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using Quantum.Profiling;
 using System;
 using UnityEngine;
 
@@ -219,10 +220,9 @@ namespace Quantum {
                             // Not a valid hit
                             continue;
                         }
-                        if (f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid) && liquid->LiquidType == LiquidType.Water) {
-                            if (!physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
+                        if (hit.IsDynamic && f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid)) {
+                            if (liquid->LiquidType != LiquidType.Water || !physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
                                 // Colliding with water and we cant interact
-                                Debug.Log('c');
                                 continue;
                             }
                         }
@@ -414,8 +414,8 @@ namespace Quantum {
                             // Not a valid hit (for this tile)
                             continue;
                         }
-                        if (f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid) && liquid->LiquidType == LiquidType.Water) {
-                            if (!physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
+                        if (hit.IsDynamic && f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid)) {
+                            if (liquid->LiquidType != LiquidType.Water || !physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
                                 // Colliding with water and we cant interact
                                 continue;
                             }
@@ -777,6 +777,7 @@ namespace Quantum {
         }
 
         public static bool BoxInGround(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default) {
+            using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.BoxInGround");
             // In a solid hitbox
             var hits = f.Physics2D.OverlapShape(position, 0, shape, f.Context.EntityAndPlayerMask, ~QueryOptions.HitTriggers);
             f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario);
@@ -802,22 +803,24 @@ namespace Quantum {
             FPVector2 boxMin = origin - extents;
             FPVector2 boxMax = origin + extents;
 
-            FPVector2[] boxCorners = {
-                new(origin.X - extents.X, origin.Y + extents.Y),
-                boxMax,
-                new(origin.X + extents.X, origin.Y - extents.Y),
-                boxMin,
-            };
+            Span<FPVector2> boxCorners = stackalloc FPVector2[4];
+            boxCorners[0] = new(origin.X - extents.X, origin.Y + extents.Y);
+            boxCorners[1] = boxMax;
+            boxCorners[2] = new(origin.X + extents.X, origin.Y - extents.Y);
+            boxCorners[3] = boxMin;
 
-            foreach (var tileTuple in GetTilesOverlappingHitbox(f, position, shape, stage)) {
-                StageTileInstance tile = tileTuple.Item2;
+            Span<LocationTilePair> tiles = stackalloc LocationTilePair[64];
+            int overlappingTiles = GetTilesOverlappingHitbox(f, position, shape, tiles, stage);
+
+            for (int i = 0; i < overlappingTiles; i++) {
+                StageTileInstance tile = tiles[i].Tile;
                 StageTile stageTile = f.FindAsset(tile.Tile);
                 if (!stageTile
                     || !stageTile.IsPolygon
                     || (!includeMegaBreakable && stageTile is BreakableBrickTile breakable && breakable.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.MegaMario))) {
                     continue;
                 }
-                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, tileTuple.Item1);
+                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, tiles[i].Position);
                 tile.GetWorldPolygons(f, stage, stageTile, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, worldPos);
 
                 int shapeIndex = 0;
@@ -836,8 +839,8 @@ namespace Quantum {
                             return true;
                         }
                     }
-                    for (int i = 0; i < polygon.Length; i++) {
-                        if (LineIntersectsBox(polygon[i], polygon[(i + 1) % polygon.Length], boxMin, boxMax)) {
+                    for (int j = 0; j < polygon.Length; j++) {
+                        if (LineIntersectsBox(polygon[j], polygon[(j + 1) % polygon.Length], boxMin, boxMax)) {
                             return true;
                         }
                     }
@@ -847,7 +850,13 @@ namespace Quantum {
             return false;
         }
 
-        public static System.Collections.Generic.IEnumerator<(Vector2Int, StageTileInstance)> GetTilesOverlappingHitbox(Frame f, FPVector2 position, Shape2D shape, VersusStageData stage = null) {
+        public struct LocationTilePair {
+            public Vector2Int Position;
+            public StageTileInstance Tile;
+        }
+
+        public static int GetTilesOverlappingHitbox(Frame f, FPVector2 position, Shape2D shape, Span<LocationTilePair> buffer, VersusStageData stage = null) {
+            using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.GetTilesOverlappingHitbox");
             if (!stage) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
@@ -857,12 +866,20 @@ namespace Quantum {
             Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents);
             Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents);
 
+            int count = 0;
             for (int x = min.x; x <= max.x; x++) {
                 for (int y = min.y; y <= max.y; y++) {
-                    // Draw.Rectangle(QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y)), new FPVector2(FP._0_50, FP._0_50), 0, new ColorRGBA(255, 0, 0, 128));
-                    yield return (new Vector2Int(x, y), stage.GetTileRelative(f, x, y));
+                    buffer[count++] = new LocationTilePair {
+                        Position = new Vector2Int(x, y),
+                        Tile = stage.GetTileRelative(f, x, y)
+                    };
+
+                    if (count == buffer.Length) {
+                        return count;
+                    }
                 }
             }
+            return count;
         }
 
         public static bool TryEject(Frame f, EntityRef entity, VersusStageData stage = null) {
@@ -906,6 +923,7 @@ namespace Quantum {
         }
 
         private static bool PointIsInsidePolygon(FPVector2 point, Span<FPVector2> polygon) {
+            using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.PointIsInsidePolygon");
             // Can't be inside a line...
             if (polygon.Length < 3) {
                 return false;
@@ -978,6 +996,7 @@ namespace Quantum {
         // P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
         // diagonal from (xmin, ymin) to (xmax, ymax).
         private static bool LineIntersectsBox(FPVector2 a, FPVector2 b, FPVector2 boxMin, FPVector2 boxMax) {
+            using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.LineIntersectsBox");
             // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
             int outcode0 = (int) ComputeOutCode(a, boxMin, boxMax);
             int outcode1 = (int) ComputeOutCode(b, boxMin, boxMax);

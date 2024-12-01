@@ -44,17 +44,28 @@ namespace Quantum {
             spinner->AngularVelocity = QuantumUtils.MoveTowards(spinner->AngularVelocity, targetAngularVelocity, 22);
 
             if (QuantumUtils.Decrement(ref spinner->RotationWaitFrames)) {
-                Func<FP, int> roundingFunction = spinner->AngularVelocity < 0 ? FPMath.CeilToInt : FPMath.FloorToInt;
+                if (spinner->AngularVelocity < 0) {
+                    int previousRotation = FPMath.CeilToInt(spinner->Rotation / 90);
+                    spinner->Rotation += spinner->AngularVelocity * f.DeltaTime;
+                    spinner->Rotation = ((spinner->Rotation % 360) + 360) % 360;
+                    int newRotation = FPMath.CeilToInt(spinner->Rotation / 90);
 
-                int previousRotation = roundingFunction(spinner->Rotation / 90);
-                spinner->Rotation += spinner->AngularVelocity * f.DeltaTime;
-                spinner->Rotation = ((spinner->Rotation % 360) + 360) % 360;
-                int newRotation = roundingFunction(spinner->Rotation / 90);
+                    if (spinner->AngularVelocity == -200 && newRotation != previousRotation) {
+                        // Pause
+                        spinner->Rotation = FPMath.CeilToInt(spinner->Rotation / 90) * 90;
+                        spinner->RotationWaitFrames = 30;
+                    }
+                } else {
+                    int previousRotation = FPMath.FloorToInt(spinner->Rotation / 90);
+                    spinner->Rotation += spinner->AngularVelocity * f.DeltaTime;
+                    spinner->Rotation = ((spinner->Rotation % 360) + 360) % 360;
+                    int newRotation = FPMath.FloorToInt(spinner->Rotation / 90);
 
-                if (spinner->AngularVelocity == -200 && newRotation != previousRotation) {
-                    // Pause
-                    spinner->Rotation = roundingFunction(spinner->Rotation / 90) * 90;
-                    spinner->RotationWaitFrames = 30;
+                    if (spinner->AngularVelocity == -200 && newRotation != previousRotation) {
+                        // Pause
+                        spinner->Rotation = FPMath.FloorToInt(spinner->Rotation / 90) * 90;
+                        spinner->RotationWaitFrames = 30;
+                    }
                 }
             }
 

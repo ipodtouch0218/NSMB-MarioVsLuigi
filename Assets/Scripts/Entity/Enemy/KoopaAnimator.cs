@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
+using Quantum.Profiling;
 using UnityEngine;
 using static NSMB.Extensions.UnityExtensions;
 
@@ -35,6 +36,7 @@ public class KoopaAnimator : QuantumEntityViewComponent {
     }
 
     public override unsafe void OnUpdateView() {
+        using var profilerScope = HostProfiler.Start("KoopaAnimator.OnUpdateView");
         Frame f = PredictedFrame;
         
         if (!f.Exists(EntityRef)) {

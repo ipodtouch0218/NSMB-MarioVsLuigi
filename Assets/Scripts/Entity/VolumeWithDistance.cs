@@ -31,10 +31,10 @@ public class VolumeWithDistance : MonoBehaviour {
         }
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-        Update();
+        LateUpdate();
     }
 
-    public void Update() {
+    public void LateUpdate() {
         float minDistance = float.MaxValue;
         FP xDifference = 0;
         foreach (var pe in PlayerElements.AllPlayerElements) {

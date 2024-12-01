@@ -1,6 +1,7 @@
 using NSMB.Extensions;
 using Photon.Deterministic;
 using Quantum;
+using Quantum.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -189,6 +190,7 @@ namespace NSMB.Entities.Player {
         }
 
         public override void OnUpdateView() {
+            using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.OnUpdateView");
             Frame f = PredictedFrame;
             if (!f.Exists(EntityRef)) {
                 return;
@@ -230,6 +232,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void HandleAnimations(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.HandleAnimations");
             // Particles
             bool disableParticles = mario->IsDead || freezable->IsFrozen(f) || f.Global->GameState == GameState.Ended;
 
@@ -313,6 +316,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void SetFacingDirection(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.SetFacingDirection");
             //TODO: refactor
             /*
             if (GameManager.Instance.GameEnded) {
@@ -380,6 +384,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void InterpolateFacingDirection(MarioPlayer* mario) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.InterpolateFacingDirection");
             if (modelRotateInstantly || wasTurnaround) {
                 models.transform.rotation = modelRotationTarget;
             } else /* if (!GameManager.Instance.GameEnded) */ {
@@ -405,6 +410,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void UpdateAnimatorVariables(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable, ref Input inputs) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.UpdateAnimatorVariables");
 
             bool right = inputs.Right.IsDown;
             bool left = inputs.Left.IsDown;
@@ -467,6 +473,7 @@ namespace NSMB.Entities.Player {
         }
 
         private void HandleMiscStates(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.HandleMiscStates");
             // Scale
             Vector3 scale;
             if (mario->MegaMushroomEndFrames > 0) {

@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 3150085164645429832}
   - component: {fileID: 5377348487338848431}
   - component: {fileID: 2586611310233273419}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Water
   m_TagString: water
   m_Icon: {fileID: 0}
@@ -208,8 +208,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 1
-    Layer: 9
+    LayerSource: 0
+    Layer: 0
     CallbackFlags:
       Value: 4095
   PhysicsBody:

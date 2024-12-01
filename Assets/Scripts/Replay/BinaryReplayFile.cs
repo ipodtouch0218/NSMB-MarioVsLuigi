@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Text;
 using UnityEngine;
-using static ReplayListManager;
 
 public class BinaryReplayFile {
 
@@ -65,11 +64,15 @@ public class BinaryReplayFile {
         return writer.BaseStream.Length;
     }
 
-    public string GetDisplayName() {
-        if (!string.IsNullOrWhiteSpace(CustomName)) {
+    public string GetDisplayName(bool replaceNullWithDefault = true) {
+        if (!replaceNullWithDefault || !string.IsNullOrWhiteSpace(CustomName)) {
             return CustomName;
         }
 
+        return GetDefaultName();
+    }
+
+    public string GetDefaultName() {
         TranslationManager tm = GlobalController.Instance.translationManager;
 
         if (QuantumUnityDB.TryGetGlobalAsset(MapAssetRef, out Map map)

@@ -1,7 +1,5 @@
-using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Physics2D;
-using System;
 
 namespace Quantum {
     public unsafe class InteractionSystem : SystemMainThreadFilterStage<InteractionSystem.Filter> {

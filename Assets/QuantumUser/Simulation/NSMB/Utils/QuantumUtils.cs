@@ -209,7 +209,6 @@ public static unsafe class QuantumUtils {
         bool tie = false;
 
         Dictionary<int, int> teamStars = GetTeamStars(f);
-        Debug.Log("team stars: " + string.Join(',', teamStars));
         foreach ((int team, int stars) in teamStars) {
             if (winningTeam == null) {
                 winningTeam = team;
@@ -224,7 +223,6 @@ public static unsafe class QuantumUtils {
             }
         }
 
-        Debug.Log($"winning team: {(tie ? null : winningTeam)}");
         return tie ? null : winningTeam;
     }
 

@@ -3,6 +3,7 @@ using NSMB.UI.Pause.Options;
 using NSMB.Utils;
 using Quantum;
 using System.Reflection;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -27,6 +28,7 @@ public class ReplayUI : MonoBehaviour {
     private float replaySpeed = 1;
     private bool replayPaused;
     private bool draggingArrow;
+    private StringBuilder builder = new();
 
     public void OnValidate() {
         this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
@@ -56,10 +58,11 @@ public class ReplayUI : MonoBehaviour {
         Frame fp = e.Game.Frames.PredictedPrevious;
 
         float currentFrameNumber = fp.Number + e.Game.InterpolationFactor;
-        replayTimecode.text =
-            Utils.SecondsToMinuteSeconds(Mathf.FloorToInt((currentFrameNumber - NetworkHandler.ReplayStart) / f.UpdateRate))
-            + '/'
-            + Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate);
+        builder.Clear();
+        builder.Append(Utils.SecondsToMinuteSeconds(Mathf.FloorToInt((currentFrameNumber - NetworkHandler.ReplayStart) / f.UpdateRate)));
+        builder.Append('/');
+        builder.Append(Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate));
+        replayTimecode.text = builder.ToString();
 
         float width = maxTrackX - minTrackX;
         float bufferPercentage = (float) NetworkHandler.ReplayFrameCache.Count * f.UpdateRate * 5 / NetworkHandler.ReplayLength;
@@ -101,8 +104,10 @@ public class ReplayUI : MonoBehaviour {
         var session = QuantumRunner.Default.Session;
 
         // It's a private method. Because of course it is.
+        NetworkHandler.IsReplayFastForwarding = true;
         var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
         resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
+        NetworkHandler.IsReplayFastForwarding = false;
 
         // Fix accumulated time applying
         if (session.AccumulatedTime > 0) {
@@ -126,8 +131,10 @@ public class ReplayUI : MonoBehaviour {
         if (newIndex < NetworkHandler.ReplayFrameCache.Count) {
             // We already have this frame
             // It's a private method. Because of course it is.
+            NetworkHandler.IsReplayFastForwarding = true;
             var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
             resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
+            NetworkHandler.IsReplayFastForwarding = false;
         } else {
             // We have to simulate up to this frame
             NetworkHandler.IsReplayFastForwarding = true;
@@ -179,8 +186,10 @@ public class ReplayUI : MonoBehaviour {
 
         // It's a private method. Because of course it is.
         var session = QuantumRunner.Default.Session;
+        NetworkHandler.IsReplayFastForwarding = true;
         var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
         resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, true });
+        NetworkHandler.IsReplayFastForwarding = false;
 
         // Fix accumulated time applying
         if (session.AccumulatedTime > 0) {

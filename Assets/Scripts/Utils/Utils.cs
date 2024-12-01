@@ -1,3 +1,4 @@
+using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,10 @@ namespace NSMB.Utils {
 
         public static float QuadraticEaseOut(float v) {
             return -1 * v * (v - 2);
+        }
+
+        public static float EaseInOut(float x) {
+            return x < 0.5f ? 2 * x * x : 1 - ((-2 * x + 2) * (-2 * x + 2) / 2);
         }
 
         private static readonly Dictionary<char, string> uiSymbols = new() {
@@ -221,7 +226,7 @@ namespace NSMB.Utils {
             if (color[0] == '#') {
                 constant = true;
                 return new Color32(byte.Parse(color[1..3], System.Globalization.NumberStyles.HexNumber), byte.Parse(color[3..5], System.Globalization.NumberStyles.HexNumber), byte.Parse(color[5..7], System.Globalization.NumberStyles.HexNumber), 255);
-            } else if (color.Equals("rainbow", StringComparison.InvariantCultureIgnoreCase)) {
+            } else if (color == "rainbow") {
                 constant = false;
                 return GetRainbowColor();
             } else {

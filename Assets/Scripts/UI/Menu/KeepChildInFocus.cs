@@ -1,9 +1,9 @@
+using NSMB.Extensions;
+using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
-using NSMB.Extensions;
 
 [RequireComponent(typeof(ScrollRect))]
 public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
@@ -18,17 +18,19 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private float scrollPos = 0;
 
     public void Awake() {
-        rect = GetComponent<ScrollRect>();
+        this.SetIfNull(ref rect);
     }
 
     public void Update() {
-        if (mouseOver || !rect.content)
+        if (mouseOver || !rect.content) {
             return;
+        }
 
         rect.verticalNormalizedPosition = Mathf.Lerp(rect.verticalNormalizedPosition, scrollPos, scrollAmount * Time.deltaTime);
 
-        if (!EventSystem.current.currentSelectedGameObject)
+        if (!EventSystem.current.currentSelectedGameObject) {
             return;
+        }
 
         RectTransform target = EventSystem.current.currentSelectedGameObject.GetComponent<RectTransform>();
 
@@ -40,15 +42,17 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
     }
 
     private bool IsFirstParent(Transform target) {
-        for (; target != null; target = target.parent) {
-            if (target.GetComponent<IFocusIgnore>() != null)
+        do {
+            if (target.GetComponent<IFocusIgnore>() != null) {
                 return false;
+            }
 
             target.GetComponents(components);
 
-            if (components.Count >= 1)
+            if (components.Count >= 1) {
                 return components.Contains(rect);
-        }
+            }
+        } while (target = target.parent);
 
         return false;
     }

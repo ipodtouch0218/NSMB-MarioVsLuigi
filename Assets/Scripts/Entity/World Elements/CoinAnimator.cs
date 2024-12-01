@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
+using Quantum.Profiling;
 using UnityEngine;
 
 public unsafe class CoinAnimator : QuantumEntityViewComponent {
@@ -31,6 +32,7 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     }
 
     public override void OnUpdateView() {
+        using var profilerScope = HostProfiler.Start("CoinAnimator.OnUpdateView");
         Frame f = PredictedFrame;
         if (!f.Exists(EntityRef)) {
             return;

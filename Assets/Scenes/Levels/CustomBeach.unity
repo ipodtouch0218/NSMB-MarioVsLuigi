@@ -1408,7 +1408,7 @@ PrefabInstance:
         type: 3}
       propertyPath: MapEntityReferences.Array.data[18]
       value: 
-      objectReference: {fileID: 2086882543}
+      objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.data[19]
@@ -12363,6 +12363,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: PhysicsCollider.Shape2D.ShapeType
