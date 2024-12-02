@@ -889,14 +889,19 @@ namespace Quantum {
                 }
 
                 // Floor tiles.
-                var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
-                StageTile tile = f.FindAsset(tileInstance.Tile);
-                if (tile is IInteractableTile it) {
-                    continueGroundpound &= it.Interact(f, filter.Entity, InteractionDirection.Down,
-                        new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
-                    interactedAny = true;
+                if (f.Exists(contact.Entity)) {
+                    // Manual Fix: allow ice block groundpound continues
+                    continueGroundpound &= f.Has<IceBlock>(contact.Entity);
+                } else {
+                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTile tile = f.FindAsset(tileInstance.Tile);
+                    if (tile is IInteractableTile it) {
+                        continueGroundpound &= it.Interact(f, filter.Entity, InteractionDirection.Down,
+                            new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
+                        interactedAny = true;
 
-                    playBumpSound &= (playBumpSound ?? true) & tempPlayBumpSound;
+                        playBumpSound &= (playBumpSound ?? true) & tempPlayBumpSound;
+                    }
                 }
             }
 

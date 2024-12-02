@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
 
@@ -39,7 +38,12 @@ namespace Quantum {
 
             if (childFreezable->IsCarryable) {
                 var childTransform = f.Unsafe.GetPointer<Transform2D>(iceBlock->Entity);
-                childTransform->Position = transform->Position - iceBlock->ChildOffset;
+                FPVector2 newPosition = transform->Position - iceBlock->ChildOffset;
+                if (stage.IsWrappingLevel && FPVector2.Distance(childTransform->Position, newPosition) > stage.TileDimensions.x / (FP) 4) {
+                    childTransform->Teleport(f, newPosition);
+                } else {
+                    childTransform->Position = newPosition;
+                }
             }
 
             if (iceBlock->IsSliding) {

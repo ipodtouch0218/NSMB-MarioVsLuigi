@@ -17,6 +17,7 @@ public class ReplayListEntry : MonoBehaviour {
     [SerializeField] private Image mapImage;
     [SerializeField] private Sprite defaultMapSprite;
     [SerializeField] private RectTransform dropDownRectTransform;
+    [SerializeField] private Color criticalColor, warningColor, favoriteColor;
 
     //---Private Variables
     private ReplayListManager manager;
@@ -128,6 +129,10 @@ public class ReplayListEntry : MonoBehaviour {
     }
 
     public void UpdateText() {
+        if (replay == null) {
+            return;
+        }
+
         TranslationManager tm = GlobalController.Instance.translationManager;
         BinaryReplayFile replayFile = replay.ReplayFile;
 
@@ -136,10 +141,13 @@ public class ReplayListEntry : MonoBehaviour {
         
         if (!replayFile.IsCompatible) {
             warningText.text = tm.GetTranslation("ui.extras.replays.incompatible");
+            warningText.color = criticalColor;
         } else if (replay.IsTemporary) {
-            warningText.text = tm.GetTranslation("ui.extras.replays.temporary");
+            warningText.text = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
+            warningText.color = warningColor;
         } else if (replay.IsFavorited) {
             warningText.text = tm.GetTranslation("ui.extras.replays.favorited");
+            warningText.color = favoriteColor;
         } else {
             warningText.text = "";
         }
