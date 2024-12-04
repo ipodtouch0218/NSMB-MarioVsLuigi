@@ -200,7 +200,6 @@ MonoBehaviour:
   HeapPageShift: 15
   HeapPageCount: 256
   HeapExtraCount: 0
-  LobbyMap: {fileID: 11400000, guid: 5b020bbd639390c47ba588a7e0bd0449, type: 2}
   InvisibleSolidTile: {fileID: 11400000, guid: af92f900a1bff3d459eaf5b25d41a4ac, type: 2}
   AllPowerups:
   - {fileID: 11400000, guid: e76c0ec90859dff49866293da2354232, type: 2}
@@ -347,7 +346,12 @@ MonoBehaviour:
     Path: QuantumUser/Resources/QuantumDefaultConfigs|DefaultConfigSystems
     Guid:
       Value: 3654882389298375385
-  Entries: []
+  Entries:
+  - SystemType:
+      AssemblyQualifiedName: Quantum.Core.DebugCommand+InternalSystem, Quantum.Simulation
+    SystemName: 
+    StartDisabled: 0
+    Children: []
 --- !u!114 &4894074246963618225
 MonoBehaviour:
   m_ObjectHideFlags: 0

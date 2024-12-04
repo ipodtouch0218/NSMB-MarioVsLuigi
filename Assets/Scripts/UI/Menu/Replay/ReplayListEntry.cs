@@ -41,6 +41,10 @@ public class ReplayListEntry : MonoBehaviour {
         UpdateText();
     }
 
+    public void UpdateNavigation(ReplayListEntry previous) {
+
+    }
+
     public void HideButtons() {
         if (!selected) {
             return;

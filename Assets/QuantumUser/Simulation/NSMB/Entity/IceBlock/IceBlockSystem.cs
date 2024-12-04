@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Core;
 
 namespace Quantum {
 
