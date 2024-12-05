@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using NSMB.Extensions;
 
 namespace NSMB.UI.MainMenu {
     public class PipeButton : MonoBehaviour {
@@ -19,17 +20,9 @@ namespace NSMB.UI.MainMenu {
         private Vector2 anchor, adjustedAnchor;
 
         public void OnValidate() {
-            if (!rect) {
-                rect = GetComponent<RectTransform>();
-            }
-
-            if (!button) {
-                button = GetComponent<Button>();
-            }
-
-            if (!image) {
-                image = GetComponentInChildren<Image>();
-            }
+            this.SetIfNull(ref rect);
+            this.SetIfNull(ref button);
+            this.SetIfNull(ref image, UnityExtensions.GetComponentType.Children);
         }
 
         public void Start() {

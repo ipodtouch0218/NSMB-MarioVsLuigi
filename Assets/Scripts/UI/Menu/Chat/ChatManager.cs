@@ -18,6 +18,9 @@ public class ChatManager : MonoBehaviour {
     public readonly List<ChatMessage.ChatMessageData> chatHistory = new();
     public readonly HashSet<string> mutedPlayers = new();
 
+    //---Serialized Variables
+    [SerializeField] private PlayerListHandler playerList;
+
     public void Awake() {
         Instance = this;
     }
@@ -84,7 +87,6 @@ public class ChatManager : MonoBehaviour {
     }
 
     public void OnPlayerSentChatMessage(EventPlayerSentChatMessage e) {
-
         // Format message, in case we can't trust the host to do it for us.
         string message = e.Message;
         message = message[..Mathf.Min(128, message.Length)];
@@ -96,11 +98,9 @@ public class ChatManager : MonoBehaviour {
 
         AddChatMessage(message, e.Player, e.Frame);
 
-        if (MainMenuManager.Instance) {
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(e.Player);
-            if (ple) {
-                ple.typingCounter = 0;
-            }
+        PlayerListEntry ple = playerList.GetPlayerEntry(e.Player);
+        if (ple) {
+            ple.typingCounter = 0;
         }
     }
 

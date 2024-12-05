@@ -162,12 +162,14 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(localPlayers[0]);
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerEntry(localPlayers[0]);
             if (!ple || ple.typingCounter > 2) {
                 return;
             }
 
-            QuantumRunner.DefaultGame.SendCommand(new CommandStartTyping());
+            foreach (var player in QuantumRunner.DefaultGame.GetLocalPlayerSlots()) {
+                QuantumRunner.DefaultGame.SendCommand(player, new CommandStartTyping());
+            }
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {
@@ -190,7 +192,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnPlayerStartedTyping(EventPlayerStartedTyping e) {
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerListEntry(e.Player);
+            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerEntry(e.Player);
             if (ple) {
                 ple.typingCounter = 4;
             }
