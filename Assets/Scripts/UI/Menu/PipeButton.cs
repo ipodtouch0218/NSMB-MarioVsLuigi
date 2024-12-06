@@ -4,20 +4,20 @@ using UnityEngine.EventSystems;
 using NSMB.Extensions;
 
 namespace NSMB.UI.MainMenu {
-    public class PipeButton : MonoBehaviour {
+    public class PipeButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 
         //---Serialized Variables
         [SerializeField] private RectTransform rect;
         [SerializeField] private Button button;
         [SerializeField] private Image image;
 
-        [SerializeField] private Color selectedColor = Color.white;
-        [SerializeField] private Color deselectedColor = Color.gray;
-        [SerializeField] private bool leftAnchored;
+        [SerializeField] private Color selectedColor = Color.white, deselectedColor = Color.gray;
+        [SerializeField] private Vector2 sizeDecreasePixels = new Vector2(50f, 0);
 
         //---Private Variables
         private Color disabledColor;
-        private Vector2 anchor, adjustedAnchor;
+        private Vector2 size;
+        private bool hover;
 
         public void OnValidate() {
             this.SetIfNull(ref rect);
@@ -26,32 +26,32 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Start() {
-            anchor = leftAnchored ? rect.anchorMax : rect.anchorMin;
-            adjustedAnchor = anchor + Vector2.right * (leftAnchored ? -0.1f : 0.1f);
+            size = rect.sizeDelta;
             disabledColor = new(deselectedColor.r, deselectedColor.g, deselectedColor.b, deselectedColor.a * 0.5f);
         }
 
         public void Update() {
-            if (!button.IsInteractable()) {
-                SetAnchor(adjustedAnchor);
+            if (button && !button.IsInteractable()) {
+                rect.sizeDelta = size - sizeDecreasePixels;
                 image.color = disabledColor;
                 return;
             }
-            if (EventSystem.current.currentSelectedGameObject == gameObject) {
-                SetAnchor(anchor);
+            if (hover || EventSystem.current.currentSelectedGameObject == gameObject) {
+                rect.sizeDelta = size;
                 image.color = selectedColor;
             } else {
-                SetAnchor(adjustedAnchor);
+                rect.sizeDelta = size - sizeDecreasePixels;
                 image.color = deselectedColor;
             }
         }
 
-        private void SetAnchor(Vector2 value) {
-            if (leftAnchored) {
-                rect.anchorMax = value;
-            } else {
-                rect.anchorMin = value;
-            }
+        public void OnPointerEnter(PointerEventData eventData) {
+            hover = true;
         }
+
+        public void OnPointerExit(PointerEventData eventData) {
+            hover = false;
+        }
+
     }
 }

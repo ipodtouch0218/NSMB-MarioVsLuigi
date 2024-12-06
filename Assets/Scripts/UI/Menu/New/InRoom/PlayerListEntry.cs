@@ -10,14 +10,17 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu {
-    public class PlayerListEntry : MonoBehaviour {
+    public class PlayerListEntry : MonoBehaviour, ISelectHandler {
 
         //---Static Variables
         public static event Action<PlayerListEntry> PlayerMuteStateChanged;
+        public static event Action<PlayerListEntry> PlayerEntrySelected;
 
         //---Public Variables
         public PlayerRef player;
         public float typingCounter;
+        public UnityEngine.UI.Button button;
+        public int joinTick = int.MaxValue;
 
         //---Serialized Variables
         [SerializeField] private TMP_Text nameText, pingText, winsText, muteButtonText;
@@ -54,14 +57,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Start() {
-            RuntimePlayer runtimePlayer = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(player);
-            nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF"; 
-            userId = runtimePlayer?.UserId;
-            nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
-
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged, onlyIfActiveAndEnabled: true);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+            QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping, onlyIfActiveAndEnabled: true);
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
+            playerExistsGameObject.SetActive(false);
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
@@ -75,9 +75,27 @@ namespace NSMB.UI.MainMenu {
             } else {
                 chattingIcon.SetActive(false);
                 typingCounter = 0;
-            }
+            };
+        }
 
-            // UpdateText(e.Game.Frames.Predicted);
+        public unsafe void SetPlayer(Frame f, PlayerRef player) {
+            this.player = player;
+            RuntimePlayer runtimePlayer = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(player);
+            nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+            userId = runtimePlayer?.UserId;
+            nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+
+            playerExistsGameObject.SetActive(true);
+            joinTick = QuantumUtils.GetPlayerData(f, player)->JoinTick;
+            name = $"{(runtimePlayer?.PlayerNickname ?? "noname")} ({userId})";
+        }
+
+        public void RemovePlayer() {
+            player = PlayerRef.None;
+            nicknameColor = default;
+            userId = default;
+            joinTick = int.MaxValue;
+            playerExistsGameObject.SetActive(false);
         }
 
         private static readonly StringBuilder Builder = new();
@@ -275,6 +293,16 @@ namespace NSMB.UI.MainMenu {
             var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
             readyIcon.SetActive(playerData->IsReady);
             settingsIcon.SetActive(playerData->IsInSettings);
+        }
+
+        public void OnSelect(BaseEventData eventData) {
+            PlayerEntrySelected?.Invoke(this);
+        }
+
+        private void OnPlayerStartedTyping(EventPlayerStartedTyping e) {
+            if (player == e.Player) {
+                typingCounter = 4;
+            }
         }
     }
 }

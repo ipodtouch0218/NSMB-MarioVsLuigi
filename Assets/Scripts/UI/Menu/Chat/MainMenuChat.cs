@@ -31,7 +31,6 @@ namespace NSMB.UI.MainMenu {
             PlayerListEntry.PlayerMuteStateChanged += OnPlayerMuteStateChanged;
             OnDisableChatChanged();
 
-            QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping, onlyIfActiveAndEnabled: true);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
         }
@@ -188,13 +187,6 @@ namespace NSMB.UI.MainMenu {
                 if (chatMessage.data.player == e.Player) {
                     chatMessage.data.player = PlayerRef.None;
                 }
-            }
-        }
-
-        private void OnPlayerStartedTyping(EventPlayerStartedTyping e) {
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerEntry(e.Player);
-            if (ple) {
-                ple.typingCounter = 4;
             }
         }
     }

@@ -1,30 +1,33 @@
+using NSMB.Extensions;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
-
-using NSMB.Extensions;
+using Button = UnityEngine.UI.Button;
+using Navigation = UnityEngine.UI.Navigation;
 
 namespace NSMB.UI.MainMenu {
     public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
         //---Serialized Variables
+        // [SerializeField] private SimulationConfig config;
         [SerializeField] private Canvas baseCanvas;
         [SerializeField] private GameObject template, blockerTemplate, content;
         [SerializeField] private Sprite clearSprite;
-        [SerializeField] private string property;
+        [SerializeField] private CharacterAsset defaultCharacter;
+        [SerializeField] private GameObject selectOnClose;
 
         //---Private Variables
         private readonly List<ColorButton> colorButtons = new();
-        private List<Button> buttons;
-        private List<Navigation> navigations;
+        private readonly List<Button> buttons = new();
+        private readonly List<Navigation> navigations = new();
         private GameObject blocker;
         private int selected;
         private bool initialized;
 
         public void Initialize() {
-            buttons = new();
-            navigations = new();
+            if (initialized) {
+                return;
+            }
 
             PlayerColorSet[] colors = ScriptableManager.Instance.skins;
 
@@ -37,7 +40,7 @@ namespace NSMB.UI.MainMenu {
                 cb.palette = color;
 
                 Button b = newButton.GetComponent<Button>();
-                newButton.name = color?.name ?? "Reset";
+                newButton.name = color ? color.name : "Reset";
                 if (color == null) {
                     b.image.sprite = clearSprite;
                 }
@@ -67,12 +70,18 @@ namespace NSMB.UI.MainMenu {
                 buttons[i].navigation = navigations[i];
             }
             initialized = true;
+
+            foreach (ColorButton b in colorButtons) {
+                b.Instantiate(defaultCharacter);
+            }
+        }
+
+        public void Start() {
+            Initialize();
         }
 
         public void ChangeCharacter(CharacterAsset data) {
-            if (!initialized) {
-                Initialize();
-            }
+            Initialize();
             foreach (ColorButton b in colorButtons) {
                 b.Instantiate(data);
             }
@@ -89,7 +98,10 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Open() {
+            Initialize();
+
             blocker = Instantiate(blockerTemplate, baseCanvas.transform);
+            gameObject.SetActive(true);
             blocker.SetActive(true);
             content.SetActive(true);
 
@@ -101,8 +113,9 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Close(bool playSound) {
+            gameObject.SetActive(false);
             Destroy(blocker);
-            EventSystem.current.SetSelectedGameObject(gameObject);
+            EventSystem.current.SetSelectedGameObject(selectOnClose);
             content.SetActive(false);
 
             if (playSound && MainMenuManager.Instance) {

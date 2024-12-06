@@ -1,4 +1,5 @@
 using Quantum;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,15 +8,21 @@ using UnityEngine;
 namespace NSMB.UI.MainMenu {
     public class PlayerListHandler : MonoBehaviour {
 
+        //---Events
+        public event Action<int> PlayerAdded;
+        public event Action<int> PlayerRemoved;
+
         //---Serialized Variables
         [SerializeField] private GameObject contentPane;
-        [SerializeField] private List<PlayerListEntry> playerListEntries = new();
+        [SerializeField] private PlayerListEntry template;
 
         //---Private Variables
         private Coroutine autoRefreshCoroutine;
+        private List<PlayerListEntry> playerListEntries = new(10);
 
         public void OnEnable() {
             autoRefreshCoroutine = StartCoroutine(AutoUpdateCoroutine());
+            ReorderEntries();
         }
 
         public void OnDisable() {
@@ -31,6 +38,11 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+
+            playerListEntries.Add(template);
+            for (int i = 1; i < 10; i++) {
+                playerListEntries.Add(Instantiate(template, template.transform.parent));
+            }
         }
 
         public unsafe void PopulatePlayerEntries(Frame f) {
@@ -50,27 +62,24 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (!GetPlayerEntry(player)) {
-                RuntimePlayer runtimePlayerData = f.GetPlayerData(player);
                 PlayerListEntry newEntry = GetUnusedPlayerEntry();
-                newEntry.name = $"{runtimePlayerData.PlayerNickname} ({runtimePlayerData.UserId})";
-                newEntry.player = player;
-            }
+                newEntry.SetPlayer(f, player);
+                UpdateAllPlayerEntries(f);
 
-            UpdateAllPlayerEntries(f);
+                PlayerAdded?.Invoke(playerListEntries.IndexOf(newEntry));
+            }
         }
 
         public void RemoveAllPlayerEntries() {
             foreach (PlayerListEntry entry in playerListEntries) {
-                Destroy(entry.gameObject);
+                entry.RemovePlayer();
             }
-            playerListEntries.Clear();
         }
-
 
         public void RemovePlayerEntry(Frame f, PlayerRef player) {
             PlayerListEntry existingEntry = GetPlayerEntry(player);
             if (existingEntry) {
-                existingEntry.player = PlayerRef.None;
+                existingEntry.RemovePlayer();
                 UpdateAllPlayerEntries(f);
             }
         }
@@ -80,7 +89,7 @@ namespace NSMB.UI.MainMenu {
                 entry.UpdateText(f);
             }
 
-            ReorderEntries(f);
+            ReorderEntries();
             if (MainMenuManager.Instance) {
                 MainMenuManager.Instance.chat.UpdatePlayerColors();
             }
@@ -94,17 +103,29 @@ namespace NSMB.UI.MainMenu {
             return playerListEntries.FirstOrDefault(ple => ple.player == PlayerRef.None);
         }
 
-        public unsafe void ReorderEntries(Frame f) {
-            var sortedEntries = playerListEntries.OrderByDescending(ple => {
-                PlayerData* data = QuantumUtils.GetPlayerData(f, ple.player);
-                if (data == null) {
-                    return int.MaxValue;
-                }
-                return data->JoinTick;
-            });
+        public PlayerListEntry GetPlayerEntryAtIndex(int index) {
+            return playerListEntries[index];
+        }
 
-            foreach (PlayerListEntry entry in sortedEntries) {
-                entry.transform.SetAsFirstSibling();
+        public int GetPlayerEntryIndexOf(PlayerListEntry entry) {
+            return playerListEntries.IndexOf(entry);
+        }
+
+        public unsafe void ReorderEntries() {
+            playerListEntries = playerListEntries.OrderBy(ple => ple.joinTick).ToList();
+
+            for (int i = 0; i < playerListEntries.Count; i++) {
+                PlayerListEntry entry = playerListEntries[i];
+                entry.transform.SetAsLastSibling();
+
+                UnityEngine.UI.Navigation navigation = new();
+                if (i != 0) {
+                    navigation.selectOnUp = playerListEntries[i - 1].button;
+                }
+                if (i != playerListEntries.Count - 1 && playerListEntries[i + 1].player.IsValid) {
+                    navigation.selectOnDown = playerListEntries[i + 1].button;
+                }
+                entry.button.navigation = navigation;
             }
         }
 
