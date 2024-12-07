@@ -154,5 +154,6 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * TeridaxXD001 (Models)
 * Treeki (UI)
 * VentureSonic (Background)
+* xFrostyCake123 (Sound)
 
 </details>

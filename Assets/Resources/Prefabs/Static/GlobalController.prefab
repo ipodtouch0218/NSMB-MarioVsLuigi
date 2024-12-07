@@ -16158,9 +16158,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
   - {fileID: 11400000, guid: 080293b8f6a11c5438f0703a4c9a77b5, type: 2}
   - {fileID: 11400000, guid: 222d170caee45db4090ed4bb3fb53965, type: 2}
-  alternatingStageMusic:
-  - {fileID: 11400000, guid: 488f1c737d498714c951d86c1a790bcc, type: 2}
-  - {fileID: 11400000, guid: 2cfae2267b801f944813218ca08798fb, type: 2}
 --- !u!114 &1217248114408797113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16352,6 +16349,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c4220a57fb14b7478ef8c716bc64eb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerList: {fileID: 0}
 --- !u!114 &6841901076153067735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27006,14 +27004,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22.85
+  m_fontSize: 22.75
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

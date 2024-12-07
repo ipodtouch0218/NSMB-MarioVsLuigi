@@ -566,6 +566,12 @@ MonoBehaviour:
     m_Scale: 1
     m_Name: player_muted
     m_HashCode: -1484968703
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 80
+    m_Scale: 1
+    m_Name: room_create
+    m_HashCode: -2000648188
   m_SpriteGlyphTable:
   - m_Index: 0
     m_Metrics:
@@ -1852,5 +1858,21 @@ MonoBehaviour:
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
     sprite: {fileID: 1560846788, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 80
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -2
+      m_HorizontalBearingY: 13
+      m_HorizontalAdvance: 17
+    m_GlyphRect:
+      m_X: 216
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: 1496232669, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []

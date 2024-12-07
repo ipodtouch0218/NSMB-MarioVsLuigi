@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class ChangePanelOnSelect : MonoBehaviour, ISelectHandler {
 
     //---Serialized Variables
-    [SerializeField] private InRoomMenu roomMenu;
+    [SerializeField] private InRoomSubmenu roomMenu;
     [SerializeField] private InRoomPanel panelToSelect;
 
     public void OnValidate() {

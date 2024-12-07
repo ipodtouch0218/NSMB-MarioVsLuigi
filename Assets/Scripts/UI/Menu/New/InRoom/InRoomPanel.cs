@@ -9,7 +9,7 @@ public class InRoomPanel : MonoBehaviour {
     public virtual GameObject DefaultSelectedObject => defaultSelectedObject;
 
     //---Serialized Variables
-    [SerializeField] protected InRoomMenu menu;
+    [SerializeField] protected InRoomSubmenu menu;
     [SerializeField] public InRoomPanel leftPanel, rightPanel;
     [SerializeField] private List<GameObject> hideWhenNotSelected;
     [SerializeField] private GameObject defaultSelectedObject;
@@ -33,5 +33,4 @@ public class InRoomPanel : MonoBehaviour {
         }
         header.color = deselectedColor;
     }
-
 }

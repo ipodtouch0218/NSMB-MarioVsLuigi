@@ -15,6 +15,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private Sprite clearSprite;
         [SerializeField] private CharacterAsset defaultCharacter;
         [SerializeField] private GameObject selectOnClose;
+        [SerializeField] private AudioSource sfx;
 
         //---Private Variables
         private readonly List<ColorButton> colorButtons = new();
@@ -107,9 +108,7 @@ namespace NSMB.UI.MainMenu {
 
             EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
 
-            if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Cursor);
-            }
+            sfx.Play();
         }
 
         public void Close(bool playSound) {
@@ -118,8 +117,8 @@ namespace NSMB.UI.MainMenu {
             EventSystem.current.SetSelectedGameObject(selectOnClose);
             content.SetActive(false);
 
-            if (playSound && MainMenuManager.Instance) {
-                MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
+            if (playSound) {
+                sfx.PlayOneShot(SoundEffect.UI_Back);
             }
         }
     }

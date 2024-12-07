@@ -1834,7 +1834,7 @@ TextureImporter:
         width: 13
         height: 13
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1842,6 +1842,48 @@ TextureImporter:
       bones: []
       spriteID: fa07d3938c9e7a14f8e5c6744ecf3582
       internalID: 1560846788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: room_create
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 243
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a59666638e4d1ef448e3c7973ef57bcd
+      internalID: 1496232669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dropdown_arrow
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 243
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a625d3a88300294f85b0612dab85b42
+      internalID: -2027879749
       vertices: []
       indices: 
       edges: []
@@ -1876,6 +1918,7 @@ TextureImporter:
       connection_great: 1763873500
       connection_host: -1762235557
       dpad_button: -1771438400
+      dropdown_arrow: -2027879749
       hud_luigi: -7975249404588759376
       hud_mario: 7263181891274304025
       hud_star: 1346584908
@@ -1899,6 +1942,7 @@ TextureImporter:
       player_muted: 1560846788
       r_button: 907324317
       room_coins: 1534273505
+      room_create: 1496232669
       room_customlevel: -971827560
       room_host: -9005941153719796207
       room_lives: 1261997413

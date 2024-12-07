@@ -36,7 +36,7 @@ public class SelectionCursor : MonoBehaviour {
             newObject = true;
         }
 
-        if (!current) {
+        if (!current || !current.activeInHierarchy) {
             image.enabled = false;
             hidden = true;
             return;
@@ -45,15 +45,8 @@ public class SelectionCursor : MonoBehaviour {
         RectTransform currentRectTransform = current.GetComponent<RectTransform>();
         currentRectTransform.GetWorldCorners(cornerBuffer);
 
-        Bounds bounds = new Bounds() {
-            center = cornerBuffer[0]
-        };
-        for (int i = 0; i < 4; i++) {
-            bounds.Encapsulate(cornerBuffer[i]);
-        }
-
-        Vector3 targetPosition = bounds.center;
-        Vector2 targetSize = (Vector2) bounds.size + sizeIncrease;
+        Vector3 targetPosition = (cornerBuffer[0] + cornerBuffer[2]) / 2;
+        Vector2 targetSize = new Vector2(Mathf.Abs(cornerBuffer[2].x - cornerBuffer[0].x), Mathf.Abs(cornerBuffer[2].y - cornerBuffer[0].y)) + sizeIncrease;
 
         if (hidden) {
             image.enabled = true;

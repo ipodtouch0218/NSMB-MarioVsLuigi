@@ -32,7 +32,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         //---Serialized Variables
-        [SerializeField] private RoomIcon roomIconPrefab, privateRoomIcon;
+        [SerializeField] private RoomIcon roomIconPrefab;
         [SerializeField] private GameObject roomListScrollRect, privateRoomIdPrompt;
         [SerializeField] private Button joinRoomButton;
 
