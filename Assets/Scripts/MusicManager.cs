@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using NSMB.Loading;
+using NSMB.UI.Game;
 using NSMB.Utils;
 using Quantum;
 using UnityEngine;

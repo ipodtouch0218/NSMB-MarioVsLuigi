@@ -1,5 +1,5 @@
 ﻿using NSMB.Extensions;
-using NSMB.UI.Pause.Options;
+using NSMB.UI.Game;
 using NSMB.Utils;
 using Quantum;
 using System.Reflection;

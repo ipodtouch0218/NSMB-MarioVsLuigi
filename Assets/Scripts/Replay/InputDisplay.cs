@@ -1,5 +1,5 @@
 using NSMB.Extensions;
-using Photon.Realtime;
+using NSMB.UI.Game;
 using Quantum;
 using UnityEngine;
 using UnityEngine.UI;

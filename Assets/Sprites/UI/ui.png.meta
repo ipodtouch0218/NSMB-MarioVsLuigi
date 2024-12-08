@@ -1876,7 +1876,7 @@ TextureImporter:
         width: 13
         height: 13
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1884,6 +1884,27 @@ TextureImporter:
       bones: []
       spriteID: 1a625d3a88300294f85b0612dab85b42
       internalID: -2027879749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: checkmark
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 202
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e7f02c22006eede4a9bbf5326f0602a5
+      internalID: 380926162
       vertices: []
       indices: 
       edges: []
@@ -1901,6 +1922,7 @@ TextureImporter:
     nameFileIdTable:
       a_button: -242346903
       b_button: 66600449
+      checkmark: 380926162
       coinnumber_0: -878907871
       coinnumber_1: -1760457897
       coinnumber_2: 1081746599

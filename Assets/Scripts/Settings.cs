@@ -1,3 +1,4 @@
+using NSMB.UI.Game;
 using System;
 using System.IO;
 using UnityEngine;
@@ -194,6 +195,8 @@ public class Settings : Singleton<Settings> {
     public RumbleManager.RumbleSetting controlsRumble;
     public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
 
+    public bool miscFilterFullRooms, miscFilterInProgressRooms;
+
     //---Private Variables
     [SerializeField] private AudioMixer mixer;
 
@@ -251,6 +254,10 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Controls_PropellerJump", controlsPropellerJump ? 1 : 0);
         PlayerPrefs.SetInt("Controls_Rumble", (int) controlsRumble);
         PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
+
+        // Misc
+        PlayerPrefs.SetInt("Misc_FilterFullRooms", miscFilterFullRooms ? 1 : 0);
+        PlayerPrefs.SetInt("Misc_FilterInProgressRooms", miscFilterInProgressRooms ? 1 : 0);
 
         PlayerPrefs.Save();
     }
@@ -326,6 +333,9 @@ public class Settings : Singleton<Settings> {
         controlsFireballSprint = PlayerPrefs.GetInt("FireballFromSprint", 1) == 1;
         controlsAutoSprint = false;
         controlsPropellerJump = false;
+
+        miscFilterFullRooms = false;
+        miscFilterInProgressRooms = false;
 
         MassDeleteKeys("Nickname", "ScoreboardAlwaysVisible", "ChatFilter", "Character", "Skin", "NDSResolution",
             "NDS4by3", "VSync", "volumeMaster", "volumeMusic", "volumeSFX", "FireballFromSprint");
