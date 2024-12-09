@@ -69,7 +69,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEnable() {
-            NetworkHandler.StateChanged += OnClientStateChanged;
             ControlSystem.controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -78,7 +77,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisable() {
-            NetworkHandler.StateChanged -= OnClientStateChanged;
             ControlSystem.controls.UI.Pause.performed -= OnPause;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
@@ -145,35 +143,6 @@ namespace NSMB.UI.MainMenu {
 
         public void Update() {
             wasSettingsOpen = GlobalController.Instance.optionsManager.gameObject.activeSelf;
-        }
-
-        public void UpdateRegionDropdown() {
-            if (NetworkHandler.Regions == null) {
-                return;
-            }
-
-            if (regionDropdown.options.Count == 0) {
-                // Create brand-new options
-                int i = 0;
-                foreach (var region in NetworkHandler.Regions) {
-                    regionDropdown.options.Add(new RegionOption(i++, region.Code, region.Ping));
-                }
-                regionDropdown.options.Sort();
-            } else {
-                // Update existing options
-                RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
-
-                if (NetworkHandler.Regions != null) {
-                    foreach (var option in regionDropdown.options) {
-                        if (option is RegionOption ro) {
-                            ro.Ping = NetworkHandler.Regions.ElementAt(ro.Index).Ping;
-                        }
-                    }
-                }
-
-                regionDropdown.options.Sort();
-                regionDropdown.SetValueWithoutNotify(regionDropdown.options.IndexOf(selected));
-            }
         }
 
         public unsafe void InitializeRoom(Frame f) {
@@ -369,17 +338,6 @@ namespace NSMB.UI.MainMenu {
 
         public void StartSound() {
             sfx.PlayOneShot(SoundEffect.UI_StartGame);
-        }
-
-        public void ConnectToDropdownRegion() {
-            RegionOption selectedRegion = (RegionOption) regionDropdown.options[regionDropdown.value];
-            string targetRegion = selectedRegion.Region;
-            if (NetworkHandler.Region == targetRegion) {
-                return;
-            }
-
-            roomManager.ClearRooms();
-            _ = NetworkHandler.ConnectToRegion(targetRegion);
         }
 
         public async void Reconnect() {
@@ -732,32 +690,6 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        private void OnClientStateChanged(ClientState oldState, ClientState newState) {
-            switch (newState) {
-            case ClientState.DisconnectingFromNameServer:
-                // Add regions to dropdown
-                UpdateRegionDropdown();
-                break;
-            case ClientState.ConnectedToMasterServer:
-                // Change region dropdown
-                int index =
-                    regionDropdown.options
-                        .Cast<RegionOption>()
-                        .IndexOf(ro => ro.Region == NetworkHandler.Region);
-
-                if (index != -1) {
-                    regionDropdown.SetValueWithoutNotify(index);
-                    regionDropdown.RefreshShownValue();
-                }
-                break;
-            }
-
-            roomListCanvasGroup.interactable = newState == ClientState.JoinedLobby || newState == ClientState.Disconnected;
-            reconnectBtn.gameObject.SetActive(newState == ClientState.Disconnected);
-            joinPrivateRoomBtn.gameObject.SetActive(newState == ClientState.JoinedLobby);
-            UpdateNickname();
-        }
-
         private unsafe void OnLanguageChanged(TranslationManager tm) {
             int selectedLevel = levelDropdown.value;
             levelDropdown.ClearOptions();
@@ -900,45 +832,6 @@ namespace NSMB.UI.MainMenu {
             public GameObject levelPreviewPosition;
             public AssetRef<Map> mapAsset;
             public bool isCustom;
-        }
-
-        public class RegionOption : TMP_Dropdown.OptionData, IComparable {
-            public int Index { get; }
-            public string Region { get; }
-            private int _ping = -1;
-            public int Ping {
-                get => _ping;
-                set {
-                    if (value <= 0) {
-                        value = -1;
-                    }
-
-                    _ping = value;
-                    text = "<align=left>" + Region + "<line-height=0>\n<align=right>" + Utils.Utils.GetPingSymbol(_ping);
-                }
-            }
-
-            public RegionOption(int index, string region, int ping) {
-                Index = index;
-                Region = region;
-                Ping = ping;
-            }
-
-            public int CompareTo(object other) {
-                if (other is not RegionOption ro) {
-                    return -1;
-                }
-
-                if (Ping <= 0) {
-                    return 1;
-                }
-
-                if (ro.Ping <= 0) {
-                    return -1;
-                }
-
-                return Ping.CompareTo(ro.Ping);
-            }
         }
     }
 }

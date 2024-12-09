@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuCanvas : MonoBehaviour {
@@ -18,12 +19,14 @@ namespace NSMB.UI.MainMenu {
 
         [Header("Header")]
         [SerializeField] private GameObject header;
+        [SerializeField] private Image headerImage;
         [SerializeField] private TMP_Text headerPath;
         [SerializeField] private string headerSeparation;
 
         //---Private Variables
-        private List<MainMenuSubmenu> allSubmenus = new();
+        private readonly List<MainMenuSubmenu> allSubmenus = new();
         private readonly List<MainMenuSubmenu> submenuStack = new();
+        private Color defaultHeaderColor;
 
         public void OnValidate() {
             this.SetIfNull(ref sfx);
@@ -31,13 +34,14 @@ namespace NSMB.UI.MainMenu {
 
         public void Awake() {
             Instance = this;
+            defaultHeaderColor = headerImage.color;
         }
 
         public void Start() {
             GetComponentsInChildren(true, allSubmenus);
             foreach (var menu in allSubmenus) {
                 menu.Initialize(this);
-                menu.Hide(false);
+                menu.Hide(SubmenuHideReason.Closed);
             }
             OpenMenu(startingSubmenu);
         }
@@ -46,10 +50,14 @@ namespace NSMB.UI.MainMenu {
             StringBuilder builder = new();
 
             bool showHeader = false;
+            Color? newHeaderColor = null;
             foreach (var menu in submenuStack) {
                 showHeader |= menu.ShowHeader;
                 if (!string.IsNullOrEmpty(menu.Header)) {
                     builder.Append(menu.Header).Append(headerSeparation);
+                }
+                if (menu.HeaderColor.HasValue) {
+                    newHeaderColor = menu.HeaderColor;
                 }
             }
 
@@ -58,13 +66,14 @@ namespace NSMB.UI.MainMenu {
                 headerPath.text = builder.ToString();
             }
 
+            headerImage.color = newHeaderColor ?? defaultHeaderColor;
             header.SetActive(showHeader);
         }
 
         public void OpenMenu(MainMenuSubmenu menu) {
             if (submenuStack.Count > 0) {
-                submenuStack[^1].Hide(true);
-                PlaySound(SoundEffect.UI_Decide);
+                submenuStack[^1].Hide(menu.IsOverlay ? SubmenuHideReason.Overlayed : SubmenuHideReason.Background);
+                PlaySound(menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
             }
 
             submenuStack.Add(menu);
@@ -80,13 +89,13 @@ namespace NSMB.UI.MainMenu {
 
             MainMenuSubmenu currentSubmenu = submenuStack[^1];
             if (currentSubmenu.TryGoBack(out bool playSound)) {
-                currentSubmenu.Hide(false);
+                currentSubmenu.Hide(SubmenuHideReason.Closed);
                 submenuStack.RemoveAt(submenuStack.Count - 1);
                 submenuStack[^1].Show(false);
             }
 
             if (playSound) {
-                PlaySound(SoundEffect.UI_Back);
+                PlaySound(currentSubmenu.IsOverlay ? SoundEffect.UI_WindowClose : SoundEffect.UI_Back);
             }
 
             UpdateHeader();
@@ -116,5 +125,11 @@ namespace NSMB.UI.MainMenu {
 
             mainPanel.SetActive(showMainPanel);
         }
+    }
+
+    public enum SubmenuHideReason {
+        Closed,
+        Background,
+        Overlayed,
     }
 }

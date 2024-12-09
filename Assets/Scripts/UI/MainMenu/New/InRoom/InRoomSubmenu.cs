@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.Utils;
 using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,42 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Properties
         public override float BackHoldTime => colorPalettePicker.activeSelf ? 0f : 1f;
+        public unsafe override Color? HeaderColor {
+            get {
+                const int rngSeed = 2035767;
+                Frame f = NetworkHandler.Runner.Game.Frames.Predicted;
+                PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+                RuntimePlayer playerData = f.GetPlayerData(host);
+                string hostname;
+
+                if (playerData == null) {
+                    // Assume we're the host...
+                    hostname = Settings.Instance.generalNickname.ToValidUsername(f, host);
+                } else {
+                    hostname = playerData.PlayerNickname.ToValidUsername(f, host);
+                }
+
+                Random.InitState(hostname.GetHashCode() + rngSeed);
+                return Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
+            }
+        }
+        public unsafe override string Header {
+            get {
+                Frame f = NetworkHandler.Runner.Game.Frames.Predicted;
+                PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+                RuntimePlayer playerData = f.GetPlayerData(host);
+                string hostname;
+
+                if (playerData == null) {
+                    // Assume we're the host...
+                    hostname = Settings.Instance.generalNickname.ToValidUsername(f, host);
+                } else {
+                    hostname = playerData.PlayerNickname.ToValidUsername(f, host);
+                }
+
+                return GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname);
+            }
+        }
 
         //---Serialized Variables
         [SerializeField] private InRoomPanel defaultSelectedPanel;

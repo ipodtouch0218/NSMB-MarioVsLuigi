@@ -383,6 +383,10 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("Controls_PropellerJump", ref controlsPropellerJump);
         TryGetSetting("Controls_Rumble", ref controlsRumble);
         TryGetSetting<string>("Controls_Bindings", nameof(ControlsBindings));
+
+        // Misc
+        TryGetSetting("Misc_FilterFullRooms", ref miscFilterFullRooms);
+        TryGetSetting("Misc_FilterInProgressRooms", ref miscFilterInProgressRooms);
     }
 
     private bool TryGetSetting<T>(string key, string propertyName, T defaultValue = default) {

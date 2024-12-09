@@ -111,6 +111,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
     }
 
+    public static Task Disconnect() {
+        return Client.DisconnectAsync();
+    }
+
     public static async Task<bool> ConnectToRegion(string region) {
         region ??= Instance.lastRegion;
         Instance.lastRegion = region;

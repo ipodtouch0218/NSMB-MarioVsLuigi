@@ -47,7 +47,7 @@ public class SpriteChangingToggle : Selectable, IPointerClickHandler, IEventSyst
 
     public virtual void Rebuild(CanvasUpdate executing) {
         if (executing == CanvasUpdate.Prelayout) {
-            onValueChanged.Invoke(m_IsOn);
+            // onValueChanged.Invoke(m_IsOn);
         }
     }
 

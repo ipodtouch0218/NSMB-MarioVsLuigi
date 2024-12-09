@@ -153,6 +153,7 @@
   "ui.rooms.filters": "Room Filters",
   "ui.rooms.filters.notstarted": "Hide in-progress rooms",
   "ui.rooms.filters.notfull": "Hide full rooms",
+  "ui.rooms.hidden": "{rooms} additional rooms are hidden by filters.",
   "ui.rooms.buttons.joinprivate": "Join a room via ID",
   "ui.rooms.buttons.create": "Create a room",
   "ui.rooms.buttons.reconnect": "Reconnect to the server",
@@ -296,5 +297,10 @@
   "discord.private": "In a private game",
   "discord.online": "Playing online",
   "discord.offline": "Playing offline",
-  "discord.replay": "Watching a replay"
+  "discord.replay": "Watching a replay",
+  "region.us": "USA, East",
+  "region.eu": "Europe",
+  "region.sa": "South America",
+  "region.kr": "South Korea",
+  "region.asia": "Asia"
 }

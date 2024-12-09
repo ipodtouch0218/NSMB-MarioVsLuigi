@@ -7,19 +7,23 @@ namespace NSMB.UI.MainMenu {
 
         //---Properties
         public virtual string Header => GlobalController.Instance.translationManager.GetTranslation(header);
+        public virtual Color? HeaderColor => useHeaderColor ? headerColor : null;
         public virtual float BackHoldTime => backHoldTime;
 
         //---Serialized Variables
         [SerializeField] public bool ShowHeader = true;
-        [SerializeField] public bool HideInBackground = true;
+        [SerializeField] public bool IsOverlay = false;
         [SerializeField] public bool RequiresMainPanel = true;
         [SerializeField] private string header;
         [SerializeField] private float backHoldTime = 0;
         [SerializeField] private GameObject defaultSelection;
+        [SerializeField] private bool useHeaderColor;
+        [SerializeField] private Color headerColor;
 
         [Header("Events")]
         [SerializeField] private UnityAction OnInitialize;
-        [SerializeField] private UnityAction<bool> OnShow, OnHide;
+        [SerializeField] private UnityAction<bool> OnShow;
+        [SerializeField] private UnityAction<SubmenuHideReason> OnHide;
 
         //---Private Variables
         protected MainMenuCanvas canvas;
@@ -37,13 +41,11 @@ namespace NSMB.UI.MainMenu {
             OnShow?.Invoke(first);
         }
 
-        public virtual void Hide(bool background) {
+        public virtual void Hide(SubmenuHideReason hideReason) {
             savedSelection = EventSystem.current.currentSelectedGameObject;
-            if (!background || HideInBackground) {
-                gameObject.SetActive(false);
-            }
+            gameObject.SetActive(hideReason == SubmenuHideReason.Overlayed);
 
-            OnHide?.Invoke(background);
+            OnHide?.Invoke(hideReason);
         }
 
         public virtual bool TryGoBack(out bool playSound) {

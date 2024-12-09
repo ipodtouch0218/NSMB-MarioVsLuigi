@@ -21,7 +21,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private Color clickColor;
 
         //---Private Variables
-        private float timer;
+        private float timer, backHoldRequirement;
         private bool backHeldViaButton, backHeldViaClick;
         private Color originalColor;
 
@@ -54,8 +54,8 @@ namespace NSMB.UI.MainMenu {
                 BackHeld = false;
             }
 
-            float requirement = canvas.SubmenuStack[^1].BackHoldTime;
             if (BackHeld) {
+                backHoldRequirement = canvas.SubmenuStack[^1].BackHoldTime;
                 if (!backButtonSfx.isPlaying || backButtonSfx.clip != growClip) {
                     backButtonSfx.Stop();
                     backButtonSfx.clip = growClip;
@@ -63,7 +63,7 @@ namespace NSMB.UI.MainMenu {
                     backButtonSfx.time = timer;
                 }
 
-                if ((timer += Time.deltaTime) >= requirement) {
+                if ((timer += Time.deltaTime) >= backHoldRequirement) {
                     canvas.GoBack();
                     BackHeld = false;
                     timer = 0;
@@ -87,7 +87,7 @@ namespace NSMB.UI.MainMenu {
                 goBackButton.color = originalColor;
             }
 
-            goBackImageFill.fillAmount = requirement > 0 ? (timer / requirement) : 0;
+            goBackImageFill.fillAmount = backHoldRequirement > 0 ? (timer / backHoldRequirement) : 0;
         }
 
         //---Callbacks

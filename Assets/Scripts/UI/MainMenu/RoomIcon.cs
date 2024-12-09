@@ -11,6 +11,16 @@ using Quantum;
 namespace NSMB.UI.MainMenu {
     public class RoomIcon : MonoBehaviour {
 
+        //---Properties
+        public bool HasGameStarted {
+            get {
+                GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
+                BooleanProperties boolProperties = (BooleanProperties) packedBoolProperties;
+
+                return boolProperties.GameStarted;
+            }
+        }
+
         //---Public Variables
         public RoomInfo room;
 

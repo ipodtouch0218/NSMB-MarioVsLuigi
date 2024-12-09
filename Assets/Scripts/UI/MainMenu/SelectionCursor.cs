@@ -35,8 +35,7 @@ public class SelectionCursor : MonoBehaviour {
             newObject = true;
         }
 
-        if (!current || !current.activeInHierarchy
-            || (current.TryGetComponent(out Image currentImage) && currentImage.color.a == 0)) {
+        if (!current || !current.activeInHierarchy || current.layer == LayerMask.NameToLayer("UINoCursor")) {
             image.enabled = false;
             hidden = true;
             return;
@@ -56,8 +55,8 @@ public class SelectionCursor : MonoBehaviour {
             positionVelocity = default;
             sizeVelocity = default;
             fadeValue = 2f;
-
             hidden = false;
+            newObject = false;
         }
 
         if (newObject && quickSnap) {

@@ -41,7 +41,7 @@ TagManager:
   - PassthroughInvalid
   - GroundEntity
   - EntityNoGroundEntity
-  - 
+  - UINoCursor
   - 
   - 
   - 

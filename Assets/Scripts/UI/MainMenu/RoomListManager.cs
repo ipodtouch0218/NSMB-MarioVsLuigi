@@ -1,14 +1,34 @@
 using Photon.Realtime;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu {
     public class RoomListManager : MonoBehaviour, ILobbyCallbacks, IConnectionCallbacks {
 
+        //---Properties
+        private bool _filterFullRooms;
+        public bool FilterFullRooms {
+            get => _filterFullRooms;
+            set {
+                _filterFullRooms = value;
+                RefreshRooms();
+            }
+        }
+        private bool _filterInProgressRooms;
+        public bool FilterInProgressRooms {
+            get => _filterInProgressRooms;
+            set {
+                _filterInProgressRooms = value;
+                RefreshRooms();
+            }
+        }
+
         //---Serialized Variables
         [SerializeField] private RoomIcon roomIconPrefab;
         [SerializeField] private GameObject roomListScrollRect, privateRoomIdPrompt;
+        [SerializeField] private TMP_Text filterRoomCountText;
 
         //---Private Variables
         private readonly Dictionary<string, RoomIcon> rooms = new();
@@ -27,9 +47,23 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void RefreshRooms() {
+            int filtered = 0;
             foreach (RoomIcon room in rooms.Values) {
-                 room.UpdateUI(room.room);
+                room.UpdateUI(room.room);
+
+                if (FilterFullRooms && room.room.PlayerCount == room.room.MaxPlayers) {
+                    room.gameObject.SetActive(false);
+                    filtered++;
+                } else if (FilterInProgressRooms && room.HasGameStarted) {
+                    room.gameObject.SetActive(false);
+                    filtered++;
+                } else {
+                    room.gameObject.SetActive(true);
+                }
             }
+
+            filterRoomCountText.enabled = filtered > 0;
+            filterRoomCountText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.hidden", "rooms", filtered.ToString());
         }
 
         private void CreateRoom(RoomInfo newRoomInfo) {
@@ -58,6 +92,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             rooms.Clear();
+            filterRoomCountText.enabled = false;
         }
 
         //---Callbacks
@@ -93,7 +128,9 @@ namespace NSMB.UI.MainMenu {
 
         public void OnConnected() { }
 
-        public void OnConnectedToMaster() { }
+        public void OnConnectedToMaster() {
+            ClearRooms();
+        }
 
         public void OnDisconnected(DisconnectCause cause) {
             ClearRooms();
