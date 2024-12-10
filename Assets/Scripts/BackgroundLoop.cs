@@ -4,7 +4,7 @@ using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
 
-public class BackgroundLoop : QuantumCallbacks {
+public class BackgroundLoop : QuantumSceneViewComponent<StageContext> {
 
     //---Static Variables
     public static BackgroundLoop Instance { get; private set; }
@@ -14,7 +14,6 @@ public class BackgroundLoop : QuantumCallbacks {
     private GameObject[] children;
     private Vector3[] truePositions;
     private float[] ppus, halfWidths;
-    private VersusStageData stage;
     private Dictionary<Camera,FPVector2> lastPositions = new();
 
     public void Start() {
@@ -36,11 +35,10 @@ public class BackgroundLoop : QuantumCallbacks {
         foreach (GameObject obj in children) {
             LoadChildObjects(obj);
         }
-
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
     public void Reposition(Camera camera) {
+        VersusStageData stage = ViewContext.Stage;
         if (!stage) {
             return;
         }

@@ -52,6 +52,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private AudioSource sfx;
         [SerializeField] private List<InRoomPanel> allPanels;
         [SerializeField] private GameObject colorPalettePicker;
+        [SerializeField] private PlayerListHandler playerListHandler;
 
         //---Private Variables
         private InRoomPanel selectedPanel;
@@ -62,6 +63,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public override void Initialize(MainMenuCanvas canvas) {
             base.Initialize(canvas);
+            playerListHandler.Initialize();
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         }
 
@@ -79,6 +81,11 @@ namespace NSMB.UI.MainMenu.Submenus {
         public void OnDisable() {
             ControlSystem.controls.UI.Next.performed -= OnNextPerformed;
             ControlSystem.controls.UI.Previous.performed -= OnPreviousPerformed;
+        }
+
+        public override bool TryGoBack(out bool playSound) {
+            _ = NetworkHandler.ConnectToRegion(null);
+            return base.TryGoBack(out playSound);
         }
 
         public void SelectPanel(InRoomPanel panel) {

@@ -18,7 +18,14 @@ namespace NSMB.UI.MainMenu {
 
         //---Private Variables
         private Coroutine autoRefreshCoroutine;
-        private List<PlayerListEntry> playerListEntries = new(10);
+        private readonly List<PlayerListEntry> playerListEntries = new(10);
+
+        public void Initialize() {
+            playerListEntries.Add(template);
+            for (int i = 1; i < 10; i++) {
+                playerListEntries.Add(Instantiate(template, template.transform.parent));
+            }
+        }
 
         public void OnEnable() {
             autoRefreshCoroutine = StartCoroutine(AutoUpdateCoroutine());
@@ -38,11 +45,6 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
-
-            playerListEntries.Add(template);
-            for (int i = 1; i < 10; i++) {
-                playerListEntries.Add(Instantiate(template, template.transform.parent));
-            }
         }
 
         public unsafe void PopulatePlayerEntries(Frame f) {
@@ -63,6 +65,7 @@ namespace NSMB.UI.MainMenu {
 
             if (!GetPlayerEntry(player)) {
                 PlayerListEntry newEntry = GetUnusedPlayerEntry();
+                Debug.Log(newEntry);
                 newEntry.SetPlayer(f, player);
                 UpdateAllPlayerEntries(f);
 

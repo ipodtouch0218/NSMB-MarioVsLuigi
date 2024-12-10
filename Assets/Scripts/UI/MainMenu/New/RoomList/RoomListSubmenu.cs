@@ -1,4 +1,5 @@
 using Photon.Realtime;
+using Quantum;
 using System;
 using System.Linq;
 using TMPro;
@@ -16,10 +17,12 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private GameObject reconnectBtn, createRoomBtn, joinPrivateRoomBtn;
         [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms;
         [SerializeField] private TMP_InputField usernameField;
+        [SerializeField] private MainMenuSubmenu inRoomSubmenu;
 
         public override void Initialize(MainMenuCanvas canvas) {
             base.Initialize(canvas);
             NetworkHandler.StateChanged += OnClientStateChanged;
+            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
         }
 
         public void OnDestroy() {
@@ -140,6 +143,10 @@ namespace NSMB.UI.MainMenu.Submenus {
             /*
             UpdateNickname();
             */
+        }
+
+        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
+            canvas.OpenMenu(inRoomSubmenu);
         }
 
         private class RegionOption : TMP_Dropdown.OptionData, IComparable {
