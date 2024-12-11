@@ -4094,6 +4094,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25b361eadac6e5f4fa3ade17a2c54574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
 --- !u!1 &386870290
 GameObject:
   m_ObjectHideFlags: 0
@@ -6260,8 +6262,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 892967448}
   - {fileID: 1281251055}
-  - {fileID: 1275037590}
   - {fileID: 359695894}
+  - {fileID: 1275037590}
   - {fileID: 653116534}
   - {fileID: 253646780}
   - {fileID: 83074480}

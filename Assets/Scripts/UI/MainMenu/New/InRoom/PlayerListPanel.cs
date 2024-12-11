@@ -30,6 +30,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         public override void Deselect() {
+            base.Deselect();
             selectedIndex = -1;
         }
 

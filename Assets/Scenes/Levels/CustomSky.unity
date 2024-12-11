@@ -188,7 +188,7 @@ Transform:
   - {fileID: 498601909}
   - {fileID: 1146816020}
   - {fileID: 144288127}
-  m_Father: {fileID: 859204837}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &61731050
 MonoBehaviour:
@@ -202,6 +202,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25b361eadac6e5f4fa3ade17a2c54574, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
 --- !u!1 &133657841
 GameObject:
   m_ObjectHideFlags: 0
@@ -1701,7 +1703,6 @@ Transform:
   - {fileID: 1205567409}
   - {fileID: 421157209}
   - {fileID: 2108825703}
-  - {fileID: 61731049}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &925657766
@@ -7017,6 +7018,7 @@ SceneRoots:
   - {fileID: 1410910066}
   - {fileID: 8587725865119912785}
   - {fileID: 133657843}
+  - {fileID: 61731049}
   - {fileID: 859204837}
   - {fileID: 1462023791}
   - {fileID: 1292545025}

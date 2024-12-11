@@ -1696,7 +1696,7 @@ MonoBehaviour:
           UserTag: 0
           IsPersistent: 1
           CompoundShapes: []
-        Layer: 9
+        Layer: 0
         IsTrigger: 1
         PhysicsMaterial:
           Id:

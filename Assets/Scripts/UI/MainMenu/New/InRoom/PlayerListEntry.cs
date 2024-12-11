@@ -1,8 +1,8 @@
-using NSMB.Extensions;
 using NSMB.Utils;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -15,6 +15,7 @@ namespace NSMB.UI.MainMenu {
         //---Static Variables
         public static event Action<PlayerListEntry> PlayerMuteStateChanged;
         public static event Action<PlayerListEntry> PlayerEntrySelected;
+        public static event Action<PlayerListEntry, bool> PlayerEntryDropdownChanged;
 
         //---Public Variables
         public PlayerRef player;
@@ -23,11 +24,11 @@ namespace NSMB.UI.MainMenu {
         public int joinTick = int.MaxValue;
 
         //---Serialized Variables
+        [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private TMP_Text nameText, pingText, winsText, muteButtonText;
         [SerializeField] private Image colorStrip;
-        [SerializeField] private RectTransform background, optionsTransform;
-        [SerializeField] private GameObject blockerTemplate, firstButton, chattingIcon, settingsIcon, readyIcon;
-        [SerializeField] private Canvas rootCanvas;
+        [SerializeField] private RectTransform background;
+        [SerializeField] private GameObject blockerTemplate, dropdownOptions, firstButton, chattingIcon, settingsIcon, readyIcon;
         [SerializeField] private LayoutElement layout;
         [SerializeField] private GameObject[] allOptions, adminOnlyOptions, othersOnlyOptions;
         [SerializeField] private GameObject playerExistsGameObject;
@@ -44,6 +45,7 @@ namespace NSMB.UI.MainMenu {
             if (QuantumRunner.DefaultGame != null) {
                 UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
             }
+            dropdownOptions.SetActive(false);
         }
 
         public void OnDisable() {
@@ -88,6 +90,7 @@ namespace NSMB.UI.MainMenu {
             playerExistsGameObject.SetActive(true);
             joinTick = QuantumUtils.GetPlayerData(f, player)->JoinTick;
             name = $"{(runtimePlayer?.PlayerNickname ?? "noname")} ({userId})";
+            dropdownOptions.SetActive(false);
         }
 
         public void RemovePlayer() {
@@ -96,6 +99,10 @@ namespace NSMB.UI.MainMenu {
             userId = default;
             joinTick = int.MaxValue;
             playerExistsGameObject.SetActive(false);
+            if (dropdownOptions.activeSelf) {
+                PlayerEntryDropdownChanged?.Invoke(this, false);
+            }
+            dropdownOptions.SetActive(false);
         }
 
         private static readonly StringBuilder Builder = new();
@@ -116,7 +123,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             // Ping text
-            pingText.text = playerData->Ping + " " + Utils.Utils.GetPingSymbol(playerData->Ping);
+            pingText.text = Utils.Utils.GetPingSymbol(playerData->Ping);
 
             // Name text
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
@@ -189,25 +196,28 @@ namespace NSMB.UI.MainMenu {
 
             Canvas.ForceUpdateCanvases();
 
-            blockerInstance = Instantiate(blockerTemplate, rootCanvas.transform);
+            blockerInstance = Instantiate(blockerTemplate, canvas.transform);
             RectTransform blockerTransform = blockerInstance.GetComponent<RectTransform>();
             blockerTransform.offsetMax = blockerTransform.offsetMin = Vector2.zero;
             blockerInstance.SetActive(true);
+            dropdownOptions.SetActive(true);
+            PlayerEntryDropdownChanged?.Invoke(this, true);
 
-            background.offsetMin = new(background.offsetMin.x, -optionsTransform.rect.height);
-            optionsTransform.anchoredPosition = new(optionsTransform.anchoredPosition.x, -optionsTransform.rect.height);
-
-            EventSystem.current.SetSelectedGameObject(firstButton);
-            MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Cursor);
+            EventSystem.current.SetSelectedGameObject(allOptions.First(go => go.activeSelf));
+            canvas.PlayCursorSound();
         }
 
         public void HideDropdown(bool didAction) {
-            Destroy(blockerInstance);
+            if (blockerInstance) {
+                Destroy(blockerInstance);
+            }
+            if (dropdownOptions.activeSelf) {
+                PlayerEntryDropdownChanged?.Invoke(this, false);
+            }
+            dropdownOptions.SetActive(false);
+            canvas.PlaySound(didAction ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
 
-            background.offsetMin = new(background.offsetMin.x, 0);
-            optionsTransform.anchoredPosition = new(optionsTransform.anchoredPosition.x, 0);
-
-            MainMenuManager.Instance.sfx.PlayOneShot(didAction ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
+            EventSystem.current.SetSelectedGameObject(button.gameObject);
         }
 
         public void BanPlayer() {

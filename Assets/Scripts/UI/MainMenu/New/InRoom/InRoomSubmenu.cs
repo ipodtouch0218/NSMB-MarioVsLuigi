@@ -9,7 +9,7 @@ namespace NSMB.UI.MainMenu.Submenus {
     public class InRoomSubmenu : MainMenuSubmenu {
 
         //---Properties
-        public override float BackHoldTime => colorPalettePicker.activeSelf ? 0f : 1f;
+        public override float BackHoldTime => colorPalettePicker.activeSelf || playerDropdownOpen ? 0f : 1f;
         public unsafe override Color? HeaderColor {
             get {
                 const int rngSeed = 2035767;
@@ -56,6 +56,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Private Variables
         private InRoomPanel selectedPanel;
+        private PlayerListEntry playerDropdownOpen;
 
         public void OnValidate() {
             this.SetIfNull(ref sfx);
@@ -70,20 +71,29 @@ namespace NSMB.UI.MainMenu.Submenus {
         public void OnEnable() {
             ControlSystem.controls.UI.Next.performed += OnNextPerformed;
             ControlSystem.controls.UI.Previous.performed += OnPreviousPerformed;
+            PlayerListEntry.PlayerEntryDropdownChanged += OnPlayerEntryDropdownChanged;
 
             foreach (var panel in allPanels) {
                 panel.Deselect();
             }
             selectedPanel = defaultSelectedPanel;
             selectedPanel.Select(true);
+            playerDropdownOpen = null;
         }
 
         public void OnDisable() {
             ControlSystem.controls.UI.Next.performed -= OnNextPerformed;
             ControlSystem.controls.UI.Previous.performed -= OnPreviousPerformed;
+            PlayerListEntry.PlayerEntryDropdownChanged -= OnPlayerEntryDropdownChanged;
         }
 
         public override bool TryGoBack(out bool playSound) {
+            if (playerDropdownOpen) {
+                playerDropdownOpen.HideDropdown(false);
+                playSound = false;
+                return false;
+            }
+
             _ = NetworkHandler.ConnectToRegion(null);
             return base.TryGoBack(out playSound);
         }
@@ -142,6 +152,10 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         private void OnGameStarted(CallbackGameStarted e) {
 
+        }
+
+        private void OnPlayerEntryDropdownChanged(PlayerListEntry entry, bool state) {
+            playerDropdownOpen = state ? entry : null;
         }
     }
 }

@@ -14,7 +14,7 @@ public class LoopingMusicPlayer : MonoBehaviour {
     [SerializeField] protected LoopingMusicData currentAudio;
     [SerializeField] private bool playOnAwake = true;
 
-    public void Start() {
+    public void OnEnable() {
         if (playOnAwake && currentAudio) {
             Play(currentAudio, true);
         }

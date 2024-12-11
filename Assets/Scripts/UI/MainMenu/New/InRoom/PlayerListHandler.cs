@@ -13,6 +13,7 @@ namespace NSMB.UI.MainMenu {
         public event Action<int> PlayerRemoved;
 
         //---Serialized Variables
+        [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private GameObject contentPane;
         [SerializeField] private PlayerListEntry template;
 
@@ -25,6 +26,11 @@ namespace NSMB.UI.MainMenu {
             for (int i = 1; i < 10; i++) {
                 playerListEntries.Add(Instantiate(template, template.transform.parent));
             }
+
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
         public void OnEnable() {
@@ -38,13 +44,6 @@ namespace NSMB.UI.MainMenu {
                 StopCoroutine(autoRefreshCoroutine);
                 autoRefreshCoroutine = null;
             }
-        }
-
-        public void Start() {
-            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
-            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
-            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
-            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
         public unsafe void PopulatePlayerEntries(Frame f) {
@@ -65,7 +64,6 @@ namespace NSMB.UI.MainMenu {
 
             if (!GetPlayerEntry(player)) {
                 PlayerListEntry newEntry = GetUnusedPlayerEntry();
-                Debug.Log(newEntry);
                 newEntry.SetPlayer(f, player);
                 UpdateAllPlayerEntries(f);
 
@@ -116,7 +114,7 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void ReorderEntries() {
             playerListEntries.Sort((a, b) => {
-                return a.joinTick - b.joinTick;
+                return b.joinTick - a.joinTick;
             });
 
             for (int i = 0; i < playerListEntries.Count; i++) {
@@ -147,10 +145,12 @@ namespace NSMB.UI.MainMenu {
         //---Callbacks
         private void OnPlayerAdded(EventPlayerAdded e) {
             AddPlayerEntry(e.Frame, e.Player);
+            canvas.PlaySound(SoundEffect.UI_PlayerConnect);
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
             RemovePlayerEntry(e.Frame, e.Player);
+            canvas.PlaySound(SoundEffect.UI_PlayerDisconnect);
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {

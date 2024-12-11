@@ -1,6 +1,5 @@
 using NSMB.Extensions;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -78,7 +77,6 @@ namespace NSMB.UI.MainMenu {
             }
 
             submenuStack.Add(menu);
-            Debug.Log($"opening {menu.name}. New stack: {string.Join(',', submenuStack.Select(m => m.name))}");
             menu.Show(true);
             UpdateHeader();
             ShowHideMainPanel();
@@ -94,7 +92,6 @@ namespace NSMB.UI.MainMenu {
                 currentSubmenu.Hide(SubmenuHideReason.Closed);
                 submenuStack.RemoveAt(submenuStack.Count - 1);
                 submenuStack[^1].Show(false);
-                Debug.Log($"closing {currentSubmenu.name}. New stack: {string.Join(',', submenuStack.Select(m => m.name))}");
             }
 
             if (playSound) {
