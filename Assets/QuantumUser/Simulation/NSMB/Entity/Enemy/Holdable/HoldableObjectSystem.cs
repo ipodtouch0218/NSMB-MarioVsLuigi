@@ -2,14 +2,18 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter>, ISignalOnBeforePhysicsCollision,
-        ISignalOnComponentRemoved<Holdable>, ISignalOnTryLiquidSplash, ISignalOnEntityFreeze {
+    public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
+        ISignalOnTryLiquidSplash, ISignalOnEntityFreeze {
         
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
             public Holdable* Holdable;
             public PhysicsObject* PhysicsObject;
+        }
+
+        public override void OnInit(Frame f) {
+            f.Context.RegisterPreContactCallback(OnPreContactCallback);
         }
 
         public override void Update(Frame f, ref Filter filter) {
@@ -35,12 +39,12 @@ namespace Quantum {
             filter.Transform->Position = holderTransform->Position + mario->GetHeldItemOffset(f, holdable->Holder);
         }
 
-        public void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
-            if (contact->Entity != EntityRef.None
-                && f.Unsafe.TryGetPointer(contact->Entity, out Holdable* holdable)
+        public void OnPreContactCallback(FrameThreadSafe f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContact) {
+            if (contact.Entity != EntityRef.None
+                && f.TryGetPointer(contact.Entity, out Holdable* holdable)
                 && (entity == holdable->Holder || (entity == holdable->PreviousHolder && holdable->IgnoreOwnerFrames > 0))) {
 
-                *allowCollision = false;
+                keepContact = false;
             }
         }
 

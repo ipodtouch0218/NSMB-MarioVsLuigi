@@ -1255,6 +1255,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: MarioVsLuigiStage
       objectReference: {fileID: 0}
+    - target: {fileID: 386082018083208079, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4655134995783614807, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -12378,7 +12383,7 @@ PrefabInstance:
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
-      value: 2097152
+      value: 1048576
       objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}

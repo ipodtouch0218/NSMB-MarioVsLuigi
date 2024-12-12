@@ -45,7 +45,7 @@ namespace Quantum {
                 transform->Position = FPVector2.Lerp(powerup->BlockSpawnOrigin, powerup->BlockSpawnDestination, t);
 
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                    if (PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.Collider->Shape, false, stage, filter.Entity)) {
+                    if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, filter.Entity)) {
                         // TODO: poof effect.
                         f.Destroy(filter.Entity);
                         return;
@@ -99,7 +99,7 @@ namespace Quantum {
 
             if (powerup->SpawnAnimationFrames == 0 && physicsObject->DisableCollision) {
                 // Test that we're not in a wall anymore
-                if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.Collider->Shape, stage: stage)) {
+                if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, stage: stage)) {
                     physicsObject->DisableCollision = false;
                 }
             }

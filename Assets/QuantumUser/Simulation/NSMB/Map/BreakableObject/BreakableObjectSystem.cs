@@ -1,24 +1,17 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
-    public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnBeforePhysicsCollision, ISignalOnStageReset {
+    public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnStageReset {
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<BreakableObject, MarioPlayer>(OnBreakableObjectMarioInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, BreakableObject>(OnBreakableObjectMarioInteraction);
         }
 
-        public void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
-            if (f.Has<MarioPlayer>(entity) && f.Has<BreakableObject>(contact->Entity)) {
-                *allowCollision &= !TryInteraction(f, contact->Entity, entity, *contact);
-            }
+        private void OnBreakableObjectMarioInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
+            TryInteraction(f, breakableObjectEntity, marioEntity, contact);
         }
 
-        private void OnBreakableObjectMarioInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity) {
-            TryInteraction(f, breakableObjectEntity, marioEntity);
-        }
-
-        private bool TryInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact? contact = null) {
+        private bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             if (mario->CurrentPowerupState != PowerupState.MegaMushroom || mario->IsDead) {
                 return false;
@@ -55,6 +48,11 @@ namespace Quantum {
                 f.Events.BreakableObjectBroken(f, breakableObjectEntity, marioEntity, -effectiveNormal, breakable->CurrentHeight - breakable->MinimumHeight);
                 ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->MinimumHeight, true);
                 breakable->IsDestroyed = true;
+
+                var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+                marioPhysicsObject->Velocity.X = marioPhysicsObject->PreviousFrameVelocity.X;
+                FP leftoverVelocity = (FPMath.Abs(marioPhysicsObject->Velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (marioPhysicsObject->Velocity.X > 0 ? 1 : -1);
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, leftoverVelocity, marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
                 return true;
             }
 

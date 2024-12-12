@@ -10,9 +10,6 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
-        public delegate void HitboxInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
-        public delegate void PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
-
         public override void BeforeUpdate(Frame f, VersusStageData stage) {
             f.Context.alreadyCollided.Clear();
         }
@@ -21,13 +18,9 @@ namespace Quantum {
             var interactable = filter.Interactable;
             var entity = filter.Entity;
 
-            if (interactable->ColliderDisabled) {
-                return;
-            }
-
-            bool allowInteraction = true;
-            f.Signals.OnBeforeInteraction(entity, &allowInteraction);
-            if (!allowInteraction) {
+            if (interactable->ColliderDisabled
+                || (f.Unsafe.TryGetPointer(entity, out Enemy* enemy) && enemy->IsDead)
+                || (f.Unsafe.TryGetPointer(entity, out Freezable* freezable) && f.Exists(freezable->FrozenCubeEntity))) {
                 return;
             }
 
@@ -36,12 +29,6 @@ namespace Quantum {
 
             // Collide with hitboxes
             if (f.Physics2D.TryGetQueryHits(interactable->OverlapQueryRef, out HitCollection hits)) {
-                for (int i = 0; i < hits.Count; i++) {
-                    TryCollideWithEntity(f, entity, hits[i].Entity);
-                }
-            }
-
-            if (f.Physics2D.TryGetQueryHits(interactable->OverlapQueryRef, out hits)) {
                 for (int i = 0; i < hits.Count; i++) {
                     TryCollideWithEntity(f, entity, hits[i].Entity);
                 }
@@ -61,7 +48,7 @@ namespace Quantum {
             }
         }
 
-        private void TryCollideWithEntity(Frame f, EntityRef entityA, in EntityRef entityB) {
+        private void TryCollideWithEntity(Frame f, EntityRef entityA, EntityRef entityB) {
             var entities = (entityA, entityB);
             if (entityA == entityB || f.Context.alreadyCollided.Contains(entities)) {
                 return;
@@ -112,6 +99,10 @@ namespace Quantum {
             }
 
             bool allowInteraction = true;
+            f.Signals.OnBeforeInteraction(entityA, &allowInteraction);
+            if (!allowInteraction) {
+                return;
+            }
             f.Signals.OnBeforeInteraction(entityB, &allowInteraction);
             if (!allowInteraction) {
                 return;

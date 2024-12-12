@@ -578,6 +578,7 @@ namespace Quantum.Prototypes {
     public QBoolean DisableCollision;
     public QBoolean SlowInLiquids;
     public QBoolean IsWaterSolid;
+    public QBoolean BreakMegaObjects;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.PhysicsObject component = default;
         Materialize((Frame)f, ref component, in context);
@@ -590,6 +591,7 @@ namespace Quantum.Prototypes {
         result.DisableCollision = this.DisableCollision;
         result.SlowInLiquids = this.SlowInLiquids;
         result.IsWaterSolid = this.IsWaterSolid;
+        result.BreakMegaObjects = this.BreakMegaObjects;
     }
   }
   [System.SerializableAttribute()]

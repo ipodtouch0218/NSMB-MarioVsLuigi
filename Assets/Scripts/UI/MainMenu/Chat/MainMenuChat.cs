@@ -1,13 +1,12 @@
 using NSMB.Extensions;
 using NSMB.Translation;
-using Photon.Realtime;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 namespace NSMB.UI.MainMenu {
 
@@ -19,6 +18,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private UnityEngine.UI.Button sendBtn;
         [SerializeField] private TMP_Text chatPrompt;
         [SerializeField] private GameObject chatWindow;
+        [SerializeField] private AudioSource sfx;
 
         //---Private Variables
         private readonly List<ChatMessage> chatMessages = new();
@@ -30,6 +30,7 @@ namespace NSMB.UI.MainMenu {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             PlayerListEntry.PlayerMuteStateChanged += OnPlayerMuteStateChanged;
             OnDisableChatChanged();
+            messagePrefab.gameObject.SetActive(false);
 
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
@@ -67,7 +68,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_Send);
+            sfx.PlayOneShot(SoundEffect.UI_Chat_Send);
 
             if (text.StartsWith('/')) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.command", ChatManager.Red);

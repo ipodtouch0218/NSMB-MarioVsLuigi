@@ -42,6 +42,7 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+            ChatManager.OnChatMessage += OnChatMessage;
             if (QuantumRunner.DefaultGame != null) {
                 UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
             }
@@ -50,6 +51,7 @@ namespace NSMB.UI.MainMenu {
 
         public void OnDisable() {
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+            ChatManager.OnChatMessage -= OnChatMessage;
         }
 
         public void OnDestroy() {
@@ -312,6 +314,12 @@ namespace NSMB.UI.MainMenu {
         private void OnPlayerStartedTyping(EventPlayerStartedTyping e) {
             if (player == e.Player) {
                 typingCounter = 4;
+            }
+        }
+
+        private void OnChatMessage(ChatMessage.ChatMessageData message) {
+            if (player == message.player) {
+                typingCounter = 0;
             }
         }
     }

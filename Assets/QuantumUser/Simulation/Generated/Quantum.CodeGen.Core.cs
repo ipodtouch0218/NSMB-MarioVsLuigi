@@ -2080,78 +2080,98 @@ namespace Quantum {
     public FPVector2 Velocity;
     [FieldOffset(0)]
     public QBoolean IgnoreMovement;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    [AllocateOnComponentAdded()]
+    [FreeOnComponentRemoved()]
+    public QListPtr<PhysicsQueryRef> Queries;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 19727;
         hash = hash * 31 + Velocity.GetHashCode();
         hash = hash * 31 + IgnoreMovement.GetHashCode();
+        hash = hash * 31 + Queries.GetHashCode();
         return hash;
       }
+    }
+    public void ClearPointers(FrameBase f, EntityRef entity) {
+      if (Queries != default) f.FreeList(ref Queries);
+    }
+    public static void OnRemoved(FrameBase frame, EntityRef entity, void* ptr) {
+      var p = (Quantum.MovingPlatform*)ptr;
+      p->ClearPointers((Frame)frame, entity);
+    }
+    public void AllocatePointers(FrameBase f, EntityRef entity) {
+      f.TryAllocateList(ref Queries);
+    }
+    public static void OnAdded(FrameBase frame, EntityRef entity, void* ptr) {
+      var p = (Quantum.MovingPlatform*)ptr;
+      p->AllocatePointers((Frame)frame, entity);
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (MovingPlatform*)ptr;
         QBoolean.Serialize(&p->IgnoreMovement, serializer);
+        QList.Serialize(&p->Queries, serializer, Statics.SerializePhysicsQueryRef);
         FPVector2.Serialize(&p->Velocity, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PhysicsObject : Quantum.IComponent {
-    public const Int32 SIZE = 152;
+    public const Int32 SIZE = 136;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(72)]
     public FPVector2 Gravity;
     [FieldOffset(64)]
     public FP TerminalVelocity;
-    [FieldOffset(8)]
+    [FieldOffset(12)]
     public QBoolean IsFrozen;
-    [FieldOffset(4)]
+    [FieldOffset(8)]
     public QBoolean DisableCollision;
-    [FieldOffset(40)]
+    [FieldOffset(44)]
     public QBoolean SlowInLiquids;
-    [FieldOffset(36)]
+    [FieldOffset(40)]
     public QBoolean IsWaterSolid;
-    [FieldOffset(136)]
+    [FieldOffset(4)]
+    public QBoolean BreakMegaObjects;
+    [FieldOffset(120)]
     [ExcludeFromPrototype()]
     public FPVector2 Velocity;
     [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public FPVector2 ParentVelocity;
-    [FieldOffset(120)]
-    [ExcludeFromPrototype()]
-    public FPVector2 PreviousVelocity;
     [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public FPVector2 PreviousFrameVelocity;
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte HoverFrames;
-    [FieldOffset(28)]
-    [ExcludeFromPrototype()]
-    public QBoolean IsTouchingLeftWall;
     [FieldOffset(32)]
     [ExcludeFromPrototype()]
+    public QBoolean IsTouchingLeftWall;
+    [FieldOffset(36)]
+    [ExcludeFromPrototype()]
     public QBoolean IsTouchingRightWall;
-    [FieldOffset(20)]
+    [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public QBoolean IsTouchingCeiling;
-    [FieldOffset(24)]
+    [FieldOffset(28)]
     [ExcludeFromPrototype()]
     public QBoolean IsTouchingGround;
     [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public FP FloorAngle;
-    [FieldOffset(16)]
+    [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public QBoolean IsOnSlipperyGround;
-    [FieldOffset(12)]
+    [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public QBoolean IsOnSlideableGround;
-    [FieldOffset(48)]
+    [FieldOffset(52)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
     public QListPtr<PhysicsContact> Contacts;
-    [FieldOffset(44)]
+    [FieldOffset(48)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
@@ -2168,9 +2188,9 @@ namespace Quantum {
         hash = hash * 31 + DisableCollision.GetHashCode();
         hash = hash * 31 + SlowInLiquids.GetHashCode();
         hash = hash * 31 + IsWaterSolid.GetHashCode();
+        hash = hash * 31 + BreakMegaObjects.GetHashCode();
         hash = hash * 31 + Velocity.GetHashCode();
         hash = hash * 31 + ParentVelocity.GetHashCode();
-        hash = hash * 31 + PreviousVelocity.GetHashCode();
         hash = hash * 31 + PreviousFrameVelocity.GetHashCode();
         hash = hash * 31 + HoverFrames.GetHashCode();
         hash = hash * 31 + IsTouchingLeftWall.GetHashCode();
@@ -2206,6 +2226,7 @@ namespace Quantum {
         var p = (PhysicsObject*)ptr;
         serializer.Stream.Serialize(&p->HoverFrames);
         serializer.Stream.Serialize(&p->UnderwaterCounter);
+        QBoolean.Serialize(&p->BreakMegaObjects, serializer);
         QBoolean.Serialize(&p->DisableCollision, serializer);
         QBoolean.Serialize(&p->IsFrozen, serializer);
         QBoolean.Serialize(&p->IsOnSlideableGround, serializer);
@@ -2223,7 +2244,6 @@ namespace Quantum {
         FPVector2.Serialize(&p->Gravity, serializer);
         FPVector2.Serialize(&p->ParentVelocity, serializer);
         FPVector2.Serialize(&p->PreviousFrameVelocity, serializer);
-        FPVector2.Serialize(&p->PreviousVelocity, serializer);
         FPVector2.Serialize(&p->Velocity, serializer);
     }
   }
@@ -2597,9 +2617,6 @@ namespace Quantum {
   public unsafe partial interface ISignalOnMarioPlayerDied : ISignal {
     void OnMarioPlayerDied(Frame f, EntityRef entity);
   }
-  public unsafe partial interface ISignalOnBeforePhysicsCollision : ISignal {
-    void OnBeforePhysicsCollision(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision);
-  }
   public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
     void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
@@ -2856,7 +2873,6 @@ namespace Quantum {
     private ISignalOnTryLiquidSplash[] _ISignalOnTryLiquidSplashSystems;
     private ISignalOnEntityEnterExitLiquid[] _ISignalOnEntityEnterExitLiquidSystems;
     private ISignalOnMarioPlayerDied[] _ISignalOnMarioPlayerDiedSystems;
-    private ISignalOnBeforePhysicsCollision[] _ISignalOnBeforePhysicsCollisionSystems;
     private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
     private ISignalOnTileChanged[] _ISignalOnTileChangedSystems;
@@ -2892,7 +2908,6 @@ namespace Quantum {
       _ISignalOnTryLiquidSplashSystems = BuildSignalsArray<ISignalOnTryLiquidSplash>();
       _ISignalOnEntityEnterExitLiquidSystems = BuildSignalsArray<ISignalOnEntityEnterExitLiquid>();
       _ISignalOnMarioPlayerDiedSystems = BuildSignalsArray<ISignalOnMarioPlayerDied>();
-      _ISignalOnBeforePhysicsCollisionSystems = BuildSignalsArray<ISignalOnBeforePhysicsCollision>();
       _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
       _ISignalOnTileChangedSystems = BuildSignalsArray<ISignalOnTileChanged>();
@@ -3215,15 +3230,6 @@ namespace Quantum {
           }
         }
       }
-      public void OnBeforePhysicsCollision(VersusStageData stage, EntityRef entity, PhysicsContact* contact, bool* allowCollision) {
-        var array = _f._ISignalOnBeforePhysicsCollisionSystems;
-        for (Int32 i = 0; i < array.Length; ++i) {
-          var s = array[i];
-          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnBeforePhysicsCollision(_f, stage, entity, contact, allowCollision);
-          }
-        }
-      }
       public void OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, QBoolean underwater) {
         var array = _f._ISignalOnEntityChangeUnderwaterStateSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
@@ -3255,11 +3261,13 @@ namespace Quantum {
   }
   public unsafe partial class Statics {
     public static FrameSerializer.Delegate SerializeEntityRef;
+    public static FrameSerializer.Delegate SerializePhysicsQueryRef;
     public static FrameSerializer.Delegate SerializePhysicsContact;
     public static FrameSerializer.Delegate SerializePlayerRef;
     public static FrameSerializer.Delegate SerializeInput;
     static partial void InitStaticDelegatesGen() {
       SerializeEntityRef = EntityRef.Serialize;
+      SerializePhysicsQueryRef = PhysicsQueryRef.Serialize;
       SerializePhysicsContact = Quantum.PhysicsContact.Serialize;
       SerializePlayerRef = PlayerRef.Serialize;
       SerializeInput = Quantum.Input.Serialize;
@@ -3411,7 +3419,7 @@ namespace Quantum {
         .Add<Quantum.Liquid>(Quantum.Liquid.Serialize, Quantum.Liquid.OnAdded, Quantum.Liquid.OnRemoved, ComponentFlags.None)
         .Add<Quantum.MarioBrosPlatform>(Quantum.MarioBrosPlatform.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.MarioPlayer>(Quantum.MarioPlayer.Serialize, null, null, ComponentFlags.None)
-        .Add<Quantum.MovingPlatform>(Quantum.MovingPlatform.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.MovingPlatform>(Quantum.MovingPlatform.Serialize, Quantum.MovingPlatform.OnAdded, Quantum.MovingPlatform.OnRemoved, ComponentFlags.None)
         .Add<Quantum.PhysicsObject>(Quantum.PhysicsObject.Serialize, Quantum.PhysicsObject.OnAdded, Quantum.PhysicsObject.OnRemoved, ComponentFlags.None)
         .Add<Quantum.PiranhaPlant>(Quantum.PiranhaPlant.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.PlayerData>(Quantum.PlayerData.Serialize, null, null, ComponentFlags.None)

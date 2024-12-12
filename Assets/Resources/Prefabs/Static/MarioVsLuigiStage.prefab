@@ -738,7 +738,7 @@ MonoBehaviour:
   SimulationSpeedMultiplier: 1
   DisplaySaveAndReloadButton: 0
   PreloadAddressables: 0
-  IsTaskProfilerEnabled: 0
+  IsTaskProfilerEnabled: 1
   DynamicAssetDB:
     OnInitialDynamicAssetsRequested:
       m_PersistentCalls:

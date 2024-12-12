@@ -402,7 +402,7 @@ namespace Quantum {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
 
-            if (!weak && PhysicsObjectSystem.Raycast(f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
+            if (!weak && PhysicsObjectSystem.Raycast((FrameThreadSafe) f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
                 fromRight = !fromRight;
             }
 

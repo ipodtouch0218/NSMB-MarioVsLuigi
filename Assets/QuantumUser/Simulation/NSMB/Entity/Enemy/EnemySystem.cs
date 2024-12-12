@@ -75,7 +75,7 @@ namespace Quantum {
                         continue;
                     }
 
-                    if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
+                    if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, entity: entity)) {
                         f.Signals.OnEnemyKilledByStageReset(entity);
                     }
                 } else {

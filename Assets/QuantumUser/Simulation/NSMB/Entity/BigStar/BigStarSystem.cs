@@ -100,7 +100,7 @@ namespace Quantum {
             if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
                 // if ((f.Number + entity.Index) % 3 == 0) {
                     var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
-                    if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, physicsCollider->Shape, true, stage)) {
+                    if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, physicsCollider->Shape, true, stage)) {
                         physicsObject->DisableCollision = false;
                     }
                 // }

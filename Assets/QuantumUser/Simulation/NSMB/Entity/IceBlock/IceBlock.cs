@@ -40,7 +40,7 @@ namespace Quantum {
             AutoBreakFrames = child->AutoBreakFrames;
 
             // Try to not spawn inside blocks/walls
-            PhysicsObjectSystem.TryEject(f, iceBlockEntity);
+            PhysicsObjectSystem.TryEject((FrameThreadSafe) f, iceBlockEntity);
         }
     }
 }

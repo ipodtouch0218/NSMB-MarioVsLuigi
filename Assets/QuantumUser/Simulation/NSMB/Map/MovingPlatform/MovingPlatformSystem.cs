@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -15,31 +16,35 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            var platform = filter.Platform;
             if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
-                filter.Platform->Velocity = physicsObject->Velocity;
+                platform->Velocity = physicsObject->Velocity;
             }
             if (f.Unsafe.TryGetPointer(filter.Entity, out Holdable* holdable)
                 && f.Exists(holdable->Holder)
                 && f.Unsafe.TryGetPointer(holdable->Holder, out PhysicsObject* holderPhysicsObject)) {
 
-                filter.Platform->Velocity = holderPhysicsObject->Velocity + holderPhysicsObject->ParentVelocity;
+                platform->Velocity = holderPhysicsObject->Velocity + holderPhysicsObject->ParentVelocity;
             }
 
-            MoveVertically(f, ref filter, stage);
-            MoveHorizontally(f, ref filter, stage);
+            var queryList = f.ResolveList(platform->Queries);
+            int queryIndex = 0;
+
+            MoveVertically(f, ref filter, queryList, ref queryIndex, stage);
+            MoveHorizontally(f, ref filter, queryList, ref queryIndex, stage);
         }
 
-        private void MoveVertically(Frame f, ref Filter filter, VersusStageData stage) {
+        private void MoveVertically(Frame f, ref Filter filter, QList<PhysicsQueryRef> queryList, ref int queryIndex, VersusStageData stage) {
             var platform = filter.Platform;
             var transform = filter.Transform;
             var shape = filter.Collider->Shape;
 
             if (shape.Type == Shape2DType.Compound && shape.Compound.GetShapes(f, out Shape2D* shapes, out int shapeCount)) {
                 for (int i = 0; i < shapeCount; i++) {
-                    RaycastVertically(f, ref filter, shapes[i], stage);
+                    RaycastVertically(f, ref filter, shapes[i], queryList, ref queryIndex, stage);
                 }
             } else {
-                RaycastVertically(f, ref filter, shape, stage);
+                RaycastVertically(f, ref filter, shape, queryList, ref queryIndex, stage);
             }
 
             if (!filter.Platform->IgnoreMovement) {
@@ -47,11 +52,12 @@ namespace Quantum {
             }
         }
 
-        private void RaycastVertically(Frame f, ref Filter filter, Shape2D shape, VersusStageData stage) {
+        private void RaycastVertically(Frame f, ref Filter filter, Shape2D shape, QList<PhysicsQueryRef> queryList, ref int queryIndex, VersusStageData stage) {
             var platform = filter.Platform;
             var transform = filter.Transform;
             var collider = filter.Collider;
-            
+            var vertical = f.Physics2D.GetQueryHits(queryList[queryIndex++]);
+
             FPVector2 yMovement = new(0, platform->Velocity.Y * f.DeltaTime);
             if (yMovement.Y == 0) {
                 return;
@@ -69,7 +75,6 @@ namespace Quantum {
                 return;
             }
 
-            var vertical = f.Physics2D.ShapeCastAll(position, 0, &shape, yMovement, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
             for (int i = 0; i < vertical.Count; i++) {
                 var hit = vertical[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
@@ -83,6 +88,7 @@ namespace Quantum {
                     continue;
                 }
 
+                /*
                 bool allowCollision = true;
                 PhysicsContact contact = new PhysicsContact {
                     Frame = f.Number,
@@ -97,6 +103,7 @@ namespace Quantum {
                 if (!allowCollision) {
                     continue;
                 }
+                */
 
                 FP movement = yMovement.Y * (1 - hit.CastDistanceNormalized);
                 if (movement > 0) {
@@ -104,7 +111,7 @@ namespace Quantum {
                 } else {
                     movement -= PhysicsObjectSystem.Skin;
                 }
-                PhysicsObjectSystem.MoveVertically(f, movement * f.UpdateRate, hit.Entity, stage);
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, movement * f.UpdateRate, hit.Entity, stage);
 
                 /*
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
@@ -123,17 +130,17 @@ namespace Quantum {
             }
         }
 
-        private void MoveHorizontally(Frame f, ref Filter filter, VersusStageData stage) {
+        private void MoveHorizontally(Frame f, ref Filter filter, QList<PhysicsQueryRef> queryList, ref int queryIndex, VersusStageData stage) {
             var platform = filter.Platform;
             var transform = filter.Transform;
             var shape = filter.Collider->Shape;
 
             if (shape.Type == Shape2DType.Compound && shape.Compound.GetShapes(f, out Shape2D* shapes, out int shapeCount)) {
                 for (int i = 0; i < shapeCount; i++) {
-                    RaycastHorizontally(f, ref filter, shapes[i], stage);
+                    RaycastHorizontally(f, ref filter, shapes[i], queryList, ref queryIndex, stage);
                 }
             } else {
-                RaycastHorizontally(f, ref filter, shape, stage);
+                RaycastHorizontally(f, ref filter, shape, queryList, ref queryIndex, stage);
             }
 
             if (!filter.Platform->IgnoreMovement) {
@@ -141,10 +148,11 @@ namespace Quantum {
             }
         }
 
-        private void RaycastHorizontally(Frame f, ref Filter filter, Shape2D shape, VersusStageData stage) {
+        private void RaycastHorizontally(Frame f, ref Filter filter, Shape2D shape, QList<PhysicsQueryRef> queryList, ref int queryIndex, VersusStageData stage) {
             var platform = filter.Platform;
             var transform = filter.Transform;
             var collider = filter.Collider;
+            var horizontal = f.Physics2D.GetQueryHits(queryList[queryIndex++]);
 
             FPVector2 xMovement = new(platform->Velocity.X * f.DeltaTime, 0);
             if (xMovement.X == 0) {
@@ -164,7 +172,6 @@ namespace Quantum {
                 return;
             }
 
-            var horizontal = f.Physics2D.ShapeCastAll(position, 0, &shape, xMovement, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo/* | QueryOptions.DetectOverlapsAtCastOrigin*/);
             for (int i = 0; i < horizontal.Count; i++) {
                 var hit = horizontal[i];
                 if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
@@ -174,6 +181,7 @@ namespace Quantum {
                     continue;
                 }
 
+                /*
                 bool allowCollision = true;
                 PhysicsContact contact = new PhysicsContact {
                     Frame = f.Number,
@@ -188,6 +196,7 @@ namespace Quantum {
                 if (!allowCollision) {
                     continue;
                 }
+                */
 
                 FP movement = xMovement.X * (1 - hit.CastDistanceNormalized);
                 if (movement > 0) {
@@ -195,7 +204,7 @@ namespace Quantum {
                 } else {
                     movement -= PhysicsObjectSystem.Skin;
                 }
-                PhysicsObjectSystem.MoveHorizontally(f, movement * f.UpdateRate, hit.Entity, stage);
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, movement * f.UpdateRate, hit.Entity, stage);
                 hitPhysicsObject->Velocity.X = 0;
 
                 /*

@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class InteractionSystemPhysicsQuerySystem : SystemMainThreadFilterStage<InteractionSystem.Filter> {
+    public unsafe class InteractionPhysicsQuerySystem : SystemMainThreadFilterStage<InteractionSystem.Filter> {
         public override void Update(Frame f, ref InteractionSystem.Filter filter, VersusStageData stage) {
             var interactable = filter.Interactable;
             var shape = filter.Collider->Shape;

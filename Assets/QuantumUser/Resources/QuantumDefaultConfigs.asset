@@ -192,7 +192,7 @@ MonoBehaviour:
       RawValue: 72090
   AutoLoadSceneFromMap: 3
   DeltaTimeType: 0
-  ThreadCount: 2
+  ThreadCount: 8
   ChecksumSnapshotHistoryLengthSeconds:
     RawValue: 196608
   ChecksumErrorDumpOptions: 0

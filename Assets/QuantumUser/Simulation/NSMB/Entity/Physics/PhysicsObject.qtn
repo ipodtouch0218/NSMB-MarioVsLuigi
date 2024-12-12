@@ -7,10 +7,10 @@ component PhysicsObject {
     bool DisableCollision;
     bool SlowInLiquids;
     bool IsWaterSolid;
+    bool BreakMegaObjects;
     
     [ExcludeFromPrototype] FPVector2 Velocity;
     [ExcludeFromPrototype] FPVector2 ParentVelocity;
-    [ExcludeFromPrototype] FPVector2 PreviousVelocity;
     [ExcludeFromPrototype] FPVector2 PreviousFrameVelocity;
 
     [ExcludeFromPrototype] byte HoverFrames;
@@ -38,7 +38,6 @@ struct PhysicsContact {
     EntityRef Entity;
 }
 
-signal OnBeforePhysicsCollision(VersusStageData stage, entity_ref entity, PhysicsContact* contact, bool* allowCollision);
 signal OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, bool underwater);
 
 event PhysicsObjectLanded {

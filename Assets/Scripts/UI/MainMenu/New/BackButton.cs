@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -105,7 +106,10 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnCancel(InputAction.CallbackContext context) {
-            if (context.performed && !GlobalController.Instance.optionsManager.IsActive()) {
+            GameObject currentObject = EventSystem.current.currentSelectedGameObject;
+            TMP_InputField inputField;
+            bool isInsideTextbox = currentObject && (inputField = currentObject.GetComponentInParent<TMP_InputField>()) && inputField.isFocused;
+            if (context.performed && !GlobalController.Instance.optionsManager.IsActive() && !isInsideTextbox) {
                 backHeldViaButton = true;
             } else if (context.canceled) {
                 backHeldViaButton = false;

@@ -14,17 +14,24 @@ namespace Quantum {
             systems.Add(new PlayerConnectedSystem());
             systems.Add(new MvLCullingSystem());
             systems.Add(new GameLogicSystem());
-            systems.Add(new InteractionSystemPhysicsQuerySystem());
-            systems.Add(new PhysicsSystem2D());
 
             systems.Add(
                 new StartDisabledSystemGroup("gameplay",
+                    new InteractionPhysicsQuerySystem(),
                     new GenericMoverSystem(),
                     new SpinnerSystem(),
+                    new MovingPlatformPhysicsQuerySystem(),
+                    new PhysicsSystem2D(),
+
+                    // Runs as an array task
                     new MovingPlatformSystem(),
+
                     new EnemySystem(),
                     new InteractionSystem(),
+                    
+                    // Runs as an array task
                     new PhysicsObjectSystem(),
+
                     new GoombaSystem(),
                     new KoopaSystem(),
                     new BobombSystem(),
@@ -43,7 +50,7 @@ namespace Quantum {
                     new CameraSystem()
                 )
             );
-            // Signals only... can't be in a group.
+
             systems.Add(new StageSystem());
             systems.Add(new LiquidSystem());
             systems.Add(new BreakableObjectSystem());

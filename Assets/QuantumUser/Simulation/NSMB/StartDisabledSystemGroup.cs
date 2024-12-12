@@ -1,8 +1,8 @@
 namespace Quantum {
-    public class StartDisabledSystemGroup : SystemMainThreadGroup {
+    public class StartDisabledSystemGroup : SystemGroup {
         public override bool StartEnabled => false;
 
-        public StartDisabledSystemGroup(string name, params SystemMainThread[] children) : base(name, children) {
+        public StartDisabledSystemGroup(string name, params SystemBase[] children) : base(name, children) {
 
         }
     }

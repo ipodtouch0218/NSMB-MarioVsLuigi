@@ -97,11 +97,6 @@ public class ChatManager : MonoBehaviour {
         message = runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player) + ": " + message.Filter();
 
         AddChatMessage(message, e.Player, e.Frame);
-
-        PlayerListEntry ple = playerList.GetPlayerEntry(e.Player);
-        if (ple) {
-            ple.typingCounter = 0;
-        }
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {

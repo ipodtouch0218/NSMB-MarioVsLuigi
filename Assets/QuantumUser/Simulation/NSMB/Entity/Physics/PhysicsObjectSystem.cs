@@ -1,11 +1,12 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
+using Quantum.Task;
 using System;
 using UnityEngine;
 
 namespace Quantum {
-    public unsafe class PhysicsObjectSystem : SystemMainThreadFilterStage<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
+    public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
 
         public static readonly FP RaycastSkin = FP.FromString("0.15");
         public static readonly FP Skin = FP.FromString("0.001");
@@ -18,21 +19,22 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
-        public override void OnInit(Frame f) {
+        protected override void OnInitUser(Frame f) {
             f.Context.EntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
         }
 
-        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+        public override void Update(FrameThreadSafe f, ref Filter filter) {
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var physicsObject = filter.PhysicsObject;
             if (physicsObject->IsFrozen) {
                 return;
             }
-
+            
             var transform = filter.Transform;
             var entity = filter.Entity;
 
             bool wasOnGround = physicsObject->IsTouchingGround;
-            bool canSnap = wasOnGround && physicsObject->Velocity.Y <= physicsObject->PreviousVelocity.Y;
+            bool canSnap = wasOnGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y;
             physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
 
             QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
@@ -75,9 +77,11 @@ namespace Quantum {
                 }
             }
 
+            /*
             if (!wasOnGround && physicsObject->IsTouchingGround) {
                 f.Events.PhysicsObjectLanded(f, entity);
             }
+            */
 
             /*
 #if DEBUG
@@ -93,17 +97,16 @@ namespace Quantum {
             }
 
             physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
-            physicsObject->PreviousVelocity = physicsObject->Velocity;
         }
 
-        private void MoveWithPlatform(Frame f, ref Filter filter, QList<PhysicsContact> contacts) {
+        private void MoveWithPlatform(FrameThreadSafe f, ref Filter filter, QList<PhysicsContact> contacts) {
             var physicsObject = filter.PhysicsObject;
 
             FP maxDot = -2;
             FPVector2? maxVelocity = null;
             foreach (var contact in contacts) {
                 if (FPVector2.Dot(contact.Normal, -physicsObject->Gravity.Normalized) < GroundMaxAngle
-                    || !f.Unsafe.TryGetPointer(contact.Entity, out MovingPlatform* platform)) {
+                    || !f.TryGetPointer(contact.Entity, out MovingPlatform* platform)) {
                     continue;
                 }
 
@@ -122,8 +125,9 @@ namespace Quantum {
             physicsObject->ParentVelocity = maxVelocity ?? FPVector2.Zero;
         }
 
-        public static FPVector2 MoveVertically(Frame f, FP relativeVelocityY, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = default) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+        public static FPVector2 MoveVertically(FrameThreadSafe f, FP relativeVelocityY, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = default) {
+            var physicsObject = f.GetPointer<PhysicsObject>(entity);
+            var mask = ((Frame) f).Context.EntityAndPlayerMask;
 
             FP velocityY = relativeVelocityY * f.DeltaTime;
             if (velocityY == 0) {
@@ -134,26 +138,26 @@ namespace Quantum {
                 contacts = f.ResolveList(physicsObject->Contacts);
             }
 
-            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var transform = f.GetPointer<Transform2D>(entity);
 
             FPVector2 directionVector = velocityY > 0 ? FPVector2.Up : FPVector2.Down;
 
             if (!physicsObject->DisableCollision) {
-                var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+                var collider = f.GetPointer<PhysicsCollider2D>(entity);
                 Shape2D shape = collider->Shape;
 
                 FPVector2 position = transform->Position;
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(0, velocityY) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
                     // Left edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -161,7 +165,7 @@ namespace Quantum {
                     // Right edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X -= stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -181,6 +185,10 @@ namespace Quantum {
                 FP end = FPMath.Floor((checkPointY + velocityY + (directionVector.Y * Skin)) * 2) / 2;
                 FP direction = directionVector.Y;
 
+                Span<FPVector2> vertexBuffer = stackalloc FPVector2[128];
+                Span<int> shapeVertexCountBuffer = stackalloc int[16];
+                Span<PhysicsContact> contactBuffer = stackalloc PhysicsContact[32];
+
                 for (FP y = start; (direction > 0 ? (y <= end) : (y >= end)); y += direction / 2) {
 
                     Span<PhysicsContact> potentialContacts = stackalloc PhysicsContact[32];
@@ -188,23 +196,23 @@ namespace Quantum {
 
                     for (FP x = left; x <= right; x += FP._0_50) {
                         FPVector2 worldPos = new FPVector2(x, y) + (FPVector2.One / 4);
-                        StageTileInstance tile = stage.GetTileWorld(f, worldPos);
+                        StageTileInstance tile = stage.GetTileWorld((Frame) f, worldPos);
                         Vector2Int tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
-                        tile.GetWorldPolygons(f, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, out StageTile stageTile, worldPos);
+                        tile.GetWorldPolygons(f, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos);
 
                         int shapeIndex = 0;
                         int vertexIndex = 0;
                         int shapeVertexCount;
-                        while ((shapeVertexCount = f.Context.ShapeVertexCountBuffer[shapeIndex++]) > 0) {
-                            Span<FPVector2> polygon = f.Context.VertexBuffer.AsSpan(vertexIndex, shapeVertexCount);
+                        while ((shapeVertexCount = shapeVertexCountBuffer[shapeIndex++]) > 0) {
+                            Span<FPVector2> polygon = vertexBuffer[vertexIndex..(vertexIndex + shapeVertexCount)];
                             vertexIndex += shapeVertexCount;
 
-                            int polygonContacts = LineSweepPolygonIntersection(f.Context.ContactBuffer,
+                            int polygonContacts = LineSweepPolygonIntersection(contactBuffer,
                                 leftWorldCheckPoint, rightWorldCheckPoint, directionVector, polygon, stageTile.IsPolygon);
 
                             for (int i = 0; i < polygonContacts; i++) {
-                                PhysicsContact newContact = f.Context.ContactBuffer[i];
+                                PhysicsContact newContact = contactBuffer[i];
                                 newContact.Frame = f.Number;
                                 newContact.TileX = tilePos.x;
                                 newContact.TileY = tilePos.y;
@@ -220,7 +228,7 @@ namespace Quantum {
                             // Not a valid hit
                             continue;
                         }
-                        if (hit.IsDynamic && f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid)) {
+                        if (hit.IsDynamic && f.TryGetPointer(hit.Entity, out Liquid* liquid)) {
                             if (liquid->LiquidType != LiquidType.Water || !physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
                                 // Colliding with water and we cant interact
                                 continue;
@@ -278,7 +286,10 @@ namespace Quantum {
                         }
                         
                         bool keepContact = true;
-                        f.Signals.OnBeforePhysicsCollision(stage, entity, &contact, &keepContact);
+                        foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
+                            callback?.Invoke(f, stage, entity, contact, ref keepContact);
+                        }
+                        
                         if (keepContact) {
                             contacts.Value.Add(contact);
                             min ??= contact.Distance;
@@ -316,8 +327,9 @@ namespace Quantum {
             return physicsObject->Velocity;
         }
 
-        public static FPVector2 MoveHorizontally(Frame f, FP velocityX, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = null) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+        public static FPVector2 MoveHorizontally(FrameThreadSafe f, FP velocityX, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = null) {
+            var physicsObject = f.GetPointer<PhysicsObject>(entity);
+            var mask = ((Frame) f).Context.EntityAndPlayerMask;
 
             velocityX *= f.DeltaTime;
             if (velocityX == 0) {
@@ -328,26 +340,26 @@ namespace Quantum {
                 contacts = f.ResolveList(physicsObject->Contacts);
             }
 
-            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var transform = f.GetPointer<Transform2D>(entity);
 
             FPVector2 directionVector = velocityX > 0 ? FPVector2.Right : FPVector2.Left;
 
             if (!physicsObject->DisableCollision) {
-                var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+                var collider = f.GetPointer<PhysicsCollider2D>(entity);
                 Shape2D shape = collider->Shape;
                 
                 FPVector2 position = transform->Position;
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(velocityX, 0) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 if (center < (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
                     // Left edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -355,7 +367,7 @@ namespace Quantum {
                     // Right edge
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X -= stage.TileDimensions.x / (FP) 2;
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -375,6 +387,10 @@ namespace Quantum {
                 FP end = FPMath.Floor((checkPointX + velocityX + (directionVector.X * Skin)) * 2) / 2;
                 FP direction = directionVector.X;
 
+                Span<FPVector2> vertexBuffer = stackalloc FPVector2[128];
+                Span<int> shapeVertexCountBuffer = stackalloc int[16];
+                Span<PhysicsContact> contactBuffer = stackalloc PhysicsContact[32];
+
                 for (FP x = start; (direction > 0 ? (x <= end) : (x >= end)); x += direction / 2) {
                     
                     Span<PhysicsContact> potentialContacts = stackalloc PhysicsContact[32];
@@ -382,23 +398,23 @@ namespace Quantum {
 
                     for (FP y = bottom; y <= top; y += FP._0_50) {
                         FPVector2 worldPos = new FPVector2(x, y) + (FPVector2.One / 4);
-                        StageTileInstance tile = stage.GetTileWorld(f, worldPos);
+                        StageTileInstance tile = stage.GetTileWorld((Frame) f, worldPos);
                         Vector2Int tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
-                        tile.GetWorldPolygons(f, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, out StageTile stageTile, worldPos);
+                        tile.GetWorldPolygons(f, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos);
 
                         int shapeIndex = 0;
                         int vertexIndex = 0;
                         int shapeVertexCount;
-                        while ((shapeVertexCount = f.Context.ShapeVertexCountBuffer[shapeIndex++]) > 0) {
-                            Span<FPVector2> polygon = f.Context.VertexBuffer.AsSpan(vertexIndex, shapeVertexCount);
+                        while ((shapeVertexCount = shapeVertexCountBuffer[shapeIndex++]) > 0) {
+                            Span<FPVector2> polygon = vertexBuffer[vertexIndex..(vertexIndex + shapeVertexCount)];
                             vertexIndex += shapeVertexCount;
 
-                            int polygonContacts = LineSweepPolygonIntersection(f.Context.ContactBuffer, bottomWorldCheckPoint,
+                            int polygonContacts = LineSweepPolygonIntersection(contactBuffer, bottomWorldCheckPoint,
                                 topWorldCheckPoint, directionVector, polygon, stageTile.IsPolygon);
 
                             for (int i = 0; i < polygonContacts; i++) {
-                                PhysicsContact newContact = f.Context.ContactBuffer[i];
+                                PhysicsContact newContact = contactBuffer[i];
                                 newContact.TileX = tilePos.x;
                                 newContact.TileY = tilePos.y;
 
@@ -414,7 +430,7 @@ namespace Quantum {
                             // Not a valid hit (for this tile)
                             continue;
                         }
-                        if (hit.IsDynamic && f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid)) {
+                        if (hit.IsDynamic && f.TryGetPointer(hit.Entity, out Liquid* liquid)) {
                             if (liquid->LiquidType != LiquidType.Water || !physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < GroundMaxAngle) {
                                 // Colliding with water and we cant interact
                                 continue;
@@ -472,7 +488,9 @@ namespace Quantum {
                         }
 
                         bool keepContact = true;
-                        f.Signals.OnBeforePhysicsCollision(stage, entity, &contact, &keepContact);
+                        foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
+                            callback?.Invoke(f, stage, entity, contact, ref keepContact);
+                        }
 
                         if (keepContact) {
                             contacts.Value.Add(contact);
@@ -510,7 +528,7 @@ namespace Quantum {
             return physicsObject->Velocity;
         }
 
-        private void ResolveContacts(Frame f, VersusStageData stage, PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
+        private void ResolveContacts(FrameThreadSafe f, VersusStageData stage, PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
 
             physicsObject->FloorAngle = 0;
             physicsObject->IsTouchingGround = false;
@@ -538,7 +556,7 @@ namespace Quantum {
                         physicsObject->FloorAngle = angle;
                     }
 
-                    if (contact.TileX != -1 && contact.TileY != -1 && f.TryFindAsset(stage.GetTileRelative(f, contact.TileX, contact.TileY).Tile, out StageTile tile)) {
+                    if (contact.TileX != -1 && contact.TileY != -1 && f.TryFindAsset(stage.GetTileRelative((Frame) f, contact.TileX, contact.TileY).Tile, out StageTile tile)) {
                         physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
                         physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
                     }
@@ -549,7 +567,7 @@ namespace Quantum {
             }
         }
 
-        public static bool Raycast(Frame f, VersusStageData stage, FPVector2 worldPos, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
+        public static bool Raycast(FrameThreadSafe f, VersusStageData stage, FPVector2 worldPos, FPVector2 direction, FP maxDistance, out PhysicsContact contact) {
             if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
@@ -584,6 +602,10 @@ namespace Quantum {
                 rayLength.Y = maxDistance;
             }
 
+            Span<FPVector2> vertexBuffer = stackalloc FPVector2[128];
+            Span<int> shapeVertexCountBuffer = stackalloc int[16];
+            Span<PhysicsContact> contactBuffer = stackalloc PhysicsContact[32];
+
             Vector2Int tilePosition = QuantumUtils.WorldToRelativeTile(stage, worldPos);
             FP distance = 0;
             while (distance < maxDistance) {
@@ -597,14 +619,14 @@ namespace Quantum {
                     rayLength.Y += stepSize.Y;
                 }
 
-                StageTileInstance tile = stage.GetTileRelative(f, tilePosition.x, tilePosition.y);
-                tile.GetWorldPolygons(f, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, out StageTile stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition));
+                StageTileInstance tile = stage.GetTileRelative((Frame) f, tilePosition.x, tilePosition.y);
+                tile.GetWorldPolygons(f, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition));
 
                 int shapeIndex = 0;
                 int vertexIndex = 0;
                 int shapeVertexCount;
-                while ((shapeVertexCount = f.Context.ShapeVertexCountBuffer[shapeIndex++]) > 0) {
-                    Span<FPVector2> polygon = f.Context.VertexBuffer.AsSpan(vertexIndex, shapeVertexCount);
+                while ((shapeVertexCount = shapeVertexCountBuffer[shapeIndex++]) > 0) {
+                    Span<FPVector2> polygon = vertexBuffer[vertexIndex..(vertexIndex + shapeVertexCount)];
                     vertexIndex += shapeVertexCount;
 
                     if (TryRayPolygonIntersection(worldPos, direction, polygon, stageTile.IsPolygon, out contact)) {
@@ -614,7 +636,7 @@ namespace Quantum {
             }
 
             finish:
-            var nullableHit = f.Physics2D.Raycast(worldPos, direction, maxDistance, f.Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+            var nullableHit = f.Physics2D.Raycast(worldPos, direction, maxDistance, ((Frame) f).Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
             if (nullableHit.HasValue) {
                 var hit = nullableHit.Value;
                 FP hitDistance = hit.CastDistanceNormalized * maxDistance;
@@ -633,7 +655,7 @@ namespace Quantum {
             return contact.Distance > 0 && contact.Distance <= maxDistance;
         }
 
-        private static int LineSweepPolygonIntersection(PhysicsContact[] contactBuffer, FPVector2 a, FPVector2 b, FPVector2 direction, Span<FPVector2> polygon, bool isPolygon) {
+        private static int LineSweepPolygonIntersection(Span<PhysicsContact> contactBuffer, FPVector2 a, FPVector2 b, FPVector2 direction, Span<FPVector2> polygon, bool isPolygon) {
             if (polygon.Length <= 1) {
                 throw new ArgumentException("Polygon must have at least 2 points!");
             }
@@ -776,11 +798,11 @@ namespace Quantum {
             return PointIsInsidePolygon(testPosition, boxCorners);
         }
 
-        public static bool BoxInGround(Frame f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default) {
+        public static bool BoxInGround(FrameThreadSafe f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default) {
             using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.BoxInGround");
             // In a solid hitbox
-            var hits = f.Physics2D.OverlapShape(position, 0, shape, f.Context.EntityAndPlayerMask, ~QueryOptions.HitTriggers);
-            f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario);
+            var hits = f.Physics2D.OverlapShape(position, 0, shape, ((Frame) f).Context.EntityAndPlayerMask, ~QueryOptions.HitTriggers);
+            f.TryGetPointer(entity, out MarioPlayer* mario);
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits.HitsBuffer[i];
                 Shape2D* hitShape = hit.GetShape(f);
@@ -809,6 +831,10 @@ namespace Quantum {
             boxCorners[2] = new(origin.X + extents.X, origin.Y - extents.Y);
             boxCorners[3] = boxMin;
 
+            Span<FPVector2> vertexBuffer = stackalloc FPVector2[128];
+            Span<int> shapeVertexCountBuffer = stackalloc int[16];
+            Span<PhysicsContact> contactBuffer = stackalloc PhysicsContact[32];
+            
             Span<LocationTilePair> tiles = stackalloc LocationTilePair[64];
             int overlappingTiles = GetTilesOverlappingHitbox(f, position, shape, tiles, stage);
 
@@ -821,13 +847,13 @@ namespace Quantum {
                     continue;
                 }
                 FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, tiles[i].Position);
-                tile.GetWorldPolygons(f, stage, stageTile, f.Context.VertexBuffer, f.Context.ShapeVertexCountBuffer, worldPos);
+                tile.GetWorldPolygons(f, stage, stageTile, vertexBuffer, shapeVertexCountBuffer, worldPos);
 
                 int shapeIndex = 0;
                 int vertexIndex = 0;
                 int shapeVertexCount;
-                while ((shapeVertexCount = f.Context.ShapeVertexCountBuffer[shapeIndex++]) > 0) {
-                    Span<FPVector2> polygon = f.Context.VertexBuffer.AsSpan(vertexIndex, shapeVertexCount);
+                while ((shapeVertexCount = shapeVertexCountBuffer[shapeIndex++]) > 0) {
+                    Span<FPVector2> polygon = vertexBuffer[vertexIndex..(vertexIndex + shapeVertexCount)];
                     vertexIndex += shapeVertexCount;
 
                     if (polygon.Length <= 2) {
@@ -855,7 +881,7 @@ namespace Quantum {
             public StageTileInstance Tile;
         }
 
-        public static int GetTilesOverlappingHitbox(Frame f, FPVector2 position, Shape2D shape, Span<LocationTilePair> buffer, VersusStageData stage = null) {
+        public static int GetTilesOverlappingHitbox(FrameThreadSafe f, FPVector2 position, Shape2D shape, Span<LocationTilePair> buffer, VersusStageData stage = null) {
             using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.GetTilesOverlappingHitbox");
             if (!stage) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -871,7 +897,7 @@ namespace Quantum {
                 for (int y = min.y; y <= max.y; y++) {
                     buffer[count++] = new LocationTilePair {
                         Position = new Vector2Int(x, y),
-                        Tile = stage.GetTileRelative(f, x, y)
+                        Tile = stage.GetTileRelative((Frame) f, x, y)
                     };
 
                     if (count == buffer.Length) {
@@ -882,15 +908,15 @@ namespace Quantum {
             return count;
         }
 
-        public static bool TryEject(Frame f, EntityRef entity, VersusStageData stage = null) {
-            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+        public static bool TryEject(FrameThreadSafe f, EntityRef entity, VersusStageData stage = null) {
+            var transform = f.GetPointer<Transform2D>(entity);
+            var collider = f.GetPointer<PhysicsCollider2D>(entity);
 
             if (!stage) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
 
-            if (!BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+            if (!BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
                 return true;
             }
 
@@ -909,7 +935,7 @@ namespace Quantum {
             while ((dist += distIncrement) < distMax) {
                 for (int i = 0; i < increments; i++) {
                     FPVector2 checkPos = transform->Position + (offsets[i] * dist);
-                    if (BoxInGround(f, checkPos, collider->Shape, stage: stage, entity: entity)) {
+                    if (BoxInGround((FrameThreadSafe) f, checkPos, collider->Shape, stage: stage, entity: entity)) {
                         continue;
                     }
 

@@ -20209,6 +20209,7 @@ GameObject:
   m_Component:
   - component: {fileID: 492594543}
   - component: {fileID: 492594544}
+  - component: {fileID: 492594545}
   m_Layer: 5
   m_Name: ChatPanel
   m_TagString: Untagged
@@ -20246,6 +20247,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 492594542}
   m_CullTransparentMesh: 0
+--- !u!114 &492594545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492594542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac148d2c192e2164eabacfccc7a23131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  messagePrefab: {fileID: 1532295033}
+  chatbox: {fileID: 1429012205}
+  sendBtn: {fileID: 1155030827}
+  chatPrompt: {fileID: 467821764}
+  chatWindow: {fileID: 1576260153}
+  sfx: {fileID: 2030938840}
 --- !u!1 &497244375
 GameObject:
   m_ObjectHideFlags: 0
@@ -35733,7 +35752,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.5
 --- !u!222 &801235714
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -42718,6 +42737,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 252585805}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenu, Assembly-CSharp
+        m_MethodName: SelectPanel
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 560333881}
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomPanel,
+            Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1527067842}
         m_TargetAssemblyTypeName: PlayerListEntry, Assembly-CSharp
         m_MethodName: ShowDropdown
@@ -44652,6 +44684,7 @@ MonoBehaviour:
   sendBtn: {fileID: 224743679}
   chatPrompt: {fileID: 1161336859}
   chatWindow: {fileID: 1603668784}
+  sfx: {fileID: 0}
 --- !u!114 &887693670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50706,7 +50739,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 791989381}
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -52254,7 +52287,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 887693669}
+      - m_Target: {fileID: 492594545}
         m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuChat, Assembly-CSharp
         m_MethodName: SendChat
         m_Mode: 1
@@ -61426,6 +61459,7 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 2
   m_InputValidator: {fileID: 11400000, guid: 6bab8aecb0976b74ca10383b026430dd, type: 2}
+  sfx: {fileID: 2030938840}
 --- !u!222 &1429012206
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -88257,7 +88291,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -38}
-  m_SizeDelta: {x: 379.70996, y: 0}
+  m_SizeDelta: {x: 379.70557, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -91066,6 +91100,7 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 2
   m_InputValidator: {fileID: 11400000, guid: 6bab8aecb0976b74ca10383b026430dd, type: 2}
+  sfx: {fileID: 0}
 --- !u!1 &1622845023
 GameObject:
   m_ObjectHideFlags: 0

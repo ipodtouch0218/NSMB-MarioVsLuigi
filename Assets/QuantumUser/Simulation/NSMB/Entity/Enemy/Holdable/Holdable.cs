@@ -27,7 +27,7 @@ namespace Quantum {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
 
-            if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape)) {
+            if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape)) {
                 var marioTransform = f.Unsafe.GetPointer<Transform2D>(Holder);
                 transform->Position = marioTransform->Position;
                 transform->Position.Y -= collider->Shape.Centroid.Y;

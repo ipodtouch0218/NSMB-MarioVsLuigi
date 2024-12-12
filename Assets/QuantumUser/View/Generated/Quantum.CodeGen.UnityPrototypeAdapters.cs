@@ -97,6 +97,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean DisableCollision;
     public QBoolean SlowInLiquids;
     public QBoolean IsWaterSolid;
+    public QBoolean BreakMegaObjects;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PhysicsObjectPrototype prototype);
     public override Quantum.Prototypes.PhysicsObjectPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.PhysicsObjectPrototype();
@@ -106,6 +107,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.DisableCollision, out result.DisableCollision);
       converter.Convert(this.SlowInLiquids, out result.SlowInLiquids);
       converter.Convert(this.IsWaterSolid, out result.IsWaterSolid);
+      converter.Convert(this.BreakMegaObjects, out result.BreakMegaObjects);
       ConvertUser(converter, ref result);
       return result;
     }

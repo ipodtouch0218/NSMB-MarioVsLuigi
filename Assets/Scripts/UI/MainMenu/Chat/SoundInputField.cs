@@ -1,5 +1,4 @@
 using NSMB.Extensions;
-using System.Collections.Generic;
 using System.Reflection;
 using TMPro;
 using UnityEngine;
@@ -8,6 +7,9 @@ using UnityEngine.EventSystems;
 namespace NSMB.UI.MainMenu {
 
     public class SoundInputField : TMP_InputField {
+
+        //---Serialized Variables
+        [SerializeField] private AudioSource sfx;
 
         //---Private Variables
         private readonly Event processingEvent = new();
@@ -42,7 +44,7 @@ namespace NSMB.UI.MainMenu {
                 case EventType.KeyUp:
                     // TODO: Figure out way to handle navigation during IME Composition.
                     if (validKeyPress) {
-                        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyUp, volume: 0.3f);
+                        sfx.PlayOneShot(SoundEffect.UI_Chat_KeyUp, volume: 0.3f);
                         validKeyPress = false;
                     }
 
@@ -75,7 +77,7 @@ namespace NSMB.UI.MainMenu {
                     shouldContinue = KeyPressed(processingEvent);
 
                     if (previousText != text && key != KeyCode.Return) {
-                        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Chat_KeyDown, volume: 0.3f);
+                        sfx.PlayOneShot(SoundEffect.UI_Chat_KeyDown, volume: 0.3f);
                         validKeyPress = true;
                     }
 
