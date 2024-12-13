@@ -265,6 +265,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             PlayerNickname = Settings.Instance.generalNickname ?? "noname",
             UserId = default(Guid).ToString(),
             UseColoredNickname = Settings.Instance.generalUseNicknameColor,
+            Character = (byte) Settings.Instance.generalCharacter,
+            Skin = (byte) Settings.Instance.generalSkin,
         });
 
         ChatManager.Instance.mutedPlayers.Clear();

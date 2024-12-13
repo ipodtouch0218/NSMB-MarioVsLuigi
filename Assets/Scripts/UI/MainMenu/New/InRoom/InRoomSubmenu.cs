@@ -48,14 +48,14 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         //---Serialized Variables
-        [SerializeField] private InRoomPanel defaultSelectedPanel;
+        [SerializeField] private InRoomSubmenuPanel defaultSelectedPanel;
         [SerializeField] private AudioSource sfx;
-        [SerializeField] private List<InRoomPanel> allPanels;
+        [SerializeField] private List<InRoomSubmenuPanel> allPanels;
         [SerializeField] private GameObject colorPalettePicker;
         [SerializeField] private PlayerListHandler playerListHandler;
 
         //---Private Variables
-        private InRoomPanel selectedPanel;
+        private InRoomSubmenuPanel selectedPanel;
         private PlayerListEntry playerDropdownOpen;
 
         public void OnValidate() {
@@ -98,11 +98,11 @@ namespace NSMB.UI.MainMenu.Submenus {
             return base.TryGoBack(out playSound);
         }
 
-        public void SelectPanel(InRoomPanel panel) {
+        public void SelectPanel(InRoomSubmenuPanel panel) {
             SelectPanel(panel, true);
         }
 
-        public void SelectPanel(InRoomPanel panel, bool setDefault) {
+        public void SelectPanel(InRoomSubmenuPanel panel, bool setDefault) {
             if (panel == selectedPanel) {
                 return;
             }

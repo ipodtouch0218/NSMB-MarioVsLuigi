@@ -12561,6 +12561,18 @@ MonoBehaviour:
   header: {fileID: 43467189}
   selectedColor: {r: 1, g: 1, b: 1, a: 1}
   deselectedColor: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
+  characterButtonImages:
+  - {fileID: 20762145}
+  - {fileID: 1551353054}
+  characterButtonLogos:
+  - {fileID: 820690679}
+  - {fileID: 648328594}
+  enabledCharacterButtonSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
+    type: 3}
+  disabledCharacterButtonSprite: {fileID: 613028815, guid: 919785a51397c1a44816e9462ed989f9,
+    type: 3}
+  enabledCharacterButtonLogoColor: {r: 1, g: 1, b: 1, a: 1}
+  disabledCharacterButtonLogoColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
 --- !u!1 &307554752
 GameObject:
   m_ObjectHideFlags: 0
@@ -46525,7 +46537,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 950123090}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25549927e9f809743ae866565ea07d92, type: 3}
+  m_Script: {fileID: 11500000, guid: 2c86c150266146746b586f96f11e0cde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   menu: {fileID: 252585805}
@@ -46537,7 +46549,12 @@ MonoBehaviour:
   defaultSelectedObject: {fileID: 1773164644}
   header: {fileID: 1914644892}
   selectedColor: {r: 1, g: 1, b: 1, a: 1}
-  deselectedColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
+  deselectedColor: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
+  colorChooser: {fileID: 0}
+  stagePreviewImage: {fileID: 400794474}
+  stageNameText: {fileID: 1988558249}
+  rulesText: {fileID: 1663424777}
+  stagePreviewManager: {fileID: 355157177}
 --- !u!1 &957537612
 GameObject:
   m_ObjectHideFlags: 0
@@ -88291,7 +88308,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -38}
-  m_SizeDelta: {x: 379.70557, y: 0}
+  m_SizeDelta: {x: 379.72577, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -106016,7 +106033,7 @@ MonoBehaviour:
         m_MethodName: SelectPanel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 950123092}
+          m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: InRoomPanel, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu.Submenus {
-    public class PlayerListPanel : InRoomPanel {
+    public class PlayerListPanel : InRoomSubmenuPanel {
 
         //---Properties
         public override GameObject DefaultSelectedObject => playerList.GetPlayerEntryAtIndex(0).button.gameObject;

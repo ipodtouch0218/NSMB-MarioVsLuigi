@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: CustomVolcano
   ScenePath: Assets/Scenes/Levels/CustomVolcano.unity
   SceneGuid: 48dfbffbd41b62a41a8135ce450497f5
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 48
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -365,6 +365,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 68130286679883786
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1108,6 +1110,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 3678451543402610698
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1893,6 +1897,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 8246143707158413322
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

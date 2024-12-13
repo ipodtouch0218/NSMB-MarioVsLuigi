@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnComponentAdded<Liquid>, 
@@ -17,6 +18,8 @@ namespace Quantum {
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
             FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y - entityPhysicsObject->Velocity.Y;
             bool isEntityUnderwater = checkHeight <= surface;
+
+            Debug.Log($"water enter {info.Entity}");
 
             QHashSet<EntityRef> splashed = f.ResolveHashSet(liquid->SplashedEntities);
             if (!splashed.Contains(info.Entity)) {
@@ -64,6 +67,8 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* liquidPhysicsObject)) {
                 return;
             }
+
+            Debug.Log($"water exit {info.Entity}");
 
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
             FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y;

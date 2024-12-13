@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: DefaultPipes
   ScenePath: Assets/Scenes/Levels/DefaultPipes.unity
   SceneGuid: 3f5866ca86038b44384372ab3dadfffc
-  WorldSize: 256
+  WorldSize: 40
   BucketsCount: 16
   BucketsSubdivisions: 8
   BucketingAxis: 0
@@ -898,6 +898,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 0
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 692988744814297096
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -3023,6 +3025,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 0
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 4642328894244913160
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

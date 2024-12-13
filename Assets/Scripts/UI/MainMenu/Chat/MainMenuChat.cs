@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
 
 namespace NSMB.UI.MainMenu {
 
@@ -34,6 +33,7 @@ namespace NSMB.UI.MainMenu {
 
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
         }
 
         public void OnDestroy() {
@@ -189,6 +189,10 @@ namespace NSMB.UI.MainMenu {
                     chatMessage.data.player = PlayerRef.None;
                 }
             }
+        }
+
+        private void OnGameDestroyed(CallbackGameDestroyed e) {
+            ClearChat();
         }
     }
 }

@@ -7,7 +7,7 @@ public class ChangePanelOnSelect : MonoBehaviour, ISelectHandler {
 
     //---Serialized Variables
     [SerializeField] private InRoomSubmenu roomMenu;
-    [SerializeField] private InRoomPanel panelToSelect;
+    [SerializeField] private InRoomSubmenuPanel panelToSelect;
 
     public void OnValidate() {
         this.SetIfNull(ref roomMenu, UnityExtensions.GetComponentType.Parent);

@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: CustomSky
   ScenePath: Assets/Scenes/Levels/CustomSky.unity
   SceneGuid: addb28d9cb6d8a6498a3b328a6e57f33
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 40
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -437,6 +437,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 767976198037831690
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -989,6 +991,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 5398694842198917130
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

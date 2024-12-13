@@ -6,6 +6,7 @@ namespace NSMB.UI.MainMenu {
     public class MainMenuSubmenu : MonoBehaviour {
 
         //---Properties
+        public MainMenuCanvas Canvas { get; private set; }
         public virtual string Header => GlobalController.Instance.translationManager.GetTranslation(header);
         public virtual Color? HeaderColor => useHeaderColor ? headerColor : null;
         public virtual float BackHoldTime => backHoldTime;
@@ -26,11 +27,10 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private UnityAction<SubmenuHideReason> OnHide;
 
         //---Private Variables
-        protected MainMenuCanvas canvas;
         private GameObject savedSelection;
 
         public virtual void Initialize(MainMenuCanvas canvas) {
-            this.canvas = canvas;
+            Canvas = canvas;
             OnInitialize?.Invoke();
         }
 

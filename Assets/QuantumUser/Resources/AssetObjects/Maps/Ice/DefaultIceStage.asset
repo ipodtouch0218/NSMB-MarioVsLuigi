@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: DefaultSnow
   ScenePath: Assets/Scenes/Levels/DefaultSnow.unity
   SceneGuid: 42e7b04a277dea44eab7edc32729f7a5
-  WorldSize: 256
+  WorldSize: 72
   BucketsCount: 16
   BucketsSubdivisions: 8
   BucketingAxis: 0
@@ -1380,6 +1380,8 @@ MonoBehaviour:
           Value: 1
         IsWaterSolid:
           Value: 0
+        BreakMegaObjects:
+          Value: 0
     - rid: 4372145401587826698
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2390,6 +2392,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 8707424676512530442
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

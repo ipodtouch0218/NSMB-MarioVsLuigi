@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: CustomDesert
   ScenePath: Assets/Scenes/Levels/CustomDesert.unity
   SceneGuid: 0a445e83695e8424e9e56da3e5b773e4
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 43
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -899,6 +899,8 @@ MonoBehaviour:
           Value: 1
         IsWaterSolid:
           Value: 0
+        BreakMegaObjects:
+          Value: 0
     - rid: 8510292287580798986
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1051,6 +1053,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 8884074765841596426
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

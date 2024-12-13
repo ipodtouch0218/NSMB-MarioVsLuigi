@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu.Submenus {
-    public class InRoomPanel : MonoBehaviour {
+    public class InRoomSubmenuPanel : MonoBehaviour {
 
         //---Properties
         public virtual GameObject DefaultSelectedObject => defaultSelectedObject;
 
         //---Serialized Variables
         [SerializeField] protected InRoomSubmenu menu;
-        [SerializeField] public InRoomPanel leftPanel, rightPanel;
+        [SerializeField] public InRoomSubmenuPanel leftPanel, rightPanel;
         [SerializeField] private List<GameObject> hideWhenNotSelected;
         [SerializeField] private GameObject defaultSelectedObject;
         [SerializeField] private TMP_Text header;

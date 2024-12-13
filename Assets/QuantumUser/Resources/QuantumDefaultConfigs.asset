@@ -84,9 +84,9 @@ MonoBehaviour:
     UsePhysicsNativeLib: 0
     SolverIterations: 4
     PositionSolverIterations: 2
-    UseJoints: 1
-    UseAngularVelocity: 1
-    UseVerticalTransform: 1
+    UseJoints: 0
+    UseAngularVelocity: 0
+    UseVerticalTransform: 0
     PenetrationAllowance:
       RawValue: 655
     PenetrationCorrection:
@@ -192,7 +192,7 @@ MonoBehaviour:
       RawValue: 72090
   AutoLoadSceneFromMap: 3
   DeltaTimeType: 0
-  ThreadCount: 8
+  ThreadCount: 4
   ChecksumSnapshotHistoryLengthSeconds:
     RawValue: 196608
   ChecksumErrorDumpOptions: 0

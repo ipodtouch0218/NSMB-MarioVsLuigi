@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: DefaultGrassLevel
   ScenePath: Assets/Scenes/Levels/DefaultGrassLevel.unity
   SceneGuid: 2cda990e2423bbf4892e6590ba056729
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 40
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -203,8 +203,6 @@ MonoBehaviour:
     - rid: 777974220477956099
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -343,8 +341,6 @@ MonoBehaviour:
     - rid: 1889659263039569924
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -412,8 +408,6 @@ MonoBehaviour:
     - rid: 1904270922169188355
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -552,8 +546,6 @@ MonoBehaviour:
     - rid: 2967068392109899780
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -630,8 +622,6 @@ MonoBehaviour:
     - rid: 3395932105807495172
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -708,8 +698,6 @@ MonoBehaviour:
     - rid: 4446608830146543620
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -786,8 +774,6 @@ MonoBehaviour:
     - rid: 4573175170545483780
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -855,8 +841,6 @@ MonoBehaviour:
     - rid: 5636341017683689475
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -995,8 +979,6 @@ MonoBehaviour:
     - rid: 6570762336053755908
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -1064,8 +1046,6 @@ MonoBehaviour:
     - rid: 7515263985617207299
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0

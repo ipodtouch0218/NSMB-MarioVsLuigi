@@ -7,5 +7,8 @@ namespace Quantum {
         public bool UseColoredNickname;
         public string NicknameColor;
 
+        public byte Character;
+        public byte Skin;
+
     }
 }

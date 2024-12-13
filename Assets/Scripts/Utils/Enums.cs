@@ -63,6 +63,15 @@ public static class AttributeExtensions {
     private static readonly Dictionary<string, AudioClip> CachedClips = new();
     private static readonly Dictionary<Enums.PrefabParticle, GameObject> CachedParticles = new();
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    public static void PreloadSounds() {
+        foreach (SoundEffect sound in Enum.GetValues(typeof(SoundEffect))) {
+            try {
+                sound.GetClip();
+            } catch { }
+        }
+    }
+
     public static AudioClip GetClip(this SoundEffect soundEffect, CharacterAsset player = null, int variant = 0) {
         string name = "Sound/" + GetClipString(soundEffect) + (variant > 0 ? "_" + variant : "");
 

@@ -13,7 +13,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<Spinner, MarioPlayer>(OnSpinnerMarioPlayerInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, Spinner>(OnSpinnerMarioPlayerInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {
@@ -72,7 +72,7 @@ namespace Quantum {
             marios.Clear();
         }
 
-        public static void OnSpinnerMarioPlayerInteraction(Frame f, EntityRef spinnerEntity, EntityRef marioEntity, PhysicsContact contact) {
+        public static void OnSpinnerMarioPlayerInteraction(Frame f, EntityRef marioEntity, EntityRef spinnerEntity, PhysicsContact contact) {
             if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
                 return;
             }

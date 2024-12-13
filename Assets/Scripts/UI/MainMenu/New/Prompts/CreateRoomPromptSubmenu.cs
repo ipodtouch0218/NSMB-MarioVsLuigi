@@ -36,14 +36,14 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void ConfirmClicked() {
             success = true;
-            canvas.PlayConfirmSound();
+            Canvas.PlayConfirmSound();
             _ = NetworkHandler.CreateRoom(new Photon.Realtime.EnterRoomArgs {
                 RoomOptions = new Photon.Realtime.RoomOptions {
                     MaxPlayers = (int) maxPlayerSlider.value,
                     IsVisible = !privateToggle.isOn,
                 }
             });
-            canvas.GoBack();
+            Canvas.GoBack();
         }
 
         public void MaxPlayerSliderChanged() {

@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: CustomJungle
   ScenePath: Assets/Scenes/Levels/CustomJungle.unity
   SceneGuid: de8e2edb54b6b5e489c97578fa670804
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 72
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -756,6 +756,8 @@ MonoBehaviour:
           Value: 0
         IsWaterSolid:
           Value: 0
+        BreakMegaObjects:
+          Value: 0
     - rid: 1987491028835237896
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -909,6 +911,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 2646313237942894602
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1106,6 +1110,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 3804419343601631241
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -1649,6 +1655,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 8298140632090673162
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

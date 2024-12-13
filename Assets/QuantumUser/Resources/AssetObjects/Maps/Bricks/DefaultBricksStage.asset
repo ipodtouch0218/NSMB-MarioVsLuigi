@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: DefaultBrickLevel
   ScenePath: Assets/Scenes/Levels/DefaultBrickLevel.unity
   SceneGuid: eccd61e23b609ef4f97a643aa84d51d5
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 24
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -962,6 +962,8 @@ MonoBehaviour:
           Value: 1
         IsWaterSolid:
           Value: 0
+        BreakMegaObjects:
+          Value: 0
     - rid: 7591444679539818506
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1246,6 +1248,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 8968679368100413449
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

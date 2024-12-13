@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: DefaultCastle
   ScenePath: Assets/Scenes/Levels/DefaultCastle.unity
   SceneGuid: 2c88ad1eb18532241acee4483fed211d
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 40
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -527,6 +527,8 @@ MonoBehaviour:
           Value: 1
         IsWaterSolid:
           Value: 0
+        BreakMegaObjects:
+          Value: 0
     - rid: 1724038351226404874
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -975,6 +977,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 5216121241349390346
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

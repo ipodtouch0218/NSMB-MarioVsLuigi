@@ -85,7 +85,6 @@ namespace Quantum {
             HandleFacingDirection(f, ref filter, physics, ref input);
             HandlePipes(f, ref filter, physics, stage);
             HandleHitbox(f, ref filter, physics);
-            mario->WasTouchingGroundLastFrame = physicsObject->IsTouchingGround;
         }
 
         public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
@@ -1126,8 +1125,9 @@ namespace Quantum {
             }
 
             physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15 && (!mario->IsInKnockback || mario->IsInWeakKnockback);
-            if (physicsObject->IsWaterSolid && !mario->WasTouchingGroundLastFrame && physicsObject->IsTouchingGround) {
+            if (physicsObject->IsWaterSolid && !physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                 // Check if we landed on water
+                Debug.Log("Splash " + f.Number);
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 foreach (var contact in contacts) {
                     if (f.Has<Liquid>(contact.Entity)) {

@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: CustomBonus
   ScenePath: Assets/Scenes/Levels/CustomBonus.unity
   SceneGuid: ce4cf98f31007b44ea19a2fb2ab0924a
-  WorldSize: 256
+  WorldSize: 72
   BucketsCount: 16
   BucketsSubdivisions: 8
   BucketingAxis: 0
@@ -1532,6 +1532,8 @@ MonoBehaviour:
           Value: 1
         IsWaterSolid:
           Value: 0
+        BreakMegaObjects:
+          Value: 0
     - rid: 4294874483904217098
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -2440,6 +2442,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 8452806171105951754
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

@@ -15,19 +15,19 @@ namespace NSMB.UI.MainMenu.Submenus {
         public void OpenOptions() {
             if (!wasOptionsOpen) {
                 GlobalController.Instance.optionsManager.OpenMenu();
-                canvas.PlayConfirmSound();
+                Canvas.PlayConfirmSound();
             }
         }
 
         public void QuitGame() {
             if (quitCoroutine == null) {
-                quitCoroutine = canvas.StartCoroutine(QuitCorotuine());
+                quitCoroutine = Canvas.StartCoroutine(QuitCorotuine());
             }
         }
 
         private IEnumerator QuitCorotuine() {
             AudioClip clip = SoundEffect.UI_Quit.GetClip();
-            canvas.PlaySound(SoundEffect.UI_Quit);
+            Canvas.PlaySound(SoundEffect.UI_Quit);
             yield return new WaitForSeconds(clip.length);
 
 #if UNITY_EDITOR

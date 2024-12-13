@@ -22,8 +22,8 @@ MonoBehaviour:
   Scene: CustomGhost
   ScenePath: Assets/Scenes/Levels/CustomGhost.unity
   SceneGuid: 39b9f67bcc00dd640a5971ac500078e9
-  WorldSize: 256
-  BucketsCount: 16
+  WorldSize: 72
+  BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
   SortingAxis: 1
@@ -319,6 +319,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 1
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 2112854041804406794
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
@@ -941,6 +943,8 @@ MonoBehaviour:
           Value: 1
         IsWaterSolid:
           Value: 0
+        BreakMegaObjects:
+          Value: 0
     - rid: 6128927690125737994
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -1438,6 +1442,8 @@ MonoBehaviour:
         SlowInLiquids:
           Value: 0
         IsWaterSolid:
+          Value: 0
+        BreakMegaObjects:
           Value: 0
     - rid: 7689850815606947848
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}

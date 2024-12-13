@@ -9,6 +9,8 @@ namespace Quantum {
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
             f.Global->Rules = f.SimulationConfig.DefaultRules;
+
+            // Support booting in the editor.
             if (!config.IsRealGame) {
                 f.Global->GameState = GameState.WaitingForPlayers;
                 f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
@@ -227,6 +229,10 @@ namespace Quantum {
             newData->PlayerRef = player;
             newData->JoinTick = f.Number;
             newData->IsSpectator = f.Global->GameState != GameState.PreGameRoom;
+
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+            newData->Character = runtimePlayer.Character;
+            newData->Skin = runtimePlayer.Skin;
 
             var datas = f.ResolveDictionary(f.Global->PlayerDatas);
             if (datas.Count == 0) {

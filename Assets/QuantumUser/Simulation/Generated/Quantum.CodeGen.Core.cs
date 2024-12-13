@@ -1178,18 +1178,15 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Cullable : Quantum.IComponent {
-    public const Int32 SIZE = 32;
+    public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(0)]
-    public QBoolean DisableCulling;
-    [FieldOffset(16)]
-    public FPVector2 Offset;
     [FieldOffset(8)]
+    public FPVector2 Offset;
+    [FieldOffset(0)]
     public FP BroadRadius;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 7759;
-        hash = hash * 31 + DisableCulling.GetHashCode();
         hash = hash * 31 + Offset.GetHashCode();
         hash = hash * 31 + BroadRadius.GetHashCode();
         return hash;
@@ -1197,7 +1194,6 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Cullable*)ptr;
-        QBoolean.Serialize(&p->DisableCulling, serializer);
         FP.Serialize(&p->BroadRadius, serializer);
         FPVector2.Serialize(&p->Offset, serializer);
     }
@@ -2117,11 +2113,11 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PhysicsObject : Quantum.IComponent {
-    public const Int32 SIZE = 136;
+    public const Int32 SIZE = 144;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(72)]
+    [FieldOffset(80)]
     public FPVector2 Gravity;
-    [FieldOffset(64)]
+    [FieldOffset(72)]
     public FP TerminalVelocity;
     [FieldOffset(12)]
     public QBoolean IsFrozen;
@@ -2133,13 +2129,13 @@ namespace Quantum {
     public QBoolean IsWaterSolid;
     [FieldOffset(4)]
     public QBoolean BreakMegaObjects;
-    [FieldOffset(120)]
+    [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public FPVector2 Velocity;
-    [FieldOffset(88)]
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public FPVector2 ParentVelocity;
-    [FieldOffset(104)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public FPVector2 PreviousFrameVelocity;
     [FieldOffset(0)]
@@ -2157,7 +2153,10 @@ namespace Quantum {
     [FieldOffset(28)]
     [ExcludeFromPrototype()]
     public QBoolean IsTouchingGround;
-    [FieldOffset(56)]
+    [FieldOffset(48)]
+    [ExcludeFromPrototype()]
+    public QBoolean WasTouchingGround;
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public FP FloorAngle;
     [FieldOffset(20)]
@@ -2166,12 +2165,12 @@ namespace Quantum {
     [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public QBoolean IsOnSlideableGround;
-    [FieldOffset(52)]
+    [FieldOffset(56)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
     public QListPtr<PhysicsContact> Contacts;
-    [FieldOffset(48)]
+    [FieldOffset(52)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
@@ -2197,6 +2196,7 @@ namespace Quantum {
         hash = hash * 31 + IsTouchingRightWall.GetHashCode();
         hash = hash * 31 + IsTouchingCeiling.GetHashCode();
         hash = hash * 31 + IsTouchingGround.GetHashCode();
+        hash = hash * 31 + WasTouchingGround.GetHashCode();
         hash = hash * 31 + FloorAngle.GetHashCode();
         hash = hash * 31 + IsOnSlipperyGround.GetHashCode();
         hash = hash * 31 + IsOnSlideableGround.GetHashCode();
@@ -2237,6 +2237,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsTouchingRightWall, serializer);
         QBoolean.Serialize(&p->IsWaterSolid, serializer);
         QBoolean.Serialize(&p->SlowInLiquids, serializer);
+        QBoolean.Serialize(&p->WasTouchingGround, serializer);
         QHashSet.Serialize(&p->LiquidContacts, serializer, Statics.SerializeEntityRef);
         QList.Serialize(&p->Contacts, serializer, Statics.SerializePhysicsContact);
         FP.Serialize(&p->FloorAngle, serializer);

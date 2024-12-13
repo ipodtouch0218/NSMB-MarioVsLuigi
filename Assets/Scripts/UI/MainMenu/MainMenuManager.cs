@@ -342,6 +342,7 @@ namespace NSMB.UI.MainMenu {
 
         public async void Reconnect() {
             GlobalController.Instance.connecting.SetActive(true);
+            Debug.Log(GlobalController.Instance.connecting.activeSelf);
             roomListCanvasGroup.interactable = false;
             _ = await NetworkHandler.ConnectToRegion(null);
         }

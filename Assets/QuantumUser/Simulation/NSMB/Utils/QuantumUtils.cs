@@ -374,6 +374,15 @@ public static unsafe class QuantumUtils {
         return FPVector2.Distance(a, b);
     }
 
+    public static FP WrappedDistanceSquared(VersusStageData stage, FPVector2 a, FPVector2 b) {
+        FP width = stage.TileDimensions.x * FP._0_50;
+        if (stage.IsWrappingLevel && FPMath.Abs(a.X - b.X) > width * FP._0_50) {
+            a.X -= width * FPMath.Sign(a.X - b.X);
+        }
+
+        return FPVector2.DistanceSquared(a, b);
+    }
+
     public static FP EaseInOut(FP x) {
         return x < FP._0_50 ? 2 * x * x : 1 - ((-2 * x + 2) * (-2 * x + 2) / 2);
     }

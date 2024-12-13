@@ -19,10 +19,11 @@ namespace Quantum {
         //---Interactions
         public delegate void HitboxInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
         public delegate void PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
-
-        public Dictionary<(Type, Type), HitboxInteractor> hitboxInteractors = new();
-        public Dictionary<(Type, Type), PlatformInteractor> platformInteractors = new();
-        public HashSet<(EntityRef, EntityRef)> alreadyCollided = new(new UnorderedTupleEqualityComparer<EntityRef>());
+        
+        public List<(Type, Type)> hitboxInteractorMap = new();
+        public List<HitboxInteractor> hitboxInteractors = new();
+        public List<(Type, Type)> platformInteractorMap = new();
+        public List<PlatformInteractor> platformInteractors = new();
 
         //---Misc
         public Dictionary<int, int> TeamStarBuffer = new(10);
@@ -34,18 +35,14 @@ namespace Quantum {
 
         public void RegisterInteraction<X, Y>(HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
             var key = (typeof(X), typeof(Y));
-
-            if (!hitboxInteractors.TryAdd(key, interactor)) {
-                Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}.");
-            }
+            hitboxInteractorMap.Add(key);
+            hitboxInteractors.Add(interactor);
         }
 
         public void RegisterInteraction<X, Y>(PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
             var key = (typeof(X), typeof(Y));
-
-            if (!platformInteractors.TryAdd(key, interactor)) {
-                Log.Warn($"[InteractionSystem] Already registered an interactor between {typeof(X).Name} and {typeof(Y).Name}.");
-            }
+            platformInteractorMap.Add(key);
+            platformInteractors.Add(interactor);
         }
     }
 }

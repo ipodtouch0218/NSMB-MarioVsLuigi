@@ -146,7 +146,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-            canvas.OpenMenu(inRoomSubmenu);
+            Canvas.OpenMenu(inRoomSubmenu);
         }
 
         private class RegionOption : TMP_Dropdown.OptionData, IComparable {

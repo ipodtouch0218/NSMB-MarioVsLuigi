@@ -12,6 +12,8 @@ namespace Quantum {
         public static readonly FP Skin = FP.FromString("0.001");
         public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
 
+        private TaskDelegateHandle sendEventTaskHandle;
+
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -21,6 +23,12 @@ namespace Quantum {
 
         protected override void OnInitUser(Frame f) {
             f.Context.EntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
+            f.Context.TaskContext.RegisterDelegate(SendEventsTask, $"{GetType().Name}.SendEvents", ref sendEventTaskHandle);
+        }
+
+        protected override TaskHandle Schedule(Frame f, TaskHandle taskHandle) {
+            TaskHandle moveObjectsTask = base.Schedule(f, taskHandle);
+            return f.Context.TaskContext.AddSingletonTask(sendEventTaskHandle, null, moveObjectsTask);
         }
 
         public override void Update(FrameThreadSafe f, ref Filter filter) {
@@ -33,8 +41,8 @@ namespace Quantum {
             var transform = filter.Transform;
             var entity = filter.Entity;
 
-            bool wasOnGround = physicsObject->IsTouchingGround;
-            bool canSnap = wasOnGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y;
+            bool wasTouchingGround = physicsObject->IsTouchingGround;
+            bool canSnap = wasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y;
             physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
 
             QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
@@ -78,12 +86,6 @@ namespace Quantum {
             }
 
             /*
-            if (!wasOnGround && physicsObject->IsTouchingGround) {
-                f.Events.PhysicsObjectLanded(f, entity);
-            }
-            */
-
-            /*
 #if DEBUG
             foreach (var contact in contacts) {
                 Draw.Ray(contact.Position, contact.Normal, ColorRGBA.Red);
@@ -95,8 +97,23 @@ namespace Quantum {
                 // Apply gravity
                 physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
             }
-
+            /*
+            if (f.Has<MarioPlayer>(entity)) {
+                Debug.Log(contacts.Count + " - " + wasTouchingGround + " -> " + physicsObject->IsTouchingGround);
+            }
+            */
             physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
+            physicsObject->WasTouchingGround = wasTouchingGround;
+        }
+
+        public void SendEventsTask(FrameThreadSafe f, int start, int count, void* arg) {
+            var filter = f.Filter<PhysicsObject>();
+            while (filter.NextUnsafe(out EntityRef entity, out PhysicsObject* physicsObject)) {
+
+                if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
+                    ((Frame) f).Events.PhysicsObjectLanded((Frame) f, entity);
+                }
+            }
         }
 
         private void MoveWithPlatform(FrameThreadSafe f, ref Filter filter, QList<PhysicsContact> contacts) {

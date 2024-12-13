@@ -18,6 +18,7 @@ component PhysicsObject {
     [ExcludeFromPrototype] bool IsTouchingRightWall;
     [ExcludeFromPrototype] bool IsTouchingCeiling;
     [ExcludeFromPrototype] bool IsTouchingGround;
+    [ExcludeFromPrototype] bool WasTouchingGround;
     [ExcludeFromPrototype] FP FloorAngle;
     [ExcludeFromPrototype] bool IsOnSlipperyGround;
     [ExcludeFromPrototype] bool IsOnSlideableGround;
