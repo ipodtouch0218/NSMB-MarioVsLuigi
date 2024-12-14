@@ -30,6 +30,7 @@ namespace NSMB.UI.Game {
             }
             var context = f.Context;
             context.CullingCameraPositions.Clear();
+            context.CullingIgnoredEntities.Clear();
             context.MaxCameraOrthoSize = 0;
 
             foreach (PlayerElements pe in PlayerElements.AllPlayerElements) {
@@ -37,6 +38,7 @@ namespace NSMB.UI.Game {
                 FPVector2 position = camera.transform.position.ToFPVector2();
                 FP size = camera.orthographicSize.ToFP();
 
+                context.CullingIgnoredEntities.Add(pe.Entity);
                 context.CullingCameraPositions.Add(position);
                 context.MaxCameraOrthoSize = FPMath.Max(context.MaxCameraOrthoSize, size);
             }

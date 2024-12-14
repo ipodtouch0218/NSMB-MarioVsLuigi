@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using NSMB.UI.MainMenu;
-using static ReplayListManager;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -47,6 +46,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     private readonly List<byte[]> replayFrameCache = new();
 
     public void Awake() {
+        Set(this);
         StateChanged += OnClientStateChanged;
 
         realtimeClient = new();
@@ -116,6 +116,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public static async Task<bool> ConnectToRegion(string region) {
+        StateChanged?.Invoke(ClientState.Disconnected, ClientState.Authenticating);
         region ??= Instance.lastRegion;
         Instance.lastRegion = region;
         Client.AuthValues = await AuthenticationHandler.Authenticate();
@@ -266,7 +267,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             UserId = default(Guid).ToString(),
             UseColoredNickname = Settings.Instance.generalUseNicknameColor,
             Character = (byte) Settings.Instance.generalCharacter,
-            Skin = (byte) Settings.Instance.generalSkin,
+            Palette = (byte) Settings.Instance.generalPalette,
         });
 
         ChatManager.Instance.mutedPlayers.Clear();

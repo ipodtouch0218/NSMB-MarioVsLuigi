@@ -21,7 +21,7 @@ namespace NSMB.UI.MainMenu {
         public PlayerRef player;
         public float typingCounter;
         public UnityEngine.UI.Button button;
-        public int joinTick = int.MaxValue;
+        [NonSerialized] public int joinTick = int.MaxValue;
 
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
@@ -66,6 +66,7 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping, onlyIfActiveAndEnabled: true);
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
             playerExistsGameObject.SetActive(false);
+            joinTick = int.MaxValue;
         }
 
         public void OnUpdateView(CallbackUpdateView e) {

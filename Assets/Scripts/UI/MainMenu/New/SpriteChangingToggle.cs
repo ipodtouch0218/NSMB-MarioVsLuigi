@@ -38,12 +38,14 @@ public class SpriteChangingToggle : Selectable, IPointerClickHandler, IEventSyst
         }
     }
 
+#if UNITY_EDITOR
     protected override void OnValidate() {
         base.OnValidate();
         if (!PrefabUtility.IsPartOfPrefabAsset(this) && !Application.isPlaying) {
             CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
         }
     }
+#endif
 
     public virtual void Rebuild(CanvasUpdate executing) {
         if (executing == CanvasUpdate.Prelayout) {

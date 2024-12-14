@@ -5,7 +5,7 @@ component PlayerData {
 	bool IsLoaded;
 
 	byte Character;
-	byte Skin;
+	byte Palette;
 	byte Team;
 	bool IsSpectator;
 	bool ManualSpectator;

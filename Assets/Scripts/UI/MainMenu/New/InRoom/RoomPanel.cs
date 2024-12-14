@@ -9,7 +9,6 @@ namespace NSMB.UI.MainMenu.Submenus {
     public class RoomPanel : InRoomSubmenuPanel {
 
         //---Serialized Variables
-        [SerializeField] private ColorChooser colorChooser;
         [SerializeField] private Image stagePreviewImage;
         [SerializeField] private TMP_Text stageNameText, rulesText;
         [SerializeField] private StagePreviewManager stagePreviewManager;

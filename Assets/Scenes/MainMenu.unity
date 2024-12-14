@@ -1413,6 +1413,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &22575003
 GameObject:
   m_ObjectHideFlags: 0
@@ -2423,6 +2424,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &45605789
 GameObject:
   m_ObjectHideFlags: 0
@@ -3441,6 +3443,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &66541007
 GameObject:
   m_ObjectHideFlags: 0
@@ -6578,6 +6581,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 161100443}
   button: {fileID: 161100438}
+  clickable: {fileID: 0}
   image: {fileID: 161100439}
   label: {fileID: 1366857891}
   selectedColor: {r: 0.33333334, g: 1, b: 0, a: 1}
@@ -7481,7 +7485,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Test message that goes all the way to a newline oooh so scary!
+  m_text: Test message
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
   m_sharedMaterial: {fileID: 6015020410494396785, guid: d42c556520644b148ada62f0b573e1a5,
@@ -8248,6 +8252,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 207090527}
   button: {fileID: 207090532}
+  clickable: {fileID: 0}
   image: {fileID: 207090530}
   label: {fileID: 1657840394}
   selectedColor: {r: 1, g: 0, b: 0, a: 1}
@@ -10198,13 +10203,17 @@ MonoBehaviour:
   useHeaderColor: 0
   headerColor: {r: 0, g: 0, b: 0, a: 0}
   defaultSelectedPanel: {fileID: 305467052}
+  paletteChooser: {fileID: 752484757}
   sfx: {fileID: 252585806}
+  musicSource: {fileID: 895565995}
   allPanels:
   - {fileID: 560333881}
   - {fileID: 950123092}
   - {fileID: 305467052}
   colorPalettePicker: {fileID: 752484754}
   playerListHandler: {fileID: 1295076279}
+  startGameButtonText: {fileID: 778383190}
+  startGameButton: {fileID: 1315080098}
 --- !u!82 &252585806
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12573,6 +12582,8 @@ MonoBehaviour:
     type: 3}
   enabledCharacterButtonLogoColor: {r: 1, g: 1, b: 1, a: 1}
   disabledCharacterButtonLogoColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  paletteChooser: {fileID: 752484757}
+  spectateToggle: {fileID: 1370509651}
 --- !u!1 &307554752
 GameObject:
   m_ObjectHideFlags: 0
@@ -14735,6 +14746,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &377987069
 GameObject:
   m_ObjectHideFlags: 0
@@ -16569,7 +16581,7 @@ MonoBehaviour:
     m_Mode: 4
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 2125415779}
-    m_SelectOnDown: {fileID: 1370509647}
+    m_SelectOnDown: {fileID: 1370509651}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 2
@@ -16886,6 +16898,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 414844260}
   button: {fileID: 414844263}
+  clickable: {fileID: 0}
   image: {fileID: 414844264}
   label: {fileID: 870442153}
   selectedColor: {r: 1, g: 0.4666667, b: 0.09019608, a: 1}
@@ -17101,7 +17114,7 @@ GameObject:
   - component: {fileID: 425527736}
   - component: {fileID: 425527735}
   m_Layer: 5
-  m_Name: ColorTemplate
+  m_Name: PaletteTemplate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17161,9 +17174,9 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1983555074}
+        - m_Target: {fileID: 752484754}
           m_TargetAssemblyTypeName: ColorChooser, Assembly-CSharp
-          m_MethodName: Close
+          m_MethodName: 
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -17233,9 +17246,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1983555074}
-        m_TargetAssemblyTypeName: ColorChooser, Assembly-CSharp
-        m_MethodName: SelectColor
+      - m_Target: {fileID: 752484757}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.PaletteChooser, Assembly-CSharp
+        m_MethodName: SelectPalette
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 425527736}
@@ -17656,6 +17669,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 432887471}
   button: {fileID: 432887476}
+  clickable: {fileID: 0}
   image: {fileID: 432887474}
   label: {fileID: 335707757}
   selectedColor: {r: 0.33333334, g: 1, b: 0, a: 1}
@@ -18254,6 +18268,81 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!1 &449551561
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 449551562}
+  - component: {fileID: 449551564}
+  - component: {fileID: 449551563}
+  m_Layer: 5
+  m_Name: Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &449551562
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449551561}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2125415778}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -1.9499817, y: 2}
+  m_SizeDelta: {x: -27.699997, y: -12}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &449551563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449551561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -265121226, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &449551564
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449551561}
+  m_CullTransparentMesh: 1
 --- !u!1 &452697243
 GameObject:
   m_ObjectHideFlags: 0
@@ -18318,6 +18407,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 452697249}
   button: {fileID: 452697246}
+  clickable: {fileID: 0}
   image: {fileID: 452697247}
   label: {fileID: 1205411748}
   selectedColor: {r: 0.33333334, g: 1, b: 0, a: 1}
@@ -19571,6 +19661,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &472883307
 GameObject:
   m_ObjectHideFlags: 0
@@ -28748,7 +28839,7 @@ GameObject:
   - component: {fileID: 632336363}
   - component: {fileID: 632336365}
   m_Layer: 5
-  m_Name: ColorNameBarWow
+  m_Name: PaletteNameBarWow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30204,6 +30295,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 658850702}
   button: {fileID: 658850705}
+  clickable: {fileID: 0}
   image: {fileID: 658850706}
   label: {fileID: 1529770111}
   selectedColor: {r: 0.34509805, g: 0.39607847, b: 0.9490197, a: 1}
@@ -31304,7 +31396,7 @@ MonoBehaviour:
   m_RestoreOriginalTextOnEscape: 1
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
-  m_InputValidator: {fileID: 11400000, guid: 8d32ebbb7d2fb9c4ba17b8e6bcf01ed2, type: 2}
+  m_InputValidator: {fileID: 0}
 --- !u!114 &678052436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31553,6 +31645,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 695016557}
+  - component: {fileID: 695016558}
   m_Layer: 0
   m_Name: MainMenu
   m_TagString: Untagged
@@ -31584,6 +31677,18 @@ Transform:
   - {fileID: 1444234972}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &695016558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 695016556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfc292274bbb3474493aa64b9e7b81e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &695280295
 GameObject:
   m_ObjectHideFlags: 0
@@ -34204,7 +34309,7 @@ GameObject:
   - component: {fileID: 752484756}
   - component: {fileID: 752484757}
   m_Layer: 5
-  m_Name: ColorPaletteChooser
+  m_Name: PaletteChooser
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34262,14 +34367,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 300ee3ab81fb8c840847057fdbbc99fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseCanvas: {fileID: 2030938838}
+  canvas: {fileID: 2030938839}
   template: {fileID: 425527733}
   blockerTemplate: {fileID: 778243027}
   content: {fileID: 1472937419}
   clearSprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  baseSprite: {fileID: -265121226, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
   defaultCharacter: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   selectOnClose: {fileID: 2125415777}
-  sfx: {fileID: 252585806}
+  overallsImage: {fileID: 2092113832}
+  shirtImage: {fileID: 1240514306}
+  baseImage: {fileID: 449551563}
 --- !u!1 &755218106
 GameObject:
   m_ObjectHideFlags: 0
@@ -45815,6 +45923,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 922932522}
   button: {fileID: 922932517}
+  clickable: {fileID: 0}
   image: {fileID: 922932518}
   label: {fileID: 1239317118}
   selectedColor: {r: 0.33333334, g: 1, b: 0, a: 1}
@@ -46550,7 +46659,6 @@ MonoBehaviour:
   header: {fileID: 1914644892}
   selectedColor: {r: 1, g: 1, b: 1, a: 1}
   deselectedColor: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
-  colorChooser: {fileID: 0}
   stagePreviewImage: {fileID: 400794474}
   stageNameText: {fileID: 1988558249}
   rulesText: {fileID: 1663424777}
@@ -49092,6 +49200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 1066041938}
   button: {fileID: 1066041941}
+  clickable: {fileID: 0}
   image: {fileID: 1066041942}
   label: {fileID: 2043922102}
   selectedColor: {r: 1, g: 0.22352943, b: 0.22352943, a: 1}
@@ -49325,6 +49434,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 1070081659}
   button: {fileID: 1070081664}
+  clickable: {fileID: 0}
   image: {fileID: 1070081662}
   label: {fileID: 1483151008}
   selectedColor: {r: 0, g: 0.65882355, b: 1, a: 1}
@@ -54960,7 +55070,7 @@ GameObject:
   - component: {fileID: 1240514307}
   - component: {fileID: 1240514306}
   m_Layer: 5
-  m_Name: Image
+  m_Name: ShirtImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55005,7 +55115,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -265121226, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
+  m_Sprite: {fileID: 907957626, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -55836,6 +55946,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 1261109724}
   button: {fileID: 1261109727}
+  clickable: {fileID: 0}
   image: {fileID: 1261109728}
   label: {fileID: 66227677}
   selectedColor: {r: 0, g: 0.57254905, b: 1, a: 1}
@@ -57560,6 +57671,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 1315080092}
   button: {fileID: 0}
+  clickable: {fileID: 1315080098}
   image: {fileID: 1315080096}
   label: {fileID: 778383190}
   selectedColor: {r: 0.33333334, g: 1, b: 0, a: 1}
@@ -57619,9 +57731,9 @@ MonoBehaviour:
   OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 887693661}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.MainMenuManager, Assembly-CSharp
-        m_MethodName: StartCountdown
+      - m_Target: {fileID: 252585805}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenu, Assembly-CSharp
+        m_MethodName: OnStartGameButtonClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -57631,6 +57743,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &1316134731
 GameObject:
   m_ObjectHideFlags: 0
@@ -58420,6 +58533,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 1362432729}
   button: {fileID: 1362432724}
+  clickable: {fileID: 0}
   image: {fileID: 645729127}
   label: {fileID: 413645249}
   selectedColor: {r: 1, g: 0.22352943, b: 0.22352943, a: 1}
@@ -58727,7 +58841,7 @@ GameObject:
   - component: {fileID: 1370509646}
   - component: {fileID: 1370509649}
   - component: {fileID: 1370509648}
-  - component: {fileID: 1370509647}
+  - component: {fileID: 1370509651}
   - component: {fileID: 1370509650}
   m_Layer: 5
   m_Name: Button
@@ -58756,54 +58870,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 0.5}
---- !u!114 &1370509647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1370509645}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 4
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 412715808}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 2
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
-      type: 3}
-    m_PressedSprite: {fileID: 1611290607, guid: 919785a51397c1a44816e9462ed989f9,
-      type: 3}
-    m_SelectedSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
-      type: 3}
-    m_DisabledSprite: {fileID: 613028815, guid: 919785a51397c1a44816e9462ed989f9,
-      type: 3}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 1370509648}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1370509648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58856,6 +58922,71 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomMenu: {fileID: 252585805}
   panelToSelect: {fileID: 305467052}
+--- !u!114 &1370509651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1370509645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0433362707c77d4f9575f1a72fdc55a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 4
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 412715808}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 2
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
+    m_PressedSprite: {fileID: 1611290607, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
+    m_SelectedSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
+    m_DisabledSprite: {fileID: 613028815, guid: 919785a51397c1a44816e9462ed989f9,
+      type: 3}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1370509648}
+  toggleTransition: 1
+  graphic: {fileID: 635805567}
+  onSprite: {fileID: 380926162, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  offSprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  onValueChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 305467052}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.ProfilePanel, Assembly-CSharp
+        m_MethodName: OnSpectateToggled
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_IsOn: 0
 --- !u!1 &1374989302
 GameObject:
   m_ObjectHideFlags: 0
@@ -58910,6 +59041,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 1374989303}
   button: {fileID: 1374989308}
+  clickable: {fileID: 0}
   image: {fileID: 1374989306}
   label: {fileID: 835158192}
   selectedColor: {r: 0, g: 0.65882355, b: 1, a: 1}
@@ -60100,6 +60232,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &1399885732
 GameObject:
   m_ObjectHideFlags: 0
@@ -87856,7 +87989,6 @@ MonoBehaviour:
     _index: 0
   typingCounter: 0
   button: {fileID: 850133327}
-  joinTick: 0
   canvas: {fileID: 2030938839}
   nameText: {fileID: 277927507}
   pingText: {fileID: 253608386}
@@ -88307,7 +88439,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -38}
+  m_AnchoredPosition: {x: 0, y: -22.600006}
   m_SizeDelta: {x: 379.72577, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
@@ -88759,6 +88891,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &1560009630
 GameObject:
   m_ObjectHideFlags: 0
@@ -89596,6 +89729,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rect: {fileID: 1587486720}
   button: {fileID: 1587486723}
+  clickable: {fileID: 0}
   image: {fileID: 1587486724}
   label: {fileID: 745348352}
   selectedColor: {r: 0.33333334, g: 1, b: 0, a: 1}
@@ -94833,7 +94967,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.85
+  m_fontSize: 21.4
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -97184,7 +97318,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d21b0aa69c428b246a67e4936109686f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseCanvas: {fileID: 1619623746}
+  canvas: {fileID: 0}
   blockerTemplate: {fileID: 957537612}
   content: {fileID: 2133950543}
   disabledIcon: {fileID: 1762068881}
@@ -98448,7 +98582,6 @@ MonoBehaviour:
     _index: 0
   typingCounter: 0
   button: {fileID: 0}
-  joinTick: 0
   canvas: {fileID: 0}
   nameText: {fileID: 238321102}
   pingText: {fileID: 695280297}
@@ -101033,6 +101166,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &1850179765
 GameObject:
   m_ObjectHideFlags: 0
@@ -105029,7 +105163,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1885872615}
   m_Layer: 5
-  m_Name: ColorPalette
+  m_Name: Palette
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -106040,6 +106174,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  Interactable: 1
 --- !u!1 &1916143646
 GameObject:
   m_ObjectHideFlags: 0
@@ -107279,6 +107414,7 @@ MonoBehaviour:
   nameText: {fileID: 571757985}
   inProgressText: {fileID: 1865114080}
   symbolsText: {fileID: 651379611}
+  mapText: {fileID: 0}
   icon: {fileID: 1927022870}
 --- !u!114 &1927022870
 MonoBehaviour:
@@ -109449,14 +109585,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 300ee3ab81fb8c840847057fdbbc99fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseCanvas: {fileID: 1619623746}
+  canvas: {fileID: 0}
   template: {fileID: 425527733}
   blockerTemplate: {fileID: 778243027}
   content: {fileID: 632336357}
   clearSprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  baseSprite: {fileID: 0}
   defaultCharacter: {fileID: 0}
   selectOnClose: {fileID: 0}
-  sfx: {fileID: 0}
+  overallsImage: {fileID: 0}
+  shirtImage: {fileID: 0}
+  baseImage: {fileID: 0}
 --- !u!114 &1983555075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112629,6 +112768,81 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   key: ui.error.networkheader
   text: {fileID: 2088446874}
+--- !u!1 &2092113830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2092113831}
+  - component: {fileID: 2092113833}
+  - component: {fileID: 2092113832}
+  m_Layer: 5
+  m_Name: OverallsImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2092113831
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092113830}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2125415778}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -1.9499817, y: 2}
+  m_SizeDelta: {x: -27.699997, y: -12}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2092113832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092113830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 945446947, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &2092113833
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092113830}
+  m_CullTransparentMesh: 1
 --- !u!1 &2092627849
 GameObject:
   m_ObjectHideFlags: 0
@@ -113435,7 +113649,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 449551562}
   - {fileID: 1240514305}
+  - {fileID: 2092113831}
   m_Father: {fileID: 89124053}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.45, y: 0}

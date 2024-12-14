@@ -10,6 +10,7 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         [SerializeField] private RectTransform rect;
         [SerializeField] private Button button;
+        [SerializeField] private Clickable clickable;
         [SerializeField] private Image image;
         [SerializeField] private TMP_Text label;
 
@@ -24,19 +25,23 @@ namespace NSMB.UI.MainMenu {
         public void OnValidate() {
             this.SetIfNull(ref rect);
             this.SetIfNull(ref button);
+            this.SetIfNull(ref clickable);
             this.SetIfNull(ref image, UnityExtensions.GetComponentType.Children);
             this.SetIfNull(ref label, UnityExtensions.GetComponentType.Children);
+
+            disabledColor = new Color(deselectedColor.r * 0.5f, deselectedColor.g * 0.5f, deselectedColor.b * 0.5f);
         }
 
         public void Start() {
             size = rect.sizeDelta;
-            disabledColor = new(deselectedColor.r, deselectedColor.g, deselectedColor.b, deselectedColor.a * 0.5f);
         }
 
         public void Update() {
-            if (button && !button.IsInteractable()) {
+            if ((button && !button.IsInteractable())
+                || (clickable && !clickable.Interactable)) {
                 rect.sizeDelta = size - sizeDecreasePixels;
                 image.color = disabledColor;
+                label.color = Color.gray;
                 return;
             }
             if (hover || EventSystem.current.currentSelectedGameObject == gameObject) {

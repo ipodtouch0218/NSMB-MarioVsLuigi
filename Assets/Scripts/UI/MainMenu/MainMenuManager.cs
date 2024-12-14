@@ -33,7 +33,7 @@ namespace NSMB.UI.MainMenu {
         [Header("Managers")]
         [SerializeField] public PlayerListHandler playerList;
         [SerializeField] public RoomListManager roomManager;
-        [SerializeField] private ColorChooser colorManager;
+        [SerializeField] private PaletteChooser colorManager;
         [SerializeField] public MainMenuChat chat;
         [SerializeField] public RoomSettingsCallbacks roomSettingsCallbacks;
         [SerializeField] private LoopingMusicPlayer musicPlayer;
@@ -154,7 +154,7 @@ namespace NSMB.UI.MainMenu {
 
             // Set the player settings
             SwapCharacter(Settings.Instance.generalCharacter, false);
-            SwapPlayerSkin(Settings.Instance.generalSkin, false);
+            SwapPlayerSkin(Settings.Instance.generalPalette, false);
             spectateToggle.isOn = false;
 
             // Create player icons
@@ -501,8 +501,8 @@ namespace NSMB.UI.MainMenu {
             if (!disabled) {
                 playerColorDisabledIcon.SetActive(false);
                 playerColorPaletteIcon.SetActive(true);
-                PlayerColorSet set = ScriptableManager.Instance.skins[index];
-                PlayerColors colors = set.GetPlayerColors(currentCharacter);
+                PaletteSet set = ScriptableManager.Instance.skins[index];
+                CharacterSpecificPalette colors = set.GetPaletteForCharacter(currentCharacter);
                 overallsColorImage.color = colors.overallsColor;
                 shirtColorImage.color = colors.shirtColor;
                 ColorName.GetComponent<TMP_Text>().text = set.Name;
@@ -512,14 +512,14 @@ namespace NSMB.UI.MainMenu {
             playerColorPaletteIcon.SetActive(!disabled);
 
             if (save) {
-                Settings.Instance.generalSkin = index;
+                Settings.Instance.generalPalette = index;
                 Settings.Instance.SaveSettings();
             }
 
             foreach (int slot in QuantumRunner.DefaultGame.GetLocalPlayerSlots()) {
                 QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
-                    EnabledChanges = CommandChangePlayerData.Changes.Skin,
-                    Skin = (byte) index
+                    EnabledChanges = CommandChangePlayerData.Changes.Palette,
+                    Palette = (byte) index
                 });
             }
 
@@ -675,7 +675,7 @@ namespace NSMB.UI.MainMenu {
             QuantumRunner.DefaultGame.SendCommand(slot, new CommandChangePlayerData {
                 EnabledChanges = CommandChangePlayerData.Changes.All,
                 Character = (byte) Settings.Instance.generalCharacter,
-                Skin = (byte) Settings.Instance.generalSkin,
+                Palette = (byte) Settings.Instance.generalPalette,
                 Spectating = false,
                 Team = (byte) (e.Player % f.SimulationConfig.Teams.Length),
             });

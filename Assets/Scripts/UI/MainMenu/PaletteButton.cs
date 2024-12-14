@@ -3,10 +3,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
-public class ColorButton : MonoBehaviour, ISelectHandler {
+public class PaletteButton : MonoBehaviour, ISelectHandler {
 
     //---Public Variables
-    public PlayerColorSet palette;
+    public PaletteSet palette;
 
     //---Serialized Variables
     [SerializeField] private TMP_Text colorNameString;
@@ -19,7 +19,7 @@ public class ColorButton : MonoBehaviour, ISelectHandler {
             return;
         }
 
-        PlayerColors col = palette.GetPlayerColors(player);
+        CharacterSpecificPalette col = palette.GetPaletteForCharacter(player);
         shirt.color = col.shirtColor;
         overalls.color = col.overallsColor;
     }

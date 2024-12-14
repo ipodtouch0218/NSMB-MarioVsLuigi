@@ -13,7 +13,10 @@ namespace Quantum {
             }
 
             bool gameStarting = f.Global->GameStartFrames == 0;
-            f.Global->GameStartFrames = (ushort) (gameStarting ? 3 * 60 : 0);
+            if (gameStarting && !QuantumUtils.IsGameStartable(f)) {
+                return;
+            }
+            f.Global->GameStartFrames = (ushort) (gameStarting ? 3 * f.UpdateRate : 0);
             f.Events.StartingCountdownChanged(f, gameStarting);
         }
     }

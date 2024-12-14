@@ -9,11 +9,12 @@ public class CharacterAsset : AssetObject {
     public string UiString;
     public string TranslationString;
 
+#if QUANTUM_UNITY
     public Sprite LoadingSmallSprite;
     public Sprite LoadingLargeSprite;
     public Sprite ReadySprite;
 
     public RuntimeAnimatorController SmallOverrides;
     public RuntimeAnimatorController LargeOverrides;
-
+#endif 
 }

@@ -2,15 +2,14 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class Clickable : MonoBehaviour, /*IPointerClickHandler,*/ IPointerDownHandler {
+public class Clickable : MonoBehaviour, IPointerDownHandler {
 
     public UnityEvent OnClick;
-/*
-    public void OnPointerClick(PointerEventData eventData) {
-        OnClick?.Invoke();
-    }
-*/
+    public bool Interactable = true;
+
     public void OnPointerDown(PointerEventData eventData) {
-        OnClick?.Invoke();
+        if (Interactable) {
+            OnClick?.Invoke();
+        }
     }
 }

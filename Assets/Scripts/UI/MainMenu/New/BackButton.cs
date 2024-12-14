@@ -44,6 +44,9 @@ namespace NSMB.UI.MainMenu {
         public void OnDisable() {
             ControlSystem.controls.UI.Cancel.performed -= OnCancel;
             ControlSystem.controls.UI.Cancel.canceled -= OnCancel;
+
+            BackHeld = false;
+            timer = 0;
         }
 
         public void Update() {

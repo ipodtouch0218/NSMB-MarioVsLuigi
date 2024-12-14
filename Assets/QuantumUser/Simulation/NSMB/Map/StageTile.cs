@@ -6,7 +6,9 @@ using UnityEngine.Tilemaps;
 
 public class StageTile : AssetObject {
 
+#if QUANTUM_UNITY
     public TileBase Tile;
+#endif 
     public TileCollisionData CollisionData;
     public bool IsSlipperyGround, IsSlideableGround, IsPolygon = true;
     public SoundEffect FootstepSound = SoundEffect.Player_Walk_Grass;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Quantum {
+﻿namespace Quantum {
     public partial class RuntimePlayer {
 
         public string UserId;
@@ -8,7 +6,7 @@ namespace Quantum {
         public string NicknameColor;
 
         public byte Character;
-        public byte Skin;
+        public byte Palette;
 
     }
 }

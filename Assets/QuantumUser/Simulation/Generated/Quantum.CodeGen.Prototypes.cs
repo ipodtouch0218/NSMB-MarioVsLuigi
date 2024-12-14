@@ -612,7 +612,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsRoomHost;
     public QBoolean IsLoaded;
     public Byte Character;
-    public Byte Skin;
+    public Byte Palette;
     public Byte Team;
     public QBoolean IsSpectator;
     public QBoolean ManualSpectator;
@@ -633,7 +633,7 @@ namespace Quantum.Prototypes {
         result.IsRoomHost = this.IsRoomHost;
         result.IsLoaded = this.IsLoaded;
         result.Character = this.Character;
-        result.Skin = this.Skin;
+        result.Palette = this.Palette;
         result.Team = this.Team;
         result.IsSpectator = this.IsSpectator;
         result.ManualSpectator = this.ManualSpectator;

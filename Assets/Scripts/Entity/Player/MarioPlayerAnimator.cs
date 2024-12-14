@@ -103,7 +103,7 @@ namespace NSMB.Entities.Player {
         private float propellerVelocity;
         private Quaternion modelRotationTarget;
         private bool modelRotateInstantly, footstepVariant;
-        private PlayerColors skin;
+        private CharacterSpecificPalette skin;
         private float lastBumpSound;
         private MaterialPropertyBlock materialBlock;
         private float teammateStompTimer;
@@ -160,10 +160,10 @@ namespace NSMB.Entities.Player {
 
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
             var skins = ScriptableManager.Instance.skins;
-            int skinIndex = Mathf.Clamp(playerData != null ? playerData->Skin : 0, 0, skins.Length - 1);
+            int skinIndex = Mathf.Clamp(playerData != null ? playerData->Palette : 0, 0, skins.Length - 1);
 
-            if (skins[skinIndex] is PlayerColorSet colorSet) {
-                skin = colorSet.GetPlayerColors(character);
+            if (skins[skinIndex] is PaletteSet colorSet) {
+                skin = colorSet.GetPaletteForCharacter(character);
             }
 
             GlowColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);

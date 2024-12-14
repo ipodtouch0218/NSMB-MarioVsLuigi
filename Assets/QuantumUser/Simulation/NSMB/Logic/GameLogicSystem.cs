@@ -232,7 +232,7 @@ namespace Quantum {
 
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             newData->Character = runtimePlayer.Character;
-            newData->Skin = runtimePlayer.Skin;
+            newData->Palette = runtimePlayer.Palette;
 
             var datas = f.ResolveDictionary(f.Global->PlayerDatas);
             if (datas.Count == 0) {
@@ -247,6 +247,7 @@ namespace Quantum {
 
         public void OnPlayerRemoved(Frame f, PlayerRef player) {
             var datas = f.ResolveDictionary(f.Global->PlayerDatas);
+            bool hostChanged = false;
 
             if (datas.TryGetValue(player, out EntityRef entity)) {
                 var deletedPlayerData = f.Unsafe.GetPointer<PlayerData>(entity);
@@ -269,6 +270,8 @@ namespace Quantum {
                         youngestPlayer->IsRoomHost = true;
                         f.Events.HostChanged(f, youngestPlayer->PlayerRef);
                     }
+
+                    hostChanged = true;
                 }
 
                 f.Destroy(entity);
@@ -277,7 +280,7 @@ namespace Quantum {
 
             f.Events.PlayerRemoved(f, player);
 
-            if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
+            if (f.Global->GameStartFrames > 0 && (hostChanged || !QuantumUtils.IsGameStartable(f))) {
                 StopCountdown(f);
             }
         }

@@ -45,6 +45,7 @@ public static class Enums {
         public const string IntProperties = "I";
         public const string BoolProperties = "B";
         public const string HostName = "H";
+        public const string StageGuid = "S";
     }
     #endregion
 }

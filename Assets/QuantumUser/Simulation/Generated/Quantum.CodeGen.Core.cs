@@ -2294,7 +2294,7 @@ namespace Quantum {
     [FieldOffset(0)]
     public Byte Character;
     [FieldOffset(1)]
-    public Byte Skin;
+    public Byte Palette;
     [FieldOffset(2)]
     public Byte Team;
     [FieldOffset(40)]
@@ -2320,7 +2320,7 @@ namespace Quantum {
         hash = hash * 31 + IsRoomHost.GetHashCode();
         hash = hash * 31 + IsLoaded.GetHashCode();
         hash = hash * 31 + Character.GetHashCode();
-        hash = hash * 31 + Skin.GetHashCode();
+        hash = hash * 31 + Palette.GetHashCode();
         hash = hash * 31 + Team.GetHashCode();
         hash = hash * 31 + IsSpectator.GetHashCode();
         hash = hash * 31 + ManualSpectator.GetHashCode();
@@ -2336,7 +2336,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (PlayerData*)ptr;
         serializer.Stream.Serialize(&p->Character);
-        serializer.Stream.Serialize(&p->Skin);
+        serializer.Stream.Serialize(&p->Palette);
         serializer.Stream.Serialize(&p->Team);
         serializer.Stream.Serialize(&p->JoinTick);
         serializer.Stream.Serialize(&p->LastChatMessage);

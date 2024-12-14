@@ -500,7 +500,7 @@ public static unsafe class QuantumUtils {
 
         int playerDataCount = f.ComponentCount<PlayerData>();
         PlayerData** allPlayerDatas = stackalloc PlayerData*[playerDataCount];
-
+        
         int index = 0;
         var playerDataFilter = f.Filter<PlayerData>();
         playerDataFilter.UseCulling = false;

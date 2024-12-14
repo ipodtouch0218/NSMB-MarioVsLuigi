@@ -13,6 +13,7 @@ namespace Quantum {
         public List<PreContactCallback> PreContactCallbacks = new();
 
         //---Culling
+        public List<EntityRef> CullingIgnoredEntities = new();
         public List<FPVector2> CullingCameraPositions = new();
         public FP MaxCameraOrthoSize = 7;
 

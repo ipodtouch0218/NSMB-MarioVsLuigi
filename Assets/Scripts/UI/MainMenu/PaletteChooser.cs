@@ -1,43 +1,46 @@
-using NSMB.Extensions;
+using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Navigation = UnityEngine.UI.Navigation;
 
 namespace NSMB.UI.MainMenu {
-    public class ColorChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
+    public class PaletteChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
 
         //---Serialized Variables
         // [SerializeField] private SimulationConfig config;
-        [SerializeField] private Canvas baseCanvas;
+        [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private GameObject template, blockerTemplate, content;
-        [SerializeField] private Sprite clearSprite;
+        [SerializeField] private Sprite clearSprite, baseSprite;
         [SerializeField] private CharacterAsset defaultCharacter;
         [SerializeField] private GameObject selectOnClose;
-        [SerializeField] private AudioSource sfx;
+
+        [SerializeField] private Image overallsImage, shirtImage, baseImage;
 
         //---Private Variables
-        private readonly List<ColorButton> colorButtons = new();
+        private readonly List<PaletteButton> paletteButtons = new();
         private readonly List<Button> buttons = new();
         private readonly List<Navigation> navigations = new();
         private GameObject blocker;
+        private CharacterAsset character;
         private int selected;
         private bool initialized;
 
-        public void Initialize() {
+        public unsafe void Initialize() {
             if (initialized) {
                 return;
             }
 
-            PlayerColorSet[] colors = ScriptableManager.Instance.skins;
+            PaletteSet[] colors = ScriptableManager.Instance.skins;
 
             for (int i = 0; i < colors.Length; i++) {
-                PlayerColorSet color = colors[i];
+                PaletteSet color = colors[i];
 
                 GameObject newButton = Instantiate(template, template.transform.parent);
-                ColorButton cb = newButton.GetComponent<ColorButton>();
-                colorButtons.Add(cb);
+                PaletteButton cb = newButton.GetComponent<PaletteButton>();
+                paletteButtons.Add(cb);
                 cb.palette = color;
 
                 Button b = newButton.GetComponent<Button>();
@@ -72,9 +75,11 @@ namespace NSMB.UI.MainMenu {
             }
             initialized = true;
 
-            foreach (ColorButton b in colorButtons) {
+            foreach (PaletteButton b in paletteButtons) {
                 b.Instantiate(defaultCharacter);
             }
+
+            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
         }
 
         public void Start() {
@@ -83,32 +88,62 @@ namespace NSMB.UI.MainMenu {
 
         public void ChangeCharacter(CharacterAsset data) {
             Initialize();
-            foreach (ColorButton b in colorButtons) {
+            foreach (PaletteButton b in paletteButtons) {
                 b.Instantiate(data);
             }
+            character = data;
+            ChangePaletteButton(selected);
         }
 
-        public void SelectColor(Button button) {
-            selected = buttons.IndexOf(button);
-            MainMenuManager.Instance.SwapPlayerSkin(buttons.IndexOf(button), true);
-            Close(false);
+        public void ChangePaletteButton(int index) {
+            selected = index;
 
-            if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
+            PaletteSet[] palettes = ScriptableManager.Instance.skins;
+            PaletteSet palette = null;
+            if (index >= 0 && index < palettes.Length) {
+                palette = palettes[index];
             }
+
+            if (palette) {
+                overallsImage.enabled = true;
+                overallsImage.color = palette.GetPaletteForCharacter(character).overallsColor;
+                shirtImage.enabled = true;
+                shirtImage.color = palette.GetPaletteForCharacter(character).shirtColor;
+                baseImage.sprite = baseSprite;
+            } else {
+                overallsImage.enabled = false;
+                shirtImage.enabled = false;
+                baseImage.sprite = clearSprite;
+            }
+
+            Settings.Instance.generalPalette = index;
+        }
+
+        public void SelectPalette(Button button) {
+            selected = buttons.IndexOf(button);
+            QuantumGame game = NetworkHandler.Runner.Game;
+            foreach (var slot in game.GetLocalPlayerSlots()) {
+                game.SendCommand(slot, new CommandChangePlayerData { 
+                    EnabledChanges = CommandChangePlayerData.Changes.Palette,
+                    Palette = (byte) selected,
+                });
+            }
+            
+            Close(false);
+            ChangePaletteButton(selected);
+            canvas.PlayConfirmSound();
         }
 
         public void Open() {
             Initialize();
 
-            blocker = Instantiate(blockerTemplate, baseCanvas.transform);
+            blocker = Instantiate(blockerTemplate, canvas.transform);
             gameObject.SetActive(true);
             blocker.SetActive(true);
             content.SetActive(true);
+            canvas.PlayCursorSound();
 
             EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
-
-            sfx.Play();
         }
 
         public void Close(bool playSound) {
@@ -118,8 +153,17 @@ namespace NSMB.UI.MainMenu {
             content.SetActive(false);
 
             if (playSound) {
-                sfx.PlayOneShot(SoundEffect.UI_Back);
+                canvas.PlaySound(SoundEffect.UI_Back);
             }
+        }
+
+        private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
+            if (!e.Game.PlayerIsLocal(e.Player)) {
+                return;
+            }
+
+            var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
+            ChangePaletteButton(playerData->Palette);
         }
     }
 }

@@ -114,7 +114,7 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void ReorderEntries() {
             playerListEntries.Sort((a, b) => {
-                return b.joinTick - a.joinTick;
+                return a.joinTick - b.joinTick;
             });
 
             for (int i = 0; i < playerListEntries.Count; i++) {

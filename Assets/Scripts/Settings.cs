@@ -184,7 +184,7 @@ public class Settings : Singleton<Settings> {
 
     //---Public Variables
     public string generalNickname;
-    public int generalCharacter, generalSkin;
+    public int generalCharacter, generalPalette;
     public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
 
     public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
@@ -219,7 +219,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("General_DisableChat", GeneralDisableChat ? 1 : 0);
         PlayerPrefs.SetInt("General_ChatFilter", generalChatFiltering ? 1 : 0);
         PlayerPrefs.SetInt("General_Character", generalCharacter);
-        PlayerPrefs.SetInt("General_Skin", generalSkin);
+        PlayerPrefs.SetInt("General_Palette", generalPalette);
         PlayerPrefs.SetString("General_Locale", GeneralLocale);
         PlayerPrefs.SetInt("General_UseNicknameColor", generalUseNicknameColor ? 1 : 0);
         PlayerPrefs.SetInt("General_DiscordIntegration", GeneralDiscordIntegration ? 1 : 0);
@@ -297,7 +297,7 @@ public class Settings : Singleton<Settings> {
         GeneralDisableChat = false;
         generalChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) != 0;
         generalCharacter = PlayerPrefs.GetInt("Character", 0);
-        generalSkin = PlayerPrefs.GetInt("Skin", 0);
+        generalPalette = PlayerPrefs.GetInt("Skin", 0);
         GeneralLocale = "en-US";
         generalUseNicknameColor = true;
         _generalDiscordIntegration = true;
@@ -348,7 +348,7 @@ public class Settings : Singleton<Settings> {
         TryGetSetting<bool>("General_DisableChat", nameof(GeneralDisableChat));
         TryGetSetting("General_ChatFilter", ref generalChatFiltering);
         TryGetSetting("General_Character", ref generalCharacter);
-        TryGetSetting("General_Skin", ref generalSkin);
+        TryGetSetting("General_Palette", ref generalPalette);
         TryGetSetting<string>("General_Locale", nameof(GeneralLocale));
         TryGetSetting("General_UseNicknameColor", ref generalUseNicknameColor);
         TryGetSetting<bool>("General_DiscordIntegration", nameof(GeneralDiscordIntegration));

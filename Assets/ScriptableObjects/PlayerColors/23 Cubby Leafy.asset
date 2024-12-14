@@ -18,7 +18,7 @@ MonoBehaviour:
     overallsColor: {r: 0.57254905, g: 0.20784314, b: 0.20784314, a: 1}
     hatUsesOverallsColor: 0
   - character: {fileID: 11400000, guid: 20241e3c68674eb4dbb58f063d01cfd2, type: 2}
-    shirtColor: {r: 0.9, g: 0.47239816, b: 0.25656107, a: 1}
-    overallsColor: {r: 0.57254905, g: 0.20784314, b: 0.20784314, a: 1}
+    shirtColor: {r: 0.6666667, g: 0.20000002, b: 1, a: 1}
+    overallsColor: {r: 1, g: 0.40000004, b: 0.33333334, a: 1}
     hatUsesOverallsColor: 0
   translationKey: skin.cubbyleafy

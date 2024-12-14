@@ -8,6 +8,7 @@ namespace NSMB.Utils {
         public static PhotonHashtable DefaultRoomProperties => new() {
             [Enums.NetRoomProperties.IntProperties] = (int) IntegerProperties.Default,
             [Enums.NetRoomProperties.BoolProperties] = (int) BooleanProperties.Default,
+            //[Enums.NetRoomProperties.StageGuid] = 
         };
 
         public static Dictionary<short, string> DisconnectMessages = new() {

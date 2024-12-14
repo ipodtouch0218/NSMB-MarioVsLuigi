@@ -9,7 +9,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private Image[] characterButtonImages, characterButtonLogos;
         [SerializeField] private Sprite enabledCharacterButtonSprite, disabledCharacterButtonSprite;
         [SerializeField] private Color enabledCharacterButtonLogoColor, disabledCharacterButtonLogoColor;
-        //[SerializeField] private
+        [SerializeField] private PaletteChooser paletteChooser;
+        [SerializeField] private SpriteChangingToggle spectateToggle;
 
         //---Private Variables
         private int currentCharacterIndex;
@@ -33,14 +34,23 @@ namespace NSMB.UI.MainMenu.Submenus {
             OnCharacterClicked((currentCharacterIndex + 1) % characterButtonImages.Length);
         }
 
-        public void OnChooseColor() {
-
+        public void OnSpectateToggled() {
+            QuantumGame game = NetworkHandler.Runner.Game;
+            foreach (var slot in game.GetLocalPlayerSlots()) {
+                game.SendCommand(slot, new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.Spectating,
+                    Spectating = spectateToggle.isOn,
+                });
+            }
+            menu.Canvas.PlayConfirmSound();
         }
 
         private void SetCharacterButtonState(Frame f, int index, bool sound) {
             if (currentCharacterIndex == index) {
                 return;
             }
+            currentCharacterIndex = index;
+            Settings.Instance.generalCharacter = index;
 
             for (int i = 0; i < characterButtonImages.Length; i++) {
                 var image = characterButtonImages[i];
@@ -58,16 +68,17 @@ namespace NSMB.UI.MainMenu.Submenus {
                 characterButtonLogos[index].color = enabledCharacterButtonLogoColor;
             }
 
-            currentCharacterIndex = index;
+            SimulationConfig config = f.SimulationConfig;
+            CharacterAsset characterAsset = config.CharacterDatas[Mathf.Clamp(index, 0, config.CharacterDatas.Length)];
+            paletteChooser.ChangeCharacter(characterAsset);
 
             if (sound) {
-                SimulationConfig config = f.SimulationConfig;
-                menu.Canvas.PlaySound(SoundEffect.Player_Voice_Selected, config.CharacterDatas[Mathf.Clamp(index, 0, config.CharacterDatas.Length)]);
+                menu.Canvas.PlaySound(SoundEffect.Player_Voice_Selected, characterAsset);
             }
         }
 
-        private void SetColorButtonState(int index) {
-
+        private void SetPaletteButtonState(int index) {
+            paletteChooser.ChangePaletteButton(index);
         }
 
         //---Callbacks
@@ -79,6 +90,8 @@ namespace NSMB.UI.MainMenu.Submenus {
             // Set character button to the correct state
             PlayerData* data = QuantumUtils.GetPlayerData(e.Frame, e.Player);
             SetCharacterButtonState(e.Frame, data->Character, false);
+            SetPaletteButtonState(data->Palette);
+            spectateToggle.SetIsOnWithoutNotify(data->ManualSpectator);
         }
     }
 }
