@@ -1,5 +1,6 @@
 using Quantum;
 using System.Collections.Generic;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,7 +13,8 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         // [SerializeField] private SimulationConfig config;
         [SerializeField] private MainMenuCanvas canvas;
-        [SerializeField] private GameObject template, blockerTemplate, content;
+        [SerializeField] private GameObject template, blockerTemplate;
+        [SerializeField] public GameObject content;
         [SerializeField] private Sprite clearSprite, baseSprite;
         [SerializeField] private CharacterAsset defaultCharacter;
         [SerializeField] private GameObject selectOnClose;
@@ -78,16 +80,9 @@ namespace NSMB.UI.MainMenu {
             foreach (PaletteButton b in paletteButtons) {
                 b.Instantiate(defaultCharacter);
             }
-
-            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
-        }
-
-        public void Start() {
-            Initialize();
         }
 
         public void ChangeCharacter(CharacterAsset data) {
-            Initialize();
             foreach (PaletteButton b in paletteButtons) {
                 b.Instantiate(data);
             }
@@ -97,7 +92,6 @@ namespace NSMB.UI.MainMenu {
 
         public void ChangePaletteButton(int index) {
             selected = index;
-
             PaletteSet[] palettes = ScriptableManager.Instance.skins;
             PaletteSet palette = null;
             if (index >= 0 && index < palettes.Length) {
@@ -115,22 +109,23 @@ namespace NSMB.UI.MainMenu {
                 shirtImage.enabled = false;
                 baseImage.sprite = clearSprite;
             }
-
-            Settings.Instance.generalPalette = index;
         }
 
         public void SelectPalette(Button button) {
-            selected = buttons.IndexOf(button);
+            int newIndex = buttons.IndexOf(button);
             QuantumGame game = NetworkHandler.Runner.Game;
             foreach (var slot in game.GetLocalPlayerSlots()) {
                 game.SendCommand(slot, new CommandChangePlayerData { 
                     EnabledChanges = CommandChangePlayerData.Changes.Palette,
-                    Palette = (byte) selected,
+                    Palette = (byte) newIndex,
                 });
             }
             
             Close(false);
+            selected = newIndex;
             ChangePaletteButton(selected);
+            Settings.Instance.generalPalette = selected;
+            Settings.Instance.SaveSettings();
             canvas.PlayConfirmSound();
         }
 
@@ -138,7 +133,6 @@ namespace NSMB.UI.MainMenu {
             Initialize();
 
             blocker = Instantiate(blockerTemplate, canvas.transform);
-            gameObject.SetActive(true);
             blocker.SetActive(true);
             content.SetActive(true);
             canvas.PlayCursorSound();
@@ -147,7 +141,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void Close(bool playSound) {
-            gameObject.SetActive(false);
             Destroy(blocker);
             EventSystem.current.SetSelectedGameObject(selectOnClose);
             content.SetActive(false);
@@ -155,15 +148,6 @@ namespace NSMB.UI.MainMenu {
             if (playSound) {
                 canvas.PlaySound(SoundEffect.UI_Back);
             }
-        }
-
-        private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
-            if (!e.Game.PlayerIsLocal(e.Player)) {
-                return;
-            }
-
-            var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
-            ChangePaletteButton(playerData->Palette);
         }
     }
 }

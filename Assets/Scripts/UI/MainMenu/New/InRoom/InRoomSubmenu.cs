@@ -12,7 +12,7 @@ namespace NSMB.UI.MainMenu.Submenus {
     public class InRoomSubmenu : MainMenuSubmenu {
 
         //---Properties
-        public override float BackHoldTime => colorPalettePicker.activeSelf || playerDropdownOpen ? 0f : 1f;
+        public override float BackHoldTime => teamChooser.content.activeSelf || paletteChooser.content.activeSelf || playerDropdownOpen ? 0f : 1f;
         public unsafe override Color? HeaderColor {
             get {
                 const int rngSeed = 2035767;
@@ -52,11 +52,11 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Serialized Variables
         [SerializeField] private InRoomSubmenuPanel defaultSelectedPanel;
-        [SerializeField] private PaletteChooser paletteChooser;
         [SerializeField] private AudioSource sfx, musicSource;
         [SerializeField] private List<InRoomSubmenuPanel> allPanels;
-        [SerializeField] private GameObject colorPalettePicker;
         [SerializeField] private PlayerListHandler playerListHandler;
+        [SerializeField] private PaletteChooser paletteChooser;
+        [SerializeField] private TeamChooser teamChooser;
         [SerializeField] private TMP_Text startGameButtonText;
         [SerializeField] private Clickable startGameButton;
 
@@ -73,8 +73,12 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public override void Initialize(MainMenuCanvas canvas) {
             base.Initialize(canvas);
+            foreach (var panel in allPanels) {
+                panel.Initialize();
+            }
             playerListHandler.Initialize();
             paletteChooser.Initialize();
+            teamChooser.Initialize();
 
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
@@ -107,6 +111,18 @@ namespace NSMB.UI.MainMenu.Submenus {
         public override bool TryGoBack(out bool playSound) {
             if (playerDropdownOpen) {
                 playerDropdownOpen.HideDropdown(false);
+                playSound = false;
+                return false;
+            }
+
+            if (teamChooser.content.activeSelf) {
+                teamChooser.Close(true);
+                playSound = false;
+                return false;
+            }
+
+            if (paletteChooser.content.activeSelf) {
+                paletteChooser.Close(true);
                 playSound = false;
                 return false;
             }

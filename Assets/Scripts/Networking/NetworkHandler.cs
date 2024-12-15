@@ -29,6 +29,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
     public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
+    public static QuantumGame Game => Runner == null ? null : Runner.Game;
     public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay { get; private set; }
@@ -262,6 +263,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         IsReplay = false;
         Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
+        Debug.Log(Settings.Instance.generalPalette);
         Runner.Game.AddPlayer(new RuntimePlayer {
             PlayerNickname = Settings.Instance.generalNickname ?? "noname",
             UserId = default(Guid).ToString(),

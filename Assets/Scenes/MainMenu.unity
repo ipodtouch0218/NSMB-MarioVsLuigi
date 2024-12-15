@@ -7300,81 +7300,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &179460437
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 179460440}
-  - component: {fileID: 179460439}
-  - component: {fileID: 179460438}
-  m_Layer: 5
-  m_Name: Overlay
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &179460438
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 179460437}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &179460439
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 179460437}
-  m_CullTransparentMesh: 1
---- !u!224 &179460440
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 179460437}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1086314064}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &182241348
 GameObject:
   m_ObjectHideFlags: 0
@@ -8353,81 +8278,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!1 &211373982
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 211373985}
-  - component: {fileID: 211373984}
-  - component: {fileID: 211373983}
-  m_Layer: 5
-  m_Name: Overlay
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &211373983
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211373982}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &211373984
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211373982}
-  m_CullTransparentMesh: 1
---- !u!224 &211373985
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211373982}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1439874740}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &211607854
 GameObject:
   m_ObjectHideFlags: 0
@@ -10203,15 +10053,15 @@ MonoBehaviour:
   useHeaderColor: 0
   headerColor: {r: 0, g: 0, b: 0, a: 0}
   defaultSelectedPanel: {fileID: 305467052}
-  paletteChooser: {fileID: 752484757}
   sfx: {fileID: 252585806}
   musicSource: {fileID: 895565995}
   allPanels:
   - {fileID: 560333881}
   - {fileID: 950123092}
   - {fileID: 305467052}
-  colorPalettePicker: {fileID: 752484754}
   playerListHandler: {fileID: 1295076279}
+  paletteChooser: {fileID: 1885872616}
+  teamChooser: {fileID: 501548763}
   startGameButtonText: {fileID: 778383190}
   startGameButton: {fileID: 1315080098}
 --- !u!82 &252585806
@@ -12582,7 +12432,7 @@ MonoBehaviour:
     type: 3}
   enabledCharacterButtonLogoColor: {r: 1, g: 1, b: 1, a: 1}
   disabledCharacterButtonLogoColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
-  paletteChooser: {fileID: 752484757}
+  paletteChooser: {fileID: 1885872616}
   spectateToggle: {fileID: 1370509651}
 --- !u!1 &307554752
 GameObject:
@@ -16612,7 +16462,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 412715809}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 501548763}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
+        m_MethodName: Open
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &412715809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17112,7 +16974,6 @@ GameObject:
   - component: {fileID: 425527737}
   - component: {fileID: 425527739}
   - component: {fileID: 425527736}
-  - component: {fileID: 425527735}
   m_Layer: 5
   m_Name: PaletteTemplate
   m_TagString: Untagged
@@ -17141,67 +17002,6 @@ RectTransform:
   m_AnchoredPosition: {x: 118, y: -34}
   m_SizeDelta: {x: 48, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &425527735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 425527733}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 566761500}
-          m_TargetAssemblyTypeName: UnityEngine.EventSystems.EventSystem, UnityEngine.UI
-          m_MethodName: SetSelectedGameObject
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 425527733}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 752484754}
-          m_TargetAssemblyTypeName: ColorChooser, Assembly-CSharp
-          m_MethodName: 
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 2
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 425527739}
-          m_TargetAssemblyTypeName: ColorButton, Assembly-CSharp
-          m_MethodName: OnPress
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!114 &425527736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17246,7 +17046,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 752484757}
+      - m_Target: {fileID: 1885872616}
         m_TargetAssemblyTypeName: NSMB.UI.MainMenu.PaletteChooser, Assembly-CSharp
         m_MethodName: SelectPalette
         m_Mode: 2
@@ -18325,7 +18125,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -265121226, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
+  m_Sprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -25307,6 +25107,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 501548762}
+  - component: {fileID: 501548763}
   m_Layer: 5
   m_Name: Team
   m_TagString: Untagged
@@ -25328,6 +25129,7 @@ RectTransform:
   m_Children:
   - {fileID: 201853782}
   - {fileID: 104213461}
+  - {fileID: 2133950544}
   m_Father: {fileID: 1649929047}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -25335,6 +25137,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 42}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &501548763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501548761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21b0aa69c428b246a67e4936109686f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
+  blockerTemplate: {fileID: 957537612}
+  content: {fileID: 2133950543}
+  buttons:
+  - {fileID: 1086314065}
+  - {fileID: 1789109366}
+  - {fileID: 2060928080}
+  - {fileID: 1439874741}
+  - {fileID: 1342071687}
+  button: {fileID: 412715808}
+  flag: {fileID: 1765738607}
+  disabledSprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
 --- !u!1 &502735012
 GameObject:
   m_ObjectHideFlags: 0
@@ -27440,7 +27266,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -8, y: -8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &574816554
 GameObject:
@@ -27475,7 +27301,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1729887815}
-  - {fileID: 2133950544}
   m_Father: {fileID: 823064026}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -32759,7 +32584,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -8, y: -8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &714972870
 GameObject:
@@ -34307,7 +34132,6 @@ GameObject:
   m_Component:
   - component: {fileID: 752484755}
   - component: {fileID: 752484756}
-  - component: {fileID: 752484757}
   m_Layer: 5
   m_Name: PaletteChooser
   m_TagString: Untagged
@@ -34355,29 +34179,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &752484757
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 752484754}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 300ee3ab81fb8c840847057fdbbc99fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canvas: {fileID: 2030938839}
-  template: {fileID: 425527733}
-  blockerTemplate: {fileID: 778243027}
-  content: {fileID: 1472937419}
-  clearSprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
-  baseSprite: {fileID: -265121226, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
-  defaultCharacter: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
-  selectOnClose: {fileID: 2125415777}
-  overallsImage: {fileID: 2092113832}
-  shirtImage: {fileID: 1240514306}
-  baseImage: {fileID: 449551563}
 --- !u!1 &755218106
 GameObject:
   m_ObjectHideFlags: 0
@@ -34884,7 +34685,6 @@ GameObject:
   - component: {fileID: 778243032}
   - component: {fileID: 778243031}
   - component: {fileID: 778243030}
-  - component: {fileID: 778243029}
   m_Layer: 5
   m_Name: Blocker
   m_TagString: Untagged
@@ -34911,35 +34711,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &778243029
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 778243027}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 752484757}
-          m_TargetAssemblyTypeName: NSMB.UI.MainMenu.ColorChooser, Assembly-CSharp
-          m_MethodName: Close
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
 --- !u!114 &778243030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34984,8 +34755,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 752484757}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.ColorChooser, Assembly-CSharp
+      - m_Target: {fileID: 1885872616}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.PaletteChooser, Assembly-CSharp
         m_MethodName: Close
         m_Mode: 6
         m_Arguments:
@@ -45681,81 +45452,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &920513010
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 920513013}
-  - component: {fileID: 920513012}
-  - component: {fileID: 920513011}
-  m_Layer: 5
-  m_Name: Overlay
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &920513011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920513010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &920513012
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920513010}
-  m_CullTransparentMesh: 1
---- !u!224 &920513013
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920513010}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1789109365}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &922932516
 GameObject:
   m_ObjectHideFlags: 0
@@ -46677,7 +46373,6 @@ GameObject:
   - component: {fileID: 957537617}
   - component: {fileID: 957537616}
   - component: {fileID: 957537615}
-  - component: {fileID: 957537614}
   m_Layer: 5
   m_Name: Blocker
   m_TagString: Untagged
@@ -46704,35 +46399,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &957537614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 957537612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1729887819}
-          m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
-          m_MethodName: Close
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
 --- !u!114 &957537615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46777,8 +46443,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1729887819}
-        m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
         m_MethodName: Close
         m_Mode: 6
         m_Arguments:
@@ -49608,7 +49274,6 @@ GameObject:
   - component: {fileID: 1086314063}
   - component: {fileID: 1086314065}
   - component: {fileID: 1086314060}
-  - component: {fileID: 1086314061}
   m_Layer: 5
   m_Name: Red Team
   m_TagString: Untagged
@@ -49634,7 +49299,7 @@ MonoBehaviour:
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 2060928075}
+    m_SelectOnRight: {fileID: 1789109361}
   m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 0.6117647, g: 0.6117647, b: 0.6117647, a: 1}
@@ -49660,8 +49325,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1729887819}
-        m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
+      - m_Target: {fileID: 501548763}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
@@ -49672,67 +49337,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1086314061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086314059}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 566761500}
-          m_TargetAssemblyTypeName: UnityEngine.EventSystems.EventSystem, UnityEngine.UI
-          m_MethodName: SetSelectedGameObject
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1086314059}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1729887819}
-          m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
-          m_MethodName: SelectTeam
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1086314065}
-            m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 2
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1086314065}
-          m_TargetAssemblyTypeName: TeamButton, Assembly-CSharp
-          m_MethodName: OnPress
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!222 &1086314063
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -49754,13 +49358,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1155845910}
-  - {fileID: 179460440}
   m_Father: {fileID: 2133950544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 22, y: -22}
-  m_SizeDelta: {x: 24, y: 24}
+  m_AnchoredPosition: {x: 36, y: -30}
+  m_SizeDelta: {x: 48, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1086314065
 MonoBehaviour:
@@ -49776,7 +49379,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlayUnpressed: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
   overlayPressed: {fileID: 590926491, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  overlay: {fileID: 179460438}
   flag: {fileID: 1155845908}
   index: 0
 --- !u!1 &1087430716
@@ -52557,7 +52159,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -8, y: -8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1158973466
 GameObject:
@@ -55102,7 +54704,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1240514304}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -57992,7 +57594,6 @@ GameObject:
   - component: {fileID: 1342071686}
   - component: {fileID: 1342071687}
   - component: {fileID: 1342071684}
-  - component: {fileID: 1342071683}
   m_Layer: 5
   m_Name: Magenta Team
   m_TagString: Untagged
@@ -58013,75 +57614,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1621248791}
-  - {fileID: 1838959176}
   m_Father: {fileID: 2133950544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 150, y: -22}
-  m_SizeDelta: {x: 24, y: 24}
+  m_AnchoredPosition: {x: 276, y: -30}
+  m_SizeDelta: {x: 48, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1342071683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1342071681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 566761500}
-          m_TargetAssemblyTypeName: UnityEngine.EventSystems.EventSystem, UnityEngine.UI
-          m_MethodName: SetSelectedGameObject
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1342071681}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1729887819}
-          m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
-          m_MethodName: SelectTeam
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1342071687}
-            m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 2
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1342071687}
-          m_TargetAssemblyTypeName: TeamButton, Assembly-CSharp
-          m_MethodName: OnPress
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!114 &1342071684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58126,8 +57665,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1729887819}
-        m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
+      - m_Target: {fileID: 501548763}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
@@ -58160,7 +57699,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlayUnpressed: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
   overlayPressed: {fileID: 590926491, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  overlay: {fileID: 1838959177}
   flag: {fileID: 1621248792}
   index: 4
 --- !u!1 &1348144973
@@ -62062,7 +61600,6 @@ GameObject:
   - component: {fileID: 1439874739}
   - component: {fileID: 1439874741}
   - component: {fileID: 1439874736}
-  - component: {fileID: 1439874737}
   m_Layer: 5
   m_Name: Yellow Team
   m_TagString: Untagged
@@ -62087,7 +61624,7 @@ MonoBehaviour:
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 1789109361}
+    m_SelectOnLeft: {fileID: 2060928075}
     m_SelectOnRight: {fileID: 1342071684}
   m_Transition: 0
   m_Colors:
@@ -62114,8 +61651,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1729887819}
-        m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
+      - m_Target: {fileID: 501548763}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
@@ -62126,67 +61663,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1439874737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1439874735}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 566761500}
-          m_TargetAssemblyTypeName: UnityEngine.EventSystems.EventSystem, UnityEngine.UI
-          m_MethodName: SetSelectedGameObject
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1439874735}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1729887819}
-          m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
-          m_MethodName: SelectTeam
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1439874741}
-            m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 2
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1439874741}
-          m_TargetAssemblyTypeName: TeamButton, Assembly-CSharp
-          m_MethodName: OnPress
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!222 &1439874739
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -62208,13 +61684,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2037723918}
-  - {fileID: 211373985}
   m_Father: {fileID: 2133950544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 118, y: -22}
-  m_SizeDelta: {x: 24, y: 24}
+  m_AnchoredPosition: {x: 216, y: -30}
+  m_SizeDelta: {x: 48, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1439874741
 MonoBehaviour:
@@ -62230,7 +61705,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlayUnpressed: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
   overlayPressed: {fileID: 590926491, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  overlay: {fileID: 211373983}
   flag: {fileID: 2037723916}
   index: 3
 --- !u!1 &1441003408
@@ -90991,10 +90465,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1342071682}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 24, y: 24}
+  m_SizeDelta: {x: -8, y: -8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1621248792
 MonoBehaviour:
@@ -91724,81 +91198,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1644367861}
   m_CullTransparentMesh: 1
---- !u!1 &1647821492
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1647821495}
-  - component: {fileID: 1647821494}
-  - component: {fileID: 1647821493}
-  m_Layer: 5
-  m_Name: Overlay
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1647821493
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1647821492}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1647821494
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1647821492}
-  m_CullTransparentMesh: 1
---- !u!224 &1647821495
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1647821492}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2060928079}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1649929046
 GameObject:
   m_ObjectHideFlags: 0
@@ -97321,8 +96720,6 @@ MonoBehaviour:
   canvas: {fileID: 0}
   blockerTemplate: {fileID: 957537612}
   content: {fileID: 2133950543}
-  disabledIcon: {fileID: 1762068881}
-  normalIcon: {fileID: 1623844676}
   buttons:
   - {fileID: 1086314065}
   - {fileID: 1789109366}
@@ -97331,6 +96728,7 @@ MonoBehaviour:
   - {fileID: 1342071687}
   button: {fileID: 1729887818}
   flag: {fileID: 1623844678}
+  disabledSprite: {fileID: 0}
 --- !u!114 &1729887820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99594,7 +98992,6 @@ GameObject:
   - component: {fileID: 1789109364}
   - component: {fileID: 1789109366}
   - component: {fileID: 1789109361}
-  - component: {fileID: 1789109362}
   m_Layer: 5
   m_Name: Green Team
   m_TagString: Untagged
@@ -99646,8 +99043,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1729887819}
-        m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
+      - m_Target: {fileID: 501548763}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
@@ -99658,67 +99055,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1789109362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1789109360}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 566761500}
-          m_TargetAssemblyTypeName: UnityEngine.EventSystems.EventSystem, UnityEngine.UI
-          m_MethodName: SetSelectedGameObject
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1789109360}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1729887819}
-          m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
-          m_MethodName: SelectTeam
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 1789109366}
-            m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 2
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1789109366}
-          m_TargetAssemblyTypeName: TeamButton, Assembly-CSharp
-          m_MethodName: OnPress
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!222 &1789109364
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -99740,13 +99076,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 572853954}
-  - {fileID: 920513013}
   m_Father: {fileID: 2133950544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 54, y: -22}
-  m_SizeDelta: {x: 24, y: 24}
+  m_AnchoredPosition: {x: 96, y: -30}
+  m_SizeDelta: {x: 48, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1789109366
 MonoBehaviour:
@@ -99762,7 +99097,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlayUnpressed: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
   overlayPressed: {fileID: 590926491, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  overlay: {fileID: 920513011}
   flag: {fileID: 572853952}
   index: 1
 --- !u!1 &1803362603
@@ -100796,81 +100130,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: -8, y: -5, z: -8, w: -5}
   m_Softness: {x: 0, y: 0}
---- !u!1 &1838959175
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1838959176}
-  - component: {fileID: 1838959178}
-  - component: {fileID: 1838959177}
-  m_Layer: 5
-  m_Name: Overlay
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1838959176
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1838959175}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1342071682}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1838959177
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1838959175}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1838959178
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1838959175}
-  m_CullTransparentMesh: 1
 --- !u!1 &1839972143
 GameObject:
   m_ObjectHideFlags: 0
@@ -105162,6 +104421,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1885872615}
+  - component: {fileID: 1885872616}
   m_Layer: 5
   m_Name: Palette
   m_TagString: Untagged
@@ -105191,6 +104451,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 42}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1885872616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885872614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 300ee3ab81fb8c840847057fdbbc99fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
+  template: {fileID: 425527733}
+  blockerTemplate: {fileID: 778243027}
+  content: {fileID: 752484754}
+  clearSprite: {fileID: -1713447182, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  baseSprite: {fileID: -265121226, guid: 7a1faa7275d22a548ba71177bba5eee2, type: 3}
+  defaultCharacter: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
+  selectOnClose: {fileID: 2125415777}
+  overallsImage: {fileID: 2092113832}
+  shirtImage: {fileID: 1240514306}
+  baseImage: {fileID: 449551563}
 --- !u!1001 &1888014261
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111644,10 +110927,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1439874740}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 24, y: 24}
+  m_SizeDelta: {x: -8, y: -8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2038675211
 GameObject:
@@ -112203,7 +111486,6 @@ GameObject:
   - component: {fileID: 2060928078}
   - component: {fileID: 2060928080}
   - component: {fileID: 2060928075}
-  - component: {fileID: 2060928076}
   m_Layer: 5
   m_Name: Blue Team
   m_TagString: Untagged
@@ -112255,8 +111537,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1729887819}
-        m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
+      - m_Target: {fileID: 501548763}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
@@ -112267,67 +111549,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &2060928076
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2060928074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 566761500}
-          m_TargetAssemblyTypeName: UnityEngine.EventSystems.EventSystem, UnityEngine.UI
-          m_MethodName: SetSelectedGameObject
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 2060928074}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 16
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1729887819}
-          m_TargetAssemblyTypeName: TeamChooser, Assembly-CSharp
-          m_MethodName: SelectTeam
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 2060928080}
-            m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 2
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2060928080}
-          m_TargetAssemblyTypeName: TeamButton, Assembly-CSharp
-          m_MethodName: OnPress
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!222 &2060928078
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -112349,13 +111570,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 714494079}
-  - {fileID: 1647821495}
   m_Father: {fileID: 2133950544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 86, y: -22}
-  m_SizeDelta: {x: 24, y: 24}
+  m_AnchoredPosition: {x: 156, y: -30}
+  m_SizeDelta: {x: 48, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2060928080
 MonoBehaviour:
@@ -112371,7 +111591,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overlayUnpressed: {fileID: 1360656184, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
   overlayPressed: {fileID: 590926491, guid: e8e1139e8fef253419394aa896aa1462, type: 3}
-  overlay: {fileID: 1647821493}
   flag: {fileID: 714494077}
   index: 2
 --- !u!1 &2066388143
@@ -112812,7 +112031,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2092113830}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -113707,8 +112926,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 752484757}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.ColorChooser, Assembly-CSharp
+      - m_Target: {fileID: 1885872616}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.PaletteChooser, Assembly-CSharp
         m_MethodName: Open
         m_Mode: 1
         m_Arguments:
@@ -113863,7 +113082,7 @@ GameObject:
   - component: {fileID: 2133950546}
   - component: {fileID: 2133950545}
   m_Layer: 5
-  m_Name: Teams
+  m_Name: TeamChooser
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113887,12 +113106,12 @@ RectTransform:
   - {fileID: 2060928079}
   - {fileID: 1439874740}
   - {fileID: 1342071682}
-  m_Father: {fileID: 574816555}
+  m_Father: {fileID: 501548762}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -6, y: 0}
-  m_SizeDelta: {x: 172, y: 44}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 316, y: 64}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &2133950545
 MonoBehaviour:
@@ -113938,15 +113157,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 10
-    m_Right: 10
-    m_Top: 10
+    m_Left: 12
+    m_Right: 16
+    m_Top: 6
     m_Bottom: 10
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 24, y: 24}
-  m_Spacing: {x: 8, y: 8}
+  m_CellSize: {x: 48, y: 48}
+  m_Spacing: {x: 12, y: 8}
   m_Constraint: 1
   m_ConstraintCount: 5
 --- !u!223 &2133950548
@@ -114001,7 +113220,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.5
 --- !u!222 &2133950550
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -1,4 +1,3 @@
-using NSMB.UI.Game;
 using Photon.Deterministic;
 using Quantum;
 using System.Linq;
@@ -42,6 +41,7 @@ namespace NSMB.UI.Game {
                 context.CullingCameraPositions.Add(position);
                 context.MaxCameraOrthoSize = FPMath.Max(context.MaxCameraOrthoSize, size);
             }
+
         }
 
         public unsafe void CheckForSpectatorUI(QuantumGame game, Frame f) {

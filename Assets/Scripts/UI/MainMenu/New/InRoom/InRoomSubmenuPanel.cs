@@ -17,6 +17,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private TMP_Text header;
         [SerializeField] private Color selectedColor, deselectedColor;
 
+        public virtual void Initialize() { }
+
         public virtual void Select(bool setDefault) {
             foreach (var hide in hideWhenNotSelected) {
                 hide.SetActive(true);

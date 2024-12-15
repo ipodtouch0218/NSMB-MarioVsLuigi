@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
@@ -243,6 +244,7 @@ namespace Quantum {
 
             datas[player] = newEntity;
             f.Events.PlayerAdded(f, player);
+            f.Events.PlayerDataChanged(f, player);
         }
 
         public void OnPlayerRemoved(Frame f, PlayerRef player) {

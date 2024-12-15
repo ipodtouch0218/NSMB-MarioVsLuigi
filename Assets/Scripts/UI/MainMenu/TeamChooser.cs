@@ -9,16 +9,33 @@ namespace NSMB.UI.MainMenu {
 
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
-        [SerializeField] private GameObject blockerTemplate, content, disabledIcon, normalIcon;
+        [SerializeField] private GameObject blockerTemplate;
+        [SerializeField] public GameObject content;
         [SerializeField] private TeamButton[] buttons;
         [SerializeField] private Button button;
         [SerializeField] private Image flag;
+        [SerializeField] private Sprite disabledSprite;
 
         //---Private Variables
         private GameObject blockerInstance;
+        private int selected;
+
+        public void Initialize() {
+            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
+            QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+        }
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+
+            if (NetworkHandler.Game != null) {
+                OnRulesChanged(new EventRulesChanged {
+                    Game = NetworkHandler.Game,
+                    Frame = NetworkHandler.Game.Frames.Predicted,
+                    LevelChanged = false,
+                    Tick = NetworkHandler.Game.Frames.Predicted.Number,
+                });
+            }
         }
 
         public void OnDisable() {
@@ -27,8 +44,6 @@ namespace NSMB.UI.MainMenu {
 
         public void SetEnabled(bool value) {
             button.interactable = value;
-            normalIcon.SetActive(value);
-            disabledIcon.SetActive(!value);
 
             if (value) {
                 OnColorblindModeChanged();
@@ -38,7 +53,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void SelectTeam(TeamButton team) {
-            int selected = team.index;
+            selected = team.index;
 
             QuantumGame game = NetworkHandler.Runner.Game;
             foreach (int slot in game.GetLocalPlayerSlots()) {
@@ -52,7 +67,6 @@ namespace NSMB.UI.MainMenu {
 
             TeamAsset teamScriptable = game.Configurations.Simulation.Teams[selected];
             flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
-
             canvas.PlayConfirmSound();
         }
 
@@ -67,12 +81,7 @@ namespace NSMB.UI.MainMenu {
             blockerInstance.SetActive(true);
             content.SetActive(true);
 
-            foreach (TeamButton button in buttons) {
-                button.OnDeselect(null);
-            }
-
             EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
-
             canvas.PlayCursorSound();
         }
 
@@ -91,13 +100,43 @@ namespace NSMB.UI.MainMenu {
         }
 
         private unsafe void OnColorblindModeChanged() {
-            QuantumGame game = NetworkHandler.Runner.Game;
-            Frame f = game.Frames.Predicted;
-            var playerData = QuantumUtils.GetPlayerData(f, game.GetLocalPlayers()[0]);
+            QuantumGame game = NetworkHandler.Game;
+            if (game == null) {
+                return;
+            }
 
-            TeamAsset[] teams = f.SimulationConfig.Teams;
-            int selected = playerData->Team % teams.Length;
-            flag.sprite = Settings.Instance.GraphicsColorblind ? teams[selected].spriteColorblind : teams[selected].spriteNormal;
+            Frame f = game.Frames.Predicted;
+            if (f.Global->Rules.TeamsEnabled) {
+                TeamAsset[] teams = f.SimulationConfig.Teams;
+                flag.sprite = Settings.Instance.GraphicsColorblind ? teams[selected].spriteColorblind : teams[selected].spriteNormal;
+            }
+        }
+
+        private unsafe void OnRulesChanged(EventRulesChanged e) {
+            Frame f = e.Frame;
+            if (f.Global->Rules.TeamsEnabled) {
+                TeamAsset team = f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length];
+                flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
+                button.interactable = true;
+            } else {
+                flag.sprite = disabledSprite;
+                button.interactable = false;
+            }
+        }
+
+        private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
+            if (!e.Game.PlayerIsLocal(e.Player)) {
+                return;
+            }
+
+            Frame f = e.Frame;
+            var playerData = QuantumUtils.GetPlayerData(f, e.Player);
+            selected = playerData->Team;
+
+            if (f.Global->Rules.TeamsEnabled) {
+                TeamAsset team = f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length];
+                flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
+            }
         }
     }
 }

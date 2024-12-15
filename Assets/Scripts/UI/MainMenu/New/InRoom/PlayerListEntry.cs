@@ -43,8 +43,10 @@ namespace NSMB.UI.MainMenu {
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
             ChatManager.OnChatMessage += OnChatMessage;
-            if (QuantumRunner.DefaultGame != null) {
-                UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
+
+            QuantumGame game = NetworkHandler.Game;
+            if (game != null) {
+                UpdateText(NetworkHandler.Game.Frames.Predicted);
             }
             dropdownOptions.SetActive(false);
         }
@@ -85,7 +87,7 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void SetPlayer(Frame f, PlayerRef player) {
             this.player = player;
-            RuntimePlayer runtimePlayer = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(player);
+            RuntimePlayer runtimePlayer = NetworkHandler.Game.Frames.Predicted.GetPlayerData(player);
             nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
             userId = runtimePlayer?.UserId;
             nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
@@ -175,7 +177,7 @@ namespace NSMB.UI.MainMenu {
                 option.SetActive(true);
             }
 
-            QuantumGame game = QuantumRunner.DefaultGame;
+            QuantumGame game = NetworkHandler.Game;
             bool adminOptions = false;
             foreach (PlayerRef localPlayer in game.GetLocalPlayers()) {
                 if (QuantumUtils.GetPlayerData(game.Frames.Predicted, localPlayer)->IsRoomHost) {
@@ -229,7 +231,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public unsafe void KickPlayer() {
-            var game = QuantumRunner.DefaultGame;
+            QuantumGame game = NetworkHandler.Game;
             PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
             if (game.PlayerIsLocal(host)) {
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
@@ -241,7 +243,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void MutePlayer() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = NetworkHandler.Game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             if (runtimePlayer != null) {
                 HashSet<string> mutedPlayers = ChatManager.Instance.mutedPlayers;
@@ -262,10 +264,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void PromotePlayer() {
-            QuantumRunner.DefaultGame.SendCommand(new CommandChangeHost {
+            QuantumGame game = NetworkHandler.Game;
+            game.SendCommand(new CommandChangeHost {
                 NewHost = player,
             });
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             if (runtimePlayer != null) {
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.player.promoted", ChatManager.Blue, "playername", runtimePlayer.PlayerNickname.ToValidUsername(f, player));
@@ -274,7 +277,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void CopyPlayerId() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            QuantumGame game = NetworkHandler.Game;
+            Frame f = game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
 
             TextEditor te = new() {
@@ -287,7 +291,9 @@ namespace NSMB.UI.MainMenu {
 
         //---Callbacks
         private void OnColorblindModeChanged() {
-            UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
+            if (NetworkHandler.Game != null) {
+                UpdateText(NetworkHandler.Game.Frames.Predicted);
+            }
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
