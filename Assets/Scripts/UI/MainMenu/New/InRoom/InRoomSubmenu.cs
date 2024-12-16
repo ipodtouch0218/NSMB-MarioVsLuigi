@@ -59,6 +59,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private TeamChooser teamChooser;
         [SerializeField] private TMP_Text startGameButtonText;
         [SerializeField] private Clickable startGameButton;
+        [SerializeField] private MainMenuChat mainMenuChat;
 
         //---Private Variables
         private InRoomSubmenuPanel selectedPanel;
@@ -79,6 +80,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             playerListHandler.Initialize();
             paletteChooser.Initialize();
             teamChooser.Initialize();
+            mainMenuChat.Initialize();
 
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
@@ -230,7 +232,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Callbacks
         private void OnPreviousPerformed(InputAction.CallbackContext context) {
-            if (!context.performed) {
+            if (!context.performed || playerDropdownOpen) {
                 return;
             }
 
@@ -238,7 +240,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private void OnNextPerformed(InputAction.CallbackContext context) {
-            if (!context.performed) {
+            if (!context.performed || playerDropdownOpen) {
                 return;
             }
 

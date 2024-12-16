@@ -8,19 +8,20 @@ namespace NSMB.Utils {
         public static PhotonHashtable DefaultRoomProperties => new() {
             [Enums.NetRoomProperties.IntProperties] = (int) IntegerProperties.Default,
             [Enums.NetRoomProperties.BoolProperties] = (int) BooleanProperties.Default,
-            //[Enums.NetRoomProperties.StageGuid] = 
+            [Enums.NetRoomProperties.StageGuid] = GlobalController.Instance.config.DefaultRules.Level.Id.ToString(),
         };
 
-        public static Dictionary<short, string> DisconnectMessages = new() {
+        public static Dictionary<short, string> RealtimeErrorCodes = new() {
             [ErrorCode.CustomAuthenticationFailed] = "ui.error.authentication",
             [ErrorCode.MaxCcuReached] = "ui.error.ccu",
 
             [ErrorCode.GameDoesNotExist] = "ui.error.join.notfound",
             [ErrorCode.GameClosed] = "ui.error.join.closed",
             [ErrorCode.GameFull] = "ui.error.join.full",
+            [ErrorCode.JoinFailedFoundActiveJoiner] = "ui.error.join.alreadyingame",
         };
 
-        public static Dictionary<DisconnectCause, string> DisconnectMessages2 = new() {
+        public static Dictionary<DisconnectCause, string> RealtimeDisconnectCauses = new() {
             [DisconnectCause.CustomAuthenticationFailed] = "ui.error.authentication",
             [DisconnectCause.MaxCcuReached] = "ui.error.ccu",
             [DisconnectCause.DnsExceptionOnConnect] = "ui.error.connection",

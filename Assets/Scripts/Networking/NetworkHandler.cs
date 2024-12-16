@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using NSMB.UI.MainMenu;
+using System.Text.RegularExpressions;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -25,7 +26,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         DisconnectCause.None, DisconnectCause.DisconnectByClientLogic
     };
 
-    //---Static
+    //---Static Variables
     public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
     public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
@@ -40,7 +41,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
     public static bool WasDisconnectedViaError { get; set; }
 
-    //---Private
+    //---Private Variables
     private RealtimeClient realtimeClient;
     private string lastRegion;
     private Coroutine pingUpdateCoroutine;
@@ -153,7 +154,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public static async Task ConnectToRoomsRegion(string roomId) {
-        int regionIndex = RoomIdValidChars.IndexOf(roomId[0]);
+        int regionIndex = RoomIdValidChars.IndexOf(roomId.ToUpper()[0]);
         string targetRegion = Regions.ElementAt(regionIndex).Code;
 
         if (Client.CurrentRegion != targetRegion) {
@@ -167,7 +168,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         StringBuilder idBuilder = new();
 
         // First char should correspond to region.
-        int index = Regions.Select(r => r.Code).IndexOf(r => r.Equals(Region, StringComparison.InvariantCultureIgnoreCase)); // Dirty linq hack
+        int index = Regions.IndexOf(r => r.Code.Equals(Region, StringComparison.InvariantCultureIgnoreCase)); // Dirty linq hack
         idBuilder.Append(RoomIdValidChars[index >= 0 ? index : 0]);
 
         // Fill rest of the string with random chars
@@ -191,8 +192,18 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         return await Client.CreateAndJoinRoomAsync(args, false);
     }
 
+    public static bool IsValidRoomId(string id) {
+        if (id.Length <= 0) {
+            return false;
+        }
+        id = id.ToUpper();
+        int regionIndex = RoomIdValidChars.IndexOf(id[0]);
+        return regionIndex >= 0 && regionIndex < Regions.Count() && Regex.IsMatch(id, $"[{RoomIdValidChars}]{{8}}");
+    }
+
     public static async Task<short> JoinRoom(EnterRoomArgs args) {
         // Change to region if we need to
+        args.RoomName = args.RoomName.ToUpper();
         await ConnectToRoomsRegion(args.RoomName);
 
         Debug.Log($"[Network] Attempting to join a game with the ID {args.RoomName}");
@@ -263,7 +274,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         IsReplay = false;
         Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
-        Debug.Log(Settings.Instance.generalPalette);
         Runner.Game.AddPlayer(new RuntimePlayer {
             PlayerNickname = Settings.Instance.generalNickname ?? "noname",
             UserId = default(Guid).ToString(),

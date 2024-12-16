@@ -35,7 +35,7 @@ public class SelectionCursor : MonoBehaviour {
             newObject = true;
         }
 
-        if (!current || !current.activeInHierarchy || current.layer == LayerMask.NameToLayer("UINoCursor")) {
+        if (!current || !current.activeInHierarchy || current.layer == LayerMask.NameToLayer("UINoCursor") || current.layer == LayerMask.NameToLayer("Default")) {
             image.enabled = false;
             hidden = true;
             return;

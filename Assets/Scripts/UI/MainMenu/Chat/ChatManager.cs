@@ -38,6 +38,7 @@ public class ChatManager : MonoBehaviour {
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+        QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
     }
 
     public void AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
@@ -113,5 +114,11 @@ public class ChatManager : MonoBehaviour {
     private void OnPlayerRemoved(EventPlayerRemoved e) {
         RuntimePlayer runtimeData = e.Frame.GetPlayerData(e.Player);
         AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(e.Frame, e.Player));
+    }
+
+    private void OnHostChanged(EventHostChanged e) {
+        if (e.Game.PlayerIsLocal(e.NewHost)) {
+            AddSystemMessage("ui.inroom.chat.hostreminder", Red);
+        }
     }
 }

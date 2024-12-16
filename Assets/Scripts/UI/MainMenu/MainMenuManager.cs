@@ -304,7 +304,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenErrorBox(short cause) {
-            OpenErrorBox(NetworkUtils.DisconnectMessages.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
+            OpenErrorBox(NetworkUtils.RealtimeErrorCodes.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"));
         }
 
         public void OpenErrorBox(string key, params string[] replacements) {
@@ -316,7 +316,7 @@ namespace NSMB.UI.MainMenu {
             if (replacements.Length == 0) {
                 replacements = new[] { "reason", GlobalController.Instance.translationManager.GetTranslation("ui.error.noreason") };
             }
-            OpenNetworkErrorBox(NetworkUtils.DisconnectMessages2.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"), replacements);
+            OpenNetworkErrorBox(NetworkUtils.RealtimeDisconnectCauses.GetValueOrDefault(cause, $"Unknown error (Code: {cause})"), replacements);
         }
 
         public void OpenNetworkErrorBox(string key, params string[] replacements) {

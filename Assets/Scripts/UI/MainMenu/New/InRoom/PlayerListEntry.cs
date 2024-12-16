@@ -7,7 +7,10 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering.UI;
 using UnityEngine.UI;
+using Button = UnityEngine.UI.Button;
+using Navigation = UnityEngine.UI.Navigation;
 
 namespace NSMB.UI.MainMenu {
     public class PlayerListEntry : MonoBehaviour, ISelectHandler {
@@ -25,12 +28,13 @@ namespace NSMB.UI.MainMenu {
 
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
+        [SerializeField] private PlayerListHandler handler;
         [SerializeField] private TMP_Text nameText, pingText, winsText, muteButtonText;
         [SerializeField] private Image colorStrip;
         [SerializeField] private RectTransform background;
         [SerializeField] private GameObject blockerTemplate, dropdownOptions, firstButton, chattingIcon, settingsIcon, readyIcon;
         [SerializeField] private LayoutElement layout;
-        [SerializeField] private GameObject[] allOptions, adminOnlyOptions, othersOnlyOptions;
+        [SerializeField] private Button[] allOptions, adminOnlyOptions, othersOnlyOptions;
         [SerializeField] private GameObject playerExistsGameObject;
 
         //---Private Variables
@@ -68,7 +72,6 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping, onlyIfActiveAndEnabled: true);
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
             playerExistsGameObject.SetActive(false);
-            joinTick = int.MaxValue;
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
@@ -173,8 +176,11 @@ namespace NSMB.UI.MainMenu {
                 Destroy(blockerInstance);
             }
 
-            foreach (var option in allOptions) {
-                option.SetActive(true);
+            foreach (var optionButton in allOptions) {
+                optionButton.gameObject.SetActive(true);
+                optionButton.navigation = new Navigation {
+                    mode = Navigation.Mode.Explicit,
+                };
             }
 
             QuantumGame game = NetworkHandler.Game;
@@ -187,16 +193,39 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (!adminOptions) {
-                foreach (var option in adminOnlyOptions) {
-                    option.SetActive(false);
+                foreach (var optionButton in adminOnlyOptions) {
+                    optionButton.gameObject.SetActive(false);
                 }
             }
 
             bool othersOptions = !game.PlayerIsLocal(player);
             if (!othersOptions) {
-                foreach (var option in othersOnlyOptions) {
-                    option.SetActive(false);
+                foreach (var optionButton  in othersOnlyOptions) {
+                    optionButton .gameObject.SetActive(false);
                 }
+            }
+
+            Button first = null;
+            Button previous = null;
+            foreach (var current in allOptions) {
+                if (!current.gameObject.activeSelf) {
+                    continue;
+                }
+                if (!first) {
+                    first = current;
+                }
+
+                // Update navigation.
+                if (previous) {
+                    Navigation previousNavigation = previous.navigation;
+                    previousNavigation.selectOnDown = current;
+                    previous.navigation = previousNavigation;
+
+                    Navigation currentNaviation = current.navigation;
+                    currentNaviation.selectOnUp = previous;
+                    current.navigation = currentNaviation;
+                }
+                previous = current;
             }
 
             Canvas.ForceUpdateCanvases();
@@ -208,7 +237,7 @@ namespace NSMB.UI.MainMenu {
             dropdownOptions.SetActive(true);
             PlayerEntryDropdownChanged?.Invoke(this, true);
 
-            EventSystem.current.SetSelectedGameObject(allOptions.First(go => go.activeSelf));
+            EventSystem.current.SetSelectedGameObject(first.gameObject);
             canvas.PlayCursorSound();
         }
 
@@ -307,11 +336,10 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            UpdateText(e.Frame);
-
             var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
             readyIcon.SetActive(playerData->IsReady);
             settingsIcon.SetActive(playerData->IsInSettings);
+            handler.UpdateAllPlayerEntries(e.Frame);
         }
 
         public void OnSelect(BaseEventData eventData) {

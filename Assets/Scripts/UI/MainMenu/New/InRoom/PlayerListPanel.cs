@@ -15,12 +15,12 @@ namespace NSMB.UI.MainMenu.Submenus {
         private int selectedIndex;
 
         public void OnEnable() {
-            playerList.PlayerRemoved += OnPlayerRemoved;
+            PlayerListHandler.PlayerRemoved += OnPlayerRemoved;
             PlayerListEntry.PlayerEntrySelected += OnPlayerEntrySelected;
         }
 
         public void OnDisable() {
-            playerList.PlayerRemoved -= OnPlayerRemoved;
+            PlayerListHandler.PlayerRemoved -= OnPlayerRemoved;
             PlayerListEntry.PlayerEntrySelected -= OnPlayerEntrySelected;
         }
 

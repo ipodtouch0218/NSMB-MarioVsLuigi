@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus {
     public class RoomListSubmenu : MainMenuSubmenu {
@@ -18,11 +19,19 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms;
         [SerializeField] private TMP_InputField usernameField;
         [SerializeField] private MainMenuSubmenu inRoomSubmenu;
+        [SerializeField] private RectTransform sideMenu;
 
         public override void Initialize(MainMenuCanvas canvas) {
             base.Initialize(canvas);
             NetworkHandler.StateChanged += OnClientStateChanged;
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
+        }
+
+        public void OnEnable() {
+            // This is needed for some bullshit where the "username" box
+            // has zero height in builds. But not in the editor.
+            // Because fuck you.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(sideMenu);
         }
 
         public void OnDestroy() {

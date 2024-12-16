@@ -9,8 +9,8 @@ namespace NSMB.UI.MainMenu {
     public class PlayerListHandler : MonoBehaviour {
 
         //---Events
-        public event Action<int> PlayerAdded;
-        public event Action<int> PlayerRemoved;
+        public static event Action<int> PlayerAdded;
+        public static event Action<int> PlayerRemoved;
 
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
@@ -27,6 +27,7 @@ namespace NSMB.UI.MainMenu {
                 playerListEntries.Add(Instantiate(template, template.transform.parent));
             }
 
+            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
@@ -80,6 +81,7 @@ namespace NSMB.UI.MainMenu {
         public void RemovePlayerEntry(Frame f, PlayerRef player) {
             PlayerListEntry existingEntry = GetPlayerEntry(player);
             if (existingEntry) {
+                PlayerRemoved?.Invoke(playerListEntries.IndexOf(existingEntry));
                 existingEntry.RemovePlayer();
                 UpdateAllPlayerEntries(f);
             }
@@ -91,9 +93,6 @@ namespace NSMB.UI.MainMenu {
             }
 
             ReorderEntries();
-            if (MainMenuManager.Instance) {
-                MainMenuManager.Instance.chat.UpdatePlayerColors();
-            }
         }
 
         public PlayerListEntry GetPlayerEntry(PlayerRef player) {
@@ -121,11 +120,13 @@ namespace NSMB.UI.MainMenu {
                 PlayerListEntry entry = playerListEntries[i];
                 entry.transform.SetAsLastSibling();
 
-                UnityEngine.UI.Navigation navigation = new();
-                if (i != 0) {
+                UnityEngine.UI.Navigation navigation = new() {
+                    mode = UnityEngine.UI.Navigation.Mode.Explicit,
+                };
+                if (i > 0) {
                     navigation.selectOnUp = playerListEntries[i - 1].button;
                 }
-                if (i != playerListEntries.Count - 1 && playerListEntries[i + 1].player.IsValid) {
+                if (i < playerListEntries.Count - 1 && playerListEntries[i + 1].player.IsValid) {
                     navigation.selectOnDown = playerListEntries[i + 1].button;
                 }
                 entry.button.navigation = navigation;
@@ -161,6 +162,10 @@ namespace NSMB.UI.MainMenu {
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
             RemoveAllPlayerEntries();
+        }
+
+        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
+            PopulatePlayerEntries(e.Frame);
         }
     }
 }

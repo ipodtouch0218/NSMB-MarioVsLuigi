@@ -26,6 +26,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         //---Serialized Variables
+        [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private RoomIcon roomIconPrefab;
         [SerializeField] private GameObject roomListScrollRect, privateRoomIdPrompt;
         [SerializeField] private TMP_Text filterRoomCountText;
@@ -40,10 +41,6 @@ namespace NSMB.UI.MainMenu {
 
         public void OnDestroy() {
             NetworkHandler.Client?.RemoveCallbackTarget(this);
-        }
-
-        public void OpenPrivateRoomPrompt() {
-            privateRoomIdPrompt.SetActive(true);
         }
 
         public void RefreshRooms() {
@@ -74,6 +71,13 @@ namespace NSMB.UI.MainMenu {
             roomIcon.UpdateUI(newRoomInfo);
 
             rooms[newRoomInfo.Name] = roomIcon;
+        }
+
+        public void JoinRoom(RoomIcon room) {
+            canvas.PlayConfirmSound();
+            _ = NetworkHandler.JoinRoom(new EnterRoomArgs {
+                RoomName = room.room.Name,
+            });
         }
 
         private void RemoveRoom(RoomIcon icon) {

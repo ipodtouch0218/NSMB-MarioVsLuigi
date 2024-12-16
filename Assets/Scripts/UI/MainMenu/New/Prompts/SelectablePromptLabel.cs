@@ -9,8 +9,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text label;
-        [SerializeField] private string translationKey;
         [SerializeField] private List<GameObject> selectionTargets;
+
+        [SerializeField] private bool changeText = true;
+        [SerializeField] private string translationKey;
         [SerializeField] private bool twoSided;
 
         //---Private Variables
@@ -31,16 +33,24 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void Select() {
-            if (twoSided) {
-                label.text = "» " + GlobalController.Instance.translationManager.GetTranslation(translationKey) + " «";
+            if (changeText) {
+                if (twoSided) {
+                    label.text = "» " + GlobalController.Instance.translationManager.GetTranslation(translationKey) + " «";
+                } else {
+                    label.text = "» " + GlobalController.Instance.translationManager.GetTranslation(translationKey);
+                }
             } else {
-                label.text = "» " + GlobalController.Instance.translationManager.GetTranslation(translationKey);
+                label.enabled = true;
             }
             selected = true;
         }
 
         public void Deselect() {
-            label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+            if (changeText) {
+                label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+            } else {
+                label.enabled = false;
+            }
             selected = false;
         }
     }

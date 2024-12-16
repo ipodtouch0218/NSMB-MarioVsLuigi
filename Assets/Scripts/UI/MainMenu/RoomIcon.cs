@@ -26,16 +26,11 @@ namespace NSMB.UI.MainMenu {
         public RoomInfo room;
 
         //---Serialized Variables
-        [SerializeField] private Color defaultColor, selectedColor;
         [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText, mapText;
         [SerializeField] private Image icon;
 
         public void OnValidate() {
             this.SetIfNull(ref icon);
-        }
-
-        public void Start() {
-            Unselect();
         }
 
         public void UpdateUI(RoomInfo newRoomInfo) {
@@ -53,7 +48,7 @@ namespace NSMB.UI.MainMenu {
             IntegerProperties intProperties = (IntegerProperties) packedIntProperties;
             BooleanProperties boolProperties = (BooleanProperties) packedBoolProperties;
 
-            playersText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.players", "players", room.PlayerCount.ToString(), "maxplayers", room.MaxPlayers.ToString());
+            playersText.text = $"{room.PlayerCount}/{room.MaxPlayers}";
             inProgressText.text = boolProperties.GameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
 
             StringBuilder symbols = new();
@@ -79,7 +74,7 @@ namespace NSMB.UI.MainMenu {
             symbolsText.text = symbols.ToString();
 
             string stageName;
-            if (AssetGuid.TryParse(stageAssetGuid, out AssetGuid guid, false)
+            if (stageAssetGuid != null && AssetGuid.TryParse(stageAssetGuid, out AssetGuid guid, false)
                 && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<Map>(guid), out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
@@ -87,15 +82,7 @@ namespace NSMB.UI.MainMenu {
             } else {
                 stageName = "???";
             }
-            mapText.text = tm.GetTranslation("ui.rooms.listing.map");
-        }
-
-        public void Select() {
-            icon.color = selectedColor;
-        }
-
-        public void Unselect() {
-            icon.color = defaultColor;
+            mapText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.map", "map", stageName);
         }
     }
 }

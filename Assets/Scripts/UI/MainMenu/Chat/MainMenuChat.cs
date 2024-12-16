@@ -23,23 +23,27 @@ namespace NSMB.UI.MainMenu {
         private readonly List<ChatMessage> chatMessages = new();
         private int previousTextLength;
 
-        public void Start() {
+        public void Initialize() {
             ChatManager.OnChatMessage += OnChatMessage;
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             PlayerListEntry.PlayerMuteStateChanged += OnPlayerMuteStateChanged;
+            PlayerListHandler.PlayerAdded += OnPlayerListEntryAddedOrRemoved;
+            PlayerListHandler.PlayerRemoved += OnPlayerListEntryAddedOrRemoved;
             OnDisableChatChanged();
             messagePrefab.gameObject.SetActive(false);
 
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
-            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
         }
 
         public void OnDestroy() {
             ChatManager.OnChatMessage -= OnChatMessage;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            PlayerListHandler.PlayerAdded -= OnPlayerListEntryAddedOrRemoved;
+            PlayerListHandler.PlayerRemoved -= OnPlayerListEntryAddedOrRemoved;
         }
 
         public void UpdatePlayerColors() {
@@ -193,6 +197,10 @@ namespace NSMB.UI.MainMenu {
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
             ClearChat();
+        }
+
+        private void OnPlayerListEntryAddedOrRemoved(int index) {
+            UpdatePlayerColors();
         }
     }
 }
