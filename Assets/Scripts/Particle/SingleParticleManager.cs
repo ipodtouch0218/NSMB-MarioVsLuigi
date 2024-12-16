@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SingleParticleManager : MonoBehaviour {
+public class SingleParticleManager : Singleton<SingleParticleManager> {
 
+    //---Serialized Variables
     [SerializeField] private ParticlePair[] serializedSystems;
-    private Dictionary<Enums.Particle, ParticleSystem> systems;
-    private Dictionary<Enums.Particle, ParticlePair> pairs;
+
+    //---Private Variables
+    private Dictionary<ParticleEffect, ParticlePair> pairs;
 
     public void Start() {
-        systems = serializedSystems.ToDictionary(pp => pp.particle, pp => pp.system);
+        Set(this, false);
         pairs = serializedSystems.ToDictionary(pp => pp.particle, pp => pp);
     }
 
-    public void Play(Enums.Particle particle, Vector3 position, Color? color = null, float rot = 0) {
-        if (!systems.ContainsKey(particle))
+    public void Play(ParticleEffect particle, Vector3 position, Color? color = null, float rot = 0) {
+        if (particle == ParticleEffect.None 
+            || !pairs.TryGetValue(particle, out ParticlePair pair)) {
             return;
-
-        ParticleSystem system = systems[particle];
-        ParticlePair pair = pairs[particle];
+        }
 
         ParticleSystem.EmitParams emitParams = new() {
             position = position,
@@ -27,15 +28,16 @@ public class SingleParticleManager : MonoBehaviour {
             applyShapeToPosition = true,
         };
 
-        if (color.HasValue)
+        if (color.HasValue) {
             emitParams.startColor = color.Value;
+        }
 
-        system.Emit(emitParams, UnityEngine.Random.Range(pair.particleMin, pair.particleMax + 1));
+        pair.system.Emit(emitParams, UnityEngine.Random.Range(pair.particleMin, pair.particleMax + 1));
     }
 
     [Serializable]
     public struct ParticlePair {
-        public Enums.Particle particle;
+        public ParticleEffect particle;
         public ParticleSystem system;
         public int particleMin, particleMax;
     }

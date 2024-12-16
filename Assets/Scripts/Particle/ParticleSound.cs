@@ -1,29 +1,44 @@
+using NSMB.Extensions;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ParticleSound : MonoBehaviour {
 
     //---Serialized Variables
-    [SerializeField] private ParticleSystem system;
+    [SerializeField] private List<ParticleSystem> systems;
     [SerializeField] private LoopingSoundPlayer sfx;
 
     public void OnValidate() {
-        if (!system) system = GetComponent<ParticleSystem>();
-        if (!sfx) sfx = GetComponent<LoopingSoundPlayer>();
+        this.SetIfNull(ref sfx);
+        if (systems == null || systems.Count == 0) {
+            GetComponentsInChildren(systems);
+        }
     }
 
-    public void Awake() {
+    public void Start() {
         OnValidate();
     }
 
     public void Update() {
-        if (!system || !sfx) {
+        if (systems == null || !sfx) {
             enabled = false;
             return;
         }
 
-        if (system.isEmitting && !sfx.IsPlaying)
-            sfx.Play();
-        if (!system.isEmitting && sfx.IsPlaying)
-            sfx.Stop();
+        sfx.Source.enabled = Time.deltaTime != 0;
+
+        if (sfx.Source.enabled) {
+            foreach (ParticleSystem system in systems) {
+                if (system.isEmitting) {
+                    if (!sfx.IsPlaying) {
+                        sfx.Play();
+                    }
+                    return;
+                }
+            }
+            if (sfx.IsPlaying) {
+                sfx.Stop();
+            }
+        }
     }
 }

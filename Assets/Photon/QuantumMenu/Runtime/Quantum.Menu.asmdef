@@ -1,0 +1,35 @@
+{
+    "name": "Quantum.Menu",
+    "rootNamespace": "",
+    "references": [
+        "Quantum.Simulation",
+        "Quantum.Unity",
+        "Photon.Realtime",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_TEXTMESHPRO"
+        },
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "QUANTUM_ENABLE_TEXTMESHPRO"
+        },
+        {
+            "name": "com.unity.multiplayer.playmode",
+            "expression": "0.6",
+            "define": "QUANTUM_ENABLE_MPPM"
+        }
+    ],
+    "noEngineReferences": false
+}

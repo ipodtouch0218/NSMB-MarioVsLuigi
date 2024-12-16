@@ -1,0 +1,23 @@
+component Koopa {
+	asset_ref<PowerupAsset> SpawnPowerupWhenStomped;
+	bool DontWalkOfLedges;
+	bool IsSpiny;
+	FP Speed;
+	FP KickSpeed;
+	FPVector2 IceBlockInShellSize;
+	FPVector2 IceBlockOutShellSize;
+
+	[ExcludeFromPrototype] byte Combo;
+	[ExcludeFromPrototype] FP CurrentSpeed;
+	[ExcludeFromPrototype] bool IsInShell;
+	[ExcludeFromPrototype] bool IsFlipped;
+	[ExcludeFromPrototype] bool IsKicked;
+	[ExcludeFromPrototype] ushort WakeupFrames;
+	[ExcludeFromPrototype] byte TurnaroundWaitFrames;
+}
+
+event KoopaKicked {
+	nothashed Frame Frame;
+	EntityRef Entity;
+	bool Groundpounded;
+}

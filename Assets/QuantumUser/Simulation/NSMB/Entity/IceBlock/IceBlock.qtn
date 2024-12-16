@@ -1,0 +1,21 @@
+import enum IceBlockBreakReason(byte);
+import enum LiquidType(byte);
+
+component IceBlock {
+	FP SlidingSpeed;
+	[ExcludeFromPrototype] entity_ref Entity;
+	[ExcludeFromPrototype] FPVector2 Size;
+	[ExcludeFromPrototype] FPVector2 ChildOffset;
+	[ExcludeFromPrototype] bool IsFlying;
+	[ExcludeFromPrototype] bool IsSliding;
+	[ExcludeFromPrototype] bool FacingRight;
+	[ExcludeFromPrototype] byte AutoBreakFrames;
+	[ExcludeFromPrototype] LiquidType InLiquidType;
+}
+
+signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason);
+
+event IceBlockSinking {
+	EntityRef Entity;
+	LiquidType LiquidType;
+}

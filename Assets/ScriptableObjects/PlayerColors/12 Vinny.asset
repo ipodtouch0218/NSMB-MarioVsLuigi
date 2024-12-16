@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: 12 Vinny
   m_EditorClassIdentifier: 
   colors:
-  - player: {fileID: 11400000, guid: 8e33573d2c2ae7c4682fc6cdb5ea28cd, type: 2}
+  - character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
     shirtColor: {r: 0.9176471, g: 0.49411768, b: 0.2392157, a: 1}
     overallsColor: {r: 0.27058825, g: 0.5019608, b: 0.4666667, a: 1}
     hatUsesOverallsColor: 0
-  - player: {fileID: 11400000, guid: b2fa1a1976f2df64db4baf42a0906e15, type: 2}
+  - character: {fileID: 11400000, guid: 20241e3c68674eb4dbb58f063d01cfd2, type: 2}
     shirtColor: {r: 0.5019608, g: 0.23529413, b: 0.15686275, a: 1}
     overallsColor: {r: 0.3803922, g: 0.36862746, b: 0.6, a: 1}
     hatUsesOverallsColor: 0

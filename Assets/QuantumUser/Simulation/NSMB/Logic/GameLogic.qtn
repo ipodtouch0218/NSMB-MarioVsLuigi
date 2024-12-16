@@ -1,0 +1,99 @@
+#pragma max_players 10
+
+global {
+	GameRules Rules;	
+	GameState GameState;
+	int StartFrame;
+	int TotalGamesPlayed;
+	ushort GameStartFrames;
+	ushort PlayerLoadFrames;
+
+	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
+	byte RealPlayers;
+	byte TotalMarios;
+}
+
+struct GameRules {
+	asset_ref<Map> Level;
+
+	byte StarsToWin;
+	byte CoinsForPowerup;
+	byte Lives;
+	ushort TimerSeconds;
+
+	bool TeamsEnabled;
+	bool CustomPowerupsEnabled;
+	bool DrawOnTimeUp;
+}
+
+enum GameState : Byte {
+    PreGameRoom,
+    WaitingForPlayers,
+    Starting,
+    Playing,
+    Ended
+}
+
+signal OnLoadingComplete();
+signal OnGameStarting();
+signal OnGameEnding(int winningTeam, bool hasWinner);
+signal OnReturnToRoom();
+
+synced event GameStateChanged {
+	Frame Frame;
+	GameState NewState;
+}
+
+synced event PlayerAdded {
+	Frame Frame;
+	PlayerRef Player;
+}
+
+synced event PlayerRemoved {
+	Frame Frame;
+	PlayerRef Player;
+}
+
+event PlayerDataChanged {
+	nothashed Frame Frame;
+	PlayerRef Player;
+}
+
+event StartingCountdownChanged {
+	nothashed Frame Frame;
+	bool IsGameStarting;
+}
+
+event CountdownTick {
+	nothashed Frame Frame;
+	int SecondsRemaining;
+}
+
+synced event HostChanged {
+	Frame Frame;
+	PlayerRef NewHost;
+}
+
+synced event RulesChanged {
+	Frame Frame;
+	bool LevelChanged;
+}
+
+synced event PlayerLoaded {
+	Frame Frame;
+	PlayerRef Player;
+}
+
+synced event RecordingStarted {
+	Frame Frame;
+}
+
+synced event GameStarted {
+	Frame Frame;
+}
+
+synced event GameEnded {
+	Frame Frame;
+	int WinningTeam;
+	bool HasWinner;
+}

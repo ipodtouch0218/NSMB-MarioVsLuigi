@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using NSMB.Extensions;
 
 namespace NSMB.Translation {
 
@@ -18,7 +19,7 @@ namespace NSMB.Translation {
         }
 
         public void OnValidate() {
-            if (!text) text = GetComponent<TMP_Text>();
+            this.SetIfNull(ref text);
         }
 
         public void OnEnable() {

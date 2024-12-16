@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e6aa951566f17244a0b6ee83dbefe12, type: 3}
+  m_Name: 0 Red
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Teams/0 Red
+    Guid:
+      Value: 382742106279861433
+  id: 0
+  nameTranslationKey: team.red
+  textSpriteNormal: <sprite name=team_red>
+  textSpriteColorblind: <sprite name=team_red_alt>
+  textSpriteColorblindBig: <sprite name=team_red_alt_big>
+  color: {r: 1, g: 0, b: 0, a: 0}
+  spriteNormal: {fileID: -2128578925, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}
+  spriteColorblind: {fileID: 240843622, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}

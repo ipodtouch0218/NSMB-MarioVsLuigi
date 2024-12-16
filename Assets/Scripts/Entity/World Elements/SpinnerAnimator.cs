@@ -1,56 +1,44 @@
+using NSMB.Extensions;
+using Quantum;
 using UnityEngine;
 
-using Fusion;
+public unsafe class SpinnerAnimator : MonoBehaviour {
 
-namespace NSMB.Entities.World {
+    //---Serialized Variables
+    [SerializeField] private QuantumEntityView entity;
+    [SerializeField] private Transform rotator;
+    [SerializeField] private AudioSource sfx;
+    [SerializeField] private GameObject launchParticlePrefab;
 
-    public class SpinnerAnimator : NetworkBehaviour, IBeforeTick {
+    public void OnValidate() {
+        this.SetIfNull(ref sfx);
+    }
 
-        //---Networked Variables
-        [Networked] public float ArmPosition { get; set; }
-        [Networked] public NetworkBool HasPlayer { get; set; }
+    public void Start() {
+        QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner, NetworkHandler.FilterOutReplayFastForward);
+        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+    }
 
-        //---Serialized Variables
-        [SerializeField] private Transform topArmBone;
-        [SerializeField] private BoxCollider2D hitbox;
-        [SerializeField] private float idleSpinSpeed = -100, fastSpinSpeed = -1800, pressSpeed = 0.5f, acceleration = 1350f;
+    public void OnUpdateView(CallbackUpdateView e) {
+        QuantumGame game = e.Game;
+        Frame f = game.Frames.Predicted;
+        Frame fp = game.Frames.PredictedPrevious;
 
-        //---Public Variables
-        public float spinSpeed;
-
-        //---Private Variables
-        private PropertyReader<float> armPositionPropertyReader;
-
-        public override void Spawned() {
-            armPositionPropertyReader = GetPropertyReader<float>(nameof(ArmPosition));
-            if (Runner.Topology == Topologies.ClientServer) {
-                Runner.SetIsSimulated(Object, true);
-            }
+        if (!f.Unsafe.TryGetPointer(entity.EntityRef, out Spinner* spinner)
+            || !fp.Unsafe.TryGetPointer(entity.EntityRef, out Spinner* spinnerPrev)) {
+            return;
         }
 
-        public void BeforeTick() {
-            HasPlayer = false;
-            hitbox.transform.localPosition = new(0, ArmPosition * -0.084f, 0);
-            Physics2D.SyncTransforms();
+        float rotation = Mathf.LerpAngle(spinnerPrev->Rotation.AsFloat, spinner->Rotation.AsFloat, game.InterpolationFactor); 
+        rotator.localRotation = Quaternion.Euler(0, rotation, 0);
+    }
+
+    public void OnMarioPlayerUsedSpinner(EventMarioPlayerUsedSpinner e) {
+        if (e.Spinner != entity.EntityRef) {
+            return;
         }
 
-        public override void Render() {
-            float armRenderPosition;
-            if (TryGetSnapshotsBuffers(out var from, out var to, out float alpha)) {
-                (float fromPosition, float toPosition) = armPositionPropertyReader.Read(from, to);
-                armRenderPosition = Mathf.Lerp(fromPosition, toPosition, alpha);
-            } else {
-                armRenderPosition = ArmPosition;
-            }
-
-            spinSpeed = Mathf.MoveTowards(spinSpeed, HasPlayer ? fastSpinSpeed : idleSpinSpeed, Time.deltaTime * acceleration);
-            topArmBone.eulerAngles += spinSpeed * Time.deltaTime * Vector3.up;
-            topArmBone.localPosition = new(0, armRenderPosition * -0.084f, 0);
-        }
-
-        public override void FixedUpdateNetwork() {
-            ArmPosition = Mathf.MoveTowards(ArmPosition, HasPlayer ? 1 : 0, pressSpeed * Runner.DeltaTime);
-            hitbox.transform.localPosition = new(0, ArmPosition * -0.084f, 0);
-        }
+        sfx.PlayOneShot(SoundEffect.World_Spinner_Launch);
+        Instantiate(launchParticlePrefab, transform.position, Quaternion.identity);
     }
 }

@@ -76,6 +76,7 @@ PlayerSettings:
   androidMinimumWindowWidth: 400
   androidMinimumWindowHeight: 300
   androidFullscreenMode: 1
+  androidAutoRotationBehavior: 1
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
   runInBackground: 1
@@ -136,6 +137,8 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
+  visionOSBundleVersion: 1.0
+  tvOSBundleVersion: 1.0
   bundleVersion: 1.8.0.0
   preloadedAssets: []
   metroInputSource: 0
@@ -231,6 +234,7 @@ PlayerSettings:
   iOSMetalForceHardShadows: 0
   metalEditorSupport: 1
   metalAPIValidation: 1
+  metalCompileShaderBinary: 0
   iOSRenderExtraFrameOnPause: 0
   iosCopyPluginsCodeInsteadOfSymlink: 0
   appleDeveloperTeamID: 
@@ -804,23 +808,25 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: 
+    Android: QUANTUM_XY
     CloudRendering: 
-    EmbeddedLinux: 
-    GameCoreScarlett: 
-    GameCoreXboxOne: 
+    EmbeddedLinux: QUANTUM_XY
+    GameCoreScarlett: QUANTUM_XY
+    GameCoreXboxOne: QUANTUM_XY
+    LinuxHeadlessSimulation: QUANTUM_XY
     Lumin: 
-    Nintendo Switch: 
-    PS4: 
-    PS5: 
-    QNX: 
-    Stadia: 
-    Standalone: FUSION_WEAVER;FUSION2
-    WebGL: FUSION_WEAVER;FUSION2
-    Windows Store Apps: FUSION_WEAVER
-    XboxOne: 
-    iPhone: 
-    tvOS: 
+    Nintendo Switch: QUANTUM_XY
+    PS4: QUANTUM_XY
+    PS5: QUANTUM_XY
+    QNX: QUANTUM_XY
+    Stadia: QUANTUM_XY
+    Standalone: QUANTUM_DISABLE_AI;QUANTUM_XY
+    VisionOS: QUANTUM_XY
+    WebGL: FUSION_WEAVER;FUSION2;QUANTUM_XY
+    Windows Store Apps: FUSION_WEAVER;QUANTUM_XY
+    XboxOne: QUANTUM_XY
+    iPhone: QUANTUM_XY
+    tvOS: QUANTUM_XY
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -864,6 +870,7 @@ PlayerSettings:
   metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628,
     a: 1}
   metroSplashScreenUseBackgroundColor: 0
+  syncCapabilities: 0
   platformCapabilities:
     WindowsStoreApps:
       InternetClient: True

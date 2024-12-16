@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e6aa951566f17244a0b6ee83dbefe12, type: 3}
+  m_Name: 1 Green
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Teams/1 Green
+    Guid:
+      Value: 423273233552518485
+  id: 1
+  nameTranslationKey: team.green
+  textSpriteNormal: <sprite name=team_green>
+  textSpriteColorblind: <sprite name=team_green_alt>
+  textSpriteColorblindBig: <sprite name=team_green_alt_big>
+  color: {r: 0, g: 1, b: 0, a: 0}
+  spriteNormal: {fileID: 633495312, guid: 94f77c37e4043774192b995a80f2ceec, type: 3}
+  spriteColorblind: {fileID: -1444108346, guid: 94f77c37e4043774192b995a80f2ceec,
+    type: 3}

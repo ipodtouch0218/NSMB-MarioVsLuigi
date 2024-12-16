@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a77651c98eb177748a49241e377f4457, type: 3}
+  m_Name: 1-Up
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Powerups/1-Up
+    Guid:
+      Value: 421291512996345105
+  Type: 0
+  State: 0
+  Prefab:
+    Id:
+      Value: 0
+  SoundPlaysEverywhere: 0
+  SoundEffect: 78
+  BlockSpawnSoundEffectEffect: 69
+  SpawnChance:
+    RawValue: 0
+  LosingSpawnBonus:
+    RawValue: 0
+  BigPowerup: 0
+  VerticalPowerup: 0
+  CustomPowerup: 1
+  LivesOnlyPowerup: 1
+  ReserveSprite: {fileID: 0}
+  AvoidPlayers: 0
+  Speed:
+    RawValue: 0
+  BounceStrength:
+    RawValue: 0
+  TerminalVelocity:
+    RawValue: -524288
+  FollowAnimationCurve: 0
+  AnimationCurveX:
+    Samples: []
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys: []
+  AnimationCurveY:
+    Samples: []
+    PreWrapMode: 0
+    PostWrapMode: 0
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 0
+    OriginalPostWrapMode: 0
+    Keys: []
+  StatePriority: -1
+  ItemPriority: -1

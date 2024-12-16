@@ -8,11 +8,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace ExitGames.Client.Photon
+namespace Photon.Client
 {
     using System;
     using System.Text;
-    using ExitGames.Client.Photon;
 
     #if UNITY_WEBGL && !UNITY_EDITOR
     using System.Runtime.InteropServices;
@@ -31,7 +30,7 @@ namespace ExitGames.Client.Photon
         /// <summary>Photon uses this to agree on a serialization protocol. Either: GpBinaryV16 or GpBinaryV18. Based on enum SerializationProtocol.</summary>
         private string protocols = "GpBinaryV16";
 
-        public Action<DebugLevel, string> DebugReturn { get; set; }
+        public Action<LogLevel, string> DebugReturn { get; set; }
 
         public WebSocket(Uri url, string proxyAddress, string protocols = null)
         {
@@ -155,17 +154,17 @@ namespace ExitGames.Client.Photon
                                       {
                                           case WebSocketSharp.LogLevel.Trace:
                                           case WebSocketSharp.LogLevel.Debug:
-                                              DebugReturn(DebugLevel.ALL, s);
+                                              DebugReturn(LogLevel.Debug, s);
                                               break;
                                           case WebSocketSharp.LogLevel.Info:
-                                              DebugReturn(DebugLevel.INFO, s);
+                                              DebugReturn(LogLevel.Info, s);
                                               break;
                                           case WebSocketSharp.LogLevel.Warn:
-                                              DebugReturn(DebugLevel.WARNING, s);
+                                              DebugReturn(LogLevel.Warning, s);
                                               break;
                                           case WebSocketSharp.LogLevel.Error:
                                           case WebSocketSharp.LogLevel.Fatal:
-                                              DebugReturn(DebugLevel.ERROR, s);
+                                              DebugReturn(LogLevel.Error, s);
                                               break;
                                       }
                                   };

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: KoopaRed
+  m_Controller: {fileID: 9100000, guid: ceceee3f37dacee4bbc211ca77b3e26a, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 4b27b963d23495540ba625759e99f981, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: a064ba5a283f38e4880b77a16452aa64, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 4e381ca2ecbbd634dbfcfcc3abc52a38, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: cf688b012a2c1524ab507da2232caddb, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: d8a0fe8d54165814a8af74569b1db76e, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: e3b2a70de75f066469fe5cf368b1fc34, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 0b851e0932baf7844a9b18f9f4ddd620, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 848abbbd389d8b246a7f15a6c5407065, type: 2}

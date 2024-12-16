@@ -1,0 +1,8 @@
+#define _1_10 1.1
+
+component PiranhaPlant {
+	entity_ref Pipe;
+	[ExcludeFromPrototype] byte WaitingFrames;
+	[ExcludeFromPrototype] byte ChompFrames;
+	[ExcludeFromPrototype] FP PopupAnimationTime;
+}

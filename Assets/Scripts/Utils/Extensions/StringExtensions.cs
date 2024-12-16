@@ -1,7 +1,7 @@
+using NSMB.UI.MainMenu;
+using Quantum;
 using System.Text.RegularExpressions;
 using UnityEngine;
-
-using NSMB.UI.MainMenu;
 
 namespace NSMB.Utils {
     public static class StringExtensions {
@@ -14,25 +14,24 @@ namespace NSMB.Utils {
             return input;
         }
 
-        public static bool IsValidUsername(this string input, bool allowDiscriminator = true) {
+        private static string UsernameRegex = null;
+        public static bool IsValidUsername(this string input) {
             if (input == null) {
                 return false;
             }
 
-            string count = MainMenuManager.NicknameMin + "," + MainMenuManager.NicknameMax;
-            return Regex.IsMatch(input, "^[0-9A-Za-z]{" + count + "}" + (allowDiscriminator ? "(\\([0-9]\\))?" : "") + "$");
+            UsernameRegex ??= $"^[0-9A-Za-z]{{{MainMenuManager.NicknameMin},{MainMenuManager.NicknameMax}}}";
+            return Regex.IsMatch(input, UsernameRegex);
         }
 
-        public static string ToValidUsername(this string input, bool discrim = true) {
+        public static unsafe string ToValidUsername(this string input, Frame f, PlayerRef player, bool discrim = true) {
             input ??= "";
 
-            string discriminator = input?.Length >= 3 ? input[^3..] : "";
-
             // Valid characters
-            input = Regex.Replace(input, @"(\([0-9]\))|[^A-Za-z0-9]", "");
+            input = Regex.Replace(input, @"[^A-Za-z0-9]", "");
 
             // Name character maximum
-            input = input.Substring(0, Mathf.Min(input.Length, MainMenuManager.NicknameMax));
+            input = input[..Mathf.Min(input.Length, MainMenuManager.NicknameMax)];
 
             // Name character minimum
             if (input.Length < MainMenuManager.NicknameMin) {
@@ -42,8 +41,33 @@ namespace NSMB.Utils {
             // Name filtering
             input = input.Filter();
 
-            if (discrim && Regex.IsMatch(discriminator, @"^\([0-9]\)$")) {
-                input += discriminator;
+            // Discriminator
+            if (discrim) {
+                int discriminator = 0;
+                PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
+                if (ourPlayerData != null) {
+                    var filter = f.Filter<PlayerData>();
+                    while (filter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
+                        if (otherPlayerData->PlayerRef == player) {
+                            // Ignore ourselves
+                            continue;
+                        }
+
+                        if (otherPlayerData->JoinTick > ourPlayerData->JoinTick) {
+                            // Ignore players that joined after us
+                            continue;
+                        }
+
+                        RuntimePlayer otherRuntimePlayer = f.GetPlayerData(otherPlayerData->PlayerRef);
+                        if (otherRuntimePlayer.PlayerNickname.Filter().Equals(input)) {
+                            discriminator++;
+                        }
+                    }
+
+                    if (discriminator > 0) {
+                        input += $" ({discriminator})";
+                    }
+                }
             }
 
             return input;

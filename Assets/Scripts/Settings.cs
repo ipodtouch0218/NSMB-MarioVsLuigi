@@ -1,11 +1,9 @@
+using NSMB.UI.Game;
 using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
-
-using NSMB.Game;
-using NSMB.Utils;
 
 public class Settings : Singleton<Settings> {
 
@@ -14,6 +12,7 @@ public class Settings : Singleton<Settings> {
     public static event Action OnColorblindModeChanged;
     public static event Action OnDisableChatChanged;
     public static event Action OnNdsBorderChanged;
+    public static event Action<bool> OnInputDisplayActiveChanged;
 
     //---Properties
 
@@ -146,8 +145,8 @@ public class Settings : Singleton<Settings> {
         get => _graphicsPlayerNametags;
         set {
             _graphicsPlayerNametags = value;
-            if (GameManager.Instance) {
-                GameManager.Instance.nametagCanvas.gameObject.SetActive(value);
+            foreach (var element in PlayerElements.AllPlayerElements) {
+                element.nametagCanvas.SetActive(value);
             }
         }
     }
@@ -165,16 +164,27 @@ public class Settings : Singleton<Settings> {
         }
     }
 
+    private bool _graphicsInputDisplay;
+    public bool GraphicsInputDisplay {
+        get => _graphicsInputDisplay;
+        set {
+            bool oldValue = _graphicsInputDisplay;
+            _graphicsInputDisplay = value;
+
+            if (oldValue != value) {
+                OnInputDisplayActiveChanged?.Invoke(value);
+            }
+        }
+    }
+
     public string ControlsBindings {
         get => ControlSystem.controls.asset.SaveBindingOverridesAsJson();
         set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
     }
 
-    public bool ValidNickname => generalNickname.IsValidUsername(false);
-
     //---Public Variables
     public string generalNickname;
-    public int generalCharacter, generalSkin;
+    public int generalCharacter, generalPalette;
     public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
 
     public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
@@ -184,6 +194,8 @@ public class Settings : Singleton<Settings> {
 
     public RumbleManager.RumbleSetting controlsRumble;
     public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump;
+
+    public bool miscFilterFullRooms, miscFilterInProgressRooms;
 
     //---Private Variables
     [SerializeField] private AudioMixer mixer;
@@ -207,7 +219,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("General_DisableChat", GeneralDisableChat ? 1 : 0);
         PlayerPrefs.SetInt("General_ChatFilter", generalChatFiltering ? 1 : 0);
         PlayerPrefs.SetInt("General_Character", generalCharacter);
-        PlayerPrefs.SetInt("General_Skin", generalSkin);
+        PlayerPrefs.SetInt("General_Palette", generalPalette);
         PlayerPrefs.SetString("General_Locale", GeneralLocale);
         PlayerPrefs.SetInt("General_UseNicknameColor", generalUseNicknameColor ? 1 : 0);
         PlayerPrefs.SetInt("General_DiscordIntegration", GeneralDiscordIntegration ? 1 : 0);
@@ -224,6 +236,7 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_Nametags", GraphicsPlayerNametags ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_Colorblind", GraphicsColorblind ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_InputDisplay", GraphicsInputDisplay ? 1 : 0);
 
         // Audio
         PlayerPrefs.SetFloat("Audio_MasterVolume", AudioMasterVolume);
@@ -241,6 +254,10 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("Controls_PropellerJump", controlsPropellerJump ? 1 : 0);
         PlayerPrefs.SetInt("Controls_Rumble", (int) controlsRumble);
         PlayerPrefs.SetString("Controls_Bindings", ControlsBindings);
+
+        // Misc
+        PlayerPrefs.SetInt("Misc_FilterFullRooms", miscFilterFullRooms ? 1 : 0);
+        PlayerPrefs.SetInt("Misc_FilterInProgressRooms", miscFilterInProgressRooms ? 1 : 0);
 
         PlayerPrefs.Save();
     }
@@ -280,7 +297,7 @@ public class Settings : Singleton<Settings> {
         GeneralDisableChat = false;
         generalChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) != 0;
         generalCharacter = PlayerPrefs.GetInt("Character", 0);
-        generalSkin = PlayerPrefs.GetInt("Skin", 0);
+        generalPalette = PlayerPrefs.GetInt("Skin", 0);
         GeneralLocale = "en-US";
         generalUseNicknameColor = true;
         _generalDiscordIntegration = true;
@@ -296,6 +313,7 @@ public class Settings : Singleton<Settings> {
         GraphicsPlayerOutlines = true;
         GraphicsPlayerNametags = true;
         GraphicsColorblind = false;
+        GraphicsInputDisplay = false;
 
         AudioMasterVolume = PlayerPrefs.GetFloat("volumeMaster", 0.75f);
         AudioMusicVolume = PlayerPrefs.GetFloat("volumeMusic", 0.5f);
@@ -316,6 +334,9 @@ public class Settings : Singleton<Settings> {
         controlsAutoSprint = false;
         controlsPropellerJump = false;
 
+        miscFilterFullRooms = false;
+        miscFilterInProgressRooms = false;
+
         MassDeleteKeys("Nickname", "ScoreboardAlwaysVisible", "ChatFilter", "Character", "Skin", "NDSResolution",
             "NDS4by3", "VSync", "volumeMaster", "volumeMusic", "volumeSFX", "FireballFromSprint");
     }
@@ -327,7 +348,7 @@ public class Settings : Singleton<Settings> {
         TryGetSetting<bool>("General_DisableChat", nameof(GeneralDisableChat));
         TryGetSetting("General_ChatFilter", ref generalChatFiltering);
         TryGetSetting("General_Character", ref generalCharacter);
-        TryGetSetting("General_Skin", ref generalSkin);
+        TryGetSetting("General_Palette", ref generalPalette);
         TryGetSetting<string>("General_Locale", nameof(GeneralLocale));
         TryGetSetting("General_UseNicknameColor", ref generalUseNicknameColor);
         TryGetSetting<bool>("General_DiscordIntegration", nameof(GeneralDiscordIntegration));
@@ -344,6 +365,7 @@ public class Settings : Singleton<Settings> {
         TryGetSetting<bool>("Graphics_PlayerOutlines", nameof(GraphicsPlayerOutlines));
         TryGetSetting<bool>("Graphics_PlayerNametags", nameof(GraphicsPlayerNametags));
         TryGetSetting<bool>("Graphics_Colorblind", nameof(GraphicsColorblind));
+        TryGetSetting<bool>("Graphics_InputDisplay", nameof(GraphicsInputDisplay));
 
         // Audio
         TryGetSetting<float>("Audio_MasterVolume", nameof(AudioMasterVolume));
@@ -361,9 +383,13 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("Controls_PropellerJump", ref controlsPropellerJump);
         TryGetSetting("Controls_Rumble", ref controlsRumble);
         TryGetSetting<string>("Controls_Bindings", nameof(ControlsBindings));
+
+        // Misc
+        TryGetSetting("Misc_FilterFullRooms", ref miscFilterFullRooms);
+        TryGetSetting("Misc_FilterInProgressRooms", ref miscFilterInProgressRooms);
     }
 
-    private bool TryGetSetting<T>(string key, string propertyName) {
+    private bool TryGetSetting<T>(string key, string propertyName, T defaultValue = default) {
         if (!PlayerPrefs.HasKey(key)) {
             return false;
         }
@@ -404,7 +430,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref string value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 
@@ -414,7 +439,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref int value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 
@@ -424,7 +448,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref float value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 
@@ -434,7 +457,6 @@ public class Settings : Singleton<Settings> {
 
     private bool TryGetSetting(string key, ref bool value) {
         if (!PlayerPrefs.HasKey(key)) {
-            value = default;
             return false;
         }
 

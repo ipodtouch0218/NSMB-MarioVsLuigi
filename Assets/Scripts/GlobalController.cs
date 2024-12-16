@@ -1,4 +1,9 @@
-﻿using System;
+﻿using NSMB.Extensions;
+using NSMB.Loading;
+using NSMB.Translation;
+using NSMB.UI.Pause.Options;
+using Quantum;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -6,28 +11,25 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
 
-using Fusion;
-using NSMB.Extensions;
-using NSMB.Loading;
-using NSMB.Translation;
-using NSMB.UI.Pause.Options;
-
 public class GlobalController : Singleton<GlobalController> {
 
     //---Events
     public event Action<RenderTexture> RenderTextureChanged;
+    public static event Action ResolutionChanged;
 
     //---Public Variables
     public TranslationManager translationManager;
     public DiscordController discordController;
     public RumbleManager rumbleManager;
     public Gradient rainbowGradient;
+    public SimulationConfig config;
 
     public PauseOptionMenuManager optionsManager;
 
     public ScriptableRendererFeature outlineFeature;
     public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting, fusionStatsTemplate;
     public LoadingCanvas loadingCanvas;
+    public AudioSource sfx;
 
     public RectTransform ndsRect;
 
@@ -36,16 +38,14 @@ public class GlobalController : Singleton<GlobalController> {
     public bool checkedForVersion = false, firstConnection = true;
     public int windowWidth = 1280, windowHeight = 720;
 
-    public ConnectionToken connectionToken;
+    //public ConnectionToken connectionToken;
 
     //---Serialized Variables
     [SerializeField] private AudioMixer mixer;
-    [SerializeField] private AudioSource sfx;
 
     //---Private Variables
     private Coroutine fadeMusicRoutine;
     private Coroutine fadeSfxRoutine;
-    private GameObject fusionStats;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
@@ -53,7 +53,7 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void OnValidate() {
-        if (!discordController) discordController = GetComponent<DiscordController>();
+        this.SetIfNull(ref discordController);
     }
 
     public void Awake() {
@@ -65,41 +65,52 @@ public class GlobalController : Singleton<GlobalController> {
 
     public void Start() {
         AuthenticationHandler.IsAuthenticating = false;
-        NetworkHandler.connecting = 0;
+        //NetworkHandler.connecting = 0;
 
         if (!Application.isFocused) {
-            if (Settings.Instance.audioMuteMusicOnUnfocus) mixer.SetFloat("MusicVolume", -80f);
-            if (Settings.Instance.audioMuteSFXOnUnfocus) mixer.SetFloat("SoundVolume", -80f);
+            if (Settings.Instance.audioMuteMusicOnUnfocus) {
+                mixer.SetFloat("MusicVolume", -80f);
+            }
+
+            if (Settings.Instance.audioMuteSFXOnUnfocus) {
+                mixer.SetFloat("SoundVolume", -80f);
+            }
         }
         ControlSystem.controls.Enable();
         ControlSystem.controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
 
-        NetworkHandler.OnShutdown += OnShutdown;
-        NetworkHandler.OnHostMigration += OnHostMigration;
-
-        CreateFusionStatsInstance();
+        //NetworkHandler.OnShutdown += OnShutdown;
+        //NetworkHandler.OnHostMigration += OnHostMigration;
+        QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
     }
 
     public void OnDestroy() {
         ControlSystem.controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
         ControlSystem.controls.Disable();
 
-        NetworkHandler.OnShutdown -= OnShutdown;
-        NetworkHandler.OnHostMigration -= OnHostMigration;
+        //NetworkHandler.OnShutdown -= OnShutdown;
+        //NetworkHandler.OnHostMigration -= OnHostMigration;
     }
 
     public void Update() {
-        int windowWidth = Screen.width;
-        int windowHeight = Screen.height;
+        int newWindowWidth = Screen.width;
+        int newWindowHeight = Screen.height;
+
+        if (windowWidth != newWindowWidth || windowHeight != newWindowHeight) {
+            windowWidth = newWindowWidth;
+            windowHeight = newWindowHeight;
+            ResolutionChanged?.Invoke();
+        }
 
         if (Settings.Instance.graphicsNdsEnabled && SceneManager.GetActiveScene().buildIndex != 0) {
 
             int targetHeight = 224;
-            int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : (float) windowWidth / windowHeight));
+            int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : (float) newWindowWidth / newWindowHeight));
 
             if (!ndsTexture || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
-                if (ndsTexture)
+                if (ndsTexture) {
                     ndsTexture.Release();
+                }
 
                 ndsTexture = RenderTexture.GetTemporary(targetWidth, targetHeight);
                 ndsTexture.filterMode = FilterMode.Point;
@@ -113,13 +124,16 @@ public class GlobalController : Singleton<GlobalController> {
 
         //todo: this jitters to hell
 #if UNITY_STANDALONE
-        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (this.windowWidth != windowWidth || this.windowHeight != windowHeight)) {
-            windowHeight = (int) (windowWidth * (9f / 16f));
-            Screen.SetResolution(windowWidth, windowHeight, FullScreenMode.Windowed);
+        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
+            newWindowHeight = (int) (newWindowWidth * (9f / 16f));
+            Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
         }
-        this.windowWidth = windowWidth;
-        this.windowHeight = windowHeight;
 #endif
+
+        if ((int) (Time.unscaledTime + Time.unscaledDeltaTime) > (int) Time.unscaledTime) {
+            // Update discord every second
+            discordController.UpdateActivity();
+        }
     }
 
 #if UNITY_WEBGL
@@ -143,10 +157,13 @@ public class GlobalController : Singleton<GlobalController> {
 #endif
 
         } else {
-            if (Settings.Instance.audioMuteMusicOnUnfocus)
+            if (Settings.Instance.audioMuteMusicOnUnfocus) {
                 fadeMusicRoutine ??= StartCoroutine(FadeVolume("MusicVolume"));
-            if (Settings.Instance.audioMuteSFXOnUnfocus)
+            }
+
+            if (Settings.Instance.audioMuteSFXOnUnfocus) {
                 fadeSfxRoutine ??= StartCoroutine(FadeVolume("SoundVolume"));
+            }
 
 #if UNITY_WEBGL
             QualitySettings.vSyncCount = previousVsyncCount;
@@ -155,9 +172,18 @@ public class GlobalController : Singleton<GlobalController> {
         }
     }
 
+    public void OnUnitySceneLoadDone(CallbackUnitySceneLoadDone e) {
+        foreach (int localPlayer in e.Game.GetLocalPlayerSlots()) {
+            e.Game.SendCommand(localPlayer, new CommandPlayerLoaded());
+        }
+
+        discordController.UpdateActivity();
+    }
+
     private void StopCoroutineNullable(ref Coroutine coroutine) {
-        if (coroutine == null)
+        if (coroutine == null) {
             return;
+        }
 
         StopCoroutine(coroutine);
         coroutine = null;
@@ -176,8 +202,8 @@ public class GlobalController : Singleton<GlobalController> {
         mixer.SetFloat(key, -80f);
     }
 
-    public void PlaySound(Enums.Sounds sound) {
-        sfx.PlayOneShot(sound);
+    public void PlaySound(SoundEffect soundEffect) {
+        sfx.PlayOneShot(soundEffect);
     }
 
     private static float ToLinearScale(float x) {
@@ -186,22 +212,6 @@ public class GlobalController : Singleton<GlobalController> {
 
     private static float ToLogScale(float x) {
         return 20 * Mathf.Log10(x);
-    }
-
-    private void CreateFusionStatsInstance() {
-        if (fusionStats)
-            DestroyImmediate(fusionStats);
-
-        fusionStats = Instantiate(fusionStatsTemplate, fusionStatsTemplate.transform.parent);
-        fusionStats.SetActive(true);
-    }
-
-    private void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {
-        CreateFusionStatsInstance();
-    }
-
-    private void OnHostMigration(NetworkRunner runner, HostMigrationToken token) {
-        CreateFusionStatsInstance();
     }
 
     private void ToggleFpsMonitor(InputAction.CallbackContext obj) {

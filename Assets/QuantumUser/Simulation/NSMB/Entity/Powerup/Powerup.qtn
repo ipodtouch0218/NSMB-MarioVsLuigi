@@ -1,0 +1,41 @@
+component Powerup {
+	asset_ref<PowerupAsset> Scriptable;
+	bool FacingRight;
+	int Lifetime;
+
+	FPVector2 AnimationCurveOrigin;
+	FP AnimationCurveTimer;
+
+	[ExcludeFromPrototype] bool BlockSpawn;
+	[ExcludeFromPrototype] bool LaunchSpawn;
+	[ExcludeFromPrototype] FPVector2 BlockSpawnOrigin;
+	[ExcludeFromPrototype] FPVector2 BlockSpawnDestination;
+	[ExcludeFromPrototype] byte BlockSpawnAnimationLength;
+
+	[ExcludeFromPrototype] byte SpawnAnimationFrames;
+	[ExcludeFromPrototype] byte IgnorePlayerFrames;
+	[ExcludeFromPrototype] EntityRef ParentMarioPlayer;
+}
+
+enum PowerupState : Byte {
+    NoPowerup,
+    MiniMushroom,
+    Mushroom,
+    FireFlower,
+    IceFlower,
+    PropellerMushroom,
+    BlueShell,
+    MegaMushroom
+}
+
+enum PowerupReserveResult : Byte {
+    None,
+    NoneButPlaySound,
+    ReserveOldPowerup,
+    ReserveNewPowerup,
+}
+
+event PowerupBecameActive {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}

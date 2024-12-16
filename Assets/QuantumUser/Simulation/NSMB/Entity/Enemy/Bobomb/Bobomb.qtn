@@ -1,0 +1,25 @@
+#define _0_95 0.95
+#define _4_50 4.5
+#define _5_50 5.5
+#define _14_75 14.75
+
+component Bobomb {
+	FP ExplosionRadius;
+	FP Speed;
+	ushort DetonationFrames;
+
+	[ExcludeFromPrototype] ushort CurrentDetonationFrames;
+}
+
+signal OnBobombExplodeEntity(entity_ref bobomb, entity_ref entity);
+
+event BobombLit {
+	nothashed Frame Frame;
+	EntityRef Entity;
+	bool Stomped;
+}
+
+event BobombExploded {
+	nothashed Frame Frame;
+	EntityRef Entity;
+}

@@ -1,41 +1,46 @@
+using NSMB.Extensions;
+using Quantum;
 using UnityEngine;
-
-using NSMB.Game;
 
 public class SecondaryCameraPositioner : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private Camera secondaryCamera;
+    [SerializeField] private Camera ourCamera;
 
     //---Private Variables
     private bool destroyed;
+    private VersusStageData stage;
 
     public void OnValidate() {
-        if (!secondaryCamera) secondaryCamera = GetComponent<Camera>();
+        this.SetIfNull(ref ourCamera);
+    }
+
+    public void Start() {
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
     }
 
     public void UpdatePosition() {
-        if (!GameManager.Instance || destroyed)
+        if (!stage || destroyed) {
             return;
+        }
 
-        GameManager gm = GameManager.Instance;
-
-        if (!gm.loopingLevel) {
+        if (!stage.IsWrappingLevel) {
             Destroy(gameObject);
             destroyed = true;
             return;
         }
 
-        bool enable =
-            mainCamera.transform.position.x > gm.LevelMinX - 1 && mainCamera.transform.position.x < gm.LevelMinX + 7
-            || mainCamera.transform.position.x < gm.LevelMaxX + 1 && mainCamera.transform.position.x > gm.LevelMaxX - 7;
+        float camX = mainCamera.transform.position.x;
+        bool enable = Mathf.Abs(camX - stage.StageWorldMin.X.AsFloat) < 7 || Mathf.Abs(camX - stage.StageWorldMax.X.AsFloat) < 7;
 
-        secondaryCamera.enabled = enable;
+        ourCamera.enabled = enable;
+        ourCamera.orthographicSize = mainCamera.orthographicSize;
 
         if (enable) {
-            bool rightHalf = mainCamera.transform.position.x > gm.LevelMiddleX;
-            transform.localPosition = new(gm.levelWidthTile * (rightHalf ? -1 : 1), 0, 0);
+            float middle = stage.StageWorldMin.X.AsFloat + stage.TileDimensions.x * 0.25f;
+            bool rightHalf = mainCamera.transform.position.x > middle;
+            transform.localPosition = new(stage.TileDimensions.x * (rightHalf ? -1 : 1) * 0.5f, 0, 0);
         }
     }
 }

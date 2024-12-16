@@ -1,0 +1,31 @@
+struct StageTileInstance {
+    asset_ref<StageTile> Tile;
+    FP Rotation;
+    FPVector2 Scale;
+}
+
+global {
+    FP Timer;
+}
+
+signal OnStageReset(bool full);
+signal OnTileChanged(int tileX, int tileY, StageTileInstance newTile);
+
+event TileChanged {
+    nothashed Frame Frame;
+    int TileX;
+    int TileY;
+    StageTileInstance NewTile;
+}
+
+event TileBroken {
+    nothashed Frame Frame;
+    entity_ref Entity;
+    int TileX;
+    int TileY;
+    StageTileInstance Tile;
+}
+
+event TimerExpired {
+    Frame Frame;
+}

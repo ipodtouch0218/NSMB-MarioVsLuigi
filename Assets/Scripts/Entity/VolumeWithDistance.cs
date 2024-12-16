@@ -1,7 +1,9 @@
-using UnityEngine;
-
-using NSMB.Game;
+using NSMB.Extensions;
+using NSMB.UI.Game;
 using NSMB.Utils;
+using Photon.Deterministic;
+using Quantum;
+using UnityEngine;
 
 public class VolumeWithDistance : MonoBehaviour {
 
@@ -10,41 +12,41 @@ public class VolumeWithDistance : MonoBehaviour {
     [SerializeField] private Transform soundOrigin;
     [SerializeField] private float soundRange = 12f;
     [SerializeField] private float maxPanning = 0.8f;
-    [SerializeField] private bool useDistanceToCamera;
 
     //---Private Variables
     private float soundRangeInverse;
     private float[] originalVolumes;
+    private VersusStageData stage;
 
     public void OnValidate() {
-        if (audioSources?.Length <= 0) {
-            audioSources = GetComponentsInChildren<AudioSource>();
-        }
-
-        if (!soundOrigin) {
-            soundOrigin = transform;
-        }
+        this.SetIfNull(ref audioSources);
+        this.SetIfNull(ref soundOrigin);
     }
 
-    public void Awake() {
+    public void Start() {
         soundRangeInverse = 1f / soundRange;
         originalVolumes = new float[audioSources.Length];
 
         for (int i = 0; i < audioSources.Length; i++) {
             originalVolumes[i] = audioSources[i].volume;
         }
+
+        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
+        LateUpdate();
     }
 
     public void LateUpdate() {
-        GameManager inst = GameManager.Instance;
-        if (!inst) {
-            return;
+        float minDistance = float.MaxValue;
+        FP xDifference = 0;
+        foreach (var pe in PlayerElements.AllPlayerElements) {
+            float distance = QuantumUtils.WrappedDistance(stage, pe.Camera.transform.position.ToFPVector2(), soundOrigin.position.ToFPVector2(), out FP tempXDifference).AsFloat;
+            if (distance < minDistance) {
+                minDistance = distance;
+                xDifference = tempXDifference;
+            }
         }
 
-        Vector3 listener = (!useDistanceToCamera && inst && inst.localPlayer) ? inst.localPlayer.transform.position : Camera.main.transform.position;
-
-        float distance = Utils.WrappedDistance(listener, soundOrigin.position, out float xDifference);
-        if (distance > soundRange) {
+        if (minDistance > soundRange) {
             foreach (AudioSource source in audioSources) {
                 source.volume = 0;
                 source.panStereo = 0;
@@ -52,9 +54,9 @@ public class VolumeWithDistance : MonoBehaviour {
             return;
         }
 
-        float percentage = 1f - (distance * soundRangeInverse);
+        float percentage = 1f - (minDistance * soundRangeInverse);
         float volume = Utils.QuadraticEaseOut(percentage);
-        float panning = Settings.Instance.audioPanning ? Utils.QuadraticEaseOut(-xDifference * soundRangeInverse) * maxPanning : 0f;
+        float panning = Settings.Instance.audioPanning ? Utils.QuadraticEaseOut(-xDifference.AsFloat * soundRangeInverse) * maxPanning : 0f;
 
         for (int i = 0; i < audioSources.Length; i++) {
             AudioSource source = audioSources[i];

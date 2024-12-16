@@ -22,6 +22,8 @@ TagManager:
   - Squishy
   - Powerup
   - water
+  - MainTilemap
+  - MasterCanvas
   layers:
   - Default
   - TransparentFX
@@ -39,7 +41,7 @@ TagManager:
   - PassthroughInvalid
   - GroundEntity
   - EntityNoGroundEntity
-  - 
+  - UINoCursor
   - 
   - 
   - 

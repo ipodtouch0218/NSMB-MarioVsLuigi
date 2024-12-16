@@ -1,0 +1,20 @@
+component PlayerData {
+
+	PlayerRef PlayerRef;
+	bool IsRoomHost;
+	bool IsLoaded;
+
+	byte Character;
+	byte Palette;
+	byte Team;
+	bool IsSpectator;
+	bool ManualSpectator;
+
+	int Wins;
+	int LastChatMessage;
+	bool IsReady;
+	bool IsInSettings;
+	int JoinTick;
+	int Ping;
+}
+

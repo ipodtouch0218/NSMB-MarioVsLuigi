@@ -1,0 +1,47 @@
+#define OnePixelPerFrame 1.875
+
+component PhysicsObject {
+    FPVector2 Gravity;
+    FP TerminalVelocity;
+    bool IsFrozen;
+    bool DisableCollision;
+    bool SlowInLiquids;
+    bool IsWaterSolid;
+    bool BreakMegaObjects;
+    
+    [ExcludeFromPrototype] FPVector2 Velocity;
+    [ExcludeFromPrototype] FPVector2 ParentVelocity;
+    [ExcludeFromPrototype] FPVector2 PreviousFrameVelocity;
+
+    [ExcludeFromPrototype] byte HoverFrames;
+    [ExcludeFromPrototype] bool IsTouchingLeftWall;
+    [ExcludeFromPrototype] bool IsTouchingRightWall;
+    [ExcludeFromPrototype] bool IsTouchingCeiling;
+    [ExcludeFromPrototype] bool IsTouchingGround;
+    [ExcludeFromPrototype] bool WasTouchingGround;
+    [ExcludeFromPrototype] FP FloorAngle;
+    [ExcludeFromPrototype] bool IsOnSlipperyGround;
+    [ExcludeFromPrototype] bool IsOnSlideableGround;
+    
+    [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
+
+    [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<EntityRef> LiquidContacts;
+    [ExcludeFromPrototype] byte UnderwaterCounter;
+}
+
+struct PhysicsContact {
+    FPVector2 Position;
+    FPVector2 Normal;
+    FP Distance;
+    int Frame;
+    int TileX;
+    int TileY;
+    EntityRef Entity;
+}
+
+signal OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, bool underwater);
+
+event PhysicsObjectLanded {
+    nothashed Frame Frame;
+    EntityRef Entity;
+}

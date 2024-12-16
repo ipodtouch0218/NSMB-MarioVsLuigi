@@ -1,0 +1,38 @@
+component Enemy {
+	FPVector2 Spawnpoint;
+	bool IgnorePlayerWhenRespawning;
+	bool DisableRespawning;
+
+	[ExcludeFromPrototype] bool IsActive;
+	[ExcludeFromPrototype] bool IsDead;
+	[ExcludeFromPrototype] bool FacingRight;
+}
+
+signal OnEnemyDespawned(entity_ref entity);
+signal OnEnemyRespawned(entity_ref entity);
+signal OnEnemyEnemyCollision(entity_ref a, entity_ref b);
+signal OnEnemyKilledByStageReset(entity_ref entity);
+signal OnEnemyTurnaround(entity_ref entity);
+
+event EnemyDespawned {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}
+
+event EnemyKilled {
+	nothashed Frame Frame;
+	entity_ref Enemy;
+	entity_ref Killer;
+	bool IsSpecialKill;
+}
+
+event PlayComboSound {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	nothashed byte Combo;
+}
+
+event PlayBumpSound {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}

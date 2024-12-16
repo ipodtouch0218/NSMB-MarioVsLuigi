@@ -1,0 +1,19 @@
+component BreakableObject {
+	FP OriginalHeight;
+	FP MinimumHeight;
+	bool IsStompable;
+
+	[ExcludeFromPrototype] FP CurrentHeight;
+	[ExcludeFromPrototype] bool IsBroken;
+	[ExcludeFromPrototype] bool IsDestroyed;
+}
+
+signal OnBreakableObjectChangedHeight(EntityRef breakable, FP newHeight);
+
+synced event BreakableObjectBroken {
+	nothashed Frame Frame;
+	EntityRef Entity;
+	EntityRef Cause;
+	nothashed FPVector2 LaunchDirection;
+	FP Height;
+}

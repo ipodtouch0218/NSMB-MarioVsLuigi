@@ -21,7 +21,7 @@ TextureImporter:
       213: -9005941153719796207
     second: host
   externalObjects: {}
-  serializedVersion: 12
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -1666,7 +1666,7 @@ TextureImporter:
         width: 13
         height: 13
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1674,6 +1674,237 @@ TextureImporter:
       bones: []
       spriteID: 78a2c269121fcce488a5696f219616dc
       internalID: 932749408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dpad_button
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 175
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 583be58e5f4631a44a7d605b043e33fc
+      internalID: -1771438400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: a_button
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 175
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 999eaf0251a65474eb5e7bd0fbe657e1
+      internalID: -242346903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: b_button
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 175
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62807b1bae33f524fbb24755e81ca371
+      internalID: 66600449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: x_button
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 175
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 75bb7f0002dfbe24184581e40c216d75
+      internalID: 2096157750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: y_button
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 175
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6b7d78c120050e4e97a573452bc41b7
+      internalID: -600503074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: l_button
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 175
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e7f5878906413834f87eb4d3f5ff5107
+      internalID: 1433395218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: r_button
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 175
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59730587d4ddf404d87b0af20baac411
+      internalID: 907324317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player_muted
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 243
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa07d3938c9e7a14f8e5c6744ecf3582
+      internalID: 1560846788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: room_create
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 243
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a59666638e4d1ef448e3c7973ef57bcd
+      internalID: 1496232669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dropdown_arrow
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 243
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a625d3a88300294f85b0612dab85b42
+      internalID: -2027879749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: checkmark
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 202
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e7f02c22006eede4a9bbf5326f0602a5
+      internalID: 380926162
       vertices: []
       indices: 
       edges: []
@@ -1689,6 +1920,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      a_button: -242346903
+      b_button: 66600449
+      checkmark: 380926162
       coinnumber_0: -878907871
       coinnumber_1: -1760457897
       coinnumber_2: 1081746599
@@ -1705,6 +1939,8 @@ TextureImporter:
       connection_good: -1507071055
       connection_great: 1763873500
       connection_host: -1762235557
+      dpad_button: -1771438400
+      dropdown_arrow: -2027879749
       hud_luigi: -7975249404588759376
       hud_mario: 7263181891274304025
       hud_star: 1346584908
@@ -1724,7 +1960,11 @@ TextureImporter:
       hudnumber_star: 861810113
       hudnumber_x: -1713447182
       hudnumbers_timer: 932749408
+      l_button: 1433395218
+      player_muted: 1560846788
+      r_button: 907324317
       room_coins: 1534273505
+      room_create: 1496232669
       room_customlevel: -971827560
       room_host: -9005941153719796207
       room_lives: 1261997413
@@ -1761,6 +2001,8 @@ TextureImporter:
       team_yellow: -769868482
       team_yellow_alt: 712068762
       team_yellow_alt_big: 1936513099
+      x_button: 2096157750
+      y_button: -600503074
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

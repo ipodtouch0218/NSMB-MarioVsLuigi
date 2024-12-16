@@ -1,0 +1,22 @@
+component BlockBump {
+	byte Lifetime;
+	asset_ref<StageTile> StartTile;
+	StageTileInstance ResultTile;
+	asset_ref<EntityPrototype> Powerup;
+	
+	[ExcludeFromPrototype] bool IsDownwards;
+	[ExcludeFromPrototype] FPVector2 Origin;
+	[ExcludeFromPrototype] int TileX;
+	[ExcludeFromPrototype] int TileY;
+	[ExcludeFromPrototype] entity_ref Owner;
+	
+	[ExcludeFromPrototype] bool AllowSelfDamage;
+	[ExcludeFromPrototype] bool HasBumped;
+}
+
+signal OnEntityBumped(entity_ref entity, FPVector2 tileWorldPosition, entity_ref blockBump);
+
+event EntityBlockBumped {
+	nothashed Frame Frame;
+	EntityRef Entity;
+}

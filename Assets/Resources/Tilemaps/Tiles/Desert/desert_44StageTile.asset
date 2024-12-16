@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
+  m_Name: desert_44StageTile
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: Resources/Tilemaps/Tiles/Desert/desert_44StageTile
+    Guid:
+      Value: 287386362909079600
+  Tile: {fileID: 11400000, guid: fc38d44cdd55d844ba11d8c2ea8a4a7e, type: 2}
+  CollisionData:
+    Shapes:
+    - Vertices:
+      - X:
+          RawValue: 32768
+        Y:
+          RawValue: 32768
+      - X:
+          RawValue: 32768
+        Y:
+          RawValue: -32768
+      - X:
+          RawValue: -32768
+        Y:
+          RawValue: -32768
+      - X:
+          RawValue: -32768
+        Y:
+          RawValue: 32768
+  IsSlipperyGround: 0
+  IsSlideableGround: 0

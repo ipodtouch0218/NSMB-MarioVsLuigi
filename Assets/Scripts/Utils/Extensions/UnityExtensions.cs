@@ -83,7 +83,7 @@ namespace NSMB.Extensions {
         }
 
         //easy sound clips
-        public static void PlayOneShot(this AudioSource source, Enums.Sounds clip, CharacterData character = null, byte variant = 0, float volume = 1f) {
+        public static void PlayOneShot(this AudioSource source, SoundEffect clip, CharacterAsset character = null, byte variant = 0, float volume = 1f) {
             source.PlayOneShot(clip.GetClip(character, variant), volume);
         }
 
@@ -119,6 +119,16 @@ namespace NSMB.Extensions {
                     GetComponentType.Children => component.GetComponentInChildren<T>(),
                     GetComponentType.Parent => component.GetComponentInParent<T>(),
                     _ => component.GetComponent<T>(),
+                };
+            }
+        }
+
+        public static void SetIfNull<T>(this Component component, ref T[] var, GetComponentType children = GetComponentType.Self) where T : Component {
+            if (component && (var == null || var.Length <= 0)) {
+                var = children switch {
+                    GetComponentType.Children => component.GetComponentsInChildren<T>(),
+                    GetComponentType.Parent => component.GetComponentsInParent<T>(),
+                    _ => component.GetComponents<T>(),
                 };
             }
         }

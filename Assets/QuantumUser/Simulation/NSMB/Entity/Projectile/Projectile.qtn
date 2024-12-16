@@ -1,0 +1,17 @@
+import enum ParticleEffect(byte);
+
+component Projectile {
+	asset_ref<ProjectileAsset> Asset;
+	FP Speed;
+	[ExcludeFromPrototype] EntityRef Owner;
+	[ExcludeFromPrototype] bool FacingRight;
+	[ExcludeFromPrototype] bool HasBounced;
+	[ExcludeFromPrototype] bool CheckedCollision;
+}
+
+event ProjectileDestroyed {
+	nothashed Frame Frame;
+	EntityRef Entity;
+	ParticleEffect Particle;
+	nothashed FPVector2 Position;
+}

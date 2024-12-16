@@ -1,11 +1,13 @@
+using NSMB.Utils;
+using Photon.Realtime;
+using UnityEngine;
+using UnityEngine.Networking;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Networking;
-
-using Fusion.Photon.Realtime;
-using NSMB.Utils;
+using NSMB.UI.MainMenu;
+using Newtonsoft.Json;
+using JetBrains.Annotations;
 
 public class AuthenticationHandler {
 
@@ -14,7 +16,10 @@ public class AuthenticationHandler {
 
     public static bool IsAuthenticating { get; set; }
 
-    public static async Task<AuthenticationValues> Authenticate(string userid, string token) {
+    public static async Task<AuthenticationValues> Authenticate() {
+
+        string userid = PlayerPrefs.GetString("id", null);
+        string token = PlayerPrefs.GetString("token", null);
 
         IsAuthenticating = true;
 
@@ -28,7 +33,7 @@ public class AuthenticationHandler {
         byte args = 0;
         Utils.BitSet(ref args, 0, !Settings.Instance.generalUseNicknameColor);
         requestUrl += "&args=" + args;
-
+        
         UnityWebRequest webRequest = UnityWebRequest.Get(requestUrl);
         webRequest.certificateHandler = new MvLCertificateHandler();
         webRequest.disposeCertificateHandlerOnDispose = true;
@@ -38,7 +43,24 @@ public class AuthenticationHandler {
 
         await webRequest.SendWebRequest();
 
-        if (webRequest.result != UnityWebRequest.Result.Success) {
+        string result = webRequest.downloadHandler.text.Trim();
+        while (result.StartsWith('"')) {
+            result = result[1..];
+        }
+        while (result.EndsWith('"')) {
+            result = result[..^1];
+        }
+         
+        if (webRequest.responseCode >= 300) {
+            BanMessage ban = JsonConvert.DeserializeObject<BanMessage>(result);
+            if (ban != null && MainMenuManager.Instance) {
+                string reason = string.IsNullOrWhiteSpace(ban.Message) ? GlobalController.Instance.translationManager.GetTranslation("ui.error.noreason") : ban.Message;
+                string template = ban.Expiration.HasValue ? "ui.error.gamebanned.temporary" : "ui.error.gamebanned.permanent";
+                MainMenuManager.Instance.OpenErrorBox(template,
+                    "banreason", reason, 
+                    "banid", ban.Id.ToString(), 
+                    "expiration", ban.Expiration.HasValue ? DateTimeOffset.FromUnixTimeSeconds(ban.Expiration.Value).LocalDateTime.ToString() : "");
+            }
             IsAuthenticating = false;
             return null;
         }
@@ -47,13 +69,22 @@ public class AuthenticationHandler {
             AuthType = CustomAuthenticationType.Custom,
             UserId = userid,
         };
-        values.AddAuthParameter("data", webRequest.downloadHandler.text.Trim().Replace("\"", ""));
+        values.AddAuthParameter("data", result);
 
         webRequest.Dispose();
 
         IsAuthenticating = false;
         return values;
     }
+}
+
+public class BanMessage {
+    [JsonProperty("Id")]
+    public int Id;
+    [JsonProperty("Message")]
+    public string Message;
+    [JsonProperty("Expiration")]
+    public long? Expiration;
 }
 
 public class UnityWebRequestAwaiter : INotifyCompletion {

@@ -1,0 +1,33 @@
+#define _8_50 8.5
+
+global {
+	ushort BigStarSpawnTimer;
+	entity_ref MainBigStar;
+	bitset[64] UsedStarSpawns;
+	int UsedStarSpawnCount;
+}
+
+component BigStar {
+	bool IsStationary;
+	ushort Lifetime;
+	byte PassthroughFrames;
+	byte UncollectableFrames;
+	FP Speed;
+	FP BounceForce;
+	
+	[ExcludeFromPrototype] bool FacingRight;
+}
+
+signal OnMarioPlayerCollectedStar(EntityRef entity);
+
+synced event MarioPlayerCollectedStar {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	FPVector2 Position;
+}
+
+synced event MarioPlayerDroppedStar {
+	Frame Frame;
+	entity_ref Entity;
+}

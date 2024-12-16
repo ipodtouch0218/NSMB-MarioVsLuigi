@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fb56a53aa9f4db4cb9a58897a414c35, type: 3}
+  m_Name: MarioPhysics
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Characters/MarioPhysics
+    Guid:
+      Value: 429607978212108660
+  WalkSpeedStage: 1
+  RunSpeedStage: 3
+  StarSpeedStage: 4
+  WalkMaxVelocity:
+  - RawValue: 61440
+  - RawValue: 184320
+  - RawValue: 276480
+  - RawValue: 368640
+  - RawValue: 552960
+  WalkAcceleration:
+  - RawValue: 518400
+  - RawValue: 259200
+  - RawValue: 230400
+  - RawValue: 172800
+  - RawValue: 5529600
+  WalkBlueShellMultiplier:
+    RawValue: 58982
+  WalkButtonReleaseDeceleration:
+    RawValue: 259200
+  SlowTurnaroundAcceleration:
+  - RawValue: 259200
+  - RawValue: 576000
+  - RawValue: 576000
+  - RawValue: 1382400
+  FastTurnaroundAcceleration:
+    RawValue: 1843200
+  SkiddingMinimumVelocity:
+    RawValue: 307200
+  SkiddingDeceleration:
+    RawValue: 691200
+  SkiddingStarmanDeceleration:
+    RawValue: 5529600
+  CrouchOffEdgeVelocity:
+    RawValue: -245760
+  WalkMegaAcceleration:
+  - RawValue: 1843200
+  - RawValue: 316800
+  - RawValue: 316800
+  - RawValue: 316800
+  - RawValue: 316800
+  SlowTurnaroundMegaAcceleration:
+  - RawValue: 302400
+  - RawValue: 691200
+  - RawValue: 1382400
+  - RawValue: 1382400
+  WalkIceAcceleration:
+  - RawValue: 129600
+  - RawValue: 259200
+  - RawValue: 230400
+  - RawValue: 172800
+  - RawValue: 5529600
+  WalkButtonReleaseIceDeceleration:
+  - RawValue: 28800
+  - RawValue: 97200
+  - RawValue: 97200
+  - RawValue: 97200
+  - RawValue: 97200
+  SkiddingIceDeceleration:
+    RawValue: 259200
+  SlowTurnaroundIceAcceleration:
+    RawValue: 172800
+  SmallHitboxHeight:
+    RawValue: 27525
+  LargeHitboxHeight:
+    RawValue: 53739
+  JumpBufferFrames: 12
+  CoyoteTimeFrames: 5
+  JumpVelocity:
+    RawValue: 433920
+  JumpSpeedBonusVelocity:
+    RawValue: 30720
+  JumpTripleBonusVelocity:
+    RawValue: 32768
+  JumpMegaVelocity:
+    RawValue: 798720
+  JumpMegaSpeedBonusVelocity:
+    RawValue: 34560
+  JumpMiniVelocity:
+    RawValue: 354480
+  JumpMiniSpeedBonusVelocity:
+    RawValue: 28080
+  WalljumpHorizontalVelocity:
+    RawValue: 276480
+  WalljumpVerticalVelocity:
+    RawValue: 422400
+  WalljumpMiniVerticalVelocity:
+    RawValue: 338880
+  GravityVelocity:
+  - RawValue: 272640
+  - RawValue: 138240
+  - RawValue: 0
+  - RawValue: -384000
+  GravityAcceleration:
+  - RawValue: -460800
+  - RawValue: -1843200
+  - RawValue: -2534400
+  - RawValue: -1843200
+  - RawValue: -2534400
+  GravityMiniVelocity:
+  - RawValue: 299280
+  - RawValue: 172560
+  - RawValue: 0
+  - RawValue: -257520
+  GravityMiniAcceleration:
+  - RawValue: -316800
+  - RawValue: -460800
+  - RawValue: -691200
+  - RawValue: -460800
+  - RawValue: -691200
+  GravityMegaVelocity:
+  - RawValue: 264960
+  GravityMegaAcceleration:
+  - RawValue: -1843200
+  - RawValue: -2534400
+  GravitySwimmingVelocity:
+  - RawValue: 0
+  GravitySwimmingAcceleration:
+  - RawValue: -316800
+  - RawValue: -201600
+  GravityFlyingAcceleration:
+    RawValue: -514326
+  GravityGroundpoundStart:
+    RawValue: 9830
+  TerminalVelocity:
+    RawValue: -491520
+  TerminalVelocityMiniMultiplier:
+    RawValue: 40960
+  TerminalVelocityMegaMultiplier:
+    RawValue: 131072
+  TerminalVelocityFlying:
+    RawValue: -92160
+  TerminalVelocityDrilling:
+    RawValue: -491520
+  TerminalVelocityWallslide:
+    RawValue: -307200
+  TerminalVelocityPropeller:
+    RawValue: -131072
+  TerminalVelocityPropellerSpin:
+    RawValue: -98304
+  TerminalVelocityGroundpound:
+    RawValue: -737280
+  PipeEnterDuration: 60
+  SwimJumpVelocity:
+    RawValue: 148320
+  SwimMaxVerticalVelocity:
+    RawValue: 316800
+  SwimTerminalVelocityButtonHeld:
+    RawValue: -61440
+  SwimTerminalVelocity:
+    RawValue: -184320
+  SwimDeceleration:
+    RawValue: 115200
+  SwimMaxVelocity:
+  - RawValue: 0
+  - RawValue: 138240
+  SwimAcceleration:
+  - RawValue: 115200
+  - RawValue: 201600
+  - RawValue: 28800
+  SwimShellMaxVelocity:
+  - RawValue: 207360
+  SwimShellAcceleration:
+  - RawValue: 403200
+  - RawValue: 403200
+  SwimWalkMaxVelocity:
+  - RawValue: 69120
+  - RawValue: 69120
+  SwimWalkAcceleration:
+  - RawValue: 201600
+  - RawValue: 115200
+  SwimWalkShellMaxVelocity:
+  - RawValue: 103680
+  - RawValue: 103680
+  SwimWalkShellAcceleration:
+  - RawValue: 403200
+  - RawValue: 403200
+  SwimGroundpoundDeceleration:
+    RawValue: 2534400
+  FlyingMaxVelocity:
+  - RawValue: 73440
+  - RawValue: 184320
+  FlyingAcceleration:
+  - RawValue: 518400
+  - RawValue: 259200
+  SpinnerLaunchVelocity:
+    RawValue: 786432
+  KnockbackDeceleration:
+    RawValue: 518400
+  SlideMaxVelocity:
+    RawValue: 491520
+  SlideFastAcceleration:
+    RawValue: 864000
+  SlideSlowAcceleration:
+    RawValue: 345600
+  SlideMinimumAngle:
+    RawValue: 819200
+  GroundpoundStartVelocity:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 98304
+  GroundpoundStartFrames: 16
+  GroundpoundStartMegaFrames: 24
+  ProjectileVolleySize: 2
+  ProjectileVolleyFrames: 75
+  ProjectileDelayFrames: 6
+  MaxProjecitles: 6
+  PropellerSpinFrames: 30
+  PropellerLaunchVelocity:
+    RawValue: 393216
+  PropellerLaunchFrames: 60

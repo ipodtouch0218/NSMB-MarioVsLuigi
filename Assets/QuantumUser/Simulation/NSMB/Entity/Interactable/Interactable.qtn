@@ -1,0 +1,7 @@
+component Interactable {
+	bool ColliderDisabled;
+	[ExcludeFromPrototype] PhysicsQueryRef OverlapQueryRef;
+	[ExcludeFromPrototype] PhysicsQueryRef OverlapLevelSeamQueryRef;
+}
+
+signal OnBeforeInteraction(EntityRef entity, bool* allowInteraction);

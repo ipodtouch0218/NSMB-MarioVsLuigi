@@ -70,7 +70,7 @@ Material:
     - WaveHeight: 0.3
     - WaveSpeed: 1.2
     - WaveWidth: 1
-    - WidthTiles: 12
+    - WidthTiles: 36
     - _BUILTIN_QueueControl: -1
     - _BUILTIN_QueueOffset: 0
     - _GlowPower: 3

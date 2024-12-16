@@ -4,6 +4,7 @@ ipodtouch0218
 
 <color=yellow>{ui.about.credits.github}</color>
 Amy54Desu
+ArianLust
 AtwerJ
 Ave
 Cubby Crazes
@@ -20,6 +21,7 @@ Skillz
 ShadowWalker
 TheMoogle
 Tombuntu
+xFrostyCake123
 VLC
 Zest
 
@@ -109,4 +111,4 @@ Techokami (Enemies)
 TeridaxXD001 (Models)
 Treeki (UI)
 VentureSonic (Background)
-
+xFrostyCake123 (Sound)

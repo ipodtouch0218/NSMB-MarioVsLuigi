@@ -1,0 +1,18 @@
+{
+    "name": "FancyTextRendering",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d8194c8ebd44f2249bb90020b50520b6",
+        "GUID:776d03a35f1b52c4a9aed9f56d7b4229",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

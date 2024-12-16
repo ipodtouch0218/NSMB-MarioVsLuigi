@@ -1,11 +1,9 @@
 public class ScriptableManager : Singleton<ScriptableManager> {
 
-    public PrefabList prefabs;
-    public PowerupScriptable[] powerups;
-    public PlayerColorSet[] skins;
-    public CharacterData[] characters;
-    public Team[] teams;
-    public LoopingMusicData[]  alternatingStageMusic;
+    // TODO public PrefabList prefabs;
+    public PaletteSet[] skins;
 
-    public void Awake() => Set(this);
+    public void Awake() {
+        Set(this);
+    }
 }

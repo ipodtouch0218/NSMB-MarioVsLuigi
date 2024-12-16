@@ -1,0 +1,43 @@
+component Coin {
+	bool IsFloating;
+	bool IsDotted;
+	ushort Lifetime;
+	byte UncollectableFrames;
+	
+	[ExcludeFromPrototype] bool IsCollected;
+	[ExcludeFromPrototype] bool IsCurrentlyDotted;
+	[ExcludeFromPrototype] byte DottedChangeFrames;
+}
+
+signal OnMarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, bool fromBlock, bool downwards);
+
+synced event MarioPlayerCollectedCoin {
+	Frame Frame;
+	entity_ref Entity;
+	MarioPlayer Mario;
+	byte Coins;
+	bool ItemSpawned;
+
+	FPVector2 CoinLocation;
+	bool CoinFromBlock;
+	bool Downwards;
+}
+
+event CoinChangedType {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	nothashed Coin Coin;
+}
+
+event CoinChangeCollected {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	nothashed Coin Coin;
+	bool Collected;
+}
+
+event CoinBounced {
+	nothashed Frame Frame;
+	entity_ref Entity;
+	nothashed Coin Coin;
+}

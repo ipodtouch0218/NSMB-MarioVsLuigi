@@ -1,0 +1,5 @@
+component MovingPlatform {
+	FPVector2 Velocity;
+	bool IgnoreMovement;
+	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsQueryRef> Queries;
+}

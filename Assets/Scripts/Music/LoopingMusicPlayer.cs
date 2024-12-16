@@ -1,4 +1,56 @@
-public class LoopingMusicPlayer : LoopingSoundPlayer {
+using UnityEngine;
+
+public class LoopingMusicPlayer : MonoBehaviour {
+
+    //---Properties
+    public bool IsPlaying => audioSource.isPlaying;
+    public float AudioStart => currentAudio.loopStartSeconds * CurrentSpeedupFactor;
+    public float AudioEnd => currentAudio.loopEndSeconds * CurrentSpeedupFactor;
+    private LoopingMusicData CurrentMusicSong => currentAudio;
+    private float CurrentSpeedupFactor => FastMusic ? 1f / (CurrentMusicSong?.speedupFactor ?? 1f) : 1f;
+
+    //---Serialized Variables
+    [SerializeField] protected AudioSource audioSource;
+    [SerializeField] protected LoopingMusicData currentAudio;
+    [SerializeField] private bool playOnAwake = true;
+
+    public void OnEnable() {
+        if (playOnAwake && currentAudio) {
+            Play(currentAudio, true);
+        }
+    }
+
+    public void Update() {
+        if (!audioSource.isPlaying || !currentAudio) {
+            return;
+        }
+
+        if (currentAudio.loopEndSeconds != -1) {
+            float time = audioSource.time;
+
+            if (time >= AudioEnd) {
+                audioSource.time = AudioStart + (time - AudioEnd);
+            }
+        }
+    }
+
+    public void Restart() {
+        if (currentAudio) {
+            Play(currentAudio, true);
+        }
+    }
+
+    public void Unpause() {
+        audioSource.UnPause();
+    }
+
+    public void Pause() {
+        audioSource.Pause();
+    }
+
+    public void Stop() {
+        audioSource.Stop();
+    }
 
     //---Properties
     private bool _fastMusic;
@@ -28,23 +80,15 @@ public class LoopingMusicPlayer : LoopingSoundPlayer {
         }
         get => _fastMusic && CurrentMusicSong && CurrentMusicSong.fastClip;
     }
-    protected override float AudioStart => currentAudio.loopStartSeconds * CurrentSpeedupFactor;
-    protected override float AudioEnd => currentAudio.loopEndSeconds * CurrentSpeedupFactor;
-    private LoopingMusicData CurrentMusicSong => currentAudio as LoopingMusicData;
-    private float CurrentSpeedupFactor => FastMusic ? 1f / (CurrentMusicSong?.speedupFactor ?? 1f) : 1f;
 
 
-    public override void SetSoundData(LoopingSoundData data) {
+    public void SetSoundData(LoopingMusicData data) {
         currentAudio = data;
-        if (data is LoopingMusicData music) {
-            audioSource.clip = (_fastMusic && music.fastClip) ? music.fastClip : music.clip;
-        } else {
-            audioSource.clip = data.clip;
-        }
+        audioSource.clip = (_fastMusic && data.fastClip) ? data.fastClip : data.clip;
     }
 
-    public override void Play(LoopingSoundData song, bool restartIfAlreadyPlaying = false) {
-        if (currentAudio == song && !restartIfAlreadyPlaying) {
+    public void Play(LoopingMusicData song, bool restartIfAlreadyPlaying = false) {
+        if (currentAudio == song && audioSource.isPlaying && !restartIfAlreadyPlaying) {
             return;
         }
 

@@ -54,6 +54,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 
 ### Contributors:
 * [Amy54Desu](https://github.com/Amy54Desu)
+* [ArianLust](https://github.com/ArianLust)
 * [AtwerJ](https://github.com/AtwerJ)
 * [Ave](https://github.com/AutumnLeafy)
 * [Cubby Crazes](https://github.com/CubbyCrazes)
@@ -69,6 +70,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [ShadowWalker13](https://github.com/ShadowWalker13)
 * [TheMoogle](https://github.com/TheMoogle)
 * [Tombuntu](https://github.com/ReXiSp)
+* [xFrostyCake123](https://github.com/xFrostyCake123)
 * [VLC](https://github.com/vlcoo)
 * [Zest](https://github.com/zestydevy)
 
@@ -152,5 +154,6 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * TeridaxXD001 (Models)
 * Treeki (UI)
 * VentureSonic (Background)
+* xFrostyCake123 (Sound)
 
 </details>

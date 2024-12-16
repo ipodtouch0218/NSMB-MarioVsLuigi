@@ -17,8 +17,9 @@ public class ParticleAutoDestroy : MonoBehaviour {
     }
 
     public void Update() {
-        if (!systems.TrueForAll(ps => ps.isStopped))
+        if (!systems.TrueForAll(ps => ps.isStopped)) {
             return;
+        }
 
         if (onlyDisable) {
             gameObject.SetActive(false);

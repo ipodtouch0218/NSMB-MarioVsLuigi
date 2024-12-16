@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
+  m_Name: green-mushroom-centerStageTile
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: Resources/Tilemaps/Tiles/Sky/small-mushrooms/green-mushroom-centerStageTile
+    Guid:
+      Value: 286968095341887972
+  Tile: {fileID: 11400000, guid: a7e171e7408d36645927e3934a750a26, type: 2}
+  CollisionData:
+    Shapes:
+    - Vertices:
+      - X:
+          RawValue: -32768
+        Y:
+          RawValue: 32768
+      - X:
+          RawValue: 32768
+        Y:
+          RawValue: 32768
+  IsSlipperyGround: 0
+  IsSlideableGround: 0
+  IsPolygon: 0
+  FootstepSound: 31
+  FootstepParticle: 0

@@ -1,0 +1,9 @@
+component MarioBrosPlatform {
+
+}
+
+event MarioBrosPlatformBumped {
+	nothashed Frame Frame;
+	EntityRef Entity;
+	nothashed FPVector2 Position;
+}

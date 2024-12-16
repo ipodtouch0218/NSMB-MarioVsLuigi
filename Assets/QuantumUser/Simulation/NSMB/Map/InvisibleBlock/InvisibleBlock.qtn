@@ -1,0 +1,4 @@
+component InvisibleBlock {
+	AssetRef<StageTile> BumpTile;
+	AssetRef<StageTile> Tile;
+}

@@ -1,13 +1,12 @@
+using Discord;
+using NSMB.Translation;
+using Photon.Realtime;
+using Quantum;
 using System;
 using System.IO;
 using UnityEngine;
 
-using Discord;
-using Fusion;
-using NSMB.Game;
-using NSMB.Translation;
-
-public class DiscordController : MonoBehaviour {
+public unsafe class DiscordController : MonoBehaviour {
 #pragma warning disable IDE0079
 #pragma warning disable CS0162
 
@@ -17,6 +16,7 @@ public class DiscordController : MonoBehaviour {
     //---Private Variables
     private Discord.Discord discord;
     private ActivityManager activityManager;
+    private float lastInitializeTime;
 
     public void OnEnable() {
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -42,7 +42,12 @@ public class DiscordController : MonoBehaviour {
         return false;
 #endif
 
-        discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
+        lastInitializeTime = Time.time;
+        try {
+            discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
+        } catch {
+            return false;
+        }
         activityManager = discord.GetActivityManager();
         //activityManager.OnActivityJoinRequest += AskToJoin;
         activityManager.OnActivityJoin += TryJoinGame;
@@ -62,6 +67,10 @@ public class DiscordController : MonoBehaviour {
 
     public void Update() {
         if (discord == null) {
+            if (Time.time - lastInitializeTime > 10) {
+                // Try to recreate every 10 seconds
+                Initialize();
+            }
             return;
         }
 
@@ -72,7 +81,7 @@ public class DiscordController : MonoBehaviour {
         }
     }
 
-    public void UpdateActivity(SessionInfo session = null) {
+    public unsafe void UpdateActivity() {
 #if UNITY_WEBGL || UNITY_WSA
         return;
 #endif
@@ -81,55 +90,57 @@ public class DiscordController : MonoBehaviour {
         }
 
         if (!Settings.Instance.GeneralDiscordIntegration) {
-            activityManager.ClearActivity(res => { Debug.Log(res); });
+            activityManager.ClearActivity(res => { });
             return;
         }
 
-        Activity activity = new();
-        if (!session && NetworkHandler.Runner) {
-            session = NetworkHandler.Runner.SessionInfo;
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        QuantumRunner runner = QuantumRunner.Default;
+        QuantumGame game = QuantumRunner.DefaultGame;
+
+        Room realtimeRoom = null;
+        if (runner && runner.NetworkClient != null) {
+            realtimeRoom = runner.NetworkClient.CurrentRoom;
         }
 
-        TranslationManager tm = GlobalController.Instance.translationManager;
+        Activity activity = new();
+        if (realtimeRoom != null) {
+            activity.Party = new() {
+                Size = new() {
+                    CurrentSize = realtimeRoom.PlayerCount,
+                    MaxSize = realtimeRoom.MaxPlayers,
+                },
+                Id = realtimeRoom.Name + "1",
+            };
+            activity.State = realtimeRoom.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
+            activity.Details = tm.GetTranslation("discord.online");
+            activity.Secrets = new() { Join = realtimeRoom.Name };
+        }
+        if (game != null) {
+            Frame f = game.Frames.Predicted;
 
-        if (SessionData.Instance && SessionData.Instance.Object) {
-
-            activity.Details = NetworkHandler.Runner.IsSinglePlayer ? tm.GetTranslation("discord.offline") : tm.GetTranslation("discord.online");
-            if (!NetworkHandler.Runner.IsSinglePlayer) {
-                activity.Party = new() {
-                    Size = new() {
-                        CurrentSize = session.PlayerCount,
-                        MaxSize = SessionData.Instance.MaxPlayers,
-                    },
-                    Id = session.Name + "1",
-                };
-            }
-            activity.State = session.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
-            activity.Secrets = new() { Join = session.Name };
-
-            if (GameManager.Instance) {
+            if (f != null && f.Global->GameState >= GameState.Playing) {
                 // In a level
-                GameManager gm = GameManager.Instance;
-
-                ActivityAssets assets = new();
-                if (gm.richPresenceId != "") {
-                    assets.LargeImage = "level-" + gm.richPresenceId;
-                } else {
-                    assets.LargeImage = "mainmenu";
+                if (activity.Details == null) {
+                    if (runner.Session.IsReplay) {
+                        activity.Details = tm.GetTranslation("discord.replay");
+                    } else {
+                        activity.Details = tm.GetTranslation("discord.offline");
+                    }
                 }
+                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-                assets.LargeText = tm.GetTranslation(gm.levelTranslationKey).Replace("<sprite name=room_customlevel>", "");
+                activity.Assets = new ActivityAssets {
+                    LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
+                    LargeText = tm.GetTranslation(stage.TranslationKey)
+                };
 
-                activity.Assets = assets;
-
-                if (SessionData.Instance.Timer <= 0) {
-                    activity.Timestamps = new() { Start = (long) gm.gameStartTimestamp };
+                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                if (f.Global->Rules.TimerSeconds > 0) {
+                    activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
                 } else {
-                    activity.Timestamps = new() { End = (long) gm.gameEndTimestamp };
+                    activity.Timestamps = new() { Start = now - ((f.Number - f.Global->StartFrame) * f.DeltaTime * 1000).AsLong };
                 }
-            } else {
-                // In a room, but on the main menu.
-                activity.Assets = new() { LargeImage = "mainmenu" };
             }
         } else {
             // In the main menu, not in a room
@@ -141,23 +152,15 @@ public class DiscordController : MonoBehaviour {
     }
 
     private void OnLanguageChanged(TranslationManager tm) {
-        if (NetworkHandler.Runner) {
-            UpdateActivity(NetworkHandler.Runner.SessionInfo);
-        } else {
-            UpdateActivity(null);
-        }
+        UpdateActivity();
     }
 
     public void TryJoinGame(string secret) {
-        // TODO: MainMenu jank...
-        if (GameManager.Instance) {
-            return;
-        }
-
+        // TODO: test
         Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
-
-        // TODO: add "disconnect" prompt if we're already in a game.
-        _ = NetworkHandler.JoinRoom(secret);
+        _ = NetworkHandler.JoinRoom(new EnterRoomArgs {
+            RoomName = secret,
+        });
     }
 
     //TODO this doesn't work???
