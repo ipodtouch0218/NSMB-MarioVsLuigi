@@ -1124,7 +1124,6 @@ namespace Quantum {
             physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15 && (!mario->IsInKnockback || mario->IsInWeakKnockback);
             if (physicsObject->IsWaterSolid && !physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                 // Check if we landed on water
-                Debug.Log("Splash " + f.Number);
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 foreach (var contact in contacts) {
                     if (f.Has<Liquid>(contact.Entity)) {
@@ -1291,7 +1290,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 || physicsObject->Velocity.Y > 0) {
+            if (FPMath.Abs(physicsObject->Velocity.X) > Constants._0_1875 || physicsObject->Velocity.Y > 0) {
                 mario->StationaryFrames = 0;
             } else if (physicsObject->IsTouchingGround && mario->StationaryFrames < byte.MaxValue) {
                 mario->StationaryFrames++;
@@ -1354,6 +1353,16 @@ namespace Quantum {
 
             if (!mario->IsSliding) {
                 return;
+            }
+
+            if (mario->IsSliding && mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsTouchingGround) {
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    if (f.Has<Liquid>(contact.Entity)) {
+                        mario->IsSliding = false;
+                        return;
+                    }
+                }
             }
 
             if (physicsObject->IsTouchingGround && validFloorAngle) {
@@ -1705,24 +1714,8 @@ namespace Quantum {
             f.Events.MarioPlayerUsedReserveItem(f, filter.Entity, true);
         }
 
-        public void OnRemoved(Frame f, EntityRef entity, Projectile* component) {
-            if (f.Unsafe.TryGetPointer(component->Owner, out MarioPlayer* mario)) {
-                mario->CurrentProjectiles--;
-            }
-        }
-
-        public void OnGameStarting(Frame f) {
-            // Respawn players
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            var filter = f.Filter<MarioPlayer>();
-            filter.UseCulling = false;
-            while (filter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
-                mario->Lives = f.Global->Rules.Lives;
-                mario->PreRespawn(f, entity, stage);
-            }
-        }
-        
-        public void OnMarioInvisibleBlockInteraction(Frame f, EntityRef marioEntity, EntityRef invisibleBlockEntity, PhysicsContact contact) {
+        #region Interactions
+        public static void OnMarioInvisibleBlockInteraction(Frame f, EntityRef marioEntity, EntityRef invisibleBlockEntity, PhysicsContact contact) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var invisibleBlock = f.Unsafe.GetPointer<InvisibleBlock>(invisibleBlockEntity);
             var transform = f.Unsafe.GetPointer<Transform2D>(invisibleBlockEntity);
@@ -1741,64 +1734,7 @@ namespace Quantum {
             BreakableBrickTile.Bump(f, stage, QuantumUtils.WorldToRelativeTile(stage, transform->Position), invisibleBlock->BumpTile, result, false, marioEntity, false);
         }
 
-        public bool OnPreContactCallback(FrameThreadSafe f, VersusStageData stage, EntityRef entity, PhysicsContact contact) {
-
-            /*
-            */
-            return true;
-        }
-
-        public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
-            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
-                mario->Powerdown(f, entity, false);
-            }
-        }
-
-        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
-            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
-                return;
-            }
-
-            var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
-            *doSplash &= (!mario->IsDead || liquid->LiquidType == LiquidType.Water) && !f.Exists(mario->CurrentPipe);
-
-            if (!exit && mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding) {
-                *doSplash = false;
-            }
-
-            if (!exit) {
-                switch (liquid->LiquidType) {
-                case LiquidType.Water:
-                    break;
-                case LiquidType.Lava:
-                    // Kill, fire death
-                    mario->Death(f, entity, true);
-                    break;
-                case LiquidType.Poison:
-                    // Kill, normal death
-                    mario->Death(f, entity, false);
-                    break;
-                }
-            }
-        }
-
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef bumper) {
-            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
-                if (mario->IsInKnockback) {
-                    return;
-                }
-
-                FPVector2 bumperPosition = f.Unsafe.GetPointer<Transform2D>(bumper)->Position;
-                var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
-
-                QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, bumperPosition, out FPVector2 ourPos, out FPVector2 theirPos);
-                bool onRight = ourPos.X > theirPos.X;
-
-                mario->DoKnockback(f, entity, !onRight, 1, false, bumper);
-            }
-        }
-
-        public void OnMarioCoinInteraction(Frame f, EntityRef marioEntity, EntityRef coinEntity) {
+        public static void OnMarioCoinInteraction(Frame f, EntityRef marioEntity, EntityRef coinEntity) {
             CoinSystem.TryCollectCoin(f, coinEntity, marioEntity);
         }
 
@@ -2124,6 +2060,75 @@ namespace Quantum {
                 }
             }
         }
+        #endregion
+
+        #region Signals
+        public void OnRemoved(Frame f, EntityRef entity, Projectile* component) {
+            if (f.Unsafe.TryGetPointer(component->Owner, out MarioPlayer* mario)) {
+                mario->CurrentProjectiles--;
+            }
+        }
+
+        public void OnGameStarting(Frame f) {
+            // Respawn players
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var filter = f.Filter<MarioPlayer>();
+            filter.UseCulling = false;
+            while (filter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
+                mario->Lives = f.Global->Rules.Lives;
+                mario->PreRespawn(f, entity, stage);
+            }
+        }
+
+        public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                mario->Powerdown(f, entity, false);
+            }
+        }
+
+        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                return;
+            }
+
+            var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
+            *doSplash &= (!mario->IsDead || liquid->LiquidType == LiquidType.Water) && !f.Exists(mario->CurrentPipe);
+
+            if (!exit && mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding) {
+                *doSplash = false;
+            }
+
+            if (!exit) {
+                switch (liquid->LiquidType) {
+                case LiquidType.Water:
+                    break;
+                case LiquidType.Lava:
+                    // Kill, fire death
+                    mario->Death(f, entity, true);
+                    break;
+                case LiquidType.Poison:
+                    // Kill, normal death
+                    mario->Death(f, entity, false);
+                    break;
+                }
+            }
+        }
+
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef bumper) {
+            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
+                if (mario->IsInKnockback) {
+                    return;
+                }
+
+                FPVector2 bumperPosition = f.Unsafe.GetPointer<Transform2D>(bumper)->Position;
+                var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+
+                QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, bumperPosition, out FPVector2 ourPos, out FPVector2 theirPos);
+                bool onRight = ourPos.X > theirPos.X;
+
+                mario->DoKnockback(f, entity, !onRight, 1, false, bumper);
+            }
+        }
 
         public void OnBeforeInteraction(Frame f, EntityRef entity, bool* allowInteraction) {
             if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
@@ -2231,5 +2236,6 @@ namespace Quantum {
                 holdable->Holder = EntityRef.None;
             }
         }
+        #endregion
     }
 }

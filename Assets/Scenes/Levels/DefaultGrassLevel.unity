@@ -5154,6 +5154,17 @@ PrefabInstance:
       propertyPath: EmissionModule.enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1990024770662139057, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: PoolablePrefabs.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990024770662139057, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: PoolablePrefabs.Array.data[3]
+      value: 
+      objectReference: {fileID: 5780648777663731097, guid: f684a3951610ecf48826ae18a65bdd04,
+        type: 3}
     - target: {fileID: 2209696094403403962, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: EmissionModule.enabled

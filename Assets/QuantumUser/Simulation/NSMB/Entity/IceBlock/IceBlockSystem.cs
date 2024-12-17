@@ -90,7 +90,25 @@ namespace Quantum {
             }
         }
 
-        public void OnIceBlockMarioInteraction(Frame f, EntityRef iceBlockEntity, EntityRef marioEntity, PhysicsContact contact) {
+        public static EntityRef Freeze(Frame f, EntityRef entityToFreeze, bool flying = false) {
+            if (!f.Has<Freezable>(entityToFreeze)) {
+                return default;
+            }
+
+            EntityRef frozenCubeEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
+            var frozenCube = f.Unsafe.GetPointer<IceBlock>(frozenCubeEntity);
+            frozenCube->Initialize(f, frozenCubeEntity, entityToFreeze);
+            frozenCube->IsFlying = flying;
+            return frozenCubeEntity;
+        }
+
+        public static void Destroy(Frame f, EntityRef frozenCube, IceBlockBreakReason breakReason) {
+            f.Signals.OnIceBlockBroken(frozenCube, breakReason);
+            f.Destroy(frozenCube);
+        }
+
+        #region Interactions
+        public static void OnIceBlockMarioInteraction(Frame f, EntityRef iceBlockEntity, EntityRef marioEntity, PhysicsContact contact) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -140,7 +158,7 @@ namespace Quantum {
             }
         }
 
-        public void OnIceBlockCoinInteraction(Frame f, EntityRef iceBlockEntity, EntityRef coinEntity) {
+        public static void OnIceBlockCoinInteraction(Frame f, EntityRef iceBlockEntity, EntityRef coinEntity) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
 
@@ -152,7 +170,7 @@ namespace Quantum {
             CoinSystem.TryCollectCoin(f, coinEntity, holdable->PreviousHolder);
         }
 
-        public void OnIceBlockProjectileInteraction(Frame f, EntityRef frozenCubeEntity, EntityRef projectileEntity, PhysicsContact contact) {
+        public static void OnIceBlockProjectileInteraction(Frame f, EntityRef frozenCubeEntity, EntityRef projectileEntity, PhysicsContact contact) {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             if (projectileAsset.Effect == ProjectileEffectType.Knockback) {
@@ -164,24 +182,9 @@ namespace Quantum {
                 ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
         }
+        #endregion
 
-        public static EntityRef Freeze(Frame f, EntityRef entityToFreeze, bool flying = false) {
-            if (!f.Has<Freezable>(entityToFreeze)) {
-                return default;
-            }
-
-            EntityRef frozenCubeEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
-            var frozenCube = f.Unsafe.GetPointer<IceBlock>(frozenCubeEntity);
-            frozenCube->Initialize(f, frozenCubeEntity, entityToFreeze);
-            frozenCube->IsFlying = flying;
-            return frozenCubeEntity;
-        }
-
-        public static void Destroy(Frame f, EntityRef frozenCube, IceBlockBreakReason breakReason) {
-            f.Signals.OnIceBlockBroken(frozenCube, breakReason);
-            f.Destroy(frozenCube);
-        }
-
+        #region Signals
         public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching, QBoolean dropped) {
             if (!f.Unsafe.TryGetPointer(entity, out IceBlock* ice)
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
@@ -263,5 +266,6 @@ namespace Quantum {
                 *allowCollision = false;
             }
         }
+        #endregion
     }
 }

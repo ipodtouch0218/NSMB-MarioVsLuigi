@@ -6,7 +6,7 @@ namespace Quantum {
             f.Context.RegisterInteraction<MarioBrosPlatform, MarioPlayer>(OnMarioBrosPlatformMarioPlayerInteraction);
         }
 
-        public void OnMarioBrosPlatformMarioPlayerInteraction(Frame f, EntityRef platformEntity, EntityRef marioEntity, PhysicsContact contact) {
+        public static void OnMarioBrosPlatformMarioPlayerInteraction(Frame f, EntityRef platformEntity, EntityRef marioEntity, PhysicsContact contact) {
             var transform = f.Unsafe.GetPointer<Transform2D>(platformEntity);
 
             FPVector2 down = FPVector2.Rotate(FPVector2.Down, transform->Rotation);

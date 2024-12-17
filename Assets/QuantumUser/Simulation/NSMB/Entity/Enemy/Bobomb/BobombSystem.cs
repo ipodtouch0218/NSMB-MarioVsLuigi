@@ -66,7 +66,72 @@ namespace Quantum {
             }
         }
 
-        public void OnBobombMarioInteraction(Frame f, EntityRef bobombEntity, EntityRef marioEntity) {
+        private static void Light(Frame f, EntityRef entity, Bobomb* bobomb, bool stomp) {
+            if (bobomb->CurrentDetonationFrames > 0) {
+                return;
+            }
+
+            bobomb->CurrentDetonationFrames = bobomb->DetonationFrames;
+            f.Unsafe.GetPointer<PhysicsObject>(entity)->Velocity.X = 0;
+
+            f.Events.BobombLit(f, entity, stomp);
+        }
+
+        private static void Explode(Frame f, ref Filter filter) {
+            var enemy = filter.Enemy;
+            var bobomb = filter.Bobomb;
+            var transform = filter.Transform;
+            var holdable = filter.Holdable;
+            var physicsObject = filter.PhysicsObject;
+
+            // Hit players
+            Shape2D shape = Shape2D.CreateCircle(bobomb->ExplosionRadius);
+            var hits = f.Physics2D.OverlapShape(*transform, shape);
+            for (int i = 0; i < hits.Count; i++) {
+                var hit = hits[i];
+                if (hit.Entity == filter.Entity) {
+                    continue;
+                }
+
+                f.Signals.OnBobombExplodeEntity(filter.Entity, hit.Entity);
+            }
+
+            // Destroy tiles
+            int sizeTiles = FPMath.FloorToInt(bobomb->ExplosionRadius * 2);
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            Vector2Int origin = QuantumUtils.WorldToRelativeTile(stage, transform->Position + filter.Collider->Shape.Centroid);
+            for (int x = -sizeTiles; x <= sizeTiles; x++) {
+                for (int y = -sizeTiles; y <= sizeTiles; y++) {
+                    // Taxicab distance
+                    if (FPMath.Abs(x) + FPMath.Abs(y) > sizeTiles) {
+                        continue;
+                    }
+
+                    Vector2Int tilePos = origin + new Vector2Int(x, y);
+                    StageTileInstance tileInstance = stage.GetTileRelative(f, tilePos);
+                    StageTile tile = f.FindAsset(tileInstance.Tile);
+                    if (tile is IInteractableTile it) {
+                        it.Interact(f, filter.Entity, IInteractableTile.InteractionDirection.Up, tilePos, tileInstance, out _);
+                    }
+                }
+            }
+
+            if (f.Exists(holdable->Holder)) {
+                var mario = f.Unsafe.GetPointer<MarioPlayer>(holdable->Holder);
+                mario->HeldEntity = default;
+                holdable->PreviousHolder = default;
+                holdable->Holder = default;
+            }
+
+            enemy->IsDead = true;
+            enemy->IsActive = false;
+            physicsObject->Velocity = FPVector2.Zero;
+            physicsObject->IsFrozen = true;
+            f.Events.BobombExploded(f, filter.Entity);
+        }
+
+        #region Interactions
+        public static void OnBobombMarioInteraction(Frame f, EntityRef bobombEntity, EntityRef marioEntity) {
             var bobombHoldable = f.Unsafe.GetPointer<Holdable>(bobombEntity);
             var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
 
@@ -134,7 +199,7 @@ namespace Quantum {
             } 
         }
 
-        public void OnBobombProjectileInteraction(Frame f, EntityRef bobombEntity, EntityRef projectileEntity) {
+        public static void OnBobombProjectileInteraction(Frame f, EntityRef bobombEntity, EntityRef projectileEntity) {
             var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
@@ -158,7 +223,7 @@ namespace Quantum {
             }
         }
 
-        public void OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static void OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -169,71 +234,9 @@ namespace Quantum {
                 bobomb->Kill(f, bobombEntity, iceBlockEntity, true);
             }
         }
+        #endregion
 
-        private static void Light(Frame f, EntityRef entity, Bobomb* bobomb, bool stomp) {
-            if (bobomb->CurrentDetonationFrames > 0) {
-                return;
-            }
-
-            bobomb->CurrentDetonationFrames = bobomb->DetonationFrames;
-            f.Unsafe.GetPointer<PhysicsObject>(entity)->Velocity.X = 0;
-
-            f.Events.BobombLit(f, entity, stomp);
-        }
-
-        private static void Explode(Frame f, ref Filter filter) {
-            var enemy = filter.Enemy;
-            var bobomb = filter.Bobomb;
-            var transform = filter.Transform;
-            var holdable = filter.Holdable;
-            var physicsObject = filter.PhysicsObject;
-
-            // Hit players
-            Shape2D shape = Shape2D.CreateCircle(bobomb->ExplosionRadius);
-            var hits = f.Physics2D.OverlapShape(*transform, shape);
-            for (int i = 0; i < hits.Count; i++) {
-                var hit = hits[i];    
-                if (hit.Entity == filter.Entity) {
-                    continue;
-                }
-
-                f.Signals.OnBobombExplodeEntity(filter.Entity, hit.Entity);
-            }
-
-            // Destroy tiles
-            int sizeTiles = FPMath.FloorToInt(bobomb->ExplosionRadius * 2);
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            Vector2Int origin = QuantumUtils.WorldToRelativeTile(stage, transform->Position + filter.Collider->Shape.Centroid);
-            for (int x = -sizeTiles; x <= sizeTiles; x++) {
-                for (int y = -sizeTiles; y <= sizeTiles; y++) {
-                    // Taxicab distance
-                    if (FPMath.Abs(x) + FPMath.Abs(y) > sizeTiles) {
-                        continue;
-                    }
-
-                    Vector2Int tilePos = origin + new Vector2Int(x, y);
-                    StageTileInstance tileInstance = stage.GetTileRelative(f, tilePos);
-                    StageTile tile = f.FindAsset(tileInstance.Tile);
-                    if (tile is IInteractableTile it) {
-                        it.Interact(f, filter.Entity, IInteractableTile.InteractionDirection.Up, tilePos, tileInstance, out _);
-                    }
-                }
-            }
-
-            if (f.Exists(holdable->Holder)) {
-                var mario = f.Unsafe.GetPointer<MarioPlayer>(holdable->Holder);
-                mario->HeldEntity = default;
-                holdable->PreviousHolder = default;
-                holdable->Holder = default;
-            }
-
-            enemy->IsDead = true;
-            enemy->IsActive = false;
-            physicsObject->Velocity = FPVector2.Zero;
-            physicsObject->IsFrozen = true;
-            f.Events.BobombExploded(f, filter.Entity);
-        }
-
+        #region Signals
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)
@@ -316,5 +319,6 @@ namespace Quantum {
                 bobomb->Kill(f, entity, EntityRef.None, true);
             }
         }
+        #endregion
     }
 }

@@ -10,6 +10,7 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private ParticleSystem sparkles;
+    [SerializeField] private bool looseCoin;
 
     public void OnValidate() {
         this.SetIfNull(ref sfx);
@@ -29,6 +30,18 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         bool dotted = coin->IsCurrentlyDotted;
         defaultCoinAnimate.isDisplaying = !dotted;
         dottedCoinAnimate.isDisplaying = dotted;
+        sRenderer.enabled = true;
+    }
+
+    public override void OnDeactivate() {
+        sRenderer.enabled = false;
+
+        if (looseCoin) {
+            sparkles.transform.SetParent(transform.parent);
+            sparkles.gameObject.SetActive(true);
+            sparkles.transform.position = sRenderer.transform.position;
+            sparkles.Play();
+        }
     }
 
     public override void OnUpdateView() {
@@ -63,6 +76,12 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
 
         sRenderer.enabled = !e.Collected;
         if (e.Collected && !NetworkHandler.IsReplayFastForwarding) {
+            if (looseCoin) {
+                sparkles.transform.SetParent(transform.parent);
+                sparkles.gameObject.SetActive(true);
+                sparkles.transform.position = sRenderer.transform.position;
+            }
+
             sparkles.Play();
         }
     }

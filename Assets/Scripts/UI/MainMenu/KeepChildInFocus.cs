@@ -16,6 +16,7 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private ScrollRect rect;
     private bool mouseOver = false;
     private float scrollPos = 0;
+    private GameObject previousSelectedObject;
 
     public void Awake() {
         this.SetIfNull(ref rect);
@@ -28,11 +29,17 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         rect.verticalNormalizedPosition = Mathf.Lerp(rect.verticalNormalizedPosition, scrollPos, scrollAmount * Time.deltaTime);
 
-        if (!EventSystem.current.currentSelectedGameObject) {
+        if (previousSelectedObject == EventSystem.current.currentSelectedGameObject) {
             return;
         }
 
-        RectTransform target = EventSystem.current.currentSelectedGameObject.GetComponent<RectTransform>();
+        GameObject obj = EventSystem.current.currentSelectedGameObject;
+        previousSelectedObject = obj;
+        if (!obj) {
+            return;
+        }
+
+        RectTransform target = obj.GetComponent<RectTransform>();
 
         if (IsFirstParent(target) && target.name != "Scrollbar Vertical") {
             scrollPos = rect.ScrollToCenter(target, false);

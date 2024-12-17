@@ -3,7 +3,7 @@ using System;
 
 namespace Quantum {
     [Serializable]
-    public unsafe partial struct StageTileInstance {
+    public unsafe partial struct StageTileInstance : IEquatable<StageTileInstance> {
 
         public bool HasWorldPolygons(Frame f) {
             return HasWorldPolygons(f.FindAsset(Tile));
@@ -69,6 +69,10 @@ namespace Quantum {
                 point.X * FPMath.Cos(rotation) - point.Y * FPMath.Sin(rotation),
                 point.Y * FPMath.Cos(rotation) + point.X * FPMath.Sin(rotation)
             );
+        }
+
+        public bool Equals(StageTileInstance other) {
+            return Tile == other.Tile && Rotation == other.Rotation && Scale == other.Scale;
         }
     }
 }

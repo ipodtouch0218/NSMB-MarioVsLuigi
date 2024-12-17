@@ -52,11 +52,12 @@ namespace Quantum {
             physicsObject->Velocity.X = goomba->Speed * (enemy->FacingRight ? 1 : -1);
         }
 
-        public void OnGoombaGoombaInteraction(Frame f, EntityRef goombaEntityA, EntityRef goombaEntityB) {
+        #region Interactions
+        public static void OnGoombaGoombaInteraction(Frame f, EntityRef goombaEntityA, EntityRef goombaEntityB) {
             EnemySystem.EnemyBumpTurnaround(f, goombaEntityA, goombaEntityB);
         }
 
-        public void OnGoombaMarioInteraction(Frame f, EntityRef goombaEntity, EntityRef marioEntity) {
+        public static void OnGoombaMarioInteraction(Frame f, EntityRef goombaEntity, EntityRef marioEntity) {
             var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
             var goombaTransform = f.Unsafe.GetPointer<Transform2D>(goombaEntity);
             var goombaEnemy = f.Unsafe.GetPointer<Enemy>(goombaEntity);
@@ -99,7 +100,7 @@ namespace Quantum {
             }
         }
 
-        public void OnGoombaIceBlockInteraction(Frame f, EntityRef goombaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static void OnGoombaIceBlockInteraction(Frame f, EntityRef goombaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -111,7 +112,7 @@ namespace Quantum {
             }
         }
 
-        public void OnGoombaProjectileInteraction(Frame f, EntityRef goombaEntity, EntityRef projectileEntity) {
+        public static void OnGoombaProjectileInteraction(Frame f, EntityRef goombaEntity, EntityRef projectileEntity) {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
@@ -129,7 +130,9 @@ namespace Quantum {
                 ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
         }
+        #endregion
 
+        #region Signals
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
             if (!f.Unsafe.TryGetPointer(entity, out Goomba* goomba)
                 || !f.Unsafe.TryGetPointer(entity, out Enemy* enemy)
@@ -158,5 +161,6 @@ namespace Quantum {
                 goomba->Kill(f, entity, EntityRef.None, true);
             }
         }
+        #endregion
     }
 }

@@ -7,11 +7,7 @@ namespace Quantum {
             f.Context.RegisterInteraction<MarioPlayer, BreakableObject>(OnBreakableObjectMarioInteraction);
         }
 
-        private void OnBreakableObjectMarioInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
-            TryInteraction(f, breakableObjectEntity, marioEntity, contact);
-        }
-
-        private bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {
+        private static bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             if (mario->CurrentPowerupState != PowerupState.MegaMushroom || mario->IsDead) {
                 return false;
@@ -59,14 +55,6 @@ namespace Quantum {
             return false;
         }
 
-        public void OnStageReset(Frame f, QBoolean full) {
-            var filter = f.Filter<BreakableObject, PhysicsCollider2D>();
-            while (filter.NextUnsafe(out EntityRef entity, out BreakableObject* breakable, out PhysicsCollider2D* collider)) {
-                ChangeHeight(f, entity, breakable, collider, breakable->OriginalHeight, false);
-                breakable->IsDestroyed = false;
-            }
-        }
-
         public static void ChangeHeight(Frame f, EntityRef entity, BreakableObject* breakable, PhysicsCollider2D* collider, FP newHeight, bool? broken) {
             newHeight = FPMath.Max(newHeight, breakable->MinimumHeight);
             breakable->CurrentHeight = newHeight;
@@ -80,5 +68,21 @@ namespace Quantum {
 
             f.Signals.OnBreakableObjectChangedHeight(entity, newHeight);
         }
+
+        #region Interactions
+        private static void OnBreakableObjectMarioInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
+            TryInteraction(f, breakableObjectEntity, marioEntity, contact);
+        }
+        #endregion
+
+        #region Signals
+        public void OnStageReset(Frame f, QBoolean full) {
+            var filter = f.Filter<BreakableObject, PhysicsCollider2D>();
+            while (filter.NextUnsafe(out EntityRef entity, out BreakableObject* breakable, out PhysicsCollider2D* collider)) {
+                ChangeHeight(f, entity, breakable, collider, breakable->OriginalHeight, false);
+                breakable->IsDestroyed = false;
+            }
+        }
+        #endregion
     }
 }

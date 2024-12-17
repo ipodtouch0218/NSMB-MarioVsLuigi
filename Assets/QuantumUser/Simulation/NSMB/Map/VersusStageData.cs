@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum;
+using Quantum.Profiling;
 using UnityEngine;
 
 public unsafe class VersusStageData : AssetObject {
@@ -93,11 +94,13 @@ public unsafe class VersusStageData : AssetObject {
     }
 
     public void ResetStage(Frame f, bool full) {
+        using var scope = HostProfiler.Start("VersusStageData.ResetStage");
         StageTileInstance[] stageData = f.StageTiles;
 
         for (int i = 0; i < TileData.Length; i++) {
-            StageTileInstance newTile = TileData[i];
+            ref StageTileInstance newTile = ref TileData[i];
             if (!stageData[i].Equals(newTile)) {
+                using var callbackScope = HostProfiler.Start("VersusStageData.ExecuteCallbacks");
                 int x = i % TileDimensions.x + TileOrigin.x;
                 int y = i / TileDimensions.x + TileOrigin.y;
                 f.Signals.OnTileChanged(x, y, newTile);

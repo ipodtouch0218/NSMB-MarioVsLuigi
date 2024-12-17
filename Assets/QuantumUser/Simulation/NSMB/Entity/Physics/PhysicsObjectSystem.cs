@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
 
-        public static readonly FP RaycastSkin = FP.FromString("0.15");
+        public static readonly FP RaycastSkin = FP.FromString("0.1");
         public static readonly FP Skin = FP.FromString("0.001");
         public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 22.5 degrees
 
@@ -296,7 +296,7 @@ namespace Quantum {
 
                         if (earlyContinue
                             || (min.HasValue && contact.Distance - min.Value > tolerance)
-                            || contact.Distance > FPMath.Abs(velocityY)
+                            || contact.Distance > (FPMath.Abs(velocityY) + RaycastSkin + Skin)
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
@@ -498,7 +498,7 @@ namespace Quantum {
 
                         if (earlyContinue
                             || (min.HasValue && contact.Distance - min.Value > tolerance)
-                            || contact.Distance > FPMath.Abs(velocityX)
+                            || contact.Distance > (FPMath.Abs(velocityX) + RaycastSkin + Skin)
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;

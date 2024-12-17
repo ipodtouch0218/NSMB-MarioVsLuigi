@@ -135,7 +135,8 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaGoombaInteraction(Frame f, EntityRef koopaEntity, EntityRef goombaEntity) {
+        #region Interactions
+        public static void OnKoopaGoombaInteraction(Frame f, EntityRef koopaEntity, EntityRef goombaEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
             bool beingHeld = f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntity)->Holder);
@@ -151,7 +152,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaKoopaInteraction(Frame f, EntityRef koopaEntityA, EntityRef koopaEntityB) {
+        public static void OnKoopaKoopaInteraction(Frame f, EntityRef koopaEntityA, EntityRef koopaEntityB) {
             var koopaA = f.Unsafe.GetPointer<Koopa>(koopaEntityA);
             var koopaB = f.Unsafe.GetPointer<Koopa>(koopaEntityB);
 
@@ -177,7 +178,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaBobombInteraction(Frame f, EntityRef koopaEntity, EntityRef bobombEntity) {
+        public static void OnKoopaBobombInteraction(Frame f, EntityRef koopaEntity, EntityRef bobombEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
 
@@ -202,7 +203,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaMarioInteraction(Frame f, EntityRef koopaEntity, EntityRef marioEntity) {
+        public static void OnKoopaMarioInteraction(Frame f, EntityRef koopaEntity, EntityRef marioEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var koopaHoldable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
@@ -320,8 +321,7 @@ namespace Quantum {
             }
         }
         
-
-        public void OnKoopaIceBlockInteraction(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static void OnKoopaIceBlockInteraction(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -335,7 +335,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaIceBlockInteractionStationary(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity) {
+        public static void OnKoopaIceBlockInteractionStationary(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var koopaTransform = f.Unsafe.GetPointer<Transform2D>(koopaEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
@@ -354,7 +354,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaCoinInteraction(Frame f, EntityRef koopaEntity, EntityRef coinEntity) {
+        public static void OnKoopaCoinInteraction(Frame f, EntityRef koopaEntity, EntityRef coinEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
 
@@ -366,7 +366,7 @@ namespace Quantum {
             CoinSystem.TryCollectCoin(f, coinEntity, holdable->PreviousHolder);
         }
 
-        public void OnKoopaProjectileInteraction(Frame f, EntityRef koopaEntity, EntityRef projectileEntity) {
+        public static void OnKoopaProjectileInteraction(Frame f, EntityRef koopaEntity, EntityRef projectileEntity) {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
@@ -385,7 +385,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaBooInteraction(Frame f, EntityRef koopaEntity, EntityRef booEntity) {
+        public static void OnKoopaBooInteraction(Frame f, EntityRef koopaEntity, EntityRef booEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
 
@@ -396,7 +396,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaPiranhaPlantInteraction(Frame f, EntityRef koopaEntity, EntityRef piranhaPlantEntity) {
+        public static void OnKoopaPiranhaPlantInteraction(Frame f, EntityRef koopaEntity, EntityRef piranhaPlantEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
 
@@ -416,7 +416,7 @@ namespace Quantum {
             }
         }
 
-        public void OnKoopaBulletBillInteraction(Frame f, EntityRef koopaEntity, EntityRef bulletBillEntity) {
+        public static void OnKoopaBulletBillInteraction(Frame f, EntityRef koopaEntity, EntityRef bulletBillEntity) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
 
@@ -432,7 +432,9 @@ namespace Quantum {
                 }
             }
         }
+        #endregion
 
+        #region Signals
         public void OnThrowHoldable(Frame f, EntityRef entity, EntityRef marioEntity, QBoolean crouching, QBoolean dropped) {
             if (!f.Unsafe.TryGetPointer(entity, out Koopa* koopa)
                 || !f.Unsafe.TryGetPointer(entity, out Holdable* holdable)
@@ -527,5 +529,6 @@ namespace Quantum {
                 koopa->TurnaroundWaitFrames = 9;
             }
         }
+        #endregion
     }
 }

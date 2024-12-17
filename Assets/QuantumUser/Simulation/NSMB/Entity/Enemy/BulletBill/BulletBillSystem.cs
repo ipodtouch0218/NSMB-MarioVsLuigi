@@ -97,7 +97,8 @@ namespace Quantum {
             f.Destroy(entity);
         }
 
-        public void OnBulletBillMarioInteraction(Frame f, EntityRef bulletBillEntity, EntityRef marioEntity) {
+        #region Interactions
+        public static void OnBulletBillMarioInteraction(Frame f, EntityRef bulletBillEntity, EntityRef marioEntity) {
             var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
             var bulletBillTransform = f.Unsafe.GetPointer<Transform2D>(bulletBillEntity);
             var bulletBillEnemy = f.Unsafe.GetPointer<Enemy>(bulletBillEntity);
@@ -135,7 +136,7 @@ namespace Quantum {
             }
         }
 
-        public void OnBulletBillIceBlockInteraction(Frame f, EntityRef bulletBillEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static void OnBulletBillIceBlockInteraction(Frame f, EntityRef bulletBillEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -147,7 +148,7 @@ namespace Quantum {
             }
         }
 
-        public void OnBulletBillProjectileInteraction(Frame f, EntityRef bulletBillEntity, EntityRef projectileEntity) {
+        public static void OnBulletBillProjectileInteraction(Frame f, EntityRef bulletBillEntity, EntityRef projectileEntity) {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             if (projectileAsset.Effect == ProjectileEffectType.Freeze) {
@@ -160,7 +161,9 @@ namespace Quantum {
                 ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
             }
         }
+        #endregion
 
+        #region Signals
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out BulletBill* bulletBill)) {
                 bulletBill->Kill(f, entity, bobomb, false);
@@ -180,5 +183,6 @@ namespace Quantum {
                 f.Events.PlayComboSound(f, iceBlock->Entity, 0);
             }
         }
+        #endregion
     }
 }
