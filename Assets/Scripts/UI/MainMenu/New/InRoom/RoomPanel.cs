@@ -1,5 +1,7 @@
 ﻿using NSMB.Translation;
 using Quantum;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -8,13 +10,28 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu.Submenus {
     public class RoomPanel : InRoomSubmenuPanel {
 
+        //---Properties
+        public override GameObject DefaultSelectedObject => rules[0].gameObject;
+        public override bool IsInSubmenu => rules.Any(r => r.Editing);
+
         //---Serialized Variables
         [SerializeField] private Image stagePreviewImage;
         [SerializeField] private TMP_Text stageNameText, rulesText;
         [SerializeField] private StagePreviewManager stagePreviewManager;
+        [SerializeField] private MainMenuChat chat;
 
         //---Private Variables
+        private readonly List<ChangeableRule> rules = new();
         private VersusStageData currentStage;
+
+        public override void Initialize() {
+            base.Initialize();
+            GetComponentsInChildren(true, rules);
+            foreach (var rule in rules) {
+                rule.Initialize();
+            }
+            chat.Initialize();
+        }
 
         public unsafe void Start() {
             if (NetworkHandler.Runner && NetworkHandler.Runner.Game != null) {
@@ -30,6 +47,17 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public void OnDestroy() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
+
+        public override bool TryGoBack(out bool playSound) {
+            if (rules.Any(r => r.Editing)) {
+                foreach (var rule in rules) {
+                    rule.Editing = false;
+                }
+                playSound = true;
+                return false;
+            }
+            return base.TryGoBack(out playSound);
         }
 
         private void UpdateRules(in GameRules rules) {

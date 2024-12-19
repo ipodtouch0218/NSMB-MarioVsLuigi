@@ -211,6 +211,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
   - {fileID: 11400000, guid: 66847e430712048408ec06255e8732aa, type: 2}
   - {fileID: 11400000, guid: 937b975636292004d99a857288a07edc, type: 2}
+  AllStages:
+  - {fileID: 11400000, guid: f06333ca273567e4aa69ecffa0ec4aa5, type: 2}
+  - {fileID: 11400000, guid: 49ae08f98b45cab4eba5f78b2b8e5e79, type: 2}
+  - {fileID: 11400000, guid: e2f52cfc3ee50884ba9f5b260e822fd0, type: 2}
+  - {fileID: 11400000, guid: 16a25243d0bc6ca4aa2e9f6bdce2863f, type: 2}
+  - {fileID: 11400000, guid: e4239af6b597ce04d87c6ecd1628779e, type: 2}
+  - {fileID: 11400000, guid: 44e13c15080ad0c4eb6de49738be371f, type: 2}
+  - {fileID: 11400000, guid: a6f9d7537b419f745a2b9468827d1da8, type: 2}
+  - {fileID: 11400000, guid: bd5808d9e85ad8b4592ca36eaff24b8f, type: 2}
+  - {fileID: 11400000, guid: 2725d860a5f0d8f48a6b40fa4d04ae1a, type: 2}
+  - {fileID: 11400000, guid: b18d332df84e64f4ba8cd55a576ce872, type: 2}
+  - {fileID: 11400000, guid: 540a3bf6243f1c94cb307db79d724474, type: 2}
   FallbackPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
   CharacterDatas:
   - {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}

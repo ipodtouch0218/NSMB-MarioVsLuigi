@@ -1,9 +1,11 @@
+using JetBrains.Annotations;
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,7 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus {
     public class InRoomSubmenu : MainMenuSubmenu {
 
         //---Properties
-        public override float BackHoldTime => teamChooser.content.activeSelf || paletteChooser.content.activeSelf || playerDropdownOpen ? 0f : 1f;
+        public override float BackHoldTime => allPanels.Any(p => p.IsInSubmenu) ? 0f : 1f;
         public unsafe override Color? HeaderColor {
             get {
                 const int rngSeed = 2035767;
@@ -54,16 +56,11 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private InRoomSubmenuPanel defaultSelectedPanel;
         [SerializeField] private AudioSource sfx, musicSource;
         [SerializeField] private List<InRoomSubmenuPanel> allPanels;
-        [SerializeField] private PlayerListHandler playerListHandler;
-        [SerializeField] private PaletteChooser paletteChooser;
-        [SerializeField] private TeamChooser teamChooser;
         [SerializeField] private TMP_Text startGameButtonText;
         [SerializeField] private Clickable startGameButton;
-        [SerializeField] private MainMenuChat mainMenuChat;
 
         //---Private Variables
         private InRoomSubmenuPanel selectedPanel;
-        private PlayerListEntry playerDropdownOpen;
         private int lastCountdownStartFrame;
         private bool invalidStart;
         private Coroutine fadeMusicCoroutine;
@@ -77,10 +74,6 @@ namespace NSMB.UI.MainMenu.Submenus {
             foreach (var panel in allPanels) {
                 panel.Initialize();
             }
-            playerListHandler.Initialize();
-            paletteChooser.Initialize();
-            teamChooser.Initialize();
-            mainMenuChat.Initialize();
 
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
@@ -94,43 +87,35 @@ namespace NSMB.UI.MainMenu.Submenus {
         public void OnEnable() {
             ControlSystem.controls.UI.Next.performed += OnNextPerformed;
             ControlSystem.controls.UI.Previous.performed += OnPreviousPerformed;
-            PlayerListEntry.PlayerEntryDropdownChanged += OnPlayerEntryDropdownChanged;
 
             foreach (var panel in allPanels) {
                 panel.Deselect();
             }
             selectedPanel = defaultSelectedPanel;
             selectedPanel.Select(true);
-            playerDropdownOpen = null;
         }
 
         public void OnDisable() {
             ControlSystem.controls.UI.Next.performed -= OnNextPerformed;
             ControlSystem.controls.UI.Previous.performed -= OnPreviousPerformed;
-            PlayerListEntry.PlayerEntryDropdownChanged -= OnPlayerEntryDropdownChanged;
         }
 
         public override bool TryGoBack(out bool playSound) {
-            if (playerDropdownOpen) {
-                playerDropdownOpen.HideDropdown(false);
-                playSound = false;
-                return false;
+            bool allowGoBack = true;
+            playSound = true;
+            foreach (var panel in allPanels) {
+                allowGoBack &= panel.TryGoBack(out bool tempPlaySound);
+                playSound &= tempPlaySound;
             }
 
-            if (teamChooser.content.activeSelf) {
-                teamChooser.Close(true);
-                playSound = false;
-                return false;
-            }
-
-            if (paletteChooser.content.activeSelf) {
-                paletteChooser.Close(true);
-                playSound = false;
+            if (!allowGoBack) {
                 return false;
             }
 
             _ = NetworkHandler.ConnectToRegion(null);
-            return base.TryGoBack(out playSound);
+            bool success = base.TryGoBack(out bool finalPlaySound);
+            playSound &= finalPlaySound;
+            return success;
         }
 
         public void SelectPanel(InRoomSubmenuPanel panel) {
@@ -232,7 +217,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Callbacks
         private void OnPreviousPerformed(InputAction.CallbackContext context) {
-            if (!context.performed || playerDropdownOpen) {
+            if (!context.performed || allPanels.Any(p => p.IsInSubmenu)) {
                 return;
             }
 
@@ -240,7 +225,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private void OnNextPerformed(InputAction.CallbackContext context) {
-            if (!context.performed || playerDropdownOpen) {
+            if (!context.performed || allPanels.Any(p => p.IsInSubmenu)) {
                 return;
             }
 
@@ -310,10 +295,6 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         private void OnCountdownTick(EventCountdownTick e) {
             UpdateStartButton(e.Game, e.Frame);
-        }
-
-        private void OnPlayerEntryDropdownChanged(PlayerListEntry entry, bool state) {
-            playerDropdownOpen = state ? entry : null;
         }
     }
 }

@@ -8,6 +8,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Properties
         public virtual GameObject DefaultSelectedObject => defaultSelectedObject;
+        public virtual bool IsInSubmenu => false;
 
         //---Serialized Variables
         [SerializeField] protected InRoomSubmenu menu;
@@ -35,6 +36,11 @@ namespace NSMB.UI.MainMenu.Submenus {
                 hide.SetActive(false);
             }
             header.color = deselectedColor;
+        }
+
+        public virtual bool TryGoBack(out bool playSound) {
+            playSound = true;
+            return true;
         }
     }
 }

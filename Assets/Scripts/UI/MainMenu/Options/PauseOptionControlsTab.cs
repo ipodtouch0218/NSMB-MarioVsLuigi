@@ -136,7 +136,7 @@ namespace NSMB.UI.Pause.Options {
             if (currentRebinding != null) {
                 DisposeRebind(currentRebinding);
             }
-
+            
             manager.SetCurrentOption(option.parent);
             GlobalController.Instance.PlaySound(SoundEffect.UI_Cursor);
 

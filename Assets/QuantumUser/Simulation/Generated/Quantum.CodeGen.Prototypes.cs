@@ -312,10 +312,10 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.GameRules))]
   public unsafe partial class GameRulesPrototype : StructPrototype {
     public AssetRef<Map> Level;
-    public Byte StarsToWin;
-    public Byte CoinsForPowerup;
-    public Byte Lives;
-    public UInt16 TimerSeconds;
+    public Int32 StarsToWin;
+    public Int32 CoinsForPowerup;
+    public Int32 Lives;
+    public Int32 TimerSeconds;
     public QBoolean TeamsEnabled;
     public QBoolean CustomPowerupsEnabled;
     public QBoolean DrawOnTimeUp;

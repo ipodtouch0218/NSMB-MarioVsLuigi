@@ -5,18 +5,41 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu.Submenus {
     public class ProfilePanel : InRoomSubmenuPanel {
 
+        //---Properties
+        public override bool IsInSubmenu => teamChooser.content.activeSelf || paletteChooser.content.activeSelf;
+
         //---Serialized Variables
         [SerializeField] private Image[] characterButtonImages, characterButtonLogos;
         [SerializeField] private Sprite enabledCharacterButtonSprite, disabledCharacterButtonSprite;
         [SerializeField] private Color enabledCharacterButtonLogoColor, disabledCharacterButtonLogoColor;
         [SerializeField] private PaletteChooser paletteChooser;
+        [SerializeField] private TeamChooser teamChooser;
         [SerializeField] private SpriteChangingToggle spectateToggle;
 
         //---Private Variables
         private int currentCharacterIndex;
 
         public override void Initialize() {
+            paletteChooser.Initialize();
+            teamChooser.Initialize();
+
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
+        }
+
+        public override bool TryGoBack(out bool playSound) {
+            if (teamChooser.content.activeSelf) {
+                teamChooser.Close(true);
+                playSound = false;
+                return false;
+            }
+
+            if (paletteChooser.content.activeSelf) {
+                paletteChooser.Close(true);
+                playSound = false;
+                return false;
+            }
+
+            return base.TryGoBack(out playSound);
         }
 
         public void OnCharacterClicked(int index) {

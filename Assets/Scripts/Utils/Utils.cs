@@ -240,5 +240,10 @@ namespace NSMB.Utils {
             double time = (Time.timeAsDouble * 0.25d) % 1d;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
         }
+
+        public static float Luminance(Color color) {
+            // https://stackoverflow.com/a/596243/19635374
+            return 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
+        }
     }
 }

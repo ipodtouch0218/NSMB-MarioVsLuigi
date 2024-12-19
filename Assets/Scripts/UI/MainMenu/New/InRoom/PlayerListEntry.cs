@@ -2,12 +2,10 @@ using NSMB.Utils;
 using Quantum;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering.UI;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Navigation = UnityEngine.UI.Navigation;
@@ -18,7 +16,9 @@ namespace NSMB.UI.MainMenu {
         //---Static Variables
         public static event Action<PlayerListEntry> PlayerMuteStateChanged;
         public static event Action<PlayerListEntry> PlayerEntrySelected;
-        public static event Action<PlayerListEntry, bool> PlayerEntryDropdownChanged;
+
+        //---Properties
+        public bool IsDropdownOpen => dropdownOptions.activeInHierarchy;
 
         //---Public Variables
         public PlayerRef player;
@@ -107,9 +107,6 @@ namespace NSMB.UI.MainMenu {
             userId = default;
             joinTick = int.MaxValue;
             playerExistsGameObject.SetActive(false);
-            if (dropdownOptions.activeSelf) {
-                PlayerEntryDropdownChanged?.Invoke(this, false);
-            }
             dropdownOptions.SetActive(false);
         }
 
@@ -235,7 +232,6 @@ namespace NSMB.UI.MainMenu {
             blockerTransform.offsetMax = blockerTransform.offsetMin = Vector2.zero;
             blockerInstance.SetActive(true);
             dropdownOptions.SetActive(true);
-            PlayerEntryDropdownChanged?.Invoke(this, true);
 
             EventSystem.current.SetSelectedGameObject(first.gameObject);
             canvas.PlayCursorSound();
@@ -244,9 +240,6 @@ namespace NSMB.UI.MainMenu {
         public void HideDropdown(bool didAction) {
             if (blockerInstance) {
                 Destroy(blockerInstance);
-            }
-            if (dropdownOptions.activeSelf) {
-                PlayerEntryDropdownChanged?.Invoke(this, false);
             }
             dropdownOptions.SetActive(false);
             canvas.PlaySound(didAction ? SoundEffect.UI_Decide : SoundEffect.UI_Back);

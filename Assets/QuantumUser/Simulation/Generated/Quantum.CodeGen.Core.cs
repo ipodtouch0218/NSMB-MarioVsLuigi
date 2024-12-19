@@ -495,23 +495,23 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 32;
+    public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(24)]
+    [FieldOffset(32)]
     public AssetRef<Map> Level;
-    [FieldOffset(2)]
-    public Byte StarsToWin;
-    [FieldOffset(0)]
-    public Byte CoinsForPowerup;
-    [FieldOffset(1)]
-    public Byte Lives;
-    [FieldOffset(4)]
-    public UInt16 TimerSeconds;
-    [FieldOffset(16)]
-    public QBoolean TeamsEnabled;
     [FieldOffset(8)]
-    public QBoolean CustomPowerupsEnabled;
+    public Int32 StarsToWin;
+    [FieldOffset(0)]
+    public Int32 CoinsForPowerup;
+    [FieldOffset(4)]
+    public Int32 Lives;
     [FieldOffset(12)]
+    public Int32 TimerSeconds;
+    [FieldOffset(24)]
+    public QBoolean TeamsEnabled;
+    [FieldOffset(16)]
+    public QBoolean CustomPowerupsEnabled;
+    [FieldOffset(20)]
     public QBoolean DrawOnTimeUp;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -690,7 +690,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 1728;
+    public const Int32 SIZE = 1736;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;

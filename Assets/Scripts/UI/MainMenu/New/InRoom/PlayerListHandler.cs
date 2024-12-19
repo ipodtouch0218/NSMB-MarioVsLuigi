@@ -12,6 +12,9 @@ namespace NSMB.UI.MainMenu {
         public static event Action<int> PlayerAdded;
         public static event Action<int> PlayerRemoved;
 
+        //---Properties
+        public PlayerListEntry OpenDropdown => playerListEntries.FirstOrDefault(ple => ple.IsDropdownOpen);
+
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] private GameObject contentPane;
@@ -32,6 +35,7 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+            QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
         }
 
         public void OnEnable() {
@@ -158,6 +162,10 @@ namespace NSMB.UI.MainMenu {
             if (e.NewState == GameState.PreGameRoom) {
                 UpdateAllPlayerEntries(e.Frame);
             }
+        }
+
+        private void OnRulesChanged(EventRulesChanged e) {
+            UpdateAllPlayerEntries(e.Frame);
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {

@@ -4,6 +4,7 @@
         public StageTile InvisibleSolidTile;
 
         public PowerupAsset[] AllPowerups;
+        public Map[] AllStages;
         public PowerupAsset FallbackPowerup;
         public CharacterAsset[] CharacterDatas;
         public TeamAsset[] Teams;

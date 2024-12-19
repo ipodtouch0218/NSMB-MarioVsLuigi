@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu.Submenus {
-    public class PlayerListPanel : InRoomSubmenuPanel {
+    public class PlayerPanel : InRoomSubmenuPanel {
 
         //---Properties
         public override GameObject DefaultSelectedObject => playerList.GetPlayerEntryAtIndex(0).button.gameObject;
+        public override bool IsInSubmenu => playerList.OpenDropdown;
 
         //---Serialized Variables
         [SerializeField] private PlayerListHandler playerList;
@@ -22,6 +23,20 @@ namespace NSMB.UI.MainMenu.Submenus {
         public void OnDisable() {
             PlayerListHandler.PlayerRemoved -= OnPlayerRemoved;
             PlayerListEntry.PlayerEntrySelected -= OnPlayerEntrySelected;
+        }
+
+        public override void Initialize() {
+            playerList.Initialize();
+        }
+
+        public override bool TryGoBack(out bool playSound) {
+            PlayerListEntry dropdown = playerList.OpenDropdown;
+            if (dropdown) {
+                dropdown.HideDropdown(false);
+                playSound = false;
+                return false;
+            }
+            return base.TryGoBack(out playSound);
         }
 
         public override void Select(bool setDefault) {

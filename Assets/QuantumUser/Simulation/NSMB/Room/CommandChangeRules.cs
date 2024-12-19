@@ -3,13 +3,13 @@ using Photon.Deterministic;
 namespace Quantum {
     public class CommandChangeRules : DeterministicCommand, ILobbyCommand {
 
-        public Changes EnabledChanges;
+        public Rules EnabledChanges;
 
         public AssetRef<Map> Level;
-        public byte StarsToWin;
-        public byte CoinsForPowerup;
-        public byte Lives;
-        public ushort TimerSeconds;
+        public int StarsToWin;
+        public int CoinsForPowerup;
+        public int Lives;
+        public int TimerSeconds;
         public bool TeamsEnabled;
         public bool CustomPowerupsEnabled;
         public bool DrawOnTimeUp;
@@ -17,7 +17,7 @@ namespace Quantum {
         public override void Serialize(BitStream stream) {
             ushort changes = (ushort) EnabledChanges;
             stream.Serialize(ref changes);
-            EnabledChanges = (Changes) changes;
+            EnabledChanges = (Rules) changes;
 
             stream.Serialize(ref Level);
             stream.Serialize(ref StarsToWin);
@@ -35,33 +35,33 @@ namespace Quantum {
                 return;
             }
 
-            Changes rulesChanges = EnabledChanges;
+            Rules rulesChanges = EnabledChanges;
             var rules = f.Global->Rules;
             bool levelChanged = false;
 
-            if (rulesChanges.HasFlag(Changes.Level)) {
+            if (rulesChanges.HasFlag(Rules.Level)) {
                 levelChanged = rules.Level != Level;
                 rules.Level = Level;
             }
-            if (rulesChanges.HasFlag(Changes.StarsToWin)) {
+            if (rulesChanges.HasFlag(Rules.StarsToWin)) {
                 rules.StarsToWin = StarsToWin;
             }
-            if (rulesChanges.HasFlag(Changes.CoinsForPowerup)) {
+            if (rulesChanges.HasFlag(Rules.CoinsForPowerup)) {
                 rules.CoinsForPowerup = CoinsForPowerup;
             }
-            if (rulesChanges.HasFlag(Changes.Lives)) {
+            if (rulesChanges.HasFlag(Rules.Lives)) {
                 rules.Lives = Lives;
             }
-            if (rulesChanges.HasFlag(Changes.TimerSeconds)) {
+            if (rulesChanges.HasFlag(Rules.TimerSeconds)) {
                 rules.TimerSeconds = TimerSeconds;
             }
-            if (rulesChanges.HasFlag(Changes.TeamsEnabled)) {
+            if (rulesChanges.HasFlag(Rules.TeamsEnabled)) {
                 rules.TeamsEnabled = TeamsEnabled;
             }
-            if (rulesChanges.HasFlag(Changes.CustomPowerupsEnabled)) {
+            if (rulesChanges.HasFlag(Rules.CustomPowerupsEnabled)) {
                 rules.CustomPowerupsEnabled = CustomPowerupsEnabled;
             }
-            if (rulesChanges.HasFlag(Changes.DrawOnTimeUp)) {
+            if (rulesChanges.HasFlag(Rules.DrawOnTimeUp)) {
                 rules.DrawOnTimeUp = DrawOnTimeUp;
             }
 
@@ -73,7 +73,7 @@ namespace Quantum {
             }
         }
 
-        public enum Changes : ushort {
+        public enum Rules : ushort {
             Level = 1 << 0,
             StarsToWin = 1 << 1,
             CoinsForPowerup = 1 << 2,

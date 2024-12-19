@@ -68,6 +68,7 @@ namespace NSMB.UI.MainMenu {
             TeamAsset teamScriptable = game.Configurations.Simulation.Teams[selected];
             flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
             canvas.PlayConfirmSound();
+            EventSystem.current.SetSelectedGameObject(button.gameObject);
         }
 
         public unsafe void Open() {
@@ -91,7 +92,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             Destroy(blockerInstance);
-            EventSystem.current.SetSelectedGameObject(gameObject);
+            EventSystem.current.SetSelectedGameObject(button.gameObject);
             content.SetActive(false);
 
             if (playSound) {

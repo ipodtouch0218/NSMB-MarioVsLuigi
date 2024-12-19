@@ -96,7 +96,7 @@ namespace NSMB.UI.MainMenu {
             MainMenuManager.MapData mapData = MainMenuManager.Instance.maps[index];
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.Level,
+                EnabledChanges = CommandChangeRules.Rules.Level,
                 Level = mapData.mapAsset,
             });
         }
@@ -127,7 +127,7 @@ namespace NSMB.UI.MainMenu {
             newValue = Mathf.Clamp(newValue, 1, 25);
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.StarsToWin,
+                EnabledChanges = CommandChangeRules.Rules.StarsToWin,
                 StarsToWin = (byte) newValue,
             });
         }
@@ -150,7 +150,7 @@ namespace NSMB.UI.MainMenu {
             newValue = Mathf.Clamp(newValue, 3, 25);
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.CoinsForPowerup,
+                EnabledChanges = CommandChangeRules.Rules.CoinsForPowerup,
                 CoinsForPowerup = (byte) newValue,
             });
         }
@@ -174,7 +174,7 @@ namespace NSMB.UI.MainMenu {
             newValue = Mathf.Clamp(newValue, 1, 25);
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.Lives,
+                EnabledChanges = CommandChangeRules.Rules.Lives,
                 Lives = (byte) newValue,
             });
             ChangeLives(newValue);
@@ -189,7 +189,7 @@ namespace NSMB.UI.MainMenu {
 
             int newValue = livesEnabledToggle.isOn ? Mathf.Clamp(int.Parse(livesInputField.text), 1, 25) : 0;
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.Lives,
+                EnabledChanges = CommandChangeRules.Rules.Lives,
                 Lives = (byte) newValue,
             });
         }
@@ -227,7 +227,7 @@ namespace NSMB.UI.MainMenu {
 
             newValue = Mathf.Clamp(newValue, 1, 99);
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.TimerSeconds,
+                EnabledChanges = CommandChangeRules.Rules.TimerSeconds,
                 TimerSeconds = (byte) newValue,
             });
         }
@@ -245,7 +245,7 @@ namespace NSMB.UI.MainMenu {
 
             newValue = timerEnabledToggle.isOn ? Mathf.Clamp(newValue, 1, 99) : 0;
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.TimerSeconds,
+                EnabledChanges = CommandChangeRules.Rules.TimerSeconds,
                 TimerSeconds = (byte) newValue,
             });
         }
@@ -272,7 +272,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.DrawOnTimeUp,
+                EnabledChanges = CommandChangeRules.Rules.DrawOnTimeUp,
                 DrawOnTimeUp = drawEnabledToggle.isOn,
             });
         }
@@ -292,7 +292,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.TeamsEnabled,
+                EnabledChanges = CommandChangeRules.Rules.TeamsEnabled,
                 TeamsEnabled = teamsEnabledToggle.isOn,
             });
 
@@ -322,7 +322,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Changes.CustomPowerupsEnabled,
+                EnabledChanges = CommandChangeRules.Rules.CustomPowerupsEnabled,
                 CustomPowerupsEnabled = customPowerupsEnabledToggle.isOn,
             });
         }

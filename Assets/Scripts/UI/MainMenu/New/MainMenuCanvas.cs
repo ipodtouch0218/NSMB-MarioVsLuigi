@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -8,9 +9,13 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu {
     public class MainMenuCanvas : MonoBehaviour {
 
+        //---Events
+        public event Action<Color> HeaderColorChanged;
+
         //---Properties
         public static MainMenuCanvas Instance { get; private set; }
         public List<MainMenuSubmenu> SubmenuStack => submenuStack;
+        public Color HeaderColor => headerImage.color;
 
         //---Serialized Variables
         [SerializeField] private MainMenuSubmenu startingSubmenu;
@@ -26,7 +31,7 @@ namespace NSMB.UI.MainMenu {
         //---Private Variables
         private readonly List<MainMenuSubmenu> allSubmenus = new();
         private readonly List<MainMenuSubmenu> submenuStack = new();
-        private Color defaultHeaderColor;
+        private Color defaultHeaderColor, currentHeaderColor;
 
         public void OnValidate() {
             this.SetIfNull(ref sfx);
@@ -66,7 +71,11 @@ namespace NSMB.UI.MainMenu {
                 headerPath.text = builder.ToString();
             }
 
-            headerImage.color = newHeaderColor ?? defaultHeaderColor;
+            Color newColor = newHeaderColor ?? defaultHeaderColor;
+            if (HeaderColor == newColor) {
+                HeaderColorChanged?.Invoke(newColor);
+            }
+            headerImage.color = newColor;
             header.SetActive(showHeader);
         }
 

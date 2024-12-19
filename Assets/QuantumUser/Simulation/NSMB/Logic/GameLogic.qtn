@@ -16,11 +16,10 @@ global {
 struct GameRules {
 	asset_ref<Map> Level;
 
-	byte StarsToWin;
-	byte CoinsForPowerup;
-	byte Lives;
-	ushort TimerSeconds;
-
+	int StarsToWin;
+	int CoinsForPowerup;
+	int Lives;
+	int TimerSeconds;
 	bool TeamsEnabled;
 	bool CustomPowerupsEnabled;
 	bool DrawOnTimeUp;
