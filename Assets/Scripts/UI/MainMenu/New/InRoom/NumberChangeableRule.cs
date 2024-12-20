@@ -17,7 +17,7 @@ public class NumberChangeableRule : ChangeableRule {
         value = Mathf.Clamp(intValue + step, minValue, maxValue);
 
         if (intValue != (int) value) {
-            canvas.PlayCursorSound();
+            cursorSfx.Play();
             SendCommand();
         }
     }
@@ -27,7 +27,7 @@ public class NumberChangeableRule : ChangeableRule {
         value = Mathf.Clamp(intValue - step, minValue, maxValue);
 
         if (intValue != (int) value) {
-            canvas.PlayCursorSound();
+            cursorSfx.Play();
             SendCommand();
         }
     }

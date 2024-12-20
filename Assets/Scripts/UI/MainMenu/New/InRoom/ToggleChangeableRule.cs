@@ -10,7 +10,7 @@ public class ToggleChangeableRule : ChangeableRule {
     protected override void IncreaseValueInternal() {
         if (!(bool) value) {
             value = true;
-            canvas.PlayCursorSound();
+            cursorSfx.Play();
             SendCommand();
         }
     }
@@ -18,7 +18,7 @@ public class ToggleChangeableRule : ChangeableRule {
     protected override unsafe void DecreaseValueInternal() {
         if ((bool) value) {
             value = false;
-            canvas.PlayCursorSound();
+            cursorSfx.Play();
             SendCommand();
         }
     }

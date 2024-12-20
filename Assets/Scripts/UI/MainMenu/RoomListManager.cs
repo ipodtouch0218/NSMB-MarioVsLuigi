@@ -1,3 +1,5 @@
+using NSMB.UI.MainMenu.Submenus;
+using NSMB.Utils;
 using Photon.Realtime;
 using System.Collections.Generic;
 using TMPro;
@@ -27,6 +29,7 @@ namespace NSMB.UI.MainMenu {
 
         //---Serialized Variables
         [SerializeField] private MainMenuCanvas canvas;
+        [SerializeField] private RoomListSubmenu submenu;
         [SerializeField] private RoomIcon roomIconPrefab;
         [SerializeField] private GameObject roomListScrollRect, privateRoomIdPrompt;
         [SerializeField] private TMP_Text filterRoomCountText;
@@ -74,6 +77,10 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void JoinRoom(RoomIcon room) {
+            if (!Settings.Instance.generalNickname.IsValidUsername()) {
+                submenu.InvalidUsername();
+                return;
+            }
             canvas.PlayConfirmSound();
             _ = NetworkHandler.JoinRoom(new EnterRoomArgs {
                 RoomName = room.room.Name,

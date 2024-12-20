@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler {
+public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, IScrollHandler {
 
     //---Properties
     public bool Editing {
@@ -27,6 +27,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler {
     [SerializeField] protected CommandChangeRules.Rules ruleType;
     [SerializeField] private Color editingColor, inactiveColor;
     [SerializeField] private TMP_Text leftArrow, rightArrow;
+    [SerializeField] protected AudioSource cursorSfx;
 
     //---Private Variables
     protected bool _editing;
@@ -84,16 +85,50 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler {
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData) {
+    public unsafe void OnPointerClick(PointerEventData eventData) {
+        QuantumGame game = NetworkHandler.Game;
+        PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+        if (!game.PlayerIsLocal(host)) {
+            canvas.PlaySound(SoundEffect.UI_Error);
+            return;
+        }
+
         Editing = true;
     }
 
-    public void IncreaseValue() {
+    Vector2 sum;
+    public void OnScroll(PointerEventData eventData) {
+        if (!Editing) {
+            return;
+        }
+
+        if (eventData.scrollDelta.y > 0) {
+            IncreaseValue();
+        } else if (eventData.scrollDelta.y < 0) {
+            DecreaseValue();
+        }
+    }
+
+    public unsafe void IncreaseValue() {
+        QuantumGame game = NetworkHandler.Game;
+        PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+        if (!game.PlayerIsLocal(host)) {
+            canvas.PlaySound(SoundEffect.UI_Error);
+            return;
+        }
+
         IncreaseValueInternal();
         UpdateState();
     }
 
-    public void DecreaseValue() {
+    public unsafe void DecreaseValue() {
+        QuantumGame game = NetworkHandler.Game;
+        PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+        if (!game.PlayerIsLocal(host)) {
+            canvas.PlaySound(SoundEffect.UI_Error);
+            return;
+        }
+
         DecreaseValueInternal();
         UpdateState();
     }
@@ -108,6 +143,11 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler {
     }
 
     public void UpdateState() {
+#if UNITY_EDITOR
+        if (!this) {
+            return;
+        }
+#endif
         UpdateLabel();
         leftArrow.enabled = Editing && CanDecreaseValue;
         rightArrow.enabled = Editing && CanIncreaseValue;

@@ -1,9 +1,11 @@
+using NSMB.Utils;
 using Photon.Realtime;
 using Quantum;
 using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus {
@@ -16,15 +18,20 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private TMP_Dropdown regionDropdown;
         [SerializeField] private RoomListManager roomManager;
         [SerializeField] private GameObject reconnectBtn, createRoomBtn, joinPrivateRoomBtn;
-        [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms;
         [SerializeField] private TMP_InputField usernameField;
+        [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms;
         [SerializeField] private MainMenuSubmenu inRoomSubmenu;
         [SerializeField] private RectTransform sideMenu;
+        [SerializeField] private Color invalidUsernameColor;
+
+        //---Private Variables
+        private Color defaultUsernameColor;
 
         public override void Initialize(MainMenuCanvas canvas) {
             base.Initialize(canvas);
             NetworkHandler.StateChanged += OnClientStateChanged;
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
+            defaultUsernameColor = usernameField.targetGraphic.color;
         }
 
         public void OnEnable() {
@@ -43,14 +50,17 @@ namespace NSMB.UI.MainMenu.Submenus {
 
             if (first) {
                 // Attempt connection.
-                roomManager.ClearRooms();
-                _ = NetworkHandler.ConnectToRegion(null);
+                Reconnect();
             }
 
             filterInProgressRooms.SetIsOnWithoutNotify(Settings.Instance.miscFilterInProgressRooms);
             roomManager.FilterInProgressRooms = Settings.Instance.miscFilterInProgressRooms;
             filterFullRooms.SetIsOnWithoutNotify(Settings.Instance.miscFilterFullRooms);
             roomManager.FilterFullRooms = Settings.Instance.miscFilterFullRooms;
+            if (string.IsNullOrWhiteSpace(Settings.Instance.generalNickname)) {
+                UnityEngine.Random.InitState((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                Settings.Instance.generalNickname = "Player" + UnityEngine.Random.Range(1000, 10000);
+            }
             usernameField.text = Settings.Instance.generalNickname;
         }
 
@@ -83,6 +93,12 @@ namespace NSMB.UI.MainMenu.Submenus {
             _ = NetworkHandler.ConnectToRegion(targetRegion);
         }
 
+        public void ChangeUsername() {
+            usernameField.targetGraphic.color = usernameField.text.IsValidUsername() ? defaultUsernameColor : invalidUsernameColor;
+            Settings.Instance.generalNickname = usernameField.text;
+            Settings.Instance.SaveSettings();
+        }
+
         public void ChangeFilterInProgress() {
             Settings.Instance.miscFilterInProgressRooms = filterInProgressRooms.isOn;
             Settings.Instance.SaveSettings();
@@ -95,6 +111,24 @@ namespace NSMB.UI.MainMenu.Submenus {
             Settings.Instance.SaveSettings();
 
             roomManager.FilterFullRooms = filterFullRooms.isOn;
+        }
+
+        public void OpenMenuIfUsernameIsValid(MainMenuSubmenu submenu) {
+            if (!Settings.Instance.generalNickname.IsValidUsername()) {
+                InvalidUsername();
+                return;
+            }
+            Canvas.OpenMenu(submenu);
+        }
+
+        public void InvalidUsername() {
+            Canvas.PlaySound(SoundEffect.UI_Error);
+            EventSystem.current.SetSelectedGameObject(usernameField.gameObject);
+        }
+
+        public async void Reconnect() {
+            roomManager.ClearRooms();
+            await NetworkHandler.ConnectToRegion(null);
         }
 
         private void UpdateRegionDropdown() {

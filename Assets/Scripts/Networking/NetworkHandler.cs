@@ -65,6 +65,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+        QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
     }
 
     public void Update() {
@@ -185,7 +186,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         args.RoomOptions.CustomRoomPropertiesForLobby = new object[] {
             Enums.NetRoomProperties.HostName,
             Enums.NetRoomProperties.IntProperties,
-            Enums.NetRoomProperties.BoolProperties
+            Enums.NetRoomProperties.BoolProperties,
+            Enums.NetRoomProperties.StageGuid,
         };
 
         Debug.Log($"[Network] Creating a game in {Region} with the ID {idBuilder}");
@@ -238,6 +240,36 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         game.RecordInputStream = null;
         Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
 #endif
+    }
+
+    private unsafe void UpdateRealtimeProperties() {
+        Frame f = Game.Frames.Predicted;
+        PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+        if (!Game.PlayerIsLocal(host)) {
+            return;
+        }
+        
+        ref GameRules rules = ref f.Global->Rules;
+        IntegerProperties intProperties = new IntegerProperties {
+            StarRequirement = rules.StarsToWin,
+            CoinRequirement = rules.CoinsForPowerup,
+            Lives = rules.Lives,
+            Timer = rules.TimerSeconds,
+        };
+        BooleanProperties boolProperties = new BooleanProperties {
+            GameStarted = f.Global->GameState != GameState.PreGameRoom,
+            CustomPowerups = rules.CustomPowerupsEnabled,
+            Teams = rules.TeamsEnabled,
+            DrawOnTimeUp = rules.DrawOnTimeUp,
+        };
+
+        RuntimePlayer hostData = f.GetPlayerData(host);
+        Client.CurrentRoom.SetCustomProperties(new Photon.Client.PhotonHashtable {
+            [Enums.NetRoomProperties.IntProperties] = (int) intProperties,
+            [Enums.NetRoomProperties.BoolProperties] = (int) boolProperties,
+            [Enums.NetRoomProperties.HostName] = (string) hostData.PlayerNickname,
+            [Enums.NetRoomProperties.StageGuid] = rules.Level.Id.ToString(),
+        });
     }
 
     public void OnFriendListUpdate(List<FriendInfo> friendList) { }
@@ -310,6 +342,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private void OnGameDestroyed(CallbackGameDestroyed e) {
         SaveReplay(e.Game);
+    }
+
+    private unsafe void OnRulesChanged(EventRulesChanged e) {
+        UpdateRealtimeProperties();
     }
 
     private void OnGameEnded(EventGameEnded e) {

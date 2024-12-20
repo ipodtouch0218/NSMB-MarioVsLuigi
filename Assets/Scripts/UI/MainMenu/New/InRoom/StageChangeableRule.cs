@@ -34,7 +34,7 @@ public class StageChangeableRule : ChangeableRule {
 
         if (currentIndex != newIndex) {
             value = (AssetRef<Map>) allStages[newIndex];
-            canvas.PlayCursorSound();
+            cursorSfx.Play();
             SendCommand();
         }
     }
@@ -47,7 +47,7 @@ public class StageChangeableRule : ChangeableRule {
 
         if (currentIndex != newIndex) {
             value = (AssetRef<Map>) allStages[newIndex];
-            canvas.PlayCursorSound();
+            cursorSfx.Play();
             SendCommand();
         }
     }

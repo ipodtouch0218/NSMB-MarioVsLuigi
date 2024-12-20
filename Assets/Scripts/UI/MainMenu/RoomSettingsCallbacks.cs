@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using NSMB.Translation;
 using Photon.Client;
 using Photon.Realtime;
@@ -42,7 +41,7 @@ namespace NSMB.UI.MainMenu {
             Frame f = game.Frames.Predicted;
             var rules = f.Global->Rules;
             IntegerProperties intProperties = new IntegerProperties {
-                Level = 0, // TODO
+                // Level = 0, // TODO
                 StarRequirement = rules.StarsToWin,
                 CoinRequirement = rules.CoinsForPowerup,
                 Lives = rules.Lives,

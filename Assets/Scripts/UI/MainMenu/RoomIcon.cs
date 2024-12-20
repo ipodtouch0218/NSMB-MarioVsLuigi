@@ -74,7 +74,7 @@ namespace NSMB.UI.MainMenu {
             symbolsText.text = symbols.ToString();
 
             string stageName;
-            if (stageAssetGuid != null && AssetGuid.TryParse(stageAssetGuid, out AssetGuid guid, false)
+            if (stageAssetGuid != null && AssetGuid.TryParse(stageAssetGuid, out AssetGuid guid, true)
                 && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<Map>(guid), out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
