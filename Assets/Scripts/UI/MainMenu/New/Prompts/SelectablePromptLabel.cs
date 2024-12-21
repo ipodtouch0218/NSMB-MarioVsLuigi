@@ -22,7 +22,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             this.SetIfNull(ref label);
         }
 
-        public void Update() {
+        public void LateUpdate() {
             bool currentlySelected = selectionTargets.Contains(EventSystem.current.currentSelectedGameObject);
             
             if (!selected && currentlySelected) {

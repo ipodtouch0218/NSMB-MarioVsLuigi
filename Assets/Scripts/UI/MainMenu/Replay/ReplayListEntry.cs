@@ -13,6 +13,7 @@ using UnityEngine.UI;
 public class ReplayListEntry : MonoBehaviour {
 
     //---Serialized Variables
+    [SerializeField] private MainMenuCanvas canvas;
     [SerializeField] private TMP_Text nameText, dateText, warningText, favoriteButtonText;
     [SerializeField] private Image mapImage;
     [SerializeField] private Sprite defaultMapSprite;
@@ -66,7 +67,7 @@ public class ReplayListEntry : MonoBehaviour {
         showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0.1f));
         manager.Selected(this);
         selected = true;
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Cursor);
+        canvas.PlayCursorSound();
     }
 
     private IEnumerator SmoothResize(float target, float time) {
@@ -105,7 +106,7 @@ public class ReplayListEntry : MonoBehaviour {
         File.Move(replay.FilePath, destination);
         replay.FilePath = destination;
         UpdateText();
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
+        canvas.PlayConfirmSound();
     }
 
     public void OnWatchClick() {

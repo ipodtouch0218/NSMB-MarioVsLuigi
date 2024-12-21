@@ -1,5 +1,4 @@
-using NSMB.Extensions;
-using NSMB.UI.MainMenu;
+using NSMB.UI.MainMenu.Submenus.Prompts;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
@@ -12,13 +11,10 @@ public class ReplayListManager : MonoBehaviour {
     [SerializeField] private ReplayListEntry replayTemplate;
     [SerializeField] private TMP_Text noReplaysText;
     [SerializeField] internal VerticalLayoutGroup layout;
-    [SerializeField] private GameObject renamePrompt, renameDefaultSelected, deletePrompt;
-    [SerializeField] private TMP_InputField renameText;
-    [SerializeField] private TMP_Text renamePlaceholder, deleteText;
+    [SerializeField] private ReplayDeletePromptSubmenu deletePrompt;
 
     //---Private Variables
     private readonly List<Replay> replays = new();
-    private Replay target;
 
     public void OnEnable() {
         replayTemplate.gameObject.SetActive(false);
@@ -26,11 +22,11 @@ public class ReplayListManager : MonoBehaviour {
     }
 
     public void StartRename(Replay replay) {
-        target = replay;
-        renameText.text = replay.ReplayFile.GetDisplayName(false);
-        renamePlaceholder.text = replay.ReplayFile.GetDefaultName();
-        renamePrompt.SetActive(true);
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
+        //target = replay;
+        //renameText.text = replay.ReplayFile.GetDisplayName(false);
+        //renamePlaceholder.text = replay.ReplayFile.GetDefaultName();
+        //renamePrompt.SetActive(true);
+        //MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
     }
 
     public void Selected(ReplayListEntry entry) {
@@ -41,54 +37,36 @@ public class ReplayListManager : MonoBehaviour {
         }
     }
 
+    public void RemoveReplay(Replay replay) {
+        Destroy(replay.ListEntry.gameObject);
+        replays.Remove(replay);
+    }
+
     public void CancelRename() {
-        renamePrompt.SetActive(false);
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
+        //renamePrompt.SetActive(false);
+        //MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
     }
     
     public void ConfirmRename() {
-        if (string.IsNullOrWhiteSpace(renameText.text)) {
-            renameText.text = null;
-        }
+        //if (string.IsNullOrWhiteSpace(renameText.text)) {
+        //    renameText.text = null;
+        //}
 
-        if (renameText.text != target.ReplayFile.GetDisplayName()) {
-            // Confirm + no change = no change. Do this because translations matter.
-            target.ReplayFile.CustomName = renameText.text;
+        //if (renameText.text != target.ReplayFile.GetDisplayName()) {
+        //    // Confirm + no change = no change. Do this because translations matter.
+        //    target.ReplayFile.CustomName = renameText.text;
 
-            using FileStream file = new FileStream(target.FilePath, FileMode.OpenOrCreate);
-            target.ReplayFile.WriteToStream(file);
-            target.ListEntry.UpdateText();
-        }
+        //    using FileStream file = new FileStream(target.FilePath, FileMode.OpenOrCreate);
+        //    target.ReplayFile.WriteToStream(file);
+        //    target.ListEntry.UpdateText();
+        //}
 
-        renamePrompt.SetActive(false);
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
+        //renamePrompt.SetActive(false);
+        //MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
     }
 
     public void StartDeletion(Replay replay) {
-        target = replay;
-        deletePrompt.SetActive(true);
-        deleteText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.extras.replays.delete.text", "replayname", replay.ReplayFile.GetDisplayName());
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
-    }
-
-    public void CancelDeletion() {
-        deletePrompt.SetActive(false);
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
-    }
-
-    public void ConfirmDeletion() {
-        File.Delete(target.FilePath);
-        Destroy(target.ListEntry.gameObject);
-        replays.Remove(target);
-        target = null;
-        deletePrompt.SetActive(false);
-        MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
-
-        if (replays.Count == 0) {
-            noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation("ui.extras.replays.none");
-        } else {
-            noReplaysText.text = "";
-        }
+        deletePrompt.Open(replay);
     }
 
     public void FindReplays() {

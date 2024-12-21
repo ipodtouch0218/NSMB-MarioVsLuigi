@@ -21,7 +21,7 @@ public class UpdateChecker {
         HttpWebResponse response = (HttpWebResponse) await request.GetResponseAsync();
 
         if (response.StatusCode != HttpStatusCode.OK) {
-            Debug.Log($"[Updater] Failed to connect to the GitHub API: {response.StatusCode}: {response.StatusDescription}");
+            Debug.Log($"[Updater] Failed to connect to the GitHub API: {response.StatusCode} - {response.StatusDescription}");
             return;
         }
 
@@ -31,14 +31,16 @@ public class UpdateChecker {
             JObject data = JObject.Parse(json);
 
             string tag = data.Value<string>("tag_name");
-            if (tag.StartsWith("v"))
+            if (tag.StartsWith("v")) {
                 tag = tag[1..];
+            }
 
             string[] splitTag = tag.Split(".");
 
             string ver = Application.version;
-            if (ver.StartsWith("v"))
+            if (ver.StartsWith("v")) {
                 ver = ver[1..];
+            }
 
             string[] splitVer = Application.version.Split(".");
 
@@ -50,10 +52,12 @@ public class UpdateChecker {
                 int.TryParse(splitTag[i], out int remote);
                 int.TryParse(splitVer[i], out int local);
 
-                if (local > remote)
+                if (local > remote) {
                     break;
-                if (local == remote)
+                }
+                if (local == remote) {
                     continue;
+                }
 
                 upToDate = false;
                 break;
