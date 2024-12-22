@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.Utils;

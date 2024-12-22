@@ -23,7 +23,7 @@ namespace NSMB.UI.MainMenu {
         //---Public Variables
         public PlayerRef player;
         public float typingCounter;
-        public UnityEngine.UI.Button button;
+        public Button button;
         [NonSerialized] public int joinTick = int.MaxValue;
 
         //---Serialized Variables

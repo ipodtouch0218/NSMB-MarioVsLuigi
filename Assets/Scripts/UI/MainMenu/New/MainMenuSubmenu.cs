@@ -10,6 +10,7 @@ namespace NSMB.UI.MainMenu {
         public virtual string Header => GlobalController.Instance.translationManager.GetTranslation(header);
         public virtual Color? HeaderColor => useHeaderColor ? headerColor : null;
         public virtual float BackHoldTime => backHoldTime;
+        public virtual GameObject DefaultSelection => defaultSelection;
 
         //---Serialized Variables
         [SerializeField] public bool ShowHeader = true;
@@ -36,7 +37,7 @@ namespace NSMB.UI.MainMenu {
 
         public virtual void Show(bool first) {
             gameObject.SetActive(true);
-            EventSystem.current.SetSelectedGameObject(first ? defaultSelection : savedSelection);
+            EventSystem.current.SetSelectedGameObject(first ? DefaultSelection : savedSelection);
 
             OnShow?.Invoke(first);
         }

@@ -103,7 +103,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             Settings.Instance.miscFilterInProgressRooms = filterInProgressRooms.isOn;
             Settings.Instance.SaveSettings();
 
-            roomManager.FilterFullRooms = filterInProgressRooms.isOn;
+            roomManager.FilterInProgressRooms = filterInProgressRooms.isOn;
         }
 
         public void ChangeFilterFull() {

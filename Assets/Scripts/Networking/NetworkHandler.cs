@@ -371,7 +371,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         BooleanProperties props = (int) Client.CurrentRoom.CustomProperties[Enums.NetRoomProperties.BoolProperties];
         props.GameStarted = e.NewState != GameState.PreGameRoom;
 
-        Client.OpSetCustomPropertiesOfRoom(new Photon.Client.PhotonHashtable {
+        Client.CurrentRoom.SetCustomProperties(new Photon.Client.PhotonHashtable {
             { Enums.NetRoomProperties.BoolProperties, (int) props }
         });
     }

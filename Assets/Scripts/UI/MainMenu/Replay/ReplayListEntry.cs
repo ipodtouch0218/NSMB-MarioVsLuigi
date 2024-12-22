@@ -8,17 +8,21 @@ using System.Collections;
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ReplayListEntry : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private MainMenuCanvas canvas;
+    [SerializeField] private GameObject defaultSelection;
     [SerializeField] private TMP_Text nameText, dateText, warningText, favoriteButtonText;
     [SerializeField] private Image mapImage;
     [SerializeField] private Sprite defaultMapSprite;
     [SerializeField] private RectTransform dropDownRectTransform;
     [SerializeField] private Color criticalColor, warningColor, favoriteColor;
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] public Button button;
 
     //---Private Variables
     private ReplayListManager manager;
@@ -55,6 +59,7 @@ public class ReplayListEntry : MonoBehaviour {
         }
         selected = false;
         showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, 0.1f));
+        canvasGroup.interactable = false;
     }
 
     public void OnClick() {
@@ -65,9 +70,11 @@ public class ReplayListEntry : MonoBehaviour {
             StopCoroutine(showHideButtonsCoroutine);
         }
         showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0.1f));
-        manager.Selected(this);
+        manager.Select(this);
         selected = true;
+        canvasGroup.interactable = true;
         canvas.PlayCursorSound();
+        EventSystem.current.SetSelectedGameObject(defaultSelection);
     }
 
     private IEnumerator SmoothResize(float target, float time) {

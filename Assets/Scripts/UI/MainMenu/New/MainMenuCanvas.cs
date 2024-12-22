@@ -80,6 +80,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenMenu(MainMenuSubmenu menu) {
+            if (submenuStack.Contains(menu)) {
+                // Close menus on top of this menu
+                while (submenuStack[^1] != menu) {
+                    GoBack(true);
+                }
+            }
+
             if (submenuStack.Count > 0) {
                 submenuStack[^1].Hide(menu.IsOverlay ? SubmenuHideReason.Overlayed : SubmenuHideReason.Background);
                 PlaySound(menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
@@ -91,13 +98,14 @@ namespace NSMB.UI.MainMenu {
             ShowHideMainPanel();
         }
 
-        public void GoBack() {
+        public void GoBack(bool force = false) {
             if (submenuStack.Count <= 1) {
                 return;
             }
 
             MainMenuSubmenu currentSubmenu = submenuStack[^1];
-            if (currentSubmenu.TryGoBack(out bool playSound)) {
+            bool playSound = false;
+            if (force || currentSubmenu.TryGoBack(out playSound)) {
                 currentSubmenu.Hide(SubmenuHideReason.Closed);
                 submenuStack.RemoveAt(submenuStack.Count - 1);
                 submenuStack[^1].Show(false);

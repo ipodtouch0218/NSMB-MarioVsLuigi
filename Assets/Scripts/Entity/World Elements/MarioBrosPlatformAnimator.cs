@@ -23,6 +23,7 @@ public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent<Stage
     private MaterialPropertyBlock mpb;
     private Texture2D displacementMap;
     private readonly List<BumpInfo> bumps = new();
+    private bool empty;
 
     public void Start() {
         QuantumEvent.Subscribe<EventMarioBrosPlatformBumped>(this, OnMarioBrosPlatformBumped);
@@ -48,6 +49,15 @@ public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent<Stage
     }
 
     public override void OnUpdateView() {
+        if (bumps.Count == 0) {
+            if (empty) {
+                return;
+            }
+            empty = true;
+        } else {
+            empty = false;
+        }
+
         for (int i = 0; i < platformWidth * samplesPerTile; i++) {
             pixels[i] = BlankColor;
         }

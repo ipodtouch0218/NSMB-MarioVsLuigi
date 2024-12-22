@@ -42,6 +42,7 @@ namespace NSMB.UI.MainMenu {
             ChatManager.OnChatMessage -= OnChatMessage;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            PlayerListEntry.PlayerMuteStateChanged -= OnPlayerMuteStateChanged;
             PlayerListHandler.PlayerAdded -= OnPlayerListEntryAddedOrRemoved;
             PlayerListHandler.PlayerRemoved -= OnPlayerListEntryAddedOrRemoved;
         }

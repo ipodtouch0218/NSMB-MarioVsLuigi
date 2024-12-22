@@ -1,8 +1,12 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu.Submenus {
     public class MainSubmenu : MainMenuSubmenu {
+
+        //---Serialized Variables
+        [SerializeField] private GameObject exitingBlocker;
 
         //---Private Variables
         private bool wasOptionsOpen;
@@ -22,6 +26,10 @@ namespace NSMB.UI.MainMenu.Submenus {
         public void QuitGame() {
             if (quitCoroutine == null) {
                 quitCoroutine = Canvas.StartCoroutine(QuitCorotuine());
+
+                // Force focus on a blocker element so the user can't do anything else.
+                exitingBlocker.SetActive(true);
+                EventSystem.current.SetSelectedGameObject(exitingBlocker);
             }
         }
 

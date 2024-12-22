@@ -4,11 +4,12 @@ using UnityEngine;
 using static ReplayListManager;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
-    public class ReplayDeletePromptSubmenu : PromptSubmenu {
+    public class ReplayRenamePromptSubmenu : PromptSubmenu {
 
         //---Serialized Variables
         [SerializeField] private ReplayListManager manager;
-        [SerializeField] private TMP_Text text;
+        [SerializeField] private TMP_InputField inputField;
+        [SerializeField] private TMP_Text defaultValue;
 
         //---Private Variables
         private Replay target;
@@ -22,8 +23,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public override void Show(bool first) {
             base.Show(first);
             success = false;
-            text.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.extras.replays.delete.text", 
-                "replayname", target.ReplayFile.GetDisplayName());
+            inputField.text = target.ReplayFile.GetDisplayName(false);
+            defaultValue.text = target.ReplayFile.GetDefaultName();
         }
 
         public override bool TryGoBack(out bool playSound) {
@@ -37,8 +38,19 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void ClickConfirm() {
-            File.Delete(target.FilePath);
-            manager.RemoveReplay(target);
+            if (string.IsNullOrWhiteSpace(inputField.text)) {
+                inputField.text = null;
+            }
+
+            if (inputField.text != target.ReplayFile.GetDisplayName()) {
+                // Confirm + no change = no change. Do this because translations matter.
+                target.ReplayFile.CustomName = inputField.text;
+
+                using FileStream file = new FileStream(target.FilePath, FileMode.OpenOrCreate);
+                target.ReplayFile.WriteToStream(file);
+                target.ListEntry.UpdateText();
+            }
+
             target = null;
             success = true;
             Canvas.GoBack();

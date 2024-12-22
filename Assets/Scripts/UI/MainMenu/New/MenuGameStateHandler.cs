@@ -5,19 +5,27 @@ public class MenuGameStateHandler : MonoBehaviour {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+        QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {
-        switch (e.NewState) {
-        case GameState.WaitingForPlayers:
+        if (e.NewState == GameState.PreGameRoom) {
+            gameObject.SetActive(true);
+        } else {
             GlobalController.Instance.loadingCanvas.Initialize(e.Game);
             gameObject.SetActive(false);
-            break;
-        case GameState.PreGameRoom:
-            gameObject.SetActive(true);
-            break;
         }
+    }
+
+    private unsafe void OnGameStarted(CallbackGameStarted e) {
+        Frame f = e.Game.Frames.Predicted;
+        OnGameStateChanged(new EventGameStateChanged { 
+            Game = e.Game,
+            Frame = f,
+            NewState = f.Global->GameState,
+            Tick = f.Number,
+        });
     }
 
     private void OnGameDestroyed(CallbackGameDestroyed e) {

@@ -32,6 +32,10 @@ namespace NSMB.UI.MainMenu {
             disabledColor = new Color(deselectedColor.r * 0.5f, deselectedColor.g * 0.5f, deselectedColor.b * 0.5f);
         }
 
+        public void OnDisable() {
+            hover = false;
+        }
+
         public void Start() {
             size = rect.sizeDelta;
         }
@@ -62,6 +66,5 @@ namespace NSMB.UI.MainMenu {
         public void OnPointerExit(PointerEventData eventData) {
             hover = false;
         }
-
     }
 }

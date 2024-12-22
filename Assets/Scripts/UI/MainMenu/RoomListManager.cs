@@ -64,6 +64,7 @@ namespace NSMB.UI.MainMenu {
 
             filterRoomCountText.enabled = filtered > 0;
             filterRoomCountText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.hidden", "rooms", filtered.ToString());
+            filterRoomCountText.transform.SetAsLastSibling();
         }
 
         private void CreateRoom(RoomInfo newRoomInfo) {
@@ -74,6 +75,7 @@ namespace NSMB.UI.MainMenu {
             roomIcon.UpdateUI(newRoomInfo);
 
             rooms[newRoomInfo.Name] = roomIcon;
+            filterRoomCountText.transform.SetAsLastSibling();
         }
 
         public void JoinRoom(RoomIcon room) {

@@ -7,66 +7,45 @@ using UnityEngine.UI;
 
 public class ReplayListManager : MonoBehaviour {
 
+    //---Properties
+    public ReplayListEntry Selected { get; private set; }
+
     //---Serialized Variables
     [SerializeField] private ReplayListEntry replayTemplate;
     [SerializeField] private TMP_Text noReplaysText;
     [SerializeField] internal VerticalLayoutGroup layout;
     [SerializeField] private ReplayDeletePromptSubmenu deletePrompt;
+    [SerializeField] private ReplayRenamePromptSubmenu renamePrompt;
 
     //---Private Variables
     private readonly List<Replay> replays = new();
 
     public void OnEnable() {
         replayTemplate.gameObject.SetActive(false);
+        Select(GetFirstReplayEntry());
         FindReplays();
     }
 
     public void StartRename(Replay replay) {
-        //target = replay;
-        //renameText.text = replay.ReplayFile.GetDisplayName(false);
-        //renamePlaceholder.text = replay.ReplayFile.GetDefaultName();
-        //renamePrompt.SetActive(true);
-        //MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
+        renamePrompt.Open(replay);
     }
 
-    public void Selected(ReplayListEntry entry) {
+    public void StartDeletion(Replay replay) {
+        deletePrompt.Open(replay);
+    }
+
+    public void Select(ReplayListEntry entry) {
         foreach (var replay in replays) {
             if (replay.ListEntry != entry) {
                 replay.ListEntry.HideButtons();
             }
         }
+        Selected = entry;
     }
 
     public void RemoveReplay(Replay replay) {
         Destroy(replay.ListEntry.gameObject);
         replays.Remove(replay);
-    }
-
-    public void CancelRename() {
-        //renamePrompt.SetActive(false);
-        //MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
-    }
-    
-    public void ConfirmRename() {
-        //if (string.IsNullOrWhiteSpace(renameText.text)) {
-        //    renameText.text = null;
-        //}
-
-        //if (renameText.text != target.ReplayFile.GetDisplayName()) {
-        //    // Confirm + no change = no change. Do this because translations matter.
-        //    target.ReplayFile.CustomName = renameText.text;
-
-        //    using FileStream file = new FileStream(target.FilePath, FileMode.OpenOrCreate);
-        //    target.ReplayFile.WriteToStream(file);
-        //    target.ListEntry.UpdateText();
-        //}
-
-        //renamePrompt.SetActive(false);
-        //MainMenuManager.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
-    }
-
-    public void StartDeletion(Replay replay) {
-        deletePrompt.Open(replay);
     }
 
     public void FindReplays() {
@@ -101,6 +80,14 @@ public class ReplayListManager : MonoBehaviour {
         } else {
             noReplaysText.text = "";
         }
+    }
+
+    public ReplayListEntry GetFirstReplayEntry() {
+        if (replays.Count <= 0) {
+            return null;
+        }
+
+        return replays[0].ListEntry;
     }
 
     public class Replay {
