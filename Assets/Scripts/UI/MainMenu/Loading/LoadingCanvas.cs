@@ -84,7 +84,7 @@ namespace NSMB.Loading {
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
-            if (e.NewState == GameState.Starting) {
+            if (e.NewState > GameState.WaitingForPlayers) {
                 EndLoading(e.Game);
             }
         }

@@ -212,7 +212,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         return await Client.JoinRoomAsync(args, false);
     }
 
-    public void SaveReplay(QuantumGame game) {
+    public unsafe void SaveReplay(QuantumGame game, sbyte winner) {
 #if UNITY_STANDALONE
         if (IsReplay || game.RecordInputStream == null) {
             return;
@@ -231,8 +231,25 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".mvlreplay");
         using FileStream outputStream = new FileStream(finalFilePath, FileMode.Create);
 
+        byte[] stars = new byte[10];
+        Frame f = game.Frames.Verified;
+        for (int i = 0; i < players; i++) {
+            var filter = f.Filter<MarioPlayer>();
+            while (filter.NextUnsafe(out _, out MarioPlayer* mario)) {
+                if (mario->PlayerRef != playerrefs[i]) {
+                    continue;
+                }
+                
+                // Found him :)
+                if (mario->Lives > 0 || !f.Global->Rules.IsLivesEnabled) {
+                    stars[i] = mario->Stars;
+                }
+                break;
+            }
+        }
+
         // Write binary replay
-        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, map, players);
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, players, playernames, playerteams, stars, winner);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
 
         // Complete
@@ -341,7 +358,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     private void OnGameDestroyed(CallbackGameDestroyed e) {
-        SaveReplay(e.Game);
+        SaveReplay(e.Game, -1);
     }
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {
@@ -349,7 +366,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     private void OnGameEnded(EventGameEnded e) {
-        SaveReplay(e.Game);
+        SaveReplay(e.Game, (sbyte) e.WinningTeam);
     }
 
     private void OnPlayerAdded(EventPlayerAdded e) {
@@ -378,17 +395,41 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     int initialFrame;
     byte[] initialFrameData;
-    AssetRef<Map> map;
     byte players;
+    string[] playernames;
+    byte[] playerteams;
+    PlayerRef[] playerrefs;
     private unsafe void OnRecordingStarted(EventRecordingStarted e) {
         QuantumGame game = e.Game;
-        Frame startFrame = e.Frame;
+        Frame f = e.Frame;
 
-        game.StartRecordingInput(startFrame.Number);
-        initialFrameData = startFrame.Serialize(DeterministicFrameSerializeMode.Serialize);
-        initialFrame = startFrame.Number;
-        map = e.Frame.MapAssetRef;
-        players = e.Frame.Global->RealPlayers;
+        game.StartRecordingInput(f.Number);
+        initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+        initialFrame = f.Number;
+
+        players = f.Global->RealPlayers;
+        playernames = new string[10];
+        playerrefs = new PlayerRef[10];
+        playerteams = new byte[10];
+
+        int count = 0;
+        for (PlayerRef player = 0; count < players && player < f.PlayerCount; player++) {
+            var playerData = QuantumUtils.GetPlayerData(f, player);
+            if (playerData == null || playerData->IsSpectator) {
+                continue;
+            }
+
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+            if (runtimePlayer == null) {
+                continue;
+            }
+
+            playernames[count] = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
+            playerrefs[count] = player;
+            playerteams[count] = playerData->Team;
+            count++;
+        }
+
         Debug.Log("[Replay] Started recording a new replay.");
     }
 

@@ -194,13 +194,24 @@ namespace NSMB.Utils {
             return PlayerElements.AllPlayerElements.Any(pe => pe.Entity == entity);
         }
 
+        public static string ColorToHex(Color32 color, bool includeAlpha) {
+            StringBuilder builder = new(8);
+            builder.Append(Convert.ToString(color.r, 16).PadLeft(2, '0'));
+            builder.Append(Convert.ToString(color.g, 16).PadLeft(2, '0'));
+            builder.Append(Convert.ToString(color.b, 16).PadLeft(2, '0'));
+            if (includeAlpha) {
+                builder.Append(Convert.ToString(color.a, 16).PadLeft(2, '0'));
+            }
+            return builder.ToString();
+        }
+
         public static string GetPingSymbol(int ping) {
             return ping switch {
                 < 0 => "<sprite name=connection_disconnected>",
                 0 => "<sprite name=connection_host>",
-                < 80 => "<sprite name=connection_great>",
-                < 130 => "<sprite name=connection_good>",
-                < 180 => "<sprite name=connection_fair>",
+                < 70=> "<sprite name=connection_great>",
+                < 140 => "<sprite name=connection_good>",
+                < 210 => "<sprite name=connection_fair>",
                 _ => "<sprite name=connection_bad>"
             };
         }

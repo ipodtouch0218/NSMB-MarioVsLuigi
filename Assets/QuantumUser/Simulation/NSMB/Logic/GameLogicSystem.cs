@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
@@ -15,6 +14,8 @@ namespace Quantum {
             if (!config.IsRealGame) {
                 f.Global->GameState = GameState.WaitingForPlayers;
                 f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
+            } else {
+                f.Events.GameStateChanged(f, f.Global->GameState);
             }
         }
 

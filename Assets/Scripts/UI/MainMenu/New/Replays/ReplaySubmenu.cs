@@ -19,6 +19,14 @@ namespace NSMB.UI.MainMenu.Submenus {
         //---Serialized Variables
         [SerializeField] private ReplayListManager replayList;
 
+        public override void Show(bool first) {
+            base.Show(first);
+
+            if (first) {
+                replayList.Show();
+            }
+        }
+
         public override bool TryGoBack(out bool playSound) {
             ReplayListEntry selected = replayList.Selected;
             if (selected) {

@@ -9,7 +9,7 @@ using UnityEngine;
 public class BinaryReplayFile {
 
     //---Helpers
-    private static readonly string[] Versions = { "Invalid", "v1.8.0.0" };
+    public static readonly string[] Versions = { "Invalid", "v1.8.0.0" };
     public const int CurrentVersion = 1;
     private static int MagicHeaderLength => Encoding.ASCII.GetByteCount(MagicHeader);
     private static readonly byte[] HeaderBuffer = new byte[MagicHeaderLength];
@@ -18,12 +18,22 @@ public class BinaryReplayFile {
     private const string MagicHeader = "MvLO-RP";
     public byte Version;
     public long UnixTimestamp;
-    public string CustomName = "";
-    public AssetRef<Map> MapAssetRef;
-    public byte Players;
     public int InitialFrameNumber;
     public int ReplayLengthInFrames;
+    public string CustomName = "";
     public bool IsCompatible => Version == CurrentVersion;
+
+    // Rules
+    public AssetRef<Map> MapAssetRef;
+    public int Stars, Coins, Lives, Timer;
+    public bool CustomPowerups, Teams;
+
+    // Player information
+    public byte Players;
+    public sbyte WinningTeam = -1;
+    public byte[] PlayerStars = new byte[10];
+    public byte[] PlayerTeams = new byte[10];
+    public string[] PlayerNames = new string[10];
 
     // Variable length
     public byte[] CompressedRuntimeConfigData;
@@ -46,8 +56,24 @@ public class BinaryReplayFile {
         writer.Write(InitialFrameNumber);
         writer.Write(ReplayLengthInFrames);
         writer.Write(CustomName);
+        
+        // Rules
         writer.Write(MapAssetRef.Id.Value);
+        writer.Write(Stars);
+        writer.Write(Coins);
+        writer.Write(Lives);
+        writer.Write(Timer);
+        writer.Write(CustomPowerups);
+        writer.Write(Teams);
+
+        // Players
         writer.Write(Players);
+        writer.Write(WinningTeam);
+        for (int i = 0; i < Players; i++) {
+            writer.Write(PlayerNames[i]);
+            writer.Write(PlayerStars[i]);
+            writer.Write(PlayerTeams[i]);
+        }
 
         // Write variable-length data lengths
         writer.Write(CompressedRuntimeConfigData.Length);
@@ -95,6 +121,7 @@ public class BinaryReplayFile {
 
     public static bool TryLoadFromFile(Stream input, out BinaryReplayFile result) {
         using BinaryReader reader = new(input, Encoding.ASCII);
+        result = new();
         try {
             reader.Read(HeaderBuffer);
             string readString = Encoding.ASCII.GetString(HeaderBuffer);
@@ -103,14 +130,29 @@ public class BinaryReplayFile {
             }
 
             // Header is good!
-            result = new();
             result.Version = reader.ReadByte();
             result.UnixTimestamp = reader.ReadInt64();
             result.InitialFrameNumber = reader.ReadInt32();
             result.ReplayLengthInFrames = reader.ReadInt32();
             result.CustomName = reader.ReadString();
+
+            // Rules
             result.MapAssetRef = (AssetGuid) reader.ReadInt64();
+            result.Stars = reader.ReadInt32();
+            result.Coins = reader.ReadInt32();
+            result.Lives = reader.ReadInt32();
+            result.Timer = reader.ReadInt32();
+            result.CustomPowerups = reader.ReadBoolean();
+            result.Teams = reader.ReadBoolean();
+
+            // Players
             result.Players = reader.ReadByte();
+            result.WinningTeam = reader.ReadSByte();
+            for (int i = 0; i < result.Players; i++) {
+                result.PlayerNames[i] = reader.ReadString();
+                result.PlayerStars[i] = reader.ReadByte();
+                result.PlayerTeams[i] = reader.ReadByte();
+            }
 
             // Read variable-length data.
             int runtimeConfigSize = reader.ReadInt32();
@@ -126,19 +168,32 @@ public class BinaryReplayFile {
             return true;
         } catch (Exception e) {
             Debug.LogWarning(e);
-            result = null;
+            // result = null;
             return false;
         }
     }
 
-    public static unsafe BinaryReplayFile FromReplayData(QuantumReplayFile replay, AssetRef<Map> map, byte players) {
+    public static unsafe BinaryReplayFile FromReplayData(QuantumReplayFile replay, GameRules rules, byte players, string[] playernames, byte[] playerteams, byte[] playerstars, sbyte winnerIndex) {
         BinaryReplayFile result = new() {
             Version = CurrentVersion,
             UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
             InitialFrameNumber = replay.InitialTick,
             ReplayLengthInFrames = replay.LastTick - replay.InitialTick,
-            MapAssetRef = map,
+
+            MapAssetRef = rules.Level,
+            Stars = rules.StarsToWin,
+            Coins = rules.CoinsForPowerup,
+            Lives = rules.Lives,
+            Timer = rules.TimerSeconds,
+            CustomPowerups = (bool) rules.CustomPowerupsEnabled,
+            Teams = (bool) rules.TeamsEnabled,
+
             Players = players,
+            PlayerNames = playernames,
+            PlayerTeams = playerteams,
+            PlayerStars = playerstars,
+            WinningTeam = winnerIndex,
+
             CompressedDeterministicConfigData = ByteUtils.GZipCompressBytes(DeterministicSessionConfig.ToByteArray(replay.DeterministicConfig)),
             CompressedRuntimeConfigData = ByteUtils.GZipCompressBytes(replay.RuntimeConfigData.Decode()),
             CompressedInitialFrameData = ByteUtils.GZipCompressBytes(replay.InitialFrameData),

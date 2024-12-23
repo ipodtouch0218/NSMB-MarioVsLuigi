@@ -31,7 +31,7 @@ namespace NSMB.UI.MainMenu {
         //---Private Variables
         private readonly List<MainMenuSubmenu> allSubmenus = new();
         private readonly List<MainMenuSubmenu> submenuStack = new();
-        private Color defaultHeaderColor, currentHeaderColor;
+        private Color defaultHeaderColor;
 
         public void OnValidate() {
             this.SetIfNull(ref sfx);
@@ -98,7 +98,14 @@ namespace NSMB.UI.MainMenu {
             ShowHideMainPanel();
         }
 
-        public void GoBack(bool force = false) {
+        public void GoBack() {
+            // We have to do this instead of a default parmeter value
+            // since I added the parameter later, and adding it
+            // breaks existing UnityAction references.
+            GoBack(false);
+        }
+
+        public void GoBack(bool force) {
             if (submenuStack.Count <= 1) {
                 return;
             }
