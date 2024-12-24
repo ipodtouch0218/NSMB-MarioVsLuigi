@@ -311,7 +311,7 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.GameRules))]
   public unsafe partial class GameRulesPrototype : StructPrototype {
-    public AssetRef<Map> Level;
+    public AssetRef<Map> Stage;
     public Int32 StarsToWin;
     public Int32 CoinsForPowerup;
     public Int32 Lives;
@@ -321,7 +321,7 @@ namespace Quantum.Prototypes {
     public QBoolean DrawOnTimeUp;
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
-        result.Level = this.Level;
+        result.Stage = this.Stage;
         result.StarsToWin = this.StarsToWin;
         result.CoinsForPowerup = this.CoinsForPowerup;
         result.Lives = this.Lives;

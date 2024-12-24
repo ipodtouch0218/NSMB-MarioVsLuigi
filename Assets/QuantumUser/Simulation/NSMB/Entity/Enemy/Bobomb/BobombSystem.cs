@@ -160,7 +160,7 @@ namespace Quantum {
 
             // Normal interactions
             if (bobomb->CurrentDetonationFrames > 0) {
-                if (mario->CanPickupItem(f, marioEntity)) {
+                if (mario->CanPickupItem(f, marioEntity, bobombEntity)) {
                     // Pickup by player
                     bobombHoldable->Pickup(f, bobombEntity, marioEntity);
                 } else {

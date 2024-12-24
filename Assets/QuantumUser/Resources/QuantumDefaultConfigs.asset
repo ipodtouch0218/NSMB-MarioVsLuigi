@@ -246,7 +246,7 @@ MonoBehaviour:
   IceBlockPrototype: {fileID: 3097001405596171208, guid: c71bb37b419b1164e96d12c17c294c79,
     type: 3}
   DefaultRules:
-    Level:
+    Stage:
       Id:
         Value: 438935048561577377
     StarsToWin: 10

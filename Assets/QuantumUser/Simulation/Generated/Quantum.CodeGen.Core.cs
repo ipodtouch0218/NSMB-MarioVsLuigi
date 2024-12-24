@@ -498,7 +498,7 @@ namespace Quantum {
     public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(32)]
-    public AssetRef<Map> Level;
+    public AssetRef<Map> Stage;
     [FieldOffset(8)]
     public Int32 StarsToWin;
     [FieldOffset(0)]
@@ -516,7 +516,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
-        hash = hash * 31 + Level.GetHashCode();
+        hash = hash * 31 + Stage.GetHashCode();
         hash = hash * 31 + StarsToWin.GetHashCode();
         hash = hash * 31 + CoinsForPowerup.GetHashCode();
         hash = hash * 31 + Lives.GetHashCode();
@@ -536,7 +536,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
-        AssetRef.Serialize(&p->Level, serializer);
+        AssetRef.Serialize(&p->Stage, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1653,11 +1653,11 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 240;
+    public const Int32 SIZE = 232;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(184)]
-    public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     [FieldOffset(176)]
+    public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+    [FieldOffset(168)]
     public AssetRef<CharacterAsset> CharacterAsset;
     [FieldOffset(64)]
     [ExcludeFromPrototype()]
@@ -1674,7 +1674,7 @@ namespace Quantum {
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
-    [FieldOffset(192)]
+    [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
     [FieldOffset(31)]
@@ -1749,9 +1749,6 @@ namespace Quantum {
     [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public Int32 LandedFrame;
-    [FieldOffset(168)]
-    [ExcludeFromPrototype()]
-    public QBoolean WasTouchingGroundLastFrame;
     [FieldOffset(72)]
     [ExcludeFromPrototype()]
     public QBoolean DoEntityBounce;
@@ -1872,16 +1869,16 @@ namespace Quantum {
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillHoldFrames;
-    [FieldOffset(216)]
+    [FieldOffset(208)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
     [FieldOffset(48)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
-    [FieldOffset(200)]
+    [FieldOffset(192)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentPipe;
-    [FieldOffset(224)]
+    [FieldOffset(216)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
     [FieldOffset(152)]
@@ -1893,7 +1890,7 @@ namespace Quantum {
     [FieldOffset(18)]
     [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
-    [FieldOffset(208)]
+    [FieldOffset(200)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentSpinner;
     public override Int32 GetHashCode() {
@@ -1931,7 +1928,6 @@ namespace Quantum {
         hash = hash * 31 + JumpBufferFrames.GetHashCode();
         hash = hash * 31 + CoyoteTimeFrames.GetHashCode();
         hash = hash * 31 + LandedFrame.GetHashCode();
-        hash = hash * 31 + WasTouchingGroundLastFrame.GetHashCode();
         hash = hash * 31 + DoEntityBounce.GetHashCode();
         hash = hash * 31 + WallslideLeft.GetHashCode();
         hash = hash * 31 + WallslideRight.GetHashCode();
@@ -2058,7 +2054,6 @@ namespace Quantum {
         QBoolean.Serialize(&p->UsedPropellerThisJump, serializer);
         QBoolean.Serialize(&p->WallslideLeft, serializer);
         QBoolean.Serialize(&p->WallslideRight, serializer);
-        QBoolean.Serialize(&p->WasTouchingGroundLastFrame, serializer);
         AssetRef.Serialize(&p->CharacterAsset, serializer);
         AssetRef.Serialize(&p->PhysicsAsset, serializer);
         AssetRef.Serialize(&p->ReserveItem, serializer);

@@ -5,7 +5,7 @@ namespace Quantum {
 
         public Rules EnabledChanges;
 
-        public AssetRef<Map> Level;
+        public AssetRef<Map> Stage;
         public int StarsToWin;
         public int CoinsForPowerup;
         public int Lives;
@@ -19,7 +19,7 @@ namespace Quantum {
             stream.Serialize(ref changes);
             EnabledChanges = (Rules) changes;
 
-            stream.Serialize(ref Level);
+            stream.Serialize(ref Stage);
             stream.Serialize(ref StarsToWin);
             stream.Serialize(ref CoinsForPowerup);
             stream.Serialize(ref Lives);
@@ -39,9 +39,9 @@ namespace Quantum {
             var rules = f.Global->Rules;
             bool levelChanged = false;
 
-            if (rulesChanges.HasFlag(Rules.Level)) {
-                levelChanged = rules.Level != Level;
-                rules.Level = Level;
+            if (rulesChanges.HasFlag(Rules.Stage)) {
+                levelChanged = rules.Stage != Stage;
+                rules.Stage = Stage;
             }
             if (rulesChanges.HasFlag(Rules.StarsToWin)) {
                 rules.StarsToWin = StarsToWin;
@@ -74,7 +74,7 @@ namespace Quantum {
         }
 
         public enum Rules : ushort {
-            Level = 1 << 0,
+            Stage = 1 << 0,
             StarsToWin = 1 << 1,
             CoinsForPowerup = 1 << 2,
             Lives = 1 << 3,

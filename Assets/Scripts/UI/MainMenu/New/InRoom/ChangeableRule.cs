@@ -159,7 +159,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
 
     private void FindValue(in GameRules rules) {
         value = ruleType switch {
-            CommandChangeRules.Rules.Level => rules.Level,
+            CommandChangeRules.Rules.Stage => rules.Stage,
             CommandChangeRules.Rules.StarsToWin => rules.StarsToWin,
             CommandChangeRules.Rules.CoinsForPowerup => rules.CoinsForPowerup,
             CommandChangeRules.Rules.Lives => rules.Lives,

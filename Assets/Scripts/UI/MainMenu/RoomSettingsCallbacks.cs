@@ -67,7 +67,7 @@ namespace NSMB.UI.MainMenu {
             ChangeMaxPlayers(realtimeRoom.MaxPlayers);
            
             var rules = f.Global->Rules;
-            ChangeLevelIndex(rules.Level, sendMessage);
+            ChangeLevelIndex(rules.Stage, sendMessage);
             ChangeStarRequirement(rules.StarsToWin);
             ChangeCoinRequirement(rules.CoinsForPowerup);
             ChangeLives(rules.Lives);
@@ -95,8 +95,8 @@ namespace NSMB.UI.MainMenu {
             MainMenuManager.MapData mapData = MainMenuManager.Instance.maps[index];
 
             game.SendCommand(hostSlot, new CommandChangeRules {
-                EnabledChanges = CommandChangeRules.Rules.Level,
-                Level = mapData.mapAsset,
+                EnabledChanges = CommandChangeRules.Rules.Stage,
+                Stage = mapData.mapAsset,
             });
         }
         private void ChangeLevelIndex(AssetRef<Map> newMap, bool changed) {

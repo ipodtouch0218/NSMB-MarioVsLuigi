@@ -36,7 +36,7 @@ namespace Quantum {
             }
         }
 
-        public bool CanHoldItem(Frame f, EntityRef entity) {
+        public bool CanHoldItem(Frame f, EntityRef entity, EntityRef item) {
             Input input = default;
             if (PlayerRef.IsValid) {
                 input = *f.GetPlayerInput(PlayerRef);
@@ -45,7 +45,7 @@ namespace Quantum {
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
             bool forceHold = false;
             bool aboveHead = false;
-            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
+            if (f.Unsafe.TryGetPointer(item, out Holdable* holdable)) {
                 aboveHead = holdable->HoldAboveHead;
                 if (aboveHead) {
                     forceHold = (f.Number - HoldStartFrame) < 25;
@@ -55,13 +55,13 @@ namespace Quantum {
             return (input.Sprint.IsDown || forceHold)
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
                 && !IsInKnockback && KnockbackGetupFrames == 0 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead
-                && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(HeldEntity) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
-                && !IsGroundpounding && !(!f.Exists(HeldEntity) && physicsObject->IsUnderwater && input.Jump.IsDown)
+                && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(item) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
+                && !IsGroundpounding && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown)
                 && !(aboveHead && physicsObject->IsUnderwater);
         }
 
-        public bool CanPickupItem(Frame f, EntityRef mario) {
-            return !f.Exists(HeldEntity) && CanHoldItem(f, mario);
+        public bool CanPickupItem(Frame f, EntityRef mario, EntityRef item) {
+            return !f.Exists(HeldEntity) && CanHoldItem(f, mario, item);
         }
 
         public bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {

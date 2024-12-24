@@ -14,7 +14,7 @@ global {
 }
 
 struct GameRules {
-	asset_ref<Map> Level;
+	asset_ref<Map> Stage;
 
 	int StarsToWin;
 	int CoinsForPowerup;

@@ -59,8 +59,8 @@ public class StageChangeableRule : ChangeableRule {
 
         QuantumGame game = NetworkHandler.Game;
         switch (ruleType) {
-        case CommandChangeRules.Rules.Level:
-            cmd.Level = (AssetRef<Map>) value;
+        case CommandChangeRules.Rules.Stage:
+            cmd.Stage = (AssetRef<Map>) value;
             break;
         }
 

@@ -110,7 +110,7 @@ public class ReplayListEntry : MonoBehaviour {
     }
 
     public void OnFavoriteClicked() {
-        string destination = Path.Combine(Application.streamingAssetsPath, "replays");
+        string destination = ReplayListManager.ReplayDirectory;
         string path = Replay.FilePath[destination.Length..];
         int nextSlash = path.IndexOf(Path.DirectorySeparatorChar, 1);
         if (nextSlash != -1) {

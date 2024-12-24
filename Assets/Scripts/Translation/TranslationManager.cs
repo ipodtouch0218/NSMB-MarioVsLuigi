@@ -33,19 +33,31 @@ namespace NSMB.Translation {
             instantiated = true;
         }
 
-        public void ChangeLanguage(string newLocale) {
-            if (!instantiated)
-                Instantiate();
+        public void Update() {
+            if (Input.GetKeyDown(KeyCode.F5)) {
+                LoadLanguage(CurrentLocale);
+            }
+        }
 
-            if (string.IsNullOrEmpty(newLocale))
+        public void ChangeLanguage(string newLocale) {
+            if (!instantiated) {
+                Instantiate();
+            }
+
+            if (string.IsNullOrEmpty(newLocale)) {
                 return;
+            }
 
             newLocale = newLocale.ToLower();
-            if (CurrentLocale == newLocale)
+            if (CurrentLocale == newLocale) {
                 return;
+            }
 
+            LoadLanguage(newLocale);
+        }
+
+        private void LoadLanguage(string newLocale) {
             bool foundTranslations = false;
-
             if (IsDesktopPlatform()) {
                 try {
                     // Find the language files from the streaming assets
@@ -75,7 +87,6 @@ namespace NSMB.Translation {
 
             if (!foundTranslations) {
                 // Load the new language file from the resources (since we can't read from the filesystem)
-
                 foreach (TextAsset locale in defaultLocales) {
                     if (locale.name == newLocale) {
                         translations = LoadLocaleFromJson(locale.text);

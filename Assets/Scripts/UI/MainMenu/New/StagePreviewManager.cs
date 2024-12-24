@@ -37,11 +37,11 @@ public class StagePreviewManager : MonoBehaviour {
     }
 
     private unsafe void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-        PreviewStage(e.Game.Frames.Predicted.Global->Rules.Level);
+        PreviewStage(e.Game.Frames.Predicted.Global->Rules.Stage);
     }
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {
-        PreviewStage(e.Frame.Global->Rules.Level);
+        PreviewStage(e.Frame.Global->Rules.Stage);
     }
 
 

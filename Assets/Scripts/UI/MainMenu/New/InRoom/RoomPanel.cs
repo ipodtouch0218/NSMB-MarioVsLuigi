@@ -37,7 +37,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             if (NetworkHandler.Runner && NetworkHandler.Runner.Game != null) {
                 Frame f = NetworkHandler.Runner.Game.Frames.Predicted;
                 UpdateRules(f.Global->Rules);
-                ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(f.Global->Rules.Level).UserAsset));
+                ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(f.Global->Rules.Stage).UserAsset));
             }
 
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
@@ -82,7 +82,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         private unsafe void OnGameStarted(CallbackGameStarted e) {
             Frame f = e.Game.Frames.Predicted;
             UpdateRules(f.Global->Rules);
-            ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(f.Global->Rules.Level).UserAsset));
+            ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(f.Global->Rules.Stage).UserAsset));
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
@@ -90,7 +90,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             ref GameRules rules = ref f.Global->Rules;
 
             if (e.LevelChanged) {
-                ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(rules.Level).UserAsset));
+                ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(rules.Stage).UserAsset));
             }
 
             UpdateRules(rules);

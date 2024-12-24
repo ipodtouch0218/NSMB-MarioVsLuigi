@@ -226,7 +226,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         initialFrameData = null;
 
         // Create directories and open file
-        string replayFolder = Path.Combine(Application.streamingAssetsPath, "replays", "temp");
+        string replayFolder = Path.Combine(ReplayListManager.ReplayDirectory, "temp");
         Directory.CreateDirectory(replayFolder);
         string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".mvlreplay");
         using FileStream outputStream = new FileStream(finalFilePath, FileMode.Create);
@@ -285,7 +285,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             [Enums.NetRoomProperties.IntProperties] = (int) intProperties,
             [Enums.NetRoomProperties.BoolProperties] = (int) boolProperties,
             [Enums.NetRoomProperties.HostName] = (string) hostData.PlayerNickname,
-            [Enums.NetRoomProperties.StageGuid] = rules.Level.Id.ToString(),
+            [Enums.NetRoomProperties.StageGuid] = rules.Stage.Id.ToString(),
         });
     }
 

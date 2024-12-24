@@ -40,7 +40,7 @@ namespace Quantum {
                     if (QuantumUtils.Decrement(ref f.Global->GameStartFrames)) {
                         // Start the game!
                         if (f.IsVerified) {
-                            f.MapAssetRef = f.Global->Rules.Level;
+                            f.MapAssetRef = f.Global->Rules.Stage;
                         }
                         f.Global->PlayerLoadFrames = (ushort) (20 * f.UpdateRate);
                         f.Global->GameState = GameState.WaitingForPlayers;

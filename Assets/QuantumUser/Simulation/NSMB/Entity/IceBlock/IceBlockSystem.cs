@@ -14,9 +14,9 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<IceBlock, Projectile>(OnIceBlockProjectileInteraction);
-            f.Context.RegisterInteraction<IceBlock, MarioPlayer>(OnIceBlockMarioInteraction);
-            f.Context.RegisterInteraction<IceBlock, Coin>(OnIceBlockCoinInteraction);
+            f.Context.RegisterInteraction<Projectile, IceBlock>(OnIceBlockProjectileInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, IceBlock>(OnIceBlockMarioInteraction);
+            f.Context.RegisterInteraction<Coin, IceBlock>(OnIceBlockCoinInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -95,20 +95,20 @@ namespace Quantum {
                 return default;
             }
 
-            EntityRef frozenCubeEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
-            var frozenCube = f.Unsafe.GetPointer<IceBlock>(frozenCubeEntity);
-            frozenCube->Initialize(f, frozenCubeEntity, entityToFreeze);
-            frozenCube->IsFlying = flying;
-            return frozenCubeEntity;
+            EntityRef iceBlockEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+            iceBlock->Initialize(f, iceBlockEntity, entityToFreeze);
+            iceBlock->IsFlying = flying;
+            return iceBlockEntity;
         }
 
-        public static void Destroy(Frame f, EntityRef frozenCube, IceBlockBreakReason breakReason) {
-            f.Signals.OnIceBlockBroken(frozenCube, breakReason);
-            f.Destroy(frozenCube);
+        public static void Destroy(Frame f, EntityRef iceBlockEntity, IceBlockBreakReason breakReason) {
+            f.Signals.OnIceBlockBroken(iceBlockEntity, breakReason);
+            f.Destroy(iceBlockEntity);
         }
 
         #region Interactions
-        public static void OnIceBlockMarioInteraction(Frame f, EntityRef iceBlockEntity, EntityRef marioEntity, PhysicsContact contact) {
+        public static void OnIceBlockMarioInteraction(Frame f, EntityRef marioEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -147,7 +147,7 @@ namespace Quantum {
 
                 if (!f.Exists(holdable2->Holder)
                     && child->IsCarryable
-                    && mario->CanPickupItem(f, marioEntity)) {
+                    && mario->CanPickupItem(f, marioEntity, iceBlockEntity)) {
 
                     // Pickup successful
                     holdable2->Pickup(f, iceBlockEntity, marioEntity);
@@ -158,7 +158,7 @@ namespace Quantum {
             }
         }
 
-        public static void OnIceBlockCoinInteraction(Frame f, EntityRef iceBlockEntity, EntityRef coinEntity) {
+        public static void OnIceBlockCoinInteraction(Frame f, EntityRef coinEntity, EntityRef iceBlockEntity) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
 
@@ -170,12 +170,12 @@ namespace Quantum {
             CoinSystem.TryCollectCoin(f, coinEntity, holdable->PreviousHolder);
         }
 
-        public static void OnIceBlockProjectileInteraction(Frame f, EntityRef frozenCubeEntity, EntityRef projectileEntity, PhysicsContact contact) {
+        public static void OnIceBlockProjectileInteraction(Frame f, EntityRef projectileEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             if (projectileAsset.Effect == ProjectileEffectType.Knockback) {
                 // Fireball: destroy
-                Destroy(f, frozenCubeEntity, IceBlockBreakReason.Fireball);
+                Destroy(f, iceBlockEntity, IceBlockBreakReason.Fireball);
             }
 
             if (projectileAsset.DestroyOnHit) {

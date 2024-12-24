@@ -15,6 +15,8 @@ using UnityEngine.UI;
 
 public class ReplayListManager : Selectable {
 
+    public static string ReplayDirectory => Path.Combine(Application.persistentDataPath, "replays");
+
     //---Properties
     public ReplayListEntry Selected { get; private set; }
 
@@ -111,7 +113,7 @@ public class ReplayListManager : Selectable {
             // Color and width
             builder.Append("<width=85%>");
             int teamIndex = file.PlayerTeams[i];
-            if (file.Teams) {
+            if (file.Rules.TeamsEnabled) {
                 var allTeams = GlobalController.Instance.config.Teams;
                 TeamAsset team = allTeams[teamIndex % allTeams.Length];
                 builder.Append("<nobr>");
@@ -142,12 +144,12 @@ public class ReplayListManager : Selectable {
         string on = tm.GetTranslation("ui.generic.on");
 
         builder.Append("<align=center><color=white>");
-        builder.Append("<sprite name=room_stars> ").Append(file.Stars).Append("    ");
-        builder.Append("<sprite name=room_coins> ").Append(file.Coins).Append("    ");
-        builder.Append("<sprite name=room_lives> ").Append(file.Lives > 0 ? file.Lives : off).Append("    ");
-        builder.Append("<sprite name=room_timer> ").Append(file.Timer > 0 ? Utils.SecondsToMinuteSeconds(file.Timer) : off).Append("    ");
-        builder.Append("<sprite name=room_powerups>").Append(file.CustomPowerups ? on : off).Append("    ");
-        builder.Append("<sprite name=room_teams>").AppendLine(file.Teams? on : off);
+        builder.Append("<sprite name=room_stars> ").Append(file.Rules.StarsToWin).Append("    ");
+        builder.Append("<sprite name=room_coins> ").Append(file.Rules.CoinsForPowerup).Append("    ");
+        builder.Append("<sprite name=room_lives> ").Append(file.Rules.Lives > 0 ? file.Rules.Lives : off).Append("    ");
+        builder.Append("<sprite name=room_timer> ").Append(file.Rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(file.Rules.TimerSeconds) : off).Append("    ");
+        builder.Append("<sprite name=room_powerups>").Append(file.Rules.CustomPowerupsEnabled ? on : off).Append("    ");
+        builder.Append("<sprite name=room_teams>").AppendLine(file.Rules.TeamsEnabled ? on : off);
 
         // Add date
         builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime());
@@ -167,11 +169,11 @@ public class ReplayListManager : Selectable {
         }
         replays.Clear();
 
-        Directory.CreateDirectory(Path.Combine(Application.streamingAssetsPath, "replays", "temp"));
-        Directory.CreateDirectory(Path.Combine(Application.streamingAssetsPath, "replays", "favorite"));
-        Directory.CreateDirectory(Path.Combine(Application.streamingAssetsPath, "replays", "saved"));
+        Directory.CreateDirectory(Path.Combine(ReplayDirectory, "temp"));
+        Directory.CreateDirectory(Path.Combine(ReplayDirectory, "favorite"));
+        Directory.CreateDirectory(Path.Combine(ReplayDirectory, "saved"));
 
-        string[] files = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "replays"), "*.mvlreplay", SearchOption.AllDirectories);
+        string[] files = Directory.GetFiles(Path.Combine(ReplayDirectory), "*.mvlreplay", SearchOption.AllDirectories);
 
         foreach (var file in files) {
             if (File.Exists(file)) {
@@ -224,7 +226,7 @@ public class ReplayListManager : Selectable {
                 using FileStream stream = new FileStream(filepath, FileMode.Open);
                 if (BinaryReplayFile.TryLoadFromFile(stream, out BinaryReplayFile parsedReplay)) {
                     // Move into the replays folder
-                    string newPath = Path.Combine(Application.streamingAssetsPath, "replays", "saved", parsedReplay.UnixTimestamp + ".mvlreplay");
+                    string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.UnixTimestamp + ".mvlreplay");
                     File.Copy(filepath, newPath, false);
 
                     Replay newReplay = new Replay {
@@ -288,7 +290,7 @@ public class ReplayListManager : Selectable {
                 }
 
                 // Check stage name
-                if (QuantumUnityDB.TryGetGlobalAsset(replay.ReplayFile.MapAssetRef, out Map map)
+                if (QuantumUnityDB.TryGetGlobalAsset(replay.ReplayFile.Rules.Stage, out Map map)
                     && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
                     if (tm.GetTranslation(stage.TranslationKey).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
@@ -336,12 +338,12 @@ public class ReplayListManager : Selectable {
         
         if (sortAscending) {
             return
-                allStages.IndexOf(map => ((AssetRef<Map>) map) == a.ReplayFile.MapAssetRef)
-                - allStages.IndexOf(map => ((AssetRef<Map>) map) == b.ReplayFile.MapAssetRef);
+                allStages.IndexOf(map => ((AssetRef<Map>) map) == a.ReplayFile.Rules.Stage)
+                - allStages.IndexOf(map => ((AssetRef<Map>) map) == b.ReplayFile.Rules.Stage);
         } else {
             return
-                allStages.IndexOf(map => ((AssetRef<Map>) map) == b.ReplayFile.MapAssetRef)
-                - allStages.IndexOf(map => ((AssetRef<Map>) map) == a.ReplayFile.MapAssetRef);
+                allStages.IndexOf(map => ((AssetRef<Map>) map) == b.ReplayFile.Rules.Stage)
+                - allStages.IndexOf(map => ((AssetRef<Map>) map) == a.ReplayFile.Rules.Stage);
         }
     }
 
@@ -355,13 +357,16 @@ public class ReplayListManager : Selectable {
 
         sortDropdown.SetValueWithoutNotify(index);
         sortDropdown.RefreshShownValue();
+
+
+        UpdateInformation(Selected ? Selected.Replay : null);
     }
 
     public class Replay {
         public string FilePath;
         public BinaryReplayFile ReplayFile;
         public ReplayListEntry ListEntry;
-        public bool IsTemporary => FilePath.StartsWith(Path.Combine(Application.streamingAssetsPath, "replays", "temp"));
-        public bool IsFavorited => FilePath.StartsWith(Path.Combine(Application.streamingAssetsPath, "replays", "favorite"));
+        public bool IsTemporary => FilePath.StartsWith(Path.Combine(ReplayDirectory, "temp"));
+        public bool IsFavorited => FilePath.StartsWith(Path.Combine(ReplayDirectory, "favorite"));
     }
 }

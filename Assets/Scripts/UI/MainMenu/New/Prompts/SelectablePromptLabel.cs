@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.Translation;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -22,6 +23,15 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             this.SetIfNull(ref label);
         }
 
+        public void OnEnable() {
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            UpdateLabel();
+        }
+
+        public void OnDisable() {
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
+
         public void LateUpdate() {
             bool currentlySelected = selectionTargets.Contains(EventSystem.current.currentSelectedGameObject);
             
@@ -33,25 +43,32 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void Select() {
-            if (changeText) {
-                if (twoSided) {
-                    label.text = "» " + GlobalController.Instance.translationManager.GetTranslation(translationKey) + " «";
-                } else {
-                    label.text = "» " + GlobalController.Instance.translationManager.GetTranslation(translationKey);
-                }
-            } else {
-                label.enabled = true;
-            }
             selected = true;
+            UpdateLabel();
         }
 
         public void Deselect() {
+            selected = false;
+            UpdateLabel();
+        }
+
+        public void UpdateLabel() {
             if (changeText) {
                 label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+                if (selected) {
+                    if (twoSided) {
+                        label.text = "» " + label.text + " «";
+                    } else {
+                        label.text = "» " + label.text;
+                    }
+                }
             } else {
-                label.enabled = false;
+                label.enabled = selected;
             }
-            selected = false;
+        }
+
+        private void OnLanguageChanged(TranslationManager tm) {
+            UpdateLabel();
         }
     }
 }

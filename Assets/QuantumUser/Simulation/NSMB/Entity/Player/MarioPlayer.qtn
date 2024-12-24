@@ -68,7 +68,6 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte JumpBufferFrames;
 	[ExcludeFromPrototype] byte CoyoteTimeFrames;
 	[ExcludeFromPrototype] int LandedFrame;
-	[ExcludeFromPrototype] bool WasTouchingGroundLastFrame;
 	[ExcludeFromPrototype] bool DoEntityBounce;
 
 	// Wallslide

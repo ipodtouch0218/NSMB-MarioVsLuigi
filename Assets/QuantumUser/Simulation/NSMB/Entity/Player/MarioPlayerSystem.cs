@@ -326,7 +326,7 @@ namespace Quantum {
                 mario->CoyoteTimeFrames = physics.CoyoteTimeFrames;
             }
 
-            if (!mario->WasTouchingGroundLastFrame && physicsObject->IsTouchingGround) {
+            if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                 // Landed Frame
                 mario->LandedFrame = f.Number;
                 if (mario->PreviousJumpState != JumpState.None && mario->PreviousJumpState == mario->JumpState) {
@@ -364,7 +364,7 @@ namespace Quantum {
                 mario->IsSpinnerFlying = true;
                 mario->IsPropellerFlying = false;
                 mario->JumpBufferFrames = 0;
-                mario->WasTouchingGroundLastFrame = false;
+                physicsObject->WasTouchingGround = false;
                 physicsObject->IsTouchingGround = false;
 
                 // Disable koyote time
@@ -389,7 +389,7 @@ namespace Quantum {
             mario->IsSpinnerFlying &= mario->DoEntityBounce;
             mario->IsPropellerFlying &= mario->DoEntityBounce;
             mario->JumpBufferFrames = 0;
-            mario->WasTouchingGroundLastFrame = false;
+            physicsObject->WasTouchingGround = false;
             physicsObject->IsTouchingGround = false;
 
             // Disable koyote time
@@ -698,10 +698,9 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (mario->WasTouchingGroundLastFrame && !physicsObject->IsTouchingGround) {
-                if (physicsObject->Velocity.Y < FP._0_10) {
-                     physicsObject->Velocity.Y = mario->IsCrouching ? physics.CrouchOffEdgeVelocity : 0;
-                }
+            if (mario->IsCrouching && physicsObject->WasTouchingGround && !physicsObject->IsTouchingGround && physicsObject->Velocity.Y < FP._0_10) {
+                physicsObject->Velocity.Y = mario->IsCrouching ? physics.CrouchOffEdgeVelocity : 0;
+                physicsObject->HoverFrames = 0;
             }
 
             // Can't crouch while sliding, flying, or mega.
@@ -1277,7 +1276,7 @@ namespace Quantum {
                 mario->WallslideLeft = false;
                 mario->WallslideRight = false;
 
-                mario->WasTouchingGroundLastFrame = false;
+                physicsObject->WasTouchingGround = false;
                 filter.PhysicsObject->IsTouchingGround = false;
                 f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
                 break;

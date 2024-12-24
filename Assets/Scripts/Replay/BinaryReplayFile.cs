@@ -1,8 +1,10 @@
 using NSMB.Translation;
 using Photon.Deterministic;
 using Quantum;
+using Quantum.Prototypes;
 using System;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
 
@@ -24,9 +26,7 @@ public class BinaryReplayFile {
     public bool IsCompatible => Version == CurrentVersion;
 
     // Rules
-    public AssetRef<Map> MapAssetRef;
-    public int Stars, Coins, Lives, Timer;
-    public bool CustomPowerups, Teams;
+    public GameRulesPrototype Rules;
 
     // Player information
     public byte Players;
@@ -56,15 +56,10 @@ public class BinaryReplayFile {
         writer.Write(InitialFrameNumber);
         writer.Write(ReplayLengthInFrames);
         writer.Write(CustomName);
-        
+
         // Rules
-        writer.Write(MapAssetRef.Id.Value);
-        writer.Write(Stars);
-        writer.Write(Coins);
-        writer.Write(Lives);
-        writer.Write(Timer);
-        writer.Write(CustomPowerups);
-        writer.Write(Teams);
+        BinaryFormatter formatter = new();
+        formatter.Serialize(output, Rules);
 
         // Players
         writer.Write(Players);
@@ -101,7 +96,7 @@ public class BinaryReplayFile {
     public string GetDefaultName() {
         TranslationManager tm = GlobalController.Instance.translationManager;
 
-        if (QuantumUnityDB.TryGetGlobalAsset(MapAssetRef, out Map map)
+        if (QuantumUnityDB.TryGetGlobalAsset(Rules.Stage, out Map map)
             && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
             // We can find the map they're talking about
             return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname", "playercount", Players.ToString(), "map", tm.GetTranslation(stage.TranslationKey));
@@ -111,7 +106,7 @@ public class BinaryReplayFile {
     }
 
     public Sprite GetMapSprite() {
-        if (QuantumUnityDB.TryGetGlobalAsset(MapAssetRef, out Map map)
+        if (QuantumUnityDB.TryGetGlobalAsset(Rules.Stage, out Map map)
             && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
             return stage.Icon;
         }
@@ -137,13 +132,8 @@ public class BinaryReplayFile {
             result.CustomName = reader.ReadString();
 
             // Rules
-            result.MapAssetRef = (AssetGuid) reader.ReadInt64();
-            result.Stars = reader.ReadInt32();
-            result.Coins = reader.ReadInt32();
-            result.Lives = reader.ReadInt32();
-            result.Timer = reader.ReadInt32();
-            result.CustomPowerups = reader.ReadBoolean();
-            result.Teams = reader.ReadBoolean();
+            BinaryFormatter formatter = new();
+            result.Rules = (GameRulesPrototype) formatter.Deserialize(input);
 
             // Players
             result.Players = reader.ReadByte();
@@ -180,13 +170,15 @@ public class BinaryReplayFile {
             InitialFrameNumber = replay.InitialTick,
             ReplayLengthInFrames = replay.LastTick - replay.InitialTick,
 
-            MapAssetRef = rules.Level,
-            Stars = rules.StarsToWin,
-            Coins = rules.CoinsForPowerup,
-            Lives = rules.Lives,
-            Timer = rules.TimerSeconds,
-            CustomPowerups = (bool) rules.CustomPowerupsEnabled,
-            Teams = (bool) rules.TeamsEnabled,
+            Rules = new GameRulesPrototype {
+                Stage = rules.Stage,
+                StarsToWin = rules.StarsToWin,
+                CoinsForPowerup = rules.CoinsForPowerup,
+                Lives = rules.Lives,
+                TimerSeconds = rules.TimerSeconds,
+                CustomPowerupsEnabled = rules.CustomPowerupsEnabled,
+                TeamsEnabled = rules.TeamsEnabled,
+            },
 
             Players = players,
             PlayerNames = playernames,
