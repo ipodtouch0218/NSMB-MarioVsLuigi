@@ -62,7 +62,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (!game.PlayerIsLocal(host)) {
                 // Canvas.PlaySound(SoundEffect.UI_Error);
                 maxPlayerSlider.SetValueWithoutNotify(currentRoom.MaxPlayers);
-                return;
             } else {
                 maxPlayerSlider.SetValueWithoutNotify(Mathf.Clamp((int) maxPlayerSlider.value, Mathf.Max(2, currentRoom.PlayerCount), 10));
                 currentRoom.MaxPlayers = (int) maxPlayerSlider.value;

@@ -1,6 +1,5 @@
 using Quantum;
 using System;
-using System.Linq;
 using UnityEngine;
 
 public class ProjectileParticles : MonoBehaviour {
@@ -13,14 +12,24 @@ public class ProjectileParticles : MonoBehaviour {
     }
 
     private void OnProjectileDestroyed(EventProjectileDestroyed e) {
-        ParticlePair pp = particles.FirstOrDefault(p => p.particle == e.Particle);
-        if (pp.prefab) {
+        if (TryGetParticlePair(e.Particle, out ParticlePair pp)) {
             Instantiate(pp.prefab, e.Position.ToUnityVector3() + pp.offset, Quaternion.identity);
         }
     }
 
+    private bool TryGetParticlePair(ParticleEffect particleEffect, out ParticlePair particlePair) {
+        foreach (var pair in particles) {
+            if (particleEffect == pair.particle) {
+                particlePair = pair;
+                return true;
+            }
+        }
+        particlePair = null;
+        return false;
+    }
+
     [Serializable]
-    public struct ParticlePair {
+    public class ParticlePair {
         public ParticleEffect particle;
         public GameObject prefab;
         public Vector3 offset;

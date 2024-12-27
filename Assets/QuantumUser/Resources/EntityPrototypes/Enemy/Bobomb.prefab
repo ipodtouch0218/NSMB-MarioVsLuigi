@@ -348,11 +348,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3da7571674e815448a99f92b1e227e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 7291188359072774658}
   sfx: {fileID: -3689537593968581114}
   sRenderer: {fileID: 4854378239597354105}
   animator: {fileID: 8735478572021304808}
-  explosionPrefab: {fileID: 1681235843256999355, guid: a89a150bbd7d5d74aa28f02a5d5a0dfb,
+  explosionPrefab: {fileID: 1674080856964950978, guid: 7ac2c558b7c96304eb065980d84e1c67,
     type: 3}
 --- !u!114 &6162738416106121865
 MonoBehaviour:
@@ -371,7 +370,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 3286581577125373960}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!82 &-3689537593968581114
 AudioSource:
   m_ObjectHideFlags: 0
@@ -504,6 +502,10 @@ MonoBehaviour:
       Value: 0
     SlowInLiquids:
       Value: 1
+    IsWaterSolid:
+      Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &5295556553734674634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -632,8 +634,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

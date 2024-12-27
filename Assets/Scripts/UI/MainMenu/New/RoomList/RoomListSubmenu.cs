@@ -48,11 +48,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         public override void Show(bool first) {
             base.Show(first);
 
-            if (first) {
-                // Attempt connection.
-                Reconnect();
-            }
-
+            Reconnect();
+            
             filterInProgressRooms.SetIsOnWithoutNotify(Settings.Instance.miscFilterInProgressRooms);
             roomManager.FilterInProgressRooms = Settings.Instance.miscFilterInProgressRooms;
             filterFullRooms.SetIsOnWithoutNotify(Settings.Instance.miscFilterFullRooms);

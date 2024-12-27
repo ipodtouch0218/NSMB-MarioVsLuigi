@@ -18,9 +18,9 @@ MonoBehaviour:
     LockstepSimulation: 0
     InputDeltaCompression: 1
     UpdateFPS: 60
-    ChecksumInterval: 0
+    ChecksumInterval: 1
     RollbackWindow: 60
-    InputHardTolerance: 8
+    InputHardTolerance: 6
     InputRedundancy: 2
     InputRepeatMaxDistance: 10
     SessionStartTimeout: 0
@@ -31,6 +31,6 @@ MonoBehaviour:
     TimeScalePingMin: 100
     TimeScalePingMax: 300
     InputDelayMin: 1
-    InputDelayMax: 60
-    InputDelayPingStart: 120
+    InputDelayMax: 20
+    InputDelayPingStart: 40
     InputFixedSize: 0

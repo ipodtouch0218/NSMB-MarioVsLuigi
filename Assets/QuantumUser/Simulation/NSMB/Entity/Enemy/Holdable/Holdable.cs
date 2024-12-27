@@ -21,6 +21,7 @@ namespace Quantum {
 
         public void Throw(Frame f, EntityRef entity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(Holder);
+            var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(Holder);
             mario->HeldEntity = default;
             mario->ProjectileDelayFrames = 15;
 
@@ -36,7 +37,15 @@ namespace Quantum {
 
             PreviousHolder = Holder;
             Holder = default;
-            f.Signals.OnThrowHoldable(entity, PreviousHolder, f.GetPlayerInput(mario->PlayerRef)->Down.IsDown, false);
+
+            bool softDrop = false;
+            var rawInput = f.GetPlayerInput(mario->PlayerRef);
+            if (rawInput != null) {
+                softDrop = rawInput->Down.IsDown;
+            }
+            softDrop &= !marioPhysicsObject->IsUnderwater;
+
+            f.Signals.OnThrowHoldable(entity, PreviousHolder, softDrop, false);
         }
     }
 }

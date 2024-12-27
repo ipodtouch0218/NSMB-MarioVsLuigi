@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -111,7 +112,7 @@ namespace Quantum {
                 } else {
                     movement -= PhysicsObjectSystem.Skin;
                 }
-                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, movement * f.UpdateRate, hit.Entity, stage);
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, new FPVector2(0, movement * f.UpdateRate), hit.Entity, stage);
 
                 /*
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
@@ -204,7 +205,7 @@ namespace Quantum {
                 } else {
                     movement -= PhysicsObjectSystem.Skin;
                 }
-                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, movement * f.UpdateRate, hit.Entity, stage);
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(movement * f.UpdateRate, 0), hit.Entity, stage);
                 hitPhysicsObject->Velocity.X = 0;
 
                 /*

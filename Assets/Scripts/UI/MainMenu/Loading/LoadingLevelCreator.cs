@@ -18,12 +18,14 @@ namespace NSMB.Loading {
                 return;
             }
 
+            // No need to worry about language changes in this state...
+            // or else...?
             text.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements(key, "username", value);
         }
 
         private string GetValueFromField() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
-            if (f == null || !f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
+            Frame f = NetworkHandler.Game.Frames.Predicted;
+            if (f == null || !f.Map || !f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
                 return "";
             }
 

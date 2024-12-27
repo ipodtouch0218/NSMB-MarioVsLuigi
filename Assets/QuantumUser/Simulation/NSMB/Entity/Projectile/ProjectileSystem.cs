@@ -63,6 +63,7 @@ namespace Quantum {
                 }
 
                 physicsObject->Velocity.Y = asset.BounceStrength + boost;
+                physicsObject->IsTouchingGround = false;
                 projectile->HasBounced = true;
             }
         }

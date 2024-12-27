@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.UI.MainMenu.Submenus.Prompts;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +22,8 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private MainMenuSubmenu startingSubmenu;
         [SerializeField] private GameObject mainPanel;
         [SerializeField] private AudioSource sfx;
+        [SerializeField] private MainMenuSubmenu goToSubmenuOnError;
+        [SerializeField] private ErrorPromptSubmenu errorSubmenu;
 
         [Header("Header")]
         [SerializeField] private GameObject header;
@@ -48,6 +51,8 @@ namespace NSMB.UI.MainMenu {
                 menu.Initialize(this);
                 menu.Hide(SubmenuHideReason.Closed);
             }
+
+            NetworkHandler.OnError += OnError;
             OpenMenu(startingSubmenu);
         }
 
@@ -96,6 +101,33 @@ namespace NSMB.UI.MainMenu {
             menu.Show(true);
             UpdateHeader();
             ShowHideMainPanel();
+        }
+
+        public void CloseSubmenuWithChildren(MainMenuSubmenu menu) {
+            // Close menus on top of this menu, incuding `menu`
+            if (!submenuStack.Contains(menu)) {
+                return;
+            }
+
+            while (true) {
+                bool stop = submenuStack[^1] == menu;
+                GoBack(true);
+                if (stop) {
+                    break;
+                }
+            }
+        }
+        
+        public void CloseSubmenu(MainMenuSubmenu menu) {
+            // Close only the single submenu. Call Show() on the new parent if we need to.
+            var head = submenuStack[^1];
+            if (submenuStack.Remove(menu)) {
+                menu.Hide(SubmenuHideReason.Closed);
+                var newHead = submenuStack[^1];
+                if (newHead != head) {
+                    newHead.Show(false);
+                }
+            }
         }
 
         public void GoBack() {
@@ -148,6 +180,10 @@ namespace NSMB.UI.MainMenu {
             }
 
             mainPanel.SetActive(showMainPanel);
+        }
+
+        private void OnError(string message) {
+            errorSubmenu.OpenWithString(message);
         }
     }
 

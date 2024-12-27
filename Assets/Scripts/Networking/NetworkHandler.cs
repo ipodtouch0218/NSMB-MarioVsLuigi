@@ -11,19 +11,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using NSMB.UI.MainMenu;
 using System.Text.RegularExpressions;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
     //---Events
     public static event Action<ClientState, ClientState> StateChanged;
+    public static event Action<string> OnError;
 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
     private static readonly int RoomIdLength = 8;
     private static readonly List<DisconnectCause> NonErrorDisconnectCauses = new() {
-        DisconnectCause.None, DisconnectCause.DisconnectByClientLogic
+        DisconnectCause.None, DisconnectCause.DisconnectByClientLogic, DisconnectCause.ApplicationQuit,
     };
 
     //---Static Variables
@@ -348,9 +348,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private void OnPluginDisconnect(CallbackPluginDisconnect e) {
         Debug.Log($"[Network] Disconnected via server plugin: {e.Reason}");
-        
-        WasDisconnectedViaError = true;
-        MainMenuManager.Instance.OpenNetworkErrorBox(DisconnectCause.DisconnectByServerLogic, "reason", e.Reason);
+
+        OnError?.Invoke(e.Reason);
 
         if (Runner) {
             Runner.Shutdown(ShutdownCause.SimulationStopped);
@@ -501,11 +500,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     public void OnDisconnected(DisconnectCause cause) {
         Debug.Log($"[Network] Disconnected. Reason: {cause}");
-        WasDisconnectedViaError = true;
-
-        if (!NonErrorDisconnectCauses.Contains(cause)) {
-            MainMenuManager.Instance.OpenNetworkErrorBox(cause);
-        }
 
         if (Runner) {
             Runner.Shutdown(ShutdownCause.SimulationStopped);

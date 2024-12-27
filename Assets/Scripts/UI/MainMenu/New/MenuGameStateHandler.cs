@@ -6,6 +6,7 @@ public class MenuGameStateHandler : MonoBehaviour {
     public void Start() {
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+        QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {
@@ -20,5 +21,11 @@ public class MenuGameStateHandler : MonoBehaviour {
     private void OnGameDestroyed(CallbackGameDestroyed e) {
         GlobalController.Instance.loadingCanvas.gameObject.SetActive(false);
         gameObject.SetActive(true);
+    }
+
+    private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
+        if (e.Game.PlayerIsLocal(e.Player)) {
+            NetworkHandler.Runner.Shutdown(ShutdownCause.SessionError);
+        }
     }
 }

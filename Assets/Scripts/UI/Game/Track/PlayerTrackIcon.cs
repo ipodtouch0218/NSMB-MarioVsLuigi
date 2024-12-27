@@ -78,7 +78,9 @@ namespace NSMB.UI.Game.Track {
                 return;
             }
 
-            flashRoutine = StartCoroutine(Flash());
+            if (flashRoutine != null) {
+                flashRoutine = StartCoroutine(Flash());
+            }
         }
 
         public void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {

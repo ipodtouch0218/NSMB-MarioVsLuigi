@@ -12,13 +12,16 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [SerializeField] private TMP_Text headerText, errorText;
 
         public void OpenWithRealtimeErrorCode(short code) {
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            string key = NetworkUtils.RealtimeErrorCodes.GetValueOrDefault(code, "ui.error.unknown");
-            errorText.text = tm.GetTranslation(key);
+            OpenWithString(NetworkUtils.RealtimeErrorCodes.GetValueOrDefault(code, "ui.error.unknown"));
         }
 
         public void OpenWithRealtimeDisconnectCause(DisconnectCause cause) {
 
+        }
+
+        public void OpenWithString(string str) {
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            errorText.text = tm.GetTranslation(str);
         }
     }
 }

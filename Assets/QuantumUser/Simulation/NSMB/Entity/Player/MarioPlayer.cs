@@ -9,7 +9,7 @@ namespace Quantum {
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
 
-        public FPVector2 GetHeldItemOffset(Frame f, EntityRef mario) {
+        public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
             if (!f.Exists(HeldEntity)) {
                 return default;
             }
@@ -20,7 +20,7 @@ namespace Quantum {
             FP holdableYOffset = (holdableShape.Box.Extents.Y - holdableShape.Centroid.Y);
 
             if (holdable->HoldAboveHead) {
-                var marioShape = f.Unsafe.GetPointer<PhysicsCollider2D>(mario)->Shape;
+                var marioShape = f.Unsafe.GetPointer<PhysicsCollider2D>(marioEntity)->Shape;
                 FP pickupFrames = 27;
                 FP time = FPMath.Clamp01((f.Number - HoldStartFrame) / pickupFrames);
                 FP alpha = 1 - QuantumUtils.EaseOut(1 - time);
@@ -29,10 +29,18 @@ namespace Quantum {
                     (marioShape.Box.Extents.Y * 2 * alpha) + holdableYOffset
                 );
             } else {
-                return new FPVector2(
-                    (FacingRight ? 1 : -1) * FP._0_25,
-                    (CurrentPowerupState >= PowerupState.Mushroom ? FP._0_10 * 4 : Constants._0_09) + holdableYOffset
-                );
+                var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+                if (marioPhysicsObject->IsUnderwater) {
+                    return new FPVector2(
+                        (FacingRight ? 1 : -1) * (CurrentPowerupState >= PowerupState.Mushroom ? Constants._0_40 : FP._0_33),
+                        (CurrentPowerupState >= PowerupState.Mushroom ? Constants._0_09 : FP._0_04) + holdableYOffset
+                    );
+                } else {
+                    return new FPVector2(
+                        (FacingRight ? 1 : -1) * FP._0_25,
+                        (CurrentPowerupState >= PowerupState.Mushroom ? Constants._0_40 : Constants._0_09) + holdableYOffset
+                    );
+                }
             }
         }
 

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace NSMB.UI.MainMenu.Submenus {
@@ -111,7 +112,6 @@ namespace NSMB.UI.MainMenu.Submenus {
                 return false;
             }
 
-            _ = NetworkHandler.ConnectToRegion(null);
             bool success = base.TryGoBack(out bool finalPlaySound);
             playSound &= finalPlaySound;
             return success;
@@ -208,9 +208,17 @@ namespace NSMB.UI.MainMenu.Submenus {
                 game.SendCommand(slot, new CommandToggleCountdown());
             } else {
                 // Ready (or unready) up
+                bool ready = false;
+                foreach (var player in game.GetLocalPlayers()) {
+                    ready |= QuantumUtils.GetPlayerData(f, player)->IsReady;
+                    break;
+                }
+
                 foreach (int slot in game.GetLocalPlayerSlots()) {
                     game.SendCommand(slot, new CommandToggleReady());
                 }
+
+                Canvas.PlaySound(ready ? SoundEffect.UI_Back : SoundEffect.UI_Decide);
             }
         }
 
@@ -219,12 +227,26 @@ namespace NSMB.UI.MainMenu.Submenus {
             if (!context.performed || allPanels.Any(p => p.IsInSubmenu)) {
                 return;
             }
+           
+            if (EventSystem.current.currentSelectedGameObject 
+                && EventSystem.current.currentSelectedGameObject.TryGetComponent(out TMP_InputField inputField)
+                && inputField.isFocused) {
+                // Don't move left/right when focused on an input field
+                return;
+            }
 
             SelectPreviousPanel();
         }
 
         private void OnNextPerformed(InputAction.CallbackContext context) {
             if (!context.performed || allPanels.Any(p => p.IsInSubmenu)) {
+                return;
+            }
+
+            if (EventSystem.current.currentSelectedGameObject 
+                && EventSystem.current.currentSelectedGameObject.TryGetComponent(out TMP_InputField inputField)
+                && inputField.isFocused) {
+                // Don't move left/right when focused on an input field
                 return;
             }
 
@@ -237,6 +259,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 fadeMusicCoroutine = null;
             }
             musicSource.volume = 1;
+            Canvas.CloseSubmenu(this);
         }
 
         private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {

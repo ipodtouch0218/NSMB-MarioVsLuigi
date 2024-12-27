@@ -27,6 +27,8 @@ namespace Quantum {
                     new MovingPlatformSystem(),
 
                     new EnemySystem(),
+
+                    // Runs as an array task
                     new InteractionSystem(),
                     
                     // Runs as an array task

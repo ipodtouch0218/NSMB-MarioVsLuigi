@@ -135,7 +135,6 @@ namespace NSMB.UI.MainMenu {
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumEvent.Subscribe<EventCountdownTick>(this, OnCountdownTick);
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
-            QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerConfirmed);
@@ -779,14 +778,6 @@ namespace NSMB.UI.MainMenu {
                 startingGame = e.IsGameStarting;
             }
             lastCountdownStartFrame = f.Number;
-        }
-
-        private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
-            UpdateStartGameButton(e.Game);
-
-            if (e.Game.PlayerIsLocal(e.Player)) {
-                QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
-            }
         }
 
         private void OnPlayerDataChanged(EventPlayerDataChanged e) {

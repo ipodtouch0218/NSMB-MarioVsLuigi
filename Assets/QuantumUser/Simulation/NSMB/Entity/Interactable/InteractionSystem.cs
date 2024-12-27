@@ -7,7 +7,8 @@ using System.Collections.Generic;
 namespace Quantum {
     public unsafe class InteractionSystem : SystemArrayFilter<InteractionSystem.Filter> {
 
-        private SortedSet<PendingInteraction> pendingInteractions = new(new PendingInteractionComparer());
+        private List<PendingInteraction> pendingInteractions = new(16);
+        //private SortedSet<PendingInteraction> pendingInteractions = new(new PendingInteractionComparer());
         private HashSet<EntityRefPair> alreadyInteracted = new(16);
         private TaskDelegateHandle executeInteractorsTaskDelegate;
 
@@ -29,6 +30,8 @@ namespace Quantum {
 
         public void ExecuteInteractors(FrameThreadSafe fts, int start, int count, void* arg) {
             Frame f = (Frame) fts;
+
+            pendingInteractions.Sort(new PendingInteractionComparer());
 
             foreach (PendingInteraction interaction in pendingInteractions) {
                 EntityRef entityA = interaction.EntityA;

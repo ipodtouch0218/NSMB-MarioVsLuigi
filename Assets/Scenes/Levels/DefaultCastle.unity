@@ -11343,7 +11343,7 @@ MonoBehaviour:
             RawValue: 655360
         RotationOffset:
           RawValue: 0
-        UserTag: 0
+        UserTag: 1
         IsSetFromSourceCollider: 0
     Shape3D:
       ShapeType: 0

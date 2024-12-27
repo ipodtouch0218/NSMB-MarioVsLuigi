@@ -48,7 +48,7 @@ namespace Quantum {
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
                 marioPhysicsObject->Velocity.X = marioPhysicsObject->PreviousFrameVelocity.X;
                 FP leftoverVelocity = (FPMath.Abs(marioPhysicsObject->Velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (marioPhysicsObject->Velocity.X > 0 ? 1 : -1);
-                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, leftoverVelocity, marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
                 return true;
             }
 

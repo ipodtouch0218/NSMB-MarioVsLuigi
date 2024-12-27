@@ -8,6 +8,7 @@
 #define _0_35 0.35
 #define _0_09 0.09
 #define _0_66 0.66666
+#define _0_075 0.075
 
 input {
 	button Up;
@@ -93,6 +94,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] int KnockbackTick;
 	[ExcludeFromPrototype] byte DamageInvincibilityFrames;
 	[ExcludeFromPrototype] byte KnockbackGetupFrames;
+	[ExcludeFromPrototype] byte CrushDamageInvincibilityFrames;
 
 	// Crouching
     [ExcludeFromPrototype] bool IsCrouching;

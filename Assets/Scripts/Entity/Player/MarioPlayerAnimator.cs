@@ -32,8 +32,9 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamHatUsesOverallsColor = Shader.PropertyToID("HatUsesOverallsColor");
         private static readonly int ParamGlowColor = Shader.PropertyToID("GlowColor");
         private static readonly int ParamVelocityX = Animator.StringToHash("velocityX");
-        private static readonly int ParamDead = Animator.StringToHash("dead");
         private static readonly int ParamVelocityY = Animator.StringToHash("velocityY");
+        private static readonly int ParamVelocityMagnitude = Animator.StringToHash("velocityMagnitude");
+        private static readonly int ParamDead = Animator.StringToHash("dead");
         private static readonly int ParamOnLeft = Animator.StringToHash("onLeft");
         private static readonly int ParamOnRight = Animator.StringToHash("onRight");
         private static readonly int ParamOnGround = Animator.StringToHash("onGround");
@@ -471,6 +472,7 @@ namespace NSMB.Entities.Player {
 
             animator.SetFloat(ParamVelocityX, animatedVelocity);
             animator.SetFloat(ParamVelocityY, physicsObject->Velocity.Y.AsFloat);
+            animator.SetFloat(ParamVelocityMagnitude, physicsObject->Velocity.Magnitude.AsFloat);
         }
 
         private void HandleMiscStates(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable) {

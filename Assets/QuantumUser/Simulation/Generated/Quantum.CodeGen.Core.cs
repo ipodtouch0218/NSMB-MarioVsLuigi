@@ -1662,28 +1662,28 @@ namespace Quantum {
     [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
-    [FieldOffset(30)]
+    [FieldOffset(31)]
     [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
-    [FieldOffset(34)]
+    [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public Byte Team;
-    [FieldOffset(39)]
+    [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
-    [FieldOffset(40)]
+    [FieldOffset(41)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
     [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
-    [FieldOffset(31)]
+    [FieldOffset(32)]
     [ExcludeFromPrototype()]
     public Byte Stars;
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte Coins;
-    [FieldOffset(14)]
+    [FieldOffset(15)]
     [ExcludeFromPrototype()]
     public Byte Lives;
     [FieldOffset(68)]
@@ -1698,16 +1698,16 @@ namespace Quantum {
     [FieldOffset(120)]
     [ExcludeFromPrototype()]
     public QBoolean IsRespawning;
-    [FieldOffset(6)]
+    [FieldOffset(7)]
     [ExcludeFromPrototype()]
     public Byte DeathAnimationFrames;
-    [FieldOffset(20)]
+    [FieldOffset(21)]
     [ExcludeFromPrototype()]
     public Byte PreRespawnFrames;
-    [FieldOffset(27)]
+    [FieldOffset(28)]
     [ExcludeFromPrototype()]
     public Byte RespawnFrames;
-    [FieldOffset(17)]
+    [FieldOffset(18)]
     [ExcludeFromPrototype()]
     public Byte NoLivesStarDirection;
     [FieldOffset(76)]
@@ -1719,28 +1719,28 @@ namespace Quantum {
     [FieldOffset(140)]
     [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
-    [FieldOffset(7)]
+    [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public Byte FastTurnaroundFrames;
-    [FieldOffset(29)]
+    [FieldOffset(30)]
     [ExcludeFromPrototype()]
     public Byte SlowTurnaroundFrames;
     [FieldOffset(60)]
     [ExcludeFromPrototype()]
     public Int32 LastPushingFrame;
-    [FieldOffset(32)]
+    [FieldOffset(33)]
     [ExcludeFromPrototype()]
     public Byte StationaryFrames;
-    [FieldOffset(37)]
-    [ExcludeFromPrototype()]
-    public JumpState JumpState;
     [FieldOffset(38)]
     [ExcludeFromPrototype()]
+    public JumpState JumpState;
+    [FieldOffset(39)]
+    [ExcludeFromPrototype()]
     public JumpState PreviousJumpState;
-    [FieldOffset(12)]
+    [FieldOffset(13)]
     [ExcludeFromPrototype()]
     public Byte JumpLandingFrames;
-    [FieldOffset(11)]
+    [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public Byte JumpBufferFrames;
     [FieldOffset(2)]
@@ -1758,10 +1758,10 @@ namespace Quantum {
     [FieldOffset(164)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
-    [FieldOffset(36)]
+    [FieldOffset(37)]
     [ExcludeFromPrototype()]
     public Byte WallslideEndFrames;
-    [FieldOffset(35)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
     [FieldOffset(100)]
@@ -1770,16 +1770,16 @@ namespace Quantum {
     [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean IsGroundpoundActive;
-    [FieldOffset(10)]
+    [FieldOffset(11)]
     [ExcludeFromPrototype()]
     public Byte GroundpoundStartFrames;
-    [FieldOffset(8)]
-    [ExcludeFromPrototype()]
-    public Byte GroundpoundCooldownFrames;
     [FieldOffset(9)]
     [ExcludeFromPrototype()]
+    public Byte GroundpoundCooldownFrames;
+    [FieldOffset(10)]
+    [ExcludeFromPrototype()]
     public Byte GroundpoundStandFrames;
-    [FieldOffset(33)]
+    [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
     [FieldOffset(104)]
@@ -1794,12 +1794,15 @@ namespace Quantum {
     [FieldOffset(52)]
     [ExcludeFromPrototype()]
     public Int32 KnockbackTick;
-    [FieldOffset(5)]
+    [FieldOffset(6)]
     [ExcludeFromPrototype()]
     public Byte DamageInvincibilityFrames;
-    [FieldOffset(13)]
+    [FieldOffset(14)]
     [ExcludeFromPrototype()]
     public Byte KnockbackGetupFrames;
+    [FieldOffset(3)]
+    [ExcludeFromPrototype()]
+    public Byte CrushDamageInvincibilityFrames;
     [FieldOffset(84)]
     [ExcludeFromPrototype()]
     public QBoolean IsCrouching;
@@ -1821,52 +1824,52 @@ namespace Quantum {
     [FieldOffset(42)]
     [ExcludeFromPrototype()]
     public UInt16 InvincibilityFrames;
-    [FieldOffset(16)]
+    [FieldOffset(17)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomStartFrames;
     [FieldOffset(44)]
     [ExcludeFromPrototype()]
     public UInt16 MegaMushroomFrames;
-    [FieldOffset(15)]
+    [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
     [FieldOffset(148)]
     [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
-    [FieldOffset(21)]
-    [ExcludeFromPrototype()]
-    public Byte ProjectileDelayFrames;
     [FieldOffset(22)]
     [ExcludeFromPrototype()]
+    public Byte ProjectileDelayFrames;
+    [FieldOffset(23)]
+    [ExcludeFromPrototype()]
     public Byte ProjectileVolleyFrames;
-    [FieldOffset(3)]
+    [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public Byte CurrentProjectiles;
-    [FieldOffset(4)]
+    [FieldOffset(5)]
     [ExcludeFromPrototype()]
     public Byte CurrentVolley;
     [FieldOffset(108)]
     [ExcludeFromPrototype()]
     public QBoolean IsInShell;
-    [FieldOffset(28)]
+    [FieldOffset(29)]
     [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
     [FieldOffset(116)]
     [ExcludeFromPrototype()]
     public QBoolean IsPropellerFlying;
-    [FieldOffset(25)]
+    [FieldOffset(26)]
     [ExcludeFromPrototype()]
     public Byte PropellerLaunchFrames;
-    [FieldOffset(26)]
+    [FieldOffset(27)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
     [FieldOffset(156)]
     [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
-    [FieldOffset(23)]
+    [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillCooldown;
-    [FieldOffset(24)]
+    [FieldOffset(25)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillHoldFrames;
     [FieldOffset(208)]
@@ -1884,10 +1887,10 @@ namespace Quantum {
     [FieldOffset(152)]
     [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
-    [FieldOffset(19)]
+    [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public Byte PipeFrames;
-    [FieldOffset(18)]
+    [FieldOffset(19)]
     [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
     [FieldOffset(200)]
@@ -1945,6 +1948,7 @@ namespace Quantum {
         hash = hash * 31 + KnockbackTick.GetHashCode();
         hash = hash * 31 + DamageInvincibilityFrames.GetHashCode();
         hash = hash * 31 + KnockbackGetupFrames.GetHashCode();
+        hash = hash * 31 + CrushDamageInvincibilityFrames.GetHashCode();
         hash = hash * 31 + IsCrouching.GetHashCode();
         hash = hash * 31 + IsSliding.GetHashCode();
         hash = hash * 31 + IsSpinnerFlying.GetHashCode();
@@ -1984,6 +1988,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Coins);
         serializer.Stream.Serialize(&p->Combo);
         serializer.Stream.Serialize(&p->CoyoteTimeFrames);
+        serializer.Stream.Serialize(&p->CrushDamageInvincibilityFrames);
         serializer.Stream.Serialize(&p->CurrentProjectiles);
         serializer.Stream.Serialize(&p->CurrentVolley);
         serializer.Stream.Serialize(&p->DamageInvincibilityFrames);
@@ -2759,6 +2764,14 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>0.075</summary>
+    public static FP _0_075 {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 4915;
+        return result;
+      }
+    }
     /// <summary>1.875</summary>
     public static FP OnePixelPerFrame {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -2835,6 +2848,8 @@ namespace Quantum {
       public const Int64 _0_09 = 5898;
       /// <summary>0.66666</summary>
       public const Int64 _0_66 = 43690;
+      /// <summary>0.075</summary>
+      public const Int64 _0_075 = 4915;
       /// <summary>1.875</summary>
       public const Int64 OnePixelPerFrame = 122880;
       /// <summary>1.1</summary>
