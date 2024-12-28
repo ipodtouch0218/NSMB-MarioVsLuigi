@@ -6,11 +6,12 @@ component PlayerData {
 
 	byte Character;
 	byte Palette;
-	byte Team;
+	byte RequestedTeam;
 	bool IsSpectator;
 	bool ManualSpectator;
 
 	int Wins;
+	byte RealTeam;
 	int LastChatMessage;
 	bool IsReady;
 	bool IsInSettings;

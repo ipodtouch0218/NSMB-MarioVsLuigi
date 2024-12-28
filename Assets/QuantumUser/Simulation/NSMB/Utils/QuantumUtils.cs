@@ -208,27 +208,29 @@ public static unsafe class QuantumUtils {
         int? winningTeam = null;
         bool tie = false;
 
-        Dictionary<int, int> teamStars = GetTeamStars(f);
-        foreach ((int team, int stars) in teamStars) {
+        Span<byte> teamStars = stackalloc byte[10];
+        GetTeamStars(f, teamStars);
+
+        for (int i = 0; i < 10; i++) {
+            byte stars = teamStars[i];
             if (winningTeam == null) {
-                winningTeam = team;
+                winningTeam = i;
                 winningStars = stars;
                 tie = false;
             } else if (stars > winningStars) {
-                winningTeam = team;
+                winningTeam = i;
                 winningStars = stars;
                 tie = false;
             } else if (stars == winningStars) {
-                tie = true;   
+                tie = true;
             }
         }
 
         return tie ? null : winningTeam;
     }
 
-    public static Dictionary<int,int> GetTeamStars(Frame f) {
-        Dictionary<int, int> stars = f.Context.TeamStarBuffer;
-        stars.Clear();
+    public static int GetValidTeams(Frame f) {
+        int result = 0;
 
         var allPlayers = f.Filter<MarioPlayer>();
         allPlayers.UseCulling = false;
@@ -237,22 +239,35 @@ public static unsafe class QuantumUtils {
                 continue;
             }
 
-            if (!stars.ContainsKey(mario->Team)) {
-                stars[mario->Team] = 0;
-            }
-
-            stars[mario->Team] += mario->Stars;
+            byte team = mario->GetTeam(f);
+            result |= (1 << team);
         }
 
-        return stars;
+        return result;
     }
 
-    public static int GetTeamStars(Frame f, int team) {
+    public static void GetTeamStars(Frame f, Span<byte> teamStars) {
+        var allPlayers = f.Filter<MarioPlayer>();
+        allPlayers.UseCulling = false;
+        while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
+            if (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+                continue;
+            }
+
+            byte team = mario->GetTeam(f);
+
+            if (team < teamStars.Length) {
+                teamStars[team] += mario->Stars;
+            }
+        }
+    }
+
+    public static int GetTeamStars(Frame f, byte team) {
         int sum = 0;
         var allPlayers = f.Filter<MarioPlayer>();
         allPlayers.UseCulling = false;
         while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
-            if (mario->Team != team
+            if (mario->GetTeam(f) != team
                 || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
                 continue;
             }
@@ -263,19 +278,12 @@ public static unsafe class QuantumUtils {
         return sum;
     }
 
-    public static int GetFirstPlaceStars(Frame f) {
-        Span<int> teamStars = stackalloc int[10];
+    public static byte GetFirstPlaceStars(Frame f) {
+        Span<byte> teamStars = stackalloc byte[10];
+        GetTeamStars(f, teamStars);
 
-        var allPlayers = f.Filter<MarioPlayer>();
-        allPlayers.UseCulling = false;
-        while (allPlayers.Next(out _, out MarioPlayer mario)) {
-            if (mario.Team < teamStars.Length) {
-                teamStars[mario.Team] += mario.Stars;
-            }
-        }
-
-        int max = 0;
-        foreach (int stars in teamStars) {
+        byte max = 0;
+        foreach (byte stars in teamStars) {
             if (stars > max) {
                 max = stars;
             }
@@ -290,7 +298,7 @@ public static unsafe class QuantumUtils {
 
         // "Losing" variable based on ln(x+1), x being the # of stars we're behind
 
-        int ourStars = GetTeamStars(f, mario->Team);
+        int ourStars = GetTeamStars(f, mario->GetTeam(f));
         int leaderStars = GetFirstPlaceStars(f);
 
         var rules = f.Global->Rules;
@@ -524,20 +532,26 @@ public static unsafe class QuantumUtils {
 
         // Check that at least two teams exist
         if (f.Global->Rules.TeamsEnabled && playerDataCount > 1) {
-            HashSet<int> teams = new();
+            byte? firstTeam = null;
             for (int i = 0; i < playerDataCount; i++) {
                 PlayerData* pd = allPlayerDatas[i];
+                if (pd->IsSpectator || pd->ManualSpectator) {
+                    continue;
+                }
 
-                if (!pd->IsSpectator && !pd->ManualSpectator) {
-                    teams.Add(pd->Team);
+                byte team = pd->RequestedTeam;
+                if (firstTeam.HasValue) {
+                    if (firstTeam == team) {
+                        goto skip;
+                    }
+                } else {
+                    firstTeam = team;
                 }
             }
-
-            if (teams.Count < 2) {
-                return false;
-            }
+            return false;
         }
 
+        skip:
         return true;
     }
 

@@ -26,6 +26,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Private Variables
         private Color defaultUsernameColor;
+        private bool overlayed;
 
         public override void Initialize(MainMenuCanvas canvas) {
             base.Initialize(canvas);
@@ -48,7 +49,9 @@ namespace NSMB.UI.MainMenu.Submenus {
         public override void Show(bool first) {
             base.Show(first);
 
-            Reconnect();
+            if (!overlayed) {
+                Reconnect();
+            }
             
             filterInProgressRooms.SetIsOnWithoutNotify(Settings.Instance.miscFilterInProgressRooms);
             roomManager.FilterInProgressRooms = Settings.Instance.miscFilterInProgressRooms;
@@ -64,6 +67,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         public override void Hide(SubmenuHideReason hideReason) {
             base.Hide(hideReason);
 
+            overlayed = hideReason == SubmenuHideReason.Overlayed;
             if (hideReason == SubmenuHideReason.Closed) {
                 // Disconnect
                 _ = NetworkHandler.Disconnect();

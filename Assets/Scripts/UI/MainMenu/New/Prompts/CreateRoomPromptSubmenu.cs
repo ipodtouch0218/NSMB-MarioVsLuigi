@@ -1,3 +1,4 @@
+using Quantum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         //---Private Variables
         private bool success;
+        private bool visible = true;
+
+        public override void Initialize(MainMenuCanvas canvas) {
+            base.Initialize(canvas);
+
+            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
+        }
 
         public override void Show(bool first) {
             base.Show(first);
@@ -37,10 +45,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void ConfirmClicked() {
             success = true;
             Canvas.PlayConfirmSound();
+            visible = !privateToggle.isOn;
             _ = NetworkHandler.CreateRoom(new Photon.Realtime.EnterRoomArgs {
                 RoomOptions = new Photon.Realtime.RoomOptions {
                     MaxPlayers = (int) maxPlayerSlider.value,
-                    IsVisible = !privateToggle.isOn,
+                    IsVisible = false,
                 }
             });
             Canvas.GoBack();
@@ -48,6 +57,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void MaxPlayerSliderChanged() {
             sliderValue.text = ((int) maxPlayerSlider.value).ToString();
+        }
+
+        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
+            if (success && e.PlayerSlot == 0) {
+                NetworkHandler.Client.CurrentRoom.IsVisible = visible;
+            }
         }
     }
 }

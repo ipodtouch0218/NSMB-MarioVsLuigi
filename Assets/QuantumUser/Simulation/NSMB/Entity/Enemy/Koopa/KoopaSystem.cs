@@ -20,17 +20,17 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<Koopa, Goomba>(OnKoopaGoombaInteraction);
-            f.Context.RegisterInteraction<Koopa, Koopa>(OnKoopaKoopaInteraction);
-            f.Context.RegisterInteraction<Koopa, MarioPlayer>(OnKoopaMarioInteraction);
-            f.Context.RegisterInteraction<Koopa, Bobomb>(OnKoopaBobombInteraction);
-            f.Context.RegisterInteraction<Koopa, BulletBill>(OnKoopaBulletBillInteraction);
-            f.Context.RegisterInteraction<Koopa, PiranhaPlant>(OnKoopaPiranhaPlantInteraction);
-            f.Context.RegisterInteraction<Koopa, Boo>(OnKoopaBooInteraction);
-            f.Context.RegisterInteraction<Koopa, Projectile>(OnKoopaProjectileInteraction);
-            f.Context.RegisterInteraction<Koopa, Coin>(OnKoopaCoinInteraction);
-            f.Context.RegisterInteraction<Koopa, IceBlock>(OnKoopaIceBlockInteraction);
-            f.Context.RegisterInteraction<Koopa, IceBlock>(OnKoopaIceBlockInteractionStationary);
+            f.Context.RegisterInteraction<Koopa, Goomba>(f, OnKoopaGoombaInteraction);
+            f.Context.RegisterInteraction<Koopa, Koopa>(f, OnKoopaKoopaInteraction);
+            f.Context.RegisterInteraction<Koopa, MarioPlayer>(f, OnKoopaMarioInteraction);
+            f.Context.RegisterInteraction<Koopa, Bobomb>(f, OnKoopaBobombInteraction);
+            f.Context.RegisterInteraction<Koopa, BulletBill>(f, OnKoopaBulletBillInteraction);
+            f.Context.RegisterInteraction<Koopa, PiranhaPlant>(f, OnKoopaPiranhaPlantInteraction);
+            f.Context.RegisterInteraction<Koopa, Boo>(f, OnKoopaBooInteraction);
+            f.Context.RegisterInteraction<Koopa, Projectile>(f, OnKoopaProjectileInteraction);
+            f.Context.RegisterInteraction<Koopa, Coin>(f, OnKoopaCoinInteraction);
+            f.Context.RegisterInteraction<Koopa, IceBlock>(f, OnKoopaIceBlockInteraction);
+            f.Context.RegisterInteraction<Koopa, IceBlock>(f, OnKoopaIceBlockInteractionStationary);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {

@@ -14,7 +14,6 @@ using UnityEngine.Rendering.Universal;
 public class GlobalController : Singleton<GlobalController> {
 
     //---Events
-    public event Action<RenderTexture> RenderTextureChanged;
     public static event Action ResolutionChanged;
 
     //---Public Variables
@@ -27,13 +26,9 @@ public class GlobalController : Singleton<GlobalController> {
     public PauseOptionMenuManager optionsManager;
 
     public ScriptableRendererFeature outlineFeature;
-    public GameObject ndsCanvas, fourByThreeImage, anyAspectImage, graphy, connecting, fusionStatsTemplate;
+    public GameObject fourByThreeImage, anyAspectImage, graphy, connecting;
     public LoadingCanvas loadingCanvas;
     public AudioSource sfx;
-
-    public RectTransform ndsRect;
-
-    public RenderTexture ndsTexture;
 
     public bool checkedForVersion = false, firstConnection = true;
     public int windowWidth = 1280, windowHeight = 720;
@@ -102,29 +97,9 @@ public class GlobalController : Singleton<GlobalController> {
             ResolutionChanged?.Invoke();
         }
 
-        if (Settings.Instance.graphicsNdsEnabled && SceneManager.GetActiveScene().buildIndex != 0) {
-
-            int targetHeight = 224;
-            int targetWidth = Mathf.CeilToInt(targetHeight * (Settings.Instance.graphicsNdsForceAspect ? (4/3f) : (float) newWindowWidth / newWindowHeight));
-
-            if (!ndsTexture || ndsTexture.width != targetWidth || ndsTexture.height != targetHeight) {
-                if (ndsTexture) {
-                    ndsTexture.Release();
-                }
-
-                ndsTexture = RenderTexture.GetTemporary(targetWidth, targetHeight);
-                ndsTexture.filterMode = FilterMode.Point;
-                ndsTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B10G11R11_UFloatPack32;
-                RenderTextureChanged?.Invoke(ndsTexture);
-            }
-            ndsCanvas.SetActive(true);
-        } else {
-            ndsCanvas.SetActive(false);
-        }
-
         //todo: this jitters to hell
 #if UNITY_STANDALONE
-        if (Screen.fullScreenMode == FullScreenMode.Windowed && Keyboard.current[Key.LeftShift].isPressed && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
+        if (Screen.fullScreenMode == FullScreenMode.Windowed && UnityEngine.Input.GetKey(KeyCode.LeftShift) && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
             newWindowHeight = (int) (newWindowWidth * (9f / 16f));
             Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
         }

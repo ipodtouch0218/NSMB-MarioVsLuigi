@@ -34,7 +34,6 @@ component MarioPlayer {
 	asset_ref<CharacterAsset> CharacterAsset;
 	[ExcludeFromPrototype] PlayerRef PlayerRef;
 	[ExcludeFromPrototype] byte SpawnpointIndex;
-	[ExcludeFromPrototype] byte Team;
 
 	[ExcludeFromPrototype] PowerupState CurrentPowerupState;
 	[ExcludeFromPrototype] PowerupState PreviousPowerupState;

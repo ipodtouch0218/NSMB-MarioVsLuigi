@@ -613,10 +613,11 @@ namespace Quantum.Prototypes {
     public QBoolean IsLoaded;
     public Byte Character;
     public Byte Palette;
-    public Byte Team;
+    public Byte RequestedTeam;
     public QBoolean IsSpectator;
     public QBoolean ManualSpectator;
     public Int32 Wins;
+    public Byte RealTeam;
     public Int32 LastChatMessage;
     public QBoolean IsReady;
     public QBoolean IsInSettings;
@@ -634,10 +635,11 @@ namespace Quantum.Prototypes {
         result.IsLoaded = this.IsLoaded;
         result.Character = this.Character;
         result.Palette = this.Palette;
-        result.Team = this.Team;
+        result.RequestedTeam = this.RequestedTeam;
         result.IsSpectator = this.IsSpectator;
         result.ManualSpectator = this.ManualSpectator;
         result.Wins = this.Wins;
+        result.RealTeam = this.RealTeam;
         result.LastChatMessage = this.LastChatMessage;
         result.IsReady = this.IsReady;
         result.IsInSettings = this.IsInSettings;

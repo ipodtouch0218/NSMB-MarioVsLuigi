@@ -227,7 +227,7 @@ namespace NSMB.UI.Game {
             bool timerEnabled = rules.TimerSeconds > 0;
 
             if (rules.TeamsEnabled) {
-                int teamIndex = mario->Team;
+                byte teamIndex = mario->GetTeam(f);
                 teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
                 TeamAsset team = f.SimulationConfig.Teams[teamIndex];
 
@@ -305,7 +305,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->Team, 0.8f, 1f) : stage.UIColor;
+            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->GetTeam(f), 0.8f, 1f) : stage.UIColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;
@@ -367,7 +367,7 @@ namespace NSMB.UI.Game {
                     var allPlayers = f.Filter<PlayerData>();
                     allPlayers.UseCulling = false;
                     while (allPlayers.NextUnsafe(out _, out PlayerData* data)) {
-                        if (data->Team == e.WinningTeam) {
+                        if (data->RealTeam == e.WinningTeam) {
                             RuntimePlayer runtimePlayer = f.GetPlayerData(data->PlayerRef);
                             winner = runtimePlayer?.PlayerNickname.ToValidUsername(f, data->PlayerRef);
                         }
@@ -375,7 +375,7 @@ namespace NSMB.UI.Game {
                     resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.player", color: ChatManager.Red, "playername", winner);
                 }
-                local = PlayerElements.AllPlayerElements.Any(pe => f.Unsafe.TryGetPointer(pe.Entity, out MarioPlayer* marioPlayer) && marioPlayer->Team == e.WinningTeam);
+                local = PlayerElements.AllPlayerElements.Any(pe => f.Unsafe.TryGetPointer(pe.Entity, out MarioPlayer* marioPlayer) && marioPlayer->GetTeam(f) == e.WinningTeam);
             } else {
                 resultText = tm.GetTranslation("ui.result.draw");
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);

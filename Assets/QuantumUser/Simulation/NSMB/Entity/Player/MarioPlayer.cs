@@ -9,6 +9,15 @@ namespace Quantum {
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
 
+        public byte GetTeam(Frame f) {
+            var data = QuantumUtils.GetPlayerData(f, PlayerRef);
+            if (data == null) {
+                return 0;
+            } else {
+                return data->RealTeam;
+            }
+        }
+
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
             if (!f.Exists(HeldEntity)) {
                 return default;

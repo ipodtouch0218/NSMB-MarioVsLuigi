@@ -155,7 +155,7 @@ namespace NSMB.Utils {
 
             // Then team
             if (f.Global->Rules.TeamsEnabled) {
-                return GetTeamColor(f, playerData->Team, s, v);
+                return GetTeamColor(f, f.Global->GameState == GameState.PreGameRoom ? playerData->RequestedTeam : playerData->RealTeam, s, v);
             }
 
             // Then id based color

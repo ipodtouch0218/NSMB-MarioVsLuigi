@@ -38,7 +38,7 @@ namespace NSMB.UI.Game.Track {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(targetEntity);
             image.color = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
             if (f.Global->Rules.TeamsEnabled) {
-                teamIcon.sprite = f.SimulationConfig.Teams[mario->Team].spriteColorblind;
+                teamIcon.sprite = f.SimulationConfig.Teams[mario->GetTeam(f)].spriteColorblind;
             }
 
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
@@ -78,7 +78,7 @@ namespace NSMB.UI.Game.Track {
                 return;
             }
 
-            if (flashRoutine != null) {
+            if (flashRoutine == null) {
                 flashRoutine = StartCoroutine(Flash());
             }
         }

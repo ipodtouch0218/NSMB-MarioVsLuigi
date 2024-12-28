@@ -6,9 +6,9 @@ namespace Quantum {
         private static readonly FPVector2 SpawnOffset = new FPVector2(0, FP.FromString("-0.45"));
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<BulletBill, MarioPlayer>(OnBulletBillMarioInteraction);
-            f.Context.RegisterInteraction<BulletBill, Projectile>(OnBulletBillProjectileInteraction);
-            f.Context.RegisterInteraction<BulletBill, IceBlock>(OnBulletBillIceBlockInteraction);
+            f.Context.RegisterInteraction<BulletBill, MarioPlayer>(f, OnBulletBillMarioInteraction);
+            f.Context.RegisterInteraction<BulletBill, Projectile>(f, OnBulletBillProjectileInteraction);
+            f.Context.RegisterInteraction<BulletBill, IceBlock>(f, OnBulletBillIceBlockInteraction);
         }
 
         public override void Update(Frame f) {

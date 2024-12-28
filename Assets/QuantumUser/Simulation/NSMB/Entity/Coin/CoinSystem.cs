@@ -27,13 +27,14 @@ namespace Quantum {
 
                 var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(filter.Entity);
                 foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants._0_66) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
                         continue;
                     }
 
                     if (physicsObject->PreviousFrameVelocity.Y < -FP._1_50) {
                         physicsObject->Velocity = physicsObject->PreviousFrameVelocity;
-                        physicsObject->Velocity.Y *= -FP._0_33 * 2;
+                        physicsObject->Velocity.Y *= -Constants._0_66;
+                        physicsObject->IsTouchingGround = false;
                         f.Events.CoinBounced(f, filter.Entity, *coin);
                     } else {
                         physicsObject->Velocity.Y = 0;

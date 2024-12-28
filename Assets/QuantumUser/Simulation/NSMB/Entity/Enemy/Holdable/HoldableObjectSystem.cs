@@ -13,7 +13,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterPreContactCallback(OnPreContactCallback);
+            f.Context.RegisterPreContactCallback(f, OnPreContactCallback);
         }
 
         public override void Update(Frame f, ref Filter filter) {

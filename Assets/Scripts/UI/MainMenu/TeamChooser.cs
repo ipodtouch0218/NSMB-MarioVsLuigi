@@ -77,7 +77,7 @@ namespace NSMB.UI.MainMenu {
             var playerData = QuantumUtils.GetPlayerData(f, game.GetLocalPlayers()[0]);
 
             TeamAsset[] teams = f.SimulationConfig.Teams;
-            int selected = Mathf.Clamp(playerData->Team, 0, teams.Length);
+            int selected = Mathf.Clamp(playerData->RequestedTeam, 0, teams.Length);
             blockerInstance = Instantiate(blockerTemplate, canvas.transform);
             blockerInstance.SetActive(true);
             content.SetActive(true);
@@ -132,7 +132,7 @@ namespace NSMB.UI.MainMenu {
 
             Frame f = e.Frame;
             var playerData = QuantumUtils.GetPlayerData(f, e.Player);
-            selected = playerData->Team;
+            selected = playerData->RequestedTeam;
 
             if (f.Global->Rules.TeamsEnabled) {
                 TeamAsset team = f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length];

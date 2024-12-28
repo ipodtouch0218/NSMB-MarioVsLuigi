@@ -1665,13 +1665,10 @@ namespace Quantum {
     [FieldOffset(31)]
     [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
-    [FieldOffset(35)]
-    [ExcludeFromPrototype()]
-    public Byte Team;
-    [FieldOffset(40)]
+    [FieldOffset(39)]
     [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
-    [FieldOffset(41)]
+    [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
     [FieldOffset(184)]
@@ -1731,10 +1728,10 @@ namespace Quantum {
     [FieldOffset(33)]
     [ExcludeFromPrototype()]
     public Byte StationaryFrames;
-    [FieldOffset(38)]
+    [FieldOffset(37)]
     [ExcludeFromPrototype()]
     public JumpState JumpState;
-    [FieldOffset(39)]
+    [FieldOffset(38)]
     [ExcludeFromPrototype()]
     public JumpState PreviousJumpState;
     [FieldOffset(13)]
@@ -1758,10 +1755,10 @@ namespace Quantum {
     [FieldOffset(164)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
-    [FieldOffset(37)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public Byte WallslideEndFrames;
-    [FieldOffset(36)]
+    [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
     [FieldOffset(100)]
@@ -1903,7 +1900,6 @@ namespace Quantum {
         hash = hash * 31 + CharacterAsset.GetHashCode();
         hash = hash * 31 + PlayerRef.GetHashCode();
         hash = hash * 31 + SpawnpointIndex.GetHashCode();
-        hash = hash * 31 + Team.GetHashCode();
         hash = hash * 31 + (Byte)CurrentPowerupState;
         hash = hash * 31 + (Byte)PreviousPowerupState;
         hash = hash * 31 + ReserveItem.GetHashCode();
@@ -2020,7 +2016,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Stars);
         serializer.Stream.Serialize(&p->StationaryFrames);
         serializer.Stream.Serialize(&p->SwimForceJumpTimer);
-        serializer.Stream.Serialize(&p->Team);
         serializer.Stream.Serialize(&p->WalljumpFrames);
         serializer.Stream.Serialize(&p->WallslideEndFrames);
         serializer.Stream.Serialize((Byte*)&p->JumpState);
@@ -2295,14 +2290,16 @@ namespace Quantum {
     public Byte Character;
     [FieldOffset(1)]
     public Byte Palette;
-    [FieldOffset(2)]
-    public Byte Team;
+    [FieldOffset(3)]
+    public Byte RequestedTeam;
     [FieldOffset(40)]
     public QBoolean IsSpectator;
     [FieldOffset(44)]
     public QBoolean ManualSpectator;
     [FieldOffset(16)]
     public Int32 Wins;
+    [FieldOffset(2)]
+    public Byte RealTeam;
     [FieldOffset(8)]
     public Int32 LastChatMessage;
     [FieldOffset(32)]
@@ -2321,10 +2318,11 @@ namespace Quantum {
         hash = hash * 31 + IsLoaded.GetHashCode();
         hash = hash * 31 + Character.GetHashCode();
         hash = hash * 31 + Palette.GetHashCode();
-        hash = hash * 31 + Team.GetHashCode();
+        hash = hash * 31 + RequestedTeam.GetHashCode();
         hash = hash * 31 + IsSpectator.GetHashCode();
         hash = hash * 31 + ManualSpectator.GetHashCode();
         hash = hash * 31 + Wins.GetHashCode();
+        hash = hash * 31 + RealTeam.GetHashCode();
         hash = hash * 31 + LastChatMessage.GetHashCode();
         hash = hash * 31 + IsReady.GetHashCode();
         hash = hash * 31 + IsInSettings.GetHashCode();
@@ -2337,7 +2335,8 @@ namespace Quantum {
         var p = (PlayerData*)ptr;
         serializer.Stream.Serialize(&p->Character);
         serializer.Stream.Serialize(&p->Palette);
-        serializer.Stream.Serialize(&p->Team);
+        serializer.Stream.Serialize(&p->RealTeam);
+        serializer.Stream.Serialize(&p->RequestedTeam);
         serializer.Stream.Serialize(&p->JoinTick);
         serializer.Stream.Serialize(&p->LastChatMessage);
         serializer.Stream.Serialize(&p->Ping);

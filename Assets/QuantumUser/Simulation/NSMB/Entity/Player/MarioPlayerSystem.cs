@@ -23,10 +23,10 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<MarioPlayer, MarioPlayer>(OnMarioMarioInteraction);
-            f.Context.RegisterInteraction<MarioPlayer, Projectile>(OnMarioProjectileInteraction);
-            f.Context.RegisterInteraction<MarioPlayer, Coin>(OnMarioCoinInteraction);
-            f.Context.RegisterInteraction<MarioPlayer, InvisibleBlock>(OnMarioInvisibleBlockInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, MarioPlayer>(f, OnMarioMarioInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, Projectile>(f, OnMarioProjectileInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, Coin>(f, OnMarioCoinInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, InvisibleBlock>(f, OnMarioInvisibleBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -353,7 +353,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
 
-            if (!mario->DoEntityBounce && (mario->CrushDamageInvincibilityFrames > 0 || physicsObject->IsUnderwater || !doJump || mario->IsInKnockback || (mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->JumpState == JumpState.SingleJump) || mario->IsWallsliding)) {
+            if (!mario->DoEntityBounce && (mario->CrushDamageInvincibilityFrames > 0 || physicsObject->IsUnderwater || !doJump || mario->IsInKnockback || mario->KnockbackGetupFrames > 0 || (mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->JumpState == JumpState.SingleJump) || mario->IsWallsliding)) {
                 return;
             }
 
@@ -1808,7 +1808,7 @@ namespace Quantum {
             bool dropStars = true;
 
             if (f.Unsafe.TryGetPointer(projectile->Owner, out MarioPlayer* ownerMario)) {
-                dropStars = ownerMario->Team != mario->Team;
+                dropStars = ownerMario->GetTeam(f) != mario->GetTeam(f);
             }
 
             if (!mario->IsInKnockback
@@ -1846,7 +1846,7 @@ namespace Quantum {
             var marioB = f.Unsafe.GetPointer<MarioPlayer>(marioBEntity);
 
             // Don't damage players in the Mega Mushroom grow animation
-            if (marioA->MegaMushroomStartFrames > 0 || marioB->MegaMushroomFrames > 0) {
+            if (marioA->MegaMushroomStartFrames > 0 || marioB->MegaMushroomStartFrames > 0) {
                 return;
             }
 
@@ -1871,7 +1871,7 @@ namespace Quantum {
             var marioBPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioBEntity);
 
             // Hit players
-            bool dropStars = marioA->Team != marioB->Team;
+            bool dropStars = marioA->GetTeam(f) != marioB->GetTeam(f);
 
             QuantumUtils.UnwrapWorldLocations(f, marioATransform->Position, marioBTransform->Position, out FPVector2 marioAPosition, out FPVector2 marioBPosition);
             bool fromRight = marioAPosition.X < marioBPosition.X;

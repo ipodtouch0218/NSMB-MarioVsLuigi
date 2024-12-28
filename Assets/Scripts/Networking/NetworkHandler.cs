@@ -119,6 +119,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public static async Task<bool> ConnectToRegion(string region) {
+        if (Client == null) {
+            return false;
+        }
+
         StateChanged?.Invoke(ClientState.Disconnected, ClientState.Authenticating);
         region ??= Instance.lastRegion;
         Instance.lastRegion = region;
@@ -228,8 +232,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         // Create directories and open file
         string replayFolder = Path.Combine(ReplayListManager.ReplayDirectory, "temp");
         Directory.CreateDirectory(replayFolder);
-        string finalFilePath = Path.Combine(replayFolder, "Replay-" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".mvlreplay");
-        using FileStream outputStream = new FileStream(finalFilePath, FileMode.Create);
 
         byte[] stars = new byte[10];
         Frame f = game.Frames.Verified;
@@ -239,7 +241,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
                 if (mario->PlayerRef != playerrefs[i]) {
                     continue;
                 }
-                
+
                 // Found him :)
                 if (mario->Lives > 0 || !f.Global->Rules.IsLivesEnabled) {
                     stars[i] = mario->Stars;
@@ -249,8 +251,22 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
 
         // Write binary replay
+        string now = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        string finalFilePath = Path.Combine(replayFolder, $"Replay-{now}.mvlreplay");
+        int attempts = 0;
+        FileStream outputStream = null;
+        do {
+            try {
+                outputStream = new FileStream(finalFilePath, FileMode.Create);
+            } catch {
+                // Failed to create file; maybe they have two copies of the game open?
+                finalFilePath = Path.Combine(replayFolder, $"Replay-{now}-{++attempts}.mvlreplay");
+            }
+        } while (outputStream == null);
+
         BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, players, playernames, playerteams, stars, winner);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
+        outputStream.Dispose();
 
         // Complete
         game.RecordInputStream.Dispose();
@@ -425,7 +441,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
             playernames[count] = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
             playerrefs[count] = player;
-            playerteams[count] = playerData->Team;
+            playerteams[count] = playerData->RealTeam;
             count++;
         }
 

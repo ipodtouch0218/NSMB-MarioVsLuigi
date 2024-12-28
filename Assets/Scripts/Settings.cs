@@ -9,9 +9,7 @@ public class Settings : Singleton<Settings> {
 
     //---Static Variables
     private Action[] VersionUpdaters;
-    public static event Action OnColorblindModeChanged;
-    public static event Action OnDisableChatChanged;
-    public static event Action OnNdsBorderChanged;
+    public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
     public static event Action<bool> OnInputDisplayActiveChanged;
 
     //---Properties
@@ -112,18 +110,33 @@ public class Settings : Singleton<Settings> {
         }
     }
 
-    private int _graphicsNdsBorder = -1;
-    public int GraphicsNdsBorder {
-        get => _graphicsNdsBorder;
+    private bool _graphicsNdsEnabled;
+    public bool GraphicsNdsEnabled { 
+        get => _graphicsNdsEnabled; 
         set {
-            int previous = _graphicsNdsBorder;
-            _graphicsNdsBorder = value;
-
-            if (previous != value) {
-                OnNdsBorderChanged?.Invoke();
-            }
+            _graphicsNdsEnabled = value;
+            OnNdsResolutionSettingChanged?.Invoke();
         }
     }
+
+    private bool _graphicsNdsForceAspect;
+    public bool GraphicsNdsForceAspect { 
+        get => _graphicsNdsForceAspect; 
+        set {
+            _graphicsNdsForceAspect = value;
+            OnNdsResolutionSettingChanged?.Invoke();
+        }
+    }
+
+    private bool _graphicsNdsPixelPerfect;
+    public bool GraphicsNdsPixelPerfect { 
+        get => _graphicsNdsPixelPerfect; 
+        set {
+            _graphicsNdsPixelPerfect = value;
+            OnNdsResolutionSettingChanged?.Invoke();
+        }
+    }
+
 
     public bool GraphicsVsync {
         get => QualitySettings.vSyncCount == 1;
@@ -187,7 +200,7 @@ public class Settings : Singleton<Settings> {
     public int generalCharacter, generalPalette;
     public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
 
-    public bool graphicsNdsEnabled, graphicsNdsForceAspect, graphicsNdsPixelPerfect, graphicsNametags;
+    public bool graphicsNametags;
 
     public Enums.SpecialPowerupMusic audioSpecialPowerupMusic;
     public bool audioMuteMusicOnUnfocus, audioMuteSFXOnUnfocus, audioPanning, audioRestartMusicOnDeath;
@@ -227,10 +240,9 @@ public class Settings : Singleton<Settings> {
         // Graphics
         PlayerPrefs.SetString("Graphics_FullscreenResolution", Screen.currentResolution.width + "," + Screen.currentResolution.height);
         PlayerPrefs.SetInt("Graphics_FullscreenMode", GraphicsFullscreenMode);
-        PlayerPrefs.SetInt("Graphics_NDS_Enabled", graphicsNdsEnabled ? 1 : 0);
-        PlayerPrefs.SetInt("Graphics_NDS_ForceAspect", graphicsNdsForceAspect ? 1 : 0);
-        PlayerPrefs.SetInt("Graphics_NDS_PixelPerfect", graphicsNdsPixelPerfect ? 1 : 0);
-        PlayerPrefs.SetInt("Graphics_NDS_Border", GraphicsNdsBorder);
+        PlayerPrefs.SetInt("Graphics_NDS_Enabled", GraphicsNdsEnabled ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_NDS_ForceAspect", GraphicsNdsForceAspect ? 1 : 0);
+        PlayerPrefs.SetInt("Graphics_NDS_PixelPerfect", GraphicsNdsPixelPerfect ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_VSync", GraphicsVsync ? 1 : 0);
         PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
         PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
@@ -304,10 +316,9 @@ public class Settings : Singleton<Settings> {
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
         GraphicsFullscreenMode = (int) Screen.fullScreenMode;
-        graphicsNdsEnabled = PlayerPrefs.GetInt("NDSResolution", 0) != 0;
-        graphicsNdsForceAspect = PlayerPrefs.GetInt("NDS4by3", 0) != 0;
-        graphicsNdsPixelPerfect = false;
-        GraphicsNdsBorder = 1;
+        GraphicsNdsEnabled = PlayerPrefs.GetInt("NDSResolution", 0) != 0;
+        GraphicsNdsForceAspect = PlayerPrefs.GetInt("NDS4by3", 0) != 0;
+        GraphicsNdsPixelPerfect = false;
         GraphicsVsync = PlayerPrefs.GetInt("VSync", 0) != 0;
         GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
@@ -356,10 +367,9 @@ public class Settings : Singleton<Settings> {
         // Graphics
         TryGetSetting<int>("Graphics_FullscreenMode", nameof(GraphicsFullscreenMode));
         TryGetSetting<string>("Graphics_FullscreenResolution", nameof(GraphicsFullscreenResolution));
-        TryGetSetting("Graphics_NDS_Enabled", ref graphicsNdsEnabled);
-        TryGetSetting("Graphics_NDS_ForceAspect", ref graphicsNdsForceAspect);
-        TryGetSetting("Graphics_NDS_PixelPerfect", ref graphicsNdsPixelPerfect);
-        TryGetSetting<int>("Graphics_NDS_Border", nameof(GraphicsNdsBorder));
+        TryGetSetting<bool>("Graphics_NDS_Enabled", nameof(GraphicsNdsEnabled));
+        TryGetSetting<bool>("Graphics_NDS_ForceAspect", nameof(GraphicsNdsForceAspect));
+        TryGetSetting<bool>("Graphics_NDS_PixelPerfect", nameof(GraphicsNdsPixelPerfect));
         TryGetSetting<int>("Graphics_MaxFPS", nameof(GraphicsMaxFps));
         TryGetSetting<bool>("Graphics_VSync", nameof(GraphicsVsync));
         TryGetSetting<bool>("Graphics_PlayerOutlines", nameof(GraphicsPlayerOutlines));

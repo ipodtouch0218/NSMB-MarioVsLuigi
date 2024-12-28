@@ -1,8 +1,6 @@
 using NSMB.Extensions;
-using NSMB.Utils;
 using Quantum;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -24,8 +22,8 @@ namespace NSMB.UI.Game.Scoreboard {
         [SerializeField] private InputActionReference toggleScoreboardAction;
 
         //---Private Variables
+        private readonly List<ScoreboardEntry> entries = new();
         private bool isToggled;
-        private List<ScoreboardEntry> entries = new();
 
         public void OnValidate() {
             this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
@@ -38,10 +36,12 @@ namespace NSMB.UI.Game.Scoreboard {
         public void OnEnable() {
             toggleScoreboardAction.action.performed += OnToggleScoreboard;
             toggleScoreboardAction.action.actionMap.Enable();
+            Settings.OnColorblindModeChanged += OnColorblindModeChanged;
         }
 
         public void OnDisable() {
             toggleScoreboardAction.action.performed -= OnToggleScoreboard;
+            Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
         }
 
         public unsafe void Start() {
@@ -127,14 +127,17 @@ namespace NSMB.UI.Game.Scoreboard {
             TeamAsset[] teamAssets = f.SimulationConfig.Teams;
             StringBuilder result = new();
 
-            Dictionary<int, int> teams = QuantumUtils.GetTeamStars(f);
-            var orderedTeams = teams.OrderBy(kvp => kvp.Key);
-            foreach ((int key, int stars) in orderedTeams) {
-                if (key < 0 || key >= teamAssets.Length) {
+            byte[] teamStars = new byte[10];
+            QuantumUtils.GetTeamStars(f, teamStars);
+            int aliveTeams = QuantumUtils.GetValidTeams(f);
+            for (int i = 0; i < 10; i++) {
+                if ((aliveTeams & (1 << i)) == 0) {
+                    // Invalid team
                     continue;
                 }
 
-                result.Append(Settings.Instance.GraphicsColorblind ? teamAssets[key].textSpriteColorblind : teamAssets[key].textSpriteNormal);
+                byte stars = teamStars[i];
+                result.Append(Settings.Instance.GraphicsColorblind ? teamAssets[i].textSpriteColorblind : teamAssets[i].textSpriteNormal);
                 result.Append(Utils.Utils.GetSymbolString("x" + stars));
             }
 
@@ -231,6 +234,10 @@ namespace NSMB.UI.Game.Scoreboard {
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
             UpdateSpectatorCount(e.Frame);
+        }
+
+        private void OnColorblindModeChanged() {
+            UpdateTeamHeader(NetworkHandler.Game.Frames.Predicted);
         }
     }
 }

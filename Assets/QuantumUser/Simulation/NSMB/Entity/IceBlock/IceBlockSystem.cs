@@ -14,9 +14,9 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<Projectile, IceBlock>(OnIceBlockProjectileInteraction);
-            f.Context.RegisterInteraction<MarioPlayer, IceBlock>(OnIceBlockMarioInteraction);
-            f.Context.RegisterInteraction<Coin, IceBlock>(OnIceBlockCoinInteraction);
+            f.Context.RegisterInteraction<Projectile, IceBlock>(f, OnIceBlockProjectileInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, IceBlock>(f, OnIceBlockMarioInteraction);
+            f.Context.RegisterInteraction<Coin, IceBlock>(f, OnIceBlockCoinInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -132,7 +132,7 @@ namespace Quantum {
                 // Side
                 if (iceBlock->IsSliding || mario->IsInShell) {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
-                    bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->Team != holderMario->Team;
+                    bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->GetTeam(f) != holderMario->GetTeam(f);
                     mario->DoKnockback(f, marioEntity, contact.Normal.X > 0, dropStars ? 1 : 0, !dropStars, iceBlockEntity);
 
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.HitWall);

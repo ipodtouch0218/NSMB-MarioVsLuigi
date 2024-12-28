@@ -104,7 +104,7 @@ namespace NSMB.UI.Game {
             stringBuilder.Clear();
 
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
-                TeamAsset team = f.SimulationConfig.Teams[mario->Team];
+                TeamAsset team = f.SimulationConfig.Teams[mario->GetTeam(f)];
                 stringBuilder.Append(team.textSpriteColorblindBig);
             }
             stringBuilder.AppendLine(cachedNickname);

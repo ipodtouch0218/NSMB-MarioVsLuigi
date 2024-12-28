@@ -24,8 +24,13 @@ namespace NSMB.Loading {
         }
 
         private string GetValueFromField() {
+            QuantumGame game = NetworkHandler.Game;
+            if (game == null) {
+                return "";
+            }
+
             Frame f = NetworkHandler.Game.Frames.Predicted;
-            if (f == null || !f.Map || !f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
+            if (f == null || !f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
                 return "";
             }
 

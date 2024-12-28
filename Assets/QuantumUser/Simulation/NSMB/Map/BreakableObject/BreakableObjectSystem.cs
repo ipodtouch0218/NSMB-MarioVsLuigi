@@ -1,10 +1,11 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnStageReset {
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<MarioPlayer, BreakableObject>(OnBreakableObjectMarioInteraction);
+            f.Context.RegisterInteraction<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioInteraction);
         }
 
         private static bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {
@@ -48,6 +49,7 @@ namespace Quantum {
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
                 marioPhysicsObject->Velocity.X = marioPhysicsObject->PreviousFrameVelocity.X;
                 FP leftoverVelocity = (FPMath.Abs(marioPhysicsObject->Velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (marioPhysicsObject->Velocity.X > 0 ? 1 : -1);
+
                 PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
                 return true;
             }

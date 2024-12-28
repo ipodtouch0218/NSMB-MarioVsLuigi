@@ -82,6 +82,8 @@ public class BinaryReplayFile {
         writer.Write(CompressedInitialFrameData);
         writer.Write(CompressedInputData);
 
+        writer.Flush();
+
         return writer.BaseStream.Length;
     }
 

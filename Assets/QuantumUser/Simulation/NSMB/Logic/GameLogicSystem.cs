@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -152,7 +153,7 @@ namespace Quantum {
                 }
 
                 if (aliveTeam == -1) {
-                    aliveTeam = mario->Team;
+                    aliveTeam = mario->GetTeam(f);
                 } else {
                     oneOrNoTeamAlive = false;
                     break;
@@ -209,7 +210,7 @@ namespace Quantum {
             var playerDatas = f.Filter<PlayerData>();
             playerDatas.UseCulling = false;
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
-                if (winningTeam == data->Team && !data->IsSpectator) {
+                if (winningTeam == data->RealTeam && !data->IsSpectator) {
                     data->Wins++;
                 }
                 data->IsSpectator = data->ManualSpectator;
@@ -231,19 +232,42 @@ namespace Quantum {
             newData->PlayerRef = player;
             newData->JoinTick = f.Number;
             newData->IsSpectator = f.Global->GameState != GameState.PreGameRoom;
+            newData->RealTeam = 255;
 
+            // Get team counts
+            int teams = f.SimulationConfig.Teams.Length;
+            Span<byte> teamCounts = stackalloc byte[teams];
+            var otherPlayerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
+            foreach ((_, EntityRef otherEntity) in otherPlayerDatas) {
+                var data = f.Unsafe.GetPointer<PlayerData>(otherEntity);
+                if (data->RequestedTeam < teams) {
+                    teamCounts[data->RequestedTeam]++;
+                }
+            }
+
+            // Assign the player to the team with the least players
+            int lowestTeamCount = teamCounts[0];
+            int lowestTeamIndex = 0;
+            for (int i = 1; i < teams; i++) {
+                if (teamCounts[i] < lowestTeamCount) {
+                    lowestTeamCount = teamCounts[i];
+                    lowestTeamIndex = i;
+                }
+            }
+            newData->RequestedTeam = (byte) lowestTeamIndex;
+
+            // Other bookkeeping
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             newData->Character = runtimePlayer.Character;
             newData->Palette = runtimePlayer.Palette;
 
-            var datas = f.ResolveDictionary(f.Global->PlayerDatas);
-            if (datas.Count == 0) {
+            if (otherPlayerDatas.Count == 0) {
                 // First player is host
                 newData->IsRoomHost = true;
                 f.Events.HostChanged(f, player);
             }
 
-            datas[player] = newEntity;
+            otherPlayerDatas[player] = newEntity;
             f.Events.PlayerAdded(f, player);
             f.Events.PlayerDataChanged(f, player);
         }
@@ -294,12 +318,6 @@ namespace Quantum {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             int teamCounter = 0;
 
-            // Debug: give existing mario players the same team
-            var sceneMarios = f.Filter<MarioPlayer>();
-            while (sceneMarios.NextUnsafe(out _, out MarioPlayer* mario)) {
-                mario->Team = 255;
-            }
-
             var playerDatas = f.Filter<PlayerData>();
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
                 if (!data->IsLoaded) {
@@ -318,7 +336,7 @@ namespace Quantum {
                 EntityRef newPlayer = f.Create(character.Prototype);
                 var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
                 mario->PlayerRef = data->PlayerRef;
-                mario->Team = (byte) (f.Global->Rules.TeamsEnabled ? data->Team : teamCounter++);
+                data->RealTeam = (byte) (f.Global->Rules.TeamsEnabled ? data->RequestedTeam : teamCounter++);
 
                 var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);
                 newTransform->Position = stage.Spawnpoint;
@@ -359,9 +377,10 @@ namespace Quantum {
             f.Global->Timer = 0;
 
             var playerDatas = f.Filter<PlayerData>();
-            while (playerDatas.NextUnsafe(out _, out PlayerData* playerData)) {
-                playerData->IsLoaded = false;
-                playerData->IsReady = false;
+            while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                data->IsLoaded = false;
+                data->IsReady = false;
+                data->RealTeam = 255;
             }
         }
     }

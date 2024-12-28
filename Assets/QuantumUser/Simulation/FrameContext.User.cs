@@ -26,21 +26,29 @@ namespace Quantum {
         public List<(Type, Type)> platformInteractorMap = new();
         public List<PlatformInteractor> platformInteractors = new();
 
-        //---Misc
-        public Dictionary<int, int> TeamStarBuffer = new(10);
+        public void RegisterPreContactCallback(Frame f, PreContactCallback callback) {
+            if (f.IsPredicted) {
+                return;
+            }
 
-
-        public void RegisterPreContactCallback(PreContactCallback callback) {
             PreContactCallbacks.Add(callback);
         }
 
-        public void RegisterInteraction<X, Y>(HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+        public void RegisterInteraction<X, Y>(Frame f, HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+            if (f.IsPredicted) {
+                return;
+            }
+
             var key = (typeof(X), typeof(Y));
             hitboxInteractorMap.Add(key);
             hitboxInteractors.Add(interactor);
         }
 
-        public void RegisterInteraction<X, Y>(PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+        public void RegisterInteraction<X, Y>(Frame f, PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+            if (f.IsPredicted) {
+                return;
+            }
+
             var key = (typeof(X), typeof(Y));
             platformInteractorMap.Add(key);
             platformInteractors.Add(interactor);

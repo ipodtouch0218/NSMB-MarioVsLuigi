@@ -35,7 +35,7 @@ namespace Quantum {
                 playerData->Palette = Palette;
             }
             if (playerChanges.HasFlag(Changes.Team)) {
-                playerData->Team = Team;
+                playerData->RequestedTeam = Team;
             }
             if (playerChanges.HasFlag(Changes.Spectating)) {
                 playerData->ManualSpectator = Spectating;
