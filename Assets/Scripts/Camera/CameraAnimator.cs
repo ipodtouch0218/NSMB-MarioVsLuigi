@@ -51,9 +51,11 @@ public unsafe class CameraAnimator : ResizingCamera {
             return;
         }
 
-
         var cameraControllerCurrent = f.Unsafe.GetPointer<CameraController>(Target);
         var cameraControllerPrevious = fp.Unsafe.GetPointer<CameraController>(Target);
+
+        float orthoSize = Mathf.Lerp(cameraControllerPrevious->OrthographicSize.AsFloat, cameraControllerCurrent->OrthographicSize.AsFloat, game.InterpolationFactor);
+        ourCamera.orthographicSize = orthoSize / 2f;
 
         FPVector2 origin = cameraControllerPrevious->CurrentPosition;
         FPVector2 target = cameraControllerCurrent->CurrentPosition;
@@ -95,7 +97,7 @@ public unsafe class CameraAnimator : ResizingCamera {
         newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
 
         float cameraMinY = stage.CameraMinPosition.Y.AsFloat + ourCamera.orthographicSize;
-        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat) - ourCamera.orthographicSize;
+        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + Mathf.Max(7, ourCamera.orthographicSize * 2), stage.CameraMaxPosition.Y.AsFloat) - ourCamera.orthographicSize;
         newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
 
         // Screenshake (ignores clamping)
@@ -110,7 +112,6 @@ public unsafe class CameraAnimator : ResizingCamera {
         if (BackgroundLoop.Instance) {
             BackgroundLoop.Instance.Reposition(ourCamera);
         }
-
     }
 
     private void OnScreenshakeCallback(float screenshake) {

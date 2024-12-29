@@ -6118,6 +6118,8 @@ MonoBehaviour:
       Value: 0
     IsWaterSolid:
       Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &-2541758970786198444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6163,7 +6165,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    _empty_prototype_dummy_field_: 0
+    OrthographicSize:
+      RawValue: 458752
+    SizeChangePerSecond:
+      RawValue: 21627
 --- !u!114 &6466318334079728413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6223,8 +6228,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

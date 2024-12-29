@@ -98,7 +98,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 var mario1 = f.Unsafe.GetPointer<MarioPlayer>(se1.Target);
                 var mario2 = f.Unsafe.GetPointer<MarioPlayer>(se2.Target);
 
-                if (f.Global->Rules.IsLivesEnabled && (mario1->Lives == 0 ^ mario2->Lives == 0)) {
+                if (f.Global->Rules.IsLivesEnabled && ((mario1->Lives == 0) ^ (mario2->Lives == 0))) {
                     return mario2->Lives - mario1->Lives;
                 }
 

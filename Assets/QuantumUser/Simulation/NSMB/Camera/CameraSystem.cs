@@ -1,4 +1,6 @@
 using Photon.Deterministic;
+using UnityEngine;
+using UnityEngine.Diagnostics;
 
 namespace Quantum {
     public unsafe class CameraSystem : SystemMainThreadFilterStage<CameraSystem.Filter> {
@@ -12,9 +14,25 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            UpdateCameraSize(f, ref filter);
             if (!filter.Mario->IsDead) {
                 filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, stage);
             }
+        }
+
+        private void UpdateCameraSize(Frame f, ref Filter filter) {
+            var mario = filter.Mario;
+            var camera = filter.Camera;
+
+            FP targetSize;
+            if (mario->IsPropellerFlying || mario->IsSpinnerFlying) {
+                targetSize = 8;
+            } else {
+                targetSize = 7;
+            }
+
+            camera->OrthographicSize = QuantumUtils.SmoothDamp(camera->OrthographicSize, targetSize, ref camera->SizeChangeVelocity, 
+                camera->SizeChangePerSecond, FP.UseableMax, f.DeltaTime);
         }
 
         private FPVector2 CalculateNewPosition(Frame f, ref Filter filter, VersusStageData stage) {

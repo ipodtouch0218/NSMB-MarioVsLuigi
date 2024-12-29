@@ -52,7 +52,7 @@ namespace Quantum {
             }
 
 
-            FP change = 2 * f.DeltaTime * (chomping ? 1 : -1);
+            FP change = (chomping ? 2 : -2) * f.DeltaTime;
             piranhaPlant->PopupAnimationTime = FPMath.Clamp01(piranhaPlant->PopupAnimationTime + change);
             filter.Interactable->ColliderDisabled = piranhaPlant->PopupAnimationTime < FP._0_10;
             FPVector2 offset = FPVector2.Up * (FP._0_25 + (piranhaPlant->PopupAnimationTime - 1) * FP._0_75);

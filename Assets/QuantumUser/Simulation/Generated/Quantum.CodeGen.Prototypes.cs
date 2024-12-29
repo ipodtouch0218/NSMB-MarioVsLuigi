@@ -193,8 +193,8 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.CameraController))]
   public unsafe partial class CameraControllerPrototype : ComponentPrototype<Quantum.CameraController> {
-    [HideInInspector()]
-    public Int32 _empty_prototype_dummy_field_;
+    public FP OrthographicSize;
+    public FP SizeChangePerSecond;
     partial void MaterializeUser(Frame frame, ref Quantum.CameraController result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.CameraController component = default;
@@ -202,6 +202,8 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.CameraController result, in PrototypeMaterializationContext context = default) {
+        result.OrthographicSize = this.OrthographicSize;
+        result.SizeChangePerSecond = this.SizeChangePerSecond;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -590,6 +592,18 @@ namespace Quantum.Prototypes {
         result.SlowInLiquids = this.SlowInLiquids;
         result.IsWaterSolid = this.IsWaterSolid;
         result.BreakMegaObjects = this.BreakMegaObjects;
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PhysicsObjectData))]
+  public unsafe partial class PhysicsObjectDataPrototype : StructPrototype {
+    public PhysicsFlags Flags;
+    public FP FloorAngle;
+    partial void MaterializeUser(Frame frame, ref Quantum.PhysicsObjectData result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.PhysicsObjectData result, in PrototypeMaterializationContext context = default) {
+        result.Flags = this.Flags;
+        result.FloorAngle = this.FloorAngle;
+        MaterializeUser(frame, ref result, in context);
     }
   }
   [System.SerializableAttribute()]

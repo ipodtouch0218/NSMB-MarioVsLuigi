@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Quantum {
 
     public unsafe class BobombSystem : SystemMainThreadFilter<BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
-        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset {
+        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed {
         
         public struct Filter {
             public EntityRef Entity;
@@ -316,6 +316,12 @@ namespace Quantum {
                     // Don't die if being held
                     return;
                 }
+                bobomb->Kill(f, entity, EntityRef.None, true);
+            }
+        }
+
+        public void OnEntityCrushed(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
                 bobomb->Kill(f, entity, EntityRef.None, true);
             }
         }

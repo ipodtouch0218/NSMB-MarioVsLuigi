@@ -12,6 +12,8 @@ namespace NSMB.UI.Game {
 
         //---Private Variables
         private RenderTexture texture;
+        private bool pixelPerfect;
+        private (int, int) previousResolution;
 
         public void Start() {
             Settings.OnNdsResolutionSettingChanged += OnNdsResolutionSettingChanged;
@@ -29,14 +31,38 @@ namespace NSMB.UI.Game {
             }
 
             // NDS res enabled.
+            int width = Screen.width;
+            int height = Screen.height;
+            float aspect = (float) width / height;
             bool resolutionChanged;
             if (Settings.Instance.GraphicsNdsForceAspect) {
                 resolutionChanged = CreateRenderTexture(298, 224);
-                fitter.enabled = true;
+
+                if (Settings.Instance.GraphicsNdsPixelPerfect && (!pixelPerfect || resolutionChanged || previousResolution != (width, height))) {
+                    // Enable pixel-perfect
+                    RectTransform fitterTransform = fitter.GetComponent<RectTransform>();
+                    fitter.enabled = false;
+                    fitterTransform.anchorMax = fitterTransform.anchorMin = new Vector2(0.5f, 0.5f);
+                    float scaling = Mathf.Min(width / texture.width, height / texture.height);
+                    if (scaling >= 1) {
+                        scaling = Mathf.Floor(scaling);
+                    } else {
+                        scaling = 1 / Mathf.Floor(1 / scaling);
+                    }
+                    fitterTransform.sizeDelta = new Vector2(texture.width * scaling, texture.height * scaling);
+                    pixelPerfect = true;
+                    previousResolution = (width, height);
+
+                } else if (!Settings.Instance.GraphicsNdsPixelPerfect && (pixelPerfect || resolutionChanged)) {
+                    // Disable pixel-perfect.
+                    fitter.enabled = true;
+                    RectTransform fitterTransform = fitter.GetComponent<RectTransform>();
+                    fitterTransform.anchorMin = Vector2.zero;
+                    fitterTransform.anchorMax = Vector2.one;
+                    fitterTransform.sizeDelta = Vector2.zero;
+                    pixelPerfect = false;
+                }
             } else {
-                int width = Screen.currentResolution.width;
-                int height = Screen.currentResolution.height;
-                float aspect = (float) width / height;
                 if (aspect > (4/3f)) {
                     // Width is larger than height
                     height = 224;
@@ -48,11 +74,12 @@ namespace NSMB.UI.Game {
                 resolutionChanged = CreateRenderTexture(width, height);
 
                 if (fitter.enabled) {
-                    RectTransform fitterTransform = fitter.GetComponent<RectTransform>();
                     fitter.enabled = false;
+                    RectTransform fitterTransform = fitter.GetComponent<RectTransform>();
                     fitterTransform.anchorMin = Vector2.zero;
                     fitterTransform.anchorMax = Vector2.one;
                     fitterTransform.sizeDelta = Vector2.zero;
+                    pixelPerfect = false;
                 }
             }
 
@@ -86,7 +113,9 @@ namespace NSMB.UI.Game {
             }
             texture = null;
 
-            playerElements.Camera.targetTexture = null;
+            if (playerElements.Camera) {
+                playerElements.Camera.targetTexture = null;
+            }
             if (playerElements.ScrollCamera) {
                 playerElements.ScrollCamera.targetTexture = null;
             }

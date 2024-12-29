@@ -3,6 +3,10 @@
 #define _2_50 2.5
 
 component CameraController {
+	FP OrthographicSize;
+	FP SizeChangePerSecond;
+	[ExcludeFromPrototype] FP SizeChangeVelocity;
+
 	[ExcludeFromPrototype] FPVector2 CurrentPosition;
 	[ExcludeFromPrototype] FP LastFloorHeight;
 	[ExcludeFromPrototype] FPVector2 LastPlayerPosition;

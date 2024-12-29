@@ -1,4 +1,5 @@
 #define OnePixelPerFrame 1.875
+import enum PhysicsFlags(byte);
 
 component PhysicsObject {
     FPVector2 Gravity;
@@ -13,20 +14,18 @@ component PhysicsObject {
     [ExcludeFromPrototype] FPVector2 ParentVelocity;
     [ExcludeFromPrototype] FPVector2 PreviousFrameVelocity;
 
-    [ExcludeFromPrototype] byte HoverFrames;
-    [ExcludeFromPrototype] bool IsTouchingLeftWall;
-    [ExcludeFromPrototype] bool IsTouchingRightWall;
-    [ExcludeFromPrototype] bool IsTouchingCeiling;
-    [ExcludeFromPrototype] bool IsTouchingGround;
-    [ExcludeFromPrototype] bool WasTouchingGround;
-    [ExcludeFromPrototype] FP FloorAngle;
-    [ExcludeFromPrototype] bool IsOnSlipperyGround;
-    [ExcludeFromPrototype] bool IsOnSlideableGround;
-    
-    [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
+    [ExcludeFromPrototype] PhysicsObjectData CurrentData;
+    [ExcludeFromPrototype] PhysicsObjectData PreviousData;
 
+    [ExcludeFromPrototype] byte HoverFrames;
+    [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<PhysicsContact> Contacts;
     [ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<EntityRef> LiquidContacts;
     [ExcludeFromPrototype] byte UnderwaterCounter;
+}
+
+struct PhysicsObjectData {
+    PhysicsFlags Flags;
+    FP FloorAngle;
 }
 
 struct PhysicsContact {
@@ -40,6 +39,7 @@ struct PhysicsContact {
 }
 
 signal OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, bool underwater);
+signal OnEntityCrushed(EntityRef entity);
 
 event PhysicsObjectLanded {
     nothashed Frame Frame;

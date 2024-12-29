@@ -9,4 +9,12 @@ namespace Quantum {
             SmoothDampVelocity = FPVector2.Zero;
         }
     }
+
+    namespace Prototypes {
+        public partial class CameraControllerPrototype {
+            partial void MaterializeUser(Frame frame, ref CameraController result, in PrototypeMaterializationContext context) {
+                result.OrthographicSize = 7;
+            }
+        }
+    }
 }

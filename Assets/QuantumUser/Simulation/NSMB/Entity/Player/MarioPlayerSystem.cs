@@ -353,7 +353,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
 
-            if (!mario->DoEntityBounce && (mario->CrushDamageInvincibilityFrames > 0 || physicsObject->IsUnderwater || !doJump || mario->IsInKnockback || mario->KnockbackGetupFrames > 0 || (mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->JumpState == JumpState.SingleJump) || mario->IsWallsliding)) {
+            if (!mario->DoEntityBounce && (physicsObject->IsBeingCrushed || physicsObject->IsUnderwater || !doJump || mario->IsInKnockback || mario->KnockbackGetupFrames > 0 || (mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->JumpState == JumpState.SingleJump) || mario->IsWallsliding)) {
                 return;
             }
 
@@ -1295,8 +1295,11 @@ namespace Quantum {
                 mario->WallslideLeft = false;
                 mario->WallslideRight = false;
 
+                // Fix sticky ground
                 physicsObject->WasTouchingGround = false;
-                filter.PhysicsObject->IsTouchingGround = false;
+                physicsObject->IsTouchingGround = false;
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, FPVector2.Up * FP._0_05 * f.UpdateRate, filter.Entity, stage);
+
                 f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
                 break;
             }
@@ -1564,14 +1567,14 @@ namespace Quantum {
             var transform = filter.Transform;
             Shape2D shape = filter.PhysicsCollider->Shape;
 
-            if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, shape, stage: stage, entity: filter.Entity, includeCeilingCrushers: !physicsObject->IsTouchingGround)) {
+            if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, shape, stage: stage, entity: filter.Entity, includeCeilingCrushers: !physicsObject->IsTouchingGround && !physicsObject->WasTouchingGround)) {
                 if (mario->IsStuckInBlock) {
                     physicsObject->DisableCollision = false;
                     physicsObject->Velocity = FPVector2.Zero;
                     mario->IsStuckInBlock = false;
                 } 
 
-                if (physicsObject->IsTouchingGround && PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, shape, stage: stage, entity: filter.Entity, includeCeilingCrushers: true)) {
+                if (physicsObject->IsBeingCrushed) {
                     // In a ceiling crusher
                     if (mario->CrushDamageInvincibilityFrames == 0) {
                         mario->CrushDamageInvincibilityFrames = 30;

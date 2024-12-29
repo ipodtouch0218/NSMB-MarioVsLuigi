@@ -41,9 +41,9 @@ namespace Quantum {
             var transform = filter.Transform;
             var entity = filter.Entity;
 
-            bool wasTouchingGround = physicsObject->IsTouchingGround;
             // bool canSnap = wasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y;
             physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
+            physicsObject->PreviousData = physicsObject->CurrentData;
 
             QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
             MoveWithPlatform(f, ref filter, contacts);
@@ -53,6 +53,10 @@ namespace Quantum {
                     contacts.RemoveAtUnordered(i);
                     i--;
                 }
+            }
+
+            if (physicsObject->WasBeingCrushed) {
+                physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y, 0);
             }
 
             FPVector2 velocityModifier = new FPVector2(1, 1);
@@ -74,7 +78,7 @@ namespace Quantum {
             }
             ResolveContacts(f, stage, physicsObject, contacts);
 
-            if (!physicsObject->DisableCollision && /* canSnap && */ wasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y && !physicsObject->IsTouchingGround) {
+            if (!physicsObject->DisableCollision && /* canSnap && */ physicsObject->WasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y && !physicsObject->IsTouchingGround) {
                 // Try snapping
                 FPVector2 previousVelocity = effectiveVelocity;
                 FPVector2 testVelocity = effectiveVelocity;
@@ -93,6 +97,13 @@ namespace Quantum {
             physicsObject->Velocity.X = effectiveVelocity.X / velocityModifier.X;
             physicsObject->Velocity.Y = effectiveVelocity.Y / velocityModifier.Y;
 
+            if (physicsObject->IsTouchingGround) {
+                // Check for ceiling crushers
+                var collider = f.GetPointer<PhysicsCollider2D>(entity);
+                Shape2D shape = collider->Shape;
+                physicsObject->IsBeingCrushed = BoxInGround(f, transform->Position, shape, stage: stage, entity: filter.Entity, includeCeilingCrushers: true);
+            }
+
             /*
 #if DEBUG
             foreach (var contact in contacts) {
@@ -106,15 +117,16 @@ namespace Quantum {
                 physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
             }
             physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
-            physicsObject->WasTouchingGround = wasTouchingGround;
         }
 
         public void SendEventsTask(FrameThreadSafe f, int start, int count, void* arg) {
             var filter = f.Filter<PhysicsObject>();
             while (filter.NextUnsafe(out EntityRef entity, out PhysicsObject* physicsObject)) {
-
                 if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                     ((Frame) f).Events.PhysicsObjectLanded((Frame) f, entity);
+                }
+                if (!physicsObject->WasBeingCrushed && physicsObject->IsBeingCrushed) {
+                    ((Frame) f).Signals.OnEntityCrushed(entity);
                 }
             }
         }
@@ -551,13 +563,7 @@ namespace Quantum {
 
         private void ResolveContacts(FrameThreadSafe f, VersusStageData stage, PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
 
-            physicsObject->FloorAngle = 0;
-            physicsObject->IsTouchingGround = false;
-            physicsObject->IsTouchingCeiling = false;
-            physicsObject->IsTouchingLeftWall = false;
-            physicsObject->IsTouchingRightWall = false;
-            physicsObject->IsOnSlideableGround = false;
-            physicsObject->IsOnSlipperyGround = false;
+            physicsObject->CurrentData = default;
 
             foreach (var contact in contacts) {
                 FP horizontalDot = FPVector2.Dot(contact.Normal, FPVector2.Right);
@@ -577,7 +583,9 @@ namespace Quantum {
                         physicsObject->FloorAngle = angle;
                     }
 
-                    if (contact.TileX != -1 && contact.TileY != -1 && f.TryFindAsset(stage.GetTileRelative((Frame) f, contact.TileX, contact.TileY).Tile, out StageTile tile)) {
+                    if (!f.Exists(contact.Entity)
+                        && f.TryFindAsset(stage.GetTileRelative((Frame) f, contact.TileX, contact.TileY).Tile, out StageTile tile)) {
+
                         physicsObject->IsOnSlideableGround |= tile.IsSlideableGround;
                         physicsObject->IsOnSlipperyGround |= tile.IsSlipperyGround;
                     }

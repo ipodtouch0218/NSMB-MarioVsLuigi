@@ -8,7 +8,7 @@ public class BackgroundLoop : QuantumSceneViewComponent<StageContext> {
 
     //---Static Variables
     public static BackgroundLoop Instance { get; private set; }
-    private static readonly Vector2 ScreenBounds = new(7.5f, 5f);
+    private static readonly Vector2 ScreenBounds = new(8.5f, 5f);
 
     //---Misc Variables
     private GameObject[] children;

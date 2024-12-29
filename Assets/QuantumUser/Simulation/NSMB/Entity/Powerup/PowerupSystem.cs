@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnEntityBumped {
+    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
         private static readonly FP BumpForce = Constants._5_50;
@@ -270,6 +270,12 @@ namespace Quantum {
             );
             physicsObject->IsTouchingGround = false;
             powerup->FacingRight = ourPos.X > theirPos.X;
+        }
+
+        public void OnEntityCrushed(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Powerup* powerup)) {
+                f.Destroy(entity);
+            }
         }
     }
 }
