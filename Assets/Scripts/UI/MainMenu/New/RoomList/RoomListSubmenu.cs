@@ -124,7 +124,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public void InvalidUsername() {
             Canvas.PlaySound(SoundEffect.UI_Error);
-            EventSystem.current.SetSelectedGameObject(usernameField.gameObject);
+            Canvas.EventSystem.SetSelectedGameObject(usernameField.gameObject);
         }
 
         public async void Reconnect() {

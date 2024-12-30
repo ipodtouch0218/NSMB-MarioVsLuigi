@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu.Submenus {
     public class MainSubmenu : MainMenuSubmenu {
@@ -29,7 +28,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
                 // Force focus on a blocker element so the user can't do anything else.
                 exitingBlocker.SetActive(true);
-                EventSystem.current.SetSelectedGameObject(exitingBlocker);
+                Canvas.EventSystem.SetSelectedGameObject(exitingBlocker);
             }
         }
 

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace NSMB.UI.MainMenu.Submenus {
@@ -228,8 +227,8 @@ namespace NSMB.UI.MainMenu.Submenus {
                 return;
             }
            
-            if (EventSystem.current.currentSelectedGameObject 
-                && EventSystem.current.currentSelectedGameObject.TryGetComponent(out TMP_InputField inputField)
+            if (Canvas.EventSystem.currentSelectedGameObject 
+                && Canvas.EventSystem.currentSelectedGameObject.TryGetComponent(out TMP_InputField inputField)
                 && inputField.isFocused) {
                 // Don't move left/right when focused on an input field
                 return;
@@ -243,8 +242,8 @@ namespace NSMB.UI.MainMenu.Submenus {
                 return;
             }
 
-            if (EventSystem.current.currentSelectedGameObject 
-                && EventSystem.current.currentSelectedGameObject.TryGetComponent(out TMP_InputField inputField)
+            if (Canvas.EventSystem.currentSelectedGameObject 
+                && Canvas.EventSystem.currentSelectedGameObject.TryGetComponent(out TMP_InputField inputField)
                 && inputField.isFocused) {
                 // Don't move left/right when focused on an input field
                 return;

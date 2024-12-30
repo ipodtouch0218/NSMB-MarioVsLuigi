@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu.Submenus {
     public class ReplaySubmenu : MainMenuSubmenu {
@@ -31,7 +30,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             ReplayListEntry selected = replayList.Selected;
             if (selected) {
                 replayList.Select(null);
-                EventSystem.current.SetSelectedGameObject(selected.button.gameObject);
+                Canvas.EventSystem.SetSelectedGameObject(selected.button.gameObject);
                 playSound = true;
                 return false;
             }

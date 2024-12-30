@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu {
@@ -17,8 +18,10 @@ namespace NSMB.UI.MainMenu {
         public static MainMenuCanvas Instance { get; private set; }
         public List<MainMenuSubmenu> SubmenuStack => submenuStack;
         public Color HeaderColor => headerImage.color;
+        public EventSystem EventSystem => eventSystem;
 
         //---Serialized Variables
+        [SerializeField] private EventSystem eventSystem;
         [SerializeField] private MainMenuSubmenu startingSubmenu;
         [SerializeField] private GameObject mainPanel;
         [SerializeField] private AudioSource sfx;

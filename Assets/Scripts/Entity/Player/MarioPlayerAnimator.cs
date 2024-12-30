@@ -170,7 +170,8 @@ namespace NSMB.Entities.Player {
             GlowColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
 
             if (Game.PlayerIsLocal(mario->PlayerRef)) {
-                PlayerElements elements = Instantiate(playerElementsPrefab, GameObject.FindGameObjectWithTag("MasterCanvas").transform);
+                MasterCanvas masterCanvas = FindObjectOfType<MasterCanvas>();
+                PlayerElements elements = Instantiate(masterCanvas.playerElementsPrefab, masterCanvas.transform);
                 elements.Initialize(Game, f, EntityRef, mario->PlayerRef);
             }
 

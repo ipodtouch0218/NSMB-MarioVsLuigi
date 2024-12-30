@@ -90,7 +90,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void RemoveRoom(RoomIcon icon) {
-            if (EventSystem.current.currentSelectedGameObject == icon.gameObject) {
+            if (canvas.EventSystem.currentSelectedGameObject == icon.gameObject) {
                 // Move cursor so it doesn't get stuck.
                 // TODO
             }

@@ -37,13 +37,13 @@ namespace NSMB.UI.MainMenu {
 
         public virtual void Show(bool first) {
             gameObject.SetActive(true);
-            EventSystem.current.SetSelectedGameObject(first ? DefaultSelection : savedSelection);
+            Canvas.EventSystem.SetSelectedGameObject(first ? DefaultSelection : savedSelection);
 
             OnShow?.Invoke(first);
         }
 
         public virtual void Hide(SubmenuHideReason hideReason) {
-            savedSelection = EventSystem.current.currentSelectedGameObject;
+            savedSelection = Canvas.EventSystem.currentSelectedGameObject;
             gameObject.SetActive(hideReason == SubmenuHideReason.Overlayed);
 
             OnHide?.Invoke(hideReason);

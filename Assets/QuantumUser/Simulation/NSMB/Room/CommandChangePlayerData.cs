@@ -22,7 +22,8 @@ namespace Quantum {
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
-            if (f.Global->GameState != GameState.PreGameRoom && !playerData->IsSpectator) {
+            bool pregame = f.Global->GameState == GameState.PreGameRoom;
+            if (!pregame && !playerData->IsSpectator) {
                 return;
             }
 
@@ -37,7 +38,7 @@ namespace Quantum {
             if (playerChanges.HasFlag(Changes.Team)) {
                 playerData->RequestedTeam = Team;
             }
-            if (playerChanges.HasFlag(Changes.Spectating)) {
+            if (playerChanges.HasFlag(Changes.Spectating) && pregame) {
                 playerData->ManualSpectator = Spectating;
                 playerData->IsSpectator = Spectating;
             }

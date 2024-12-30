@@ -1,4 +1,6 @@
+using NSMB.Extensions;
 using NSMB.Translation;
+using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.Utils;
 using Quantum;
@@ -21,6 +23,7 @@ public class ReplayListManager : Selectable {
     public ReplayListEntry Selected { get; private set; }
 
     //---Serialized Variables
+    [SerializeField] private MainMenuCanvas canvas;
     [SerializeField] private ReplayDeletePromptSubmenu deletePrompt;
     [SerializeField] private ReplayRenamePromptSubmenu renamePrompt;
     [SerializeField] private ReplayListEntry replayTemplate;
@@ -35,6 +38,13 @@ public class ReplayListManager : Selectable {
     private readonly List<Replay> replays = new();
     private bool sortAscending;
     private int sortIndex;
+
+#if UNITY_EDITOR
+    protected override void OnValidate() {
+        base.OnValidate();
+        this.SetIfNull(ref canvas, UnityExtensions.GetComponentType.Parent);
+    }
+#endif
 
     public void Show() {
         sortDropdown.value = 0;
@@ -60,11 +70,11 @@ public class ReplayListManager : Selectable {
 
     private IEnumerator SelectAtEndOfFrame() {
         yield return new WaitForEndOfFrame();
-        if (!(EventSystem.current == null) && !EventSystem.current.alreadySelecting) {
+        if (!canvas.EventSystem.alreadySelecting) {
             if (Selected) {
-                EventSystem.current.SetSelectedGameObject(Selected.defaultSelection);
+                canvas.EventSystem.SetSelectedGameObject(Selected.defaultSelection);
             } else {
-                EventSystem.current.SetSelectedGameObject(GetFirstReplayEntry().button.gameObject);
+                canvas.EventSystem.SetSelectedGameObject(GetFirstReplayEntry().button.gameObject);
             }
         }
     }

@@ -841,8 +841,10 @@ namespace Quantum {
                     continue;
                 }
 
-                if (!includeMegaBreakable && f.Has<IceBlock>(hit.Entity)) {
-                    continue;
+                if (f.TryGetPointer(hit.Entity, out IceBlock* iceBlock)) {
+                    if (!includeMegaBreakable || entity == iceBlock->Entity) {
+                        continue;
+                    }
                 }
 
                 if (!includeCeilingCrushers && hitShape->UserTag == 1) {

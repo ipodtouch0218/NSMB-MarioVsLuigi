@@ -1,7 +1,9 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class CoinSystem : SystemMainThreadFilterStage<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin, ISignalOnEntityBumped {
+    public unsafe class CoinSystem : SystemMainThreadFilterStage<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin,
+        ISignalOnEntityBumped, ISignalOnEntityCrushed {
+        
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -125,6 +127,14 @@ namespace Quantum {
                     coin->IsCollected = true;
                     f.Events.CoinChangeCollected(f, entity, *coin, true);
                 } else {
+                    f.Destroy(entity);
+                }
+            }
+        }
+
+        public void OnEntityCrushed(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Coin* coin)) {
+                if (!coin->IsFloating) {
                     f.Destroy(entity);
                 }
             }

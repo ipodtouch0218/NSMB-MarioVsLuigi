@@ -322,6 +322,7 @@ namespace Quantum {
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
+                Debug.Log("bobomb crushed");
                 bobomb->Kill(f, entity, EntityRef.None, true);
             }
         }

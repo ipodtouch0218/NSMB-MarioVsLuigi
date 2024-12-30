@@ -89,7 +89,7 @@ public class ReplayListEntry : MonoBehaviour {
         selected = true;
         canvasGroup.interactable = true;
         canvas.PlayCursorSound();
-        EventSystem.current.SetSelectedGameObject(defaultSelection);
+        canvas.EventSystem.SetSelectedGameObject(defaultSelection);
     }
 
     private IEnumerator SmoothResize(float target, float time) {

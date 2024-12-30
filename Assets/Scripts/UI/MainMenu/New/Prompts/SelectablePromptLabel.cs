@@ -9,6 +9,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class SelectablePromptLabel : MonoBehaviour {
 
         //---Serialized Variables
+        [SerializeField] private EventSystem eventSystem;
         [SerializeField] private TMP_Text label;
         [SerializeField] private List<GameObject> selectionTargets;
 
@@ -21,6 +22,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public void OnValidate() {
             this.SetIfNull(ref label);
+            if (!eventSystem) {
+                eventSystem = FindObjectOfType<EventSystem>(true);
+            }
         }
 
         public void OnEnable() {
@@ -33,7 +37,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void LateUpdate() {
-            bool currentlySelected = selectionTargets.Contains(EventSystem.current.currentSelectedGameObject);
+            bool currentlySelected = selectionTargets.Contains(eventSystem.currentSelectedGameObject);
             
             if (!selected && currentlySelected) {
                 Select();

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu.Submenus {
     public class InRoomSubmenuPanel : MonoBehaviour {
@@ -27,7 +26,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             header.color = selectedColor;
 
             if (setDefault) {
-                EventSystem.current.SetSelectedGameObject(DefaultSelectedObject);
+                menu.Canvas.EventSystem.SetSelectedGameObject(DefaultSelectedObject);
             }
         }
 

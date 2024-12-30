@@ -68,7 +68,7 @@ namespace NSMB.UI.MainMenu {
             TeamAsset teamScriptable = game.Configurations.Simulation.Teams[selected];
             flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
             canvas.PlayConfirmSound();
-            EventSystem.current.SetSelectedGameObject(button.gameObject);
+            canvas.EventSystem.SetSelectedGameObject(button.gameObject);
         }
 
         public unsafe void Open() {
@@ -82,8 +82,8 @@ namespace NSMB.UI.MainMenu {
             blockerInstance.SetActive(true);
             content.SetActive(true);
 
-            EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
             canvas.PlayCursorSound();
+            canvas.EventSystem.SetSelectedGameObject(buttons[selected].gameObject);
         }
 
         public void Close(bool playSound) {
@@ -92,7 +92,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             Destroy(blockerInstance);
-            EventSystem.current.SetSelectedGameObject(button.gameObject);
+            canvas.EventSystem.SetSelectedGameObject(button.gameObject);
             content.SetActive(false);
 
             if (playSound) {

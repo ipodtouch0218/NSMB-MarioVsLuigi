@@ -25,7 +25,6 @@ namespace NSMB.UI.Game {
         public ReplayUI ReplayUi => replayUi;
 
         //---Serialized Variables
-        [SerializeField] private RawImage image;
         [SerializeField] private UIUpdater uiUpdater;
         [SerializeField] private CameraAnimator cameraAnimator;
         [SerializeField] private Camera ourCamera, scrollCamera;
@@ -47,7 +46,6 @@ namespace NSMB.UI.Game {
         private Vector2 previousNavigate;
 
         public void OnValidate() {
-            this.SetIfNull(ref image);
             this.SetIfNull(ref uiUpdater);
             this.SetIfNull(ref cameraAnimator);
             this.SetIfNull(ref ourCamera, UnityExtensions.GetComponentType.Children);

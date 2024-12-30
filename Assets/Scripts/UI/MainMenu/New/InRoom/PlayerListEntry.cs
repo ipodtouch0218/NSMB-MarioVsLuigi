@@ -233,7 +233,7 @@ namespace NSMB.UI.MainMenu {
             blockerInstance.SetActive(true);
             dropdownOptions.SetActive(true);
 
-            EventSystem.current.SetSelectedGameObject(first.gameObject);
+            canvas.EventSystem.SetSelectedGameObject(first.gameObject);
             canvas.PlayCursorSound();
         }
 
@@ -243,8 +243,7 @@ namespace NSMB.UI.MainMenu {
             }
             dropdownOptions.SetActive(false);
             canvas.PlaySound(didAction ? SoundEffect.UI_Decide : SoundEffect.UI_Back);
-
-            EventSystem.current.SetSelectedGameObject(button.gameObject);
+            canvas.EventSystem.SetSelectedGameObject(button.gameObject);
         }
 
         public void BanPlayer() {

@@ -7,7 +7,7 @@ namespace NSMB.UI.Game {
     public class MasterCanvas : MonoBehaviour {
 
         //---Serialize Variables
-        [SerializeField] private PlayerElements playerElementsPrefab;
+        [SerializeField] public PlayerElements playerElementsPrefab;
 
         public unsafe void Start() {
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
