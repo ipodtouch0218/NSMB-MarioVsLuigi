@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
@@ -111,6 +112,8 @@ namespace Quantum {
         public static void OnIceBlockMarioInteraction(Frame f, EntityRef marioEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+
+            Debug.Log(f.Number + " - " + mario->IsGroundpoundActive);
 
             if (mario->IsStarmanInvincible) {
                 Destroy(f, iceBlockEntity, IceBlockBreakReason.Other);

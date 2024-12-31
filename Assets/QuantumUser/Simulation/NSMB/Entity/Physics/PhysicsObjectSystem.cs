@@ -3,7 +3,9 @@ using Quantum.Collections;
 using Quantum.Profiling;
 using Quantum.Task;
 using System;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
@@ -46,6 +48,9 @@ namespace Quantum {
             physicsObject->PreviousData = physicsObject->CurrentData;
 
             QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+
+            CeilingCrusherCheck(f, ref filter, stage, contacts);
+
             MoveWithPlatform(f, ref filter, contacts);
             for (int i = 0; i < contacts.Count; i++) {
                 var contact = contacts[i];
@@ -97,12 +102,7 @@ namespace Quantum {
             physicsObject->Velocity.X = effectiveVelocity.X / velocityModifier.X;
             physicsObject->Velocity.Y = effectiveVelocity.Y / velocityModifier.Y;
 
-            if (physicsObject->IsTouchingGround) {
-                // Check for ceiling crushers
-                var collider = f.GetPointer<PhysicsCollider2D>(entity);
-                Shape2D shape = collider->Shape;
-                physicsObject->IsBeingCrushed = BoxInGround(f, transform->Position, shape, stage: stage, entity: filter.Entity, includeCeilingCrushers: true);
-            }
+            CeilingCrusherCheck(f, ref filter, stage, contacts);
 
             /*
 #if DEBUG
@@ -127,6 +127,32 @@ namespace Quantum {
                 }
                 if (!physicsObject->WasBeingCrushed && physicsObject->IsBeingCrushed) {
                     ((Frame) f).Signals.OnEntityCrushed(entity);
+                }
+            }
+        }
+
+        private void CeilingCrusherCheck(FrameThreadSafe f, ref Filter filter, VersusStageData stage, QList<PhysicsContact> contacts) {
+            var physicsObject = filter.PhysicsObject;
+            if (!physicsObject->IsTouchingGround) {
+                return;
+            }
+            var entity = filter.Entity;
+            var transform = filter.Transform;
+
+            // Check for ceiling crushers
+            var collider = f.GetPointer<PhysicsCollider2D>(entity);
+            Shape2D shape = collider->Shape;
+            physicsObject->IsBeingCrushed = BoxInGround(f, transform->Position, shape, stage: stage, entity: filter.Entity, includeCeilingCrushers: true);
+
+            if (physicsObject->IsBeingCrushed) {
+                // Snap to ground.
+                foreach (var contact in contacts) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < GroundMaxAngle) {
+                        continue;
+                    }
+
+                    transform->Position.Y = contact.Position.Y + shape.Box.Extents.Y - shape.Centroid.Y + Skin;
+                    break;
                 }
             }
         }
@@ -313,6 +339,7 @@ namespace Quantum {
                         if (earlyContinue
                             || (min.HasValue && contact.Distance - min.Value > tolerance)
                             || contact.Distance > (FPMath.Abs(velocityY) + RaycastSkin)
+                            || contact.Distance <= 0
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
@@ -515,6 +542,7 @@ namespace Quantum {
                         if (earlyContinue
                             || (min.HasValue && contact.Distance - min.Value > tolerance)
                             || contact.Distance > (FPMath.Abs(velocityX) + RaycastSkin)
+                            || contact.Distance <= 0
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;

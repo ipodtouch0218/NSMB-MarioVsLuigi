@@ -46,10 +46,12 @@ namespace NSMB.UI.MainMenu {
             NetworkHandler.Client?.RemoveCallbackTarget(this);
         }
 
-        public void RefreshRooms() {
+        public void RefreshRooms(bool updateUI = true) {
             int filtered = 0;
             foreach (RoomIcon room in rooms.Values) {
-                room.UpdateUI(room.room);
+                if (updateUI) {
+                    room.UpdateUI(room.room);
+                }
 
                 if (FilterFullRooms && room.room.PlayerCount == room.room.MaxPlayers) {
                     room.gameObject.SetActive(false);
@@ -135,6 +137,7 @@ namespace NSMB.UI.MainMenu {
                     }
                 }
             }
+            RefreshRooms(false);
         }
 
         public void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics) { }

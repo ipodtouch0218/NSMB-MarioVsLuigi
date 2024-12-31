@@ -794,7 +794,7 @@ namespace Quantum {
                     mario->IsDrilling = false;
                 }
             } else if (mario->IsGroundpounding) {
-                if (physicsObject->IsTouchingGround && !inputs.Down.IsDown) {
+                if (physicsObject->IsTouchingGround && physicsObject->WasTouchingGround && !inputs.Down.IsDown) {
                     // Cancel from being grounded
                     mario->GroundpoundStandFrames = 15;
                     mario->IsGroundpounding = false;
@@ -907,8 +907,11 @@ namespace Quantum {
                 // Floor tiles.
                 if (f.Exists(contact.Entity)) {
                     // Manual Fix: allow ice block groundpound continues
-                    continueGroundpound &= f.Has<IceBlock>(contact.Entity);
+                    bool ice = f.Has<IceBlock>(contact.Entity);
+                    continueGroundpound &= ice;
+                    interactedAny |= ice;
                 } else {
+                    Debug.Log("b");
                     var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
@@ -926,6 +929,7 @@ namespace Quantum {
             }
 
             continueGroundpound &= interactedAny;
+            Debug.Log("continue? " + continueGroundpound);
             mario->IsGroundpoundActive &= continueGroundpound;
 
             if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {

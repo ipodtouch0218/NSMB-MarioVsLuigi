@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using Unity.Collections.LowLevel.Unsafe;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -50,6 +51,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public void Awake() {
         Set(this);
         StateChanged += OnClientStateChanged;
+        Settings.OnReplaysEnabledChanged += OnReplaysEnabledChanged;
 
         realtimeClient = new();
         realtimeClient.StateChanged += (ClientState oldState, ClientState newState) => {
@@ -219,6 +221,16 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public unsafe void SaveReplay(QuantumGame game, sbyte winner) {
 #if UNITY_STANDALONE
         if (IsReplay || game.RecordInputStream == null) {
+            return;
+        }
+
+        if (!Settings.Instance.GeneralReplaysEnabled) {
+            // Disabled replays mid-game
+            game.RecordInputStream.Dispose();
+            game.RecordInputStream = null;
+            playernames = null;
+            playerteams = null;
+            playerrefs = null;
             return;
         }
 
@@ -538,5 +550,28 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     public static bool FilterOutReplayFastForward(IDeterministicGame game) {
         return !IsReplayFastForwarding;
+    }
+
+    private unsafe void OnReplaysEnabledChanged(bool enable) {
+        if (Game == null) {
+            return;
+        }
+
+        Frame f = Game.Frames.Predicted;
+        if (enable) {
+            if (f.Global->GameState >= GameState.Starting && f.Global->GameState < GameState.Ended) {
+                OnRecordingStarted(new EventRecordingStarted {
+                    Game = Game,
+                    Frame = f,
+                    Tick = f.Number,
+                });
+            }    
+        } else {
+            // Disable
+            if (Game.RecordInputStream != null) {
+                Game.RecordInputStream.Dispose();
+                Game.RecordInputStream = null;
+            }
+        }
     }
 }

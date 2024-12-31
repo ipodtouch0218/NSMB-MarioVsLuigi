@@ -273,7 +273,8 @@ namespace Quantum {
         }
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
-            if (f.Unsafe.TryGetPointer(entity, out Powerup* powerup)) {
+            if (f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
+                && powerup->SpawnAnimationFrames <= 0) {
                 f.Destroy(entity);
             }
         }

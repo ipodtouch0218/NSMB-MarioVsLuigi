@@ -201,7 +201,7 @@ public class ReplayListManager : Selectable {
         }
 
         if (replays.Count == 0) {
-            noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation("ui.extras.replays.none");
+            noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
         } else {
             noReplaysText.text = "";
         }

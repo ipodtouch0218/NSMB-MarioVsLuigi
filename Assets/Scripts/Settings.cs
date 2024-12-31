@@ -10,7 +10,7 @@ public class Settings : Singleton<Settings> {
     //---Static Variables
     private Action[] VersionUpdaters;
     public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
-    public static event Action<bool> OnInputDisplayActiveChanged;
+    public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
 
     //---Properties
 
@@ -57,6 +57,14 @@ public class Settings : Singleton<Settings> {
         }
     }
 
+    private bool _generalReplaysEnabled;
+    public bool GeneralReplaysEnabled {
+        get => _generalReplaysEnabled;
+        set {
+            _generalReplaysEnabled = value;
+            OnReplaysEnabledChanged?.Invoke(value);
+        }
+    }
 
     private string _graphicsFullscreenResolution;
     public string GraphicsFullscreenResolution {
@@ -197,7 +205,7 @@ public class Settings : Singleton<Settings> {
 
     //---Public Variables
     public string generalNickname;
-    public int generalCharacter, generalPalette;
+    public int generalCharacter, generalPalette, generalMaxTempReplays;
     public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
 
     public bool graphicsNametags;
@@ -235,6 +243,8 @@ public class Settings : Singleton<Settings> {
         PlayerPrefs.SetInt("General_Palette", generalPalette);
         PlayerPrefs.SetString("General_Locale", GeneralLocale);
         PlayerPrefs.SetInt("General_UseNicknameColor", generalUseNicknameColor ? 1 : 0);
+        PlayerPrefs.SetInt("General_ReplaysEnabled", GeneralReplaysEnabled ? 1 : 0);
+        PlayerPrefs.SetInt("General_MaxTempReplays", generalMaxTempReplays);
         PlayerPrefs.SetInt("General_DiscordIntegration", GeneralDiscordIntegration ? 1 : 0);
 
         // Graphics
@@ -312,6 +322,8 @@ public class Settings : Singleton<Settings> {
         generalPalette = PlayerPrefs.GetInt("Skin", 0);
         GeneralLocale = "en-US";
         generalUseNicknameColor = true;
+        GeneralReplaysEnabled = true;
+        generalMaxTempReplays = 11;
         _generalDiscordIntegration = true;
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;
@@ -362,6 +374,8 @@ public class Settings : Singleton<Settings> {
         TryGetSetting("General_Palette", ref generalPalette);
         TryGetSetting<string>("General_Locale", nameof(GeneralLocale));
         TryGetSetting("General_UseNicknameColor", ref generalUseNicknameColor);
+        TryGetSetting<bool>("General_ReplaysEnabled", nameof(GeneralReplaysEnabled));
+        TryGetSetting("General_MaxTempReplays", ref generalMaxTempReplays);
         TryGetSetting<bool>("General_DiscordIntegration", nameof(GeneralDiscordIntegration));
 
         // Graphics

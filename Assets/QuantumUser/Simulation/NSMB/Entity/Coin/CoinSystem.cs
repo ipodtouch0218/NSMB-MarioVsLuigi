@@ -133,10 +133,9 @@ namespace Quantum {
         }
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
-            if (f.Unsafe.TryGetPointer(entity, out Coin* coin)) {
-                if (!coin->IsFloating) {
-                    f.Destroy(entity);
-                }
+            if (f.Unsafe.TryGetPointer(entity, out Coin* coin)
+                && !coin->IsFloating) {
+                f.Destroy(entity);
             }
         }
     }
