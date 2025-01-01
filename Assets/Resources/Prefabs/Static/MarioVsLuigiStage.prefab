@@ -635,7 +635,7 @@ MonoBehaviour:
     LengthSeconds:
       RawValue: 196608
   RuntimeConfig:
-    Seed: 0
+    Seed: 1
     Map:
       Id:
         Value: 438935048561577377

@@ -17,6 +17,7 @@ using UnityEngine.UI;
 
 public class ReplayListManager : Selectable {
 
+    public static ReplayListManager Instance { get; private set; }
     public static string ReplayDirectory => Path.Combine(Application.persistentDataPath, "replays");
 
     //---Properties
@@ -36,6 +37,7 @@ public class ReplayListManager : Selectable {
 
     //---Private Variables
     private readonly List<Replay> replays = new();
+    private readonly SortedSet<Replay> temporaryReplays = new(new ReplayDateComparer());
     private bool sortAscending;
     private int sortIndex;
 
@@ -162,7 +164,8 @@ public class ReplayListManager : Selectable {
         builder.Append("<sprite name=room_teams>").AppendLine(file.Rules.TeamsEnabled ? on : off);
 
         // Add date
-        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime());
+        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime().ToString()).Append(" - ");
+        builder.Append(Utils.SecondsToMinuteSeconds(file.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(file.FileSize));
 
         replayInformation.text = builder.ToString();
         replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Left;
@@ -174,28 +177,37 @@ public class ReplayListManager : Selectable {
     }
 
     public void FindReplays() {
+        Instance = this;
         foreach (var replay in replays) {
             Destroy(replay.ListEntry.gameObject);
         }
         replays.Clear();
+        temporaryReplays.Clear();
 
-        Directory.CreateDirectory(Path.Combine(ReplayDirectory, "temp"));
+        string tempPath = Path.Combine(ReplayDirectory, "temp");
+        Directory.CreateDirectory(tempPath);
         Directory.CreateDirectory(Path.Combine(ReplayDirectory, "favorite"));
         Directory.CreateDirectory(Path.Combine(ReplayDirectory, "saved"));
 
         string[] files = Directory.GetFiles(Path.Combine(ReplayDirectory), "*.mvlreplay", SearchOption.AllDirectories);
-
         foreach (var file in files) {
-            if (File.Exists(file)) {
-                using FileStream inputStream = new FileStream(file, FileMode.Open);
-                if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile)) {
-                    Replay newReplay = new Replay {
-                        FilePath = file,
-                        ReplayFile = replayFile,
-                        ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
-                    };
-                    newReplay.ListEntry.Initialize(this, newReplay);
-                    replays.Add(newReplay);
+            if (!File.Exists(file)) {
+                continue;
+            }
+
+            using FileStream inputStream = new FileStream(file, FileMode.Open);
+            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile)) {
+                Replay newReplay = new Replay {
+                    FilePath = file,
+                    ReplayFile = replayFile,
+                    ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
+                };
+                newReplay.ListEntry.Initialize(this, newReplay);
+                replays.Add(newReplay);
+
+                if (file.StartsWith(tempPath)) {
+                    // Is temporary
+                    temporaryReplays.Add(newReplay);
                 }
             }
         }
@@ -206,11 +218,16 @@ public class ReplayListManager : Selectable {
             noReplaysText.text = "";
         }
 
+        foreach (var replay in replays) {
+            replay.ListEntry.UpdateText();
+        }
         SortReplays();
         FilterReplays();
 
         ReplayListEntry firstReplay = GetFirstReplayEntry();
-        Select(firstReplay ? firstReplay.Replay : null);
+        if (gameObject.activeInHierarchy) {
+            Select(firstReplay ? firstReplay.Replay : null);
+        }
     }
 
     public void OnSortDropdownChanged() {
@@ -246,7 +263,7 @@ public class ReplayListManager : Selectable {
                     };
                     newReplay.ListEntry.Initialize(this, newReplay);
                     replays.Add(newReplay);
-                    
+                    newReplay.ListEntry.UpdateText();
                 }
             } catch {
                 Debug.Log($"[Replay] Failed to import replay file at '{filepath}'");
@@ -306,6 +323,11 @@ public class ReplayListManager : Selectable {
                     if (tm.GetTranslation(stage.TranslationKey).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
                         continue;
                     }
+                }
+
+                // Check status
+                if (replay.ListEntry.warningText.text.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    continue;
                 }
 
                 // Did not match
@@ -372,11 +394,39 @@ public class ReplayListManager : Selectable {
         UpdateInformation(Selected ? Selected.Replay : null);
     }
 
+    public int? GetReplaysUntilDeletion(Replay replay) {
+        int max = Settings.Instance.generalMaxTempReplays;
+        int index = temporaryReplays.IndexOf(r => r == replay);
+        if (max == 0 || !replay.IsTemporary || index == -1) {    
+            return null;
+        }
+
+        return Mathf.Max(1, max - index);
+    }
+
+    public List<Replay> GetTemporaryReplaysToDelete() {
+        List<Replay> replaysToDelete = new();
+
+        foreach (var replay in temporaryReplays) {
+            if (GetReplaysUntilDeletion(replay) == 1) {
+                replaysToDelete.Add(replay);
+            }
+        }
+
+        return replaysToDelete;
+    }
+
     public class Replay {
         public string FilePath;
         public BinaryReplayFile ReplayFile;
         public ReplayListEntry ListEntry;
         public bool IsTemporary => FilePath.StartsWith(Path.Combine(ReplayDirectory, "temp"));
         public bool IsFavorited => FilePath.StartsWith(Path.Combine(ReplayDirectory, "favorite"));
+    }
+
+    public class ReplayDateComparer : IComparer<Replay> {
+        public int Compare(Replay x, Replay y) {
+            return x.ReplayFile.UnixTimestamp < y.ReplayFile.UnixTimestamp ? 1 : -1;
+        }
     }
 }

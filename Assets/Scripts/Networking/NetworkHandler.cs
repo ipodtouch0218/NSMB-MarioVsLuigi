@@ -12,7 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Text.RegularExpressions;
-using Unity.Collections.LowLevel.Unsafe;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -31,7 +30,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
     public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
-    public static QuantumGame Game => Runner == null ? null : Runner.Game;
+    public static QuantumGame Game => Runner?.Game;
     public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay { get; private set; }
@@ -148,6 +147,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         try {
             await Client.ConnectUsingSettingsAsync(new AppSettings {
                 AppIdQuantum = "6b4b72d0-57c3-4991-96c1-f3f36f9548e5",
+                AppVersion = Application.version,
                 EnableLobbyStatistics = true,
                 AuthMode = AuthModeOption.Auth,
                 FixedRegion = region,
@@ -232,6 +232,17 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             playerteams = null;
             playerrefs = null;
             return;
+        }
+
+        // Make room for this replay - delete old ones.
+        var manager = ReplayListManager.Instance;
+        if (manager) {
+            var deletions = manager.GetTemporaryReplaysToDelete();
+            foreach (var replay in deletions) {
+                Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.GetDisplayName()}' ({replay.FilePath}) to make room.");
+                File.Delete(replay.FilePath);
+                manager.RemoveReplay(replay);
+            }
         }
 
         // JSON-friendly replay
@@ -463,6 +474,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public async static void StartReplay(BinaryReplayFile replay) {
         if (Client.IsConnected) {
             await Client.DisconnectAsync();
+        }
+        if (Runner && Runner.IsRunning) {
+            await Runner.ShutdownAsync();
         }
 
         IsReplay = true;

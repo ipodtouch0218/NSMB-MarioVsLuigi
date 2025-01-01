@@ -451,11 +451,6 @@ PrefabInstance:
       propertyPath: MapEntityReferences.Array.data[18]
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 8642252342915534796, guid: dcdc633a29f212843ae9cbdf4be58fb2,
-        type: 3}
-      propertyPath: RuntimeConfig.Seed
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2833826708827202206, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}
     - {fileID: 7625224819000450171, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}

@@ -78,7 +78,7 @@ MonoBehaviour:
   SlowTurnaroundIceAcceleration:
     RawValue: 172800
   SmallHitboxHeight:
-    RawValue: 27525
+    RawValue: 26214
   LargeHitboxHeight:
     RawValue: 53739
   JumpBufferFrames: 12

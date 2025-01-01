@@ -7,7 +7,6 @@ using System.Collections;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ReplayListEntry : MonoBehaviour {
@@ -18,7 +17,8 @@ public class ReplayListEntry : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private MainMenuCanvas canvas;
     [SerializeField] internal GameObject defaultSelection;
-    [SerializeField] private TMP_Text nameText, dateText, warningText, favoriteButtonText;
+    [SerializeField] private TMP_Text nameText, dateText, favoriteButtonText;
+    [SerializeField] public TMP_Text warningText;
     [SerializeField] private Image mapImage;
     [SerializeField] private Sprite defaultMapSprite;
     [SerializeField] private RectTransform dropDownRectTransform;
@@ -45,7 +45,6 @@ public class ReplayListEntry : MonoBehaviour {
         manager = ourManager;
         Replay = ourReplay;
         gameObject.SetActive(true);
-        UpdateText();
     }
 
     public void UpdateNavigation(ReplayListEntry previous) {
@@ -179,8 +178,17 @@ public class ReplayListEntry : MonoBehaviour {
                 button.interactable = false;
             }
         } else if (Replay.IsTemporary) {
-            warningText.text = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
-            warningText.color = warningColor;
+            int? deletion = manager.GetReplaysUntilDeletion(Replay);
+            if (deletion.HasValue && deletion == 1) {
+                warningText.text = tm.GetTranslation("ui.extras.replays.temporary.next");
+                warningText.color = criticalColor;
+            } else if (deletion.HasValue && deletion <= 5) {
+                warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.temporary", "expire", deletion.ToString());
+                warningText.color = criticalColor;
+            } else {
+                warningText.text = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
+                warningText.color = warningColor;
+            }
         } else if (Replay.IsFavorited) {
             warningText.text = tm.GetTranslation("ui.extras.replays.favorited");
             warningText.color = favoriteColor;

@@ -911,7 +911,6 @@ namespace Quantum {
                     continueGroundpound &= ice;
                     interactedAny |= ice;
                 } else {
-                    Debug.Log("b");
                     var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
@@ -929,7 +928,6 @@ namespace Quantum {
             }
 
             continueGroundpound &= interactedAny;
-            Debug.Log("continue? " + continueGroundpound);
             mario->IsGroundpoundActive &= continueGroundpound;
 
             if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
@@ -1062,7 +1060,7 @@ namespace Quantum {
                     f.Events.MarioPlayerMegaStart(f, filter.Entity);
                 } else {
                     // Still growing...
-                    if (f.Number % 4 == 0 && PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, false, stage)) {
+                    if ((f.Number + filter.Entity.Index) % 4 == 0 && PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, false, stage)) {
                         // Cancel growing
                         mario->CurrentPowerupState = PowerupState.Mushroom;
                         mario->MegaMushroomEndFrames = (byte) (90 - mario->MegaMushroomStartFrames);
@@ -1098,6 +1096,47 @@ namespace Quantum {
                     }
 
                     mario->JumpState = JumpState.None;
+                }
+
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                foreach (var contact in contacts) {
+                    // Try to break this tile as mega mario...
+                    if (contact.TileX == -1 || contact.TileY == -1) {
+                        continue;
+                    }
+
+                    InteractionDirection direction;
+                    FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
+                    if (upDot > PhysicsObjectSystem.GroundMaxAngle) {
+                        // Ground contact... only allow if groundpounding
+                        if (!mario->IsGroundpoundActive) {
+                            continue;
+                        }
+                        direction = InteractionDirection.Down;
+                    } else if (upDot < -PhysicsObjectSystem.GroundMaxAngle) {
+                        direction = InteractionDirection.Up;
+                    } else if (contact.Normal.X < 0) {
+                        direction = InteractionDirection.Right;
+                    } else {
+                        direction = InteractionDirection.Left;
+                    }
+
+                    StageTileInstance tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTile tile = f.FindAsset(tileInstance.Tile);
+                    if (tile is IInteractableTile it) {
+                        if (it.Interact(f, filter.Entity, direction, new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool _)) {
+                            // Block broke, preserve velocity.
+                            if (direction == InteractionDirection.Left || direction == InteractionDirection.Right) {
+                                physicsObject->Velocity.X = physicsObject->PreviousFrameVelocity.X;
+                                FP leftoverVelocity = (FPMath.Abs(physicsObject->Velocity.X) - (contact.Distance * f.UpdateRate)) * (physicsObject->Velocity.X > 0 ? 1 : -1);
+                                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), filter.Entity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
+                            } else if (direction == InteractionDirection.Up) {
+                                physicsObject->Velocity.Y = physicsObject->PreviousFrameVelocity.Y;
+                                FP leftoverVelocity = (FPMath.Abs(physicsObject->Velocity.Y) - (contact.Distance * f.UpdateRate)) * (physicsObject->Velocity.Y > 0 ? 1 : -1);
+                                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, new FPVector2(0, leftoverVelocity), filter.Entity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
+                            }
+                        }
+                    }
                 }
 
                 if (QuantumUtils.Decrement(ref mario->MegaMushroomFrames)) {
@@ -1181,52 +1220,8 @@ namespace Quantum {
             }
 
             PowerupState state = mario->CurrentPowerupState;
-
-            if (state == PowerupState.MegaMushroom) {
-                if (mario->MegaMushroomStartFrames > 0) {
-                    return;
-                }
-
-                var contacts = f.ResolveList(physicsObject->Contacts);
-                foreach (var contact in contacts) {
-                    // Try to break this tile as mega mario...
-                    if (contact.TileX == -1 || contact.TileY == -1) {
-                        continue;
-                    }
-
-                    InteractionDirection direction;
-                    FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
-                    if (upDot > PhysicsObjectSystem.GroundMaxAngle) {
-                        // Ground contact... only allow if groundpounding
-                        if (!mario->IsGroundpoundActive) {
-                            continue;
-                        }
-                        direction = InteractionDirection.Down;
-                    } else if (upDot < -PhysicsObjectSystem.GroundMaxAngle) {
-                        direction = InteractionDirection.Up;
-                    } else if (contact.Normal.X < 0) {
-                        direction = InteractionDirection.Right;
-                    } else {
-                        direction = InteractionDirection.Left;
-                    }
-
-                    StageTileInstance tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
-                    StageTile tile = f.FindAsset(tileInstance.Tile);
-                    if (tile is IInteractableTile it) {
-                        if (it.Interact(f, filter.Entity, direction, new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool _)) {
-                            // Block broke, preserve velocity.
-                            if (direction == InteractionDirection.Left || direction == InteractionDirection.Right) {
-                                physicsObject->Velocity.X = physicsObject->PreviousFrameVelocity.X;
-                                FP leftoverVelocity = (FPMath.Abs(physicsObject->Velocity.X) - (contact.Distance * f.UpdateRate)) * (physicsObject->Velocity.X > 0 ? 1 : -1);
-                                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), filter.Entity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
-                            } else if (direction == InteractionDirection.Up) {
-                                physicsObject->Velocity.Y = physicsObject->PreviousFrameVelocity.Y;
-                                FP leftoverVelocity = (FPMath.Abs(physicsObject->Velocity.Y) - (contact.Distance * f.UpdateRate)) * (physicsObject->Velocity.Y > 0 ? 1 : -1);
-                                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, new FPVector2(0, leftoverVelocity), filter.Entity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
-                            }
-                        }
-                    }
-                }
+            if (mario->MegaMushroomStartFrames > 0) {
+                return;
             }
 
             if (!(inputs.PowerupAction.WasPressed 
@@ -1514,7 +1509,7 @@ namespace Quantum {
 
             FPVector2 iceBlockSize = collider->Shape.Box.Extents;
             FP newHeight;
-            bool crouchHitbox = mario->CurrentPowerupState != PowerupState.MiniMushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
+            bool crouchHitbox = mario->CurrentPowerupState >= PowerupState.Mushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
             bool smallHitbox = (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->IsGroundpounding;
             if (mario->CurrentPowerupState <= PowerupState.MiniMushroom || smallHitbox) {
                 newHeight = physics.SmallHitboxHeight;
@@ -1529,7 +1524,7 @@ namespace Quantum {
             }
 
             if (crouchHitbox) {
-                newHeight *= mario->CurrentPowerupState <= PowerupState.MiniMushroom ? FP._0_75 : FP._0_50;
+                newHeight /= 2;
             }
 
             FPVector2 newExtents = new(Constants._0_1875, newHeight / 2);

@@ -113,8 +113,6 @@ namespace Quantum {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
-            Debug.Log(f.Number + " - " + mario->IsGroundpoundActive);
-
             if (mario->IsStarmanInvincible) {
                 Destroy(f, iceBlockEntity, IceBlockBreakReason.Other);
                 return;

@@ -5,10 +5,13 @@ using Quantum.Task;
 using System.Collections.Generic;
 
 namespace Quantum {
-    public unsafe class InteractionSystem : SystemArrayFilter<InteractionSystem.Filter> {
 
+#if MULTITHREADED
+    public unsafe class InteractionSystem : SystemArrayFilter<InteractionSystem.Filter> {
+#else
+    public unsafe class InteractionSystem : SystemMainThread {
+#endif
         private List<PendingInteraction> pendingInteractions = new(16);
-        //private SortedSet<PendingInteraction> pendingInteractions = new(new PendingInteractionComparer());
         private HashSet<EntityRefPair> alreadyInteracted = new(16);
         private TaskDelegateHandle executeInteractorsTaskDelegate;
 
@@ -19,6 +22,7 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
+#if MULTITHREADED
         protected override void OnInitUser(Frame f) {
             f.Context.TaskContext.RegisterDelegate(ExecuteInteractors, $"{GetType().Name}.ExecuteInteractors", ref executeInteractorsTaskDelegate);
         }
@@ -27,6 +31,7 @@ namespace Quantum {
             TaskHandle findInteractionsTask = base.Schedule(f, taskHandle);
             return f.Context.TaskContext.AddMainThreadTask(executeInteractorsTaskDelegate, null, findInteractionsTask);
         }
+#endif
 
         public void ExecuteInteractors(FrameThreadSafe fts, int start, int count, void* arg) {
             Frame f = (Frame) fts;
@@ -77,6 +82,7 @@ namespace Quantum {
             alreadyInteracted.Clear();
         }
 
+#if MULTITHREADED
         public override void Update(FrameThreadSafe f, ref Filter filter) {
             var interactable = filter.Interactable;
             var entity = filter.Entity;
@@ -110,6 +116,47 @@ namespace Quantum {
                 }
             }
         }
+#else
+        public override void Update(Frame f) {
+            var entityFilter = f.Unsafe.FilterStruct<Filter>();
+            Filter filter = default;
+            while (entityFilter.Next(&filter)) {
+                var interactable = filter.Interactable;
+                var entity = filter.Entity;
+
+                if (interactable->ColliderDisabled
+                    || (f.Unsafe.TryGetPointer(entity, out Enemy* enemy) && enemy->IsDead)
+                    || (f.Unsafe.TryGetPointer(entity, out Freezable* freezable) && f.Exists(freezable->FrozenCubeEntity))) {
+                    continue;
+                }
+
+                var shape = filter.Collider->Shape;
+                var transform = filter.Transform;
+
+                // Collide with hitboxes
+                if (f.Physics2D.TryGetQueryHits(interactable->OverlapQueryRef, out HitCollection hits)) {
+                    for (int i = 0; i < hits.Count; i++) {
+                        TryCollideWithEntity((FrameThreadSafe) f, entity, hits[i].Entity);
+                    }
+                }
+
+                // Collide with physical objects
+                if (f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
+                    && f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
+
+                    foreach (var contact in contacts) {
+                        if (!f.Exists(contact.Entity)) {
+                            continue;
+                        }
+
+                        TryCollideWithEntity((FrameThreadSafe) f, entity, contact.Entity, contact);
+                    }
+                }
+            }
+
+            ExecuteInteractors((FrameThreadSafe) f, 0, 0, (void*) null);
+        }
+#endif
 
         private void TryCollideWithEntity(FrameThreadSafe f, EntityRef entityA, EntityRef entityB) {
             if (entityA == entityB) {

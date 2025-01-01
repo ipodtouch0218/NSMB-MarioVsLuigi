@@ -207,6 +207,7 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             physicsObject->IsFrozen = true;
             physicsObject->DisableCollision = true;
+            physicsObject->CurrentData = default;
 
             f.Signals.OnMarioPlayerDied(entity);
             f.Events.MarioPlayerDied(f, entity, fire);

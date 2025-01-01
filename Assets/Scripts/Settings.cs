@@ -323,7 +323,7 @@ public class Settings : Singleton<Settings> {
         GeneralLocale = "en-US";
         generalUseNicknameColor = true;
         GeneralReplaysEnabled = true;
-        generalMaxTempReplays = 11;
+        generalMaxTempReplays = 20;
         _generalDiscordIntegration = true;
 
         GraphicsFullscreenResolution = Screen.resolutions[^1].width + "," + Screen.resolutions[^1].height;

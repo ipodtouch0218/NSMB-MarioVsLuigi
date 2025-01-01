@@ -3,9 +3,7 @@ using Quantum.Collections;
 using Quantum.Profiling;
 using Quantum.Task;
 using System;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
@@ -34,12 +32,12 @@ namespace Quantum {
         }
 
         public override void Update(FrameThreadSafe f, ref Filter filter) {
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var physicsObject = filter.PhysicsObject;
             if (physicsObject->IsFrozen) {
                 return;
             }
-            
+
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var transform = filter.Transform;
             var entity = filter.Entity;
 
@@ -337,9 +335,8 @@ namespace Quantum {
                         }
 
                         if (earlyContinue
-                            || (min.HasValue && contact.Distance - min.Value > tolerance)
+                            || (min.HasValue && min.Value > 0 && contact.Distance - min.Value > tolerance)
                             || contact.Distance > (FPMath.Abs(velocityY) + RaycastSkin)
-                            || contact.Distance <= 0
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
@@ -538,11 +535,10 @@ namespace Quantum {
                                 break;
                             }
                         }
-
+                        
                         if (earlyContinue
-                            || (min.HasValue && contact.Distance - min.Value > tolerance)
+                            || (min.HasValue && min.Value > 0 && contact.Distance - min.Value > tolerance)
                             || contact.Distance > (FPMath.Abs(velocityX) + RaycastSkin)
-                            || contact.Distance <= 0
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;

@@ -16,6 +16,9 @@ public class BinaryReplayFile {
     private static int MagicHeaderLength => Encoding.ASCII.GetByteCount(MagicHeader);
     private static readonly byte[] HeaderBuffer = new byte[MagicHeaderLength];
 
+    // Metadata
+    public long FileSize { get; private set; }
+
     // Header
     private const string MagicHeader = "MvLO-RP";
     public byte Version;
@@ -84,7 +87,7 @@ public class BinaryReplayFile {
 
         writer.Flush();
 
-        return writer.BaseStream.Length;
+        return (FileSize = writer.BaseStream.Length);
     }
 
     public string GetDisplayName(bool replaceNullWithDefault = true) {
@@ -118,7 +121,10 @@ public class BinaryReplayFile {
 
     public static bool TryLoadFromFile(Stream input, out BinaryReplayFile result) {
         using BinaryReader reader = new(input, Encoding.ASCII);
+
         result = new();
+        result.FileSize = reader.BaseStream.Length;
+
         try {
             reader.Read(HeaderBuffer);
             string readString = Encoding.ASCII.GetString(HeaderBuffer);

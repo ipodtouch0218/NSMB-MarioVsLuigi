@@ -80,10 +80,10 @@ namespace NSMB.UI.MainMenu {
             }
 
             Color newColor = newHeaderColor ?? defaultHeaderColor;
-            if (HeaderColor == newColor) {
+            if (HeaderColor != newColor) {
+                headerImage.color = newColor;
                 HeaderColorChanged?.Invoke(newColor);
             }
-            headerImage.color = newColor;
             header.SetActive(showHeader);
         }
 
