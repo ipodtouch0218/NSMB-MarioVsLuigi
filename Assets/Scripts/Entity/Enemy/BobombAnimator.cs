@@ -39,6 +39,11 @@ public unsafe class BobombAnimator : QuantumEntityViewComponent {
             return;
         }
 
+        if (f.Global->GameState >= GameState.Ended) {
+            animator.speed = 0;
+            return;
+        }
+
         var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
         if (freezable->IsFrozen(f)) {
             animator.speed = 0;

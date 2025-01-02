@@ -1319,7 +1319,7 @@ PrefabInstance:
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.size
-      value: 19
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
@@ -1415,7 +1415,7 @@ PrefabInstance:
         type: 3}
       propertyPath: MapEntityReferences.Array.data[18]
       value: 
-      objectReference: {fileID: 1171524072}
+      objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.data[19]
@@ -2089,86 +2089,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1001 &1171524071
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4457025799422764819, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_Name
-      value: Ice Flower
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -9.478903
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 3.076054
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4457025799422764827, guid: 1c0c7582045793f42b2983b08068485f,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1c0c7582045793f42b2983b08068485f, type: 3}
---- !u!114 &1171524072 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5565156223957319043, guid: 1c0c7582045793f42b2983b08068485f,
-    type: 3}
-  m_PrefabInstance: {fileID: 1171524071}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1188871164
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8086,7 +8006,7 @@ Tilemap:
   - first: {x: -17, y: 11, z: 0}
     second:
       serializedVersion: 2
-      m_TileIndex: 0
+      m_TileIndex: 2
       m_TileSpriteIndex: 12
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
@@ -8415,11 +8335,11 @@ Tilemap:
       m_AnimationTimeOffset: 0
       m_Flags: 0
   m_TileAssetArray:
-  - m_RefCount: 6
+  - m_RefCount: 5
     m_Data: {fileID: 11400000, guid: bcd5c9c2415a9104a849cb42bdbb4fc0, type: 2}
   - m_RefCount: 8
     m_Data: {fileID: 11400000, guid: 5b752973dc1c0dc42a34828d1f33c6fd, type: 2}
-  - m_RefCount: 1
+  - m_RefCount: 2
     m_Data: {fileID: 11400000, guid: 0ffdd217d1f2ce148930be60c260f209, type: 2}
   - m_RefCount: 224
     m_Data: {fileID: 11400000, guid: 1e5c5e2f4f737204cba5abe97733c0d3, type: 2}
@@ -12902,4 +12822,3 @@ SceneRoots:
   - {fileID: 2097970934}
   - {fileID: 2090642776}
   - {fileID: 2086882542}
-  - {fileID: 1171524071}

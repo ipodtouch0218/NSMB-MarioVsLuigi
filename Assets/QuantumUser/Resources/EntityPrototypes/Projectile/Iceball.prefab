@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -2054149978793598197}
   - component: {fileID: 5152219214808162071}
   - component: {fileID: 4699996320109001571}
+  - component: {fileID: 4325935567163801675}
   m_Layer: 9
   m_Name: Iceball
   m_TagString: Untagged
@@ -252,6 +253,8 @@ MonoBehaviour:
       Value: 0
     IsWaterSolid:
       Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &3977285621181604314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,8 +315,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0
@@ -321,6 +322,21 @@ MonoBehaviour:
         RawValue: 9830
     BroadRadius:
       RawValue: 65536
+--- !u!114 &4325935567163801675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6307920351473437675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee3e15f5c22e22746860121bd7f7db13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sRenderer: {fileID: 6983710913193508245}
+  sameTeamColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
+  differentTeamColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &6313951447176480054
 GameObject:
   m_ObjectHideFlags: 0

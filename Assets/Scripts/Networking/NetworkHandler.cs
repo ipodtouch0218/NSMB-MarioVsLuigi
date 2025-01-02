@@ -226,11 +226,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         if (!Settings.Instance.GeneralReplaysEnabled) {
             // Disabled replays mid-game
-            game.RecordInputStream.Dispose();
-            game.RecordInputStream = null;
-            playernames = null;
-            playerteams = null;
-            playerrefs = null;
+            DisposeReplay();
             return;
         }
 
@@ -292,10 +288,19 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         outputStream.Dispose();
 
         // Complete
-        game.RecordInputStream.Dispose();
-        game.RecordInputStream = null;
         Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
+        DisposeReplay();
 #endif
+    }
+
+    private void DisposeReplay() {
+        if (Game != null && Game.RecordInputStream != null) {
+            Game.RecordInputStream.Dispose();
+            Game.RecordInputStream = null;
+        }
+        playernames = null;
+        playerteams = null;
+        playerrefs = null;
     }
 
     private unsafe void UpdateRealtimeProperties() {
@@ -437,9 +442,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     string[] playernames;
     byte[] playerteams;
     PlayerRef[] playerrefs;
-    private unsafe void OnRecordingStarted(EventRecordingStarted e) {
-        QuantumGame game = e.Game;
-        Frame f = e.Frame;
+    private void OnRecordingStarted(EventRecordingStarted e) {
+        RecordReplay(e.Game, e.Frame);
+    }
+
+    public unsafe void RecordReplay(QuantumGame game, Frame f) {
+        if (!Settings.Instance.GeneralReplaysEnabled) {
+            return;
+        }
 
         game.StartRecordingInput(f.Number);
         initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
@@ -509,12 +519,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {
-        if (e.Game.Frames.Verified.Global->GameState == GameState.Playing) {
-            Frame startFrame = e.Game.Frames.Verified;
-
-            e.Game.StartRecordingInput(startFrame.Number);
-            initialFrameData = startFrame.Serialize(DeterministicFrameSerializeMode.Serialize);
-            initialFrame = startFrame.Number;
+        Frame f = e.Game.Frames.Verified;
+        if (f.Global->GameState == GameState.Playing) {
+            RecordReplay(e.Game, f);
         }
     }
 
@@ -529,9 +536,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             int index = (f.Number - ReplayStart) / (5 * f.UpdateRate);
             if (replayFrameCache.Count <= index) {
                 byte[] serializedFrame = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+                /*
                 byte[] copy = new byte[serializedFrame.Length];
                 Array.Copy(serializedFrame, copy, serializedFrame.Length);
                 replayFrameCache.Add(copy);
+                */
+                replayFrameCache.Add(serializedFrame);
             }
         }
     }
@@ -574,18 +584,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         Frame f = Game.Frames.Predicted;
         if (enable) {
             if (f.Global->GameState >= GameState.Starting && f.Global->GameState < GameState.Ended) {
-                OnRecordingStarted(new EventRecordingStarted {
-                    Game = Game,
-                    Frame = f,
-                    Tick = f.Number,
-                });
+                RecordReplay(Game, f);
             }    
         } else {
             // Disable
-            if (Game.RecordInputStream != null) {
-                Game.RecordInputStream.Dispose();
-                Game.RecordInputStream = null;
-            }
+            DisposeReplay();
         }
     }
 }
