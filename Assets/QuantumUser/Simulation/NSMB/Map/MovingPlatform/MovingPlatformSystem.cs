@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -12,7 +13,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.EntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
+            f.Context.ExcludeEntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -62,24 +63,29 @@ namespace Quantum {
             if (yMovement.Y == 0) {
                 return;
             }
-            yMovement.Y += PhysicsObjectSystem.RaycastSkin * (yMovement.Y > 0 ? 1 : -1);
+            //yMovement.Y += PhysicsObjectSystem.RaycastSkin * (yMovement.Y > 0 ? 1 : -1);
 
             FPVector2 position = transform->Position;
             if (shape.Type == Shape2DType.Box) {
+                /*
                 FPVector2 yExtents = shape.Box.Extents;
                 yExtents.Y -= PhysicsObjectSystem.RaycastSkin;
                 shape.Box.Extents = yExtents;
+                */
             } else if (shape.Type == Shape2DType.Edge) {
+                /*
                 position.Y -= PhysicsObjectSystem.RaycastSkin * (yMovement.Y > 0 ? 1 : -1);
+                */
             } else {
                 return;
             }
 
             for (int i = 0; i < vertical.Count; i++) {
                 var hit = vertical[i];
-                if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
+                EntityRef entity = hit.Entity;
+                if (!f.Unsafe.TryGetPointer(entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
-                    || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
+                    || !f.Unsafe.TryGetPointer(entity, out Transform2D* hitTransform)) {
                     continue;
                 }
 
@@ -105,13 +111,16 @@ namespace Quantum {
                 }
                 */
 
-                FP movement = yMovement.Y * (1 - hit.CastDistanceNormalized);
-                if (movement > 0) {
-                    movement += PhysicsObjectSystem.Skin;
-                } else {
-                    movement -= PhysicsObjectSystem.Skin;
+                FP direction = FPMath.Sign(yMovement.Y);
+                FP moveDistance = ((FPMath.Abs(yMovement.Y) + (PhysicsObjectSystem.RaycastSkin * 2)) * (1 - hit.CastDistanceNormalized)) - PhysicsObjectSystem.RaycastSkin;
+                if (hit.CastDistanceNormalized <= 0 || moveDistance < 0 || moveDistance > yMovement.Y + PhysicsObjectSystem.RaycastSkin) {
+                    // Out of range.
+                    continue;
                 }
-                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, new FPVector2(0, movement * f.UpdateRate), hit.Entity, stage);
+
+                moveDistance += PhysicsObjectSystem.Skin;
+                moveDistance *= direction;
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, new FPVector2(0, moveDistance * f.UpdateRate), hit.Entity, stage);
 
                 /*
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
@@ -158,26 +167,30 @@ namespace Quantum {
             if (xMovement.X == 0) {
                 return;
             }
-
-            xMovement.X += PhysicsObjectSystem.RaycastSkin * (xMovement.X > 0 ? 1 : -1);
+            //xMovement.X += PhysicsObjectSystem.RaycastSkin * (xMovement.X > 0 ? 1 : -1);
 
             FPVector2 position = transform->Position;
             if (shape.Type == Shape2DType.Box) {
+                /*
                 FPVector2 xExtents = shape.Box.Extents;
                 xExtents.X -= PhysicsObjectSystem.RaycastSkin;
                 shape.Box.Extents = xExtents;
+                */
             } else if (shape.Type == Shape2DType.Edge) {
+                /*
                 position.Y -= PhysicsObjectSystem.RaycastSkin * (xMovement.X > 0 ? 1 : -1);
+                */
             } else {
                 return;
             }
 
             for (int i = 0; i < horizontal.Count; i++) {
                 var hit = horizontal[i];
-                if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* hitPhysicsObject)
+                EntityRef entity = hit.Entity;
+                if (!f.Unsafe.TryGetPointer(entity, out PhysicsObject* hitPhysicsObject)
                     || hitPhysicsObject->DisableCollision
                     //|| ((FPMath.Sign(hitPhysicsObject->Velocity.X) == FPMath.Sign(xMovement.X)) && (FPMath.Abs(hitPhysicsObject->Velocity.X) > FPMath.Abs(xMovement.X)))
-                    || !f.Unsafe.TryGetPointer(hit.Entity, out Transform2D* hitTransform)) {
+                    || !f.Unsafe.TryGetPointer(entity, out Transform2D* hitTransform)) {
                     continue;
                 }
 
@@ -198,13 +211,17 @@ namespace Quantum {
                 }
                 */
 
-                FP movement = xMovement.X * (1 - hit.CastDistanceNormalized);
-                if (movement > 0) {
-                    movement += PhysicsObjectSystem.Skin;
-                } else {
-                    movement -= PhysicsObjectSystem.Skin;
+
+                FP direction = FPMath.Sign(xMovement.X);
+                FP moveDistance = ((FPMath.Abs(xMovement.X) + (PhysicsObjectSystem.RaycastSkin * 2)) * (1 - hit.CastDistanceNormalized)) - PhysicsObjectSystem.RaycastSkin;
+                if (hit.CastDistanceNormalized <= 0 || moveDistance < 0 || moveDistance > xMovement.X + PhysicsObjectSystem.RaycastSkin) {
+                    // Out of range.
+                    continue;
                 }
-                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(movement * f.UpdateRate, 0), hit.Entity, stage);
+
+                moveDistance += PhysicsObjectSystem.Skin;
+                moveDistance *= direction;
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(moveDistance * f.UpdateRate, 0), entity, stage);
                 hitPhysicsObject->Velocity.X = 0;
 
                 /*

@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformPhysicsQuerySystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -36,25 +35,23 @@ namespace Quantum {
 
         private void QueueVertical(Frame f, FPVector2 position, in Shape2D shape, MovingPlatform* platform, QList<PhysicsQueryRef> queryList) {
             FPVector2 yMovement = new(0, platform->Velocity.Y * f.DeltaTime);
-            /*
-            if (yMovement.Y == 0) {
-                return;
-            }
-            */
+            FPVector2 directionVector = yMovement.Y > 0 ? FPVector2.Up : FPVector2.Down;
+            position -= directionVector * PhysicsObjectSystem.RaycastSkin;
+            yMovement += directionVector * PhysicsObjectSystem.RaycastSkin * 2;
 
-            PhysicsQueryRef q = f.Physics2D.AddShapeCastQuery(position, 0, shape, yMovement, false, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+            PhysicsQueryRef q = f.Physics2D.AddShapeCastQuery(position, 0, shape, yMovement, false, ~f.Context.ExcludeEntityAndPlayerMask, 
+                QueryOptions.DetectOverlapsAtCastOrigin | QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
             queryList.Add(q);
         }
 
         private void QueueHorizontal(Frame f, FPVector2 position, in Shape2D shape, MovingPlatform* platform, QList<PhysicsQueryRef> queryList) {
             FPVector2 xMovement = new(platform->Velocity.X * f.DeltaTime, 0);
-            /*
-            if (xMovement.X == 0) {
-                return;
-            }
-            */
+            FPVector2 directionVector = xMovement.X > 0 ? FPVector2.Right : FPVector2.Left;
+            position -= directionVector * PhysicsObjectSystem.RaycastSkin;
+            xMovement += directionVector * PhysicsObjectSystem.RaycastSkin * 2;
 
-            PhysicsQueryRef q = f.Physics2D.AddShapeCastQuery(position, 0, shape, xMovement, false, f.Context.EntityAndPlayerMask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+            PhysicsQueryRef q = f.Physics2D.AddShapeCastQuery(position, 0, shape, xMovement, false, ~f.Context.ExcludeEntityAndPlayerMask, 
+                QueryOptions.DetectOverlapsAtCastOrigin | QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
             queryList.Add(q);
         }
     }

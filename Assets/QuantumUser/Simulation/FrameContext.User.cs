@@ -6,7 +6,7 @@ namespace Quantum {
     public partial class FrameContextUser {
 
         //---Physics
-        public LayerMask EntityAndPlayerMask, PlayerOnlyMask;
+        public LayerMask ExcludeEntityAndPlayerMask, PlayerOnlyMask;
         public Shape2D CircleRadiusTwo;
 
         public delegate void PreContactCallback(FrameThreadSafe f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContacts);

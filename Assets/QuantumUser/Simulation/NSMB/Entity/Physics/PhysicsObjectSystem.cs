@@ -22,7 +22,7 @@ namespace Quantum {
         }
 
         protected override void OnInitUser(Frame f) {
-            f.Context.EntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
+            f.Context.ExcludeEntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
             f.Context.TaskContext.RegisterDelegate(SendEventsTask, $"{GetType().Name}.SendEvents", ref sendEventTaskHandle);
         }
 
@@ -184,7 +184,7 @@ namespace Quantum {
 
         public static FPVector2 MoveVertically(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = default) {
             var physicsObject = f.GetPointer<PhysicsObject>(entity);
-            var mask = ((Frame) f).Context.EntityAndPlayerMask;
+            var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
 
             FP velocityY = velocity.Y * f.DeltaTime;
             if (velocityY == 0) {
@@ -299,15 +299,18 @@ namespace Quantum {
                             }
                         }
 
-                        potentialContacts[potentialContactCount++] = new PhysicsContact {
-                            Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.Y) - (RaycastSkin + Skin),
-                            Normal = hit.Normal,
-                            Position = hit.Point,
-                            Frame = f.Number,
-                            TileX = -1,
-                            TileY = -1,
-                            Entity = hit.Entity,
-                        };
+                        FP distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.Y) - (RaycastSkin + (2 * Skin));
+                        if (distance > -(RaycastSkin + Skin)) {
+                            potentialContacts[potentialContactCount++] = new PhysicsContact {
+                                Distance = distance,
+                                Normal = hit.Normal,
+                                Position = hit.Point,
+                                Frame = f.Number,
+                                TileX = -1,
+                                TileY = -1,
+                                Entity = hit.Entity,
+                            };
+                        }
                     }
 
                     if (potentialContactCount == 0) {
@@ -336,7 +339,7 @@ namespace Quantum {
 
                         if (earlyContinue
                             || (min.HasValue && min.Value > 0 && contact.Distance - min.Value > tolerance)
-                            || contact.Distance > (FPMath.Abs(velocityY) + RaycastSkin)
+                            || contact.Distance > FPMath.Abs(velocityY)
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
@@ -386,7 +389,7 @@ namespace Quantum {
 
         public static FPVector2 MoveHorizontally(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = null) {
             var physicsObject = f.GetPointer<PhysicsObject>(entity);
-            var mask = ((Frame) f).Context.EntityAndPlayerMask;
+            var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
 
             FP velocityX = velocity.X * f.DeltaTime;
             if (velocityX == 0) {
@@ -501,15 +504,18 @@ namespace Quantum {
                             }
                         }
 
-                        potentialContacts[potentialContactCount++] = new PhysicsContact {
-                            Distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.X) - (RaycastSkin + Skin),
-                            Normal = hit.Normal,
-                            Position = hit.Point,
-                            Frame = f.Number,
-                            TileX = -1,
-                            TileY = -1,
-                            Entity = hit.Entity,
-                        };
+                        FP distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.X) - (RaycastSkin + (2 * Skin));
+                        if (distance > -(RaycastSkin + Skin)) {
+                            potentialContacts[potentialContactCount++] = new PhysicsContact {
+                                Distance = distance,
+                                Normal = hit.Normal,
+                                Position = hit.Point,
+                                Frame = f.Number,
+                                TileX = -1,
+                                TileY = -1,
+                                Entity = hit.Entity,
+                            };
+                        }
                     }
 
                     if (potentialContactCount == 0) {
@@ -538,7 +544,7 @@ namespace Quantum {
                         
                         if (earlyContinue
                             || (min.HasValue && min.Value > 0 && contact.Distance - min.Value > tolerance)
-                            || contact.Distance > (FPMath.Abs(velocityX) + RaycastSkin)
+                            || contact.Distance > FPMath.Abs(velocityX)
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
@@ -689,7 +695,7 @@ namespace Quantum {
             }
 
             finish:
-            var nullableHit = f.Physics2D.Raycast(worldPos, direction, maxDistance, ((Frame) f).Context.EntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+            var nullableHit = f.Physics2D.Raycast(worldPos, direction, maxDistance, ((Frame) f).Context.ExcludeEntityAndPlayerMask, QueryOptions.HitAll & ~QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
             if (nullableHit.HasValue) {
                 var hit = nullableHit.Value;
                 FP hitDistance = hit.CastDistanceNormalized * maxDistance;
@@ -854,7 +860,7 @@ namespace Quantum {
         public static bool BoxInGround(FrameThreadSafe f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default, bool includeCeilingCrushers = true) {
             using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.BoxInGround");
             // In a solid hitbox
-            var hits = f.Physics2D.OverlapShape(position, 0, shape, ((Frame) f).Context.EntityAndPlayerMask, ~QueryOptions.HitTriggers);
+            var hits = f.Physics2D.OverlapShape(position, 0, shape, ((Frame) f).Context.ExcludeEntityAndPlayerMask, ~QueryOptions.HitTriggers);
             f.TryGetPointer(entity, out MarioPlayer* mario);
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits.HitsBuffer[i];
