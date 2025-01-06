@@ -8,6 +8,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Scripting;
 
 namespace NSMB.UI.MainMenu.Submenus {
     public class InRoomSubmenu : MainMenuSubmenu {
@@ -56,7 +57,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private AudioSource sfx, musicSource;
         [SerializeField] private List<InRoomSubmenuPanel> allPanels;
         [SerializeField] private TMP_Text startGameButtonText;
-        [SerializeField] private Clickable startGameButton;
+        [SerializeField] private UnityEngine.UI.Button startGameButton;
 
         //---Private Variables
         private InRoomSubmenuPanel selectedPanel;
@@ -116,6 +117,14 @@ namespace NSMB.UI.MainMenu.Submenus {
             return success;
         }
 
+        [Preserve]
+        public void OpenOptions() {
+            if (GlobalController.Instance.optionsManager.OpenMenu()) {
+                Canvas.PlaySound(SoundEffect.UI_WindowOpen);
+            }
+        }
+
+        [Preserve]
         public void SelectPanel(InRoomSubmenuPanel panel) {
             SelectPanel(panel, true);
         }
@@ -154,7 +163,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
             if (seconds <= 0) {
                 // Cancelled
-                startGameButton.Interactable = !isHost || QuantumUtils.IsGameStartable(f);
+                startGameButton.interactable = !isHost || QuantumUtils.IsGameStartable(f);
                 if (isHost) {
                     startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
                 } else {
@@ -177,7 +186,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 }
             } else {
                 // Starting
-                startGameButton.Interactable = isHost;
+                startGameButton.interactable = isHost;
                 startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", seconds.ToString());
 
                 if (seconds == 1) {
@@ -196,6 +205,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         //---Buttons
+        [Preserve]
         public unsafe void OnStartGameButtonClicked() {
             QuantumGame game = NetworkHandler.Runner.Game;
             Frame f = game.Frames.Predicted;
@@ -308,9 +318,9 @@ namespace NSMB.UI.MainMenu.Submenus {
             bool isHost = e.Game.PlayerIsLocal(QuantumUtils.GetHostPlayer(e.Frame, out _));
 
             if (isHost) {
-                startGameButton.Interactable = QuantumUtils.IsGameStartable(e.Frame);
+                startGameButton.interactable = QuantumUtils.IsGameStartable(e.Frame);
             } else {
-                startGameButton.Interactable = e.Frame.Global->GameStartFrames == 0;
+                startGameButton.interactable = e.Frame.Global->GameStartFrames == 0;
             }
         }
 

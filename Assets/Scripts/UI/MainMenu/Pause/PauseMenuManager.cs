@@ -233,8 +233,9 @@ namespace NSMB.UI.Pause {
         }
 
         public void OpenSettings() {
-            GlobalController.Instance.optionsManager.OpenMenu();
-            GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+            if (GlobalController.Instance.optionsManager.OpenMenu()) {
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+            }
         }
         
         public void OpenConfirmationMenu(bool quit) {

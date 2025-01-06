@@ -327,14 +327,14 @@ MonoBehaviour:
   ManualDisposal: 0
   ViewFlags: 0
   InterpolationMode: 0
-  ErrorCorrectionRateMin: 3.3
-  ErrorCorrectionRateMax: 10
-  ErrorPositionBlendStart: 0.25
-  ErrorPositionBlendEnd: 1
+  ErrorCorrectionRateMin: 10
+  ErrorCorrectionRateMax: 30
+  ErrorPositionBlendStart: 0.2
+  ErrorPositionBlendEnd: 0.7
   ErrorRotationBlendStart: 0.1
   ErrorRotationBlendEnd: 0.5
   ErrorPositionMinCorrection: 0.025
-  ErrorPositionTeleportDistance: 2
+  ErrorPositionTeleportDistance: 1
   ErrorRotationTeleportDistance: 0.5
   OnEntityInstantiated:
     m_PersistentCalls:
@@ -354,7 +354,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daf6a7acd9a12d949825b7c47ca4d970, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 3919163699763193810}
   sRenderer: {fileID: 7821411591339125535}
   deadSprite: {fileID: -728934508601558331, guid: b455056ca00f84e48a8040f94ae8170d,
     type: 3}
@@ -485,7 +484,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 7523289063499453456}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!114 &6594219812404515847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -512,6 +510,10 @@ MonoBehaviour:
       Value: 0
     SlowInLiquids:
       Value: 1
+    IsWaterSolid:
+      Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &6536869809639107625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -622,8 +624,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

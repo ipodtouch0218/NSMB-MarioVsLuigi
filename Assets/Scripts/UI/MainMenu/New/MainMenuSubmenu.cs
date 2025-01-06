@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 namespace NSMB.UI.MainMenu {
     public class MainMenuSubmenu : MonoBehaviour {

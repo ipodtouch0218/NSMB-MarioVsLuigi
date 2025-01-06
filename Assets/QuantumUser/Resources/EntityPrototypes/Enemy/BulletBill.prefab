@@ -5199,14 +5199,14 @@ MonoBehaviour:
   ManualDisposal: 0
   ViewFlags: 0
   InterpolationMode: 0
-  ErrorCorrectionRateMin: 3.3
-  ErrorCorrectionRateMax: 10
-  ErrorPositionBlendStart: 0.25
-  ErrorPositionBlendEnd: 1
+  ErrorCorrectionRateMin: 10
+  ErrorCorrectionRateMax: 30
+  ErrorPositionBlendStart: 0.2
+  ErrorPositionBlendEnd: 0.7
   ErrorRotationBlendStart: 0.1
   ErrorRotationBlendEnd: 0.5
   ErrorPositionMinCorrection: 0.025
-  ErrorPositionTeleportDistance: 2
+  ErrorPositionTeleportDistance: 1
   ErrorRotationTeleportDistance: 0.5
   OnEntityInstantiated:
     m_PersistentCalls:
@@ -5238,7 +5238,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7d8e5a78e377e4a84b91340258cb1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 6716509788317583719}
   sRenderer: {fileID: 4540435544182297773}
   trailParticles: {fileID: 1566471443926189886}
   sfx: {fileID: 5407584048357268515}
@@ -5263,7 +5262,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 2627485830306083583}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!82 &5407584048357268515
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5402,6 +5400,12 @@ MonoBehaviour:
       Value: 0
     DisableCollision:
       Value: 1
+    SlowInLiquids:
+      Value: 0
+    IsWaterSolid:
+      Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &808433351997747540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5497,8 +5501,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

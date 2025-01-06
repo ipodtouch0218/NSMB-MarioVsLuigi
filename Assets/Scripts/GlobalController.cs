@@ -8,7 +8,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
 
 public class GlobalController : Singleton<GlobalController> {

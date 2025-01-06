@@ -232,14 +232,13 @@ public static unsafe class QuantumUtils {
     public static int GetValidTeams(Frame f) {
         int result = 0;
 
-        var allPlayers = f.Filter<MarioPlayer>();
-        allPlayers.UseCulling = false;
-        while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
-            if (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled) {
+        var allPlayers = f.Filter<PlayerData>();
+        while (allPlayers.NextUnsafe(out _, out PlayerData* data)) {
+            if (data->IsSpectator) {
                 continue;
             }
 
-            byte team = mario->GetTeam(f);
+            byte team = data->RealTeam;
             result |= (1 << team);
         }
 

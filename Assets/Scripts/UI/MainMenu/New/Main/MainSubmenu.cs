@@ -8,17 +8,11 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private GameObject exitingBlocker;
 
         //---Private Variables
-        private bool wasOptionsOpen;
         private Coroutine quitCoroutine;
 
-        public void Update() {
-            wasOptionsOpen = GlobalController.Instance.optionsManager.IsActive();
-        }
-
         public void OpenOptions() {
-            if (!wasOptionsOpen) {
-                GlobalController.Instance.optionsManager.OpenMenu();
-                Canvas.PlayConfirmSound();
+            if (GlobalController.Instance.optionsManager.OpenMenu()) {
+                Canvas.PlaySound(SoundEffect.UI_WindowOpen);
             }
         }
 

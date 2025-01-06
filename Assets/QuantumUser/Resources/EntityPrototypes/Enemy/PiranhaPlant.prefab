@@ -126,7 +126,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 435428292489101360}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!82 &7558042822839980312
 AudioSource:
   m_ObjectHideFlags: 0
@@ -448,14 +447,14 @@ MonoBehaviour:
   ManualDisposal: 0
   ViewFlags: 0
   InterpolationMode: 0
-  ErrorCorrectionRateMin: 3.3
-  ErrorCorrectionRateMax: 10
-  ErrorPositionBlendStart: 0.25
-  ErrorPositionBlendEnd: 1
+  ErrorCorrectionRateMin: 10
+  ErrorCorrectionRateMax: 30
+  ErrorPositionBlendStart: 0.2
+  ErrorPositionBlendEnd: 0.7
   ErrorRotationBlendStart: 0.1
   ErrorRotationBlendEnd: 0.5
   ErrorPositionMinCorrection: 0.025
-  ErrorPositionTeleportDistance: 2
+  ErrorPositionTeleportDistance: 1
   ErrorRotationTeleportDistance: 0.5
   OnEntityInstantiated:
     m_PersistentCalls:
@@ -497,8 +496,8 @@ MonoBehaviour:
         RawValue: 0
     IgnorePlayerWhenRespawning:
       Value: 1
-    IsRespawnable:
-      Value: 1
+    DisableRespawning:
+      Value: 0
 --- !u!114 &3502500067357238800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -523,6 +522,12 @@ MonoBehaviour:
       Value: 1
     DisableCollision:
       Value: 0
+    SlowInLiquids:
+      Value: 0
+    IsWaterSolid:
+      Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &1515450150619802232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -535,7 +540,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4709ceb6ecd1f74a8e5aa527181775c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 228394594773550846}
   sfx: {fileID: 7558042822839980312}
   sRenderer: {fileID: 5652721323520962159}
   animator: {fileID: 863355600414429673}
@@ -598,8 +602,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

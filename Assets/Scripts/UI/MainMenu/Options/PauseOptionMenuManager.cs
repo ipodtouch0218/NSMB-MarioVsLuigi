@@ -28,6 +28,7 @@ namespace NSMB.UI.Pause.Options {
         private bool inputted;
         private GameObject previouslySelected;
         private float upHoldStart, downHoldStart;
+        private double closeTime;
 
         //---Propreties
         public bool EnableInput { get; set; }
@@ -302,7 +303,11 @@ namespace NSMB.UI.Pause.Options {
             inputted = true;
         }
 
-        public void OpenMenu() {
+        public bool OpenMenu() {
+            if (closeTime == Time.timeAsDouble) {
+                return false;
+            }
+
             gameObject.SetActive(true);
 
             foreach (PauseOptionTab tab in tabs) {
@@ -322,6 +327,7 @@ namespace NSMB.UI.Pause.Options {
                     game.SendCommand(slot, new CommandSetInSettings { InSettings = true });
                 }
             }
+            return true;
         }
 
         public void CloseMenu() {
@@ -343,6 +349,7 @@ namespace NSMB.UI.Pause.Options {
                     game.SendCommand(slot, new CommandSetInSettings { InSettings = false });
                 }
             }
+            closeTime = Time.unscaledTimeAsDouble;
         }
 
         public void SetCurrentOption(int index, bool center = false) {
