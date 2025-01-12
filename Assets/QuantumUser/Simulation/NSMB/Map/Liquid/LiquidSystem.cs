@@ -75,7 +75,7 @@ namespace Quantum {
             if (splashed.Remove(info.Entity)) {
                 // Exit splash
                 // "checkHeight - surface < 1" prevents teleportation splashes
-                bool doSplash = !isEntityUnderwater && checkHeight - surface < 1;
+                bool doSplash = !isEntityUnderwater && (f.Number - entityTransform->PositionTeleportFrame) > 3;
                 f.Signals.OnTryLiquidSplash(info.Entity, info.Other, true, &doSplash);
                 
                 if (doSplash) {

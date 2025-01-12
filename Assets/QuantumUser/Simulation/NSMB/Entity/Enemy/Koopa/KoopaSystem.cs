@@ -6,7 +6,8 @@ using static IInteractableTile;
 namespace Quantum {
 
     public unsafe class KoopaSystem : SystemMainThreadFilterStage<KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
-        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEnemyTurnaround, ISignalOnEntityCrushed {
+        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEnemyTurnaround, ISignalOnEntityCrushed,
+        ISignalOnMarioPlayerBecameInvincible {
        
         public struct Filter {
             public EntityRef Entity;
@@ -533,6 +534,13 @@ namespace Quantum {
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Koopa* koopa)) {
                 koopa->Kill(f, entity, EntityRef.None, true);
+            }
+        }
+
+        public void OnMarioPlayerBecameInvincible(Frame f, EntityRef entity) {
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Koopa* koopa)) {
+                koopa->Kill(f, mario->HeldEntity, entity, true);
             }
         }
         #endregion

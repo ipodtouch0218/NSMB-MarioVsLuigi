@@ -2622,6 +2622,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnMarioPlayerDied : ISignal {
     void OnMarioPlayerDied(Frame f, EntityRef entity);
   }
+  public unsafe partial interface ISignalOnMarioPlayerBecameInvincible : ISignal {
+    void OnMarioPlayerBecameInvincible(Frame f, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
     void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
@@ -2891,6 +2894,7 @@ namespace Quantum {
     private ISignalOnTryLiquidSplash[] _ISignalOnTryLiquidSplashSystems;
     private ISignalOnEntityEnterExitLiquid[] _ISignalOnEntityEnterExitLiquidSystems;
     private ISignalOnMarioPlayerDied[] _ISignalOnMarioPlayerDiedSystems;
+    private ISignalOnMarioPlayerBecameInvincible[] _ISignalOnMarioPlayerBecameInvincibleSystems;
     private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnEntityCrushed[] _ISignalOnEntityCrushedSystems;
     private ISignalOnStageReset[] _ISignalOnStageResetSystems;
@@ -2927,6 +2931,7 @@ namespace Quantum {
       _ISignalOnTryLiquidSplashSystems = BuildSignalsArray<ISignalOnTryLiquidSplash>();
       _ISignalOnEntityEnterExitLiquidSystems = BuildSignalsArray<ISignalOnEntityEnterExitLiquid>();
       _ISignalOnMarioPlayerDiedSystems = BuildSignalsArray<ISignalOnMarioPlayerDied>();
+      _ISignalOnMarioPlayerBecameInvincibleSystems = BuildSignalsArray<ISignalOnMarioPlayerBecameInvincible>();
       _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnEntityCrushedSystems = BuildSignalsArray<ISignalOnEntityCrushed>();
       _ISignalOnStageResetSystems = BuildSignalsArray<ISignalOnStageReset>();
@@ -3247,6 +3252,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnMarioPlayerDied(_f, entity);
+          }
+        }
+      }
+      public void OnMarioPlayerBecameInvincible(EntityRef entity) {
+        var array = _f._ISignalOnMarioPlayerBecameInvincibleSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerBecameInvincible(_f, entity);
           }
         }
       }

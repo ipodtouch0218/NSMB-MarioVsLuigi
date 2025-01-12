@@ -140,9 +140,8 @@ component MarioPlayer {
 	[ExcludeFromPrototype] entity_ref CurrentSpinner;
 }
 
-
 signal OnMarioPlayerDied(EntityRef entity);
-
+signal OnMarioPlayerBecameInvincible(EntityRef entity);
 
 event MarioPlayerJumped {
 	nothashed Frame Frame;

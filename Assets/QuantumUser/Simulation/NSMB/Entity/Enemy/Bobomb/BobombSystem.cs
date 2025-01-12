@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Quantum {
 
     public unsafe class BobombSystem : SystemMainThreadFilter<BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
-        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed {
+        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnMarioPlayerBecameInvincible {
         
         public struct Filter {
             public EntityRef Entity;
@@ -323,6 +323,13 @@ namespace Quantum {
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
                 bobomb->Kill(f, entity, EntityRef.None, true);
+            }
+        }
+
+        public void OnMarioPlayerBecameInvincible(Frame f, EntityRef entity) {
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Bobomb* bobomb)) {
+                bobomb->Kill(f, mario->HeldEntity, entity, true);
             }
         }
         #endregion

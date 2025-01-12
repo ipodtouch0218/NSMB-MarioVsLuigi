@@ -178,6 +178,7 @@ namespace Quantum {
 
             if (newPowerup.Type == PowerupType.Starman) {
                 mario->InvincibilityFrames = 600;
+                f.Signals.OnMarioPlayerBecameInvincible(marioEntity);
                 return PowerupReserveResult.NoneButPlaySound;
             }
 
