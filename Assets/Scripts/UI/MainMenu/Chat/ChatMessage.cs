@@ -6,6 +6,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static ChatManager;
 
 public class ChatMessage : MonoBehaviour {
 
@@ -23,11 +24,6 @@ public class ChatMessage : MonoBehaviour {
 
     public void OnDestroy() {
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
-    }
-
-    private void OnLanguageChanged(TranslationManager tm) {
-        chatText.text = tm.GetTranslationWithReplacements(data.message, data.replacements);
-        chatText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
     }
 
     public void Initialize(ChatMessageData data) {
@@ -58,12 +54,8 @@ public class ChatMessage : MonoBehaviour {
         image.color = Utils.GetPlayerColor(QuantumRunner.DefaultGame.Frames.Predicted, data.player, 0.2f);
     }
 
-    public class ChatMessageData {
-        public PlayerRef player;
-        public string userId;
-        public Color color;
-        public bool isSystemMessage;
-        public string message;
-        public string[] replacements;
+    private void OnLanguageChanged(TranslationManager tm) {
+        chatText.text = tm.GetTranslationWithReplacements(data.message, data.replacements);
+        chatText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
     }
 }

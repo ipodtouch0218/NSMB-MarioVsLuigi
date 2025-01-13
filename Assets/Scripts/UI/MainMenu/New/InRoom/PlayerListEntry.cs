@@ -344,8 +344,8 @@ namespace NSMB.UI.MainMenu {
             }
         }
 
-        private void OnChatMessage(ChatMessage.ChatMessageData message) {
-            if (player == message.player) {
+        private void OnChatMessage(ChatManager.ChatMessageData data) {
+            if (player == data.player) {
                 typingCounter = 0;
             }
         }

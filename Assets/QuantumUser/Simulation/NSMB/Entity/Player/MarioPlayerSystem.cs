@@ -478,7 +478,9 @@ namespace Quantum {
 
             // Slow-rise check
             bool swimming = physicsObject->IsUnderwater;
-            if (!swimming && (mario->IsSpinnerFlying || mario->IsPropellerFlying)) {
+            if (swimming && f.Exists(mario->HeldEntity)) {
+                gravity = 0;
+            } else if (!swimming && (mario->IsSpinnerFlying || mario->IsPropellerFlying)) {
                 gravity = mario->IsDrilling ? physics.GravityAcceleration[^1] : physics.GravityFlyingAcceleration;
             } else if ((mario->IsGroundpounding && !swimming) || physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0) {
                 gravity = mario->GroundpoundStartFrames > 0 ? physics.GravityGroundpoundStart : physics.GravityAcceleration[^1];
@@ -1320,18 +1322,18 @@ namespace Quantum {
                 return;
             }
 
-            bool holdingSmall = false;
+            bool holdingSmallObject = false;
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
                 if (holdable->HoldAboveHead) {
                     // Drop without throw
                     mario->HeldEntity = EntityRef.None;
                     holdable->Holder = EntityRef.None;
                 } else {
-                    holdingSmall = true;
+                    holdingSmallObject = true;
                 }
             }
 
-            if (holdingSmall) {
+            if (holdingSmallObject) {
                 FP maxSurface = FP.MinValue;
                 var liquids = f.ResolveHashSet(physicsObject->LiquidContacts);
                 foreach (var liquidEntity in liquids) {
@@ -1347,10 +1349,11 @@ namespace Quantum {
                 FP distanceToSurface = maxSurface - hitboxCenter;
 
                 if (distanceToSurface > 0) {
-                    physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (physics.SwimAcceleration[^1] * FPMath.Clamp01(distanceToSurface * (1 - FPMath.Clamp01(physicsObject->Velocity.Y / physics.SwimJumpVelocity)))), physics.SwimJumpVelocity);
-                    if (physicsObject->IsTouchingGround) {
-                        physicsObject->Velocity.Y += FP._0_05;
+                    FP original = physicsObject->Velocity.Y;
+                    if (physicsObject->IsTouchingGround && physicsObject->Velocity.Y < 0) {
+                        physicsObject->Velocity.Y = 1;
                     }
+                    physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (physics.SwimAcceleration[^1] * FPMath.Clamp01(distanceToSurface * (1 - FPMath.Clamp01(physicsObject->Velocity.Y / physics.SwimJumpVelocity)))), physics.SwimJumpVelocity);
                     physicsObject->IsTouchingGround = false;
                     physicsObject->WasTouchingGround = false;
                 }

@@ -12,10 +12,10 @@ public class ChatManager : MonoBehaviour {
     public static readonly Color32 Blue = new Color32(85, 85, 202, 255);
 
     public static ChatManager Instance { get; private set; }
-    public static event Action<ChatMessage.ChatMessageData> OnChatMessage;
+    public static event Action<ChatMessageData> OnChatMessage;
 
     //---Public Variables
-    public readonly List<ChatMessage.ChatMessageData> chatHistory = new();
+    public readonly List<ChatMessageData> chatHistory = new();
     public readonly HashSet<string> mutedPlayers = new();
 
     //---Serialized Variables
@@ -46,7 +46,7 @@ public class ChatManager : MonoBehaviour {
             message = message.Filter();
         }
 
-        ChatMessage.ChatMessageData data = new() {
+        ChatMessageData data = new() {
             isSystemMessage = false,
             player = player,
             userId = f.GetPlayerData(player).UserId,
@@ -58,7 +58,7 @@ public class ChatManager : MonoBehaviour {
 
     private static readonly Color SystemMessageColor = new(0x55/255f, 0x55/255f, 0x55/255f, 1);
     public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
-        ChatMessage.ChatMessageData data = new() {
+        ChatMessageData data = new() {
             isSystemMessage = true,
             color = color ?? SystemMessageColor,
             message = key,
@@ -74,7 +74,7 @@ public class ChatManager : MonoBehaviour {
     }
 
     //---Callbacks
-    private void OnChatMessageCallback(ChatMessage.ChatMessageData data) {
+    private void OnChatMessageCallback(ChatMessageData data) {
         if (NetworkHandler.IsReplay) {
             return;
         }
@@ -120,5 +120,15 @@ public class ChatManager : MonoBehaviour {
         if (e.Game.PlayerIsLocal(e.NewHost)) {
             AddSystemMessage("ui.inroom.chat.hostreminder", Red);
         }
+    }
+
+
+    public class ChatMessageData {
+        public PlayerRef player;
+        public string userId;
+        public Color color;
+        public bool isSystemMessage;
+        public string message;
+        public string[] replacements;
     }
 }

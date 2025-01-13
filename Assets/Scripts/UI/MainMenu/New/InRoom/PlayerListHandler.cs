@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using Quantum;
 using System;
 using System.Collections;
@@ -150,12 +151,12 @@ namespace NSMB.UI.MainMenu {
         //---Callbacks
         private void OnPlayerAdded(EventPlayerAdded e) {
             AddPlayerEntry(e.Frame, e.Player);
-            canvas.PlaySound(SoundEffect.UI_PlayerConnect);
+            GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_PlayerConnect);
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
             RemovePlayerEntry(e.Frame, e.Player);
-            canvas.PlaySound(SoundEffect.UI_PlayerDisconnect);
+            GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_PlayerDisconnect);
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {

@@ -26,11 +26,18 @@ namespace Quantum {
                 FPVector2 spawnpoint = transform->Position + FPVector2.Up * (collider->Shape.Box.Extents.Y * 2) + SpawnOffset;
                 var allPlayers = f.Filter<MarioPlayer, Transform2D>();
                 FP absDistance = 0;
-                FP minDistance = FP.MaxValue;
+                FP minDistance = FP.UseableMax;
                 while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
                     QuantumUtils.WrappedDistance(stage, spawnpoint, marioTransform->Position, out FP distance);
                     FP abs = FPMath.Abs(distance);
-                    if (abs >= launcher->MinimumShootRadius && abs < minDistance) {
+
+                    // Player is too close
+                    if (abs >= launcher->MinimumShootRadius) {
+                        minDistance = FP.UseableMax;
+                        break;
+                    }
+
+                    if (abs < minDistance) {
                         absDistance = abs;
                         minDistance = distance;
                     }

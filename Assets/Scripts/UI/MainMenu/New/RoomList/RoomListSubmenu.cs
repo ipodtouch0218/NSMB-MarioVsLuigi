@@ -180,6 +180,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 break;
             }
 
+            Debug.Log(reconnectBtn);
             reconnectBtn.SetActive(newState == ClientState.Disconnected);
             joinPrivateRoomBtn.SetActive(newState == ClientState.JoinedLobby);
             createRoomBtn.SetActive(newState == ClientState.JoinedLobby);
