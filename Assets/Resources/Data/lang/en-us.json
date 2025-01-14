@@ -96,6 +96,8 @@
   "ui.extras.replays.actions.import": "Import from file",
   "ui.extras.replays.information": "Replay Information",
   "ui.extras.replays.information.none": "No replay selected.",
+  "ui.extras.replays.simulating": "Simulating...",
+  "ui.extras.replays.simulating.cancel": "Press pause to cancel",
   "ui.options.tab.general": "General",
   "ui.options.tab.graphics": "Graphics",
   "ui.options.tab.audio": "Audio",

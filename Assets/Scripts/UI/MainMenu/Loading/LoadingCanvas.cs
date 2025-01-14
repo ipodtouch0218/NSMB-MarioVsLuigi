@@ -24,18 +24,23 @@ namespace NSMB.Loading {
         [SerializeField] private CharacterAsset defaultCharacterAsset;
 
         //---Private Variables
-        private Coroutine fadeCoroutine;
+        private Coroutine fadeVolumeCoroutine, endCoroutine;
+        private bool running;
 
         public void OnValidate() {
             this.SetIfNull(ref mario, UnityExtensions.GetComponentType.Children);
         }
 
         public void Awake() {
-            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged, onlyIfActiveAndEnabled: true);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted, onlyIfActiveAndEnabled: true);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged, onlyIfActiveAndEnabled: true);
         }
 
         public unsafe void Initialize(QuantumGame game) {
+            if (running) {
+                return;
+            }
+
             int characterIndex = 0;
             CharacterAsset character = defaultCharacterAsset;
             if (game != null) {
@@ -70,17 +75,18 @@ namespace NSMB.Loading {
             audioSource.volume = 0;
             audioSource.Play();
 
-            if (fadeCoroutine != null) {
-                StopCoroutine(fadeCoroutine);
+            if (fadeVolumeCoroutine != null) {
+                StopCoroutine(fadeVolumeCoroutine);
             }
 
-            fadeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
-
-            //audioListener.enabled = true;
+            fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, true));
+            running = true;
         }
 
         private void OnGameStarted(CallbackGameStarted e) {
-            EndLoading(e.Game);
+            if (!NetworkHandler.IsReplay) {
+                EndLoading(e.Game);
+            }
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
@@ -90,7 +96,9 @@ namespace NSMB.Loading {
         }
 
         public unsafe void EndLoading(QuantumGame game) {
-            StartCoroutine(EndLoadingRoutine(game));
+            if (running && endCoroutine == null) {
+                endCoroutine = StartCoroutine(EndLoadingRoutine(game));
+            }
         } 
 
         public IEnumerator EndLoadingRoutine(QuantumGame game) {
@@ -105,14 +113,16 @@ namespace NSMB.Loading {
             readyGroup.gameObject.SetActive(true);
             animator.SetTrigger(validPlayer ? "loaded" : "spectating");
 
-            if (fadeCoroutine != null) {
-                StopCoroutine(fadeCoroutine);
+            if (fadeVolumeCoroutine != null) {
+                StopCoroutine(fadeVolumeCoroutine);
             }
 
-            fadeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
+            fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             //audioListener.enabled = false;
 
             OnLoadingEnded?.Invoke(validPlayer);
+            running = false;
+            endCoroutine = null;
         }
 
         public void EndAnimation() {

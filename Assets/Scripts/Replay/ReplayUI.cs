@@ -14,8 +14,8 @@ public class ReplayUI : MonoBehaviour {
     //---Serialized Variables
     [SerializeField] private PlayerElements playerElements;
 
-    [SerializeField] private GameObject replayUI;
-    [SerializeField] private Transform trackArrow;
+    [SerializeField] private GameObject replayUI, simulatingCanvas;
+    [SerializeField] private Transform trackArrow, simulationTargetTrackArrow;
     [SerializeField] private RectMask2D trackBufferMask;
     [SerializeField] private TMP_Text trackArrowText;
     [SerializeField] private float minTrackX = -180, maxTrackX = 180;
@@ -26,6 +26,7 @@ public class ReplayUI : MonoBehaviour {
 
     //---Private Variables
     private float replaySpeed = 1;
+    private int fastForwardDestinationTick;
     private bool replayPaused;
     private bool draggingArrow;
     private StringBuilder builder = new();
@@ -47,10 +48,32 @@ public class ReplayUI : MonoBehaviour {
 
     public void OnDestroy() {
         Time.timeScale = 1;
+        NetworkHandler.IsReplayFastForwarding = false;
     }
 
     public void Update() {
-        NetworkHandler.IsReplayFastForwarding = false;
+        if (NetworkHandler.IsReplayFastForwarding) {
+            float update = Time.deltaTime;
+            Frame f = NetworkHandler.Game.Frames.Predicted;
+            float maxDelta = (fastForwardDestinationTick - f.Number) * f.DeltaTime.AsFloat;
+
+            bool done = update >= maxDelta;
+            if (done) {
+                update = maxDelta;
+            }
+
+            NetworkHandler.Runner.Session.Update(update);
+
+            if (done) {
+                NetworkHandler.IsReplayFastForwarding = false;
+                simulatingCanvas.SetActive(false);
+                fastForwardDestinationTick = 0;
+                Time.captureDeltaTime = 0;
+                Time.timeScale = replaySpeed;
+                NetworkHandler.Runner.IsSessionUpdateDisabled = false;
+                simulationTargetTrackArrow.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void OnUpdateView(CallbackUpdateView e) {
@@ -96,12 +119,12 @@ public class ReplayUI : MonoBehaviour {
             return;
         }
 
-        Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+        Frame f = NetworkHandler.Game.Frames.Predicted;
         int currentIndex = (f.Number - NetworkHandler.ReplayStart) / (5 * f.UpdateRate);
         int newIndex = Mathf.Max(currentIndex - 1, 0);
         int newFrame = (newIndex * (5 * f.UpdateRate)) + NetworkHandler.ReplayStart;
 
-        var session = QuantumRunner.Default.Session;
+        var session = NetworkHandler.Runner.Session;
 
         // It's a private method. Because of course it is.
         NetworkHandler.IsReplayFastForwarding = true;
@@ -122,23 +145,36 @@ public class ReplayUI : MonoBehaviour {
             return;
         }
 
-        Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+        Frame f = NetworkHandler.Game.Frames.Predicted;
         int currentIndex = (f.Number - NetworkHandler.ReplayStart) / (5 * f.UpdateRate);
         int newIndex = currentIndex + 1;
         int newFrame = Mathf.Min((newIndex * (5 * f.UpdateRate)) + NetworkHandler.ReplayStart, NetworkHandler.ReplayEnd);
 
-        var session = QuantumRunner.Default.Session;
+        var session = NetworkHandler.Runner.Session;
         if (newIndex < NetworkHandler.ReplayFrameCache.Count) {
             // We already have this frame
             // It's a private method. Because of course it is.
             NetworkHandler.IsReplayFastForwarding = true;
             var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
             resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
+
+            // Fix accumulated time applying
+            if (session.AccumulatedTime > 0) {
+                var simulator = session.GetType().GetField("_simulator", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(session);
+                var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
+                adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
+            }
             NetworkHandler.IsReplayFastForwarding = false;
         } else {
             // We have to simulate up to this frame
             NetworkHandler.IsReplayFastForwarding = true;
-            session.Update((newFrame - f.Number) * f.DeltaTime.AsDouble);
+            simulatingCanvas.SetActive(true);
+            fastForwardDestinationTick = newFrame;
+            NetworkHandler.Runner.IsSessionUpdateDisabled = true;
+            Time.captureDeltaTime = Time.maximumDeltaTime;
+            Time.timeScale = 3;
+            simulationTargetTrackArrow.position = trackArrow.position;
+            simulationTargetTrackArrow.gameObject.SetActive(true);
         }
     }
 
@@ -168,7 +204,7 @@ public class ReplayUI : MonoBehaviour {
     }
 
     public void StopArrowDrag() {
-        QuantumRunner runner = QuantumRunner.Default;
+        QuantumRunner runner = NetworkHandler.Runner;
         Frame f = runner.Game.Frames.Predicted;
 
         draggingArrow = false;
@@ -184,24 +220,32 @@ public class ReplayUI : MonoBehaviour {
         newFrameCacheIndex = Mathf.Clamp(newFrameCacheIndex, 0, NetworkHandler.ReplayFrameCache.Count - 1);
         int cachedFrame = (newFrameCacheIndex * (5 * f.UpdateRate)) + NetworkHandler.ReplayStart;
 
-        // It's a private method. Because of course it is.
-        var session = QuantumRunner.Default.Session;
-        NetworkHandler.IsReplayFastForwarding = true;
-        var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
-        resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, true });
-        NetworkHandler.IsReplayFastForwarding = false;
+        var session = runner.Session;
+        if (cachedFrame > f.Number || newFrame < f.Number) {
+            // It's a private method. Because of course it is.
+            NetworkHandler.IsReplayFastForwarding = true;
+            var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
+            resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, true });
+            NetworkHandler.IsReplayFastForwarding = false;
 
-        // Fix accumulated time applying
-        if (session.AccumulatedTime > 0) {
-            var simulator = session.GetType().GetField("_simulator", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(session);
-            var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
-            adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
+            // Fix accumulated time applying
+            if (session.AccumulatedTime > 0) {
+                var simulator = session.GetType().GetField("_simulator", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(session);
+                var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
+                adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
+            }
         }
 
         // Simulate up to the target frame
         if (newFrame != cachedFrame) {
             NetworkHandler.IsReplayFastForwarding = true;
-            session.Update((newFrame - cachedFrame) * f.DeltaTime.AsDouble);
+            simulatingCanvas.SetActive(true);
+            fastForwardDestinationTick = newFrame;
+            NetworkHandler.Runner.IsSessionUpdateDisabled = true;
+            Time.captureDeltaTime = Time.maximumDeltaTime;
+            Time.timeScale = 3;
+            simulationTargetTrackArrow.position = trackArrow.position;
+            simulationTargetTrackArrow.gameObject.SetActive(true);
         }
     }
 }

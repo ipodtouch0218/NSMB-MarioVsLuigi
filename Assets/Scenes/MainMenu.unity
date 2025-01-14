@@ -1773,6 +1773,7 @@ MonoBehaviour:
   - {fileID: -1928666995, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
   - {fileID: 1223106022, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
   - {fileID: -1669520036, guid: f35c24c4a8384af48a1325892d1dc60f, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 54883025}
   image: {fileID: 0}
 --- !u!111 &54883027
@@ -21187,6 +21188,7 @@ MonoBehaviour:
   - {fileID: -1953617679, guid: b74955a4d8fef234aa26fd50a4054d1d, type: 3}
   - {fileID: -1953617679, guid: b74955a4d8fef234aa26fd50a4054d1d, type: 3}
   - {fileID: -1699356974, guid: b74955a4d8fef234aa26fd50a4054d1d, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 0}
   image: {fileID: 569628151}
 --- !u!114 &569628151
@@ -40093,6 +40095,7 @@ MonoBehaviour:
   - {fileID: 249546405, guid: 897f10582e84a334a8312631ebd28a8e, type: 3}
   - {fileID: 88292509, guid: 897f10582e84a334a8312631ebd28a8e, type: 3}
   - {fileID: 1240976055, guid: 897f10582e84a334a8312631ebd28a8e, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 1214967831}
   image: {fileID: 0}
 --- !u!212 &1214967831
@@ -43969,6 +43972,7 @@ MonoBehaviour:
   - {fileID: -1623889475, guid: bc84ac99b7339e644a9a148d5a22d9b3, type: 3}
   - {fileID: -735336298, guid: bc84ac99b7339e644a9a148d5a22d9b3, type: 3}
   - {fileID: 134405086, guid: bc84ac99b7339e644a9a148d5a22d9b3, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 1394325187}
   image: {fileID: 0}
 --- !u!111 &1394325186
@@ -45128,6 +45132,7 @@ MonoBehaviour:
   - {fileID: 311743045, guid: 507f9d3e904abe34da025f747e616629, type: 3}
   - {fileID: -757514992, guid: 507f9d3e904abe34da025f747e616629, type: 3}
   - {fileID: -1880769187, guid: 507f9d3e904abe34da025f747e616629, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 1422464826}
   image: {fileID: 0}
 --- !u!111 &1422464825
@@ -45544,7 +45549,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 10
   m_Viewport: {fileID: 1621987998}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 2136901370}
@@ -72830,6 +72835,7 @@ MonoBehaviour:
   - {fileID: -1345363073, guid: 87344e5139abb894cb2584819a3db248, type: 3}
   - {fileID: -1345363073, guid: 87344e5139abb894cb2584819a3db248, type: 3}
   - {fileID: -1345363073, guid: 87344e5139abb894cb2584819a3db248, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 0}
   image: {fileID: 1560009632}
 --- !u!114 &1560009632

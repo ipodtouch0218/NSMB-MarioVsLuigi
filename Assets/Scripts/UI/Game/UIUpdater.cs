@@ -96,7 +96,7 @@ namespace NSMB.UI.Game {
             boos.SetActive(stage.HidePlayersOnMinimap);
             StartCoroutine(UpdatePingTextCoroutine());
 
-            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, NetworkHandler.FilterOutReplayFastForward);
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);

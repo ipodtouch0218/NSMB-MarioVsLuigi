@@ -36,9 +36,9 @@ public class ChatManager : MonoBehaviour {
     public void Start() {
         QuantumEvent.Subscribe<EventPlayerSentChatMessage>(this, OnPlayerSentChatMessage);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
-        QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
-        QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
-        QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
+        QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded, NetworkHandler.FilterOutReplay);
+        QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved, NetworkHandler.FilterOutReplay);
+        QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged, NetworkHandler.FilterOutReplay);
     }
 
     public void AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {

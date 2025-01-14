@@ -7493,6 +7493,7 @@ MonoBehaviour:
   - {fileID: -6469537607060608100, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -6746097347225962745, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -176354558837914207, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 0}
   image: {fileID: 5474131616444625048}
 --- !u!1 &2125029649578202481
@@ -17460,7 +17461,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 30001
+  m_SortingOrder: 30002
   m_TargetDisplay: 0
 --- !u!114 &4439588243686557099
 MonoBehaviour:
@@ -25648,6 +25649,7 @@ MonoBehaviour:
   - {fileID: -6469537607060608100, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -6746097347225962745, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -176354558837914207, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 0}
   image: {fileID: 7117306549404952500}
 --- !u!1 &7785377661651635322

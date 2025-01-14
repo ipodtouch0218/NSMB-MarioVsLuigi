@@ -576,6 +576,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         return !IsReplayFastForwarding;
     }
 
+    public static bool FilterOutReplay(IDeterministicGame game) {
+        return !IsReplay;
+    }
+
     private unsafe void OnReplaysEnabledChanged(bool enable) {
         if (Game == null) {
             return;

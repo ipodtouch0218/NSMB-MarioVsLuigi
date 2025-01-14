@@ -131,10 +131,9 @@ namespace NSMB.UI.Game {
 
             if (!NetworkHandler.IsReplay) {
                 spectationUI.SetActive(true);
-            }
-
-            if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
-                GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
+                if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
+                    GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
+                }
             }
 
             SpectateNextPlayer();

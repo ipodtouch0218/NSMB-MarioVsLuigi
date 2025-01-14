@@ -33,8 +33,8 @@ namespace NSMB.UI.MainMenu {
 
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
-            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
-            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded, NetworkHandler.FilterOutReplay);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved, NetworkHandler.FilterOutReplay);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
         }

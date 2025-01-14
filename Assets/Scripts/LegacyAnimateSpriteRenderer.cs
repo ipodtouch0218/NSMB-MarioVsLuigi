@@ -13,6 +13,7 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
     [SerializeField] private float frame; // Must be a float because legacy animators dont support ints, apparently?
     [SerializeField] private float fps = 8;
     [SerializeField] public Sprite[] frames;
+    [SerializeField] private bool useUnscaledDelta = false;
 
     //---Components
     [SerializeField] private SpriteRenderer sRenderer;
@@ -27,18 +28,22 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
     [ExecuteAlways]
     public void LateUpdate() {
-        if (!runInEditor && !Application.isPlaying)
+        if (!runInEditor && !Application.isPlaying) {
             return;
-        if (frames == null || frames.Length == 0 || (!sRenderer && !image) || !enabled)
-            return;
+        }
 
-        frame += fps * Time.deltaTime;
+        if (frames == null || frames.Length == 0 || (!sRenderer && !image) || !enabled) {
+            return;
+        }
+
+        frame += fps * (useUnscaledDelta ? Time.unscaledDeltaTime : Time.deltaTime);
         SetSprite();
     }
 
     private void SetSprite() {
-        if (!isDisplaying || frames == null || frames.Length == 0)
+        if (!isDisplaying || frames == null || frames.Length == 0) {
             return;
+        }
 
         frame = Mathf.Repeat(frame, frames.Length);
         int currentFrame = Mathf.FloorToInt(frame);
