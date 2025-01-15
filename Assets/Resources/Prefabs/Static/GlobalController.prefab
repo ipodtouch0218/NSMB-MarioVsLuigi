@@ -2706,6 +2706,8 @@ GameObject:
   - component: {fileID: 5061284475807942218}
   - component: {fileID: 7591913286340890330}
   - component: {fileID: 2963565463025760622}
+  - component: {fileID: 1367555303310369425}
+  - component: {fileID: 4409226317458608702}
   m_Layer: 16
   m_Name: GamepadSecondary
   m_TagString: Untagged
@@ -2902,6 +2904,30 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &1367555303310369425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 792090487836810226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4409226317458608702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 792090487836810226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &919671209857476879
 GameObject:
   m_ObjectHideFlags: 0
@@ -4352,6 +4378,8 @@ GameObject:
   - component: {fileID: 3806332302581398478}
   - component: {fileID: 8825707884139379357}
   - component: {fileID: 9220535890299667377}
+  - component: {fileID: 4987278071822888293}
+  - component: {fileID: 1583479777451715575}
   m_Layer: 16
   m_Name: GamepadPrimary
   m_TagString: Untagged
@@ -4548,6 +4576,30 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &4987278071822888293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143413125752415482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1583479777451715575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143413125752415482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1181285011793357166
 GameObject:
   m_ObjectHideFlags: 0
@@ -5302,7 +5354,7 @@ GameObject:
   - component: {fileID: 8122805202515525364}
   - component: {fileID: 1495512435342682076}
   - component: {fileID: 5323073305053584230}
-  - component: {fileID: 5209738252556239556}
+  - component: {fileID: 6436952049088483346}
   m_Layer: 16
   m_Name: ArrowRight
   m_TagString: Untagged
@@ -5450,7 +5502,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
---- !u!114 &5209738252556239556
+--- !u!114 &6436952049088483346
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5459,27 +5511,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1488711948420406864}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
-  m_Horizontal: 1
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1599472426380686694
 GameObject:
   m_ObjectHideFlags: 0
@@ -6196,6 +6230,7 @@ GameObject:
   - component: {fileID: 4625858104516352392}
   - component: {fileID: 2542437468340309939}
   - component: {fileID: 7402388916276037497}
+  - component: {fileID: 7448954297719192965}
   m_Layer: 16
   m_Name: ArrowLeft
   m_TagString: Untagged
@@ -6343,6 +6378,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
+--- !u!114 &7448954297719192965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918865078561867103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1932625643664893310
 GameObject:
   m_ObjectHideFlags: 0
@@ -9474,7 +9521,7 @@ GameObject:
   - component: {fileID: 2067859623266994410}
   - component: {fileID: 7219596033287778215}
   - component: {fileID: 5858962933135430117}
-  - component: {fileID: 3470350703876991713}
+  - component: {fileID: 6197989703804037734}
   m_Layer: 16
   m_Name: ArrowRight
   m_TagString: Untagged
@@ -9622,7 +9669,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
---- !u!114 &3470350703876991713
+--- !u!114 &6197989703804037734
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9631,27 +9678,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2785722043289793520}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
-  m_Horizontal: 1
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &2802625629796542778
 GameObject:
   m_ObjectHideFlags: 0
@@ -10336,6 +10365,7 @@ GameObject:
   - component: {fileID: 1471979937623545773}
   - component: {fileID: 2638814580248054865}
   - component: {fileID: 5437232307964099525}
+  - component: {fileID: 5877259426242547411}
   m_Layer: 16
   m_Name: ArrowLeft
   m_TagString: Untagged
@@ -10483,6 +10513,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
+--- !u!114 &5877259426242547411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3224445868221125754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3261322623537873979
 GameObject:
   m_ObjectHideFlags: 0
@@ -11559,6 +11601,7 @@ GameObject:
   - component: {fileID: 1319869543942936095}
   - component: {fileID: 7934580705109863487}
   - component: {fileID: 3135806706165552980}
+  - component: {fileID: 832040349055199731}
   m_Layer: 16
   m_Name: ArrowLeft
   m_TagString: Untagged
@@ -11706,6 +11749,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
+--- !u!114 &832040349055199731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3631593960556239022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3647486183009553400
 GameObject:
   m_ObjectHideFlags: 0
@@ -15407,7 +15462,7 @@ GameObject:
   - component: {fileID: 3325701043970361746}
   - component: {fileID: 686285757146381766}
   - component: {fileID: 375487673991821921}
-  - component: {fileID: 7567508781929681231}
+  - component: {fileID: 7402112283046788818}
   m_Layer: 16
   m_Name: ArrowRight
   m_TagString: Untagged
@@ -15555,7 +15610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
---- !u!114 &7567508781929681231
+--- !u!114 &7402112283046788818
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -15564,27 +15619,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4722271917762552144}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
-  m_Horizontal: 1
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &4924455418572410026
 GameObject:
   m_ObjectHideFlags: 0
@@ -17229,6 +17266,7 @@ GameObject:
   - component: {fileID: 379632184780788516}
   - component: {fileID: 8861817690202411063}
   - component: {fileID: 6946263983949777489}
+  - component: {fileID: 6556772777827403553}
   m_Layer: 16
   m_Name: ArrowLeft
   m_TagString: Untagged
@@ -17376,6 +17414,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
+--- !u!114 &6556772777827403553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5288840367089504583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5293603156190226434
 GameObject:
   m_ObjectHideFlags: 0
@@ -17635,6 +17685,8 @@ GameObject:
   - component: {fileID: 8163370898293939470}
   - component: {fileID: 7404856610693672463}
   - component: {fileID: 8360497878280187173}
+  - component: {fileID: 7948543854499232967}
+  - component: {fileID: 6653402473587986736}
   m_Layer: 16
   m_Name: KeyboardSecondary
   m_TagString: Untagged
@@ -17831,6 +17883,30 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &7948543854499232967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5327417210661540474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6653402473587986736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5327417210661540474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5351015350952236961
 GameObject:
   m_ObjectHideFlags: 0
@@ -23778,6 +23854,7 @@ GameObject:
   - component: {fileID: 3676665234251852319}
   - component: {fileID: 3170157263826073666}
   - component: {fileID: 4243066510256533267}
+  - component: {fileID: 2675300465433318765}
   m_Layer: 16
   m_Name: ArrowLeft
   m_TagString: Untagged
@@ -23925,6 +24002,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
+--- !u!114 &2675300465433318765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7226004253874715704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7251015831826651699
 GameObject:
   m_ObjectHideFlags: 0
@@ -25020,7 +25109,7 @@ GameObject:
   - component: {fileID: 4700514796069863336}
   - component: {fileID: 8695137727148639332}
   - component: {fileID: 3947050678438137762}
-  - component: {fileID: 6692853817168747786}
+  - component: {fileID: 2858137028950764917}
   m_Layer: 16
   m_Name: ArrowRight
   m_TagString: Untagged
@@ -25168,7 +25257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
---- !u!114 &6692853817168747786
+--- !u!114 &2858137028950764917
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -25177,27 +25266,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7541222184083787438}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
-  m_Horizontal: 1
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &7583845247482472544
 GameObject:
   m_ObjectHideFlags: 0
@@ -27301,6 +27372,8 @@ GameObject:
   - component: {fileID: 2756937483046056188}
   - component: {fileID: 2835654070183055795}
   - component: {fileID: 7329227428036957529}
+  - component: {fileID: 7452466308499933858}
+  - component: {fileID: 8899374475140532486}
   m_Layer: 16
   m_Name: KeyboardPrimary
   m_TagString: Untagged
@@ -27497,6 +27570,30 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &7452466308499933858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8412947559903033390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8899374475140532486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8412947559903033390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8457399149192444934
 GameObject:
   m_ObjectHideFlags: 0
@@ -28697,7 +28794,7 @@ GameObject:
   - component: {fileID: 9035781085814160182}
   - component: {fileID: 5338055253550447491}
   - component: {fileID: 6531534850620625150}
-  - component: {fileID: 4543707030381190457}
+  - component: {fileID: 2995317007434768658}
   m_Layer: 16
   m_Name: ArrowRight
   m_TagString: Untagged
@@ -28845,7 +28942,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
---- !u!114 &4543707030381190457
+--- !u!114 &2995317007434768658
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -28854,27 +28951,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8708701226986506961}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
-  m_Horizontal: 1
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &8742583837026239983
 GameObject:
   m_ObjectHideFlags: 0
@@ -29038,7 +29117,7 @@ GameObject:
   - component: {fileID: 1400690183887734211}
   - component: {fileID: 6459207088402002466}
   - component: {fileID: 8287102819177580773}
-  - component: {fileID: 3378997635408074862}
+  - component: {fileID: 2300621759104610285}
   m_Layer: 16
   m_Name: ArrowRight
   m_TagString: Untagged
@@ -29186,7 +29265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
---- !u!114 &3378997635408074862
+--- !u!114 &2300621759104610285
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -29195,27 +29274,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8770227977355162825}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
-  m_Horizontal: 1
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &8770636328146023084
 GameObject:
   m_ObjectHideFlags: 0
@@ -30117,6 +30178,7 @@ GameObject:
   - component: {fileID: 885924684176366508}
   - component: {fileID: 8690633642650907430}
   - component: {fileID: 1163618787622428876}
+  - component: {fileID: 5244084911946896108}
   m_Layer: 16
   m_Name: ArrowLeft
   m_TagString: Untagged
@@ -30264,6 +30326,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates: []
+--- !u!114 &5244084911946896108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9127517203150748019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b43c74b8b68684abcbe13d72db54c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9131684593850119181
 GameObject:
   m_ObjectHideFlags: 0

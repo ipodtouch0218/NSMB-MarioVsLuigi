@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,6 +59,35 @@ namespace NSMB.Extensions {
             return Mathf.Clamp(scrollPos, 0f, 1f);
         }
 
+        public static float ScrollIntoView(this ScrollRect scrollRect, RectTransform target, bool onlyOffscreen, float additionalOffset) {
+            // The scroll rect's view's space is used to calculate scroll position
+            var view = scrollRect.viewport != null ? scrollRect.viewport : scrollRect.GetComponent<RectTransform>();
+
+            // Calcualte the scroll offset in the view's space
+            var viewRect = view.rect;
+            var elementBounds = target.TransformBoundsTo(view);
+
+            var offset = viewRect.center.y - elementBounds.center.y;
+            if (offset < 0) {
+                // Top bound
+                offset -= elementBounds.extents.y;
+            } else {
+                // Bottom bound
+                offset += elementBounds.extents.y;
+            }
+
+            if (onlyOffscreen && Mathf.Abs(offset) < (viewRect.height * 0.5f) - additionalOffset) {
+                return scrollRect.verticalNormalizedPosition;
+            }
+
+            offset += Mathf.Sign(offset) * additionalOffset;
+            offset -= Mathf.Sign(offset) * viewRect.height * 0.5f;
+
+            // Normalize and apply the calculated offset
+            var scrollPos = scrollRect.verticalNormalizedPosition - scrollRect.NormalizeScrollDistance(1, offset);
+            return Mathf.Clamp(scrollPos, 0f, 1f);
+        }
+
         // Missing component-wise multiply and divide operators for vector3
         public static Vector3 Multiply(this Vector3 a, Vector3 b) {
             return new(a.x * b.x, a.y * b.y, a.z * b.z);
@@ -69,36 +97,9 @@ namespace NSMB.Extensions {
             return new(a.x / b.x, a.y / b.y, a.z / b.z);
         }
 
-        /// <summary>
-        /// Sets the x, y, and z values for an existing Vector3 if the given x, y, and z values are not null.
-        /// </summary>
-        /// <param name="vec">An existing Vector3 to modify</param>
-        /// <param name="x">The new X value. If null, the existing X value is kept.</param>
-        /// <param name="y">The new Y value. If null, the existing Y value is kept.</param>
-        /// <param name="z">The new Z value. If null, the existing Z value is kept.</param>
-        public static void SetNonNulls(this ref Vector3 vec, float? x, float? y, float? z) {
-            vec.x = x ?? vec.x;
-            vec.y = y ?? vec.y;
-            vec.z = z ?? vec.z;
-        }
-
         //easy sound clips
         public static void PlayOneShot(this AudioSource source, SoundEffect clip, CharacterAsset character = null, byte variant = 0, float volume = 1f) {
             source.PlayOneShot(clip.GetClip(character, variant), volume);
-        }
-
-        public static void AddRange<K, V>(this Dictionary<K, V> dict, Dictionary<K, V> adder) {
-            foreach ((K key, V value) in adder) {
-                dict[key] = value;
-            }
-        }
-
-        public static bool ContainsLayer(this LayerMask mask, int layer) {
-            return (mask & (1 << layer)) != 0;
-        }
-
-        public static bool ContainsLayer(this LayerMask mask, string layerName) {
-            return ContainsLayer(mask, LayerMask.NameToLayer(layerName));
         }
 
         public static void SetLossyScale(this Transform transform, Vector3 lossyScale) {

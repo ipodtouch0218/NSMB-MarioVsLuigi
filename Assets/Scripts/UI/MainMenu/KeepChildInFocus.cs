@@ -1,12 +1,12 @@
+using JimmysUnityUtilities;
 using NSMB.Extensions;
-using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(ScrollRect))]
-public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+public class KeepChildInFocus : MonoBehaviour, IScrollHandler {
 
     //---Serialized Variables
     [SerializeField] private float scrollAmount = 15;
@@ -14,35 +14,33 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
     //---Private Variables
     private readonly List<ScrollRect> components = new();
     private ScrollRect rect;
-    private bool mouseOver = false;
     private float scrollPos = 0;
-    private GameObject previousSelectedObject;
+    private GameObject previousObject;
+    private bool scrolled;
 
     public void Awake() {
         this.SetIfNull(ref rect);
     }
 
     public void Update() {
-        if (mouseOver || !rect.content) {
+        if (!rect.content) {
             return;
         }
 
         rect.verticalNormalizedPosition = Mathf.Lerp(rect.verticalNormalizedPosition, scrollPos, scrollAmount * Time.deltaTime);
 
-        if (previousSelectedObject == EventSystem.current.currentSelectedGameObject) {
-            return;
-        }
-
         GameObject obj = EventSystem.current.currentSelectedGameObject;
-        previousSelectedObject = obj;
+        if (obj != previousObject) {
+            scrolled = false;
+            previousObject = obj;
+        }
         if (!obj) {
             return;
         }
 
-        RectTransform target = obj.GetComponent<RectTransform>();
-
-        if (IsFirstParent(target) && target.name != "Scrollbar Vertical") {
-            scrollPos = rect.ScrollToCenter(target, false);
+        RectTransform target = (RectTransform) obj.transform;
+        if (!scrolled && IsFirstParent(target) && !target.TryGetComponentInParent(out Scrollbar _)) {
+            scrollPos = rect.ScrollIntoView(target, true, 32);
         } else {
             scrollPos = rect.verticalNormalizedPosition;
         }
@@ -64,12 +62,8 @@ public class KeepChildInFocus : MonoBehaviour, IPointerEnterHandler, IPointerExi
         return false;
     }
 
-    public void OnPointerEnter(PointerEventData eventData) {
-        mouseOver = true;
-    }
-
-    public void OnPointerExit(PointerEventData eventData) {
-        mouseOver = false;
+    public void OnScroll(PointerEventData eventData) {
+        scrolled = true;
     }
 
     public interface IFocusIgnore { }
