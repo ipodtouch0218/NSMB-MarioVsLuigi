@@ -25,7 +25,7 @@ public class ParticleSound : MonoBehaviour {
             return;
         }
 
-        sfx.Source.enabled = Time.deltaTime != 0;
+        sfx.Source.enabled = Time.deltaTime != 0 && !NetworkHandler.IsReplayFastForwarding;
 
         if (sfx.Source.enabled) {
             foreach (ParticleSystem system in systems) {

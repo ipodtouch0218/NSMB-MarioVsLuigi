@@ -22,6 +22,10 @@ public class InGameChat : MonoBehaviour {
     }
 
     private void OnChatMessage(ChatManager.ChatMessageData data) {
+        if (NetworkHandler.Game == null || !NetworkHandler.Game.Frames.Predicted.RuntimeConfig.IsRealGame) {
+            return;
+        }
+
         InGameChatMessage newMessage = Instantiate(messagePrefab, parent);
 
         bool active;

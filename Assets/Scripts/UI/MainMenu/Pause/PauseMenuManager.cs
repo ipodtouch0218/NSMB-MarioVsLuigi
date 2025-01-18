@@ -49,6 +49,7 @@ namespace NSMB.UI.Pause {
                 options[1].translationKey = "ui.pause.replay.hide";
             }
             UpdateLabels();
+            QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         }
 
         public void OnDestroy() {
@@ -56,7 +57,7 @@ namespace NSMB.UI.Pause {
         }
 
         private unsafe void OnPause(InputAction.CallbackContext context) {
-            if (isPaused || unpauseTime == Time.unscaledTime) {
+            if (isPaused || unpauseTime == Time.unscaledTime || NetworkHandler.IsReplayFastForwarding) {
                 return;
             }
 
@@ -211,9 +212,9 @@ namespace NSMB.UI.Pause {
 
         public unsafe void ClickConfirmYes() {
             if (isInConfirmationForQuitting) {
-                QuantumRunner.Default.Shutdown();
+                NetworkHandler.Runner.Shutdown();
             } else {
-                QuantumGame game = QuantumRunner.DefaultGame;
+                QuantumGame game = NetworkHandler.Game;
                 Frame f = game.Frames.Predicted;
                 PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
 
@@ -322,6 +323,12 @@ namespace NSMB.UI.Pause {
                 option.originalText = tm.GetTranslation(option.translationKey);
             }
             UpdateLabels();
+        }
+
+        private void OnGameEnded(EventGameEnded e) {
+            if (isPaused) {
+                Unpause(false);
+            }
         }
 
         [Serializable]

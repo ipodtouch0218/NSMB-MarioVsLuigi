@@ -193,8 +193,6 @@ MonoBehaviour:
     - rid: 1971040655551496196
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -271,8 +269,6 @@ MonoBehaviour:
     - rid: 3054802971113029636
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -349,8 +345,6 @@ MonoBehaviour:
     - rid: 3388837992360574980
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -551,8 +545,6 @@ MonoBehaviour:
     - rid: 4495734601653682180
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -868,8 +860,6 @@ MonoBehaviour:
     - rid: 7591444679539818499
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -1032,8 +1022,6 @@ MonoBehaviour:
     - rid: 7893719521440038916
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -1110,8 +1098,6 @@ MonoBehaviour:
     - rid: 8783231218654117892
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -1179,8 +1165,6 @@ MonoBehaviour:
     - rid: 8968679368100413443
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0

@@ -23,6 +23,7 @@ namespace NSMB.UI.Game.Scoreboard {
         private bool constantNicknameColor = true;
 
         public void Start() {
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
@@ -110,6 +111,10 @@ namespace NSMB.UI.Game.Scoreboard {
             }
 
             UpdateEntry(e.Frame);
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            UpdateEntry(e.Game.Frames.Predicted);
         }
     }
 }

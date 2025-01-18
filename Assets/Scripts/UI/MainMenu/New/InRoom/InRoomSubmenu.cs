@@ -268,7 +268,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 fadeMusicCoroutine = null;
             }
             musicSource.volume = 1;
-            Canvas.CloseSubmenu(this);
+            Canvas.CloseSubmenuAndChildren(this);
         }
 
         private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {

@@ -279,3 +279,8 @@ event MarioPlayerStompedByTeammate {
 	nothashed Frame Frame;
 	entity_ref Entity;
 }
+
+synced event MarioPlayerDestroyed {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}

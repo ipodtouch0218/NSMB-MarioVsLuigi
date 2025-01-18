@@ -41,7 +41,7 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
             sparkles.gameObject.SetActive(true);
             sparkles.transform.position = sRenderer.transform.position;
             sparkles.Play();
-            Destroy(sparkles, 0.5f);
+            // Destroy(sparkles, 0.5f);
         }
     }
 

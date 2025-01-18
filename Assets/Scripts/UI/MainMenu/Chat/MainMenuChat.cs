@@ -12,6 +12,7 @@ namespace NSMB.UI.MainMenu {
     public unsafe class MainMenuChat : MonoBehaviour {
 
         //---Serialized Variables
+        [SerializeField] private PlayerListHandler playerList;
         [SerializeField] private ChatMessage messagePrefab;
         [SerializeField] private TMP_InputField chatbox;
         [SerializeField] private UnityEngine.UI.Button sendBtn;
@@ -151,10 +152,6 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnTextboxChanged() {
-            if (!MainMenuManager.Instance) {
-                return;
-            }
-
             int size = chatbox.text.Length;
             if (size == previousTextLength) {
                 return;
@@ -162,18 +159,20 @@ namespace NSMB.UI.MainMenu {
 
             previousTextLength = size;
 
-            List<PlayerRef> localPlayers = QuantumRunner.DefaultGame.GetLocalPlayers();
+            var game = NetworkHandler.Game;
+            List<PlayerRef> localPlayers = game.GetLocalPlayers();
             if (localPlayers.Count <= 0) {
                 return;
             }
 
-            PlayerListEntry ple = MainMenuManager.Instance.playerList.GetPlayerEntry(localPlayers[0]);
+            PlayerListEntry ple = playerList.GetPlayerEntry(localPlayers[0]);
             if (!ple || ple.typingCounter > 2) {
                 return;
             }
 
-            foreach (var player in QuantumRunner.DefaultGame.GetLocalPlayerSlots()) {
-                QuantumRunner.DefaultGame.SendCommand(player, new CommandStartTyping());
+            var startTypingCommand = new CommandStartTyping();
+            foreach (var player in game.GetLocalPlayerSlots()) {
+                game.SendCommand(player, startTypingCommand);
             }
         }
 

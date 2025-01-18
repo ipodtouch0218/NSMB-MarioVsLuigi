@@ -172,7 +172,12 @@ public class ReplayListManager : Selectable {
     }
 
     public void RemoveReplay(Replay replay) {
-        Destroy(replay.ListEntry.gameObject);
+        if (replay == null) {
+            return;
+        }
+        if (replay.ListEntry) {
+            Destroy(replay.ListEntry.gameObject);
+        }
         replays.Remove(replay);
     }
 

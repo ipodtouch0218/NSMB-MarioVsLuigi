@@ -499,6 +499,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         var inputStream = new Photon.Deterministic.BitStream(replay.DecompressedInputData);
         var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);
 
+        // Disable checksums- they murder performance.
+        deterministicConfig.ChecksumInterval = 0;
+
         var arguments = new SessionRunner.Arguments {
             GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
             RuntimeConfig = runtimeConfig,
@@ -509,7 +512,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             PlayerCount = deterministicConfig.PlayerCount,
             InitialTick = ReplayStart,
             FrameData = replay.DecompressedInitialFrameData,
-            DeltaTimeType = SimulationUpdateTime.EngineDeltaTime
+            DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
+            GameFlags = QuantumGameFlags.EnableTaskProfiler,
         };
 
         GlobalController.Instance.loadingCanvas.Initialize(null);
@@ -519,6 +523,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {
+        if (IsReplay) {
+            return;
+        }
+
         Frame f = e.Game.Frames.Verified;
         if (f.Global->GameState == GameState.Playing) {
             RecordReplay(e.Game, f);

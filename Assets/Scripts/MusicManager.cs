@@ -58,12 +58,13 @@ public class MusicManager : MonoBehaviour {
         allPlayers.UseCulling = false;
 
         int playersWithOneLife = 0;
-        int playerCount = 0;
         while (allPlayers.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
+            if (rules.IsLivesEnabled && mario->Lives == 0) {
+                continue;
+            }
             if (rules.IsLivesEnabled && mario->Lives == 1) {
                 playersWithOneLife++;
             }
-            playerCount++;
 
             bool isSpectateTarget = false;
             foreach (var playerElement in PlayerElements.AllPlayerElements) {
@@ -88,7 +89,7 @@ public class MusicManager : MonoBehaviour {
             // Also speed up the music if:
             // A: two players left, at least one has one life
             // B: three+ players left, all have one life
-            speedup |= (playerCount <= 2 && playersWithOneLife > 0) || (playersWithOneLife >= playerCount);
+            speedup |= (f.Global->RealPlayers <= 2 && playersWithOneLife > 0) || (playersWithOneLife >= f.Global->RealPlayers);
         }
 
         if (mega) {
@@ -119,6 +120,7 @@ public class MusicManager : MonoBehaviour {
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {
+        Debug.Log(e.Game.Frames.Predicted.Global->GameState);
         if (e.Game.Frames.Predicted.Global->GameState == GameState.Playing) {
             HandleMusic(e.Game, true);
         }

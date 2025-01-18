@@ -51,13 +51,14 @@ namespace NSMB.UI.Game.Scoreboard {
                 PopulateScoreboard(game.Frames.Predicted);
             }
 
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
-            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
@@ -107,7 +108,12 @@ namespace NSMB.UI.Game.Scoreboard {
                     return starDiff;
                 }
 
-                return mario2->PlayerRef - mario1->PlayerRef;
+                var playerDataOne = QuantumUtils.GetPlayerData(f, mario1->PlayerRef);
+                var playerDataTwo = QuantumUtils.GetPlayerData(f, mario2->PlayerRef);
+                if (playerDataOne == null || playerDataTwo == null) {
+                    return 0;
+                }
+                return playerDataTwo->JoinTick - playerDataOne->JoinTick;
             });
 
             foreach (var entry in entries) {
@@ -238,6 +244,12 @@ namespace NSMB.UI.Game.Scoreboard {
 
         private void OnColorblindModeChanged() {
             UpdateTeamHeader(NetworkHandler.Game.Frames.Predicted);
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            Frame f = e.Game.Frames.Predicted;
+            UpdateTeamHeader(f);
+            UpdateSpectatorCount(f);
         }
     }
 }

@@ -43,12 +43,14 @@ public class ReplayUI : MonoBehaviour {
         }
 
         trackArrowText.gameObject.SetActive(false);
+        ControlSystem.controls.UI.Pause.performed += OnPause;
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
     public void OnDestroy() {
         Time.timeScale = 1;
         NetworkHandler.IsReplayFastForwarding = false;
+        ControlSystem.controls.UI.Pause.performed -= OnPause;
     }
 
     public void Update() {
@@ -65,15 +67,19 @@ public class ReplayUI : MonoBehaviour {
             NetworkHandler.Runner.Session.Update(update);
 
             if (done) {
-                NetworkHandler.IsReplayFastForwarding = false;
-                simulatingCanvas.SetActive(false);
-                fastForwardDestinationTick = 0;
-                Time.captureDeltaTime = 0;
-                Time.timeScale = replaySpeed;
-                NetworkHandler.Runner.IsSessionUpdateDisabled = false;
-                simulationTargetTrackArrow.gameObject.SetActive(false);
+                FinishFastForward();
             }
         }
+    }
+
+    private void FinishFastForward() {
+        NetworkHandler.IsReplayFastForwarding = false;
+        simulatingCanvas.SetActive(false);
+        fastForwardDestinationTick = 0;
+        Time.captureDeltaTime = 0;
+        Time.timeScale = replaySpeed;
+        NetworkHandler.Runner.IsSessionUpdateDisabled = false;
+        simulationTargetTrackArrow.gameObject.SetActive(false);
     }
 
     private void OnUpdateView(CallbackUpdateView e) {
@@ -171,8 +177,8 @@ public class ReplayUI : MonoBehaviour {
             simulatingCanvas.SetActive(true);
             fastForwardDestinationTick = newFrame;
             NetworkHandler.Runner.IsSessionUpdateDisabled = true;
-            Time.captureDeltaTime = Time.maximumDeltaTime;
-            Time.timeScale = 3;
+            Time.captureDeltaTime = 1/30f;
+            Time.timeScale = 8;
             simulationTargetTrackArrow.position = trackArrow.position;
             simulationTargetTrackArrow.gameObject.SetActive(true);
         }
@@ -242,10 +248,16 @@ public class ReplayUI : MonoBehaviour {
             simulatingCanvas.SetActive(true);
             fastForwardDestinationTick = newFrame;
             NetworkHandler.Runner.IsSessionUpdateDisabled = true;
-            Time.captureDeltaTime = Time.maximumDeltaTime;
-            Time.timeScale = 3;
+            Time.captureDeltaTime = 1/30f;
+            Time.timeScale = 8;
             simulationTargetTrackArrow.position = trackArrow.position;
             simulationTargetTrackArrow.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnPause(InputAction.CallbackContext context) {
+        if (NetworkHandler.IsReplayFastForwarding) {
+            FinishFastForward();
         }
     }
 }

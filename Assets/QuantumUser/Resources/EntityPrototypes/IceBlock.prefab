@@ -224,34 +224,10 @@ MonoBehaviour:
   ErrorRotationTeleportDistance: 0.5
   OnEntityInstantiated:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5602955539102130327}
-        m_TargetAssemblyTypeName: FrozenCubeAnimator, Assembly-CSharp
-        m_MethodName: Initialize
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   OnEntityDestroyed:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5602955539102130327}
-        m_TargetAssemblyTypeName: IceBlockAnimator, Assembly-CSharp
-        m_MethodName: Destroyed
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &5602955539102130327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +240,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38866505948a8864aae8c12f36520e26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 6562383333162367074}
   sfx: {fileID: -4211955845073762521}
   sRenderer: {fileID: 5772244049117569476}
   breakPrefab: {fileID: 6779589790155936114, guid: 18ec030fd34201b4c90cac2de9b22a2d,
@@ -394,7 +369,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 6697499874741732443}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!114 &1322364620185426663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,6 +409,10 @@ MonoBehaviour:
     DisableCollision:
       Value: 0
     SlowInLiquids:
+      Value: 0
+    IsWaterSolid:
+      Value: 0
+    BreakMegaObjects:
       Value: 0
 --- !u!114 &6061536990872593317
 MonoBehaviour:

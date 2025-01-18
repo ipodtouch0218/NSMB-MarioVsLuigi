@@ -121,7 +121,7 @@ namespace NSMB.Utils {
             return symbolStringBuilder.ToString();
         }
 
-        private static readonly Color spectatorColor = new(0.9f, 0.9f, 0.9f, 0.7f);
+        private static readonly Color spectatorColor = new(0.8f, 0.8f, 0.8f, 0.7f);
         public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1) {
             if (f == null || player == PlayerRef.None) {
                 return spectatorColor;
@@ -140,15 +140,16 @@ namespace NSMB.Utils {
             if (f.Global->GameState > GameState.WaitingForPlayers) {
                 var marioFilter = f.Filter<MarioPlayer>();
                 marioFilter.UseCulling = false;
-                bool hasMario = false;
+                MarioPlayer* existingMario = null;
                 while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
                     if (mario->PlayerRef == player) {
-                        hasMario = true;
+                        existingMario = mario;
                         break;
                     }
                 }
 
-                if (!hasMario) {
+                if (existingMario == null
+                    || (f.Global->GameState >= GameState.Playing && f.Global->Rules.IsLivesEnabled && existingMario->Lives <= 0)) {
                     return spectatorColor;
                 }
             }
@@ -209,7 +210,7 @@ namespace NSMB.Utils {
             return ping switch {
                 < 0 => "<sprite name=connection_disconnected>",
                 0 => "<sprite name=connection_host>",
-                < 70=> "<sprite name=connection_great>",
+                < 70 => "<sprite name=connection_great>",
                 < 140 => "<sprite name=connection_good>",
                 < 210 => "<sprite name=connection_fair>",
                 _ => "<sprite name=connection_bad>"
@@ -236,7 +237,11 @@ namespace NSMB.Utils {
 
             if (color[0] == '#') {
                 constant = true;
-                return new Color32(byte.Parse(color[1..3], System.Globalization.NumberStyles.HexNumber), byte.Parse(color[3..5], System.Globalization.NumberStyles.HexNumber), byte.Parse(color[5..7], System.Globalization.NumberStyles.HexNumber), 255);
+                return new Color32(
+                    byte.Parse(color[1..3], System.Globalization.NumberStyles.HexNumber),
+                    byte.Parse(color[3..5], System.Globalization.NumberStyles.HexNumber),
+                    byte.Parse(color[5..7], System.Globalization.NumberStyles.HexNumber),
+                    255);
             } else if (color == "rainbow") {
                 constant = false;
                 return GetRainbowColor();

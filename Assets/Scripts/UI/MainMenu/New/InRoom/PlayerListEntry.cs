@@ -1,3 +1,4 @@
+using JimmysUnityUtilities;
 using NSMB.Utils;
 using Quantum;
 using System;
@@ -31,7 +32,7 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private PlayerListHandler handler;
         [SerializeField] private TMP_Text nameText, pingText, winsText, muteButtonText;
         [SerializeField] private Image colorStrip;
-        [SerializeField] private RectTransform background;
+        [SerializeField] private RectTransform background, dropdownBackgroundImage;
         [SerializeField] private GameObject blockerTemplate, dropdownOptions, firstButton, chattingIcon, settingsIcon, readyIcon;
         [SerializeField] private LayoutElement layout;
         [SerializeField] private Button[] allOptions, adminOnlyOptions, othersOnlyOptions;
@@ -43,6 +44,7 @@ namespace NSMB.UI.MainMenu {
         private string userId;
         private string nicknameColor;
         private bool constantNicknameColor;
+        private int orderIndex;
 
         public void OnEnable() {
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
@@ -69,9 +71,12 @@ namespace NSMB.UI.MainMenu {
         public void Start() {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged, onlyIfActiveAndEnabled: true);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
-            QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping, onlyIfActiveAndEnabled: true);
+            QuantumEvent.Subscribe<EventPlayerStartedTyping>(this, OnPlayerStartedTyping);
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, onlyIfActiveAndEnabled: true);
-            playerExistsGameObject.SetActive(false);
+
+            if (!player.IsValid) {
+                playerExistsGameObject.SetActive(false);
+            }
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
@@ -155,17 +160,17 @@ namespace NSMB.UI.MainMenu {
             nameText.text = Builder.ToString();
 
             Transform parent = transform.parent;
-            int childIndex = 0;
+            orderIndex = 0;
             for (int i = 0; i < parent.childCount; i++) {
                 if (parent.GetChild(i) != transform) {
                     continue;
                 }
 
-                childIndex = i;
+                orderIndex = i;
                 break;
             }
 
-            layout.layoutPriority = transform.parent.childCount - childIndex;
+            layout.layoutPriority = transform.parent.childCount - orderIndex;
         }
 
         public unsafe void ShowDropdown() {
@@ -198,7 +203,7 @@ namespace NSMB.UI.MainMenu {
             bool othersOptions = !game.PlayerIsLocal(player);
             if (!othersOptions) {
                 foreach (var optionButton  in othersOnlyOptions) {
-                    optionButton .gameObject.SetActive(false);
+                    optionButton.gameObject.SetActive(false);
                 }
             }
 
@@ -232,6 +237,13 @@ namespace NSMB.UI.MainMenu {
             blockerTransform.offsetMax = blockerTransform.offsetMin = Vector2.zero;
             blockerInstance.SetActive(true);
             dropdownOptions.SetActive(true);
+
+            // FLip options if needed
+            bool flip = orderIndex >= 5;
+            RectTransform dropdownRect = (RectTransform) dropdownOptions.transform;
+            dropdownRect.SetPivotY(flip ? 0 : 1);
+            dropdownRect.SetAnchoredPositionY(0);
+            dropdownBackgroundImage.transform.localScale = flip ? new Vector3(1, -1, 1) : Vector3.one;
 
             canvas.EventSystem.SetSelectedGameObject(first.gameObject);
             canvas.PlayCursorSound();

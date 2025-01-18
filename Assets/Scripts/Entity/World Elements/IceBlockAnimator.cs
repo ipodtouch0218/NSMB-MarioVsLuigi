@@ -23,7 +23,10 @@ public unsafe class IceBlockAnimator : QuantumEntityViewComponent {
     public override void OnActivate(Frame f) {
         var cube = f.Unsafe.GetPointer<IceBlock>(EntityRef);
 
-        sfx.PlayOneShot(SoundEffect.Enemy_Generic_Freeze);
+        if (!NetworkHandler.IsReplayFastForwarding) {
+            sfx.PlayOneShot(SoundEffect.Enemy_Generic_Freeze);
+        }
+
         sRenderer.size = cube->Size.ToUnityVector2() * 2;
 
         Vector3 position = transform.position;
@@ -49,8 +52,10 @@ public unsafe class IceBlockAnimator : QuantumEntityViewComponent {
         }
     }
 
-    public void Destroyed(QuantumGame game) {
-        Instantiate(breakPrefab, transform.position, Quaternion.identity);
+    public override void OnDeactivate() {
+        if (!NetworkHandler.IsReplayFastForwarding) {
+            Instantiate(breakPrefab, transform.position, Quaternion.identity);
+        }
     }
 
     private void OnIceBlockSinking(EventIceBlockSinking e) {

@@ -104,9 +104,10 @@ namespace NSMB.UI.MainMenu {
             menu.Show(true);
             UpdateHeader();
             ShowHideMainPanel();
+            
         }
 
-        public void CloseSubmenuWithChildren(MainMenuSubmenu menu) {
+        public void CloseSubmenuAndChildren(MainMenuSubmenu menu) {
             // Close menus on top of this menu, incuding `menu`
             if (!submenuStack.Contains(menu)) {
                 return;
@@ -129,6 +130,7 @@ namespace NSMB.UI.MainMenu {
                 var newHead = submenuStack[^1];
                 if (newHead != head) {
                     newHead.Show(false);
+                    UpdateHeader();
                 }
             }
         }

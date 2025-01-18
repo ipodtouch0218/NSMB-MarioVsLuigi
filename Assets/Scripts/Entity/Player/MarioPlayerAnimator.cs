@@ -635,6 +635,10 @@ namespace NSMB.Entities.Player {
         }
 
         public void Footstep() {
+            if (NetworkHandler.IsReplayFastForwarding) {
+                return;
+            }
+
             Frame f = PredictedFrame;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(EntityRef);
@@ -704,6 +708,10 @@ namespace NSMB.Entities.Player {
 
 
         public void PlayMegaFootstep() {
+            if (NetworkHandler.IsReplayFastForwarding) {
+                return;
+            }
+
             Frame f = PredictedFrame;
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(EntityRef);
             if (physicsObject->IsUnderwater) {
