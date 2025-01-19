@@ -26,14 +26,14 @@ MonoBehaviour:
   TileOrigin: {x: -38, y: -13}
   TilemapWorldPosition:
     X:
-      RawValue: 0
+      RawValue: 196608
     Y:
       RawValue: 327680
   IsWrappingLevel: 1
   ExtendCeilingHitboxes: 0
   Spawnpoint:
     X:
-      RawValue: -1146880
+      RawValue: -950272
     Y:
       RawValue: 114688
   SpawnpointArea:
@@ -3716,10 +3716,10 @@ MonoBehaviour:
       Id:
         Value: 319909369411498505
     Rotation:
-      RawValue: 0
+      RawValue: -3
     Scale:
       X:
-        RawValue: 65536
+        RawValue: -65536
       Y:
         RawValue: 65536
   - Tile:
@@ -4364,7 +4364,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -4374,7 +4374,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -4384,7 +4384,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -4394,7 +4394,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -5004,7 +5004,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -5014,7 +5014,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -5024,7 +5024,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -5034,7 +5034,7 @@ MonoBehaviour:
         RawValue: 65536
   - Tile:
       Id:
-        Value: 319909369411498505
+        Value: 0
     Rotation:
       RawValue: 0
     Scale:
@@ -5184,38 +5184,38 @@ MonoBehaviour:
         RawValue: 65536
   BigStarSpawnpoints:
   - X:
-      RawValue: 491520
+      RawValue: 688128
     Y:
       RawValue: 294912
   - X:
-      RawValue: 557056
+      RawValue: 753664
     Y:
       RawValue: 65536
   - X:
-      RawValue: -131072
+      RawValue: 65536
     Y:
       RawValue: 262144
   - X:
-      RawValue: -786432
+      RawValue: -589824
     Y:
       RawValue: 294912
   - X:
-      RawValue: -1146880
+      RawValue: -950272
     Y:
       RawValue: 262144
   - X:
-      RawValue: -327024
+      RawValue: -130416
     Y:
       RawValue: 327680
   - X:
-      RawValue: 294912
+      RawValue: 491520
     Y:
       RawValue: 229376
   - X:
-      RawValue: -360448
+      RawValue: -163840
     Y:
       RawValue: 98304
   - X:
-      RawValue: 131072
+      RawValue: 327680
     Y:
       RawValue: 98304

@@ -2143,11 +2143,11 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PhysicsObject : Quantum.IComponent {
-    public const Int32 SIZE = 136;
+    public const Int32 SIZE = 144;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(40)]
+    [FieldOffset(48)]
     public FPVector2 Gravity;
-    [FieldOffset(32)]
+    [FieldOffset(40)]
     public FP TerminalVelocity;
     [FieldOffset(12)]
     public QBoolean IsFrozen;
@@ -2159,19 +2159,22 @@ namespace Quantum {
     public QBoolean IsWaterSolid;
     [FieldOffset(4)]
     public QBoolean BreakMegaObjects;
-    [FieldOffset(88)]
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public FPVector2 Velocity;
-    [FieldOffset(56)]
+    [FieldOffset(32)]
+    [ExcludeFromPrototype()]
+    public EntityRef Parent;
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public FPVector2 ParentVelocity;
-    [FieldOffset(72)]
+    [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public FPVector2 PreviousFrameVelocity;
-    [FieldOffset(104)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public PhysicsObjectData CurrentData;
-    [FieldOffset(120)]
+    [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public PhysicsObjectData PreviousData;
     [FieldOffset(0)]
@@ -2201,6 +2204,7 @@ namespace Quantum {
         hash = hash * 31 + IsWaterSolid.GetHashCode();
         hash = hash * 31 + BreakMegaObjects.GetHashCode();
         hash = hash * 31 + Velocity.GetHashCode();
+        hash = hash * 31 + Parent.GetHashCode();
         hash = hash * 31 + ParentVelocity.GetHashCode();
         hash = hash * 31 + PreviousFrameVelocity.GetHashCode();
         hash = hash * 31 + CurrentData.GetHashCode();
@@ -2239,6 +2243,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->SlowInLiquids, serializer);
         QHashSet.Serialize(&p->LiquidContacts, serializer, Statics.SerializeEntityRef);
         QList.Serialize(&p->Contacts, serializer, Statics.SerializePhysicsContact);
+        EntityRef.Serialize(&p->Parent, serializer);
         FP.Serialize(&p->TerminalVelocity, serializer);
         FPVector2.Serialize(&p->Gravity, serializer);
         FPVector2.Serialize(&p->ParentVelocity, serializer);

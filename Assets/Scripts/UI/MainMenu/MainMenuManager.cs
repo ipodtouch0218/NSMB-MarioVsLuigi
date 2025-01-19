@@ -69,7 +69,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEnable() {
-            ControlSystem.controls.UI.Pause.performed += OnPause;
+            Settings.Controls.UI.Pause.performed += OnPause;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
 
@@ -77,7 +77,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnDisable() {
-            ControlSystem.controls.UI.Pause.performed -= OnPause;
+            Settings.Controls.UI.Pause.performed -= OnPause;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 

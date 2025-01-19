@@ -5,7 +5,7 @@ namespace Quantum {
     public unsafe class BigStarSystem : SystemMainThread, ISignalOnReturnToRoom {
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<BigStar, MarioPlayer>(f, OnBigStarMarioInteraction);
+            f.Context.Interactions.Register<BigStar, MarioPlayer>(f, OnBigStarMarioInteraction);
         }
 
         public override void Update(Frame f) {

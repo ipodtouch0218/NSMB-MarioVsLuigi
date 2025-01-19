@@ -17,7 +17,7 @@ public class MusicManager : MonoBehaviour {
         this.SetIfNull(ref musicPlayer);
     }
 
-    public void Start() {
+    public unsafe void Start() {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
@@ -26,6 +26,12 @@ public class MusicManager : MonoBehaviour {
 
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
+
+        QuantumGame game = NetworkHandler.Game;
+        if (game != null && game.Frames.Predicted.Global->GameState == GameState.Playing) {
+            // Already in a game
+            HandleMusic(game, true);
+        }
     }
 
     public void OnDestroy() {
@@ -120,7 +126,6 @@ public class MusicManager : MonoBehaviour {
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {
-        Debug.Log(e.Game.Frames.Predicted.Global->GameState);
         if (e.Game.Frames.Predicted.Global->GameState == GameState.Playing) {
             HandleMusic(e.Game, true);
         }

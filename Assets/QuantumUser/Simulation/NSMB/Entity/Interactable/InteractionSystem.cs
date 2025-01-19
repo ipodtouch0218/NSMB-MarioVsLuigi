@@ -70,9 +70,9 @@ namespace Quantum {
                 {
                     using var profilerScope3 = HostProfiler.Start("InteractionSystem.ExecuteInteractors");
                     if (interaction.IsPlatformInteraction) {
-                        f.Context.platformInteractors[interaction.InteractorIndex].Invoke(f, entityA, entityB, interaction.Contact);
+                        f.Context.Interactions.platformInteractors[interaction.InteractorIndex].Invoke(f, entityA, entityB, interaction.Contact);
                     } else {
-                        f.Context.hitboxInteractors[interaction.InteractorIndex].Invoke(f, entityA, entityB);
+                        f.Context.Interactions.hitboxInteractors[interaction.InteractorIndex].Invoke(f, entityA, entityB);
                     }
                 }
             }
@@ -118,6 +118,7 @@ namespace Quantum {
         }
 #else
         public override void Update(Frame f) {
+            FrameThreadSafe fts = (FrameThreadSafe) f;
             var entityFilter = f.Unsafe.FilterStruct<Filter>();
             Filter filter = default;
             while (entityFilter.Next(&filter)) {
@@ -136,7 +137,7 @@ namespace Quantum {
                 // Collide with hitboxes
                 if (f.Physics2D.TryGetQueryHits(interactable->OverlapQueryRef, out HitCollection hits)) {
                     for (int i = 0; i < hits.Count; i++) {
-                        TryCollideWithEntity((FrameThreadSafe) f, entity, hits[i].Entity);
+                        TryCollideWithEntity(fts, entity, hits[i].Entity);
                     }
                 }
 
@@ -149,16 +150,17 @@ namespace Quantum {
                             continue;
                         }
 
-                        TryCollideWithEntity((FrameThreadSafe) f, entity, contact.Entity, contact);
+                        TryCollideWithEntity(fts, entity, contact.Entity, contact);
                     }
                 }
             }
 
-            ExecuteInteractors((FrameThreadSafe) f, 0, 0, (void*) null);
+            ExecuteInteractors(fts, 0, 0, (void*) null);
         }
 #endif
 
         private void TryCollideWithEntity(FrameThreadSafe f, EntityRef entityA, EntityRef entityB) {
+            using var profileScope = HostProfiler.Start("InteractionSystem.TryCollideWithEntity.Hitbox");
             if (entityA == entityB) {
                 return;
             }
@@ -168,29 +170,20 @@ namespace Quantum {
                 return;
             }
 
-            var interactors = ((Frame) f).Context.hitboxInteractorMap;
-            for (int i = 0; i < interactors.Count; i++) {
-                var key = interactors[i];
-                int componentIdA = ComponentTypeId.GetComponentIndex(key.Item1);
-                int componentIdB = ComponentTypeId.GetComponentIndex(key.Item2);
-
-                if (f.Has(entityA, componentIdA)
-                    && f.Has(entityB, componentIdB)) {
-
-                    lock (pendingInteractions) {
-                        pendingInteractions.Add(new PendingInteraction {
-                            EntityA = entityA,
-                            EntityB = entityB,
-                            InteractorIndex = i,
-                            IsPlatformInteraction = false,
-                        });
-                    }
-                    break;
+            PendingInteraction interaction = ((Frame) f).Context.Interactions.FindHitboxInteractor(entityA, f.GetComponentSet(entityA), entityB, f.GetComponentSet(entityB));
+            if (interaction.InteractorIndex != -1) {
+#if MULTITHREADED
+                lock (pendingInteractions) {
+                    pendingInteractions.Add(interaction);
                 }
+#else
+                pendingInteractions.Add(interaction);
+#endif
             }
         }
 
         private void TryCollideWithEntity(FrameThreadSafe f, EntityRef entityA, EntityRef entityB, in PhysicsContact contact) {
+            using var profileScope = HostProfiler.Start("InteractionSystem.TryCollideWithEntity.Platform");
             if (entityA == entityB) {
                 return;
             }
@@ -200,22 +193,15 @@ namespace Quantum {
                 return;
             }
 
-            var interactors = ((Frame) f).Context.platformInteractorMap;
-            for (int i = 0; i < interactors.Count; i++) {
-                var key = interactors[i];
-                int componentIdA = ComponentTypeId.GetComponentIndex(key.Item1);
-                int componentIdB = ComponentTypeId.GetComponentIndex(key.Item2);
-
-                if (f.Has(entityA, componentIdA) && f.Has(entityB, componentIdB)) {
-                    pendingInteractions.Add(new PendingInteraction {
-                        EntityA = entityA,
-                        EntityB = entityB,
-                        Contact = contact,
-                        InteractorIndex = i,
-                        IsPlatformInteraction = true,
-                    });
-                    break;
+            PendingInteraction interaction = ((Frame) f).Context.Interactions.FindPlatformInteractor(entityA, f.GetComponentSet(entityA), entityB, f.GetComponentSet(entityB));
+            if (interaction.InteractorIndex != -1) {
+#if MULTITHREADED
+                lock (pendingInteractions) {
+                    pendingInteractions.Add(interaction);
                 }
+#else
+                pendingInteractions.Add(interaction);
+#endif
             }
         }
 

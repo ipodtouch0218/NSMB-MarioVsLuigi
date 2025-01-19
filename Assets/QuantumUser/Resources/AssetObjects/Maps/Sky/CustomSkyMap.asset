@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: CustomSky
   ScenePath: Assets/Scenes/Levels/CustomSky.unity
   SceneGuid: addb28d9cb6d8a6498a3b328a6e57f33
-  WorldSize: 40
+  WorldSize: 32
   BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
@@ -155,9 +155,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 589824
+            RawValue: 524288
           Y:
-            RawValue: 278528
+            RawValue: 147456
         Rotation:
           RawValue: 0
     - rid: 63473090432073729
@@ -214,8 +214,6 @@ MonoBehaviour:
     - rid: 63473090432073732
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -233,9 +231,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -622592
+            RawValue: -688128
           Y:
-            RawValue: -32768
+            RawValue: -163840
         Rotation:
           RawValue: 0
     - rid: 400122020186030081
@@ -294,9 +292,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -720896
+            RawValue: -786432
           Y:
-            RawValue: 65536
+            RawValue: -65536
         Rotation:
           RawValue: 0
     - rid: 767976198037831681
@@ -344,8 +342,6 @@ MonoBehaviour:
     - rid: 767976198037831683
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -358,9 +354,9 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: -720896
+            RawValue: -786432
           Y:
-            RawValue: 65536
+            RawValue: -65536
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -449,9 +445,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 933888
+            RawValue: 868352
           Y:
-            RawValue: 278528
+            RawValue: 147456
         Rotation:
           RawValue: 0
     - rid: 1473102297092325377
@@ -508,8 +504,6 @@ MonoBehaviour:
     - rid: 1473102297092325380
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -527,9 +521,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -409600
+            RawValue: -475136
           Y:
-            RawValue: 114688
+            RawValue: -16384
         Rotation:
           RawValue: 0
     - rid: 1560578802248056833
@@ -586,8 +580,6 @@ MonoBehaviour:
     - rid: 1560578802248056836
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -605,9 +597,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 901120
+            RawValue: 835584
           Y:
-            RawValue: 278528
+            RawValue: 147456
         Rotation:
           RawValue: 0
     - rid: 2051947054745255937
@@ -664,8 +656,6 @@ MonoBehaviour:
     - rid: 2051947054745255940
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -683,9 +673,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 491520
+            RawValue: 425984
           Y:
-            RawValue: 327680
+            RawValue: 196608
         Rotation:
           RawValue: 11796480
     - rid: 3869101471622496257
@@ -744,9 +734,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -262144
+            RawValue: -327680
           Y:
-            RawValue: 262144
+            RawValue: 131072
         Rotation:
           RawValue: 0
     - rid: 4580170607118778369
@@ -796,9 +786,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 327680
+            RawValue: 262144
           Y:
-            RawValue: 196608
+            RawValue: 65536
         Rotation:
           RawValue: 0
     - rid: 4732500527886106625
@@ -848,9 +838,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 851968
+            RawValue: 786432
           Y:
-            RawValue: 131072
+            RawValue: 0
         Rotation:
           RawValue: 0
     - rid: 5398694842198917121
@@ -898,8 +888,6 @@ MonoBehaviour:
     - rid: 5398694842198917123
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -912,9 +900,9 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: 851968
+            RawValue: 786432
           Y:
-            RawValue: 131072
+            RawValue: 0
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -1003,9 +991,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -442368
+            RawValue: -507904
           Y:
-            RawValue: 114688
+            RawValue: -16384
         Rotation:
           RawValue: 0
     - rid: 5598451713846542337
@@ -1062,8 +1050,6 @@ MonoBehaviour:
     - rid: 5598451713846542340
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -1081,9 +1067,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -491520
+            RawValue: -557056
           Y:
-            RawValue: 360448
+            RawValue: 229376
         Rotation:
           RawValue: 0
     - rid: 5751041621869199361
@@ -1133,9 +1119,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 688128
+            RawValue: 622592
           Y:
-            RawValue: -32768
+            RawValue: -163840
         Rotation:
           RawValue: 0
     - rid: 7040794028543049729
@@ -1194,9 +1180,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -475136
+            RawValue: -540672
           Y:
-            RawValue: 114688
+            RawValue: -16384
         Rotation:
           RawValue: 0
     - rid: 7223293923458809857
@@ -1253,8 +1239,6 @@ MonoBehaviour:
     - rid: 7223293923458809860
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0
@@ -1272,9 +1256,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 32768
+            RawValue: -32768
           Y:
-            RawValue: 360448
+            RawValue: 229376
         Rotation:
           RawValue: 0
     - rid: 8361572304005627905
@@ -1324,9 +1308,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 589824
+            RawValue: 524288
           Y:
-            RawValue: 180224
+            RawValue: 49152
         Rotation:
           RawValue: 0
     - rid: 8382210276845420545
@@ -1383,8 +1367,6 @@ MonoBehaviour:
     - rid: 8382210276845420548
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        DisableCulling:
-          Value: 0
         Offset:
           X:
             RawValue: 0

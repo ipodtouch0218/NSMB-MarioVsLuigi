@@ -44,7 +44,7 @@ namespace NSMB.UI.Pause {
         }
 
         public void Start() {
-            ControlSystem.controls.UI.Pause.performed += OnPause;
+            Settings.Controls.UI.Pause.performed += OnPause;
             if (NetworkHandler.IsReplay) {
                 options[1].translationKey = "ui.pause.replay.hide";
             }
@@ -53,7 +53,7 @@ namespace NSMB.UI.Pause {
         }
 
         public void OnDestroy() {
-            ControlSystem.controls.UI.Pause.performed -= OnPause;
+            Settings.Controls.UI.Pause.performed -= OnPause;
         }
 
         private unsafe void OnPause(InputAction.CallbackContext context) {
@@ -70,10 +70,10 @@ namespace NSMB.UI.Pause {
         }
 
         public unsafe void Pause(bool playSound) {
-            ControlSystem.controls.UI.Navigate.performed += OnNavigate;
-            ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
-            ControlSystem.controls.UI.Submit.performed += OnSubmit;
-            ControlSystem.controls.UI.Cancel.performed += OnCancel;
+            Settings.Controls.UI.Navigate.performed += OnNavigate;
+            Settings.Controls.UI.Navigate.canceled += OnNavigate;
+            Settings.Controls.UI.Submit.performed += OnSubmit;
+            Settings.Controls.UI.Cancel.performed += OnCancel;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OnLanguageChanged(GlobalController.Instance.translationManager);
 
@@ -97,10 +97,10 @@ namespace NSMB.UI.Pause {
         }
 
         public void Unpause(bool playSound) {
-            ControlSystem.controls.UI.Navigate.performed -= OnNavigate;
-            ControlSystem.controls.UI.Navigate.canceled -= OnNavigate;
-            ControlSystem.controls.UI.Submit.performed -= OnSubmit;
-            ControlSystem.controls.UI.Cancel.performed -= OnCancel;
+            Settings.Controls.UI.Navigate.performed -= OnNavigate;
+            Settings.Controls.UI.Navigate.canceled -= OnNavigate;
+            Settings.Controls.UI.Submit.performed -= OnSubmit;
+            Settings.Controls.UI.Cancel.performed -= OnCancel;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
 
             main.SetActive(false);

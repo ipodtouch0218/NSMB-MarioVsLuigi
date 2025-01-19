@@ -47,12 +47,12 @@ namespace NSMB.UI.Pause.Options {
         protected override void OnEnable() {
             base.OnEnable();
 
-            ControlSystem.controls.UI.Navigate.performed += OnNavigate;
-            ControlSystem.controls.UI.Navigate.canceled += OnNavigate;
-            ControlSystem.controls.UI.Next.performed += OnNext;
-            ControlSystem.controls.UI.Previous.performed += OnPrevious;
-            ControlSystem.controls.UI.Cancel.performed += OnCancel;
-            ControlSystem.controls.UI.Submit.performed += OnSubmit;
+            Settings.Controls.UI.Navigate.performed += OnNavigate;
+            Settings.Controls.UI.Navigate.canceled += OnNavigate;
+            Settings.Controls.UI.Next.performed += OnNext;
+            Settings.Controls.UI.Previous.performed += OnPrevious;
+            Settings.Controls.UI.Cancel.performed += OnCancel;
+            Settings.Controls.UI.Submit.performed += OnSubmit;
 
             if (EventSystem.current) {
                 previouslySelected = EventSystem.current.currentSelectedGameObject;
@@ -66,12 +66,12 @@ namespace NSMB.UI.Pause.Options {
         protected override void OnDisable() {
             base.OnDisable();
 
-            ControlSystem.controls.UI.Navigate.performed -= OnNavigate;
-            ControlSystem.controls.UI.Navigate.canceled -= OnNavigate;
-            ControlSystem.controls.UI.Next.performed -= OnNext;
-            ControlSystem.controls.UI.Previous.performed -= OnPrevious;
-            ControlSystem.controls.UI.Cancel.performed -= OnCancel;
-            ControlSystem.controls.UI.Submit.performed -= OnSubmit;
+            Settings.Controls.UI.Navigate.performed -= OnNavigate;
+            Settings.Controls.UI.Navigate.canceled -= OnNavigate;
+            Settings.Controls.UI.Next.performed -= OnNext;
+            Settings.Controls.UI.Previous.performed -= OnPrevious;
+            Settings.Controls.UI.Cancel.performed -= OnCancel;
+            Settings.Controls.UI.Submit.performed -= OnSubmit;
 
             if (EventSystem.current) {
                 EventSystem.current.SetSelectedGameObject(previouslySelected);
@@ -95,7 +95,7 @@ namespace NSMB.UI.Pause.Options {
                 return;
             }
 
-            Vector2 direction = ControlSystem.controls.UI.Navigate.ReadValue<Vector2>();
+            Vector2 direction = Settings.Controls.UI.Navigate.ReadValue<Vector2>();
             direction = direction.normalized;
             float u = Vector2.Dot(direction, Vector2.up);
             float d = Vector2.Dot(direction, Vector2.down);

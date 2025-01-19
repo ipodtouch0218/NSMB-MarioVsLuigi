@@ -16,7 +16,7 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<Powerup, MarioPlayer>(f, OnPowerupMarioInteraction);
+            f.Context.Interactions.Register<Powerup, MarioPlayer>(f, OnPowerupMarioInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {

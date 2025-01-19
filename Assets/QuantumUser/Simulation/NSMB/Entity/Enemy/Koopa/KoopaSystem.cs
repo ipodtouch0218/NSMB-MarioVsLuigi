@@ -21,17 +21,17 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<Koopa, Goomba>(f, OnKoopaGoombaInteraction);
-            f.Context.RegisterInteraction<Koopa, Koopa>(f, OnKoopaKoopaInteraction);
-            f.Context.RegisterInteraction<Koopa, MarioPlayer>(f, OnKoopaMarioInteraction);
-            f.Context.RegisterInteraction<Koopa, Bobomb>(f, OnKoopaBobombInteraction);
-            f.Context.RegisterInteraction<Koopa, BulletBill>(f, OnKoopaBulletBillInteraction);
-            f.Context.RegisterInteraction<Koopa, PiranhaPlant>(f, OnKoopaPiranhaPlantInteraction);
-            f.Context.RegisterInteraction<Koopa, Boo>(f, OnKoopaBooInteraction);
-            f.Context.RegisterInteraction<Koopa, Projectile>(f, OnKoopaProjectileInteraction);
-            f.Context.RegisterInteraction<Koopa, Coin>(f, OnKoopaCoinInteraction);
-            f.Context.RegisterInteraction<Koopa, IceBlock>(f, OnKoopaIceBlockInteraction);
-            f.Context.RegisterInteraction<Koopa, IceBlock>(f, OnKoopaIceBlockInteractionStationary);
+            f.Context.Interactions.Register<Koopa, Goomba>(f, OnKoopaGoombaInteraction);
+            f.Context.Interactions.Register<Koopa, Koopa>(f, OnKoopaKoopaInteraction);
+            f.Context.Interactions.Register<Koopa, MarioPlayer>(f, OnKoopaMarioInteraction);
+            f.Context.Interactions.Register<Koopa, Bobomb>(f, OnKoopaBobombInteraction);
+            f.Context.Interactions.Register<Koopa, BulletBill>(f, OnKoopaBulletBillInteraction);
+            f.Context.Interactions.Register<Koopa, PiranhaPlant>(f, OnKoopaPiranhaPlantInteraction);
+            f.Context.Interactions.Register<Koopa, Boo>(f, OnKoopaBooInteraction);
+            f.Context.Interactions.Register<Koopa, Projectile>(f, OnKoopaProjectileInteraction);
+            f.Context.Interactions.Register<Koopa, Coin>(f, OnKoopaCoinInteraction);
+            f.Context.Interactions.Register<Koopa, IceBlock>(f, OnKoopaIceBlockInteraction);
+            f.Context.Interactions.Register<Koopa, IceBlock>(f, OnKoopaIceBlockInteractionStationary);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {

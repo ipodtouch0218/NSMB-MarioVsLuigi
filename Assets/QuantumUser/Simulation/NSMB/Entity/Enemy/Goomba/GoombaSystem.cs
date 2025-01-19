@@ -14,11 +14,11 @@ namespace Quantum {
 		}
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<Goomba, Goomba>(f, OnGoombaGoombaInteraction);
-            f.Context.RegisterInteraction<Goomba, PiranhaPlant>(f, EnemySystem.EnemyBumpTurnaroundOnlyFirst);
-            f.Context.RegisterInteraction<Goomba, MarioPlayer>(f, OnGoombaMarioInteraction);
-            f.Context.RegisterInteraction<Goomba, Projectile>(f, OnGoombaProjectileInteraction);
-            f.Context.RegisterInteraction<Goomba, IceBlock>(f, OnGoombaIceBlockInteraction);
+            f.Context.Interactions.Register<Goomba, Goomba>(f, OnGoombaGoombaInteraction);
+            f.Context.Interactions.Register<Goomba, PiranhaPlant>(f, EnemySystem.EnemyBumpTurnaroundOnlyFirst);
+            f.Context.Interactions.Register<Goomba, MarioPlayer>(f, OnGoombaMarioInteraction);
+            f.Context.Interactions.Register<Goomba, Projectile>(f, OnGoombaProjectileInteraction);
+            f.Context.Interactions.Register<Goomba, IceBlock>(f, OnGoombaIceBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {

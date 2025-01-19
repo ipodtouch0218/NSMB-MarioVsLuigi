@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 0.54901963, g: 0.5882353, b: 0.627451, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -430,7 +430,7 @@ Transform:
   m_GameObject: {fileID: 133657841}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2, y: -5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -648,7 +648,7 @@ Transform:
   m_GameObject: {fileID: 402974982}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.2, z: 0}
+  m_LocalPosition: {x: 0, y: -2.8000002, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1751,12 +1751,12 @@ PrefabInstance:
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: 1163264
+      value: 1032192
       objectReference: {fileID: 0}
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 229376
+      value: -98304
       objectReference: {fileID: 0}
     - target: {fileID: 4462257224907729137, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -1866,7 +1866,7 @@ Transform:
   m_GameObject: {fileID: 859204836}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2, y: -5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2356,7 +2356,7 @@ Transform:
   m_GameObject: {fileID: 1292545024}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2, y: -5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4100,12 +4100,12 @@ PrefabInstance:
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: 1064960
+      value: 933888
       objectReference: {fileID: 0}
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 229376
+      value: -98304
       objectReference: {fileID: 0}
     - target: {fileID: 4462257224907729137, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -12478,12 +12478,12 @@ PrefabInstance:
     - target: {fileID: 8572227882836430078, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430078, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 8572227882836430078, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -12578,12 +12578,12 @@ PrefabInstance:
     - target: {fileID: 7020551328166419880, guid: df38f39e18bbdcf4b9b2ee15b49f1bb2,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.75
+      value: 3.75
       objectReference: {fileID: 0}
     - target: {fileID: 7020551328166419880, guid: df38f39e18bbdcf4b9b2ee15b49f1bb2,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.5
+      value: -2.5
       objectReference: {fileID: 0}
     - target: {fileID: 7020551328166419880, guid: df38f39e18bbdcf4b9b2ee15b49f1bb2,
         type: 3}
@@ -12699,7 +12699,7 @@ Transform:
   m_GameObject: {fileID: 2097970933}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2, y: -5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12719,12 +12719,12 @@ PrefabInstance:
     - target: {fileID: 1004745928310103790, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: -278528
+      value: -409600
       objectReference: {fileID: 0}
     - target: {fileID: 1004745928310103790, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
       propertyPath: Prototype.Spawnpoint.Y.RawValue
-      value: 491520
+      value: 163840
       objectReference: {fileID: 0}
     - target: {fileID: 2331939488413250953, guid: 8cf8f49ac0882ed44953ea53ff901f11,
         type: 3}
@@ -12815,8 +12815,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 781762829}
   - {fileID: 121915677}
-  - {fileID: 133657843}
   - {fileID: 402974983}
+  - {fileID: 133657843}
   - {fileID: 1292545025}
   - {fileID: 859204837}
   - {fileID: 2097970934}

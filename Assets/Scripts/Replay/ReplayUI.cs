@@ -43,14 +43,14 @@ public class ReplayUI : MonoBehaviour {
         }
 
         trackArrowText.gameObject.SetActive(false);
-        ControlSystem.controls.UI.Pause.performed += OnPause;
+        Settings.Controls.UI.Pause.performed += OnPause;
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
     public void OnDestroy() {
         Time.timeScale = 1;
         NetworkHandler.IsReplayFastForwarding = false;
-        ControlSystem.controls.UI.Pause.performed -= OnPause;
+        Settings.Controls.UI.Pause.performed -= OnPause;
     }
 
     public void Update() {

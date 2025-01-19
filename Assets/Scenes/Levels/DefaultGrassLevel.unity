@@ -135,7 +135,7 @@ PrefabInstance:
     - target: {fileID: 148468707364900969, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: -1130496
+      value: -606208
       objectReference: {fileID: 0}
     - target: {fileID: 148468707364900969, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
@@ -270,7 +270,7 @@ PrefabInstance:
     - target: {fileID: 148468707364900969, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: -868352
+      value: -344064
       objectReference: {fileID: 0}
     - target: {fileID: 148468707364900969, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
@@ -414,7 +414,7 @@ Transform:
   m_GameObject: {fileID: 195012561}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -636,7 +636,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -11
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -3827,7 +3827,7 @@ Transform:
   m_GameObject: {fileID: 1227227467}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4147,7 +4147,7 @@ PrefabInstance:
     - target: {fileID: 148468707364900969, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: -180224
+      value: 344064
       objectReference: {fileID: 0}
     - target: {fileID: 148468707364900969, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
@@ -4303,7 +4303,7 @@ Transform:
   m_GameObject: {fileID: 1674679210}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4383,7 +4383,7 @@ Transform:
   m_GameObject: {fileID: 1761972579}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4590,7 +4590,7 @@ PrefabInstance:
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -14
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 8766815991138205779, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
@@ -4670,7 +4670,7 @@ PrefabInstance:
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue
-      value: -180224
+      value: 344064
       objectReference: {fileID: 0}
     - target: {fileID: -8052371499079056490, guid: 4f50cb5e806289d43bf820de1f1347bb,
         type: 3}
@@ -5057,7 +5057,7 @@ PrefabInstance:
     - target: {fileID: 4425110965538168567, guid: 52fa37521c30ebb40ab4cac4ef31be57,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.25
+      value: 10.25
       objectReference: {fileID: 0}
     - target: {fileID: 4425110965538168567, guid: 52fa37521c30ebb40ab4cac4ef31be57,
         type: 3}
@@ -5314,6 +5314,16 @@ PrefabInstance:
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.data[14]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: MapEntityReferences.Array.data[15]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: MapEntityReferences.Array.data[16]
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8642252342915534796, guid: dcdc633a29f212843ae9cbdf4be58fb2,

@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using NSMB.Translation;
+using NSMB.UI.Pause.Options;
 using NSMB.Utils;
 using Quantum;
 using System.Collections;
@@ -85,8 +86,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         public void OnEnable() {
-            ControlSystem.controls.UI.Next.performed += OnNextPerformed;
-            ControlSystem.controls.UI.Previous.performed += OnPreviousPerformed;
+            Settings.Controls.UI.Next.performed += OnNextPerformed;
+            Settings.Controls.UI.Previous.performed += OnPreviousPerformed;
 
             foreach (var panel in allPanels) {
                 panel.Deselect();
@@ -96,8 +97,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         public void OnDisable() {
-            ControlSystem.controls.UI.Next.performed -= OnNextPerformed;
-            ControlSystem.controls.UI.Previous.performed -= OnPreviousPerformed;
+            Settings.Controls.UI.Next.performed -= OnNextPerformed;
+            Settings.Controls.UI.Previous.performed -= OnPreviousPerformed;
         }
 
         public override bool TryGoBack(out bool playSound) {
@@ -233,7 +234,8 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Callbacks
         private void OnPreviousPerformed(InputAction.CallbackContext context) {
-            if (!context.performed || allPanels.Any(p => p.IsInSubmenu)) {
+            if (!context.performed || allPanels.Any(p => p.IsInSubmenu)
+                || GlobalController.Instance.optionsManager.isActiveAndEnabled || Canvas.SubmenuStack[^1] != this) {
                 return;
             }
            
@@ -248,7 +250,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private void OnNextPerformed(InputAction.CallbackContext context) {
-            if (!context.performed || allPanels.Any(p => p.IsInSubmenu)) {
+            if (!context.performed || allPanels.Any(p => p.IsInSubmenu)
+                || GlobalController.Instance.optionsManager.isActiveAndEnabled || Canvas.SubmenuStack[^1] != this) {
                 return;
             }
 

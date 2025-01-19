@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: DefaultBrickLevel
   ScenePath: Assets/Scenes/Levels/DefaultBrickLevel.unity
   SceneGuid: eccd61e23b609ef4f97a643aa84d51d5
-  WorldSize: 24
+  WorldSize: 16
   BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
@@ -134,9 +134,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -344064
+            RawValue: -16384
           Y:
-            RawValue: 245760
+            RawValue: 114688
         Rotation:
           RawValue: 0
     - rid: 1971040655551496193
@@ -210,9 +210,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -606208
+            RawValue: -278528
           Y:
-            RawValue: 376832
+            RawValue: 245760
         Rotation:
           RawValue: 0
     - rid: 3054802971113029633
@@ -286,9 +286,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -573440
+            RawValue: -245760
           Y:
-            RawValue: 376832
+            RawValue: 245760
         Rotation:
           RawValue: 0
     - rid: 3388837992360574977
@@ -362,9 +362,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 196608
+            RawValue: 524288
           Y:
-            RawValue: 229376
+            RawValue: 98304
         Rotation:
           RawValue: 0
     - rid: 3620598001065525249
@@ -486,9 +486,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -835584
+            RawValue: -507904
           Y:
-            RawValue: 180224
+            RawValue: 49152
         Rotation:
           RawValue: 0
     - rid: 4495734601653682177
@@ -562,9 +562,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 196608
+            RawValue: 524288
           Y:
-            RawValue: 0
+            RawValue: -131072
         Rotation:
           RawValue: 0
     - rid: 5727890311477198849
@@ -686,9 +686,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 196608
+            RawValue: 524288
           Y:
-            RawValue: -229376
+            RawValue: -360448
         Rotation:
           RawValue: 0
     - rid: 6791012105135849473
@@ -810,9 +810,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -704512
+            RawValue: -376832
           Y:
-            RawValue: 229376
+            RawValue: 98304
         Rotation:
           RawValue: 0
     - rid: 7591444679539818497
@@ -872,9 +872,9 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: -704512
+            RawValue: -376832
           Y:
-            RawValue: 229376
+            RawValue: 98304
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -963,9 +963,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -376832
+            RawValue: -49152
           Y:
-            RawValue: 245760
+            RawValue: 114688
         Rotation:
           RawValue: 0
     - rid: 7893719521440038913
@@ -1039,9 +1039,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 180223
+            RawValue: 507904
           Y:
-            RawValue: 180224
+            RawValue: 49152
         Rotation:
           RawValue: 0
     - rid: 8783231218654117889
@@ -1115,9 +1115,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -212992
+            RawValue: 114688
           Y:
-            RawValue: 0
+            RawValue: -131072
         Rotation:
           RawValue: 0
     - rid: 8968679368100413441
@@ -1177,9 +1177,9 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: -212992
+            RawValue: 114688
           Y:
-            RawValue: 0
+            RawValue: -131072
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:

@@ -23,10 +23,10 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<MarioPlayer, MarioPlayer>(f, OnMarioMarioInteraction);
-            f.Context.RegisterInteraction<MarioPlayer, Projectile>(f, OnMarioProjectileInteraction);
-            f.Context.RegisterInteraction<MarioPlayer, Coin>(f, OnMarioCoinInteraction);
-            f.Context.RegisterInteraction<MarioPlayer, InvisibleBlock>(f, OnMarioInvisibleBlockInteraction);
+            f.Context.Interactions.Register<MarioPlayer, MarioPlayer>(f, OnMarioMarioInteraction);
+            f.Context.Interactions.Register<MarioPlayer, Projectile>(f, OnMarioProjectileInteraction);
+            f.Context.Interactions.Register<MarioPlayer, Coin>(f, OnMarioCoinInteraction);
+            f.Context.Interactions.Register<MarioPlayer, InvisibleBlock>(f, OnMarioInvisibleBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -768,10 +768,16 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
+            if (inputs.Down.IsDown && mario->GroundpoundCooldownFrames == 0 && !mario->IsGroundpounding) {
+                // 6 frame delay
+                mario->GroundpoundCooldownFrames = 7;
+            }
+
+            bool allowGroundpoundStart = mario->GroundpoundCooldownFrames == 1;
             QuantumUtils.Decrement(ref mario->GroundpoundCooldownFrames);
             QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 
-            if (inputs.Down.WasPressed || (mario->IsPropellerFlying && inputs.Down.IsDown)) {
+            if (inputs.Down.IsDown && allowGroundpoundStart) {
                 TryStartGroundpound(f, ref filter, physics, ref inputs, stage);
             }
 
@@ -800,7 +806,7 @@ namespace Quantum {
                     // Cancel from being grounded
                     mario->GroundpoundStandFrames = 15;
                     mario->IsGroundpounding = false;
-                } else if (inputs.Up.WasPressed && mario->GroundpoundStartFrames == 0) {
+                } else if (inputs.Up.IsDown && mario->GroundpoundStartFrames == 0) {
                     // Cancel from hitting "up"
                     mario->GroundpoundCooldownFrames = 12;
                     mario->IsGroundpounding = false;

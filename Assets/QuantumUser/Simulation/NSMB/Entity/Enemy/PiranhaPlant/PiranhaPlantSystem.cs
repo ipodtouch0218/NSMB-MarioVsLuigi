@@ -16,9 +16,9 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<PiranhaPlant, MarioPlayer>(f, OnPiranhaPlantMarioInteraction);
-            f.Context.RegisterInteraction<PiranhaPlant, Projectile>(f, OnPiranhaPlantProjectileInteraction);
-            f.Context.RegisterInteraction<PiranhaPlant, IceBlock>(f, OnPiranhaPlantIceBlockInteraction);
+            f.Context.Interactions.Register<PiranhaPlant, MarioPlayer>(f, OnPiranhaPlantMarioInteraction);
+            f.Context.Interactions.Register<PiranhaPlant, Projectile>(f, OnPiranhaPlantProjectileInteraction);
+            f.Context.Interactions.Register<PiranhaPlant, IceBlock>(f, OnPiranhaPlantIceBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {

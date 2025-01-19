@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: CustomJungle
   ScenePath: Assets/Scenes/Levels/CustomJungle.unity
   SceneGuid: de8e2edb54b6b5e489c97578fa670804
-  WorldSize: 72
+  WorldSize: 64
   BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0

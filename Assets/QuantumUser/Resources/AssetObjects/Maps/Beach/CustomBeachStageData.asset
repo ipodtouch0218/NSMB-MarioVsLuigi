@@ -26,16 +26,16 @@ MonoBehaviour:
   TileOrigin: {x: -28, y: -12}
   TilemapWorldPosition:
     X:
-      RawValue: 0
+      RawValue: -131072
     Y:
-      RawValue: 327680
+      RawValue: 0
   IsWrappingLevel: 1
   ExtendCeilingHitboxes: 0
   Spawnpoint:
     X:
-      RawValue: -622592
+      RawValue: -753664
     Y:
-      RawValue: 311296
+      RawValue: -16384
   SpawnpointArea:
     X:
       RawValue: 91750
@@ -46,12 +46,12 @@ MonoBehaviour:
     X:
       RawValue: -65536000
     Y:
-      RawValue: 32768
+      RawValue: -294912
   CameraMaxPosition:
     X:
       RawValue: 65536000
     Y:
-      RawValue: 917504
+      RawValue: 589824
   UIColor: {r: 0.8784314, g: 0.8156863, b: 0.6, a: 1}
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 0
@@ -15423,42 +15423,42 @@ MonoBehaviour:
         RawValue: 65536
   BigStarSpawnpoints:
   - X:
-      RawValue: 98304
+      RawValue: -32768
     Y:
-      RawValue: 131072
-  - X:
-      RawValue: 114688
-    Y:
-      RawValue: 376832
-  - X:
-      RawValue: -622592
-    Y:
-      RawValue: 524288
-  - X:
       RawValue: -196608
-    Y:
-      RawValue: 622592
   - X:
-      RawValue: 1032192
+      RawValue: -16384
     Y:
-      RawValue: 622592
+      RawValue: 49152
   - X:
-      RawValue: 983040
+      RawValue: -753664
     Y:
-      RawValue: 163840
-  - X:
-      RawValue: 540672
-    Y:
-      RawValue: 262144
+      RawValue: 196608
   - X:
       RawValue: -327680
     Y:
       RawValue: 294912
   - X:
-      RawValue: 819200
+      RawValue: 901120
     Y:
-      RawValue: 458752
+      RawValue: 294912
   - X:
-      RawValue: 376832
+      RawValue: 851968
     Y:
-      RawValue: 622592
+      RawValue: -163840
+  - X:
+      RawValue: 409600
+    Y:
+      RawValue: -65536
+  - X:
+      RawValue: -458752
+    Y:
+      RawValue: -32768
+  - X:
+      RawValue: 688128
+    Y:
+      RawValue: 131072
+  - X:
+      RawValue: 245760
+    Y:
+      RawValue: 294912

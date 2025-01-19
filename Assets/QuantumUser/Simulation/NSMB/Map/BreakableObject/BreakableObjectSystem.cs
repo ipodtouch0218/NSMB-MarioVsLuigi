@@ -1,11 +1,10 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnStageReset {
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioInteraction);
+            f.Context.Interactions.Register<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioInteraction);
         }
 
         private static bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {

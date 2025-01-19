@@ -46,7 +46,7 @@ namespace NSMB.UI.Pause.Options {
         private bool initialized;
 
         //---Properties
-        public InputActionAsset Controls => ControlSystem.controls.asset;
+        public InputActionAsset Controls => Settings.Controls.asset;
         private bool IsCompositeRebind => rebindCompositePrompt.gameObject.activeSelf;
 
         public override void Selected() {

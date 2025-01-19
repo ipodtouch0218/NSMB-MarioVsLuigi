@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: CustomBonus
   ScenePath: Assets/Scenes/Levels/CustomBonus.unity
   SceneGuid: ce4cf98f31007b44ea19a2fb2ab0924a
-  WorldSize: 72
+  WorldSize: 64
   BucketsCount: 16
   BucketsSubdivisions: 8
   BucketingAxis: 0

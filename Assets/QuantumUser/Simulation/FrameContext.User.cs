@@ -1,6 +1,7 @@
 ﻿using Photon.Deterministic;
 using System;
 using System.Collections.Generic;
+using static Quantum.InteractionSystem;
 
 namespace Quantum {
     public partial class FrameContextUser {
@@ -10,22 +11,7 @@ namespace Quantum {
         public Shape2D CircleRadiusTwo;
 
         public delegate void PreContactCallback(FrameThreadSafe f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContacts);
-        public List<PreContactCallback> PreContactCallbacks = new();
-
-        //---Culling
-        public List<EntityRef> CullingIgnoredEntities = new();
-        public List<FPVector2> CullingCameraPositions = new();
-        public FP MaxCameraOrthoSize = 7;
-
-        //---Interactions
-        public delegate void HitboxInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
-        public delegate void PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
-        
-        public List<(Type, Type)> hitboxInteractorMap = new();
-        public List<HitboxInteractor> hitboxInteractors = new();
-        public List<(Type, Type)> platformInteractorMap = new();
-        public List<PlatformInteractor> platformInteractors = new();
-
+        public readonly List<PreContactCallback> PreContactCallbacks = new();
         public void RegisterPreContactCallback(Frame f, PreContactCallback callback) {
             if (f.IsPredicted) {
                 return;
@@ -34,24 +20,85 @@ namespace Quantum {
             PreContactCallbacks.Add(callback);
         }
 
-        public void RegisterInteraction<X, Y>(Frame f, HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
-            if (f.IsPredicted) {
-                return;
+
+        //---Culling
+        public readonly List<EntityRef> CullingIgnoredEntities = new();
+        public readonly List<FPVector2> CullingCameraPositions = new();
+        public FP MaxCameraOrthoSize = 7;
+
+        //---Interactions
+        public readonly InteractionContext Interactions = new();
+
+        public class InteractionContext {
+
+            public delegate void HitboxInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
+            public delegate void PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
+
+            public readonly List<(int, int)> hitboxInteractorMap = new();
+            public readonly List<HitboxInteractor> hitboxInteractors = new();
+
+            public readonly List<(int, int)> platformInteractorMap = new();
+            public readonly List<PlatformInteractor> platformInteractors = new();
+
+            private static readonly PendingInteraction None = new PendingInteraction {
+                InteractorIndex = -1
+            };
+
+            public PendingInteraction FindHitboxInteractor(EntityRef a, ComponentSet ac, EntityRef b, ComponentSet bc) {
+                for (int i = 0; i < hitboxInteractorMap.Count; i++) {
+                    var key = hitboxInteractorMap[i];
+                    if (ac.IsSet(key.Item1)
+                        && bc.IsSet(key.Item2)) {
+
+                        return new PendingInteraction {
+                            EntityA = a,
+                            EntityB = b,
+                            InteractorIndex = i,
+                            IsPlatformInteraction = false,
+                        };
+                    }
+                }
+
+                return None;
             }
 
-            var key = (typeof(X), typeof(Y));
-            hitboxInteractorMap.Add(key);
-            hitboxInteractors.Add(interactor);
-        }
+            public PendingInteraction FindPlatformInteractor(EntityRef a, ComponentSet ac, EntityRef b, ComponentSet bc) {
+                for (int i = 0; i < platformInteractorMap.Count; i++) {
+                    var key = platformInteractorMap[i];
+                    if (ac.IsSet(key.Item1)
+                        && bc.IsSet(key.Item2)) {
 
-        public void RegisterInteraction<X, Y>(Frame f, PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
-            if (f.IsPredicted) {
-                return;
+                        return new PendingInteraction {
+                            EntityA = a,
+                            EntityB = b,
+                            InteractorIndex = i,
+                            IsPlatformInteraction = true,
+                        };
+                    }
+                }
+
+                return None;
             }
 
-            var key = (typeof(X), typeof(Y));
-            platformInteractorMap.Add(key);
-            platformInteractors.Add(interactor);
+            public void Register<X, Y>(Frame f, HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+                if (f.IsPredicted) {
+                    return;
+                }
+
+                var key = (ComponentTypeId.GetComponentIndex(typeof(X)), ComponentTypeId.GetComponentIndex(typeof(Y)));
+                hitboxInteractorMap.Add(key);
+                hitboxInteractors.Add(interactor);
+            }
+
+            public void Register<X, Y>(Frame f, PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+                if (f.IsPredicted) {
+                    return;
+                }
+
+                var key = (ComponentTypeId.GetComponentIndex(typeof(X)), ComponentTypeId.GetComponentIndex(typeof(Y)));
+                platformInteractorMap.Add(key);
+                platformInteractors.Add(interactor);
+            }
         }
     }
 }

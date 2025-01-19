@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 public class Settings : Singleton<Settings> {
 
     //---Static Variables
+    public static Controls Controls { get; private set; }
     private Action[] VersionUpdaters;
     public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
     public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
@@ -199,8 +200,8 @@ public class Settings : Singleton<Settings> {
     }
 
     public string ControlsBindings {
-        get => ControlSystem.controls.asset.SaveBindingOverridesAsJson();
-        set => ControlSystem.controls.asset.LoadBindingOverridesFromJson(value);
+        get => Controls.asset.SaveBindingOverridesAsJson();
+        set => Controls.asset.LoadBindingOverridesFromJson(value);
     }
 
     //---Public Variables
@@ -223,9 +224,7 @@ public class Settings : Singleton<Settings> {
 
     public void Awake() {
         Set(this);
-    }
-
-    public void Start() {
+        Controls = new();
         VersionUpdaters = new Action[] { LoadFromVersion0, LoadFromVersion1 };
         LoadSettings();
 

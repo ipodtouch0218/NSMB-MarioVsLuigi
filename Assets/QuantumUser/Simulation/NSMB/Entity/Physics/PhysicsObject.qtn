@@ -11,6 +11,7 @@ component PhysicsObject {
     bool BreakMegaObjects;
     
     [ExcludeFromPrototype] FPVector2 Velocity;
+    [ExcludeFromPrototype] EntityRef Parent;
     [ExcludeFromPrototype] FPVector2 ParentVelocity;
     [ExcludeFromPrototype] FPVector2 PreviousFrameVelocity;
 

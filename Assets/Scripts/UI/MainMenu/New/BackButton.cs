@@ -37,13 +37,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEnable() {
-            ControlSystem.controls.UI.Cancel.performed += OnCancel;
-            ControlSystem.controls.UI.Cancel.canceled += OnCancel;
+            Settings.Controls.UI.Cancel.performed += OnCancel;
+            Settings.Controls.UI.Cancel.canceled += OnCancel;
         }
 
         public void OnDisable() {
-            ControlSystem.controls.UI.Cancel.performed -= OnCancel;
-            ControlSystem.controls.UI.Cancel.canceled -= OnCancel;
+            Settings.Controls.UI.Cancel.performed -= OnCancel;
+            Settings.Controls.UI.Cancel.canceled -= OnCancel;
 
             BackHeld = false;
             timer = 0;

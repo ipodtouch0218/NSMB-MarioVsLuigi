@@ -36,6 +36,8 @@ namespace Quantum {
             }
 
             filter.PhysicsObject->Velocity = FPVector2.Zero;
+            filter.PhysicsObject->WasTouchingGround = false;
+            filter.PhysicsObject->IsTouchingGround = false;
             filter.Transform->Position = holderTransform->Position + mario->GetHeldItemOffset(f, holdable->Holder);
         }
 

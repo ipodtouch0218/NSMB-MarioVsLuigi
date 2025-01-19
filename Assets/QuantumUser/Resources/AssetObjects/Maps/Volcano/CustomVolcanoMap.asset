@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: CustomVolcano
   ScenePath: Assets/Scenes/Levels/CustomVolcano.unity
   SceneGuid: 48dfbffbd41b62a41a8135ce450497f5
-  WorldSize: 48
+  WorldSize: 40
   BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
@@ -222,9 +222,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 868352
+            RawValue: 638976
           Y:
-            RawValue: 242483
+            RawValue: -85196
         Rotation:
           RawValue: 0
     - rid: 68130286679883777
@@ -284,9 +284,9 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: 868352
+            RawValue: 638976
           Y:
-            RawValue: 242483
+            RawValue: -85196
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -375,9 +375,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 475136
+            RawValue: 245760
           Y:
-            RawValue: 311296
+            RawValue: -16384
         Rotation:
           RawValue: 0
     - rid: 701423104953417729
@@ -451,9 +451,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 1458176
+            RawValue: 1228800
           Y:
-            RawValue: 638976
+            RawValue: 311296
         Rotation:
           RawValue: 0
     - rid: 739945055325782017
@@ -527,9 +527,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 294912
+            RawValue: 65536
           Y:
-            RawValue: 229376
+            RawValue: -98304
         Rotation:
           RawValue: 0
     - rid: 1436104441634750465
@@ -583,9 +583,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 901120
+            RawValue: 671744
           Y:
-            RawValue: 229376
+            RawValue: -98304
         Rotation:
           RawValue: 0
     - rid: 2261435267871145985
@@ -639,9 +639,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -475136
+            RawValue: -704512
           Y:
-            RawValue: 141930
+            RawValue: -185749
         Rotation:
           RawValue: 0
     - rid: 3133657868440436737
@@ -725,9 +725,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -1064960
+            RawValue: -1294336
           Y:
-            RawValue: 638976
+            RawValue: 311296
         Rotation:
           RawValue: 0
     - rid: 3156775879950991361
@@ -801,9 +801,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 114688
+            RawValue: -114688
           Y:
-            RawValue: 311296
+            RawValue: -16384
         Rotation:
           RawValue: 0
     - rid: 3216328451220832257
@@ -877,9 +877,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 770048
+            RawValue: 540672
           Y:
-            RawValue: 606208
+            RawValue: 278528
         Rotation:
           RawValue: 0
     - rid: 3246287961234341889
@@ -953,9 +953,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 311296
+            RawValue: 81920
           Y:
-            RawValue: 242483
+            RawValue: -85196
         Rotation:
           RawValue: 0
     - rid: 3678451543402610689
@@ -1015,9 +1015,9 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: 311296
+            RawValue: 81920
           Y:
-            RawValue: 242483
+            RawValue: -85196
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -1106,9 +1106,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -475136
+            RawValue: -704512
           Y:
-            RawValue: 507904
+            RawValue: 180224
         Rotation:
           RawValue: 0
     - rid: 3727240194336751617
@@ -1182,9 +1182,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -475136
+            RawValue: -704512
           Y:
-            RawValue: 573440
+            RawValue: 245760
         Rotation:
           RawValue: 0
     - rid: 4680192939379392513
@@ -1258,9 +1258,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -475136
+            RawValue: -704512
           Y:
-            RawValue: 137625
+            RawValue: -190054
         Rotation:
           RawValue: 0
     - rid: 4811008838532595713
@@ -1310,9 +1310,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 344064
+            RawValue: 114688
           Y:
-            RawValue: 147456
+            RawValue: -180224
         Rotation:
           RawValue: 0
     - rid: 5439435628510969857
@@ -1386,9 +1386,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 1327104
+            RawValue: 1097728
           Y:
-            RawValue: 229376
+            RawValue: -98304
         Rotation:
           RawValue: 0
     - rid: 6054679761551097857
@@ -1442,9 +1442,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -229376
+            RawValue: -458752
           Y:
-            RawValue: 376832
+            RawValue: 49152
         Rotation:
           RawValue: 0
     - rid: 6149917455146811393
@@ -1518,9 +1518,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -753664
+            RawValue: -983040
           Y:
-            RawValue: 196608
+            RawValue: -131072
         Rotation:
           RawValue: 0
     - rid: 6753430655964545025
@@ -1574,9 +1574,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -933888
+            RawValue: -1163264
           Y:
-            RawValue: 671744
+            RawValue: 344064
         Rotation:
           RawValue: 0
     - rid: 7025304896857440257
@@ -1650,9 +1650,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 245760
+            RawValue: 16384
           Y:
-            RawValue: 147456
+            RawValue: -180224
         Rotation:
           RawValue: 0
     - rid: 7041684246414491649
@@ -1726,9 +1726,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 1359872
+            RawValue: 1130496
           Y:
-            RawValue: 242483
+            RawValue: -85196
         Rotation:
           RawValue: 0
     - rid: 8246143707158413313
@@ -1788,9 +1788,9 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: 1359872
+            RawValue: 1130496
           Y:
-            RawValue: 242483
+            RawValue: -85196
         IgnorePlayerWhenRespawning:
           Value: 0
         DisableRespawning:
@@ -1879,9 +1879,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -229376
+            RawValue: -458752
           Y:
-            RawValue: 475136
+            RawValue: 147456
         Rotation:
           RawValue: 0
     - rid: 8267537570619981825
@@ -1955,9 +1955,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 671744
+            RawValue: 442368
           Y:
-            RawValue: 606208
+            RawValue: 278528
         Rotation:
           RawValue: 0
     - rid: 8573978543682224129
@@ -2031,9 +2031,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -671744
+            RawValue: -901120
           Y:
-            RawValue: 671744
+            RawValue: 344064
         Rotation:
           RawValue: 0
     - rid: 8932072812080791553
@@ -2107,9 +2107,9 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 229376
+            RawValue: 0
           Y:
-            RawValue: -32768
+            RawValue: -360448
         Rotation:
           RawValue: 0
     - rid: 9186332453642436609

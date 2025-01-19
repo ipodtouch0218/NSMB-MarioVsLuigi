@@ -18,12 +18,12 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.RegisterInteraction<Bobomb, Bobomb>(f, EnemySystem.EnemyBumpTurnaround);
-            f.Context.RegisterInteraction<Bobomb, Goomba>(f, EnemySystem.EnemyBumpTurnaround);
-            f.Context.RegisterInteraction<Bobomb, PiranhaPlant>(f, EnemySystem.EnemyBumpTurnaroundOnlyFirst);
-            f.Context.RegisterInteraction<Bobomb, MarioPlayer>(f, OnBobombMarioInteraction);
-            f.Context.RegisterInteraction<Bobomb, Projectile>(f, OnBobombProjectileInteraction);
-            f.Context.RegisterInteraction<Bobomb, IceBlock>(f, OnBobombIceBlockInteraction);
+            f.Context.Interactions.Register<Bobomb, Bobomb>(f, EnemySystem.EnemyBumpTurnaround);
+            f.Context.Interactions.Register<Bobomb, Goomba>(f, EnemySystem.EnemyBumpTurnaround);
+            f.Context.Interactions.Register<Bobomb, PiranhaPlant>(f, EnemySystem.EnemyBumpTurnaroundOnlyFirst);
+            f.Context.Interactions.Register<Bobomb, MarioPlayer>(f, OnBobombMarioInteraction);
+            f.Context.Interactions.Register<Bobomb, Projectile>(f, OnBobombProjectileInteraction);
+            f.Context.Interactions.Register<Bobomb, IceBlock>(f, OnBobombIceBlockInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter) {

@@ -56,19 +56,19 @@ namespace NSMB.UI.Game {
 
         public void OnEnable() {
             AllPlayerElements.Add(this);
-            ControlSystem.controls.UI.Navigate.performed += OnNavigate;
-            ControlSystem.controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
-            ControlSystem.controls.UI.Next.performed += SpectateNextPlayer;
-            ControlSystem.controls.UI.Previous.performed += SpectatePreviousPlayer;
+            Settings.Controls.UI.Navigate.performed += OnNavigate;
+            Settings.Controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
+            Settings.Controls.UI.Next.performed += SpectateNextPlayer;
+            Settings.Controls.UI.Previous.performed += SpectatePreviousPlayer;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
         public void OnDisable() {
             AllPlayerElements.Remove(this);
-            ControlSystem.controls.UI.Navigate.performed -= OnNavigate;
-            ControlSystem.controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
-            ControlSystem.controls.UI.Next.performed -= SpectateNextPlayer;
-            ControlSystem.controls.UI.Previous.performed -= SpectatePreviousPlayer;
+            Settings.Controls.UI.Navigate.performed -= OnNavigate;
+            Settings.Controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
+            Settings.Controls.UI.Next.performed -= SpectateNextPlayer;
+            Settings.Controls.UI.Previous.performed -= SpectatePreviousPlayer;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 

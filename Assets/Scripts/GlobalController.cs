@@ -70,8 +70,8 @@ public class GlobalController : Singleton<GlobalController> {
                 mixer.SetFloat("SoundVolume", -80f);
             }
         }
-        ControlSystem.controls.Enable();
-        ControlSystem.controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
+        Settings.Controls.Enable();
+        Settings.Controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
 
         //NetworkHandler.OnShutdown += OnShutdown;
         //NetworkHandler.OnHostMigration += OnHostMigration;
@@ -79,8 +79,8 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     public void OnDestroy() {
-        ControlSystem.controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
-        ControlSystem.controls.Disable();
+        Settings.Controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
+        Settings.Controls.Disable();
 
         //NetworkHandler.OnShutdown -= OnShutdown;
         //NetworkHandler.OnHostMigration -= OnHostMigration;

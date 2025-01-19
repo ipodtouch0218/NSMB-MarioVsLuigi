@@ -22,7 +22,7 @@ MonoBehaviour:
   Scene: DefaultCastle
   ScenePath: Assets/Scenes/Levels/DefaultCastle.unity
   SceneGuid: 2c88ad1eb18532241acee4483fed211d
-  WorldSize: 40
+  WorldSize: 32
   BucketsCount: 8
   BucketsSubdivisions: 8
   BucketingAxis: 0
@@ -165,7 +165,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 114688
+            RawValue: 311296
           Y:
             RawValue: 245760
         Rotation:
@@ -241,7 +241,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -540672
+            RawValue: -344064
           Y:
             RawValue: 81920
         Rotation:
@@ -317,7 +317,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -573440
+            RawValue: -376832
           Y:
             RawValue: 81920
         Rotation:
@@ -393,7 +393,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 81920
+            RawValue: 278528
           Y:
             RawValue: 65536
         Rotation:
@@ -463,7 +463,7 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: 81920
+            RawValue: 278528
           Y:
             RawValue: 65536
         IgnorePlayerWhenRespawning:
@@ -530,7 +530,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -278528
+            RawValue: -81920
           Y:
             RawValue: 245760
         Rotation:
@@ -606,7 +606,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -999424
+            RawValue: -802816
           Y:
             RawValue: 245760
         Rotation:
@@ -682,7 +682,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -606208
+            RawValue: -409600
           Y:
             RawValue: 81920
         Rotation:
@@ -758,7 +758,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -737280
+            RawValue: -540672
           Y:
             RawValue: 278528
         Rotation:
@@ -834,7 +834,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -737280
+            RawValue: -540672
           Y:
             RawValue: 98304
         Rotation:
@@ -904,7 +904,7 @@ MonoBehaviour:
       data:
         Spawnpoint:
           X:
-            RawValue: -737280
+            RawValue: -540672
           Y:
             RawValue: 98304
         IgnorePlayerWhenRespawning:
@@ -971,7 +971,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 573440
+            RawValue: 770048
           Y:
             RawValue: 245760
         Rotation:
@@ -1047,7 +1047,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 540672
+            RawValue: 737280
           Y:
             RawValue: 245760
         Rotation:
@@ -1123,7 +1123,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -311296
+            RawValue: -114688
           Y:
             RawValue: 245760
         Rotation:
@@ -1199,7 +1199,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -507904
+            RawValue: -311296
           Y:
             RawValue: 81920
         Rotation:
@@ -1275,7 +1275,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 835584
+            RawValue: 1032192
           Y:
             RawValue: 311296
         Rotation:
@@ -1351,7 +1351,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 0
+            RawValue: 196608
           Y:
             RawValue: 0
         Rotation:
