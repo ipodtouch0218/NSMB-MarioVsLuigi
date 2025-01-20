@@ -3,6 +3,7 @@ using Quantum.Physics2D;
 using Quantum.Profiling;
 using Quantum.Task;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Quantum {
 
@@ -193,7 +194,7 @@ namespace Quantum {
                 return;
             }
 
-            PendingInteraction interaction = ((Frame) f).Context.Interactions.FindPlatformInteractor(entityA, f.GetComponentSet(entityA), entityB, f.GetComponentSet(entityB));
+            PendingInteraction interaction = ((Frame) f).Context.Interactions.FindPlatformInteractor(entityA, f.GetComponentSet(entityA), entityB, f.GetComponentSet(entityB), contact);
             if (interaction.InteractorIndex != -1) {
 #if MULTITHREADED
                 lock (pendingInteractions) {

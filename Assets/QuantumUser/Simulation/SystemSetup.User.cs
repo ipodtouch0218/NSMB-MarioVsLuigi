@@ -21,17 +21,15 @@ namespace Quantum {
                     new GenericMoverSystem(),
                     new SpinnerSystem(),
                     new MovingPlatformPhysicsQuerySystem(),
+
+                    // multithreaded
                     new PhysicsSystem2D(),
 
-                    // Runs as an array task
                     new MovingPlatformSystem(),
-
                     new EnemySystem(),
-
-                    // Runs as an array task
                     new InteractionSystem(),
-                    
-                    // Runs as an array task
+
+                    // multithreaded
                     new PhysicsObjectSystem(),
 
                     new GoombaSystem(),
@@ -49,6 +47,8 @@ namespace Quantum {
                     new BigStarSystem(),
                     new HoldableObjectSystem(),
                     new IceBlockSystem(),
+
+                    // multithreaded
                     new CameraSystem()
                 )
             );

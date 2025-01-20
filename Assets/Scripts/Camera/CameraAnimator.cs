@@ -37,8 +37,7 @@ public unsafe class CameraAnimator : ResizingCamera {
         OnScreenshake += OnScreenshakeCallback;
     }
 
-    public override void OnDestroy() {
-        base.OnDestroy();
+    public void OnDestroy() {
         OnScreenshake -= OnScreenshakeCallback;
     }
 
@@ -54,8 +53,9 @@ public unsafe class CameraAnimator : ResizingCamera {
         var cameraControllerCurrent = f.Unsafe.GetPointer<CameraController>(Target);
         var cameraControllerPrevious = fp.Unsafe.GetPointer<CameraController>(Target);
 
+        // Resize from game
         float orthoSize = Mathf.Lerp(cameraControllerPrevious->OrthographicSize.AsFloat, cameraControllerCurrent->OrthographicSize.AsFloat, game.InterpolationFactor);
-        ourCamera.orthographicSize = orthoSize / 2f;
+        ClampCameraAspectRatio(orthoSize * 0.5f);
 
         FPVector2 origin = cameraControllerPrevious->CurrentPosition;
         FPVector2 target = cameraControllerCurrent->CurrentPosition;

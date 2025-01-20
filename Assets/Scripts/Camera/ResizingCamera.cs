@@ -11,24 +11,14 @@ public class ResizingCamera : MonoBehaviour {
     }
 
     public virtual void Start() {
-        GlobalController.ResolutionChanged += AdjustCamera;
-        AdjustCamera();
+        ClampCameraAspectRatio();
     }
 
-    public virtual void OnDestroy() {
-        GlobalController.ResolutionChanged -= AdjustCamera;
-    }
-
-    protected virtual double GetNewCameraSize() {
-        return (14f / 4f)/* + SizeIncreaseCurrent*/;
-    }
-
-    private void AdjustCamera() {
+    protected void ClampCameraAspectRatio(float target = 14f/4f) {
         float aspect = ourCamera.aspect;
-        double size = GetNewCameraSize();
 
         // https://forum.unity.com/threads/how-to-calculate-horizontal-field-of-view.16114/#post-2961964
         double aspectReciprocals = 1d / aspect;
-        ourCamera.orthographicSize = Mathf.Min((float) size, (float) (size * (16d/9d) * aspectReciprocals));
+        ourCamera.orthographicSize = Mathf.Min(target, (float) (target * (16d/9d) * aspectReciprocals));
     }
 }

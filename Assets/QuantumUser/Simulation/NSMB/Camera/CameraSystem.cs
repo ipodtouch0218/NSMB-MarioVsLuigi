@@ -1,9 +1,8 @@
 using Photon.Deterministic;
-using UnityEngine;
-using UnityEngine.Diagnostics;
+using Quantum.Task;
 
 namespace Quantum {
-    public unsafe class CameraSystem : SystemMainThreadFilterStage<CameraSystem.Filter> {
+    public unsafe class CameraSystem : SystemArrayFilter<CameraSystem.Filter> {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -13,14 +12,14 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
-        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+        public override void Update(FrameThreadSafe f, ref Filter filter) {
             UpdateCameraSize(f, ref filter);
             if (!filter.Mario->IsDead) {
-                filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, stage);
+                filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, f.FindAsset<VersusStageData>(f.Map.UserAsset));
             }
         }
 
-        private void UpdateCameraSize(Frame f, ref Filter filter) {
+        private void UpdateCameraSize(FrameThreadSafe f, ref Filter filter) {
             var mario = filter.Mario;
             var camera = filter.Camera;
 
@@ -35,7 +34,7 @@ namespace Quantum {
                 camera->SizeChangePerSecond, FP.UseableMax, f.DeltaTime);
         }
 
-        private FPVector2 CalculateNewPosition(Frame f, ref Filter filter, VersusStageData stage) {
+        private FPVector2 CalculateNewPosition(FrameThreadSafe f, ref Filter filter, VersusStageData stage) {
             var camera = filter.Camera;
             var mario = filter.Mario;
             var transform = filter.Transform;
@@ -89,7 +88,7 @@ namespace Quantum {
                 camera->SmoothDampVelocity.Y = 0;
             }
 
-            camera->LastPlayerPosition = QuantumUtils.WrapWorld(f, camera->LastPlayerPosition, out _);
+            camera->LastPlayerPosition = QuantumUtils.WrapWorld(stage, camera->LastPlayerPosition, out _);
 
             FP xDifference = FPVector2.Distance(FPVector2.Right * newCameraPosition.X, FPVector2.Right * camera->LastPlayerPosition.X);
             bool right = newCameraPosition.X > camera->LastPlayerPosition.X;

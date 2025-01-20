@@ -44,7 +44,7 @@ namespace Quantum {
                 InteractorIndex = -1
             };
 
-            public PendingInteraction FindHitboxInteractor(EntityRef a, ComponentSet ac, EntityRef b, ComponentSet bc) {
+            public PendingInteraction FindHitboxInteractor(EntityRef a, in ComponentSet ac, EntityRef b, in ComponentSet bc) {
                 for (int i = 0; i < hitboxInteractorMap.Count; i++) {
                     var key = hitboxInteractorMap[i];
                     if (ac.IsSet(key.Item1)
@@ -62,7 +62,7 @@ namespace Quantum {
                 return None;
             }
 
-            public PendingInteraction FindPlatformInteractor(EntityRef a, ComponentSet ac, EntityRef b, ComponentSet bc) {
+            public PendingInteraction FindPlatformInteractor(EntityRef a, in ComponentSet ac, EntityRef b, in ComponentSet bc, in PhysicsContact contact) {
                 for (int i = 0; i < platformInteractorMap.Count; i++) {
                     var key = platformInteractorMap[i];
                     if (ac.IsSet(key.Item1)
@@ -73,6 +73,17 @@ namespace Quantum {
                             EntityB = b,
                             InteractorIndex = i,
                             IsPlatformInteraction = true,
+                            Contact = contact,
+                        };
+                    } else if (ac.IsSet(key.Item2)
+                        && bc.IsSet(key.Item1)) {
+
+                        return new PendingInteraction {
+                            EntityA = b,
+                            EntityB = a,
+                            InteractorIndex = i,
+                            IsPlatformInteraction = true,
+                            Contact = contact,
                         };
                     }
                 }
@@ -80,24 +91,26 @@ namespace Quantum {
                 return None;
             }
 
-            public void Register<X, Y>(Frame f, HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+            public int Register<X, Y>(Frame f, HitboxInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
                 if (f.IsPredicted) {
-                    return;
+                    return -1;
                 }
 
                 var key = (ComponentTypeId.GetComponentIndex(typeof(X)), ComponentTypeId.GetComponentIndex(typeof(Y)));
                 hitboxInteractorMap.Add(key);
                 hitboxInteractors.Add(interactor);
+                return hitboxInteractors.Count - 1;
             }
 
-            public void Register<X, Y>(Frame f, PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
+            public int Register<X, Y>(Frame f, PlatformInteractor interactor) where X : unmanaged, IComponent where Y : unmanaged, IComponent {
                 if (f.IsPredicted) {
-                    return;
+                    return -1;
                 }
 
                 var key = (ComponentTypeId.GetComponentIndex(typeof(X)), ComponentTypeId.GetComponentIndex(typeof(Y)));
                 platformInteractorMap.Add(key);
                 platformInteractors.Add(interactor);
+                return platformInteractors.Count - 1;
             }
         }
     }

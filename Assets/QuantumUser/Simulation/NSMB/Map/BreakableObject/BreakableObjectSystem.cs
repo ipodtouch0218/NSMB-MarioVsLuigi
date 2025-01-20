@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnStageReset {
@@ -45,11 +46,18 @@ namespace Quantum {
                 ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->MinimumHeight, true);
                 breakable->IsDestroyed = true;
 
-                var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
-                marioPhysicsObject->Velocity.X = marioPhysicsObject->PreviousFrameVelocity.X;
-                FP leftoverVelocity = (FPMath.Abs(marioPhysicsObject->Velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (marioPhysicsObject->Velocity.X > 0 ? 1 : -1);
 
+                var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+                FPVector2 velocity = marioPhysicsObject->PreviousFrameVelocity;
+
+
+                FP before = f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position.X;
+                FP leftoverVelocity = (FPMath.Abs(velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (velocity.X > 0 ? 1 : -1);
                 PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
+                marioPhysicsObject->Velocity.X = velocity.X;
+                FP after = f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position.X;
+
+                Debug.Log(leftoverVelocity + " - " + (after - before));
                 return true;
             }
 
