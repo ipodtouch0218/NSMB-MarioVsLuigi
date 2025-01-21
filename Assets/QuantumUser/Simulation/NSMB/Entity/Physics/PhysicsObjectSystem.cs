@@ -99,13 +99,11 @@ namespace Quantum {
 
             CeilingCrusherCheck(f, ref filter, stage, contacts);
 
-            /*
 #if DEBUG
             foreach (var contact in contacts) {
                 Draw.Ray(contact.Position, contact.Normal, ColorRGBA.Red);
             }
 #endif
-            */
 
             if (QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
                 // Apply gravity
@@ -874,9 +872,9 @@ namespace Quantum {
                 }
 
                 if (f.TryGetPointer(hit.Entity, out IceBlock* iceBlock)) {
-                    if (!includeMegaBreakable || entity == iceBlock->Entity) {
+                    //if (!includeMegaBreakable || entity == iceBlock->Entity) {
                         continue;
-                    }
+                    //}
                 }
 
                 if (!includeCeilingCrushers && hitShape->UserTag == 1) {

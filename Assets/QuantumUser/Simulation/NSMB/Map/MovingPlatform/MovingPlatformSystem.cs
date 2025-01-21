@@ -93,8 +93,13 @@ namespace Quantum {
                     continue;
                 }
 
-                /*
-                bool allowCollision = true;
+                FP direction = FPMath.Sign(yMovement.Y);
+                FP moveDistance = ((FPMath.Abs(yMovement.Y) + (PhysicsObjectSystem.RaycastSkin * 2)) * (1 - hit.CastDistanceNormalized)) - PhysicsObjectSystem.RaycastSkin;
+                if (hit.CastDistanceNormalized <= 0 || moveDistance < 0 || moveDistance > yMovement.Y + PhysicsObjectSystem.RaycastSkin) {
+                    // Out of range.
+                    continue;
+                }
+
                 PhysicsContact contact = new PhysicsContact {
                     Frame = f.Number,
                     Distance = hit.CastDistanceNormalized * FPMath.Abs(yMovement.Y) - PhysicsObjectSystem.RaycastSkin,
@@ -104,16 +109,11 @@ namespace Quantum {
                     TileX = -1,
                     TileY = -1
                 };
-                f.Signals.OnBeforePhysicsCollision(stage, hit.Entity, &contact, &allowCollision);
-                if (!allowCollision) {
-                    continue;
+                bool keepContact = true;
+                foreach (var callback in f.Context.PreContactCallbacks) {
+                    callback?.Invoke((FrameThreadSafe) f, stage, entity, contact, ref keepContact);
                 }
-                */
-
-                FP direction = FPMath.Sign(yMovement.Y);
-                FP moveDistance = ((FPMath.Abs(yMovement.Y) + (PhysicsObjectSystem.RaycastSkin * 2)) * (1 - hit.CastDistanceNormalized)) - PhysicsObjectSystem.RaycastSkin;
-                if (hit.CastDistanceNormalized <= 0 || moveDistance < 0 || moveDistance > yMovement.Y + PhysicsObjectSystem.RaycastSkin) {
-                    // Out of range.
+                if (!keepContact) {
                     continue;
                 }
 
@@ -121,7 +121,6 @@ namespace Quantum {
                 moveDistance *= direction;
                 PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, new FPVector2(0, moveDistance * f.UpdateRate), hit.Entity, stage);
 
-                /*
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
                     hitContacts = f.AllocateList(out hitPhysicsObject->Contacts);
                 }
@@ -134,7 +133,6 @@ namespace Quantum {
                     Entity = filter.Entity,
                     Frame = f.Number,
                 });
-                */
             }
         }
 

@@ -23,4 +23,7 @@ MonoBehaviour:
   AutoBuildOnSceneSave: 96
   AutoBuildOnPlaymodeChanged: 96
   AutoBuildOnBuild: 96
-  AssetGuidOverrides: []
+  AssetGuidOverrides:
+  - Asset: {fileID: 11400000, guid: a4a40f45bf3ad7247a6045308fbf1c8e, type: 2}
+    Guid:
+      Value: 4412267672456022196
