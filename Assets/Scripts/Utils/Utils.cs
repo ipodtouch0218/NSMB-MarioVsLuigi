@@ -122,7 +122,7 @@ namespace NSMB.Utils {
         }
 
         private static readonly Color spectatorColor = new(0.8f, 0.8f, 0.8f, 0.7f);
-        public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1) {
+        public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1, bool considerDisqualifications = true) {
             if (f == null || player == PlayerRef.None) {
                 return spectatorColor;
             }
@@ -137,7 +137,7 @@ namespace NSMB.Utils {
             }
 
             // Or dead marios
-            if (f.Global->GameState > GameState.WaitingForPlayers) {
+            if (f.Global->GameState > GameState.WaitingForPlayers && considerDisqualifications) {
                 var marioFilter = f.Filter<MarioPlayer>();
                 marioFilter.UseCulling = false;
                 MarioPlayer* existingMario = null;

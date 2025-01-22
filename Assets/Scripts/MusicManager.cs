@@ -38,8 +38,10 @@ public class MusicManager : MonoBehaviour {
         LoadingCanvas.OnLoadingEnded -= OnLoadingEnded;
     }
 
-    public void OnUpdateView(CallbackUpdateView e) {
-        HandleMusic(e.Game, false);
+    public unsafe void OnUpdateView(CallbackUpdateView e) {
+        if (e.Game.Frames.Predicted.Global->GameState != GameState.Ended) {
+            HandleMusic(e.Game, false);
+        }
     }
 
     private void OnLoadingEnded(bool validPlayer) {

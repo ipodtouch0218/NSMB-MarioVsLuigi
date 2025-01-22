@@ -57,7 +57,6 @@ namespace Quantum {
                 marioPhysicsObject->Velocity.X = velocity.X;
                 FP after = f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position.X;
 
-                Debug.Log(leftoverVelocity + " - " + (after - before));
                 return true;
             }
 

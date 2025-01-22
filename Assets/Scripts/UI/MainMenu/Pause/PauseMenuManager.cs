@@ -214,7 +214,7 @@ namespace NSMB.UI.Pause {
             if (isInConfirmationForQuitting) {
                 NetworkHandler.Runner.Shutdown();
             } else {
-                QuantumGame game = NetworkHandler.Game;
+                QuantumGame game = QuantumRunner.DefaultGame;
                 Frame f = game.Frames.Predicted;
                 PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
 

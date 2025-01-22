@@ -56,6 +56,11 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+
+            if (NetworkHandler.Game != null) {
+                UpdateText(NetworkHandler.Game.Frames.Predicted);
+            }
         }
 
         public unsafe void LateUpdate() {
@@ -148,6 +153,10 @@ namespace NSMB.UI.Game {
             }
 
             UpdateText(e.Frame);
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            UpdateText(e.Game.Frames.Predicted);
         }
     }
 }

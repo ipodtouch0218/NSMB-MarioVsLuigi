@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class InputDisplayToggler : MonoBehaviour {
 
+    //---Serialized Variables
+    [SerializeField] private GameObject child;
+
     public void Start() {
         Settings.OnInputDisplayActiveChanged += OnInputDisplayActiveChanged;
         OnInputDisplayActiveChanged(Settings.Instance.GraphicsInputDisplay);
@@ -12,6 +15,6 @@ public class InputDisplayToggler : MonoBehaviour {
     }
 
     private void OnInputDisplayActiveChanged(bool active) {
-        gameObject.SetActive(active);
+        child.SetActive(active);
     }
 }

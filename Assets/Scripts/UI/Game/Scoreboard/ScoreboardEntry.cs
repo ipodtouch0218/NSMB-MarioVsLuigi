@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using NSMB.Utils;
 using Quantum;
 using System.Text;
@@ -28,6 +29,10 @@ namespace NSMB.UI.Game.Scoreboard {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
+
+            if (NetworkHandler.Game != null) {
+                UpdateEntry(NetworkHandler.Game.Frames.Predicted);
+            }
         }
 
         public unsafe void Initialize(Frame f, EntityRef target, ScoreboardUpdater updater) {

@@ -33,6 +33,7 @@ namespace NSMB.UI.Game {
 
         [SerializeField] private TMP_Text winText;
         [SerializeField] private Animator winTextAnimator;
+        //[SerializeField] private RectTransform[] player
 
         //---Private Variables
         private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
