@@ -1617,38 +1617,41 @@ namespace Quantum {
         }
 
         private void HandleBreakingBlocks(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+            var physicsObject = filter.PhysicsObject;
+            if (!physicsObject->IsTouchingCeiling) {
+                return;
+            }
+
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleBreakingBlocks");
             var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
 
-            if (physicsObject->IsTouchingCeiling) {
-                bool? playBumpSound = null;
-                QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
-                foreach (var contact in contacts) {
-                    if (FPVector2.Dot(contact.Normal, FPVector2.Down) < FP._0_33 * 2) {
-                        continue;
-                    }
-
-                    // Ceiling tiles.
-                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
-                    StageTile tile = f.FindAsset(tileInstance.Tile);
-                    if (!tile) {
-                        playBumpSound = false;
-                    } else if (tile is IInteractableTile it) {
-                        it.Interact(f, filter.Entity, InteractionDirection.Up,
-                            new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
-
-                        playBumpSound = (playBumpSound ?? true) & tempPlayBumpSound;
-                    }
+            bool? playBumpSound = null;
+            QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+            foreach (var contact in contacts) {
+                if (f.Exists(contact.Entity)
+                    || FPVector2.Dot(contact.Normal, FPVector2.Down) < PhysicsObjectSystem.GroundMaxAngle) {
+                    continue;
                 }
 
-                if (physicsObject->IsUnderwater) {
-                    // TODO: magic value
-                    physicsObject->Velocity.Y = -2;
+                // Ceiling tiles.
+                var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                StageTile tile = f.FindAsset(tileInstance.Tile);
+                if (!tile) {
+                    playBumpSound = false;
+                } else if (tile is IInteractableTile it) {
+                    it.Interact(f, filter.Entity, InteractionDirection.Up,
+                        new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
+
+                    playBumpSound = (playBumpSound ?? true) & tempPlayBumpSound;
                 }
-                if (playBumpSound ?? true) {
-                    f.Events.PlayBumpSound(f, filter.Entity);
-                }
+            }
+
+            if (physicsObject->IsUnderwater) {
+                // TODO: magic value
+                physicsObject->Velocity.Y = -2;
+            }
+            if (playBumpSound ?? true) {
+                f.Events.PlayBumpSound(f, filter.Entity);
             }
         }
 
@@ -1808,8 +1811,11 @@ namespace Quantum {
         }
 
         public static void OnMarioProjectileInteraction(Frame f, EntityRef marioEntity, EntityRef projectileEntity) {
-            var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
+            if (!f.Exists(projectileEntity)) {
+                return;
+            }
 
+            var projectile = f.Unsafe.GetPointer<Projectile>(projectileEntity);
             if (projectile->Owner == marioEntity) {
                 return;
             }

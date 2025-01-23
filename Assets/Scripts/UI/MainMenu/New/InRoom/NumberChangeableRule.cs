@@ -48,7 +48,7 @@ public class NumberChangeableRule : ChangeableRule {
             cmd.Lives = (int) value;
             break;
         case CommandChangeRules.Rules.TimerSeconds:
-            cmd.TimerSeconds = (int) value;
+            cmd.TimerSeconds = (int) value * 60;
             break;
         }
 

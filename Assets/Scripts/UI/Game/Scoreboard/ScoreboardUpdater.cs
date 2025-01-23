@@ -3,6 +3,7 @@ using Quantum;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -75,11 +76,20 @@ namespace NSMB.UI.Game.Scoreboard {
             UpdateTeamHeader(f);
             UpdateSpectatorCount(f);
 
-            var playerFilter = f.Filter<MarioPlayer>();
-            playerFilter.UseCulling = false;
-            while (playerFilter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
+            for (int i = 0; i < f.Global->RealPlayers; i++) {
+                ref PlayerInformation info = ref f.Global->PlayerInfo[i];
+
+                EntityRef entity = default;
+                var filter = f.Filter<MarioPlayer>();
+                while (filter.NextUnsafe(out EntityRef marioEntity, out MarioPlayer* mario)) {
+                    if (mario->PlayerRef == info.PlayerRef) {
+                        entity = marioEntity;
+                        break;
+                    }
+                }
+
                 ScoreboardEntry newEntry = Instantiate(entryTemplate, entryTemplate.transform.parent);
-                newEntry.Initialize(f, entity, this);
+                newEntry.Initialize(f, i, entity, this);
                 entries.Add(newEntry);
             }
 
@@ -113,7 +123,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 if (playerDataOne == null || playerDataTwo == null) {
                     return 0;
                 }
-                return playerDataTwo->JoinTick - playerDataOne->JoinTick;
+                return playerDataOne->JoinTick - playerDataTwo->JoinTick;
             });
 
             foreach (var entry in entries) {

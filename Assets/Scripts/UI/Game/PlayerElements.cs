@@ -4,12 +4,11 @@ using NSMB.Translation;
 using NSMB.UI.Game.Scoreboard;
 using NSMB.Utils;
 using Quantum;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 namespace NSMB.UI.Game {
     public class PlayerElements : MonoBehaviour {
@@ -23,6 +22,7 @@ namespace NSMB.UI.Game {
         public Camera Camera => ourCamera;
         public CameraAnimator CameraAnimator => cameraAnimator;
         public ReplayUI ReplayUi => replayUi;
+        public bool IsSpectating => spectating;
 
         //---Serialized Variables
         [SerializeField] private UIUpdater uiUpdater;
@@ -32,7 +32,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private ScoreboardUpdater scoreboardUpdater;
         [SerializeField] private ReplayUI replayUi;
 
-        [SerializeField] private GameObject spectationUI;
+        [SerializeField] public GameObject spectationUI;
         [SerializeField] private TMP_Text spectatingText;
         [SerializeField] private PlayerNametag nametagPrefab;
         [SerializeField] public GameObject nametagCanvas;
@@ -116,7 +116,7 @@ namespace NSMB.UI.Game {
         }
 
         public unsafe void UpdateSpectateUI() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = NetworkHandler.Game.Frames.Predicted;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(spectatingEntity);
 
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
@@ -128,11 +128,10 @@ namespace NSMB.UI.Game {
 
         public void StartSpectating() {
             spectating = true;
-
+            spectationUI.SetActive(true);
             if (!NetworkHandler.IsReplay) {
-                spectationUI.SetActive(true);
                 if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
-                    GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
+                    GlobalController.Instance.loadingCanvas.EndLoading(NetworkHandler.Game);
                 }
             }
 
@@ -155,24 +154,16 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            Span<EntityRef> marios = stackalloc EntityRef[marioCount];
+            List<EntityRef> marios = new(marioCount);
             var marioFilter = f.Filter<MarioPlayer>();
             marioFilter.UseCulling = false;
-
-            int index = 0;
             while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
-                marios[index++] = entity;
+                marios.Add(entity);
             }
-
-            int currentIndex = -1;
-            for (int i = 0; i < marioCount; i++) {
-                if (spectatingEntity == marios[i]
-                    || marios[i].Index > spectatingEntity.Index) {
-
-                    currentIndex = i;
-                    break;
-                }
-            }
+            marios.Sort((a, b) => {
+                return a.Index - b.Index;
+            });
+            int currentIndex = marios.IndexOf(spectatingEntity);
             spectatingEntity = marios[(currentIndex + 1) % marioCount];
             UpdateSpectateUI();
         }
@@ -193,30 +184,22 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            Span<EntityRef> marios = stackalloc EntityRef[marioCount];
+            List<EntityRef> marios = new(marioCount);
             var marioFilter = f.Filter<MarioPlayer>();
             marioFilter.UseCulling = false;
-
-            int index = 0;
             while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
-                marios[index++] = entity;
+                marios.Add(entity);
             }
-
-            int currentIndex = -1;
-            for (int i = marioCount - 1; i >= 0; i--) {
-                if (spectatingEntity == marios[i]
-                    || marios[i].Index < spectatingEntity.Index) {
-
-                    currentIndex = i;
-                    break;
-                }
-            }
+            marios.Sort((a, b) => {
+                return a.Index - b.Index;
+            });
+            int currentIndex = marios.IndexOf(spectatingEntity);
             spectatingEntity = marios[(currentIndex - 1 + marioCount) % marioCount];
             UpdateSpectateUI();
         }
 
         private void OnNavigate(InputAction.CallbackContext context) {
-            if (!spectating) {
+            if (!spectating || EventSystem.current != spectationUI) {
                 return;
             }
 

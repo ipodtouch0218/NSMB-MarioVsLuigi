@@ -105,6 +105,20 @@ namespace NSMB.Utils {
             ['8'] = "room_smallnumber_8",
             ['9'] = "room_smallnumber_9",
         };
+        public static readonly Dictionary<char, string> resultsSymbols = new() {
+            ['0'] = "results_0",
+            ['1'] = "results_1",
+            ['2'] = "results_2",
+            ['3'] = "results_3",
+            ['4'] = "results_4",
+            ['5'] = "results_5",
+            ['6'] = "results_6",
+            ['7'] = "results_7",
+            ['8'] = "results_8",
+            ['9'] = "results_9",
+            ['S'] = "results_star",
+            ['O'] = "results_out",
+        };
 
         private static StringBuilder symbolStringBuilder = new();
         public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null) {

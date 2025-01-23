@@ -115,7 +115,7 @@ namespace NSMB.UI.MainMenu {
             dropdownOptions.SetActive(false);
         }
 
-        private static readonly StringBuilder Builder = new();
+        private readonly StringBuilder builder = new();
         public unsafe void UpdateText(Frame f) {
             colorStrip.color = Utils.Utils.GetPlayerColor(f, player);
             var playerData = QuantumUtils.GetPlayerData(f, player);
@@ -129,7 +129,8 @@ namespace NSMB.UI.MainMenu {
             if (playerData->Wins == 0) {
                 winsText.text = "";
             } else {
-                winsText.text = "<sprite name=room_wins>" + playerData->Wins;
+                builder.Clear();
+                winsText.text = builder.Append("<sprite name=room_wins>").Append(playerData->Wins).ToString();
             }
 
             // Ping text
@@ -137,27 +138,27 @@ namespace NSMB.UI.MainMenu {
 
             // Name text
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            Builder.Clear();
+            builder.Clear();
 
             if (ChatManager.Instance.mutedPlayers.Contains(runtimePlayer.UserId)) {
-                Builder.Append("<sprite name=player_muted>");
+                builder.Append("<sprite name=player_muted>");
             }
 
             if (playerData->IsRoomHost) {
-                Builder.Append("<sprite name=room_host>");
+                builder.Append("<sprite name=room_host>");
             }
 
             int characterIndex = playerData->Character;
             characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
-            Builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
+            builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
 
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
                 TeamAsset team = f.SimulationConfig.Teams[playerData->RequestedTeam];
-                Builder.Append(team.textSpriteColorblindBig);
+                builder.Append(team.textSpriteColorblindBig);
             }
 
-            Builder.Append(runtimePlayer.PlayerNickname.ToValidUsername(f, player));
-            nameText.text = Builder.ToString();
+            builder.Append(runtimePlayer.PlayerNickname.ToValidUsername(f, player));
+            nameText.text = builder.ToString();
 
             Transform parent = transform.parent;
             orderIndex = 0;
@@ -343,7 +344,7 @@ namespace NSMB.UI.MainMenu {
             var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
             readyIcon.SetActive(playerData->IsReady);
             settingsIcon.SetActive(playerData->IsInSettings);
-            handler.UpdateAllPlayerEntries(e.Frame);
+            handler.GetPlayerEntry(e.Player).UpdateText(e.Frame);
         }
 
         public void OnSelect(BaseEventData eventData) {

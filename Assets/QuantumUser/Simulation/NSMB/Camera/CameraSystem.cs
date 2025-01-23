@@ -1,8 +1,14 @@
+#define MULTITHREADED
+
 using Photon.Deterministic;
 using Quantum.Task;
 
 namespace Quantum {
+#if MULTITHREADED
     public unsafe class CameraSystem : SystemArrayFilter<CameraSystem.Filter> {
+#else
+    public unsafe class CameraSystem : SystemMainThreadFilterStage<CameraSystem.Filter> {
+#endif
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -12,12 +18,21 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
+#if MULTITHREADED
         public override void Update(FrameThreadSafe f, ref Filter filter) {
             UpdateCameraSize(f, ref filter);
             if (!filter.Mario->IsDead) {
                 filter.Camera->CurrentPosition = CalculateNewPosition(f, ref filter, f.FindAsset<VersusStageData>(f.Map.UserAsset));
             }
         }
+#else
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            UpdateCameraSize((FrameThreadSafe) f, ref filter);
+            if (!filter.Mario->IsDead) {
+                filter.Camera->CurrentPosition = CalculateNewPosition((FrameThreadSafe) f, ref filter, stage);
+            }
+        }
+#endif
 
         private void UpdateCameraSize(FrameThreadSafe f, ref Filter filter) {
             var mario = filter.Mario;

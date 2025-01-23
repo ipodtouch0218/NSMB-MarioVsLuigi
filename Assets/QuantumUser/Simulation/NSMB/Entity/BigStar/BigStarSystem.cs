@@ -105,7 +105,7 @@ namespace Quantum {
         }
 
         public void OnBigStarMarioInteraction(Frame f, EntityRef starEntity, EntityRef marioEntity) {
-            if (f.DestroyPending(starEntity)) {
+            if (!f.Exists(starEntity) || f.DestroyPending(starEntity)) {
                 return;
             }
 

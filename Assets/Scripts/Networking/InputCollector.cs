@@ -1,3 +1,4 @@
+using NSMB.UI.Game;
 using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
@@ -9,6 +10,9 @@ public class InputCollector : MonoBehaviour {
     //---Properties
     public bool IsPaused { get; set; }
 
+    //---Serialized Variables
+    [SerializeField] private PlayerElements playerElements;
+
     public void Start() {
         Settings.Controls.Player.ReserveItem.performed += OnPowerupAction;
         QuantumCallback.Subscribe<CallbackPollInput>(this, OnPollInput);
@@ -19,7 +23,9 @@ public class InputCollector : MonoBehaviour {
     }
 
     public void OnPowerupAction(InputAction.CallbackContext context) {
-        QuantumRunner.DefaultGame.SendCommand(new CommandSpawnReserveItem());
+        if (!playerElements.IsSpectating) {
+            NetworkHandler.Game.SendCommand(new CommandSpawnReserveItem());
+        }
     }
 
     public void OnPollInput(CallbackPollInput callback) {
@@ -40,6 +46,7 @@ public class InputCollector : MonoBehaviour {
 
             bool jump = Settings.Controls.Player.Jump.ReadValue<float>() > 0.5f;
             bool sprint = Settings.Controls.Player.Sprint.ReadValue<float>() > 0.5f;
+            bool powerupAction = Settings.Controls.Player.PowerupAction.ReadValue<float>() > 0.5f;
 
             i = new() {
                 Up = up,
@@ -48,7 +55,7 @@ public class InputCollector : MonoBehaviour {
                 Right = right,
                 Jump = jump,
                 Sprint = sprint ^ Settings.Instance.controlsAutoSprint,
-                PowerupAction = Settings.Controls.Player.PowerupAction.ReadValue<float>() > 0.5f,
+                PowerupAction = powerupAction,
                 FireballPowerupAction = Settings.Instance.controlsFireballSprint && sprint,
                 PropellerPowerupAction = Settings.Instance.controlsPropellerJump && jump,
             };

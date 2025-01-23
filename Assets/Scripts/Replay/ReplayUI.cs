@@ -117,6 +117,7 @@ public class ReplayUI : MonoBehaviour {
 
     public bool ToggleReplayControls() {
         replayUI.SetActive(!replayUI.activeSelf);
+        playerElements.spectationUI.SetActive(replayUI.activeSelf);
         return replayUI.activeSelf;
     }
 

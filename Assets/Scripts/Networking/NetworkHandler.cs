@@ -30,7 +30,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static RealtimeClient Client => Instance ? Instance.realtimeClient : null;
     public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
-    public static QuantumGame Game => Runner?.Game;
+    public static QuantumGame Game => Runner?.Game ?? QuantumRunner.DefaultGame;
     public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay { get; private set; }
@@ -38,6 +38,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static int ReplayLength { get; private set; }
     public static int ReplayEnd => ReplayStart + ReplayLength;
     public static bool IsReplayFastForwarding { get; set; }
+    public static string SavedRecordingPath { get; set; }
     public static List<byte[]> ReplayFrameCache => Instance.replayFrameCache;
     public static bool WasDisconnectedViaError { get; set; }
 
@@ -147,7 +148,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         try {
             await Client.ConnectUsingSettingsAsync(new AppSettings {
                 AppIdQuantum = "6b4b72d0-57c3-4991-96c1-f3f36f9548e5",
-                AppVersion = Application.version,
+                AppVersion = Application.version[0..(Application.version.LastIndexOf('.') - 1)],
                 EnableLobbyStatistics = true,
                 AuthMode = AuthModeOption.Auth,
                 FixedRegion = region,
@@ -221,12 +222,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public unsafe void SaveReplay(QuantumGame game, sbyte winner) {
 #if UNITY_STANDALONE
         if (IsReplay || game.RecordInputStream == null) {
+            SavedRecordingPath = null;
             return;
         }
 
         if (!Settings.Instance.GeneralReplaysEnabled) {
             // Disabled replays mid-game
             DisposeReplay();
+            SavedRecordingPath = null;
             return;
         }
 
@@ -287,8 +290,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
         outputStream.Dispose();
 
+        SavedRecordingPath = finalFilePath;
+
         // Complete
-        Debug.Log($"[Replay] Saved new replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
+        Debug.Log($"[Replay] Saved new temporary replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
         DisposeReplay();
 #endif
     }

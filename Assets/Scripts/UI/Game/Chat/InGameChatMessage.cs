@@ -36,7 +36,7 @@ public class InGameChatMessage : MonoBehaviour {
             text.richText = false;
             text.text = data.message;
         }
-        text.color = data.color;
+        // text.color = data.color;
 
         group.alpha = 1;
         Destroy(gameObject, lifetime);

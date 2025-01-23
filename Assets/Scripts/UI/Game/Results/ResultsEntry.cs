@@ -1,7 +1,5 @@
-using JimmysUnityUtilities;
 using NSMB.Utils;
 using Quantum;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,36 +7,57 @@ using UnityEngine.UI;
 public class ResultsEntry : MonoBehaviour {
 
     //---Seriaized Variables
-    [SerializeField] private Image[] recolorables;
+    [SerializeField] private Image leftHalf, rightHalf;
     [SerializeField] private Image characterIcon;
     [SerializeField] private TMP_Text usernameText, starCountText;
     [SerializeField] private RectTransform childTransform;
     [SerializeField] private GameObject fullSlot, emptySlot;
-
-    [SerializeField, ColorUsage(false)] private Color firstPlaceColor, secondPlaceColor, thirdPlaceColor, unrankedColor;
+    [SerializeField] private Color firstPlaceColor, secondPlaceColor, thirdPlaceColor, unrankedColor;
     [SerializeField] private float offscreenStartPosition = -500, slideInTimeSeconds = 0.1f;
-    [SerializeField, ColorUsage(false)] private Color normalStarColor, outColor;
 
-    public unsafe void Initialize(Frame f, PlayerRef owner, int ranking, float delay) {
-        RuntimePlayer runtimePlayer = f.GetPlayerData(owner);
-        PlayerData* data = QuantumUtils.GetPlayerData(f, owner);
+    //---Private Variables
+    private string nicknameColor;
+    private bool constantNicknameColor;
 
-        bool occupied = data != null;
+    public unsafe void Initialize(Frame f, in PlayerInformation? info, int ranking, float delay, int stars = -1) {
+        bool occupied = info.HasValue;
         fullSlot.SetActive(occupied);
         emptySlot.SetActive(!occupied);
 
         if (occupied) {
-            usernameText.text = runtimePlayer.PlayerNickname.ToValidUsername(f, owner);
-            characterIcon.sprite = f.SimulationConfig.CharacterDatas[data->Character].ReadySprite;
+            PlayerRef player = info.Value.PlayerRef;
 
+            usernameText.text = info.Value.Nickname.ToString().ToValidUsername(f, player);
+            nicknameColor = info.Value.NicknameColor.ToString();
+            usernameText.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            characterIcon.sprite = f.SimulationConfig.CharacterDatas[info.Value.Character].ReadySprite;
 
+            if (stars < 0) {
+                starCountText.text = "<sprite name=results_out>";
+                rightHalf.color = unrankedColor;
+            } else {
+                starCountText.text = Utils.GetSymbolString("S" + stars.ToString(), Utils.resultsSymbols);
+                rightHalf.color = ranking switch {
+                    1 => firstPlaceColor,
+                    2 => secondPlaceColor,
+                    3 => thirdPlaceColor,
+                    _ => unrankedColor
+                };
+            }
+
+            leftHalf.color = Utils.GetPlayerColor(f, player, s: 0.7f, considerDisqualifications: false);
+        } else {
+            constantNicknameColor = true;
+            leftHalf.color = rightHalf.color = unrankedColor;
         }
 
-        Color color = Utils.GetPlayerColor(f, owner, considerDisqualifications: false);
-        foreach (var recolorable in recolorables) {
-            recolorable.color = color;
-        }
 
         StartCoroutine(ResultsHandler.MoveObjectToTarget(childTransform, offscreenStartPosition, 0, slideInTimeSeconds, delay));
+    }
+
+    public void Update() {
+        if (!constantNicknameColor) {
+            usernameText.color = Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+        }
     }
 }

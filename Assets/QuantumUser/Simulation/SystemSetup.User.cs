@@ -21,17 +21,11 @@ namespace Quantum {
                     new GenericMoverSystem(),
                     new SpinnerSystem(),
                     new MovingPlatformPhysicsQuerySystem(),
-
-                    // multithreaded
                     new PhysicsSystem2D(),
-
                     new MovingPlatformSystem(),
                     new EnemySystem(),
                     new InteractionSystem(),
-
-                    // multithreaded
                     new PhysicsObjectSystem(),
-
                     new GoombaSystem(),
                     new KoopaSystem(),
                     new BobombSystem(),
@@ -47,17 +41,14 @@ namespace Quantum {
                     new BigStarSystem(),
                     new HoldableObjectSystem(),
                     new IceBlockSystem(),
-
-                    // multithreaded
-                    new CameraSystem()
+                    new CameraSystem(),
+                    new StageSystem(),
+                    new LiquidSystem(),
+                    new BreakableObjectSystem(),
+                    new MarioBrosPlatformSystem(),
+                    new EnterablePipeSystem()
                 )
             );
-
-            systems.Add(new StageSystem());
-            systems.Add(new LiquidSystem());
-            systems.Add(new BreakableObjectSystem());
-            systems.Add(new MarioBrosPlatformSystem());
-            systems.Add(new EnterablePipeSystem());
         }
     }
 }

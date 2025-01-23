@@ -134,6 +134,15 @@ namespace NSMB.Extensions {
             }
         }
 
+        public static void StopCoroutineNullable(this MonoBehaviour b, ref Coroutine coroutine) {
+            if (b == null || coroutine == null) {
+                return;
+            }
+
+            b.StopCoroutine(coroutine);
+            coroutine = null;
+        }
+
         public enum GetComponentType {
             Self,
             Parent,

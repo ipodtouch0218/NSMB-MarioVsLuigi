@@ -37,7 +37,7 @@ namespace Quantum {
         public void ExecuteInteractors(FrameThreadSafe fts, int start, int count, void* arg) {
             Frame f = (Frame) fts;
 
-            pendingInteractions.Sort(new PendingInteractionComparer());
+            // pendingInteractions.Sort(new PendingInteractionComparer());
 
             foreach (PendingInteraction interaction in pendingInteractions) {
                 EntityRef entityA = interaction.EntityA;

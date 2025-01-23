@@ -246,6 +246,8 @@
   "ui.game.ping.hosting": "Hosting",
   "ui.game.results": "RESULTS",
   "ui.game.results.savereplay": "Save replay",
+  "ui.game.results.replayunavailable": "Replay unavailable",
+  "ui.game.results.votedtocontinue": "Voted to continue",
   "ui.pause.continue": "Continue",
   "ui.pause.returntoroom": "Return to room",
   "ui.pause.replay.show": "Show replay controls",

@@ -630,6 +630,7 @@ namespace Quantum.Prototypes {
     public Byte RequestedTeam;
     public QBoolean IsSpectator;
     public QBoolean ManualSpectator;
+    public QBoolean VotedToContinue;
     public Int32 Wins;
     public Byte RealTeam;
     public Int32 LastChatMessage;
@@ -652,6 +653,7 @@ namespace Quantum.Prototypes {
         result.RequestedTeam = this.RequestedTeam;
         result.IsSpectator = this.IsSpectator;
         result.ManualSpectator = this.ManualSpectator;
+        result.VotedToContinue = this.VotedToContinue;
         result.Wins = this.Wins;
         result.RealTeam = this.RealTeam;
         result.LastChatMessage = this.LastChatMessage;
@@ -659,6 +661,30 @@ namespace Quantum.Prototypes {
         result.IsInSettings = this.IsInSettings;
         result.JoinTick = this.JoinTick;
         result.Ping = this.Ping;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.PlayerInformation))]
+  public unsafe partial class PlayerInformationPrototype : StructPrototype {
+    public PlayerRef PlayerRef;
+    [MaxStringByteCount(46, "Unicode")]
+    public string Nickname;
+    [MaxStringByteCount(14, "Unicode")]
+    public string NicknameColor;
+    public Byte Team;
+    public Byte Character;
+    public QBoolean Disconnected;
+    public QBoolean Disqualified;
+    partial void MaterializeUser(Frame frame, ref Quantum.PlayerInformation result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.PlayerInformation result, in PrototypeMaterializationContext context = default) {
+        result.PlayerRef = this.PlayerRef;
+        PrototypeValidator.AssignQString(this.Nickname, 48, in context, out result.Nickname);
+        PrototypeValidator.AssignQString(this.NicknameColor, 16, in context, out result.NicknameColor);
+        result.Team = this.Team;
+        result.Character = this.Character;
+        result.Disconnected = this.Disconnected;
+        result.Disqualified = this.Disqualified;
         MaterializeUser(frame, ref result, in context);
     }
   }

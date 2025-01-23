@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 public class GlobalController : Singleton<GlobalController> {
 
@@ -27,6 +28,7 @@ public class GlobalController : Singleton<GlobalController> {
     public ScriptableRendererFeature outlineFeature;
     public GameObject fourByThreeImage, anyAspectImage, graphy, connecting;
     public LoadingCanvas loadingCanvas;
+    public Image fullscreenFadeImage;
     public AudioSource sfx;
 
     public bool checkedForVersion = false, firstConnection = true;
@@ -38,8 +40,7 @@ public class GlobalController : Singleton<GlobalController> {
     [SerializeField] private AudioMixer mixer;
 
     //---Private Variables
-    private Coroutine fadeMusicRoutine;
-    private Coroutine fadeSfxRoutine;
+    private Coroutine fadeMusicRoutine, fadeSfxRoutine, totalFadeRoutine;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void CreateInstance() {
@@ -59,7 +60,6 @@ public class GlobalController : Singleton<GlobalController> {
 
     public void Start() {
         AuthenticationHandler.IsAuthenticating = false;
-        //NetworkHandler.connecting = 0;
 
         if (!Application.isFocused) {
             if (Settings.Instance.audioMuteMusicOnUnfocus) {
@@ -72,18 +72,13 @@ public class GlobalController : Singleton<GlobalController> {
         }
         Settings.Controls.Enable();
         Settings.Controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
-
-        //NetworkHandler.OnShutdown += OnShutdown;
-        //NetworkHandler.OnHostMigration += OnHostMigration;
+        QuantumEvent.Subscribe<EventStartGameEndFade>(this, OnStartGameEndFade);
         QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
     }
 
     public void OnDestroy() {
         Settings.Controls.Debug.FPSMonitor.performed -= ToggleFpsMonitor;
         Settings.Controls.Disable();
-
-        //NetworkHandler.OnShutdown -= OnShutdown;
-        //NetworkHandler.OnHostMigration -= OnHostMigration;
     }
 
     public void Update() {
@@ -118,8 +113,8 @@ public class GlobalController : Singleton<GlobalController> {
     public void OnApplicationFocus(bool focus) {
         if (focus) {
             Settings.Instance.ApplyVolumeSettings();
-            StopCoroutineNullable(ref fadeMusicRoutine);
-            StopCoroutineNullable(ref fadeSfxRoutine);
+            this.StopCoroutineNullable(ref fadeMusicRoutine);
+            this.StopCoroutineNullable(ref fadeSfxRoutine);
 
 #if UNITY_WEBGL
             // Lock framerate when losing focus to (hopefully) disable browsers slowing the game
@@ -152,15 +147,9 @@ public class GlobalController : Singleton<GlobalController> {
         }
 
         discordController.UpdateActivity();
-    }
-
-    private void StopCoroutineNullable(ref Coroutine coroutine) {
-        if (coroutine == null) {
-            return;
-        }
-
-        StopCoroutine(coroutine);
-        coroutine = null;
+        this.StopCoroutineNullable(ref totalFadeRoutine);
+        mixer.SetFloat("OverrideVolume", 0f);
+        StartCoroutine(FadeFullscreenImage(0, 1/3f, 0.1f));
     }
 
     private IEnumerator FadeVolume(string key) {
@@ -180,15 +169,36 @@ public class GlobalController : Singleton<GlobalController> {
         sfx.PlayOneShot(soundEffect);
     }
 
+    private IEnumerator FadeFullscreenImage(float target, float fadeDuration, float delay = 0) {
+        float original = fullscreenFadeImage.color.a;
+        float timer = fadeDuration;
+        if (delay > 0) {
+            yield return new WaitForSeconds(delay);
+        }
+
+        Color color = fullscreenFadeImage.color;
+        while (timer > 0) {
+            timer -= Time.deltaTime;
+            color.a = Mathf.Lerp(original, target, 1 - (timer / fadeDuration));
+            fullscreenFadeImage.color = color;
+            yield return null;
+        }
+    }
+
+    private void OnStartGameEndFade(EventStartGameEndFade e) {
+        StartCoroutine(FadeFullscreenImage(1, 1/3f));
+        totalFadeRoutine = StartCoroutine(FadeVolume("OverrideVolume"));
+    }
+
+    private void ToggleFpsMonitor(InputAction.CallbackContext obj) {
+        graphy.SetActive(!graphy.activeSelf);
+    }
+
     private static float ToLinearScale(float x) {
         return Mathf.Pow(10, x / 20);
     }
 
     private static float ToLogScale(float x) {
         return 20 * Mathf.Log10(x);
-    }
-
-    private void ToggleFpsMonitor(InputAction.CallbackContext obj) {
-        graphy.SetActive(!graphy.activeSelf);
     }
 }

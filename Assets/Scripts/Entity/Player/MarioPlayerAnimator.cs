@@ -111,6 +111,7 @@ namespace NSMB.Entities.Player {
         private float lastStompSoundTime = -1;
         private float waterSurfaceMovementDistance;
         private Vector3 previousPosition;
+        private bool forceUpdate;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -178,6 +179,9 @@ namespace NSMB.Entities.Player {
             AllMarioPlayers.RemoveWhere(ma => ma == null);
             AllMarioPlayers.Add(this);
             MarioPlayerInitialized?.Invoke(Game, f, this);
+
+            forceUpdate = true;
+            OnUpdateView();
         }
 
         public override void OnDeactivate() {
@@ -201,7 +205,7 @@ namespace NSMB.Entities.Player {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
 
-            if (f.Global->GameState >= GameState.Ended) {
+            if (f.Global->GameState >= GameState.Ended && !forceUpdate) {
                 animator.speed = 0;
                 models.SetActive(!mario->IsRespawning);
                 SetParticleEmission(drillParticle, false);
@@ -232,6 +236,7 @@ namespace NSMB.Entities.Player {
             UpdateAnimatorVariables(f, mario, physicsObject, freezable, ref inputs);
 
             previousPosition = transform.position;
+            forceUpdate = false;
         }
 
         public void HandleAnimations(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable) {

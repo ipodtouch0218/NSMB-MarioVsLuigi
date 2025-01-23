@@ -9,8 +9,22 @@ global {
 	ushort PlayerLoadFrames;
 
 	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
+	array<PlayerInformation>[10] PlayerInfo;
 	byte RealPlayers;
 	byte TotalMarios;
+
+	int WinningTeam;
+	bool HasWinner;
+}
+
+struct PlayerInformation {
+	PlayerRef PlayerRef;
+	QString<48> Nickname;
+	QString<16> NicknameColor;
+	byte Team;
+	byte Character;
+	bool Disconnected;
+	bool Disqualified;
 }
 
 struct GameRules {
@@ -95,4 +109,8 @@ synced event GameEnded {
 	Frame Frame;
 	int WinningTeam;
 	bool HasWinner;
+}
+
+event StartGameEndFade {
+	nothashed Frame Frame;
 }

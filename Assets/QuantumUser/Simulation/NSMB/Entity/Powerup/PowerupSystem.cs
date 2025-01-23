@@ -145,7 +145,7 @@ namespace Quantum {
         }
 
         public void OnPowerupMarioInteraction(Frame f, EntityRef powerupEntity, EntityRef marioEntity) {
-            if (f.DestroyPending(powerupEntity)) {
+            if (!f.Exists(powerupEntity) || f.DestroyPending(powerupEntity)) {
                 // Already collected
                 return;
             }

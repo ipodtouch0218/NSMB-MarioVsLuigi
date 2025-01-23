@@ -494,6 +494,138 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  [System.SerializableAttribute()]
+  public unsafe partial struct QString16 : IQString, System.IEquatable<QString16> {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(0)]
+    public UInt16 ByteCount;
+    [FieldOffset(2)]
+    [FixedBufferDynamicLength("ByteCount")]
+    public fixed Byte Bytes[14];
+    public const int MaxByteCount = 14;
+    public QString16(String str) {
+      QString.ConstructFrom(str, MaxByteCount, out this);
+    }
+    public int Length {
+      get {
+        return QString.GetLength(ref this);
+      }
+    }
+    public override System.String ToString() {
+      return QString.GetString(ref this);
+    }
+    public static Boolean CanHold(String str) {
+      return QString.CanHold(str, MaxByteCount);
+    }
+    Int32 IQString.CompareOrdinal(byte* bytes, UInt16 byteCount) {
+      return QString.CompareOrdinal(ref this, bytes, byteCount);
+    }
+    public Int32 CompareOrdinal(String str) {
+      return QString.CompareOrdinal(ref this, str);
+    }
+    public static implicit operator QString16(String str) {
+      return new QString16(str);
+    }
+    public static implicit operator String(QString16 str) {
+      return str.ToString();
+    }
+    public override Boolean Equals(Object obj) {
+      return QString.AreEqual(ref this, obj);
+    }
+    public Boolean Equals(QString16 str) {
+      return QString.CompareOrdinal(ref this, str.Bytes, str.ByteCount) == 0;
+    }
+    public Boolean Equals<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str) == 0;
+    }
+    public Int32 CompareOrdinal<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str);
+    }
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 12211;
+        hash = hash * 31 + ByteCount.GetHashCode();
+        fixed (Byte* p = Bytes) hash = hash * 31 + HashCodeUtils.GetArrayHashCode(p, this.ByteCount);
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (QString16*)ptr;
+        serializer.Stream.Serialize(&p->ByteCount);
+        Assert.Always(p->ByteCount <= 14, p->ByteCount);
+        serializer.Stream.SerializeBuffer(&p->Bytes[0], p->ByteCount);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  [System.SerializableAttribute()]
+  public unsafe partial struct QString48 : IQString, System.IEquatable<QString48> {
+    public const Int32 SIZE = 48;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(0)]
+    public UInt16 ByteCount;
+    [FieldOffset(2)]
+    [FixedBufferDynamicLength("ByteCount")]
+    public fixed Byte Bytes[46];
+    public const int MaxByteCount = 46;
+    public QString48(String str) {
+      QString.ConstructFrom(str, MaxByteCount, out this);
+    }
+    public int Length {
+      get {
+        return QString.GetLength(ref this);
+      }
+    }
+    public override System.String ToString() {
+      return QString.GetString(ref this);
+    }
+    public static Boolean CanHold(String str) {
+      return QString.CanHold(str, MaxByteCount);
+    }
+    Int32 IQString.CompareOrdinal(byte* bytes, UInt16 byteCount) {
+      return QString.CompareOrdinal(ref this, bytes, byteCount);
+    }
+    public Int32 CompareOrdinal(String str) {
+      return QString.CompareOrdinal(ref this, str);
+    }
+    public static implicit operator QString48(String str) {
+      return new QString48(str);
+    }
+    public static implicit operator String(QString48 str) {
+      return str.ToString();
+    }
+    public override Boolean Equals(Object obj) {
+      return QString.AreEqual(ref this, obj);
+    }
+    public Boolean Equals(QString48 str) {
+      return QString.CompareOrdinal(ref this, str.Bytes, str.ByteCount) == 0;
+    }
+    public Boolean Equals<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str) == 0;
+    }
+    public Int32 CompareOrdinal<T>(ref T str)
+      where T : unmanaged, IQString {
+      return QString.CompareOrdinal(ref this, ref str);
+    }
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 13049;
+        hash = hash * 31 + ByteCount.GetHashCode();
+        fixed (Byte* p = Bytes) hash = hash * 31 + HashCodeUtils.GetArrayHashCode(p, this.ByteCount);
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (QString48*)ptr;
+        serializer.Stream.Serialize(&p->ByteCount);
+        Assert.Always(p->ByteCount <= 46, p->ByteCount);
+        serializer.Stream.SerializeBuffer(&p->Bytes[0], p->ByteCount);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
     public const Int32 SIZE = 40;
     public const Int32 ALIGNMENT = 8;
@@ -685,6 +817,48 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct PlayerInformation {
+    public const Int32 SIZE = 80;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(4)]
+    public PlayerRef PlayerRef;
+    [FieldOffset(32)]
+    public QString48 Nickname;
+    [FieldOffset(16)]
+    public QString16 NicknameColor;
+    [FieldOffset(1)]
+    public Byte Team;
+    [FieldOffset(0)]
+    public Byte Character;
+    [FieldOffset(8)]
+    public QBoolean Disconnected;
+    [FieldOffset(12)]
+    public QBoolean Disqualified;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 5669;
+        hash = hash * 31 + PlayerRef.GetHashCode();
+        hash = hash * 31 + Nickname.GetHashCode();
+        hash = hash * 31 + NicknameColor.GetHashCode();
+        hash = hash * 31 + Team.GetHashCode();
+        hash = hash * 31 + Character.GetHashCode();
+        hash = hash * 31 + Disconnected.GetHashCode();
+        hash = hash * 31 + Disqualified.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (PlayerInformation*)ptr;
+        serializer.Stream.Serialize(&p->Character);
+        serializer.Stream.Serialize(&p->Team);
+        PlayerRef.Serialize(&p->PlayerRef, serializer);
+        QBoolean.Serialize(&p->Disconnected, serializer);
+        QBoolean.Serialize(&p->Disqualified, serializer);
+        Quantum.QString16.Serialize(&p->NicknameColor, serializer);
+        Quantum.QString48.Serialize(&p->Nickname, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct StageTileInstance {
     public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
@@ -712,7 +886,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 1736;
+    public const Int32 SIZE = 2544;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -741,13 +915,13 @@ namespace Quantum {
     public BitSet10 PlayerLastConnectionState;
     [FieldOffset(1644)]
     public UInt16 BigStarSpawnTimer;
-    [FieldOffset(1680)]
+    [FieldOffset(1688)]
     public EntityRef MainBigStar;
-    [FieldOffset(1672)]
+    [FieldOffset(1680)]
     public BitSet64 UsedStarSpawns;
     [FieldOffset(1660)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1696)]
+    [FieldOffset(1704)]
     public GameRules Rules;
     [FieldOffset(1642)]
     public GameState GameState;
@@ -759,18 +933,30 @@ namespace Quantum {
     public UInt16 GameStartFrames;
     [FieldOffset(1648)]
     public UInt16 PlayerLoadFrames;
-    [FieldOffset(1664)]
+    [FieldOffset(1672)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
+    [FieldOffset(1744)]
+    [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
+    private fixed Byte _PlayerInfo_[800];
     [FieldOffset(1640)]
     public Byte RealPlayers;
     [FieldOffset(1641)]
     public Byte TotalMarios;
-    [FieldOffset(1688)]
+    [FieldOffset(1664)]
+    public Int32 WinningTeam;
+    [FieldOffset(1668)]
+    public QBoolean HasWinner;
+    [FieldOffset(1696)]
     public FP Timer;
     public FixedArray<Input> input {
       get {
         fixed (byte* p = _input_) { return new FixedArray<Input>(p, 108, 10); }
+      }
+    }
+    public FixedArray<PlayerInformation> PlayerInfo {
+      get {
+        fixed (byte* p = _PlayerInfo_) { return new FixedArray<PlayerInformation>(p, 80, 10); }
       }
     }
     public override Int32 GetHashCode() {
@@ -799,8 +985,11 @@ namespace Quantum {
         hash = hash * 31 + GameStartFrames.GetHashCode();
         hash = hash * 31 + PlayerLoadFrames.GetHashCode();
         hash = hash * 31 + PlayerDatas.GetHashCode();
+        hash = hash * 31 + HashCodeUtils.GetArrayHashCode(PlayerInfo);
         hash = hash * 31 + RealPlayers.GetHashCode();
         hash = hash * 31 + TotalMarios.GetHashCode();
+        hash = hash * 31 + WinningTeam.GetHashCode();
+        hash = hash * 31 + HasWinner.GetHashCode();
         hash = hash * 31 + Timer.GetHashCode();
         return hash;
       }
@@ -834,11 +1023,14 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->StartFrame);
         serializer.Stream.Serialize(&p->TotalGamesPlayed);
         serializer.Stream.Serialize(&p->UsedStarSpawnCount);
+        serializer.Stream.Serialize(&p->WinningTeam);
+        QBoolean.Serialize(&p->HasWinner, serializer);
         QDictionary.Serialize(&p->PlayerDatas, serializer, Statics.SerializePlayerRef, Statics.SerializeEntityRef);
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);
         EntityRef.Serialize(&p->MainBigStar, serializer);
         FP.Serialize(&p->Timer, serializer);
         Quantum.GameRules.Serialize(&p->Rules, serializer);
+        FixedArray.Serialize(p->PlayerInfo, serializer, Statics.SerializePlayerInformation);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -2288,7 +2480,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PlayerData : Quantum.IComponent {
-    public const Int32 SIZE = 48;
+    public const Int32 SIZE = 52;
     public const Int32 ALIGNMENT = 4;
     [FieldOffset(20)]
     public PlayerRef PlayerRef;
@@ -2306,6 +2498,8 @@ namespace Quantum {
     public QBoolean IsSpectator;
     [FieldOffset(44)]
     public QBoolean ManualSpectator;
+    [FieldOffset(48)]
+    public QBoolean VotedToContinue;
     [FieldOffset(16)]
     public Int32 Wins;
     [FieldOffset(2)]
@@ -2331,6 +2525,7 @@ namespace Quantum {
         hash = hash * 31 + RequestedTeam.GetHashCode();
         hash = hash * 31 + IsSpectator.GetHashCode();
         hash = hash * 31 + ManualSpectator.GetHashCode();
+        hash = hash * 31 + VotedToContinue.GetHashCode();
         hash = hash * 31 + Wins.GetHashCode();
         hash = hash * 31 + RealTeam.GetHashCode();
         hash = hash * 31 + LastChatMessage.GetHashCode();
@@ -2358,6 +2553,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsRoomHost, serializer);
         QBoolean.Serialize(&p->IsSpectator, serializer);
         QBoolean.Serialize(&p->ManualSpectator, serializer);
+        QBoolean.Serialize(&p->VotedToContinue, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -3312,12 +3508,14 @@ namespace Quantum {
     public static FrameSerializer.Delegate SerializePhysicsQueryRef;
     public static FrameSerializer.Delegate SerializePhysicsContact;
     public static FrameSerializer.Delegate SerializePlayerRef;
+    public static FrameSerializer.Delegate SerializePlayerInformation;
     public static FrameSerializer.Delegate SerializeInput;
     static partial void InitStaticDelegatesGen() {
       SerializeEntityRef = EntityRef.Serialize;
       SerializePhysicsQueryRef = PhysicsQueryRef.Serialize;
       SerializePhysicsContact = Quantum.PhysicsContact.Serialize;
       SerializePlayerRef = PlayerRef.Serialize;
+      SerializePlayerInformation = Quantum.PlayerInformation.Serialize;
       SerializeInput = Quantum.Input.Serialize;
     }
     static partial void RegisterSimulationTypesGen(TypeRegistry typeRegistry) {
@@ -3420,6 +3618,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(PhysicsSceneSettings), PhysicsSceneSettings.SIZE);
       typeRegistry.Register(typeof(Quantum.PiranhaPlant), Quantum.PiranhaPlant.SIZE);
       typeRegistry.Register(typeof(Quantum.PlayerData), Quantum.PlayerData.SIZE);
+      typeRegistry.Register(typeof(Quantum.PlayerInformation), Quantum.PlayerInformation.SIZE);
       typeRegistry.Register(typeof(PlayerRef), PlayerRef.SIZE);
       typeRegistry.Register(typeof(Quantum.Powerup), Quantum.Powerup.SIZE);
       typeRegistry.Register(typeof(Quantum.PowerupReserveResult), 1);
@@ -3427,6 +3626,8 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.Projectile), Quantum.Projectile.SIZE);
       typeRegistry.Register(typeof(Ptr), Ptr.SIZE);
       typeRegistry.Register(typeof(QBoolean), QBoolean.SIZE);
+      typeRegistry.Register(typeof(Quantum.QString16), Quantum.QString16.SIZE);
+      typeRegistry.Register(typeof(Quantum.QString48), Quantum.QString48.SIZE);
       typeRegistry.Register(typeof(Quantum.Ptr), Quantum.Ptr.SIZE);
       typeRegistry.Register(typeof(QueryOptions), 2);
       typeRegistry.Register(typeof(RNGSession), RNGSession.SIZE);
@@ -3492,6 +3693,8 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<PhysicsFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupReserveResult>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupState>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString16>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString48>();
       FramePrinter.EnsurePrimitiveNotStripped<QueryOptions>();
     }
   }

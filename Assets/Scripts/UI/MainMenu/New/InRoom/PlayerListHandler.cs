@@ -40,7 +40,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEnable() {
-            autoRefreshCoroutine = StartCoroutine(AutoUpdateCoroutine());
+            // autoRefreshCoroutine = StartCoroutine(AutoUpdateCoroutine());
             ReorderEntries();
         }
 

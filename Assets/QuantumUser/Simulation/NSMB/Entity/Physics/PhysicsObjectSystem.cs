@@ -6,13 +6,16 @@ using System;
 using UnityEngine;
 
 namespace Quantum {
+#if MULTITHREADED
     public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
+#else
+    public unsafe class PhysicsObjectSystem : SystemMainThread, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
+#endif
 
         public static readonly FP RaycastSkin = FP.FromString("0.1");
         public static readonly FP Skin = FP.FromString("0.001");
         public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 1 - cos(22.5 degrees)
 
-        private TaskDelegateHandle sendEventTaskHandle;
 
         public struct Filter {
             public EntityRef Entity;
@@ -21,23 +24,32 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
+#if MULTITHREADED
+        private TaskDelegateHandle sendEventTaskHandle;
+
         protected override void OnInitUser(Frame f) {
             f.Context.ExcludeEntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
             f.Context.TaskContext.RegisterDelegate(SendEventsTask, $"{GetType().Name}.SendEvents", ref sendEventTaskHandle);
         }
-
+        
         protected override TaskHandle Schedule(Frame f, TaskHandle taskHandle) {
             TaskHandle moveObjectsTask = base.Schedule(f, taskHandle);
             return f.Context.TaskContext.AddSingletonTask(sendEventTaskHandle, null, moveObjectsTask);
         }
+#else
+        public override void OnInit(Frame f) {
+            f.Context.ExcludeEntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
+        }
+#endif
 
+
+#if MULTITHREADED
         public override void Update(FrameThreadSafe f, ref Filter filter) {
             var physicsObject = filter.PhysicsObject;
             if (physicsObject->IsFrozen) {
                 return;
             }
 
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var transform = filter.Transform;
             var entity = filter.Entity;
 
@@ -47,9 +59,9 @@ namespace Quantum {
 
             QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
 
-            CeilingCrusherCheck(f, ref filter, stage, contacts);
+            CeilingCrusherCheck((FrameThreadSafe) f, ref filter, stage, contacts);
 
-            MoveWithPlatform(f, ref filter, contacts);
+            MoveWithPlatform((FrameThreadSafe) f, ref filter, contacts);
             for (int i = 0; i < contacts.Count; i++) {
                 var contact = contacts[i];
                 if (contact.Frame < f.Number) {
@@ -75,7 +87,7 @@ namespace Quantum {
             FPVector2 previousPosition = transform->Position;
             effectiveVelocity = MoveVertically(f, effectiveVelocity, entity, stage, contacts);
             effectiveVelocity = MoveHorizontally(f, effectiveVelocity, entity, stage, contacts);
-            ResolveContacts(f, stage, physicsObject, contacts);
+            ResolveContacts((FrameThreadSafe) f, stage, physicsObject, contacts);
 
             if (!physicsObject->DisableCollision && /* canSnap && */ physicsObject->WasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y && !physicsObject->IsTouchingGround) {
                 // Try snapping
@@ -97,7 +109,7 @@ namespace Quantum {
             physicsObject->Velocity.X = effectiveVelocity.X / velocityModifier.X;
             physicsObject->Velocity.Y = effectiveVelocity.Y / velocityModifier.Y;
 
-            CeilingCrusherCheck(f, ref filter, stage, contacts);
+            CeilingCrusherCheck((FrameThreadSafe) f, ref filter, stage, contacts);
 
 #if DEBUG
             foreach (var contact in contacts) {
@@ -111,6 +123,98 @@ namespace Quantum {
             }
             physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
         }
+
+#else
+
+        public override void Update(Frame f) {
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            FrameThreadSafe fts = (FrameThreadSafe) f;
+
+            Filter filter = default;
+            var loop = f.Unsafe.FilterStruct<Filter>();
+            while (loop.Next(&filter)) {
+                var physicsObject = filter.PhysicsObject;
+                if (physicsObject->IsFrozen) {
+                    continue;
+                }
+
+                var transform = filter.Transform;
+                var entity = filter.Entity;
+
+                // bool canSnap = wasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y;
+                physicsObject->PreviousFrameVelocity = physicsObject->Velocity;
+                physicsObject->PreviousData = physicsObject->CurrentData;
+
+                QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+
+                CeilingCrusherCheck(fts, ref filter, stage, contacts);
+
+                MoveWithPlatform(fts, ref filter, contacts);
+                for (int i = 0; i < contacts.Count; i++) {
+                    var contact = contacts[i];
+                    if (contact.Frame < f.Number) {
+                        contacts.RemoveAtUnordered(i);
+                        i--;
+                    }
+                }
+
+                if (physicsObject->WasBeingCrushed) {
+                    physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y, 0);
+                }
+
+                FPVector2 velocityModifier = FPVector2.One;
+                if (physicsObject->SlowInLiquids && physicsObject->IsUnderwater) {
+                    velocityModifier.X = FP._0_50;
+                    if (FPMath.Abs(physicsObject->Velocity.Y) > Constants.OnePixelPerFrame) {
+                        velocityModifier.Y = Constants.OnePixelPerFrame / FPMath.Abs(physicsObject->Velocity.Y);
+                    }
+                }
+                FPVector2 effectiveVelocity = new FPVector2(physicsObject->Velocity.X * velocityModifier.X, physicsObject->Velocity.Y * velocityModifier.Y);
+                effectiveVelocity += physicsObject->ParentVelocity;
+
+                FPVector2 previousPosition = transform->Position;
+                effectiveVelocity = MoveVertically(fts, effectiveVelocity, entity, stage, contacts);
+                effectiveVelocity = MoveHorizontally(fts, effectiveVelocity, entity, stage, contacts);
+                ResolveContacts((FrameThreadSafe) f, stage, physicsObject, contacts);
+
+                if (!physicsObject->DisableCollision && /* canSnap && */ physicsObject->WasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y && !physicsObject->IsTouchingGround) {
+                    // Try snapping
+                    FPVector2 previousVelocity = effectiveVelocity;
+                    FPVector2 testVelocity = effectiveVelocity;
+                    testVelocity.Y = -FP._0_25 * f.UpdateRate;
+                    effectiveVelocity = MoveVertically(fts, testVelocity, entity, stage, contacts);
+                    ResolveContacts(fts, stage, physicsObject, contacts);
+
+                    if (!physicsObject->IsTouchingGround) {
+                        transform->Position.Y = previousPosition.Y;
+                        effectiveVelocity = previousVelocity;
+                        effectiveVelocity.Y = 0;
+                        physicsObject->HoverFrames = 3;
+                    }
+                }
+
+                effectiveVelocity -= physicsObject->ParentVelocity;
+                physicsObject->Velocity.X = effectiveVelocity.X / velocityModifier.X;
+                physicsObject->Velocity.Y = effectiveVelocity.Y / velocityModifier.Y;
+
+                CeilingCrusherCheck(fts, ref filter, stage, contacts);
+
+    #if DEBUG
+                foreach (var contact in contacts) {
+                    Draw.Ray(contact.Position, contact.Normal, ColorRGBA.Red);
+                }
+    #endif
+
+                if (QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
+                    // Apply gravity
+                    physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
+                }
+                physicsObject->Velocity.Y = FPMath.Max(physicsObject->Velocity.Y, physicsObject->TerminalVelocity);
+            }
+
+            SendEventsTask(fts, 0, 0, null);
+        }
+#endif
 
         public void SendEventsTask(FrameThreadSafe f, int start, int count, void* arg) {
             var filter = f.Filter<PhysicsObject>();

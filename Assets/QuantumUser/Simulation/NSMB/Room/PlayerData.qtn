@@ -9,6 +9,7 @@ component PlayerData {
 	byte RequestedTeam;
 	bool IsSpectator;
 	bool ManualSpectator;
+	bool VotedToContinue;
 
 	int Wins;
 	byte RealTeam;

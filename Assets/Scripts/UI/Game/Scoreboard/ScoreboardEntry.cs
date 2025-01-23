@@ -1,6 +1,6 @@
-using JetBrains.Annotations;
 using NSMB.Utils;
 using Quantum;
+using System.CodeDom;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -18,9 +18,8 @@ namespace NSMB.UI.Game.Scoreboard {
 
         //---Private Variables
         private ScoreboardUpdater updater;
-        private string nickname = "noname";
-        private bool isValidPlayer;
-        private string nicknameColor = "#FFFFFF";
+        private int informationIndex;
+        private string nickname, nicknameColor;
         private bool constantNicknameColor = true;
 
         public void Start() {
@@ -29,25 +28,23 @@ namespace NSMB.UI.Game.Scoreboard {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
+            QuantumEvent.Subscribe<EventMarioPlayerDestroyed>(this, OnMarioPlayerDestroyed);
 
             if (NetworkHandler.Game != null) {
                 UpdateEntry(NetworkHandler.Game.Frames.Predicted);
             }
         }
 
-        public unsafe void Initialize(Frame f, EntityRef target, ScoreboardUpdater updater) {
+        public unsafe void Initialize(Frame f, int index, EntityRef target, ScoreboardUpdater updater) {
             Target = target;
             this.updater = updater;
 
-            if (f.Unsafe.TryGetPointer(target, out MarioPlayer* mario)) {
-                RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-                if (runtimePlayer != null) {
-                    nickname = runtimePlayer.PlayerNickname;
-                    isValidPlayer = true;
-                    nicknameColor = runtimePlayer.NicknameColor;
-                    nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
-                }
-            }
+            informationIndex = index;
+            ref PlayerInformation info = ref f.Global->PlayerInfo[index];
+            nickname = info.Nickname;
+            nicknameColor = info.NicknameColor;
+            nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+
             UpdateEntry(f);
             gameObject.SetActive(true);
         }
@@ -59,31 +56,32 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         public unsafe void UpdateEntry(Frame f) {
-            if (!f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
-                Color dcColor = Utils.Utils.GetPlayerColor(f, PlayerRef.None);
-                dcColor.a = 0.5f;
-                background.color = dcColor;
-                return;
+            ref PlayerInformation info = ref f.Global->PlayerInfo[informationIndex];
+
+            var playerData = QuantumUtils.GetPlayerData(f, info.PlayerRef);
+            int ping = (!info.Disconnected && playerData != null) ? playerData->Ping : -1;
+            nicknameText.text = Utils.Utils.GetPingSymbol(ping) + nickname.ToValidUsername(f, info.PlayerRef);
+
+            Color backgroundColor = Utils.Utils.GetPlayerColor(f, info.PlayerRef, considerDisqualifications: true);
+            backgroundColor.a = 0.5f;
+            background.color = backgroundColor;
+
+            var character = f.SimulationConfig.CharacterDatas[info.Character];
+            int stars = 0;
+            int lives = 0;
+            if (f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
+                stars = mario->Stars;
+                lives = mario->Lives;
             }
-
-            var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
-
-            int ping = playerData != null ? playerData->Ping : (isValidPlayer ? -1 : 0);
-            nicknameText.text = Utils.Utils.GetPingSymbol(ping) + nickname.ToValidUsername(f, mario->PlayerRef);
 
             StringBuilder scoreBuilder = new();
             if (f.Global->Rules.IsLivesEnabled) {
-                var character = f.FindAsset(mario->CharacterAsset);
-                scoreBuilder.Append(character.UiString).Append(Utils.Utils.GetSymbolString(mario->Lives.ToString()));
+                scoreBuilder.Append(character.UiString).Append(Utils.Utils.GetSymbolString(lives.ToString()));
             }
-            scoreBuilder.Append(Utils.Utils.GetSymbolString('S' + mario->Stars.ToString()));
+            scoreBuilder.Append(Utils.Utils.GetSymbolString('S' + stars.ToString()));
 
             scoreText.text = scoreBuilder.ToString();
             updater.RequestSorting = true;
-
-            Color backgroundColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
-            backgroundColor.a = 0.5f;
-            background.color = backgroundColor;
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
@@ -111,6 +109,14 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
+            if (e.Entity != Target) {
+                return;
+            }
+
+            UpdateEntry(e.Frame);
+        }
+
+        private void OnMarioPlayerDestroyed(EventMarioPlayerDestroyed e) {
             if (e.Entity != Target) {
                 return;
             }

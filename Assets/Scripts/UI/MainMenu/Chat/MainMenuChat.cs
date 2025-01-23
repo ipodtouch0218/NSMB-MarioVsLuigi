@@ -100,6 +100,8 @@ namespace NSMB.UI.MainMenu {
 
         //---Callbacks
         public void OnChatMessage(ChatManager.ChatMessageData data) {
+            Debug.Log(messagePrefab);
+            Debug.Log((bool) messagePrefab);
             ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
 
             bool active;
