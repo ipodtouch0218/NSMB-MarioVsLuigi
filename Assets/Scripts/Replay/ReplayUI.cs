@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class ReplayUI : MonoBehaviour {
+public class ReplayUI : QuantumSceneViewComponent {
 
     //---Serialized Variables
     [SerializeField] private PlayerElements playerElements;
@@ -26,25 +26,26 @@ public class ReplayUI : MonoBehaviour {
 
     //---Private Variables
     private float replaySpeed = 1;
-    private int fastForwardDestinationTick;
+    private int fastForwardDestinationTick, previousTimestampSeconds;
     private bool replayPaused;
     private bool draggingArrow;
+    private string replayLength;
     private StringBuilder builder = new();
 
     public void OnValidate() {
         this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
     }
 
-    public void Start() {
+    public override void OnActivate(Frame f) {
         replayUI.SetActive(NetworkHandler.IsReplay);
         if (!NetworkHandler.IsReplay) {
             enabled = false;
             return;
         }
 
+        replayLength = Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate);
         trackArrowText.gameObject.SetActive(false);
         Settings.Controls.UI.Pause.performed += OnPause;
-        QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
     }
 
     public void OnDestroy() {
@@ -82,16 +83,19 @@ public class ReplayUI : MonoBehaviour {
         simulationTargetTrackArrow.gameObject.SetActive(false);
     }
 
-    private void OnUpdateView(CallbackUpdateView e) {
-        Frame f = e.Game.Frames.Predicted;
-        Frame fp = e.Game.Frames.PredictedPrevious;
+    public override void OnUpdateView() {
+        Frame f = PredictedFrame;
 
-        float currentFrameNumber = fp.Number + e.Game.InterpolationFactor;
-        builder.Clear();
-        builder.Append(Utils.SecondsToMinuteSeconds(Mathf.FloorToInt((currentFrameNumber - NetworkHandler.ReplayStart) / f.UpdateRate)));
-        builder.Append('/');
-        builder.Append(Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate));
-        replayTimecode.text = builder.ToString();
+        float currentFrameNumber = PredictedPreviousFrame.Number + Game.InterpolationFactor;
+        int currentSeconds = Mathf.FloorToInt((currentFrameNumber - NetworkHandler.ReplayStart) / f.UpdateRate);
+        if (previousTimestampSeconds != currentSeconds) {
+            builder.Clear();
+            builder.Append(Utils.SecondsToMinuteSeconds(currentSeconds));
+            builder.Append('/').Append(replayLength);
+            replayTimecode.text = builder.ToString();
+
+            previousTimestampSeconds = currentSeconds;
+        }
 
         float width = maxTrackX - minTrackX;
         float bufferPercentage = (float) NetworkHandler.ReplayFrameCache.Count * f.UpdateRate * 5 / NetworkHandler.ReplayLength;

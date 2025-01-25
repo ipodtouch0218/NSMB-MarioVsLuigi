@@ -21,6 +21,7 @@ public class GlobalController : Singleton<GlobalController> {
     public DiscordController discordController;
     public RumbleManager rumbleManager;
     public Gradient rainbowGradient;
+    public Sprite[] pingIndicators;
     public SimulationConfig config;
 
     public PauseOptionMenuManager optionsManager;
@@ -34,8 +35,7 @@ public class GlobalController : Singleton<GlobalController> {
     public bool checkedForVersion = false, firstConnection = true;
     public int windowWidth = 1280, windowHeight = 720;
 
-    //public ConnectionToken connectionToken;
-
+ 
     //---Serialized Variables
     [SerializeField] private AudioMixer mixer;
 

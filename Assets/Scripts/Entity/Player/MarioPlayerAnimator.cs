@@ -112,6 +112,7 @@ namespace NSMB.Entities.Player {
         private float waterSurfaceMovementDistance;
         private Vector3 previousPosition;
         private bool forceUpdate;
+        private GameObject activeRespawnParticle;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -155,6 +156,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         }
 
         public override void OnActivate(Frame f) {
@@ -855,12 +857,12 @@ namespace NSMB.Entities.Player {
             }
 
             var marioTransform = e.Frame.Unsafe.GetPointer<Transform2D>(e.Entity);
-            GameObject respawn = SpawnParticle(respawnParticle, marioTransform->Position.ToUnityVector3());
-            foreach (ParticleSystem particle in respawn.GetComponentsInChildren<ParticleSystem>()) {
+            activeRespawnParticle = SpawnParticle(respawnParticle, marioTransform->Position.ToUnityVector3());
+            foreach (ParticleSystem particle in activeRespawnParticle.GetComponentsInChildren<ParticleSystem>()) {
                 var main = particle.main;    
                 main.startColor = GlowColor;
             }
-            PlaySound(SoundEffect.Player_Sound_Respawn);
+            //PlaySound(SoundEffect.Player_Sound_Respawn);
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
@@ -1154,6 +1156,12 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(SoundEffect.Player_Voice_SpinnerLaunch);
+        }
+
+        private void OnGameResynced(CallbackGameResynced e) {
+            if (activeRespawnParticle) {
+                Destroy(activeRespawnParticle);
+            }
         }
     }
 }

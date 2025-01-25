@@ -360,7 +360,7 @@ namespace Quantum {
                         StageTileInstance tile = stage.GetTileWorld((Frame) f, worldPos);
                         Vector2Int tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
-                        tile.GetWorldPolygons(f, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos);
+                        tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos);
 
                         int shapeIndex = 0;
                         int vertexIndex = 0;
@@ -565,7 +565,7 @@ namespace Quantum {
                         StageTileInstance tile = stage.GetTileWorld((Frame) f, worldPos);
                         Vector2Int tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
-                        tile.GetWorldPolygons(f, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos);
+                        tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos);
 
                         int shapeIndex = 0;
                         int vertexIndex = 0;
@@ -783,7 +783,7 @@ namespace Quantum {
                 }
 
                 StageTileInstance tile = stage.GetTileRelative((Frame) f, tilePosition.x, tilePosition.y);
-                tile.GetWorldPolygons(f, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition));
+                tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition));
 
                 int shapeIndex = 0;
                 int vertexIndex = 0;

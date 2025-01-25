@@ -165,7 +165,7 @@ public class BinaryReplayFile {
 
             return true;
         } catch (Exception e) {
-            Debug.LogWarning(e);
+            Debug.LogWarning("Failed to parse replay: " + e);
             // result = null;
             return false;
         }

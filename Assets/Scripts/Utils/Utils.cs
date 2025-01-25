@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NSMB.Utils {
     public class Utils {
@@ -229,6 +230,18 @@ namespace NSMB.Utils {
                 < 210 => "<sprite name=connection_fair>",
                 _ => "<sprite name=connection_bad>"
             };
+        }
+
+        public static Sprite GetPingSprite(int ping) {
+            int index = ping switch {
+                < 0 => 0,
+                0 => 1,
+                < 70 => 2,
+                < 140 => 3,
+                < 210 => 4,
+                _ => 5
+            };
+            return GlobalController.Instance.pingIndicators[index];
         }
 
         public static string BytesToString(long byteCount) {

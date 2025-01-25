@@ -14,7 +14,11 @@ namespace Quantum {
         }
 
         public void GetWorldPolygons(FrameThreadSafe f, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, out StageTile tile, FPVector2? worldPos = null) {
-            GetWorldPolygons(f, f.FindAsset<VersusStageData>(f.Map.UserAsset), tile = f.FindAsset(Tile), vertexBuffer, shapeVertexCountBuffer, worldPos ?? FPVector2.Zero);
+            GetWorldPolygons(f, f.FindAsset<VersusStageData>(f.Map.UserAsset), vertexBuffer, shapeVertexCountBuffer, out tile, worldPos ?? FPVector2.Zero);
+        }
+
+        public void GetWorldPolygons(FrameThreadSafe f, VersusStageData stage, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, out StageTile tile, FPVector2? worldPos = null) {
+            GetWorldPolygons(f, stage, tile = f.FindAsset(Tile), vertexBuffer, shapeVertexCountBuffer, worldPos ?? FPVector2.Zero);
         }
 
         public void GetWorldPolygons(FrameThreadSafe f, VersusStageData stage, StageTile stageTile, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, FPVector2? worldPos = null) {

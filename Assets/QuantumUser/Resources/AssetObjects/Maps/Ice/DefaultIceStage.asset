@@ -624,7 +624,7 @@ MonoBehaviour:
             Value: 1440373003412769203
         TimeToShoot: 240
         MinimumShootRadius:
-          RawValue: 26214
+          RawValue: 39322
         MaximumShootRadius:
           RawValue: 458752
         BulletBillCount: 0
@@ -698,7 +698,7 @@ MonoBehaviour:
             Value: 1440373003412769203
         TimeToShoot: 240
         MinimumShootRadius:
-          RawValue: 26214
+          RawValue: 39322
         MaximumShootRadius:
           RawValue: 458752
         BulletBillCount: 0

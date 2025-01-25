@@ -1,6 +1,7 @@
 using NSMB.Entities.Player;
 using NSMB.Utils;
 using Quantum;
+using System.Drawing.Drawing2D;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -36,13 +37,10 @@ namespace NSMB.UI.Game {
             this.elements = elements;
             this.parent = parent;
 
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(parent.EntityRef);
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(Entity);
             this.character = f.FindAsset(mario->CharacterAsset);
             stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-
-            RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-            nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
-            cachedNickname = runtimePlayer?.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
+            UpdateCachedNickname(f, mario);
 
             arrow.color = parent.GlowColor;
             text.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
@@ -56,6 +54,7 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
 
             if (NetworkHandler.Game != null) {
@@ -123,6 +122,16 @@ namespace NSMB.UI.Game {
             text.text = stringBuilder.ToString();
         }
 
+        public unsafe void UpdateCachedNickname(Frame f, MarioPlayer* mario = null) {
+            if (mario == null) {
+                if (!f.Unsafe.TryGetPointer(Entity, out mario)) {
+                    return;
+                }
+            }
+            RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
+            cachedNickname = runtimePlayer?.PlayerNickname.ToValidUsername(f, mario->PlayerRef) ?? "noname";
+        }
+
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
             if (e.Entity != Entity) {
                 return;
@@ -157,6 +166,11 @@ namespace NSMB.UI.Game {
 
         private void OnGameResynced(CallbackGameResynced e) {
             UpdateText(e.Game.Frames.Predicted);
+        }
+
+        private unsafe void OnPlayerRemoved(EventPlayerRemoved e) {
+            UpdateCachedNickname(e.Frame);
+            UpdateText(e.Frame);
         }
     }
 }

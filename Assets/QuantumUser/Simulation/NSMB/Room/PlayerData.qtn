@@ -1,5 +1,4 @@
 component PlayerData {
-
 	PlayerRef PlayerRef;
 	bool IsRoomHost;
 	bool IsLoaded;

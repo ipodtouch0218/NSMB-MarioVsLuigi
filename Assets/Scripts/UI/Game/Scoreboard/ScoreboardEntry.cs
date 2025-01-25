@@ -1,6 +1,5 @@
 using NSMB.Utils;
 using Quantum;
-using System.CodeDom;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -13,14 +12,14 @@ namespace NSMB.UI.Game.Scoreboard {
         public EntityRef Target { get; private set; }
 
         //---Serialized Variables
-        [SerializeField] private Image background;
+        [SerializeField] private Image background, pingIndicator;
         [SerializeField] private TMP_Text nicknameText, scoreText;
 
         //---Private Variables
         private ScoreboardUpdater updater;
         private int informationIndex;
-        private string nickname, nicknameColor;
-        private bool constantNicknameColor = true;
+        private string cachedNickname, nicknameColor, cachedPingSymbol;
+        private bool constantNicknameColor = true, nicknameMayHaveChanged;
 
         public void Start() {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
@@ -29,6 +28,7 @@ namespace NSMB.UI.Game.Scoreboard {
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
             QuantumEvent.Subscribe<EventMarioPlayerDestroyed>(this, OnMarioPlayerDestroyed);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
 
             if (NetworkHandler.Game != null) {
                 UpdateEntry(NetworkHandler.Game.Frames.Predicted);
@@ -41,9 +41,10 @@ namespace NSMB.UI.Game.Scoreboard {
 
             informationIndex = index;
             ref PlayerInformation info = ref f.Global->PlayerInfo[index];
-            nickname = info.Nickname;
+            cachedNickname = info.Nickname;
             nicknameColor = info.NicknameColor;
             nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            nicknameMayHaveChanged = true;
 
             UpdateEntry(f);
             gameObject.SetActive(true);
@@ -60,7 +61,11 @@ namespace NSMB.UI.Game.Scoreboard {
 
             var playerData = QuantumUtils.GetPlayerData(f, info.PlayerRef);
             int ping = (!info.Disconnected && playerData != null) ? playerData->Ping : -1;
-            nicknameText.text = Utils.Utils.GetPingSymbol(ping) + nickname.ToValidUsername(f, info.PlayerRef);
+            pingIndicator.sprite = Utils.Utils.GetPingSprite(ping);
+            if (nicknameMayHaveChanged) {
+                nicknameText.text = cachedNickname;
+                nicknameMayHaveChanged = false;
+            }
 
             Color backgroundColor = Utils.Utils.GetPlayerColor(f, info.PlayerRef, considerDisqualifications: true);
             backgroundColor.a = 0.5f;
@@ -126,6 +131,14 @@ namespace NSMB.UI.Game.Scoreboard {
 
         private void OnGameResynced(CallbackGameResynced e) {
             UpdateEntry(e.Game.Frames.Predicted);
+        }
+
+        private unsafe void OnPlayerRemoved(EventPlayerRemoved e) {
+            ref PlayerInformation info = ref e.Frame.Global->PlayerInfo[informationIndex];
+            cachedNickname = info.Nickname.ToString().ToValidUsername(e.Frame, info.PlayerRef);
+            nicknameMayHaveChanged = true;
+
+            UpdateEntry(e.Frame);
         }
     }
 }

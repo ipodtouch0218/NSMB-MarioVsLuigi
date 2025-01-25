@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace NSMB.UI.Game {
-    public class PlayerElements : MonoBehaviour {
+    public class PlayerElements : QuantumSceneViewComponent {
 
         public static HashSet<PlayerElements> AllPlayerElements = new();
 
@@ -54,7 +54,7 @@ namespace NSMB.UI.Game {
             this.SetIfNull(ref replayUi, UnityExtensions.GetComponentType.Children);
         }
 
-        public void OnEnable() {
+        public override void OnActivate(Frame f) {
             AllPlayerElements.Add(this);
             Settings.Controls.UI.Navigate.performed += OnNavigate;
             Settings.Controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
@@ -63,7 +63,7 @@ namespace NSMB.UI.Game {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
-        public void OnDisable() {
+        public override void OnDeactivate() {
             AllPlayerElements.Remove(this);
             Settings.Controls.UI.Navigate.performed -= OnNavigate;
             Settings.Controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
@@ -74,7 +74,6 @@ namespace NSMB.UI.Game {
 
         public void Start() {
             nametagCanvas.SetActive(Settings.Instance.GraphicsPlayerNametags);
-            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         }
 
         public void Initialize(QuantumGame game, Frame f, EntityRef entity, PlayerRef player) {
@@ -101,8 +100,8 @@ namespace NSMB.UI.Game {
             newNametag.Initialize(game, f, this, mario);
         }
 
-        public void OnUpdateView(CallbackUpdateView e) {
-            Frame f = e.Game.Frames.Predicted;
+        public override void OnUpdateView() {
+            Frame f = PredictedFrame;
 
             if (!spectating && !f.Exists(entity)) {
                 // Spectating
@@ -116,7 +115,7 @@ namespace NSMB.UI.Game {
         }
 
         public unsafe void UpdateSpectateUI() {
-            Frame f = NetworkHandler.Game.Frames.Predicted;
+            Frame f = PredictedFrame;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(spectatingEntity);
 
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
@@ -147,7 +146,7 @@ namespace NSMB.UI.Game {
         }
 
         public unsafe void SpectateNextPlayer() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = PredictedFrame;
 
             int marioCount = f.ComponentCount<MarioPlayer>();
             if (marioCount <= 0) {
@@ -173,11 +172,11 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            SpectateNextPlayer();
+            SpectatePreviousPlayer();
         }
 
         public unsafe void SpectatePreviousPlayer() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = PredictedFrame;
 
             int marioCount = f.ComponentCount<MarioPlayer>();
             if (marioCount <= 0) {

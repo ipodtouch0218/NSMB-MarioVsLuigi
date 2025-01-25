@@ -26,31 +26,31 @@ namespace Quantum {
                 FPVector2 spawnpoint = transform->Position + FPVector2.Up * (collider->Shape.Box.Extents.Y * 2) + SpawnOffset;
                 var allPlayers = f.Filter<MarioPlayer, Transform2D>();
                 FP absDistance = 0;
-                FP minDistance = FP.UseableMax;
+                FP smallestDistance = FP.UseableMax;
                 while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
                     QuantumUtils.WrappedDistance(stage, spawnpoint, marioTransform->Position, out FP distance);
                     FP abs = FPMath.Abs(distance);
 
                     // Player is too close
-                    if (abs >= launcher->MinimumShootRadius) {
-                        minDistance = FP.UseableMax;
+                    if (abs < launcher->MinimumShootRadius) {
+                        smallestDistance = FP.UseableMax;
                         break;
                     }
 
-                    if (abs < minDistance) {
+                    if (abs < smallestDistance) {
                         absDistance = abs;
-                        minDistance = distance;
+                        smallestDistance = distance;
                     }
                 }
 
-                if (FPMath.Abs(minDistance) > launcher->MaximumShootRadius) {
+                if (FPMath.Abs(smallestDistance) > launcher->MaximumShootRadius) {
                     launcher->TimeToShootFrames = launcher->TimeToShoot;
                     continue;
                 }
 
                 if (QuantumUtils.Decrement(ref launcher->TimeToShootFrames)) {
                     // Attempt a shot
-                    bool right = minDistance < 0;
+                    bool right = smallestDistance < 0;
 
                     EntityRef newBillEntity = f.Create(launcher->BulletBillPrototype);
                     var newBill = f.Unsafe.GetPointer<BulletBill>(newBillEntity);

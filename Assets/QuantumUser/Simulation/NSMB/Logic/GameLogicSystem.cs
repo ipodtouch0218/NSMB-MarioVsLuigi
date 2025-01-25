@@ -238,6 +238,7 @@ namespace Quantum {
         }
 
         public void OnPlayerAdded(Frame f, PlayerRef player, bool firstTime) {
+            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             EntityRef newEntity = f.Create();
             f.Add(newEntity, out PlayerData* newData);
             newData->PlayerRef = player;
@@ -248,8 +249,8 @@ namespace Quantum {
             // Get team counts
             int teams = f.SimulationConfig.Teams.Length;
             Span<byte> teamCounts = stackalloc byte[teams];
-            var otherPlayerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
-            foreach ((_, EntityRef otherEntity) in otherPlayerDatas) {
+            var playerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
+            foreach ((PlayerRef otherPlayer, EntityRef otherEntity) in playerDatas) {
                 var data = f.Unsafe.GetPointer<PlayerData>(otherEntity);
                 if (data->RequestedTeam < teams) {
                     teamCounts[data->RequestedTeam]++;
@@ -268,37 +269,43 @@ namespace Quantum {
             newData->RequestedTeam = (byte) lowestTeamIndex;
 
             // Other bookkeeping
-            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
             newData->Character = runtimePlayer.Character;
             newData->Palette = runtimePlayer.Palette;
 
-            if (otherPlayerDatas.Count == 0) {
+            if (playerDatas.Count == 0) {
                 // First player is host
                 newData->IsRoomHost = true;
                 f.Events.HostChanged(f, player);
             }
 
-            otherPlayerDatas[player] = newEntity;
+            foreach ((_, EntityRef otherEntity) in playerDatas) {
+                var data = f.Unsafe.GetPointer<PlayerData>(otherEntity);
+                if (data->RequestedTeam < teams) {
+                    teamCounts[data->RequestedTeam]++;
+                }
+            }
+
+            playerDatas[player] = newEntity;
             f.Events.PlayerAdded(f, player);
             f.Events.PlayerDataChanged(f, player);
         }
 
         public void OnPlayerRemoved(Frame f, PlayerRef player) {
-            var datas = f.ResolveDictionary(f.Global->PlayerDatas);
+            var playerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
             bool hostChanged = false;
 
-            if (datas.TryGetValue(player, out EntityRef entity)) {
-                var deletedPlayerData = f.Unsafe.GetPointer<PlayerData>(entity);
+            if (playerDatas.TryGetValue(player, out EntityRef entity)
+                && f.Unsafe.TryGetPointer(entity, out PlayerData* deletedPlayerData)) {
 
                 if (deletedPlayerData->IsRoomHost) {
                     // Give the host to the youngest player.
-                    var playerDataFilter = f.Filter<PlayerData>();
                     PlayerData* youngestPlayer = null;
-                    while (playerDataFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
+                    foreach ((_, EntityRef otherEntity) in playerDatas) {
+                        PlayerData* otherPlayerData = f.Unsafe.GetPointer<PlayerData>(otherEntity);
                         if (deletedPlayerData == otherPlayerData) {
                             continue;
                         }
-                        
+
                         if (youngestPlayer == null || otherPlayerData->JoinTick < youngestPlayer->JoinTick) {
                             youngestPlayer = otherPlayerData;
                         }
@@ -313,7 +320,7 @@ namespace Quantum {
                 }
 
                 f.Destroy(entity);
-                datas.Remove(player);
+                playerDatas.Remove(player);
             }
 
             f.Events.PlayerRemoved(f, player);

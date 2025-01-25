@@ -15967,6 +15967,13 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
+  pingIndicators:
+  - {fileID: 762531918, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - {fileID: -1762235557, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - {fileID: 1763873500, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - {fileID: -1507071055, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - {fileID: 1021722474, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - {fileID: 116447381, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   config: {fileID: -4363489268676355003, guid: 89b430ef207c0e04997f44798547dc4d, type: 2}
   optionsManager: {fileID: 6650708626366051462}
   outlineFeature: {fileID: 8738572190042607270, guid: 5f58d6b1c480f4b4f9c77b6264ddfa5b,

@@ -43,7 +43,7 @@ namespace NSMB.UI.Game {
         private bool uiHidden;
 
         //private TeamManager teamManager;
-        private int cachedCoins = -1, teamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1;
+        private int cachedCoins = -1, cachedTeamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1;
         private PowerupAsset previousPowerup;
         private VersusStageData stage;
         private EntityRef previousTarget;
@@ -229,10 +229,12 @@ namespace NSMB.UI.Game {
 
             if (rules.TeamsEnabled) {
                 byte teamIndex = mario->GetTeam(f);
-                teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
-                TeamAsset team = f.SimulationConfig.Teams[teamIndex];
-
-                uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + teamStars + "/" + starRequirement);
+                int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
+                if (cachedTeamStars != teamStars) {
+                    cachedTeamStars = teamStars;
+                    TeamAsset team = f.SimulationConfig.Teams[teamIndex];
+                    uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + "/" + starRequirement);
+                }
             } else {
                 teamsParent.SetActive(false);
             }
