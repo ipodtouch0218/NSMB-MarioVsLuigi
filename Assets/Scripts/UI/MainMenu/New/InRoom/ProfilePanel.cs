@@ -10,7 +10,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         //---Serialized Variables
         [SerializeField] private Image[] characterButtonImages, characterButtonLogos;
-        [SerializeField] private Sprite enabledCharacterButtonSprite, disabledCharacterButtonSprite;
+        [SerializeField] private Sprite[] enabledCharacterButtonSprites, disabledCharacterButtonSprites;
         [SerializeField] private Color enabledCharacterButtonLogoColor, disabledCharacterButtonLogoColor;
         [SerializeField] private PaletteChooser paletteChooser;
         [SerializeField] private TeamChooser teamChooser;
@@ -74,7 +74,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
             for (int i = 0; i < characterButtonImages.Length; i++) {
                 var image = characterButtonImages[i];
-                image.sprite = disabledCharacterButtonSprite;
+                image.sprite = disabledCharacterButtonSprites[i];
                 image.transform.SetAsLastSibling();
 
                 if (i < characterButtonLogos.Length && characterButtonLogos[i]) {
@@ -82,7 +82,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 }
             }
 
-            characterButtonImages[index].sprite = enabledCharacterButtonSprite;
+            characterButtonImages[index].sprite = enabledCharacterButtonSprites[index];
             characterButtonImages[index].transform.SetAsLastSibling();
             if (index < characterButtonLogos.Length && characterButtonLogos[index]) {
                 characterButtonLogos[index].color = enabledCharacterButtonLogoColor;
