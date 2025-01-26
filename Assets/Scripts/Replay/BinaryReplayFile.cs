@@ -67,6 +67,8 @@ public class BinaryReplayFile {
         // Players
         writer.Write(Players);
         writer.Write(WinningTeam);
+
+        // TODO: change to Information struct ?
         for (int i = 0; i < Players; i++) {
             writer.Write(PlayerNames[i]);
             writer.Write(PlayerStars[i]);

@@ -284,3 +284,8 @@ synced event MarioPlayerDestroyed {
 	nothashed Frame Frame;
 	entity_ref Entity;
 }
+
+event MarioPlayerLandedWithAnimation {
+	nothashed Frame Frame;
+	entity_ref Entity;
+}

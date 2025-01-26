@@ -1,5 +1,3 @@
-using Photon.Deterministic;
-
 namespace Quantum {
     public unsafe partial struct PiranhaPlant {
         public void Respawn(Frame f, EntityRef entity) {
@@ -35,6 +33,7 @@ namespace Quantum {
             enemy->IsDead = true;
             enemy->IsActive = false;
 
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
             f.Events.EnemyKilled(f, entity, killerEntity, special);
         }
     }

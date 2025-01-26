@@ -294,6 +294,13 @@ namespace Quantum {
             var playerDatas = f.ResolveDictionary(f.Global->PlayerDatas);
             bool hostChanged = false;
 
+            for (int i = 0; i < f.Global->RealPlayers; i++) {
+                ref PlayerInformation info = ref f.Global->PlayerInfo[i];
+                if (info.PlayerRef == player) {
+                    info.PlayerRef = PlayerRef.None;
+                }
+            }
+
             if (playerDatas.TryGetValue(player, out EntityRef entity)
                 && f.Unsafe.TryGetPointer(entity, out PlayerData* deletedPlayerData)) {
 

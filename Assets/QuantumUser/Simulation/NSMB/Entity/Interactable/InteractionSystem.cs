@@ -3,6 +3,7 @@ using Quantum.Physics2D;
 using Quantum.Profiling;
 using Quantum.Task;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Quantum {
@@ -38,6 +39,7 @@ namespace Quantum {
             Frame f = (Frame) fts;
 
             // pendingInteractions.Sort(new PendingInteractionComparer());
+            // Debug.Log(string.Join(',', pendingInteractions.Select(x => x.EntityA + " - " + x.EntityB + " (" + x.InteractorIndex + ") " + (x.IsPlatformInteraction ? "platform" : "object"))));
 
             foreach (PendingInteraction interaction in pendingInteractions) {
                 EntityRef entityA = interaction.EntityA;

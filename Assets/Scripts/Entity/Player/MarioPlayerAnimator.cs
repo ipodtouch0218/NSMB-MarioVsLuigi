@@ -128,6 +128,7 @@ namespace NSMB.Entities.Player {
 
             RenderPipelineManager.beginCameraRendering += URPOnPreRender;
 
+            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventMarioPlayerJumped>(this, OnMarioPlayerJumped, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerGroundpounded>(this, OnMarioPlayerGroundpounded, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerGroundpoundStarted>(this, OnMarioPlayerGroundpoundStarted, NetworkHandler.FilterOutReplayFastForward);
@@ -156,7 +157,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
-            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+            QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation);
         }
 
         public override void OnActivate(Frame f) {
@@ -1162,6 +1163,14 @@ namespace NSMB.Entities.Player {
             if (activeRespawnParticle) {
                 Destroy(activeRespawnParticle);
             }
+        }
+
+        private void OnMarioPlayerLandedWithAnimation(EventMarioPlayerLandedWithAnimation e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            animator.Play("jumplanding");
         }
     }
 }

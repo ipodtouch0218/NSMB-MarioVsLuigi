@@ -8,6 +8,7 @@ namespace Quantum {
             Lifetime += spawnAnimationLength;
 
             f.Unsafe.GetPointer<PhysicsObject>(thisEntity)->DisableCollision = true;
+            f.Unsafe.GetPointer<Interactable>(thisEntity)->ColliderDisabled = true;
         }
 
         public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength, FPVector2 spawnOrigin, FPVector2 spawnDestination, bool launch = false) {

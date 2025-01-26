@@ -52,13 +52,14 @@ namespace Quantum {
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
-            var allCoins = f.Filter<Coin>();
-            while (allCoins.NextUnsafe(out EntityRef entity, out Coin* coin)) {
+            var allCoins = f.Filter<Coin, Interactable>();
+            while (allCoins.NextUnsafe(out EntityRef entity, out Coin* coin, out Interactable* interactable)) {
                 if (!full && (!coin->IsCollected || !coin->IsFloating)) {
                     continue;
                 }
 
                 coin->IsCollected = false;
+                interactable->ColliderDisabled = false;
                 f.Events.CoinChangeCollected(f, entity, *coin, false);
 
                 if (coin->IsDotted && (!coin->IsCurrentlyDotted || full)) {
@@ -85,10 +86,12 @@ namespace Quantum {
 
             var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
             var coinCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(coinEntity);
+            var coinInteractable = f.Unsafe.GetPointer<Interactable>(coinEntity);
             f.Signals.OnMarioPlayerCollectedCoin(marioEntity, f.Unsafe.GetPointer<MarioPlayer>(marioEntity), coinTransform->Position + coinCollider->Shape.Centroid, false, false);
 
             if (coin->IsFloating) {
                 coin->IsCollected = true;
+                coinInteractable->ColliderDisabled = true;
                 f.Events.CoinChangeCollected(f, coinEntity, *coin, true);
             } else {
                 f.Destroy(coinEntity);

@@ -35,7 +35,10 @@ namespace Quantum {
 
             Input input = default;
             if (player.IsValid) {
-                input = *f.GetPlayerInput(player);
+                Input* inputPtr = f.GetPlayerInput(player);
+                if (inputPtr != null) {
+                    input = *inputPtr;
+                }
             }
 
             if (f.GetPlayerCommand(player) is CommandSpawnReserveItem) {
@@ -339,6 +342,10 @@ namespace Quantum {
             if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                 // Landed Frame
                 mario->LandedFrame = f.Number;
+                if (mario->JumpState == JumpState.TripleJump && (!inputs.Left.IsDown && !inputs.Right.IsDown)) {
+                    physicsObject->Velocity.X = 0;
+                    f.Events.MarioPlayerLandedWithAnimation(f, filter.Entity);
+                }
                 if (mario->PreviousJumpState != JumpState.None && mario->PreviousJumpState == mario->JumpState) {
                     mario->JumpState = JumpState.None;
                 }
@@ -2107,7 +2114,7 @@ namespace Quantum {
             bool groundpounded = attackerMario->IsGroundpoundActive || attackerMario->IsDrilling;
 
             if (attackerMario->CurrentPowerupState == PowerupState.MiniMushroom && defenderMario->CurrentPowerupState != PowerupState.MiniMushroom) {
-                // We are mini, they arent. special rules.
+                // Attacker is mini, they arent. special rules.
                 if (groundpounded) {
                     defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 3 : 0, false, attacker);
                     attackerMario->IsGroundpounding = false;
@@ -2115,7 +2122,8 @@ namespace Quantum {
                 }
             } else if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {
                 // We are big, groundpounding a mini opponent. squish.
-                defenderMario->DoKnockback(f, defender, fromRight, dropStars ? 3 : 0, false, attacker);
+                defenderMario->SpawnStars(f, defender, 3);
+                defenderMario->Death(f, defender, false, false);
                 attackerMario->DoEntityBounce = false;
             } else {
                 // Normal knockbacks
@@ -2240,6 +2248,7 @@ namespace Quantum {
             }
 
             physicsObject->Velocity = FPVector2.Zero;
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
 
             switch (breakReason) {
             case IceBlockBreakReason.BlockBump:

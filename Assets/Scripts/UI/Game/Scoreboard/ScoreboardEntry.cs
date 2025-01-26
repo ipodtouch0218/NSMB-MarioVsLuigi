@@ -41,7 +41,7 @@ namespace NSMB.UI.Game.Scoreboard {
 
             informationIndex = index;
             ref PlayerInformation info = ref f.Global->PlayerInfo[index];
-            cachedNickname = info.Nickname;
+            cachedNickname = info.Nickname.ToString().ToValidUsername(f, info.PlayerRef);
             nicknameColor = info.NicknameColor;
             nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
             nicknameMayHaveChanged = true;

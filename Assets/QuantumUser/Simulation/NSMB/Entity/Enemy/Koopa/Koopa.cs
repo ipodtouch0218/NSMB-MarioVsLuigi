@@ -13,6 +13,8 @@ namespace Quantum {
             CurrentSpeed = Speed;
             holdable->Holder = default;
             holdable->PreviousHolder = default;
+
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
         }
 
         public void EnterShell(Frame f, EntityRef entity, EntityRef initiator, bool flipped, bool groundpounded) {
@@ -46,10 +48,10 @@ namespace Quantum {
             f.Events.KoopaKicked(f, entity, false);
         }
 
-        public void Kill(Frame f, EntityRef koopaEntity, EntityRef killerEntity, bool special) {
-            var enemy = f.Unsafe.GetPointer<Enemy>(koopaEntity);
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(koopaEntity);
-            var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
+        public void Kill(Frame f, EntityRef entity, EntityRef killerEntity, bool special) {
+            var enemy = f.Unsafe.GetPointer<Enemy>(entity);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            var holdable = f.Unsafe.GetPointer<Holdable>(entity);
 
             if (f.Exists(holdable->Holder)) {
                 f.Unsafe.GetPointer<MarioPlayer>(holdable->Holder)->HeldEntity = default;
@@ -58,8 +60,8 @@ namespace Quantum {
                 holdable->IgnoreOwnerFrames = 15;
             }
 
-            var koopaTransform = f.Unsafe.GetPointer<Transform2D>(koopaEntity);
-            var koopaCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(koopaEntity);
+            var koopaTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var koopaCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
 
             // Spawn coin
             EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
@@ -71,9 +73,9 @@ namespace Quantum {
             // Fall off screen
             if (f.Unsafe.TryGetPointer(killerEntity, out Transform2D* killerTransform)) {
                 QuantumUtils.UnwrapWorldLocations(f, koopaTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
-                enemy->ChangeFacingRight(f, koopaEntity, ourPos.X > theirPos.X);
+                enemy->ChangeFacingRight(f, entity, ourPos.X > theirPos.X);
             } else {
-                enemy->ChangeFacingRight(f, koopaEntity, false);
+                enemy->ChangeFacingRight(f, entity, false);
             }
 
             physicsObject->DisableCollision = true;
@@ -91,13 +93,14 @@ namespace Quantum {
             } else {
                 combo = 0;
             }
-            f.Events.PlayComboSound(f, koopaEntity, combo);
+            f.Events.PlayComboSound(f, entity, combo);
 
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
             enemy->IsDead = true;
             IsInShell = false;
             IsKicked = false;
             IsFlipped = false;
-            f.Events.EnemyKilled(f, koopaEntity, killerEntity, false);
+            f.Events.EnemyKilled(f, entity, killerEntity, false);
         }
     }
 }

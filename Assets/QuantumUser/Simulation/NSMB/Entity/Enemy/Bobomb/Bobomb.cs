@@ -10,6 +10,8 @@ namespace Quantum {
             holdable->Holder = default;
             holdable->PreviousHolder = default;
             holdable->IgnoreOwnerFrames = 0;
+
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
         }
 
         public void Kick(Frame f, EntityRef entity, EntityRef initiator, FP speed) {
@@ -26,10 +28,10 @@ namespace Quantum {
             f.Events.PlayComboSound(f, entity, 0);
         }
 
-        public void Kill(Frame f, EntityRef entity, EntityRef killerEntity, bool special) {
-            var enemy = f.Unsafe.GetPointer<Enemy>(entity);
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            var bobombTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+        public void Kill(Frame f, EntityRef bobombEntity, EntityRef killerEntity, bool special) {
+            var enemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(bobombEntity);
+            var bobombTransform = f.Unsafe.GetPointer<Transform2D>(bobombEntity);
 
             // Spawn coin
             EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
@@ -41,9 +43,9 @@ namespace Quantum {
             // Fall off screen
             if (f.Unsafe.TryGetPointer(killerEntity, out Transform2D* killerTransform)) {
                 QuantumUtils.UnwrapWorldLocations(f, bobombTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
-                enemy->ChangeFacingRight(f, entity, ourPos.X > theirPos.X);
+                enemy->ChangeFacingRight(f, bobombEntity, ourPos.X > theirPos.X);
             } else {
-                enemy->ChangeFacingRight(f, entity, false);
+                enemy->ChangeFacingRight(f, bobombEntity, false);
             }
 
             physicsObject->DisableCollision = true;
@@ -61,19 +63,20 @@ namespace Quantum {
             } else {
                 combo = 0;
             }
-            f.Events.PlayComboSound(f, entity, combo);
+            f.Events.PlayComboSound(f, bobombEntity, combo);
 
             enemy->IsDead = true;
 
             // Holdable
-            var holdable = f.Unsafe.GetPointer<Holdable>(entity);
+            var holdable = f.Unsafe.GetPointer<Holdable>(bobombEntity);
             if (f.Unsafe.TryGetPointer(holdable->Holder, out MarioPlayer* marioHolder)) {
                 marioHolder->HeldEntity = default;
                 holdable->PreviousHolder = default;
                 holdable->Holder = default;
             }
 
-            f.Events.EnemyKilled(f, entity, killerEntity, special);
+            f.Unsafe.GetPointer<Interactable>(bobombEntity)->ColliderDisabled = true;
+            f.Events.EnemyKilled(f, bobombEntity, killerEntity, special);
         }
     }
 }

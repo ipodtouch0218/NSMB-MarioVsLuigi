@@ -13,6 +13,7 @@ namespace Quantum {
             public Powerup* Powerup;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
+            public Interactable* Interactable;
         }
 
         public override void OnInit(Frame f) {
@@ -34,6 +35,7 @@ namespace Quantum {
 
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                     powerup->ParentMarioPlayer = EntityRef.None;
+                    filter.Interactable->ColliderDisabled = false;
                     physicsObject->IsFrozen = false;
                     f.Events.PowerupBecameActive(f, filter.Entity);
                 } else {
@@ -44,6 +46,10 @@ namespace Quantum {
                 FP t = 1 - ((FP) powerup->SpawnAnimationFrames / (FP) powerup->BlockSpawnAnimationLength);
                 transform->Position = FPVector2.Lerp(powerup->BlockSpawnOrigin, powerup->BlockSpawnDestination, t);
 
+                if (powerup->SpawnAnimationFrames == 7) {
+                    filter.Interactable->ColliderDisabled = false;
+                }
+
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                     if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, filter.Entity)) {
                         // TODO: poof effect.
@@ -52,6 +58,7 @@ namespace Quantum {
                     }
                     powerup->BlockSpawn = false;
                     physicsObject->IsFrozen = false;
+                    filter.Interactable->ColliderDisabled = false;
                     f.Events.PowerupBecameActive(f, filter.Entity);
                 } else {
                     return;
@@ -62,6 +69,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                     powerup->LaunchSpawn = false;
                     physicsObject->DisableCollision = false;
+                    filter.Interactable->ColliderDisabled = false;
                     f.Events.PowerupBecameActive(f, filter.Entity);
                 }
             } else {
@@ -151,11 +159,6 @@ namespace Quantum {
             }
 
             var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
-
-            // Don't be collectable if we're following a player / spawning
-            if ((powerup->BlockSpawn && (powerup->SpawnAnimationFrames) > 6) || (!powerup->BlockSpawn && powerup->SpawnAnimationFrames > 0)) {
-                return;
-            }
 
             // Don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
             // so we dont collect it instantly)

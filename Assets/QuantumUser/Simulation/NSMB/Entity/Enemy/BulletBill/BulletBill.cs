@@ -41,6 +41,7 @@ namespace Quantum {
             }
 
             enemy->IsDead = true;
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
             f.Events.EnemyKilled(f, entity, killerEntity, special);
         }
     }

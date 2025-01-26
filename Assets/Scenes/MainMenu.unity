@@ -6591,7 +6591,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1<sprite name=room_wins>
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 5ade88ee859873b4882004e755013bf7, type: 2}
@@ -38609,7 +38609,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.8341102
+  m_Size: 0.8341982
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -39173,7 +39173,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 4, y: -3.9999695}
+  m_AnchoredPosition: {x: 4, y: -3.9999619}
   m_SizeDelta: {x: 86, y: 36}
   m_Pivot: {x: 1, y: 0}
 --- !u!1 &1155409046
@@ -72205,7 +72205,7 @@ MonoBehaviour:
   winsText: {fileID: 259235382}
   muteButtonText: {fileID: 836379551}
   colorStrip: {fileID: 223773483}
-  pingImage: {fileID: 0}
+  pingImage: {fileID: 818779536}
   background: {fileID: 702961852}
   dropdownBackgroundImage: {fileID: 16827555}
   blockerTemplate: {fileID: 842380516}
@@ -72433,7 +72433,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -22.600006}
-  m_SizeDelta: {x: 383.74335, y: 0}
+  m_SizeDelta: {x: 383.57758, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -73362,7 +73362,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 0.000015258789}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1576260155

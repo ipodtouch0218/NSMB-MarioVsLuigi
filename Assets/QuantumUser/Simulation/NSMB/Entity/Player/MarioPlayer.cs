@@ -149,27 +149,25 @@ namespace Quantum {
             ReserveItem = newItem;
         }
 
-        public void Death(Frame f, EntityRef entity, bool fire) {
+        public void Death(Frame f, EntityRef entity, bool fire, bool stars = true) {
             if (IsDead) {
                 return;
             }
 
             IsDead = true;
-            // DeathplaneDeath = deathplane;
             FireDeath = fire;
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
 
             PreRespawnFrames = 180;
             RespawnFrames = 78;
 
             if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
-                // Last death - drop all stars at 0.5s each
-                // TODO if (!GameManager.Instance.CheckForWinner()) {
-                    SpawnStars(f, entity, 1);
-                // }
-
+                SpawnStars(f, entity, 1);
                 DeathAnimationFrames = (Stars > 0) ? (byte) 30 : (byte) 36;
             } else {
-                SpawnStars(f, entity, 1);
+                if (stars) {
+                    SpawnStars(f, entity, 1);
+                }
                 DeathAnimationFrames = 36;
             }
 
@@ -364,6 +362,7 @@ namespace Quantum {
 
             physicsObject->IsFrozen = true;
             physicsObject->Velocity = FPVector2.Zero;
+            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
 
             f.Events.MarioPlayerPreRespawned(f, entity);
         }

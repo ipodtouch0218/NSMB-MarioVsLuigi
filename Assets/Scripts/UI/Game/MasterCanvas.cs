@@ -4,21 +4,16 @@ using System.Linq;
 using UnityEngine;
 
 namespace NSMB.UI.Game {
-    public class MasterCanvas : MonoBehaviour {
+    public class MasterCanvas : QuantumSceneViewComponent {
 
         //---Serialize Variables
         [SerializeField] public PlayerElements playerElementsPrefab;
 
-        public unsafe void Start() {
-            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
-            QuantumGame game;
-            Frame f;
-            if ((game = QuantumRunner.DefaultGame) != null
-                && (f = game.Frames.Predicted) != null
-                && f.Global->GameState > GameState.WaitingForPlayers) {
-
-                CheckForSpectatorUI(game, f);
+        public override unsafe void OnActivate(Frame f) {
+            if (f.Global->GameState > GameState.WaitingForPlayers) {
+                CheckForSpectatorUI(f);
             }
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
         public void Update() {
@@ -41,22 +36,21 @@ namespace NSMB.UI.Game {
                 context.CullingCameraPositions.Add(position);
                 context.MaxCameraOrthoSize = FPMath.Max(context.MaxCameraOrthoSize, size);
             }
-
         }
 
-        public unsafe void CheckForSpectatorUI(QuantumGame game, Frame f) {
+        public unsafe void CheckForSpectatorUI(Frame f) {
             if (PlayerElements.AllPlayerElements.Any(pe => pe)) {
                 return;
             }
 
             // Create a new spectator-only PlayerElement
             PlayerElements newPlayerElements = Instantiate(playerElementsPrefab, transform);
-            newPlayerElements.Initialize(game, f, EntityRef.None, PlayerRef.None);
+            newPlayerElements.Initialize(Game, f, EntityRef.None, PlayerRef.None);
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.Starting) {
-                CheckForSpectatorUI(e.Game, e.Frame);
+                CheckForSpectatorUI(e.Frame);
             }
         }
     }

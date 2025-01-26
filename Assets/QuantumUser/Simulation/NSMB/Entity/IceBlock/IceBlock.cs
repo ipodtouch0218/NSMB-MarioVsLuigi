@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System.Security.Policy;
 
 namespace Quantum {
     public unsafe partial struct IceBlock {
@@ -24,6 +25,10 @@ namespace Quantum {
             if (IsFlying) {
                 var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(iceBlockEntity);
                 physicsObject->IsFrozen = true;
+            }
+
+            if (f.Unsafe.TryGetPointer(childEntity, out Interactable* childInteractable)) {
+                childInteractable->ColliderDisabled = true;
             }
 
             // Set location

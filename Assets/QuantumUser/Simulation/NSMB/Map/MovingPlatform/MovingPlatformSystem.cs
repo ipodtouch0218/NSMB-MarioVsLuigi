@@ -221,12 +221,11 @@ namespace Quantum {
                 PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(moveDistance * f.UpdateRate, 0), entity, stage);
                 hitPhysicsObject->Velocity.X = 0;
 
-                /*
                 if (!f.TryResolveList(hitPhysicsObject->Contacts, out QList<PhysicsContact> hitContacts)) {
                     hitContacts = f.AllocateList(out hitPhysicsObject->Contacts);
                 }
                 hitContacts.Add(new PhysicsContact {
-                    Distance = movement,
+                    Distance = (xMovement.X * hit.CastDistanceNormalized) - PhysicsObjectSystem.RaycastSkin,
                     Normal = xMovement.Normalized,
                     Position = hit.Point,
                     TileX = -1,
@@ -234,7 +233,6 @@ namespace Quantum {
                     Entity = filter.Entity,
                     Frame = f.Number,
                 });
-                */
             }
         }
     }

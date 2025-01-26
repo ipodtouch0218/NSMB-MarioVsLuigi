@@ -41,6 +41,7 @@ namespace NSMB.UI.Game {
         private PlayerRef player;
         private EntityRef entity;
 
+        private bool initialized;
         private bool spectating;
         private EntityRef spectatingEntity;
         private Vector2 previousNavigate;
@@ -88,6 +89,7 @@ namespace NSMB.UI.Game {
             foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
                 MarioPlayerInitialized(game, f, mario);
             }
+            initialized = true;
             MarioPlayerAnimator.MarioPlayerInitialized += MarioPlayerInitialized;
         }
 
@@ -100,10 +102,13 @@ namespace NSMB.UI.Game {
             newNametag.Initialize(game, f, this, mario);
         }
 
-        public override void OnUpdateView() {
-            Frame f = PredictedFrame;
+        public override unsafe void OnUpdateView() {
+            if (!initialized) {
+                return;
+            }
 
-            if (!spectating && !f.Exists(entity)) {
+            Frame f = PredictedFrame;
+            if (!spectating && !f.Exists(entity) && f.Global->GameState == GameState.Starting) {
                 // Spectating
                 StartSpectating();
             }
