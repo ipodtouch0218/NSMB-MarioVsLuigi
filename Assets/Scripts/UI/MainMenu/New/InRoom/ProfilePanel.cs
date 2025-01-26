@@ -12,6 +12,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private Image[] characterButtonImages, characterButtonLogos;
         [SerializeField] private Sprite[] enabledCharacterButtonSprites, disabledCharacterButtonSprites;
         [SerializeField] private Color enabledCharacterButtonLogoColor, disabledCharacterButtonLogoColor;
+        [SerializeField] private Image paletteBackground;
         [SerializeField] private PaletteChooser paletteChooser;
         [SerializeField] private TeamChooser teamChooser;
         [SerializeField] private SpriteChangingToggle spectateToggle;
@@ -83,6 +84,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             }
 
             characterButtonImages[index].sprite = enabledCharacterButtonSprites[index];
+            paletteBackground.sprite = disabledCharacterButtonSprites[index];
             characterButtonImages[index].transform.SetAsLastSibling();
             if (index < characterButtonLogos.Length && characterButtonLogos[index]) {
                 characterButtonLogos[index].color = enabledCharacterButtonLogoColor;
