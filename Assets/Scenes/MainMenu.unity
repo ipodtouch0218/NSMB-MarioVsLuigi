@@ -692,7 +692,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
+  m_Sprite: {fileID: 1138117175, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8450,12 +8450,15 @@ MonoBehaviour:
   characterButtonLogos:
   - {fileID: 820690679}
   - {fileID: 648328594}
-  enabledCharacterButtonSprite: {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9,
-    type: 3}
-  disabledCharacterButtonSprite: {fileID: 613028815, guid: 919785a51397c1a44816e9462ed989f9,
-    type: 3}
+  enabledCharacterButtonSprites:
+  - {fileID: 1138117175, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
+  - {fileID: -655794942, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
+  disabledCharacterButtonSprites:
+  - {fileID: -335287802, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
+  - {fileID: 613028815, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
   enabledCharacterButtonLogoColor: {r: 1, g: 1, b: 1, a: 1}
   disabledCharacterButtonLogoColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  paletteBackground: {fileID: 1472937426}
   paletteChooser: {fileID: 1885872616}
   teamChooser: {fileID: 501548763}
   spectateToggle: {fileID: 1370509651}
@@ -38605,8 +38608,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 791989381}
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.8341102
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -39170,7 +39173,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 4, y: -3.9999924}
+  m_AnchoredPosition: {x: 4, y: -3.9999695}
   m_SizeDelta: {x: 86, y: 36}
   m_Pivot: {x: 1, y: 0}
 --- !u!1 &1155409046
@@ -47314,7 +47317,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 613028815, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
+  m_Sprite: {fileID: -335287802, guid: 919785a51397c1a44816e9462ed989f9, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -72199,10 +72202,10 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   handler: {fileID: 1295076279}
   nameText: {fileID: 277927507}
-  pingText: {fileID: 0}
   winsText: {fileID: 259235382}
   muteButtonText: {fileID: 836379551}
   colorStrip: {fileID: 223773483}
+  pingImage: {fileID: 0}
   background: {fileID: 702961852}
   dropdownBackgroundImage: {fileID: 16827555}
   blockerTemplate: {fileID: 842380516}
@@ -72430,7 +72433,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -22.600006}
-  m_SizeDelta: {x: 383.57758, y: 0}
+  m_SizeDelta: {x: 383.74335, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -73359,7 +73362,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000015258789}
+  m_AnchoredPosition: {x: 0, y: -0.000030517578}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1576260155
