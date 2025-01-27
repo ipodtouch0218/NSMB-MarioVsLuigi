@@ -401,7 +401,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -477,7 +477,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -751,7 +751,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -827,7 +827,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -903,7 +903,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1132,7 +1132,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1208,7 +1208,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1336,7 +1336,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1468,7 +1468,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1600,7 +1600,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1676,7 +1676,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1905,7 +1905,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -1981,7 +1981,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -2057,7 +2057,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 16384
+              RawValue: 14746
           PositionOffset:
             X:
               RawValue: 0
@@ -2116,7 +2116,7 @@ MonoBehaviour:
       type: {class: PhysicsCollider2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         ShapeConfig:
-          ShapeType: 4
+          ShapeType: 16
           PolygonCollider:
             Id:
               Value: 0
@@ -2143,7 +2143,277 @@ MonoBehaviour:
             RawValue: 0
           UserTag: 0
           IsPersistent: 1
-          CompoundShapes: []
+          CompoundShapes:
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: -1179648
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: -917504
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: -655360
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: -393216
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: -131072
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: 393216
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: 655360
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: 917504
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
+          - ShapeType: 4
+            PolygonCollider:
+              Id:
+                Value: 0
+            CircleRadius:
+              RawValue: 0
+            CapsuleSize:
+              X:
+                RawValue: 0
+              Y:
+                RawValue: 0
+            EdgeExtent:
+              RawValue: 0
+            BoxExtents:
+              X:
+                RawValue: 131072
+              Y:
+                RawValue: 32768
+            PositionOffset:
+              X:
+                RawValue: 1179648
+              Y:
+                RawValue: 32768
+            RotationOffset:
+              RawValue: 0
+            UserTag: 0
+            IsSetFromSourceCollider: 0
         Layer: 0
         IsTrigger: 1
         PhysicsMaterial:

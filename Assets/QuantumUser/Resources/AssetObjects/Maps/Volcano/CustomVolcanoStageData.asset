@@ -24863,35 +24863,39 @@ MonoBehaviour:
         RawValue: 65536
   BigStarSpawnpoints:
   - X:
+      RawValue: -589824
+    Y:
+      RawValue: -98304
+  - X:
+      RawValue: -704512
+    Y:
+      RawValue: 491520
+  - X:
+      RawValue: -786432
+    Y:
+      RawValue: -98304
+  - X:
+      RawValue: -1212416
+    Y:
+      RawValue: -65536
+  - X:
+      RawValue: 884736
+    Y:
+      RawValue: 131072
+  - X:
       RawValue: 65536
     Y:
       RawValue: -163840
   - X:
-      RawValue: -458752
+      RawValue: 65536
     Y:
-      RawValue: 327680
+      RawValue: 0
   - X:
       RawValue: 1277952
     Y:
       RawValue: 360448
   - X:
       RawValue: 884736
-    Y:
-      RawValue: -98304
-  - X:
-      RawValue: 65536
-    Y:
-      RawValue: 0
-  - X:
-      RawValue: -1032192
-    Y:
-      RawValue: 196608
-  - X:
-      RawValue: -704512
-    Y:
-      RawValue: 491520
-  - X:
-      RawValue: -589824
     Y:
       RawValue: -98304
   - X:
@@ -24903,14 +24907,10 @@ MonoBehaviour:
     Y:
       RawValue: -65536
   - X:
-      RawValue: 884736
+      RawValue: -1032192
     Y:
-      RawValue: 131072
+      RawValue: 196608
   - X:
-      RawValue: -786432
+      RawValue: -458752
     Y:
-      RawValue: -98304
-  - X:
-      RawValue: -1212416
-    Y:
-      RawValue: -65536
+      RawValue: 327680

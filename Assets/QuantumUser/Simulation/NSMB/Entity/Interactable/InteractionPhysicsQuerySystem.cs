@@ -7,7 +7,7 @@ namespace Quantum {
             var shape = filter.Collider->Shape;
 
             Transform2D transformCopy = *filter.Transform;
-
+            
             interactable->OverlapQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
 
             FP center = transformCopy.Position.X + shape.Centroid.X;

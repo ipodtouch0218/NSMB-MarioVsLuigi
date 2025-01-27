@@ -776,8 +776,8 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             if (inputs.Down.WasPressed && mario->GroundpoundCooldownFrames == 0) {
-                // 6 frame delay
-                mario->GroundpoundCooldownFrames = 7;
+                // 4 frame delay
+                mario->GroundpoundCooldownFrames = 5;
             }
 
             bool allowGroundpoundStart = mario->GroundpoundCooldownFrames == 1;

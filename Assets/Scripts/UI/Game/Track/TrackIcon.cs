@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace NSMB.UI.Game.Track {
-    public abstract class TrackIcon : MonoBehaviour {
+    public abstract class TrackIcon : QuantumSceneViewComponent {
 
         //---Serialized Variables
         [SerializeField] private float trackMinX, trackMaxX;
@@ -34,7 +34,7 @@ namespace NSMB.UI.Game.Track {
             levelWidthReciprocal = 2f / stage.TileDimensions.x;
         }
 
-        public virtual void LateUpdate() {
+        public override void OnLateUpdateView() {
             float percentage = (targetTransform.position.x - levelMinX) * levelWidthReciprocal;
             transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
         }

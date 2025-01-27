@@ -1,4 +1,3 @@
-using NSMB.Utils;
 using Quantum;
 using System.Collections;
 using UnityEngine;
@@ -20,11 +19,17 @@ namespace NSMB.UI.Game.Track {
         //---Private Variables
         private Coroutine flashRoutine;
 
-        public void OnEnable() {
+        public override void OnActivate(Frame f) {
             image.enabled = true;
+
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(targetEntity);
+            image.color = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
+            if (f.Global->Rules.TeamsEnabled) {
+                teamIcon.sprite = f.SimulationConfig.Teams[mario->GetTeam(f)].spriteColorblind;
+            }
         }
 
-        public void OnDisable() {
+        public override void OnDeactivate() {
             if (flashRoutine != null) {
                 StopCoroutine(flashRoutine);
                 flashRoutine = null;
@@ -32,29 +37,18 @@ namespace NSMB.UI.Game.Track {
         }
 
         public void Start() {
-            QuantumGame game = QuantumRunner.DefaultGame;
-            Frame f = game.Frames.Predicted;
-
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(targetEntity);
-            image.color = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
-            if (f.Global->Rules.TeamsEnabled) {
-                teamIcon.sprite = f.SimulationConfig.Teams[mario->GetTeam(f)].spriteColorblind;
-            }
-
-            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
         }
 
-        public void OnUpdateView(CallbackUpdateView e) {
-            QuantumGame game = e.Game;
+        public override void OnUpdateView() {
             bool controllingCamera = playerElements.CameraAnimator.Target == targetEntity;
             transform.localScale = controllingCamera ? FlipY : TwoThirds;
 
-            Frame f = game.Frames.Predicted;
-            image.enabled &= controllingCamera || !stage.HidePlayersOnMinimap;
-            teamIcon.gameObject.SetActive(Settings.Instance.GraphicsColorblind && f.Global->Rules.TeamsEnabled && !controllingCamera);
+            Frame f = PredictedFrame;
+            image.enabled &= flashRoutine != null || controllingCamera || !stage.HidePlayersOnMinimap;
+            teamIcon.gameObject.SetActive(image.enabled && Settings.Instance.GraphicsColorblind && f.Global->Rules.TeamsEnabled && !controllingCamera);
         }
 
         private void OnGameResynced(CallbackGameResynced e) {

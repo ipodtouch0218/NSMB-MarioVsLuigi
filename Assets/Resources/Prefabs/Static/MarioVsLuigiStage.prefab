@@ -156,6 +156,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51aa41408f2d4a642a1ec9819a195586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 2550855901662361809}
+  UseFindUpdater: 0
   playerElementsPrefab: {fileID: 2058053739306675502, guid: 18c3a33796560c4448895ccfbe44362c,
     type: 3}
 --- !u!1 &3446223911251472860

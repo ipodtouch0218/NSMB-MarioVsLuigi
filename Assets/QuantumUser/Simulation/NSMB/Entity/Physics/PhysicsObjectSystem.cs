@@ -199,13 +199,13 @@ namespace Quantum {
 
                 CeilingCrusherCheck(fts, ref filter, stage, contacts);
 
-    #if DEBUG
+#if DEBUG
                 foreach (var contact in contacts) {
                     Draw.Ray(contact.Position, contact.Normal, ColorRGBA.Red);
                 }
-    #endif
+#endif
 
-                if (QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
+                if (!physicsObject->IsTouchingGround && QuantumUtils.Decrement(ref physicsObject->HoverFrames)) {
                     // Apply gravity
                     physicsObject->Velocity += physicsObject->Gravity * f.DeltaTime;
                 }

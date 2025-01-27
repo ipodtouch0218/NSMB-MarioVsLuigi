@@ -12377,11 +12377,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
-      propertyPath: PhysicsCollider.Shape2D.ShapeType
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
-        type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
       value: 1048576
       objectReference: {fileID: 0}
@@ -12393,7 +12388,7 @@ PrefabInstance:
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.size
-      value: 1
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -12402,13 +12397,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
-      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[0].ShapeType
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[1].ShapeType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[2].ShapeType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[3].ShapeType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[4].ShapeType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[5].ShapeType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[6].ShapeType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[7].ShapeType
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[0].BoxExtents.X.RawValue
-      value: 2097152
+      value: 131072
       objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
@@ -12417,7 +12442,152 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[1].BoxExtents.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[1].BoxExtents.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[2].BoxExtents.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[2].BoxExtents.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[3].BoxExtents.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[3].BoxExtents.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[4].BoxExtents.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[4].BoxExtents.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[5].BoxExtents.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[5].BoxExtents.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[6].BoxExtents.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[6].BoxExtents.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[7].BoxExtents.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[7].BoxExtents.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[0].PositionOffset.X.RawValue
+      value: -917504
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
       propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[0].PositionOffset.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[1].PositionOffset.X.RawValue
+      value: -655360
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[1].PositionOffset.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[2].PositionOffset.X.RawValue
+      value: -393216
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[2].PositionOffset.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[3].PositionOffset.X.RawValue
+      value: -131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[3].PositionOffset.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[4].PositionOffset.X.RawValue
+      value: 131072
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[4].PositionOffset.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[5].PositionOffset.X.RawValue
+      value: 393216
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[5].PositionOffset.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[6].PositionOffset.X.RawValue
+      value: 655360
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[6].PositionOffset.Y.RawValue
+      value: 81920
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[7].PositionOffset.X.RawValue
+      value: 917504
+      objectReference: {fileID: 0}
+    - target: {fileID: -40322239282908238, guid: 9d1829544a867764ea85ac4428593208,
+        type: 3}
+      propertyPath: PhysicsCollider.Shape2D.CompoundShapes.Array.data[7].PositionOffset.Y.RawValue
       value: 81920
       objectReference: {fileID: 0}
     - target: {fileID: 509181467402301160, guid: 9d1829544a867764ea85ac4428593208,
