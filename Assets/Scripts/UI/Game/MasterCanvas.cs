@@ -10,7 +10,6 @@ namespace NSMB.UI.Game {
         [SerializeField] public PlayerElements playerElementsPrefab;
 
         public override unsafe void OnActivate(Frame f) {
-            Debug.Log(f.Global->GameState);
             if (f.Global->GameState > GameState.WaitingForPlayers) {
                 CheckForSpectatorUI(f);
             }
@@ -50,7 +49,7 @@ namespace NSMB.UI.Game {
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
-            if (e.NewState == GameState.Starting) {
+            if (e.NewState == GameState.Playing) {
                 CheckForSpectatorUI(e.Frame);
             }
         }

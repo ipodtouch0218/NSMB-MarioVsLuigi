@@ -367,7 +367,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -443,7 +443,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -519,7 +519,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -595,7 +595,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1032,7 +1032,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1160,7 +1160,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1236,7 +1236,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1312,7 +1312,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1388,7 +1388,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1464,7 +1464,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1846,7 +1846,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0
@@ -1922,7 +1922,7 @@ MonoBehaviour:
             X:
               RawValue: 14336
             Y:
-              RawValue: 14746
+              RawValue: 16384
           PositionOffset:
             X:
               RawValue: 0

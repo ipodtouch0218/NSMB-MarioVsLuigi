@@ -1144,6 +1144,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc10683f819b1044da70703eb51912f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   trackMinX: -269
   trackMaxX: 269
   image: {fileID: 7860219787626498675}
@@ -20734,6 +20736,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 820b881c5e589924f85e26fc765b736d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   trackMinX: -269
   trackMaxX: 269
   image: {fileID: 6909927067386886871}

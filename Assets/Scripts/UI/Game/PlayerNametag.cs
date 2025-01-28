@@ -1,7 +1,6 @@
 using NSMB.Entities.Player;
 using NSMB.Utils;
 using Quantum;
-using System.Drawing.Drawing2D;
 using System.Text;
 using TMPro;
 using UnityEngine;

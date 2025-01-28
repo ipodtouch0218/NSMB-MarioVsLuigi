@@ -1,10 +1,11 @@
-using NSMB.UI.MainMenu;
 using Quantum;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace NSMB.Utils {
     public static class StringExtensions {
+
+        public const int NicknameMin = 2, NicknameMax = 20;
 
         public static string Filter(this string input) {
             if (Settings.Instance.generalChatFiltering) {
@@ -20,7 +21,7 @@ namespace NSMB.Utils {
                 return false;
             }
 
-            UsernameRegex ??= $"^[0-9A-Za-z]{{{MainMenuManager.NicknameMin},{MainMenuManager.NicknameMax}}}";
+            UsernameRegex ??= $"^[0-9A-Za-z]{{{NicknameMin},{NicknameMax}}}";
             return Regex.IsMatch(input, UsernameRegex);
         }
 
@@ -31,10 +32,10 @@ namespace NSMB.Utils {
             input = Regex.Replace(input, @"[^A-Za-z0-9]", "");
 
             // Name character maximum
-            input = input[..Mathf.Min(input.Length, MainMenuManager.NicknameMax)];
+            input = input[..Mathf.Min(input.Length, NicknameMax)];
 
             // Name character minimum
-            if (input.Length < MainMenuManager.NicknameMin) {
+            if (input.Length < NicknameMin) {
                 input = "noname";
             }
 

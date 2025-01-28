@@ -12,7 +12,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     //---Private Variables
     private readonly Dictionary<EntityRef, AudioSource> entityBreakBlockSounds = new();
-    private readonly Dictionary<int, TileChangeData> eventData = new();
+    private readonly Dictionary<EventKey, TileChangeData> eventData = new();
     private readonly Dictionary<Vector3Int, List<TileEventData>> tileStack = new();
     private VersusStageData stage;
 
@@ -42,7 +42,7 @@ public class TilemapAnimator : MonoBehaviour {
     }
 
     private void OnEventConfirmed(CallbackEventConfirmed e) {
-        int id = e.EventKey.Id;
+        EventKey id = e.EventKey;
 
         if (eventData.TryGetValue(id, out var data)) {
             if (tileStack.TryGetValue(data.position, out var stack)) {
@@ -50,7 +50,7 @@ public class TilemapAnimator : MonoBehaviour {
                 root.ChangeData = data;
                 stack[0] = root;
 
-                stack.RemoveAll(ted => ted.Id == id);
+                stack.RemoveAll(ted => ted.Equals(id));
             }
 
             eventData.Remove(id);
@@ -58,14 +58,14 @@ public class TilemapAnimator : MonoBehaviour {
     }
 
     private void OnEventCanceled(CallbackEventCanceled e) {
-        int id = e.EventKey.Id;
+        EventKey id = e.EventKey;
 
         if (!eventData.TryGetValue(id, out var data)) {
             return;
         }
 
         if (tileStack.TryGetValue(data.position, out var stack)) {
-            if (stack[^1].Id == id) {
+            if (stack[^1].Id.Equals(id)) {
                 // Revert
                 var root = stack[0].ChangeData;
 
@@ -74,7 +74,7 @@ public class TilemapAnimator : MonoBehaviour {
                 tilemap.RefreshTile(root.position);
             }
 
-            stack.RemoveAll(ted => ted.Id == id);
+            stack.RemoveAll(ted => ted.Equals(id));
         }
 
         eventData.Remove(id);
@@ -83,19 +83,17 @@ public class TilemapAnimator : MonoBehaviour {
     private void OnTileChanged(EventTileChanged e) {
         Vector3Int coords = new(e.TileX, e.TileY, 0);
 
-        if (!e.Synced) {
-            if (!tileStack.ContainsKey(coords)) {
-                tileStack[coords] = new() {
-                    new TileEventData {
-                        Id = -1,
-                        ChangeData = new TileChangeData {
-                            position = coords,
-                            tile = tilemap.GetTile(coords),
-                            transform = tilemap.GetTransformMatrix(coords)
-                        }
+        if (!tileStack.ContainsKey(coords)) {
+            tileStack[coords] = new() {
+                new TileEventData {
+                    Id = default,
+                    ChangeData = new TileChangeData {
+                        position = coords,
+                        tile = tilemap.GetTile(coords),
+                        transform = tilemap.GetTransformMatrix(coords)
                     }
-                };
-            }
+                }
+            };
         }
 
         var tile = QuantumUnityDB.GetGlobalAsset(e.NewTile.Tile);
@@ -105,13 +103,11 @@ public class TilemapAnimator : MonoBehaviour {
         Matrix4x4 mat = Matrix4x4.TRS(default, Quaternion.Euler(0, 0, e.NewTile.Rotation.AsFloat), new Vector3(e.NewTile.Scale.X.AsFloat, e.NewTile.Scale.Y.AsFloat, 1));
         tilemap.SetTransformMatrix(coords, mat);
 
-        if (!e.Synced) {
-            eventData[e.Id] = new TileChangeData {
-                position = coords,
-                tile = unityTile,
-                transform = mat
-            };
-        }
+        eventData[(EventKey) e] = new TileChangeData {
+            position = coords,
+            tile = unityTile,
+            transform = mat
+        };
 
         tilemap.RefreshTile(coords);
     }
@@ -167,7 +163,7 @@ public class TilemapAnimator : MonoBehaviour {
     }
 
     public struct TileEventData {
-        public int Id;
+        public EventKey Id;
         public TileChangeData ChangeData;
     }
 }
