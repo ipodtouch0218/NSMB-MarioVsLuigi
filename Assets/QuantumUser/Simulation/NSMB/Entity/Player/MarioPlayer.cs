@@ -259,15 +259,6 @@ namespace Quantum {
             bool fastStars = amount > 2 && Stars > 2;
             int starDirection = FacingRight ? 1 : 2;
 
-            // If the level doesn't loop, don't have stars go towards the edges of the map
-            if (!stage.IsWrappingLevel) {
-                if (transform->Position.X > stage.StageWorldMin.X - 3) {
-                    starDirection = 2;
-                } else if (transform->Position.X < stage.StageWorldMax.X + 3) {
-                    starDirection = 1;
-                }
-            }
-
             if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
                 fastStars = true;
                 NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);

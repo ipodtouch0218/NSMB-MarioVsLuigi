@@ -2,8 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnComponentAdded<Liquid>, 
-        ISignalOnTriggerEnter2D, ISignalOnTrigger2D, ISignalOnTriggerExit2D {
+    public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnTriggerEnter2D, ISignalOnTrigger2D, ISignalOnTriggerExit2D {
 
         public void OnTriggerEnter2D(Frame f, TriggerInfo2D info) {
             if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
@@ -13,6 +12,11 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* entityPhysicsObject)) {
                 return;
             }
+
+            if (f.Unsafe.TryGetPointer(info.Entity, out Interactable* interactable)
+                && interactable->ColliderDisabled) {
+                return;
+            } 
 
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
             FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y - entityPhysicsObject->Velocity.Y;
@@ -40,6 +44,12 @@ namespace Quantum {
                 return;
             }
 
+            bool callSignals = true;
+            if (f.Unsafe.TryGetPointer(info.Entity, out Interactable* interactable)
+                && interactable->ColliderDisabled) {
+                callSignals = false;
+            }
+
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
             FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y;
             bool isEntityUnderwater = checkHeight <= surface;
@@ -48,11 +58,15 @@ namespace Quantum {
             if (isEntityUnderwater && !underwater.Contains(info.Entity)) {
                 // Enter state
                 underwater.Add(info.Entity);
-                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, true);
+                if (callSignals) {
+                    f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, true);
+                }
             } else if (!isEntityUnderwater && underwater.Contains(info.Entity)) {
                 // Exit state
                 underwater.Remove(info.Entity);
-                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
+                if (callSignals) {
+                    f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
+                }
             }
         }
 
@@ -87,24 +101,6 @@ namespace Quantum {
                 // Exit state
                 f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
             }
-        }
-
-        public void OnAdded(Frame f, EntityRef entity, Liquid* component) {
-            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
-
-            Shape2D shape = Shape2D.CreatePersistentCompound();
-            FP totalWidth = component->WidthTiles * FP._0_50;
-            FP centroidY = component->HeightTiles * FP._0_25 - FP._0_10;
-
-            int sections = FPMath.CeilToInt(totalWidth / 4);
-            FPVector2 extents = new((totalWidth / sections) / 2, component->HeightTiles * FP._0_25);
-            for (int i = 0; i < sections; i++) {
-                FP centroidX = ((2 * i + 1) * extents.X) - (totalWidth / 2);
-                Shape2D newBox = Shape2D.CreateBox(extents, new FPVector2(centroidX, centroidY));
-                shape.Compound.AddShape(f, ref newBox);
-            }
-
-            collider->Shape = shape;
         }
     }
 }

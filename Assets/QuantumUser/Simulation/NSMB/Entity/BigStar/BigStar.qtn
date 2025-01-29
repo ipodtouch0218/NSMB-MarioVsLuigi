@@ -10,7 +10,6 @@ global {
 component BigStar {
 	bool IsStationary;
 	ushort Lifetime;
-	byte PassthroughFrames;
 	byte UncollectableFrames;
 	FP Speed;
 	FP BounceForce;

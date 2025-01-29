@@ -561,7 +561,7 @@ public static unsafe class QuantumUtils {
 
                 byte team = pd->RequestedTeam;
                 if (firstTeam.HasValue) {
-                    if (firstTeam == team) {
+                    if (firstTeam != team) {
                         goto skip;
                     }
                 } else {

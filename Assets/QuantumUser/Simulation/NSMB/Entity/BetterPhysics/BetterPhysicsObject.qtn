@@ -1,0 +1,15 @@
+component BetterPhysicsObject {
+
+	Shape2D Shape;
+	list<BetterPhysicsContact> Contacts;
+	bool ColliderDisabled;
+
+}
+
+struct BetterPhysicsContact {
+	EntityRef Entity;
+	FPVector2 Point;
+	FPVector2 Normal;
+	FP Overlap;
+	bool HasOverlap;
+}

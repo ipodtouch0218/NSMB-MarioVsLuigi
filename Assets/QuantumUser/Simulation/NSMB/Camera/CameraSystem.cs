@@ -59,7 +59,7 @@ namespace Quantum {
                 camera->LastPlayerPosition = transform->Position;
             }
 
-            FP vOrtho = Constants._3_50;
+            FP vOrtho = camera->OrthographicSize / 2;
             FP xOrtho = vOrtho * Constants.SixteenOverNine;
             FPVector2 newCameraPosition = camera->CurrentPosition;
 
@@ -126,13 +126,12 @@ namespace Quantum {
                 camera->SmoothDampVelocity = FPVector2.Zero;
             }
 
-            newCameraPosition = Clamp(stage, newCameraPosition);
+            newCameraPosition = Clamp(stage, newCameraPosition, vOrtho);
 
             return newCameraPosition;
         }
 
-        public static FPVector2 Clamp(VersusStageData stage, FPVector2 position) {
-            FP vOrtho = Constants._3_50;
+        public static FPVector2 Clamp(VersusStageData stage, FPVector2 position, FP vOrtho) {
             FP xOrtho = vOrtho * Constants.SixteenOverNine;
 
             // Clamping to within level bounds

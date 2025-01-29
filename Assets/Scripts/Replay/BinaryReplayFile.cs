@@ -166,8 +166,8 @@ public class BinaryReplayFile {
             result.CompressedInputData = reader.ReadBytes(inputDataSize);
 
             return true;
-        } catch (Exception e) {
-            Debug.LogWarning("Failed to parse replay: " + e);
+        } catch /* (Exception e) */ {
+            // Debug.LogWarning("Failed to parse replay: " + e);
             // result = null;
             return false;
         }

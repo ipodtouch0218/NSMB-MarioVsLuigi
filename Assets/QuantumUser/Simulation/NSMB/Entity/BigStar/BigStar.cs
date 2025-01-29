@@ -8,7 +8,6 @@ namespace Quantum {
             IsStationary = false;
             Speed *= (starDirection == 0 || starDirection == 3) ? 2 : 1;
             FacingRight = starDirection >= 2;
-            PassthroughFrames = 60;
             UncollectableFrames = 30;
 
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);

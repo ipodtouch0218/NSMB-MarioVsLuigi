@@ -1240,7 +1240,7 @@ namespace Quantum {
             }
 
             if (!(inputs.PowerupAction.WasPressed 
-                || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed) 
+                || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed && !physicsObject->IsTouchingGround && !mario->IsWallsliding) 
                 || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower) && inputs.FireballPowerupAction.WasPressed))) {
                 return;
             }
@@ -1308,10 +1308,12 @@ namespace Quantum {
                 mario->JumpState = JumpState.None;
                 mario->WallslideLeft = false;
                 mario->WallslideRight = false;
+                mario->CoyoteTimeFrames = 0;
 
                 // Fix sticky ground
                 physicsObject->WasTouchingGround = false;
                 physicsObject->IsTouchingGround = false;
+                physicsObject->HoverFrames = 0;
                 PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, FPVector2.Up * FP._0_05 * f.UpdateRate, filter.Entity, stage);
 
                 f.Events.MarioPlayerUsedPropeller(f, filter.Entity);

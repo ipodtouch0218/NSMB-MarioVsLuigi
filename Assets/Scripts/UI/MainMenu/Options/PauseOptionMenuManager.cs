@@ -304,7 +304,7 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public bool OpenMenu() {
-            if (closeTime == Time.timeAsDouble) {
+            if (closeTime == Time.unscaledTimeAsDouble) {
                 return false;
             }
 

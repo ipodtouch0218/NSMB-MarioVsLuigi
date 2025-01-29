@@ -50,11 +50,53 @@ namespace Quantum.Prototypes {
   #endif //;
   
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BetterPhysicsContact))]
+  public unsafe class BetterPhysicsContactPrototype : StructPrototype {
+    public MapEntityId Entity;
+    public FPVector2 Point;
+    public FPVector2 Normal;
+    public FP Overlap;
+    public QBoolean HasOverlap;
+    public void Materialize(Frame frame, ref Quantum.BetterPhysicsContact result, in PrototypeMaterializationContext context = default) {
+        PrototypeValidator.FindMapEntity(this.Entity, in context, out result.Entity);
+        result.Point = this.Point;
+        result.Normal = this.Normal;
+        result.Overlap = this.Overlap;
+        result.HasOverlap = this.HasOverlap;
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.BetterPhysicsObject))]
+  public unsafe class BetterPhysicsObjectPrototype : ComponentPrototype<Quantum.BetterPhysicsObject> {
+    public Shape2D Shape;
+    [DynamicCollectionAttribute()]
+    public Quantum.Prototypes.BetterPhysicsContactPrototype[] Contacts = {};
+    public QBoolean ColliderDisabled;
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.BetterPhysicsObject component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.BetterPhysicsObject result, in PrototypeMaterializationContext context = default) {
+        result.Shape = this.Shape;
+        if (this.Contacts.Length == 0) {
+          result.Contacts = default;
+        } else {
+          var list = frame.AllocateList(out result.Contacts, this.Contacts.Length);
+          for (int i = 0; i < this.Contacts.Length; ++i) {
+            Quantum.BetterPhysicsContact tmp = default;
+            this.Contacts[i].Materialize(frame, ref tmp, in context);
+            list.Add(tmp);
+          }
+        }
+        result.ColliderDisabled = this.ColliderDisabled;
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BigStar))]
   public unsafe partial class BigStarPrototype : ComponentPrototype<Quantum.BigStar> {
     public QBoolean IsStationary;
     public UInt16 Lifetime;
-    public Byte PassthroughFrames;
     public Byte UncollectableFrames;
     public FP Speed;
     public FP BounceForce;
@@ -67,7 +109,6 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.BigStar result, in PrototypeMaterializationContext context = default) {
         result.IsStationary = this.IsStationary;
         result.Lifetime = this.Lifetime;
-        result.PassthroughFrames = this.PassthroughFrames;
         result.UncollectableFrames = this.UncollectableFrames;
         result.Speed = this.Speed;
         result.BounceForce = this.BounceForce;

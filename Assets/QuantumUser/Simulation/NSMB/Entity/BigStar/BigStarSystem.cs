@@ -90,18 +90,31 @@ namespace Quantum {
                 physicsObject->IsTouchingGround = false;
             }
 
+            if (!stage.IsWrappingLevel) {
+                var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+                ref Shape2D shape = ref physicsCollider->Shape;
+                if (transform->Position.X - shape.Centroid.X - shape.Box.Extents.X <= stage.StageWorldMin.X) {
+                    // Hit left wall
+                    bigStar->FacingRight = true;
+                    physicsObject->Velocity.X = bigStar->Speed;
+                } else if (transform->Position.X + shape.Centroid.X + shape.Box.Extents.X >= stage.StageWorldMax.X) {
+                    // Hit right wall
+                    bigStar->FacingRight = false;
+                    physicsObject->Velocity.X = -bigStar->Speed;
+                }
+            }
+
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 bigStar->FacingRight = physicsObject->IsTouchingLeftWall;
                 physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
             }
 
-            if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->PassthroughFrames)) {
+            if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->UncollectableFrames)) {
                 var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
                 if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, physicsCollider->Shape, true, stage)) {
                     physicsObject->DisableCollision = false;
                 }
             }
-            QuantumUtils.Decrement(ref bigStar->UncollectableFrames);
         }
 
         public void OnBigStarMarioInteraction(Frame f, EntityRef starEntity, EntityRef marioEntity) {
