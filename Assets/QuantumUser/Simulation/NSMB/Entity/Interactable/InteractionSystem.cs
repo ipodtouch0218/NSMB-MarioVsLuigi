@@ -190,7 +190,7 @@ namespace Quantum {
                 return;
             }
 
-            if (!f.TryGetPointer(entityB, out Interactable* entityBInteractable) || entityBInteractable->ColliderDisabled) {
+            if (f.TryGetPointer(entityB, out Interactable* entityBInteractable) && entityBInteractable->ColliderDisabled) {
                 return;
             }
 

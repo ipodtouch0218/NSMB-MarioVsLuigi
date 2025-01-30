@@ -50,41 +50,6 @@ namespace Quantum.Prototypes.Unity {
   #endif //;
   
   [System.SerializableAttribute()]
-  public unsafe partial class BetterPhysicsContactPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BetterPhysicsContactPrototype> {
-    public Quantum.QuantumEntityPrototype Entity;
-    public FPVector2 Point;
-    public FPVector2 Normal;
-    public FP Overlap;
-    public QBoolean HasOverlap;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BetterPhysicsContactPrototype prototype);
-    public override Quantum.Prototypes.BetterPhysicsContactPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.BetterPhysicsContactPrototype();
-      converter.Convert(this.Entity, out result.Entity);
-      converter.Convert(this.Point, out result.Point);
-      converter.Convert(this.Normal, out result.Normal);
-      converter.Convert(this.Overlap, out result.Overlap);
-      converter.Convert(this.HasOverlap, out result.HasOverlap);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
-  public unsafe partial class BetterPhysicsObjectPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.BetterPhysicsObjectPrototype> {
-    public Shape2D Shape;
-    [DynamicCollectionAttribute()]
-    public Quantum.Prototypes.Unity.BetterPhysicsContactPrototype[] Contacts = {};
-    public QBoolean ColliderDisabled;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.BetterPhysicsObjectPrototype prototype);
-    public override Quantum.Prototypes.BetterPhysicsObjectPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.BetterPhysicsObjectPrototype();
-      converter.Convert(this.Shape, out result.Shape);
-      converter.Convert(this.Contacts, out result.Contacts);
-      converter.Convert(this.ColliderDisabled, out result.ColliderDisabled);
-      ConvertUser(converter, ref result);
-      return result;
-    }
-  }
-  [System.SerializableAttribute()]
   public unsafe partial class EnterablePipePrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.EnterablePipePrototype> {
     public Quantum.QuantumEntityPrototype OtherPipe;
     public QBoolean IsEnterable;

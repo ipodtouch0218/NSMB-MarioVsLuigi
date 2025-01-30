@@ -20,8 +20,12 @@ namespace Quantum {
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
 
+            physicsObject->Shape = Shape2D.CreateBox(FPVector2.One / 2);
+            physicsObject->Gravity = FPVector2.Down * FP._0_33;
+            physicsObject->Velocity += physicsObject->Gravity;
+
             // Solver
-            FPVector2 finalVelocity = default;
+            FPVector2 finalVelocity = physicsObject->Velocity * f.DeltaTime;
             transform->Position += finalVelocity;
 
             var contacts = f.ResolveList(physicsObject->Contacts);
@@ -38,15 +42,10 @@ namespace Quantum {
         }
 
         public static void FindContacts(Frame f, ref Filter filter, in QList<BetterPhysicsContact> contacts) {
-            var hits = f.Physics2D.OverlapShape(filter.Transform->Position, 0, filter.PhysicsObject->Shape, 0, QueryOptions.HitAll);
+            var hits = f.Physics2D.OverlapShape(filter.Transform->Position, 0, filter.PhysicsObject->Shape, f.Context.ExcludeEntityAndPlayerMask, QueryOptions.HitAll);
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits[i];
                 if (hit.IsTrigger) {
-                    // f.Signals.OnKCC2DTrigger(_context.Entity, _context.KCC, hit);
-                    //if (_context.KCC->IgnoreStep) {
-                    //    _contactsCount = 0;
-                    //    return;
-                    //}
                     continue;
                 }
 
@@ -54,15 +53,10 @@ namespace Quantum {
                     continue;
                 }
 
-                var contact = new BetterPhysicsContact();
-                // contact.Contact = hit;
-                // f.Signals.OnKCC2DPreCollision(_context.Entity, _context.KCC, &contact);
-                // add to contacts if not ignored
+                var contact = new BetterPhysicsContact() {
+                    Hit = hit
+                };
                 contacts.Add(contact);
-                //if (_context.KCC->IgnoreStep) {
-                //    _contactsCount = 0;
-                //    return;
-                //}
             }
         }
 
@@ -85,7 +79,7 @@ namespace Quantum {
                 
 
                 // contact.ContactType = KCCContactType.NONE;
-                contact->HasOverlap = ComputePenetration(f, transform, &filter.PhysicsObject->Shape, contact);
+                contact->HasOverlap = ComputePenetration(f, transform, &(filter.PhysicsObject->Shape), contact);
                 // contact.SurfaceTangent = FPVector2.Rotate(contact.Contact.Normal, -FP.Rad_90);
                 // contact.ContactAngle = FPVector2.Angle(FPVector2.Up, contact.Contact.Normal);
 
@@ -116,8 +110,8 @@ namespace Quantum {
                 */
 
                 // apply correction
-                if (contact->Overlap > Penetration) {
-                    var fullCorrection = contact->Normal * contact->Overlap;
+                if (contact->Hit.OverlapPenetration > Penetration) {
+                    var fullCorrection = contact->Hit.Normal * contact->Hit.OverlapPenetration;
                     Draw.Ray(transform->Position, fullCorrection, ColorRGBA.Red);
                     var correction = fullCorrection * CorrectionRate;
                     transform->Position += correction;
@@ -129,12 +123,10 @@ namespace Quantum {
 
 
         private static bool ComputePenetration(Frame f, Transform2D* transform, Shape2D* shape, BetterPhysicsContact* contact) {
-            Hit h = default;
+            Hit h = contact->Hit;
             var hits = f.Physics2D.CheckOverlap(shape, transform, &h);
             if (hits.Count > 0) {
-                contact->Normal = hits[0].Normal;
-                contact->Overlap = hits[0].OverlapPenetration;
-                contact->Point = hits[0].Point;
+                contact->Hit = hits[0];
                 return true;
             }
             return false;

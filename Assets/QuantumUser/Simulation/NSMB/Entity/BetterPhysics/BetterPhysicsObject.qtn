@@ -1,15 +1,13 @@
 component BetterPhysicsObject {
-
 	Shape2D Shape;
-	list<BetterPhysicsContact> Contacts;
+	FPVector2 Gravity;
 	bool ColliderDisabled;
 
+	[ExcludeFromPrototype] FPVector2 Velocity;
+	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] list<BetterPhysicsContact> Contacts;
 }
 
 struct BetterPhysicsContact {
-	EntityRef Entity;
-	FPVector2 Point;
-	FPVector2 Normal;
-	FP Overlap;
+	Hit Hit;
 	bool HasOverlap;
 }

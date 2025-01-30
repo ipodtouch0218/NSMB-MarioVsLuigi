@@ -51,27 +51,23 @@ namespace Quantum.Prototypes {
   
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BetterPhysicsContact))]
-  public unsafe class BetterPhysicsContactPrototype : StructPrototype {
-    public MapEntityId Entity;
-    public FPVector2 Point;
-    public FPVector2 Normal;
-    public FP Overlap;
+  public unsafe partial class BetterPhysicsContactPrototype : StructPrototype {
+    public Hit Hit;
     public QBoolean HasOverlap;
+    partial void MaterializeUser(Frame frame, ref Quantum.BetterPhysicsContact result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.BetterPhysicsContact result, in PrototypeMaterializationContext context = default) {
-        PrototypeValidator.FindMapEntity(this.Entity, in context, out result.Entity);
-        result.Point = this.Point;
-        result.Normal = this.Normal;
-        result.Overlap = this.Overlap;
+        result.Hit = this.Hit;
         result.HasOverlap = this.HasOverlap;
+        MaterializeUser(frame, ref result, in context);
     }
   }
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.BetterPhysicsObject))]
-  public unsafe class BetterPhysicsObjectPrototype : ComponentPrototype<Quantum.BetterPhysicsObject> {
+  public unsafe partial class BetterPhysicsObjectPrototype : ComponentPrototype<Quantum.BetterPhysicsObject> {
     public Shape2D Shape;
-    [DynamicCollectionAttribute()]
-    public Quantum.Prototypes.BetterPhysicsContactPrototype[] Contacts = {};
+    public FPVector2 Gravity;
     public QBoolean ColliderDisabled;
+    partial void MaterializeUser(Frame frame, ref Quantum.BetterPhysicsObject result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.BetterPhysicsObject component = default;
         Materialize((Frame)f, ref component, in context);
@@ -79,17 +75,9 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.BetterPhysicsObject result, in PrototypeMaterializationContext context = default) {
         result.Shape = this.Shape;
-        if (this.Contacts.Length == 0) {
-          result.Contacts = default;
-        } else {
-          var list = frame.AllocateList(out result.Contacts, this.Contacts.Length);
-          for (int i = 0; i < this.Contacts.Length; ++i) {
-            Quantum.BetterPhysicsContact tmp = default;
-            this.Contacts[i].Materialize(frame, ref tmp, in context);
-            list.Add(tmp);
-          }
-        }
+        result.Gravity = this.Gravity;
         result.ColliderDisabled = this.ColliderDisabled;
+        MaterializeUser(frame, ref result, in context);
     }
   }
   [System.SerializableAttribute()]

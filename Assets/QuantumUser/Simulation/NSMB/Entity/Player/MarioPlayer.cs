@@ -85,7 +85,7 @@ namespace Quantum {
             return CurrentPowerupState == PowerupState.MegaMushroom
                 || IsStarmanInvincible
                 || IsInShell
-                || (includeSliding && ((IsSliding || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10));
+                || (includeSliding && (IsSliding || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
         }
 
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {

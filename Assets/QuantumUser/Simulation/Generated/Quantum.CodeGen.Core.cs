@@ -627,25 +627,16 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BetterPhysicsContact {
-    public const Int32 SIZE = 56;
+    public const Int32 SIZE = 80;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(8)]
-    public EntityRef Entity;
-    [FieldOffset(40)]
-    public FPVector2 Point;
-    [FieldOffset(24)]
-    public FPVector2 Normal;
-    [FieldOffset(16)]
-    public FP Overlap;
+    public Hit Hit;
     [FieldOffset(0)]
     public QBoolean HasOverlap;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 16901;
-        hash = hash * 31 + Entity.GetHashCode();
-        hash = hash * 31 + Point.GetHashCode();
-        hash = hash * 31 + Normal.GetHashCode();
-        hash = hash * 31 + Overlap.GetHashCode();
+        hash = hash * 31 + Hit.GetHashCode();
         hash = hash * 31 + HasOverlap.GetHashCode();
         return hash;
       }
@@ -653,10 +644,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (BetterPhysicsContact*)ptr;
         QBoolean.Serialize(&p->HasOverlap, serializer);
-        EntityRef.Serialize(&p->Entity, serializer);
-        FP.Serialize(&p->Overlap, serializer);
-        FPVector2.Serialize(&p->Normal, serializer);
-        FPVector2.Serialize(&p->Point, serializer);
+        Hit.Serialize(&p->Hit, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1069,34 +1057,53 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BetterPhysicsObject : Quantum.IComponent {
-    public const Int32 SIZE = 80;
+    public const Int32 SIZE = 112;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(8)]
+    [FieldOffset(40)]
     public Shape2D Shape;
-    [FieldOffset(4)]
-    public QListPtr<BetterPhysicsContact> Contacts;
+    [FieldOffset(8)]
+    public FPVector2 Gravity;
     [FieldOffset(0)]
     public QBoolean ColliderDisabled;
+    [FieldOffset(24)]
+    [ExcludeFromPrototype()]
+    public FPVector2 Velocity;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    [AllocateOnComponentAdded()]
+    [FreeOnComponentRemoved()]
+    public QListPtr<BetterPhysicsContact> Contacts;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 20743;
         hash = hash * 31 + Shape.GetHashCode();
-        hash = hash * 31 + Contacts.GetHashCode();
+        hash = hash * 31 + Gravity.GetHashCode();
         hash = hash * 31 + ColliderDisabled.GetHashCode();
+        hash = hash * 31 + Velocity.GetHashCode();
+        hash = hash * 31 + Contacts.GetHashCode();
         return hash;
       }
     }
     public void ClearPointers(FrameBase f, EntityRef entity) {
-      Contacts = default;
+      if (Contacts != default) f.FreeList(ref Contacts);
     }
     public static void OnRemoved(FrameBase frame, EntityRef entity, void* ptr) {
       var p = (Quantum.BetterPhysicsObject*)ptr;
       p->ClearPointers((Frame)frame, entity);
     }
+    public void AllocatePointers(FrameBase f, EntityRef entity) {
+      f.TryAllocateList(ref Contacts);
+    }
+    public static void OnAdded(FrameBase frame, EntityRef entity, void* ptr) {
+      var p = (Quantum.BetterPhysicsObject*)ptr;
+      p->AllocatePointers((Frame)frame, entity);
+    }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (BetterPhysicsObject*)ptr;
         QBoolean.Serialize(&p->ColliderDisabled, serializer);
         QList.Serialize(&p->Contacts, serializer, Statics.SerializeBetterPhysicsContact);
+        FPVector2.Serialize(&p->Gravity, serializer);
+        FPVector2.Serialize(&p->Velocity, serializer);
         Shape2D.Serialize(&p->Shape, serializer);
     }
   }
@@ -3716,7 +3723,7 @@ namespace Quantum {
     static partial void InitComponentTypeIdGen() {
       ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 32)
         .AddBuiltInComponents()
-        .Add<Quantum.BetterPhysicsObject>(Quantum.BetterPhysicsObject.Serialize, null, Quantum.BetterPhysicsObject.OnRemoved, ComponentFlags.None)
+        .Add<Quantum.BetterPhysicsObject>(Quantum.BetterPhysicsObject.Serialize, Quantum.BetterPhysicsObject.OnAdded, Quantum.BetterPhysicsObject.OnRemoved, ComponentFlags.None)
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.BlockBump>(Quantum.BlockBump.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Bobomb>(Quantum.Bobomb.Serialize, null, null, ComponentFlags.None)

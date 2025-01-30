@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
-using Quantum.Task;
 using System;
 using UnityEngine;
 
@@ -964,7 +963,7 @@ namespace Quantum {
         public static bool BoxInGround(FrameThreadSafe f, FPVector2 position, Shape2D shape, bool includeMegaBreakable = true, VersusStageData stage = null, EntityRef entity = default, bool includeCeilingCrushers = true) {
             using var profilerScope = HostProfiler.Start("PhysicsObjectSystem.BoxInGround");
             // In a solid hitbox
-            var hits = f.Physics2D.OverlapShape(position, 0, shape, ((Frame) f).Context.ExcludeEntityAndPlayerMask, ~QueryOptions.HitTriggers);
+            var hits = f.Physics2D.OverlapShape(position, 0, shape, ((Frame) f).Context.ExcludeEntityAndPlayerMask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo);
             f.TryGetPointer(entity, out MarioPlayer* mario);
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits.HitsBuffer[i];

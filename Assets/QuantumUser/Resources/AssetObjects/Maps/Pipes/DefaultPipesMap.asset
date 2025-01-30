@@ -411,7 +411,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 555616
+            RawValue: 557056
           Y:
             RawValue: 360448
         Rotation:
@@ -594,7 +594,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 31328
+            RawValue: 32768
           Y:
             RawValue: 360448
         Rotation:
@@ -977,7 +977,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -820640
+            RawValue: -819200
           Y:
             RawValue: 360448
         Rotation:
@@ -1160,7 +1160,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 490080
+            RawValue: 491520
           Y:
             RawValue: 360448
         Rotation:
@@ -1739,7 +1739,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -886176
+            RawValue: -884736
           Y:
             RawValue: 360448
         Rotation:
@@ -1937,7 +1937,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 227936
+            RawValue: 229376
           Y:
             RawValue: 360448
         Rotation:
@@ -1998,7 +1998,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -558496
+            RawValue: -557056
           Y:
             RawValue: 360448
         Rotation:
@@ -2135,7 +2135,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -755104
+            RawValue: -753664
           Y:
             RawValue: 360448
         Rotation:
@@ -2196,7 +2196,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 752224
+            RawValue: 753664
           Y:
             RawValue: 360448
         Rotation:
@@ -2257,7 +2257,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -361888
+            RawValue: -360448
           Y:
             RawValue: 360448
         Rotation:
@@ -2562,7 +2562,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 162400
+            RawValue: 163840
           Y:
             RawValue: 360448
         Rotation:
@@ -2623,7 +2623,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 621152
+            RawValue: 622592
           Y:
             RawValue: 360448
         Rotation:
@@ -2760,7 +2760,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 96864
+            RawValue: 98304
           Y:
             RawValue: 360448
         Rotation:
@@ -3090,7 +3090,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -492960
+            RawValue: -491520
           Y:
             RawValue: 360448
         Rotation:
@@ -3379,7 +3379,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -165280
+            RawValue: -163840
           Y:
             RawValue: 360448
         Rotation:
@@ -3440,7 +3440,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 686688
+            RawValue: 688128
           Y:
             RawValue: 360448
         Rotation:
@@ -3501,7 +3501,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -689568
+            RawValue: -688128
           Y:
             RawValue: 360448
         Rotation:
@@ -3562,7 +3562,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 883296
+            RawValue: 884736
           Y:
             RawValue: 360448
         Rotation:
@@ -3897,7 +3897,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -230816
+            RawValue: -229376
           Y:
             RawValue: 360448
         Rotation:
@@ -3958,7 +3958,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -99744
+            RawValue: -98304
           Y:
             RawValue: 360448
         Rotation:
@@ -4224,7 +4224,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -296352
+            RawValue: -294912
           Y:
             RawValue: 360448
         Rotation:
@@ -4285,7 +4285,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -624032
+            RawValue: -622592
           Y:
             RawValue: 360448
         Rotation:
@@ -4346,7 +4346,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 817760
+            RawValue: 819200
           Y:
             RawValue: 360448
         Rotation:
@@ -4544,7 +4544,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -427424
+            RawValue: -425984
           Y:
             RawValue: 360448
         Rotation:
@@ -4605,7 +4605,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: -34208
+            RawValue: -32768
           Y:
             RawValue: 360448
         Rotation:
