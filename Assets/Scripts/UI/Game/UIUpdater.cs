@@ -97,15 +97,27 @@ namespace NSMB.UI.Game {
             boos.SetActive(stage.HidePlayersOnMinimap);
             StartCoroutine(UpdatePingTextCoroutine());
 
-            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView, NetworkHandler.FilterOutReplayFastForward);
+            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired);
-            QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventStartCameraFadeOut>(this, OnStartCameraFadeOut);
+        }
+
+        public void OnDestroy() {
+            Destroy(timerMaterial);
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
+            if (!timerMaterial) {
+                // what a hack.
+                try {
+                    CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
+                    cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
+                } catch { }
+            }
+
             QuantumGame game = e.Game;
             Frame f = game.Frames.Predicted;
             //UpdateTrackIcons(f);
@@ -212,8 +224,6 @@ namespace NSMB.UI.Game {
         }
 
         private void OnTimerExpired(EventTimerExpired e) {
-            CanvasRenderer cr = uiCountdown.transform.GetChild(0).GetComponent<CanvasRenderer>();
-            cr.SetMaterial(timerMaterial = new(cr.GetMaterial()), 0);
             timerMaterial.SetColor("_Color", Color.red);
         }
 
@@ -327,7 +337,7 @@ namespace NSMB.UI.Game {
         }
 
         //---Callbacks
-        private void OnGameResynced(CallbackGameResynced e) {
+        private unsafe void OnGameResynced(CallbackGameResynced e) {
             if (endGameSequenceCoroutine != null) {
                 StopCoroutine(endGameSequenceCoroutine);
                 endGameSequenceCoroutine = null;
@@ -338,6 +348,13 @@ namespace NSMB.UI.Game {
                 winText.enabled = false;
                 winTextAnimator.Play("Empty");
             }
+
+            Frame f = e.Game.Frames.Predicted;
+            Color timerColor = Color.white;
+            if (f.Global->Timer <= 0 && f.Global->Rules.IsTimerEnabled) {
+                timerColor = Color.red;
+            }
+            timerMaterial.SetColor("_Color", timerColor);
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {

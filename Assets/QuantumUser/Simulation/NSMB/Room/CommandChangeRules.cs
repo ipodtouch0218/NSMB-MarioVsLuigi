@@ -9,7 +9,7 @@ namespace Quantum {
         public int StarsToWin;
         public int CoinsForPowerup;
         public int Lives;
-        public int TimerSeconds;
+        public int TimerMinutes;
         public bool TeamsEnabled;
         public bool CustomPowerupsEnabled;
         public bool DrawOnTimeUp;
@@ -23,7 +23,7 @@ namespace Quantum {
             stream.Serialize(ref StarsToWin);
             stream.Serialize(ref CoinsForPowerup);
             stream.Serialize(ref Lives);
-            stream.Serialize(ref TimerSeconds);
+            stream.Serialize(ref TimerMinutes);
             stream.Serialize(ref TeamsEnabled);
             stream.Serialize(ref CustomPowerupsEnabled);
             stream.Serialize(ref DrawOnTimeUp);
@@ -53,7 +53,7 @@ namespace Quantum {
                 rules.Lives = Lives;
             }
             if (rulesChanges.HasFlag(Rules.TimerSeconds)) {
-                rules.TimerSeconds = TimerSeconds;
+                rules.TimerSeconds = TimerMinutes;
             }
             if (rulesChanges.HasFlag(Rules.TeamsEnabled)) {
                 rules.TeamsEnabled = TeamsEnabled;

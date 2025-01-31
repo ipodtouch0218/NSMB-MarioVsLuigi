@@ -80,7 +80,7 @@ namespace Quantum {
                     f.Global->RealPlayers = (byte) loadedPlayers;
                     f.Global->GameState = GameState.Starting;
                     f.Global->GameStartFrames = 6 * 60;
-                    f.Global->Timer = f.Global->Rules.TimerSeconds;
+                    f.Global->Timer = f.Global->Rules.TimerSeconds * 60;
 
                     f.Signals.OnLoadingComplete();
                     f.Events.GameStateChanged(f, GameState.Starting);
