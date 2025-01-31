@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -231,7 +230,7 @@ namespace Quantum {
                             if (physicsObject->IsOnSlipperyGround) {
                                 acc = physics.SlowTurnaroundIceAcceleration;
                             } else {
-                                mario->SlowTurnaroundFrames = (byte) Mathf.Clamp(mario->SlowTurnaroundFrames + 1, 0,
+                                mario->SlowTurnaroundFrames = (byte) FPMath.Clamp(mario->SlowTurnaroundFrames + 1, 0,
                                     physics.SlowTurnaroundAcceleration.Length - 1);
                                 acc = mario->CurrentPowerupState == PowerupState.MegaMushroom
                                     ? physics.SlowTurnaroundMegaAcceleration[mario->SlowTurnaroundFrames]
@@ -1645,7 +1644,7 @@ namespace Quantum {
                 // Ceiling tiles.
                 var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
                 StageTile tile = f.FindAsset(tileInstance.Tile);
-                if (!tile) {
+                if (tile == null) {
                     playBumpSound = false;
                 } else if (tile is IInteractableTile it) {
                     it.Interact(f, filter.Entity, InteractionDirection.Up,
@@ -1785,7 +1784,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var reserveItem = f.FindAsset(mario->ReserveItem);
 
-            if (!reserveItem || mario->IsDead || mario->MegaMushroomStartFrames > 0 || (mario->MegaMushroomStationaryEnd && mario->MegaMushroomEndFrames > 0)) {
+            if (reserveItem == null || mario->IsDead || mario->MegaMushroomStartFrames > 0 || (mario->MegaMushroomStationaryEnd && mario->MegaMushroomEndFrames > 0)) {
                 f.Events.MarioPlayerUsedReserveItem(f, filter.Entity, false);
                 return;
             }
@@ -2282,7 +2281,7 @@ namespace Quantum {
                     continue;
                 }
 
-                if (!stage) {
+                if (stage == null) {
                     stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 }
 

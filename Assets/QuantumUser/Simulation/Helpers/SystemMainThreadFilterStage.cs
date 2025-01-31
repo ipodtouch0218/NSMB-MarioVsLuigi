@@ -9,7 +9,7 @@ namespace Quantum {
             VersusStageData stage = null;
             T filterStruct = default;
             while (filtered.Next(&filterStruct)) {
-                if (!stage) {
+                if (stage == null) {
                     stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                     BeforeUpdate(f, stage);
                 }

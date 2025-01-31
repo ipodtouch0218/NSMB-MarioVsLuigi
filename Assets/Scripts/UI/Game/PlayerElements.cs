@@ -108,7 +108,7 @@ namespace NSMB.UI.Game {
             }
 
             Frame f = PredictedFrame;
-            if (!spectating && !f.Exists(entity) && f.Global->GameState == GameState.Starting) {
+            if (!spectating && !f.Exists(entity) && f.Global->GameState >= GameState.Starting) {
                 // Spectating
                 StartSpectating();
             }

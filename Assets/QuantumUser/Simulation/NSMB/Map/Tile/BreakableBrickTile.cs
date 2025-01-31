@@ -2,11 +2,12 @@ using static IInteractableTile;
 using Photon.Deterministic;
 using Quantum;
 using System;
-using UnityEngine;
 
 public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
-    public Color ParticleColor;
+#if QUANTUM_UNITY
+    public UnityEngine.Color ParticleColor;
+#endif
     public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioDrill | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs;
     public bool BumpIfNotBroken;
     public FPVector2 BumpSize = new FPVector2(FP._0_50, FP._0_50);
@@ -74,14 +75,14 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
     }
 
     public static void Bump(Frame f, VersusStageData stage, Vector2Int tilePosition, StageTileInstance result, bool downwards, EntityRef owner, bool allowSelfDamage, AssetRef<EntityPrototype> powerup = default) {
-        if (!stage) {
+        if (stage == null) {
             stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
         }
         Bump(f, stage, tilePosition, stage.GetTileRelative(f, tilePosition.x, tilePosition.y).Tile, result, downwards, owner, allowSelfDamage, powerup);
     }
 
     public static void Bump(Frame f, VersusStageData stage, Vector2Int tilePosition, AssetRef<StageTile> tile, StageTileInstance result, bool downwards, EntityRef owner, bool allowSelfDamage, AssetRef<EntityPrototype> powerup = default) {
-        if (!stage) {
+        if (stage == null) {
             stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
         }
         EntityRef newEntity = f.Create(f.SimulationConfig.BlockBumpPrototype);

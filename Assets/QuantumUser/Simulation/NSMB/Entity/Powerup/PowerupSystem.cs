@@ -214,8 +214,8 @@ namespace Quantum {
             }
             */
 
-            sbyte currentPowerupStatePriority = currentPowerup ? currentPowerup.StatePriority : (sbyte) -1;
-            sbyte newPowerupItemPriority = newPowerup ? newPowerup.ItemPriority : (sbyte) -1;
+            sbyte currentPowerupStatePriority = currentPowerup != null ? currentPowerup.StatePriority : (sbyte) -1;
+            sbyte newPowerupItemPriority = newPowerup != null ? newPowerup.ItemPriority : (sbyte) -1;
 
             // Reserve if we have a higher priority item
             if (currentPowerupStatePriority > newPowerupItemPriority) {

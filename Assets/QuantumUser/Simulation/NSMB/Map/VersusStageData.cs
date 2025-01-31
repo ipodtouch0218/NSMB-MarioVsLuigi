@@ -15,12 +15,14 @@ public unsafe class VersusStageData : AssetObject {
     public string MusicComposer;
     public string TranslationKey;
     public string DiscordStageImage;
+#if QUANTUM_UNITY
     public Sprite Icon;
+#endif
 
     [Header("-- Tilemap")]
     public bool OverrideAutomaticTilemapSettings;
-    public Vector2Int TileDimensions;
-    public Vector2Int TileOrigin;
+    public Quantum.Vector2Int TileDimensions;
+    public Quantum.Vector2Int TileOrigin;
     public FPVector2 TilemapWorldPosition;
     public bool IsWrappingLevel = true;
     public bool ExtendCeilingHitboxes = false;
@@ -35,7 +37,7 @@ public unsafe class VersusStageData : AssetObject {
     public FPVector2 CameraMaxPosition;
 
     [Header("-- UI")]
-    public Color UIColor = new(24, 178, 170);
+    public ColorRGBA UIColor = new(24, 178, 170);
     public bool HidePlayersOnMinimap;
 
     [Header("-- Powerups")]
@@ -73,7 +75,7 @@ public unsafe class VersusStageData : AssetObject {
         return stageLayout[index];
     }
 
-    public StageTileInstance GetTileRelative(Frame f, Vector2Int tile) {
+    public StageTileInstance GetTileRelative(Frame f, Quantum.Vector2Int tile) {
         return GetTileRelative(f, tile.x, tile.y);
     }
 

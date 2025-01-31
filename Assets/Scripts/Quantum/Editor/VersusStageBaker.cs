@@ -37,8 +37,8 @@ public class VersusStageBaker : MapDataBakerCallback {
         tilemap.CompressBounds();
         stage.TilemapWorldPosition = tilemap.transform.position.ToFPVector2();
         if (!stage.OverrideAutomaticTilemapSettings) {
-            stage.TileOrigin = new Vector2Int(tilemap.cellBounds.xMin, tilemap.cellBounds.yMin);
-            stage.TileDimensions = new Vector2Int(tilemap.cellBounds.size.x, tilemap.cellBounds.size.y);
+            stage.TileOrigin = new Quantum.Vector2Int(tilemap.cellBounds.xMin, tilemap.cellBounds.yMin);
+            stage.TileDimensions = new Quantum.Vector2Int(tilemap.cellBounds.size.x, tilemap.cellBounds.size.y);
             LogInfo($"Automatically found stage dimensions: origin={stage.TileOrigin} size={stage.TileDimensions}");
         }
 

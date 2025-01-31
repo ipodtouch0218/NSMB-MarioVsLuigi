@@ -22,4 +22,4 @@ MonoBehaviour:
   BinOutputPath: bin
   PluginSdkPath: 
   TargetPlatform: 0
-  TargetConfiguration: 0
+  TargetConfiguration: 1

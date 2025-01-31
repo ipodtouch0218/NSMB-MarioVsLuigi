@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum;
-using UnityEngine;
 
 public class PowerupAsset : AssetObject {
 
@@ -13,7 +12,10 @@ public class PowerupAsset : AssetObject {
     public SoundEffect BlockSpawnSoundEffect = SoundEffect.World_Block_Powerup;
     public FP SpawnChance = FP._0_10, LosingSpawnBonus = 0;
     public bool BigPowerup, VerticalPowerup, CustomPowerup, LivesOnlyPowerup;
-    public Sprite ReserveSprite;
+
+#if QUANTUM_UNITY
+    public UnityEngine.Sprite ReserveSprite;
+#endif
 
     public bool AvoidPlayers;
     public FP Speed;

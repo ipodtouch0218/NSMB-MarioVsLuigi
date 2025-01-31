@@ -3,7 +3,6 @@ using Quantum;
 using Quantum.Collections;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public static unsafe class QuantumUtils {
 
@@ -74,7 +73,7 @@ public static unsafe class QuantumUtils {
 
 
     public static SoundEffect GetComboSoundEffect(int combo) {
-        return ComboSounds[Mathf.Clamp(combo, 0, ComboSounds.Length - 1)];
+        return ComboSounds[FPMath.Clamp(combo, 0, ComboSounds.Length - 1)];
     }
 
     public static Vector2Int WorldToUnityTile(Frame f, FPVector2 worldPos) {
@@ -96,7 +95,7 @@ public static unsafe class QuantumUtils {
         x = (x % stage.TileDimensions.x + stage.TileDimensions.x) % stage.TileDimensions.x; // Wrapping
         int y = unityTile.y - stage.TileOrigin.y;
         if (stage.ExtendCeilingHitboxes) {
-            y = Mathf.Min(y, stage.TileDimensions.y - 1);
+            y = Math.Min(y, stage.TileDimensions.y - 1);
         }
         return new Vector2Int(x, y);
     }

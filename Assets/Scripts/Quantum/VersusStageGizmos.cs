@@ -59,7 +59,7 @@ public class VersusStageGizmos : MonoBehaviour {
                     continue;
                 }
                 StageTile originalTile = stageTile;
-                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, new Vector2Int(x, y));
+                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, new Quantum.Vector2Int(x, y));
                 if (stageTile is TileInteractionRelocator tir) {
                     tile = stage.TileData[tir.RelocateTo.x + tir.RelocateTo.y * stage.TileDimensions.x];
                     stageTile = QuantumUnityDB.GetGlobalAsset(tile.Tile);

@@ -1,13 +1,11 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
-using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class StageTile : AssetObject {
 
 #if QUANTUM_UNITY
-    public TileBase Tile;
+    public UnityEngine.Tilemaps.TileBase Tile;
 #endif 
     public TileCollisionData CollisionData;
     public bool IsSlipperyGround, IsSlideableGround, IsPolygon = true;

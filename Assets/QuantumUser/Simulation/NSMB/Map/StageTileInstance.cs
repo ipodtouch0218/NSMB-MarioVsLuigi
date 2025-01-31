@@ -22,7 +22,7 @@ namespace Quantum {
         }
 
         public void GetWorldPolygons(FrameThreadSafe f, VersusStageData stage, StageTile stageTile, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, FPVector2? worldPos = null) {
-            if (!stageTile) {
+            if (stageTile == null) {
                 shapeVertexCountBuffer[0] = 0;
                 return;
             }
@@ -31,7 +31,7 @@ namespace Quantum {
                 f.TryFindAsset(stage.GetTileRelative((Frame) f, tir.RelocateTo.x, tir.RelocateTo.y).Tile, out stageTile);
             }
 
-            if (!stageTile || stageTile.CollisionData.Shapes == null) {
+            if (stageTile == null || stageTile.CollisionData.Shapes == null) {
                 shapeVertexCountBuffer[0] = 0;
                 return;
             }

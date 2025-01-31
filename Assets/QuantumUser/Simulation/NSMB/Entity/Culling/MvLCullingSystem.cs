@@ -5,7 +5,7 @@ namespace Quantum {
         public override void Update(Frame f) {
             f.ClearCulledState();
             VersusStageData stage;
-            if (f.IsVerified || f.Context.CullingCameraPositions.Count <= 0 || !f.Map || !(stage = f.FindAsset<VersusStageData>(f.Map.UserAsset))) {
+            if (f.IsVerified || f.Context.CullingCameraPositions.Count <= 0 || f.Map == null || (stage = f.FindAsset<VersusStageData>(f.Map.UserAsset)) == null) {
                 return;
             }
 

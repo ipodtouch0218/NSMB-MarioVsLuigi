@@ -1,12 +1,13 @@
-using UnityEngine;
 using Quantum;
 
 public class LoopingMusicData : AssetObject {
 
-    public AudioClip clip;
+#if QUANTUM_UNITY
+    public UnityEngine.AudioClip clip;
+    public UnityEngine.AudioClip fastClip;
+#endif
     public float loopStartSeconds;
     public float loopEndSeconds;
-    public AudioClip fastClip;
     public float speedupFactor = 1.25f;
 
 }

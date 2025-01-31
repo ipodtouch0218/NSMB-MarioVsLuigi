@@ -1,5 +1,5 @@
 using Photon.Deterministic;
-using UnityEngine;
+using System;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -125,20 +125,20 @@ namespace Quantum {
         public void SetReserveItem(Frame f, PowerupAsset newItem) {
             var currentItem = f.FindAsset(ReserveItem);
 
-            if (!currentItem) {
+            if (currentItem == null) {
                 // We don't have a reserve item, so we can just set it
                 ReserveItem = newItem;
                 return;
             }
 
-            if (!newItem) {
+            if (newItem == null) {
                 // Not a valid powerup, so just clear our reserve item instead
                 ReserveItem = null;
                 return;
             }
 
-            sbyte newItemPriority = newItem ? newItem.ItemPriority : (sbyte) -1;
-            sbyte currentItemPriority = currentItem ? currentItem.ItemPriority : (sbyte) -1;
+            sbyte newItemPriority = newItem != null ? newItem.ItemPriority : (sbyte) -1;
+            sbyte currentItemPriority = currentItem != null ? currentItem.ItemPriority : (sbyte) -1;
 
             if (newItemPriority < currentItemPriority) {
                 // New item is less important than our current reserve item, so we don't want to replace it
@@ -395,7 +395,7 @@ namespace Quantum {
             }
 
             if (IsInKnockback || IsInWeakKnockback) {
-                starsToDrop = Mathf.Min(1, starsToDrop);
+                starsToDrop = Math.Min(1, starsToDrop);
             }
 
             IsInKnockback = true;

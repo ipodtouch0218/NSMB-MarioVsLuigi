@@ -1,12 +1,10 @@
 using Photon.Deterministic;
 using Quantum;
-using UnityEngine;
 using static IInteractableTile;
 
 public unsafe class CoinTile : BreakableBrickTile {
 
-    //---Serialized Variables
-    [SerializeField] private StageTileInstance resultTile;
+    public StageTileInstance resultTile;
 
     public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
         if (base.Interact(f, entity, direction, tilePosition, tileInstance, out playBumpSound)) {

@@ -114,7 +114,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     private unsafe void OnTileBroken(EventTileBroken e) {
         ParticleSystem particle = Instantiate(tileBreakParticleSystem,
-            QuantumUtils.RelativeTileToWorld(stage, new Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
+            QuantumUtils.RelativeTileToWorld(stage, new Quantum.Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
 
         if (QuantumUnityDB.GetGlobalAsset(e.Tile.Tile) is BreakableBrickTile bbt) {
             var main = particle.main;
@@ -147,7 +147,7 @@ public class TilemapAnimator : MonoBehaviour {
         int width = stage.TileDimensions.x;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < stage.TileDimensions.y; y++) {
-                Vector3Int coords = new Vector3Int(x, y, 0) + (Vector3Int) stage.TileOrigin;
+                Vector3Int coords = new(stage.TileOrigin.x + x, stage.TileOrigin.y + y, 0);
 
                 StageTileInstance tileInstance = f.StageTiles[x + y * width];
                 StageTile stageTile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);

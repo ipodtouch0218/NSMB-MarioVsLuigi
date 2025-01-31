@@ -318,7 +318,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->GetTeam(f), 0.8f, 1f) : stage.UIColor;
+            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->GetTeam(f), 0.8f, 1f) : stage.UIColor.AsColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;
