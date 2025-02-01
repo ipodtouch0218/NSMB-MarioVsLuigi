@@ -77,6 +77,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public void OnDestroy() {
+        StateChanged -= OnClientStateChanged;
         realtimeClient.RemoveCallbackTarget(this);
     }
 
@@ -201,12 +202,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         return await Client.CreateAndJoinRoomAsync(args, false);
     }
 
-    public static bool IsValidRoomId(string id) {
+    public static bool IsValidRoomId(string id, out int regionIndex) {
         if (id.Length <= 0) {
+            regionIndex = -1;
             return false;
         }
         id = id.ToUpper();
-        int regionIndex = RoomIdValidChars.IndexOf(id[0]);
+        regionIndex = RoomIdValidChars.IndexOf(id[0]);
         return regionIndex >= 0 && regionIndex < Regions.Count() && Regex.IsMatch(id, $"[{RoomIdValidChars}]{{8}}");
     }
 

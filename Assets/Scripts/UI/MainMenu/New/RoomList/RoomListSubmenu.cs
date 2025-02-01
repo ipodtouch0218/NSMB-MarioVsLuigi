@@ -27,8 +27,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         private Color defaultUsernameColor;
         private bool overlayed;
 
-        public override void Initialize(MainMenuCanvas canvas) {
-            base.Initialize(canvas);
+        public override void Initialize() {
+            base.Initialize();
             NetworkHandler.StateChanged += OnClientStateChanged;
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             defaultUsernameColor = usernameField.targetGraphic.color;

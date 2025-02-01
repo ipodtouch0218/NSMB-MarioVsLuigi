@@ -791,6 +791,18 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.Vector2Int))]
+  public unsafe partial class Vector2IntPrototype : StructPrototype {
+    public Int32 x;
+    public Int32 y;
+    partial void MaterializeUser(Frame frame, ref Quantum.Vector2Int result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.Vector2Int result, in PrototypeMaterializationContext context = default) {
+        result.x = this.x;
+        result.y = this.y;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.WrappingObject))]
   public unsafe partial class WrappingObjectPrototype : ComponentPrototype<Quantum.WrappingObject> {
     [HideInInspector()]

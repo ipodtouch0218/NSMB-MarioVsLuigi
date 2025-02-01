@@ -1,3 +1,5 @@
+using NSMB.Translation;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -7,6 +9,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         //---Serialized Variables
         [SerializeField] private TMP_InputField idInputField;
         [SerializeField] private TMP_Text invalidText;
+        [SerializeField] private Color validIdColor, invalidIdColor;
 
         //---Private Variables
         private bool success;
@@ -17,6 +20,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (first) {
                 // Default values
                 idInputField.text = "";
+                IDTextChanged();
             }
             success = false;
         }
@@ -31,7 +35,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void ConfirmClicked() {
-            if (!NetworkHandler.IsValidRoomId(idInputField.text)) {
+            if (!NetworkHandler.IsValidRoomId(idInputField.text, out _)) {
                 Canvas.PlaySound(SoundEffect.UI_Error);
                 return;
             }
@@ -45,7 +49,15 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void IDTextChanged() {
-            invalidText.enabled = !NetworkHandler.IsValidRoomId(idInputField.text);
+            bool valid = NetworkHandler.IsValidRoomId(idInputField.text, out int regionIndex);
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            if (valid) {
+                invalidText.text = tm.GetTranslationWithReplacements("ui.rooms.joinprivate.valid", "region", $"region.{NetworkHandler.Regions.ElementAt(regionIndex).Code}");
+                invalidText.color = validIdColor;
+            } else {
+                invalidText.text = tm.GetTranslation("ui.rooms.joinprivate.invalid");
+                invalidText.color = invalidIdColor;
+            }
         }
     }
 }

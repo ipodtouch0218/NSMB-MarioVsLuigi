@@ -1,6 +1,5 @@
 ﻿using Photon.Deterministic;
 using System.Collections.Generic;
-using UnityEngine;
 using static Quantum.InteractionSystem;
 
 namespace Quantum {
@@ -19,7 +18,6 @@ namespace Quantum {
 
             PreContactCallbacks.Add(callback);
         }
-
 
         //---Culling
         public readonly List<EntityRef> CullingIgnoredEntities = new();

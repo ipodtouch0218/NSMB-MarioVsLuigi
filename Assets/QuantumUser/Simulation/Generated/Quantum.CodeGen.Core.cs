@@ -909,6 +909,28 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct Vector2Int {
+    public const Int32 SIZE = 8;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(0)]
+    public Int32 x;
+    [FieldOffset(4)]
+    public Int32 y;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 18397;
+        hash = hash * 31 + x.GetHashCode();
+        hash = hash * 31 + y.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (Vector2Int*)ptr;
+        serializer.Stream.Serialize(&p->x);
+        serializer.Stream.Serialize(&p->y);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
     public const Int32 SIZE = 2544;
     public const Int32 ALIGNMENT = 8;
@@ -3718,6 +3740,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Transform2D), Transform2D.SIZE);
       typeRegistry.Register(typeof(Transform2DVertical), Transform2DVertical.SIZE);
       typeRegistry.Register(typeof(Transform3D), Transform3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.Vector2Int), Quantum.Vector2Int.SIZE);
       typeRegistry.Register(typeof(View), View.SIZE);
       typeRegistry.Register(typeof(Quantum.WrappingObject), Quantum.WrappingObject.SIZE);
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);

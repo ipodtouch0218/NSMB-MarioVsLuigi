@@ -779,7 +779,7 @@ namespace Quantum {
                 mario->GroundpoundCooldownFrames = 5;
             }
 
-            bool allowGroundpoundStart = mario->GroundpoundCooldownFrames == 1;
+            bool allowGroundpoundStart = mario->GroundpoundCooldownFrames == 1 || mario->IsPropellerFlying || mario->IsSpinnerFlying;
             QuantumUtils.Decrement(ref mario->GroundpoundCooldownFrames);
             QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 

@@ -159,8 +159,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 266.66663, y: -88}
-  m_SizeDelta: {x: 533.33325, y: 48}
+  m_AnchoredPosition: {x: 300, y: -88}
+  m_SizeDelta: {x: 600, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &351366
 MonoBehaviour:
@@ -4515,7 +4515,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -479.93604, y: 0}
+  m_SizeDelta: {x: -479.8181, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &164163238
 MonoBehaviour:
@@ -38609,7 +38609,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.8341982
+  m_Size: 0.83422107
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -39173,7 +39173,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 4, y: -3.9999619}
+  m_AnchoredPosition: {x: 4, y: -3.999977}
   m_SizeDelta: {x: 86, y: 36}
   m_Pivot: {x: 1, y: 0}
 --- !u!1 &1155409046
@@ -45054,8 +45054,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 266.66663, y: -124}
-  m_SizeDelta: {x: 533.33325, y: 24}
+  m_AnchoredPosition: {x: 300, y: -124}
+  m_SizeDelta: {x: 600, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1412833469
 MonoBehaviour:
@@ -45080,8 +45080,7 @@ MonoBehaviour:
   m_text: Invalid Room ID
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 38e8769007229044bb229d69f8cbae74, type: 2}
-  m_sharedMaterial: {fileID: 3023213983796840565, guid: 38e8769007229044bb229d69f8cbae74,
-    type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: f6c8b2e4424304d47b2ad9cf79cd7c7f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -72433,7 +72432,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -22.600006}
-  m_SizeDelta: {x: 383.57758, y: 0}
+  m_SizeDelta: {x: 383.5345, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -81459,6 +81458,8 @@ MonoBehaviour:
   backButton: {fileID: 1339369343}
   idInputField: {fileID: 351366}
   invalidText: {fileID: 1412833469}
+  validIdColor: {r: 0.5568628, g: 0.5568628, b: 0.5568628, a: 1}
+  invalidIdColor: {r: 0.8, g: 0.5568628, b: 0.5568628, a: 1}
 --- !u!1 &1788886548
 GameObject:
   m_ObjectHideFlags: 0

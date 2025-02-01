@@ -18,8 +18,8 @@ namespace NSMB.UI.MainMenu.Submenus {
         //---Serialized Variables
         [SerializeField] private ReplayListManager replayList;
 
-        public override void Initialize(MainMenuCanvas canvas) {
-            base.Initialize(canvas);
+        public override void Initialize() {
+            base.Initialize();
             replayList.FindReplays();
         }
 

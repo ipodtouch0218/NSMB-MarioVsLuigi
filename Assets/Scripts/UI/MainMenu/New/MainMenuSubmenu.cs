@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -5,13 +6,14 @@ namespace NSMB.UI.MainMenu {
     public class MainMenuSubmenu : MonoBehaviour {
 
         //---Properties
-        public MainMenuCanvas Canvas { get; private set; }
+        public MainMenuCanvas Canvas => canvas;
         public virtual string Header => GlobalController.Instance.translationManager.GetTranslation(header);
         public virtual Color? HeaderColor => useHeaderColor ? headerColor : null;
         public virtual float BackHoldTime => backHoldTime;
         public virtual GameObject DefaultSelection => defaultSelection;
 
         //---Serialized Variables
+        [SerializeField] private MainMenuCanvas canvas;
         [SerializeField] public bool ShowHeader = true;
         [SerializeField] public bool IsOverlay = false;
         [SerializeField] public bool RequiresMainPanel = true;
@@ -29,8 +31,11 @@ namespace NSMB.UI.MainMenu {
         //---Private Variables
         private GameObject savedSelection;
 
-        public virtual void Initialize(MainMenuCanvas canvas) {
-            Canvas = canvas;
+        public virtual void OnValidate() {
+            this.SetIfNull(ref canvas, UnityExtensions.GetComponentType.Parent);
+        }
+
+        public virtual void Initialize() {
             OnInitialize?.Invoke();
         }
 
