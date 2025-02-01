@@ -16,6 +16,7 @@ public class ProjectileAsset : AssetObject {
 
     public bool DoesntEffectBlueShell = true;
     public byte BlueShellSlowdownFrames = 40;
+    public bool BounceOnStart = false;
 
     public ParticleEffect DestroyParticleEffect = ParticleEffect.None;
     public SoundEffect ShootSound = SoundEffect.Powerup_Fireball_Shoot;

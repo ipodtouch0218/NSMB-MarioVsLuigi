@@ -520,6 +520,7 @@ namespace NSMB.Entities.Player {
                 PowerupState.FireFlower => 1,
                 PowerupState.PropellerMushroom => 2,
                 PowerupState.IceFlower => 3,
+                PowerupState.HammerSuit => 4,
                 _ => 0
             };
             materialBlock.SetFloat(ParamPowerupState, ps);

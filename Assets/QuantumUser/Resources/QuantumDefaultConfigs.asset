@@ -211,6 +211,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
   - {fileID: 11400000, guid: 66847e430712048408ec06255e8732aa, type: 2}
   - {fileID: 11400000, guid: 937b975636292004d99a857288a07edc, type: 2}
+  - {fileID: 11400000, guid: ae542675f5e586b4eafdda85af1627dd, type: 2}
+  - {fileID: 11400000, guid: 5a6d8e27fecb6774b9c9fccdd163c3a8, type: 2}
   AllStages:
   - {fileID: 11400000, guid: f06333ca273567e4aa69ecffa0ec4aa5, type: 2}
   - {fileID: 11400000, guid: 49ae08f98b45cab4eba5f78b2b8e5e79, type: 2}
@@ -219,10 +221,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e4239af6b597ce04d87c6ecd1628779e, type: 2}
   - {fileID: 11400000, guid: 44e13c15080ad0c4eb6de49738be371f, type: 2}
   - {fileID: 11400000, guid: a6f9d7537b419f745a2b9468827d1da8, type: 2}
+  - {fileID: 11400000, guid: 38b485d0cebae0645a9d3fac32e38653, type: 2}
   - {fileID: 11400000, guid: bd5808d9e85ad8b4592ca36eaff24b8f, type: 2}
   - {fileID: 11400000, guid: 2725d860a5f0d8f48a6b40fa4d04ae1a, type: 2}
   - {fileID: 11400000, guid: b18d332df84e64f4ba8cd55a576ce872, type: 2}
   - {fileID: 11400000, guid: 540a3bf6243f1c94cb307db79d724474, type: 2}
+  - {fileID: 11400000, guid: 8c3db505f8ae08f42a57fd6adf33d1ef, type: 2}
   FallbackPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
   CharacterDatas:
   - {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
@@ -237,6 +241,8 @@ MonoBehaviour:
     type: 3}
   IceballPrototype: {fileID: 3097001405596171208, guid: f34a1c8377d923742858185e987aa0c6,
     type: 3}
+  HammerPrototype: {fileID: 3097001405596171208, guid: 6cd84404656b38b47a3096f0080b0063,
+    type: 3}
   BigStarPrototype: {fileID: 3097001405596171208, guid: f4614a9d678f440429280d54866b33cc,
     type: 3}
   BlockBumpPrototype: {fileID: 3097001405596171208, guid: bccc5bdeb7a9b96419ace83dcddd92e6,
@@ -250,7 +256,7 @@ MonoBehaviour:
       Id:
         Value: 438935048561577377
     StarsToWin: 10
-    CoinsForPowerup: 8
+    CoinsForPowerup: 5
     Lives: 0
     TimerSeconds: 0
     TeamsEnabled:

@@ -1240,7 +1240,7 @@ namespace Quantum {
 
             if (!(inputs.PowerupAction.WasPressed 
                 || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed && !physicsObject->IsTouchingGround && !mario->IsWallsliding) 
-                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower) && inputs.FireballPowerupAction.WasPressed))) {
+                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower || state == PowerupState.HammerSuit) && inputs.FireballPowerupAction.WasPressed))) {
                 return;
             }
 
@@ -1251,7 +1251,8 @@ namespace Quantum {
 
             switch (mario->CurrentPowerupState) {
             case PowerupState.IceFlower:
-            case PowerupState.FireFlower: {
+            case PowerupState.FireFlower:
+            case PowerupState.HammerSuit: {
                 if (!fireballReady || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
                     || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsSkidding || mario->IsTurnaround) {
                     return;
@@ -1281,6 +1282,8 @@ namespace Quantum {
 
                 EntityRef newEntity = f.Create(mario->CurrentPowerupState == PowerupState.IceFlower
                     ? f.SimulationConfig.IceballPrototype
+                    : mario->CurrentPowerupState == PowerupState.HammerSuit
+                    ? f.SimulationConfig.HammerPrototype
                     : f.SimulationConfig.FireballPrototype);
 
                 if (f.Unsafe.TryGetPointer(newEntity, out Projectile* projectile)) {
@@ -1478,6 +1481,7 @@ namespace Quantum {
             physicsObject->Velocity = mario->PipeDirection;
             physicsObject->DisableCollision = true;
 
+QuantumUtils.Decrement(ref mario->PipeFrames);
             if (QuantumUtils.Decrement(ref mario->PipeFrames)) {
                 if (mario->PipeEntering) {
                     // Teleport to other pipe

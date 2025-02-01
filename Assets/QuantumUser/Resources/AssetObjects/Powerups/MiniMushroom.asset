@@ -23,7 +23,7 @@ MonoBehaviour:
       Value: 1414434856952255942
   SoundPlaysEverywhere: 0
   SoundEffect: 45
-  BlockSpawnSoundEffectEffect: 69
+  BlockSpawnSoundEffect: 69
   SpawnChance:
     RawValue: 131072
   LosingSpawnBonus:
@@ -66,4 +66,4 @@ MonoBehaviour:
     OriginalPostWrapMode: 0
     Keys: []
   StatePriority: 0
-  ItemPriority: 3
+  ItemPriority: 2

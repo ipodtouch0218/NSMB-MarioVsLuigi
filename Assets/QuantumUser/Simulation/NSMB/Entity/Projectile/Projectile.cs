@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct Projectile {
@@ -11,6 +12,11 @@ namespace Quantum {
             // Vars
             Owner = owner;
             FacingRight = right;
+            //if (asset.TurnWithRotation) {
+            //  animator Animator = f.Unsafe.GetPointer<Animator>(thisEntity);
+            //  if (!FacingRight)
+            //    Animator->Play("Left");
+            //}
 
             // Speed
             Speed = asset.Speed;

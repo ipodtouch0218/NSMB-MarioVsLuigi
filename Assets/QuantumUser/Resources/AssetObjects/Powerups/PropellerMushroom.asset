@@ -23,11 +23,11 @@ MonoBehaviour:
       Value: 1286010981056643553
   SoundPlaysEverywhere: 0
   SoundEffect: 16
-  BlockSpawnSoundEffectEffect: 69
+  BlockSpawnSoundEffect: 69
   SpawnChance:
-    RawValue: 32768
-  LosingSpawnBonus:
     RawValue: 98304
+  LosingSpawnBonus:
+    RawValue: 65536
   BigPowerup: 0
   VerticalPowerup: 1
   CustomPowerup: 1

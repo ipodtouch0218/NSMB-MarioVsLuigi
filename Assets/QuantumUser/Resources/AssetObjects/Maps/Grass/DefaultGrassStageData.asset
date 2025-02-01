@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-grassland
   Icon: {fileID: 21300000, guid: e65b552347cbc084fae4f7174a2f115e, type: 3}
   OverrideAutomaticTilemapSettings: 0
-  TileDimensions: {x: 64, y: 12}
-  TileOrigin: {x: -48, y: -13}
+  TileDimensions:
+    x: 64
+    y: 12
+  TileOrigin:
+    x: -48
+    y: -13
   TilemapWorldPosition:
     X:
       RawValue: 524288
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 6553600
     Y:
       RawValue: 294912
-  UIColor: {r: 0.09411765, g: 0.69803923, b: 0.6666667, a: 1}
+  UIColor:
+    R: 24
+    G: 178
+    B: 170
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1

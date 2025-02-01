@@ -45,18 +45,18 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             // Despawn
-            if (physicsObject->IsTouchingLeftWall
+            if ((physicsObject->IsTouchingLeftWall
                 || physicsObject->IsTouchingRightWall
                 || physicsObject->IsTouchingCeiling
                 || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
-                || PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.PhysicsCollider->Shape)) {
+                || PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.PhysicsCollider->Shape)) && !physicsObject->DisableCollision) {
 
                 Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                 return;
             }
 
             // Bounce
-            if (physicsObject->IsTouchingGround && asset.Bounce) {
+            if ((physicsObject->IsTouchingGround && asset.Bounce) || (asset.BounceOnStart && !projectile->HasBounced)) {
                 FP boost = asset.BounceStrength * FPMath.Abs(FPMath.Sin(physicsObject->FloorAngle * FP.Deg2Rad)) * FP._1_25;
                 if ((physicsObject->FloorAngle > 0) == projectile->FacingRight) {
                     boost = 0;
