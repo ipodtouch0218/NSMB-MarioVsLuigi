@@ -51,7 +51,7 @@ namespace NSMB.UI.MainMenu {
         public void Start() {
             GetComponentsInChildren(true, allSubmenus);
             foreach (var menu in allSubmenus) {
-                menu.Initialize(this);
+                menu.Initialize();
                 menu.Hide(SubmenuHideReason.Closed);
             }
 

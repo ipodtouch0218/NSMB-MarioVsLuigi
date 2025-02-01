@@ -15,8 +15,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         private bool success;
         private bool visible = true;
 
-        public override void Initialize(MainMenuCanvas canvas) {
-            base.Initialize(canvas);
+        public override void Initialize() {
+            base.Initialize();
 
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
         }

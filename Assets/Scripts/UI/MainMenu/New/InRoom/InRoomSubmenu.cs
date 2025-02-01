@@ -66,12 +66,13 @@ namespace NSMB.UI.MainMenu.Submenus {
         private bool invalidStart;
         private Coroutine fadeMusicCoroutine;
 
-        public void OnValidate() {
+        public override void OnValidate() {
+            base.OnValidate();
             this.SetIfNull(ref sfx);
         }
 
-        public override void Initialize(MainMenuCanvas canvas) {
-            base.Initialize(canvas);
+        public override void Initialize() {
+            base.Initialize();
             foreach (var panel in allPanels) {
                 panel.Initialize();
             }

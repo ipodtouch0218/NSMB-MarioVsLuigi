@@ -5,8 +5,6 @@ namespace Quantum {
 
         public StageTileInstance[] StageTiles;
 
-        
-
         /* IDK if this is valid
         private AssetRef<Map> cachedMap;
         private VersusStageData cachedUserAsset;

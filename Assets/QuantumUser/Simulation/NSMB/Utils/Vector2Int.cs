@@ -2,30 +2,24 @@ using System;
 
 namespace Quantum {
     [System.Serializable]
-    public struct Vector2Int : IEquatable<Vector2Int> {
-        public int x, y;
+    public unsafe partial struct Vector2Int : IEquatable<Vector2Int> {
 
         public Vector2Int(int x, int y) {
             this.x = x;
             this.y = y;
         }
 
-        public override bool Equals(object obj) {
-            return obj is Vector2Int other && Equals(other);
-        }
-
         public bool Equals(Vector2Int other) {
-            return x == other.x && y == other.y;
+            return this.x == other.x && this.y == other.y;
         }
 
-        public override int GetHashCode() {
-            return HashCode.Combine(x, y);
+        public override bool Equals(object obj) {
+            return obj is Vector2Int other && this.Equals(other);
         }
 
         public static bool operator ==(Vector2Int a, Vector2Int b) {
             return a.Equals(b);
         }
-
         public static bool operator !=(Vector2Int a, Vector2Int b) {
             return !a.Equals(b);
         }

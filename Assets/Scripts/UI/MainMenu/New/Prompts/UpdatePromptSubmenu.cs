@@ -11,8 +11,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         private string remoteVersion;
         private bool upToDate = true, alreadyPrompted, success;
 
-        public override void Initialize(MainMenuCanvas canvas) {
-            base.Initialize(canvas);
+        public override void Initialize() {
+            base.Initialize();
             UpdateChecker.IsUpToDate((isUpToDate, newVersion) => {
                 remoteVersion = newVersion;
                 upToDate = isUpToDate;

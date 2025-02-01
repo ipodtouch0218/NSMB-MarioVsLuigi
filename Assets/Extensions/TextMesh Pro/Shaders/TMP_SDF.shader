@@ -283,6 +283,9 @@ SubShader {
 		#if UNDERLAY_ON
 			float d = tex2D(_MainTex, input.texcoord2.xy).a * input.texcoord2.z;
 			faceColor += input.underlayColor * saturate(d - input.texcoord2.w) * (1 - faceColor.a);
+
+			float d_origin = tex2D(_MainTex, input.atlas).a * input.texcoord2.z;
+			faceColor += input.underlayColor * saturate(d_origin - input.texcoord2.w) * (1 - faceColor.a);
 		#endif
 
 		#if UNDERLAY_INNER

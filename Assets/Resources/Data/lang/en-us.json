@@ -187,6 +187,7 @@
   "ui.rooms.create.webgl": "Hosting a room while using the web version of the game is not recommended, as all clients have a worse connection than if the standalone version was used to host.\n\nPlease use the standalone version when hosting a game.",
   "ui.rooms.joinprivate.header": "Enter Room ID",
   "ui.rooms.joinprivate.invalid": "Invalid Room ID",
+  "ui.rooms.joinprivate.valid": "Valid Room ID for {region}",
   "ui.inroom.player.kick": "Kick",
   "ui.inroom.player.ban": "Ban",
   "ui.inroom.player.mute": "Mute",

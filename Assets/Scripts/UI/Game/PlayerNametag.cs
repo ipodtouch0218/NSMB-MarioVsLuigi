@@ -1,6 +1,7 @@
 using NSMB.Entities.Player;
 using NSMB.Utils;
 using Quantum;
+using System.Drawing.Drawing2D;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -121,14 +122,11 @@ namespace NSMB.UI.Game {
             text.text = stringBuilder.ToString();
         }
 
-        public unsafe void UpdateCachedNickname(Frame f, MarioPlayer* mario = null) {
-            if (mario == null) {
-                if (!f.Unsafe.TryGetPointer(Entity, out mario)) {
-                    return;
-                }
-            }
+        public unsafe void UpdateCachedNickname(Frame f, MarioPlayer* mario) {
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-            cachedNickname = runtimePlayer?.PlayerNickname.ToValidUsername(f, mario->PlayerRef) ?? "noname";
+            if (runtimePlayer != null) {
+                cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
+            }
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
@@ -168,8 +166,11 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void OnPlayerRemoved(EventPlayerRemoved e) {
-            UpdateCachedNickname(e.Frame);
-            UpdateText(e.Frame);
+            Frame f = e.Frame;
+            if (f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
+                UpdateCachedNickname(f, mario);
+            }
+            UpdateText(f);
         }
     }
 }
