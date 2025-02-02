@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-bonus
   Icon: {fileID: 21300000, guid: 204191df3a0fc884cb8fc1030f65465d, type: 3}
   OverrideAutomaticTilemapSettings: 0
-  TileDimensions: {x: 128, y: 19}
-  TileOrigin: {x: -64, y: -13}
+  TileDimensions:
+    x: 128
+    y: 19
+  TileOrigin:
+    x: -64
+    y: -13
   TilemapWorldPosition:
     X:
       RawValue: 0
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 458752
-  UIColor: {r: 0.85, g: 0.1, b: 1, a: 1}
+  UIColor:
+    R: 217
+    G: 26
+    B: 255
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1

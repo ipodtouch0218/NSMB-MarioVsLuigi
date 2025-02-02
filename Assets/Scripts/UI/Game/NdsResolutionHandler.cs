@@ -6,7 +6,8 @@ namespace NSMB.UI.Game {
 
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
-        [SerializeField] private GameObject ndsCanvas;
+        [SerializeField] private Canvas rootCanvas;
+        [SerializeField] private GameObject ndsBackground;
         [SerializeField] private RawImage ndsImage;
         [SerializeField] private AspectRatioFitter fitter;
 
@@ -49,6 +50,7 @@ namespace NSMB.UI.Game {
                     } else {
                         scaling = 1 / Mathf.Floor(1 / scaling);
                     }
+                    scaling /= rootCanvas.scaleFactor;
                     fitterTransform.sizeDelta = new Vector2(texture.width * scaling, texture.height * scaling);
                     pixelPerfect = true;
                     previousResolution = (width, height);
@@ -103,7 +105,7 @@ namespace NSMB.UI.Game {
                 playerElements.ScrollCamera.targetTexture = texture;
             }
 
-            ndsCanvas.SetActive(true);
+            ndsBackground.SetActive(true);
             return true;
         }
 
@@ -119,7 +121,7 @@ namespace NSMB.UI.Game {
             if (playerElements.ScrollCamera) {
                 playerElements.ScrollCamera.targetTexture = null;
             }
-            ndsCanvas.SetActive(false);
+            ndsBackground.SetActive(false);
         }
 
         private void OnNdsResolutionSettingChanged() {

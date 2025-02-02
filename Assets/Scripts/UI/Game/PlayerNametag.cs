@@ -1,7 +1,7 @@
 using NSMB.Entities.Player;
+using NSMB.Extensions;
 using NSMB.Utils;
 using Quantum;
-using System.Drawing.Drawing2D;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -17,7 +17,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private GameObject nametag;
         [SerializeField] private TMP_Text text;
         [SerializeField] private Image arrow;
-        [SerializeField] private RectTransform parentTransform;
+        [SerializeField] private Canvas parentCanvas;
 
         [SerializeField] private Vector2 temp = Vector2.one;
 
@@ -91,8 +91,9 @@ namespace NSMB.UI.Game {
                 }
             }
 
-            transform.localPosition = cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * parentTransform.rect.size;
-            transform.localPosition -= (Vector3) (parentTransform.rect.size / 2);
+            RectTransform parentTransform = (RectTransform) transform.parent;
+            transform.localPosition = (cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * 2) - Vector3.one;
+            transform.localPosition = transform.localPosition.Multiply(parentTransform.rect.size / 2);
 
             if (!constantNicknameColor) {
                 text.color = Utils.Utils.SampleNicknameColor(nicknameColor, out _);
@@ -126,6 +127,7 @@ namespace NSMB.UI.Game {
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
             if (runtimePlayer != null) {
                 cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
+                nicknameColor = runtimePlayer.NicknameColor;
             }
         }
 

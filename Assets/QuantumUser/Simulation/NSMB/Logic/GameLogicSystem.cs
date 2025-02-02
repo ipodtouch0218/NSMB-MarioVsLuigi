@@ -436,7 +436,7 @@ namespace Quantum {
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
                 data->IsLoaded = false;
                 data->IsReady = false;
-                data->IsSpectator = false;
+                data->IsSpectator = data->ManualSpectator;
                 data->VotedToContinue = false;
                 data->RealTeam = 255;
             }

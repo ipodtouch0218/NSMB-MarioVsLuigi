@@ -3228,6 +3228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6efb79159a24f4640ba8e1682c9aaa10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 0
   IsOverlay: 1
   RequiresMainPanel: 0
@@ -4352,6 +4353,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 900411c46d99a0a478b2a85c5d561f25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 0
   IsOverlay: 1
   RequiresMainPanel: 0
@@ -6331,6 +6333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29c8ec55ec689c94e883c25d895b0c23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 1
   IsOverlay: 0
   RequiresMainPanel: 1
@@ -20229,6 +20232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d3151633890f614cb9bef4bb2fe77cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 0
   IsOverlay: 1
   RequiresMainPanel: 0
@@ -24403,6 +24407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cdf3191b97d92b479bd628962e72154, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 0
   IsOverlay: 1
   RequiresMainPanel: 0
@@ -37851,6 +37856,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fd37465f909293489db48c1c199d663, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 0
   IsOverlay: 1
   RequiresMainPanel: 0
@@ -38608,8 +38614,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 791989381}
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.83422107
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -39173,7 +39179,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 4, y: -3.999977}
+  m_AnchoredPosition: {x: 4, y: -3.9999924}
   m_SizeDelta: {x: 86, y: 36}
   m_Pivot: {x: 1, y: 0}
 --- !u!1 &1155409046
@@ -41354,6 +41360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce1fc896cbf24834798562c1184b4aa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 1
   IsOverlay: 0
   RequiresMainPanel: 1
@@ -72432,7 +72439,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -22.600006}
-  m_SizeDelta: {x: 383.5345, y: 0}
+  m_SizeDelta: {x: 383.59998, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -73361,7 +73368,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000015258789}
+  m_AnchoredPosition: {x: 0, y: -0.000015258789}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1576260155
@@ -81447,6 +81454,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efb8c556ed5a8ee4d929d61431dea251, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 0
   IsOverlay: 1
   RequiresMainPanel: 0
@@ -82169,6 +82177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecab46ca8e7a4df408ca37d3a9885492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 1
   IsOverlay: 0
   RequiresMainPanel: 1
@@ -82280,6 +82289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c29ba3731323320498ecad29ee2261c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 1
   IsOverlay: 0
   RequiresMainPanel: 1
@@ -88416,6 +88426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f22dd0280b17e7d47b6b2b2cc7dbca92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 1
   IsOverlay: 1
   RequiresMainPanel: 0
@@ -90112,6 +90123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43676bd3363e6cc4e842b36f9b30f8cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 2030938839}
   ShowHeader: 0
   IsOverlay: 1
   RequiresMainPanel: 0

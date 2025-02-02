@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-sky
   Icon: {fileID: 21300000, guid: d65bece2d20a7eb49bb91fd73710962e, type: 3}
   OverrideAutomaticTilemapSettings: 1
-  TileDimensions: {x: 64, y: 20}
-  TileOrigin: {x: -30, y: -13}
+  TileDimensions:
+    x: 64
+    y: 20
+  TileOrigin:
+    x: -30
+    y: -13
   TilemapWorldPosition:
     X:
       RawValue: -65536
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 557056
-  UIColor: {r: 1, g: 0, b: 0, a: 1}
+  UIColor:
+    R: 255
+    G: 101
+    B: 0
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1

@@ -1751,6 +1751,7 @@ namespace Quantum {
                     // Try to drop more stars
                     mario->SpawnStars(f, entity, 1);
                     mario->DeathAnimationFrames = 30;
+                    mario->PreRespawnFrames = 180;
                 } else {
                     // Play the animation as normal
                     if (transform->Position.Y > stage.StageWorldMin.Y) {
