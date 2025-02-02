@@ -79,6 +79,7 @@ namespace Quantum {
     MegaMushroom,
     CatSuit,
     HammerSuit,
+    JumpSuit,
   }
   [System.FlagsAttribute()]
   public enum InputButtons : int {

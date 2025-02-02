@@ -86,7 +86,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle;
-        [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller;
+        [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller, HammerHelm, HammerShell, HammerTuck;
         [SerializeField] private AudioClip normalDrill, propellerDrill;
         [SerializeField] private LoopingSoundPlayer dustPlayer, drillPlayer;
         [SerializeField] private LoopingSoundData wallSlideData, shellSlideData, spinnerDrillData, propellerDrillData;
@@ -521,6 +521,7 @@ namespace NSMB.Entities.Player {
                 PowerupState.PropellerMushroom => 2,
                 PowerupState.IceFlower => 3,
                 PowerupState.HammerSuit => 4,
+                PowerupState.JumpSuit => 2,
                 _ => 0
             };
             materialBlock.SetFloat(ParamPowerupState, ps);
@@ -551,6 +552,9 @@ namespace NSMB.Entities.Player {
             smallModel.SetActive(!large);
             blueShell.SetActive(mario->CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(mario->CurrentPowerupState == PowerupState.PropellerMushroom);
+            HammerHelm.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit);
+            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit);
+            HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching);
 
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;
             bool changedAvatar = animator.avatar != targetAvatar;

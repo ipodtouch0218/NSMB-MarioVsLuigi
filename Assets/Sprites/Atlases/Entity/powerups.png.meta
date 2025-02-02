@@ -391,6 +391,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: JumpSuit
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 54bab28a4a43ff34e8ecad1e2d48b14d
+      internalID: 1662652401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -407,6 +428,7 @@ TextureImporter:
       FireFlower: -6090384608550177697
       HammerSuit: -1109677166
       IceFlower: 4928671260392873470
+      JumpSuit: 1662652401
       MiniMushroom: 621560852509794982
       Mushroom: 3410918491446568398
       Shell: 2834573260081099437

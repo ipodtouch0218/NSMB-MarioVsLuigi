@@ -1369,7 +1369,7 @@ MonoBehaviour:
       type: {class: BooPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         MaxRange:
-          RawValue: 1310720
+          RawValue: 786432
     - rid: 7689850815606947844
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

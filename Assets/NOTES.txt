@@ -1,7 +1,7 @@
- MarioPlayerSystem.cs the new playercontroller
- GameLogicSystem.cs the new "gamemanager"
- "Generated" Folder Contains The Contents For Some Enums, As Well As Enums
- Global Controller Contains A Config Object With loads of informations
+ MarioPlayerSystem.cs: the new playercontroller
+ GameLogicSystem.cs: the new "gamemanager"
+ Generated Folder: Contains The Contents For Some Enums, As Well As Enums
+ Global Controller: Contains A Config Object With loads of informations
 
 make cat suit & HammerSuit
 port thwomp volcano(?)
