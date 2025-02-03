@@ -78,7 +78,7 @@ public class ReplayUI : QuantumSceneViewComponent {
         simulatingCanvas.SetActive(false);
         fastForwardDestinationTick = 0;
         Time.captureDeltaTime = 0;
-        Time.timeScale = replaySpeed;
+        Time.timeScale = replayPaused ? 0 : replaySpeed;
         NetworkHandler.Runner.IsSessionUpdateDisabled = false;
         simulationTargetTrackArrow.gameObject.SetActive(false);
     }

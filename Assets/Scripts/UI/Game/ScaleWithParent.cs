@@ -4,9 +4,21 @@ using UnityEngine.EventSystems;
 [ExecuteAlways, RequireComponent(typeof(RectTransform))]
 public class ScaleWithParent : UIBehaviour {
 
+    //---Serialized Variables
     [SerializeField] private float targetWidth = 1000, aspectRatio = (16f/9f);
 
+    //---Private Variables
     private DrivenRectTransformTracker tracker;
+    private int width, height;
+
+    protected override void OnValidate() {
+        ValidationUtility.SafeOnValidate(() => {
+            if (!this) {
+                return;
+            }
+            OnRectTransformDimensionsChange();
+        });
+    }
 
     protected override void OnEnable() {
         tracker.Add(this, (RectTransform) transform, DrivenTransformProperties.Scale | DrivenTransformProperties.Anchors | DrivenTransformProperties.SizeDelta | DrivenTransformProperties.AnchoredPosition);
@@ -17,24 +29,46 @@ public class ScaleWithParent : UIBehaviour {
         tracker.Clear();
     }
 
+    public void Update() {
+        if (Screen.width != width || Screen.height != height) {
+            OnRectTransformDimensionsChange();
+            width = Screen.width;
+            height = Screen.height;
+        }
+    }
+
     protected override void OnRectTransformDimensionsChange() {
         RectTransform rt = (RectTransform) transform;
         RectTransform parent = (RectTransform) rt.parent;
 
-        rt.anchorMin = new(0, 0.5f);
-        rt.anchorMax = new(1, 0.5f);
+        rt.anchorMin = new(0.5f, 0.5f);
+        rt.anchorMax = new(0.5f, 0.5f);
 
-        float scale = Mathf.Min(1, parent.rect.size.x / targetWidth);
-        if (scale <= 0) {
-            // Avoid NaNs
+        float scale = parent.rect.size.x / targetWidth;
+        if (scale == 0) { 
             return;
         }
-        rt.localScale = Vector3.one * scale;
 
-        float differenceX = Mathf.Max(0, targetWidth - parent.rect.size.x);
-        rt.sizeDelta = new(
-            differenceX,
-            parent.rect.size.y / scale
-        );
+        if (scale > 1) {
+            scale = 1;
+            float expectedHeight = targetWidth / aspectRatio;
+            if (parent.rect.size.y < expectedHeight) {
+                // Can't fit; we still need to shrink.
+                scale = parent.rect.size.y / expectedHeight;
+            }
+
+            // Screen too wide. Expand.
+            rt.localScale = Vector3.one * scale;
+            rt.sizeDelta = new(
+                parent.rect.size.x / scale,
+                parent.rect.size.y / scale
+            );
+        } else {
+            rt.localScale = Vector3.one * scale;
+            rt.sizeDelta = new(
+                targetWidth,
+                parent.rect.size.y / scale
+            );
+        }
     }
 }

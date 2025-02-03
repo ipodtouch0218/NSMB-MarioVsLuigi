@@ -41,6 +41,10 @@ public unsafe class CameraAnimator : ResizingCamera {
         OnScreenshake -= OnScreenshakeCallback;
     }
 
+    public override void Update() {
+        // Do nothing.
+    }
+
     public void OnUpdateView(CallbackUpdateView e) {
         QuantumGame game = e.Game;
         Frame f = game.Frames.Predicted;
@@ -117,8 +121,8 @@ public unsafe class CameraAnimator : ResizingCamera {
     private void OnScreenshakeCallback(float screenshake) {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-        if (f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
-            && physicsObject->IsTouchingGround) {
+        if (!f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
+            || physicsObject->IsTouchingGround) {
 
             screenshakeTimer += screenshake;
         }
