@@ -1,4 +1,0 @@
-TODO:
-Add HammerSuit Team Color Functionality
-Uhhh Prob Some Model Optimisations (As It Uses 3 Values For The Helmet, Shell, And TuckShell (ForCrouching) :woozy_face:)
-Balance Ig? I Think I Did A Pretty Good Job With It, Hard To Tell From A Single Playtest Session Where The Iframes Were The most Complained About Lol
