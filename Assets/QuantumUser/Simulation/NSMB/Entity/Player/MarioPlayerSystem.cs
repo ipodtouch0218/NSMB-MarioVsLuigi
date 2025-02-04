@@ -1844,11 +1844,11 @@ namespace Quantum {
             if (!mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
                 && mario->IsDamageable
-                && ((!mario->IsCrouchedInShell && !mario->IsInShell) || projectileAsset.Effect == ProjectileEffectType.Toughback)) { //Hammers Hit Shell
+                && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell)) { 
 
                 switch (projectileAsset.Effect) {
-                case ProjectileEffectType.Toughback:
-                case ProjectileEffectType.Knockback:
+                case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
+                case ProjectileEffectType.Fire:
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                         mario->Death(f, marioEntity, false);
                     } else {
@@ -1996,11 +1996,11 @@ namespace Quantum {
             }
 
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            // Blue shell stomps, Hammer Also Has This Defense While Crouching
-            if (((marioA->CurrentPowerupState == PowerupState.HammerSuit && marioA->IsCrouching) || marioA->IsInShell) && marioAPhysics->IsTouchingGround && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling) {
+            // Crouched in shell stomps
+            if (marioA->IsCrouchedInShell && marioAPhysics->IsTouchingGround && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling) {
                 MarioMarioBlueShellStomp(f, stage, marioBEntity, marioAEntity, fromRight);
                 return;
-            } else if (((marioB->CurrentPowerupState == PowerupState.HammerSuit && marioB->IsCrouching) || marioB->IsCrouchedInShell) && marioBPhysics->IsTouchingGround && marioAAbove && !marioA->IsGroundpoundActive && !marioA->IsDrilling) {
+            } else if (marioB->IsCrouchedInShell && marioBPhysics->IsTouchingGround && marioAAbove && !marioA->IsGroundpoundActive && !marioA->IsDrilling) {
                 MarioMarioBlueShellStomp(f, stage, marioAEntity, marioBEntity, fromRight);
                 return;
             }

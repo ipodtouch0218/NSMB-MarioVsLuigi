@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter> {
@@ -24,11 +23,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var asset = f.FindAsset(projectile->Asset);
 
-          //TODO: Make Melee Attack Attatch To Players
-            if (asset.IsMelee) {
-              //transform->Position = (FP) f.Unsafe.GetPointer<Transform2D>(projectile->Owner);
-            }
-
+            // Check to instant-despawn if spawned inside a wall
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape)) {
                     Destroy(f, filter.Entity, asset.DestroyParticleEffect);
@@ -62,7 +57,7 @@ namespace Quantum {
             }
 
             // Bounce
-            if ((physicsObject->IsTouchingGround && asset.Bounce) || (asset.BounceOnStart && !projectile->HasBounced)) {
+            if (physicsObject->IsTouchingGround && asset.Bounce) {
                 FP boost = asset.BounceStrength * FPMath.Abs(FPMath.Sin(physicsObject->FloorAngle * FP.Deg2Rad)) * FP._1_25;
                 if ((physicsObject->FloorAngle > 0) == projectile->FacingRight) {
                     boost = 0;

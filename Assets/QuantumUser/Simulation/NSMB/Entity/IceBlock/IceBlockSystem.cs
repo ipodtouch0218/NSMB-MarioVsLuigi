@@ -175,7 +175,7 @@ namespace Quantum {
         public static void OnIceBlockProjectileInteraction(Frame f, EntityRef projectileEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
-            if (projectileAsset.Effect == ProjectileEffectType.Knockback) {
+            if (projectileAsset.Effect == ProjectileEffectType.Fire) {
                 // Fireball: destroy
                 Destroy(f, iceBlockEntity, IceBlockBreakReason.Fireball);
             }

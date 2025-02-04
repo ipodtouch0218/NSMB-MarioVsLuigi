@@ -57,9 +57,9 @@ MonoBehaviour:
     Y:
       RawValue: 327680
   UIColor:
-    R: 24
-    G: 178
-    B: 170
+    R: 240
+    G: 224
+    B: 111
     A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1

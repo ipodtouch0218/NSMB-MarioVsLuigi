@@ -160,7 +160,7 @@ namespace Quantum {
 
             if (projectileAsset.Effect == ProjectileEffectType.Freeze) {
                 IceBlockSystem.Freeze(f, bulletBillEntity, true);
-            } else if (projectileAsset.Effect == ProjectileEffectType.Knockback) {
+            } else if (projectileAsset.Effect == ProjectileEffectType.Fire) {
                 var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
                 bulletBill->Kill(f, bulletBillEntity, projectileEntity, false);
             } else {

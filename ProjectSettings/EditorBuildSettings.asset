@@ -47,12 +47,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/CustomBeach.unity
     guid: fb42e791761c8774688977ac600ab52b
-  - enabled: 1
-    path: Assets/Scenes/Levels/TestStage.unity
-    guid: f090314c09339c347b7fc7c4a2dc24fc
-  - enabled: 1
-    path: Assets/Scenes/Levels/KKTBeach.unity
-    guid: 7f20078f74f6b944e9593b24e524119c
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: b02bce592fba21b4982d8cf5e36a1459,
       type: 2}

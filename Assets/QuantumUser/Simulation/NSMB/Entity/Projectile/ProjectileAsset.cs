@@ -13,18 +13,14 @@ public class ProjectileAsset : AssetObject {
     public bool LockTo45Degrees = true;
     public bool InheritShooterVelocity;
     public bool HasCollision = true;
-
     public bool DoesntEffectBlueShell = true;
-    public byte BlueShellSlowdownFrames = 40;
-    public bool BounceOnStart = false;
-    public bool IsMelee = false;
 
     public ParticleEffect DestroyParticleEffect = ParticleEffect.None;
     public SoundEffect ShootSound = SoundEffect.Powerup_Fireball_Shoot;
 }
 
 public enum ProjectileEffectType {
-    Knockback,
+    Fire,
     Freeze,
-    Toughback,
+    KillEnemiesAndSoftKnockbackPlayers,
 }
