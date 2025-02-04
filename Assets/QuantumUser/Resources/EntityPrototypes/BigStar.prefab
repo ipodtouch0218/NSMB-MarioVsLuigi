@@ -4926,9 +4926,9 @@ MonoBehaviour:
         RawValue: 0
       BoxExtents:
         X:
-          RawValue: 24576
+          RawValue: 28262
         Y:
-          RawValue: 24576
+          RawValue: 28262
       PositionOffset:
         X:
           RawValue: 0
@@ -5361,7 +5361,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 1973747262660636105}
   soundRange: 5
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!114 &1605029935836861777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5378,7 +5377,6 @@ MonoBehaviour:
     IsStationary:
       Value: 0
     Lifetime: 900
-    PassthroughFrames: 0
     UncollectableFrames: 0
     Speed:
       RawValue: 98304
@@ -5426,6 +5424,8 @@ MonoBehaviour:
       Value: 0
     IsWaterSolid:
       Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &5501024112843099950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5439,8 +5439,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0
