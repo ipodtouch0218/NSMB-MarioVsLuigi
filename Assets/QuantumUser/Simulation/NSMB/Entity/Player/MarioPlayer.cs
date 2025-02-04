@@ -6,7 +6,7 @@ namespace Quantum {
 
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
-        public bool IsCrouchedInShell => (CurrentPowerupState == PowerupState.BlueShell || CurrentPowerupState == PowerupState.HammerSuit) && IsCrouching && !IsInShell;
+        public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
 
         public byte GetTeam(Frame f) {
