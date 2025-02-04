@@ -1,3 +1,4 @@
+using Quantum.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +22,8 @@ namespace NSMB.Utils {
         private static string[] filteredWords;
 
         public static string FilterString(string input) {
+            using var profileScope = HostProfiler.Start("ChatFilter.FilterString");
+
             DecodeFilter();
 
             string filteredInput = input.ToLower();
@@ -29,6 +32,7 @@ namespace NSMB.Utils {
             StringBuilder result = new(input), filtered = new(filteredInput);
 
             foreach (string word in filteredWords) {
+                using var profileScope2 = HostProfiler.Start($"ChatFilter.FilterString.{word}");
 
                 Match match;
                 while ((match = Regex.Match(filtered.ToString(), word)).Success) {

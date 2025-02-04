@@ -14,6 +14,10 @@ public class ResizingCamera : MonoBehaviour {
         ClampCameraAspectRatio();
     }
 
+    public virtual void Update() {
+        ClampCameraAspectRatio();
+    }
+
     protected void ClampCameraAspectRatio(float target = 14f/4f) {
         float aspect = ourCamera.aspect;
 

@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-volcano
   Icon: {fileID: 21300000, guid: db2bb15e68990db4582869c4a4d80c44, type: 3}
   OverrideAutomaticTilemapSettings: 1
-  TileDimensions: {x: 80, y: 31}
-  TileOrigin: {x: -33, y: -11}
+  TileDimensions:
+    x: 80
+    y: 31
+  TileOrigin:
+    x: -33
+    y: -11
   TilemapWorldPosition:
     X:
       RawValue: -229376
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 655360
-  UIColor: {r: 0.985517, g: 1, b: 0, a: 1}
+  UIColor:
+    R: 251
+    G: 255
+    B: 0
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 0
   SpawnVerticalPowerups: 1

@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
