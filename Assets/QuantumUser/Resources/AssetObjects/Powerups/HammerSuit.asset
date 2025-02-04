@@ -17,7 +17,7 @@ MonoBehaviour:
     Guid:
       Value: 402398838204577684
   Type: 0
-  State: 9
+  State: 8
   Prefab:
     Id:
       Value: 1472665878288241371
@@ -25,7 +25,7 @@ MonoBehaviour:
   SoundEffect: 16
   BlockSpawnSoundEffect: 69
   SpawnChance:
-    RawValue: 32768
+    RawValue: 7241728
   LosingSpawnBonus:
     RawValue: 98304
   BigPowerup: 0
