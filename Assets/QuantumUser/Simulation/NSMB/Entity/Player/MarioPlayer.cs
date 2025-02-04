@@ -224,6 +224,7 @@ namespace Quantum {
                 Death(f,entity, false);
                 break;
             }
+            case PowerupState.JumpSuit:
             case PowerupState.Mushroom: {
                 CurrentPowerupState = PowerupState.NoPowerup;
                 SpawnStars(f, entity, 1);
@@ -231,7 +232,6 @@ namespace Quantum {
             }
             case PowerupState.CatSuit:
             case PowerupState.HammerSuit:
-            case PowerupState.JumpSuit:
             case PowerupState.FireFlower:
             case PowerupState.IceFlower:
             case PowerupState.PropellerMushroom:

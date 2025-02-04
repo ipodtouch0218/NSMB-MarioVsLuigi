@@ -82,14 +82,14 @@ MonoBehaviour:
         RawValue: 0
       BoxExtents:
         X:
-          RawValue: 9011
+          RawValue: 9175
         Y:
-          RawValue: 9011
+          RawValue: 9175
       PositionOffset:
         X:
           RawValue: 0
         Y:
-          RawValue: 9011
+          RawValue: 0
       RotationOffset:
         RawValue: 0
       UserTag: 0
@@ -475,7 +475,7 @@ SpriteRenderer:
   m_Size: {x: 0.11, y: 0.11}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &9162743564300288012
@@ -557,7 +557,7 @@ Transform:
   m_GameObject: {fileID: 7524634318836740490}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5383,17 +5383,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b5d73eb4473d1c54683911fb44031e91,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.039999995
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d73eb4473d1c54683911fb44031e91,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.04
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d73eb4473d1c54683911fb44031e91,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.039999995
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d73eb4473d1c54683911fb44031e91,
         type: 3}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KKTUndergroundStage
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Maps/UnderGround/KKTUndergroundStage
+    Path: QuantumUser/Resources/AssetObjects/Maps/KKTUnderGround/KKTUndergroundStage
     Guid:
       Value: 367168498426924088
   UserAsset:

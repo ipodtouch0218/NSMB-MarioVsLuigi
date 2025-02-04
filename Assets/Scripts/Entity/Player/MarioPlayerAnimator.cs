@@ -552,8 +552,8 @@ namespace NSMB.Entities.Player {
             smallModel.SetActive(!large);
             blueShell.SetActive(mario->CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(mario->CurrentPowerupState == PowerupState.PropellerMushroom);
-            HammerHelm.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit);
-            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit);
+            HammerHelm.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
+            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
             HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching);
 
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;

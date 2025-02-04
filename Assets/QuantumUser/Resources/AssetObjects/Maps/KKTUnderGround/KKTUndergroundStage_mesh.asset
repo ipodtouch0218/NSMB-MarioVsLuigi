@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KKTUndergroundStage_mesh
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Maps/UnderGround/KKTUndergroundStage_mesh
+    Path: QuantumUser/Resources/AssetObjects/Maps/KKTUnderGround/KKTUndergroundStage_mesh
     Guid:
       Value: 358523904316380873
   Data: 0000000000000000

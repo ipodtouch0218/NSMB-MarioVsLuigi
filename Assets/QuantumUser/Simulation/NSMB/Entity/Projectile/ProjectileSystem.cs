@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter> {
@@ -22,6 +23,11 @@ namespace Quantum {
             var projectile = filter.Projectile;
             var physicsObject = filter.PhysicsObject;
             var asset = f.FindAsset(projectile->Asset);
+
+          //TODO: Make Melee Attack Attatch To Players
+            if (asset.IsMelee) {
+              //transform->Position = (FP) f.Unsafe.GetPointer<Transform2D>(projectile->Owner);
+            }
 
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
                 if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape)) {

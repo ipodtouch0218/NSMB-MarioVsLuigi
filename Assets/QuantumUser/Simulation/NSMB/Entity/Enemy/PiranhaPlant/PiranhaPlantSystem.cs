@@ -73,6 +73,7 @@ namespace Quantum {
             var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
 
             switch (projectileAsset.Effect) {
+            case ProjectileEffectType.Toughback:
             case ProjectileEffectType.Knockback: {
                 piranhaPlant->Kill(f, piranhaPlantEntity, projectileEntity, true);
                 break;

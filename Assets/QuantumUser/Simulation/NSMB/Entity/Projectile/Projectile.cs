@@ -12,11 +12,6 @@ namespace Quantum {
             // Vars
             Owner = owner;
             FacingRight = right;
-            //if (asset.TurnWithRotation) {
-            //  animator Animator = f.Unsafe.GetPointer<Animator>(thisEntity);
-            //  if (!FacingRight)
-            //    Animator->Play("Left");
-            //}
 
             // Speed
             Speed = asset.Speed;

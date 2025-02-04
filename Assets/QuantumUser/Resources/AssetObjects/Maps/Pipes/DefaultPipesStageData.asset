@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-pipes
   Icon: {fileID: 21300000, guid: c82b36c5c4874c44d9e79480880ddc16, type: 3}
   OverrideAutomaticTilemapSettings: 0
-  TileDimensions: {x: 64, y: 27}
-  TileOrigin: {x: -39, y: -11}
+  TileDimensions:
+    x: 64
+    y: 27
+  TileOrigin:
+    x: -39
+    y: -11
   TilemapWorldPosition:
     X:
       RawValue: 229376
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 1048576
     Y:
       RawValue: 360448
-  UIColor: {r: 1, g: 0.509714, b: 0, a: 1}
+  UIColor:
+    R: 24
+    G: 178
+    B: 170
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1

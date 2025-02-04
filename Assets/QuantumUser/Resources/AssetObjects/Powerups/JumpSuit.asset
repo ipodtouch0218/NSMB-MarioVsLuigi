@@ -33,11 +33,11 @@ MonoBehaviour:
   CustomPowerup: 1
   LivesOnlyPowerup: 0
   ReserveSprite: {fileID: 21300000, guid: e64cca18721d2d14e95065a64ba3f71c, type: 3}
-  AvoidPlayers: 0
+  AvoidPlayers: 1
   Speed:
-    RawValue: 262144
+    RawValue: -262144
   BounceStrength:
-    RawValue: 786432
+    RawValue: 720896
   TerminalVelocity:
     RawValue: -524288
   FollowAnimationCurve: 0

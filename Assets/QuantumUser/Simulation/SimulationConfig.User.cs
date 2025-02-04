@@ -9,7 +9,7 @@
         public CharacterAsset[] CharacterDatas;
         public TeamAsset[] Teams;
 
-        public EntityPrototype FireballPrototype, IceballPrototype, HammerPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype;
+        public EntityPrototype FireballPrototype, IceballPrototype, HammerPrototype, ScratchPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype;
 
         public GameRules DefaultRules;
     }

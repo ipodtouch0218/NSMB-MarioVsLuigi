@@ -16,7 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Projectile/HammerProjectile
     Guid:
       Value: 395779911797546411
-  Effect: 0
+  Effect: 2
   Bounce: 1
   Speed:
     RawValue: 212992
@@ -35,5 +35,6 @@ MonoBehaviour:
   DoesntEffectBlueShell: 1
   BlueShellSlowdownFrames: 0
   BounceOnStart: 1
+  IsMelee: 0
   DestroyParticleEffect: 5
   ShootSound: 9
