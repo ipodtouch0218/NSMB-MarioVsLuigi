@@ -224,13 +224,11 @@ namespace Quantum {
                 Death(f,entity, false);
                 break;
             }
-            case PowerupState.JumpSuit:
             case PowerupState.Mushroom: {
                 CurrentPowerupState = PowerupState.NoPowerup;
                 SpawnStars(f, entity, 1);
                 break;
             }
-            case PowerupState.CatSuit:
             case PowerupState.HammerSuit:
             case PowerupState.FireFlower:
             case PowerupState.IceFlower:

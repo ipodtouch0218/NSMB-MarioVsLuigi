@@ -1,9 +1,4 @@
- MarioPlayerSystem.cs: the new playercontroller
- GameLogicSystem.cs: the new "gamemanager"
- Generated Folder: Contains The Contents For Some Enums, As Well As Enums
- Global Controller: Contains A Config Object With loads of informations
-
-make cat suit & HammerSuit
-port thwomp volcano(?)
-port beach, & pillars maps
-make a underground map
+TODO:
+Add HammerSuit Team Color Functionality
+Uhhh Prob Some Model Optimisations (As It Uses 3 Values For The Helmet, Shell, And TuckShell (ForCrouching) :woozy_face:)
+Balance Ig? I Think I Did A Pretty Good Job With It, Hard To Tell From A Single Playtest Session Where The Iframes Were The most Complained About Lol
