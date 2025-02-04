@@ -25,7 +25,7 @@ MonoBehaviour:
   SoundEffect: 16
   BlockSpawnSoundEffect: 69
   SpawnChance:
-    RawValue: 7241728
+    RawValue: 32768
   LosingSpawnBonus:
     RawValue: 98304
   BigPowerup: 0
