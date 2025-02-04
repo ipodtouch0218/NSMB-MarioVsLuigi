@@ -228,6 +228,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b18d332df84e64f4ba8cd55a576ce872, type: 2}
   - {fileID: 11400000, guid: 540a3bf6243f1c94cb307db79d724474, type: 2}
   - {fileID: 11400000, guid: 8c3db505f8ae08f42a57fd6adf33d1ef, type: 2}
+  - {fileID: 11400000, guid: d8799b89fa47f934297546dee7fef543, type: 2}
+  - {fileID: 11400000, guid: aae1e37583692e04e88c42ce88eca1bc, type: 2}
   FallbackPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
   CharacterDatas:
   - {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}

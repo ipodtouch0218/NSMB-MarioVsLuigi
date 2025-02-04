@@ -1847,7 +1847,7 @@ QuantumUtils.Decrement(ref mario->PipeFrames);
             if (!mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
                 && mario->IsDamageable
-                && !mario->IsCrouchedInShell && !mario->IsInShell && !(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching)) {
+                && !mario->IsCrouchedInShell && !mario->IsInShell) {
 
                 switch (projectileAsset.Effect) {
                 case ProjectileEffectType.Toughback:
@@ -2000,10 +2000,10 @@ QuantumUtils.Decrement(ref mario->PipeFrames);
 
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             // Blue shell stomps
-            if (marioA->IsInShell && marioAPhysics->IsTouchingGround && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling) {
+            if (((marioA->CurrentPowerupState == PowerupState.HammerSuit && marioA->IsCrouching) || marioA->IsInShell) && marioAPhysics->IsTouchingGround && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling) {
                 MarioMarioBlueShellStomp(f, stage, marioBEntity, marioAEntity, fromRight);
                 return;
-            } else if (marioB->IsCrouchedInShell && marioBPhysics->IsTouchingGround && marioAAbove && !marioA->IsGroundpoundActive && !marioA->IsDrilling) {
+            } else if (((marioB->CurrentPowerupState == PowerupState.HammerSuit && marioB->IsCrouching) || marioB->IsCrouchedInShell) && marioBPhysics->IsTouchingGround && marioAAbove && !marioA->IsGroundpoundActive && !marioA->IsDrilling) {
                 MarioMarioBlueShellStomp(f, stage, marioAEntity, marioBEntity, fromRight);
                 return;
             }

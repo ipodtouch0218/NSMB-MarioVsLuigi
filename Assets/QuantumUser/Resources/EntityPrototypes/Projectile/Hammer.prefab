@@ -244,7 +244,7 @@ MonoBehaviour:
       Y:
         RawValue: 0
     TerminalVelocity:
-      RawValue: -983040
+      RawValue: -524288
     IsFrozen:
       Value: 0
     DisableCollision:

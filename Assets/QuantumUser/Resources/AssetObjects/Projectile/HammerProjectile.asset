@@ -19,9 +19,9 @@ MonoBehaviour:
   Effect: 2
   Bounce: 1
   Speed:
-    RawValue: 212992
+    RawValue: 147456
   BounceStrength:
-    RawValue: 507904
+    RawValue: 638976
   Gravity:
     X:
       RawValue: 0
