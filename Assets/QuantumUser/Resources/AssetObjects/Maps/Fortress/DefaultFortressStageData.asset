@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-fortress
   Icon: {fileID: 21300000, guid: c8510af529294be40a5f09eeddf3d764, type: 3}
   OverrideAutomaticTilemapSettings: 0
-  TileDimensions: {x: 64, y: 8}
-  TileOrigin: {x: -38, y: -13}
+  TileDimensions:
+    x: 64
+    y: 8
+  TileOrigin:
+    x: -38
+    y: -13
   TilemapWorldPosition:
     X:
       RawValue: 196608
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 163840
-  UIColor: {r: 0, g: 0.392405, b: 1, a: 1}
+  UIColor:
+    R: 24
+    G: 178
+    B: 170
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 0
   SpawnVerticalPowerups: 0

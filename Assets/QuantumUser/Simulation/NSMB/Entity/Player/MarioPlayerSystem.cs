@@ -1240,7 +1240,7 @@ namespace Quantum {
 
             if (!(inputs.PowerupAction.WasPressed 
                 || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed && !physicsObject->IsTouchingGround && !mario->IsWallsliding) 
-                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower) && inputs.FireballPowerupAction.WasPressed))) {
+                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower || state == PowerupState.HammerSuit) && inputs.FireballPowerupAction.WasPressed))) {
                 return;
             }
 
@@ -1251,7 +1251,8 @@ namespace Quantum {
 
             switch (mario->CurrentPowerupState) {
             case PowerupState.IceFlower:
-            case PowerupState.FireFlower: {
+            case PowerupState.FireFlower:
+            case PowerupState.HammerSuit: {
                 if (!fireballReady || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
                     || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsSkidding || mario->IsTurnaround) {
                     return;
@@ -1281,6 +1282,8 @@ namespace Quantum {
 
                 EntityRef newEntity = f.Create(mario->CurrentPowerupState == PowerupState.IceFlower
                     ? f.SimulationConfig.IceballPrototype
+                    : mario->CurrentPowerupState == PowerupState.HammerSuit
+                    ? f.SimulationConfig.HammerPrototype
                     : f.SimulationConfig.FireballPrototype);
 
                 if (f.Unsafe.TryGetPointer(newEntity, out Projectile* projectile)) {
@@ -1412,7 +1415,8 @@ namespace Quantum {
                 && !((mario->FacingRight && physicsObject->IsTouchingRightWall) || (!mario->FacingRight && physicsObject->IsTouchingLeftWall))
                 && (mario->IsCrouching || inputs.Down.IsDown)
                 && !mario->IsInShell /* && mario->CurrentPowerupState != PowerupState.MegaMushroom*/
-                && !physicsObject->IsUnderwater) {
+                && !physicsObject->IsUnderwater
+                && mario->CurrentPowerupState != PowerupState.HammerSuit) { //Hammer Can't Slide, But Can gp To Slide (Weird Interaction But Works)
 
                 mario->IsSliding = true;
                 mario->IsCrouching = false;
@@ -1840,10 +1844,11 @@ namespace Quantum {
             if (!mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
                 && mario->IsDamageable
-                && !mario->IsCrouchedInShell && !mario->IsInShell) {
+                && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell)) { 
 
                 switch (projectileAsset.Effect) {
-                case ProjectileEffectType.Knockback:
+                case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
+                case ProjectileEffectType.Fire:
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                         mario->Death(f, marioEntity, false);
                     } else {
@@ -1991,7 +1996,7 @@ namespace Quantum {
             }
 
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            // Blue shell stomps
+            // Crouched in shell stomps
             if (marioA->IsCrouchedInShell && marioAPhysics->IsTouchingGround && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling) {
                 MarioMarioBlueShellStomp(f, stage, marioBEntity, marioAEntity, fromRight);
                 return;

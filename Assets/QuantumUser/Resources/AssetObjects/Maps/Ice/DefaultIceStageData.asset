@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-ice
   Icon: {fileID: 21300000, guid: 4a19e608bfb8d1f41966b099fe265f46, type: 3}
   OverrideAutomaticTilemapSettings: 0
-  TileDimensions: {x: 128, y: 19}
-  TileOrigin: {x: -44, y: -14}
+  TileDimensions:
+    x: 128
+    y: 19
+  TileOrigin:
+    x: -44
+    y: -14
   TilemapWorldPosition:
     X:
       RawValue: -655360
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 655360
-  UIColor: {r: 0.381132, g: 1, b: 0.984505, a: 1}
+  UIColor:
+    R: 24
+    G: 178
+    B: 170
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1

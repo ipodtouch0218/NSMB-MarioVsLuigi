@@ -23,7 +23,7 @@ MonoBehaviour:
       Value: 1349070666859566638
   SoundPlaysEverywhere: 0
   SoundEffect: 16
-  BlockSpawnSoundEffectEffect: 69
+  BlockSpawnSoundEffect: 69
   SpawnChance:
     RawValue: 131072
   LosingSpawnBonus:

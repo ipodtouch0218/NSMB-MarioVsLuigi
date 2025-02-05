@@ -77,6 +77,7 @@ namespace Quantum {
     PropellerMushroom,
     BlueShell,
     MegaMushroom,
+    HammerSuit
   }
   [System.FlagsAttribute()]
   public enum InputButtons : int {

@@ -229,6 +229,7 @@ namespace Quantum {
                 SpawnStars(f, entity, 1);
                 break;
             }
+            case PowerupState.HammerSuit:
             case PowerupState.FireFlower:
             case PowerupState.IceFlower:
             case PowerupState.PropellerMushroom:

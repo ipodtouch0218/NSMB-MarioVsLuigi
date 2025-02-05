@@ -204,7 +204,11 @@ namespace Quantum {
             var projectileAsset = f.FindAsset(f.Unsafe.GetPointer<Projectile>(projectileEntity)->Asset);
 
             switch (projectileAsset.Effect) {
-            case ProjectileEffectType.Knockback: {
+            case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers: {
+                f.Unsafe.GetPointer<Bobomb>(bobombEntity)->Kill(f, bobombEntity, projectileEntity, true);
+                break;
+            }
+            case ProjectileEffectType.Fire: {
                 if (bobomb->CurrentDetonationFrames > 0) {
                     bobomb->Kick(f, bobombEntity, projectileEntity, 0);
                 } else {

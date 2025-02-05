@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: level-desert
   Icon: {fileID: 21300000, guid: 8f78382475e08064f8dbe0c4d5897670, type: 3}
   OverrideAutomaticTilemapSettings: 1
-  TileDimensions: {x: 70, y: 13}
-  TileOrigin: {x: -33, y: -13}
+  TileDimensions:
+    x: 70
+    y: 13
+  TileOrigin:
+    x: -33
+    y: -13
   TilemapWorldPosition:
     X:
       RawValue: -65536
@@ -52,7 +56,11 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 327680
-  UIColor: {r: 0.941176, g: 0.878431, b: 0.435294, a: 1}
+  UIColor:
+    R: 240
+    G: 224
+    B: 111
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1

@@ -8,6 +8,7 @@ public class ProjectileAnimator : QuantumEntityViewComponent {
 
     //---Serialized Variables
     [SerializeField] private SpriteRenderer sRenderer;
+    [SerializeField] private Animator animator;
     [SerializeField] private Color sameTeamColor, differentTeamColor;
 
     //---Private Variables
@@ -15,11 +16,22 @@ public class ProjectileAnimator : QuantumEntityViewComponent {
 
     public void OnValidate() {
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
+        this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
     }
 
     public override unsafe void OnActivate(Frame f) {
         RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
-        owner = f.Unsafe.GetPointer<Projectile>(EntityRef)->Owner;
+        var projectile = f.Unsafe.GetPointer<Projectile>(EntityRef);
+
+        owner = projectile->Owner;
+
+        if (projectile->FacingRight) {
+            if (sRenderer) {
+                sRenderer.flipX = true;
+            } else if (animator) {
+                animator.Play("Left");
+            }
+        }
     }
 
     public override void OnDeactivate() {
