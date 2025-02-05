@@ -105,7 +105,6 @@ component MarioPlayer {
 	[ExcludeFromPrototype] bool IsStuckInBlock;
 
 	// Powerups
-	[ExcludeFromPrototype] byte Combo;
     [ExcludeFromPrototype] ushort InvincibilityFrames;
 	
 	[ExcludeFromPrototype] byte MegaMushroomStartFrames;

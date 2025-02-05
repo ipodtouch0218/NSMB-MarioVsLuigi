@@ -11,6 +11,7 @@ public class ScaleWithParent : UIBehaviour {
     private DrivenRectTransformTracker tracker;
     private int width, height;
 
+#if UNITY_EDITOR
     protected override void OnValidate() {
         ValidationUtility.SafeOnValidate(() => {
             if (!this) {
@@ -19,6 +20,7 @@ public class ScaleWithParent : UIBehaviour {
             OnRectTransformDimensionsChange();
         });
     }
+#endif
 
     protected override void OnEnable() {
         tracker.Add(this, (RectTransform) transform, DrivenTransformProperties.Scale | DrivenTransformProperties.Anchors | DrivenTransformProperties.SizeDelta | DrivenTransformProperties.AnchoredPosition);

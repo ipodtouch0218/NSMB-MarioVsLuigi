@@ -19,14 +19,14 @@ MonoBehaviour:
   Effect: 2
   Bounce: 1
   Speed:
-    RawValue: 147456
+    RawValue: 294912
   BounceStrength:
-    RawValue: 638976
+    RawValue: 196608
   Gravity:
     X:
       RawValue: 0
     Y:
-      RawValue: -1414398
+      RawValue: -1179648
   DestroyOnSecondBounce: 0
   DestroyOnHit: 0
   LockTo45Degrees: 0
@@ -34,4 +34,4 @@ MonoBehaviour:
   HasCollision: 0
   DoesntEffectBlueShell: 0
   DestroyParticleEffect: 5
-  ShootSound: 9
+  ShootSound: 106

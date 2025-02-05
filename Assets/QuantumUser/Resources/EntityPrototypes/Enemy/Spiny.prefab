@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: -3156354585278191863}
   - component: {fileID: 3436560665117882628}
   - component: {fileID: 6612678236420697831}
+  - component: {fileID: -2455541069636724775}
   m_Layer: 0
   m_Name: Spiny
   m_TagString: Untagged
@@ -552,6 +553,20 @@ MonoBehaviour:
         RawValue: 0
     BroadRadius:
       RawValue: 32768
+--- !u!114 &-2455541069636724775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435431862184428451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 484a7ff6b8f969f4785aaf61364ef059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    Combo: 0
 --- !u!1 &2736979299832079342
 GameObject:
   m_ObjectHideFlags: 0

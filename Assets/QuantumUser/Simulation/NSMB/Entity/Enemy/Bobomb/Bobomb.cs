@@ -56,10 +56,8 @@ namespace Quantum {
             physicsObject->Gravity = new FPVector2(0, -Constants._14_75);
 
             byte combo;
-            if (f.Unsafe.TryGetPointer(killerEntity, out MarioPlayer* mario)) {
-                combo = mario->Combo++;
-            } else if (f.Unsafe.TryGetPointer(killerEntity, out Koopa* koopa)) {
-                combo = koopa->Combo++;
+            if (f.Unsafe.TryGetPointer(killerEntity, out ComboKeeper* comboKeeper)) {
+                combo = comboKeeper->Combo++;
             } else {
                 combo = 0;
             }

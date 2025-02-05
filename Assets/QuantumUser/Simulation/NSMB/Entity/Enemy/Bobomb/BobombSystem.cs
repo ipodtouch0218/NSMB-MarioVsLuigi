@@ -222,9 +222,7 @@ namespace Quantum {
             }
             }
 
-            if (projectileAsset.DestroyOnHit) {
-                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            }
+            f.Signals.OnProjectileHitEntity(f, projectileEntity, bobombEntity);
         }
 
         public static void OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
