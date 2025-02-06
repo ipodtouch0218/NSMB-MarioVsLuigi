@@ -103,7 +103,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] int actionFlags;
 	[ExcludeFromPrototype] int actionTimer;
 	[ExcludeFromPrototype] int actionState;
-	[ExcludeFromPrototype] int actionArgs;
+	[ExcludeFromPrototype] int actionArg;
 
 	// Walk/Running
     [ExcludeFromPrototype] bool FacingRight;

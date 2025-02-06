@@ -2087,7 +2087,7 @@ namespace Quantum {
     public Int32 actionState;
     [FieldOffset(64)]
     [ExcludeFromPrototype()]
-    public Int32 actionArgs;
+    public Int32 actionArg;
     [FieldOffset(100)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
@@ -2300,7 +2300,7 @@ namespace Quantum {
         hash = hash * 31 + actionFlags.GetHashCode();
         hash = hash * 31 + actionTimer.GetHashCode();
         hash = hash * 31 + actionState.GetHashCode();
-        hash = hash * 31 + actionArgs.GetHashCode();
+        hash = hash * 31 + actionArg.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + IsSkidding.GetHashCode();
         hash = hash * 31 + IsTurnaround.GetHashCode();
@@ -2415,7 +2415,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->KnockbackTick);
         serializer.Stream.Serialize(&p->LandedFrame);
         serializer.Stream.Serialize(&p->LastPushingFrame);
-        serializer.Stream.Serialize(&p->actionArgs);
+        serializer.Stream.Serialize(&p->actionArg);
         serializer.Stream.Serialize(&p->actionFlags);
         serializer.Stream.Serialize(&p->actionState);
         serializer.Stream.Serialize(&p->actionTimer);
