@@ -29,6 +29,46 @@ enum JumpState : Byte {
     TripleJump,
 }
 
+enum PlayerAction : Int32 {
+    Idle,
+    Walk,
+    Crouch,
+    Sliding,
+    SingleJump,
+    DoubleJump,
+    TripleJump,
+    Wallkick,
+    GroundPound,
+    SoftKnockback,
+    NormalKnockback,
+    HardKnockback,
+    SpinBlockDrill,
+    BlueShellCrouch,
+    BlueShellSliding,
+    BlueShellJump,
+    BlueShellGroundPound,
+    PropellerSpin,
+    PropellerDrill,
+}
+
+enum ActionFlags : Int32 {
+    Intangible = 1,
+    GivesSoftKnockback = 2,
+    GivesNormalKnockback = 4,
+    GivesHardKnockback = 8,
+    Takes0Stars = 16, // deals knockback, but no stars
+    Takes1Star = 32,
+    Takes3Stars = 64,
+    IsShelled = 128,
+    Attacking = 256,
+    NoPlayerBounce = 512,
+    NoEnemyBounce = 1028,
+    AirAction = 2056,
+    WaterAction = 4112,
+    AllowGroundBump = 8224,
+    StrongAction = 16448, // used for things like ground pounds
+}
+
 component MarioPlayer {
     asset_ref<MarioPlayerPhysicsInfo> PhysicsAsset;
 	asset_ref<CharacterAsset> CharacterAsset;
@@ -51,6 +91,14 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte PreRespawnFrames;
 	[ExcludeFromPrototype] byte RespawnFrames;
 	[ExcludeFromPrototype] byte NoLivesStarDirection;
+
+	// Actions
+	[ExcludeFromPrototype] PlayerAction action;
+	[ExcludeFromPrototype] PlayerAction prevAction;
+	[ExcludeFromPrototype] int actionFlags;
+	[ExcludeFromPrototype] int actionTimer;
+	[ExcludeFromPrototype] int actionState;
+	[ExcludeFromPrototype] int actionArgs;
 
 	// Walk/Running
     [ExcludeFromPrototype] bool FacingRight;
