@@ -112,7 +112,7 @@ namespace Quantum {
 
             bool swimming = physicsObject->IsUnderwater;
             if (!physicsObject->IsTouchingGround || swimming) {
-                mario->IsSkidding = false;
+                mario->setPlayerAction(PlayerAction.Skidding);
             }
 
             bool run = (inputs.Sprint.IsDown || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->IsPropellerFlying) & !mario->IsSpinnerFlying;
@@ -174,7 +174,7 @@ namespace Quantum {
             } else if (mario->IsTurnaround && !physicsObject->IsOnSlipperyGround) {
                 // Can't fast turnaround on ice.
                 mario->IsTurnaround = physicsObject->IsTouchingGround && !mario->IsCrouching && xVelAbs < physics.WalkMaxVelocity[1] && !physicsObject->IsTouchingLeftWall && !physicsObject->IsTouchingRightWall;
-                mario->IsSkidding = mario->IsTurnaround;
+                if (mario->IsTurnaround) mario->setPlayerAction(PlayerAction.Skidding);
 
                 physicsObject->Velocity.X += (physics.FastTurnaroundAcceleration * (mario->FacingRight ? -1 : 1) * f.DeltaTime);
             } else if ((inputs.Left ^ inputs.Right)
@@ -184,7 +184,7 @@ namespace Quantum {
 
                 // We can walk here
                 int direction = inputs.Left ? -1 : 1;
-                if (mario->IsSkidding) {
+                if (mario->action == PlayerAction.Skidding) {
                     direction = -sign;
                 }
 
@@ -212,11 +212,11 @@ namespace Quantum {
                     mario->IsTurnaround = false;
                     if (physicsObject->IsTouchingGround) {
                         if (!swimming && xVelAbs >= physics.SkiddingMinimumVelocity && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom) {
-                            mario->IsSkidding = true;
+                            mario->setPlayerAction(PlayerAction.Skidding);
                             mario->FacingRight = sign == 1;
                         }
 
-                        if (mario->IsSkidding) {
+                        if (mario->action == PlayerAction.Skidding) {
                             if (physicsObject->IsOnSlipperyGround) {
                                 acc = physics.SkiddingIceDeceleration;
                             } else if (xVelAbs > maxArray[physics.RunSpeedStage]) {
@@ -252,7 +252,7 @@ namespace Quantum {
                     newX = FPMath.Clamp(newX, -max, max);
                 }
 
-                if (mario->IsSkidding && !mario->IsTurnaround && (FPMath.Sign(newX) != sign || xVelAbs < FP._0_05)) {
+                if (mario->action == PlayerAction.Skidding && !mario->IsTurnaround && (FPMath.Sign(newX) != sign || xVelAbs < FP._0_05)) {
                     // Turnaround
                     mario->FastTurnaroundFrames = 10;
                     newX = 0;
@@ -262,7 +262,6 @@ namespace Quantum {
 
             } else if (physicsObject->IsTouchingGround || swimming) {
                 // Not holding anything, sliding, or holding both directions. decelerate
-                mario->IsSkidding = false;
                 mario->IsTurnaround = false;
 
                 FP angle = FPMath.Abs(physicsObject->FloorAngle);
@@ -370,7 +369,6 @@ namespace Quantum {
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
                 spinner->PlatformWaitFrames = 6;
 
-                mario->IsSkidding = false;
                 mario->IsTurnaround = false;
                 mario->IsSliding = false;
                 mario->WallslideEndFrames = 0;
@@ -404,7 +402,6 @@ namespace Quantum {
             bool topSpeed = FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
             bool canSpecialJump = topSpeed && !inputs.Down.IsDown && (doJump || (mario->DoEntityBounce && inputs.Jump.IsDown)) && mario->JumpState != JumpState.None && !mario->IsSpinnerFlying && !mario->IsPropellerFlying && ((f.Number - mario->LandedFrame < 12) || mario->DoEntityBounce) && !mario->HeldEntity.IsValid && mario->JumpState != JumpState.TripleJump && !mario->IsCrouching && !mario->IsInShell && (physicsObject->Velocity.X < 0 != mario->FacingRight) /* && !Runner.GetPhysicsScene2D().Raycast(body.Position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround) */;
 
-            mario->IsSkidding = false;
             mario->IsTurnaround = false;
             mario->IsSliding = false;
             mario->WallslideEndFrames = 0;
@@ -705,11 +702,11 @@ namespace Quantum {
 
             if (mario->WalljumpFrames > 0) {
                 mario->FacingRight = physicsObject->Velocity.X > 0;
-            } else if (!mario->IsInShell && !mario->IsSliding && !mario->IsSkidding && !mario->IsInKnockback && !mario->IsTurnaround) {
+            } else if (!mario->IsInShell && !mario->IsSliding && mario->action != PlayerAction.Skidding && !mario->IsInKnockback && !mario->IsTurnaround) {
                 if (rightOrLeft) {
                     mario->FacingRight = inputs.Right.IsDown;
                 }
-            } else if (mario->MegaMushroomStartFrames == 0 && mario->MegaMushroomEndFrames == 0 && !mario->IsSkidding && !mario->IsTurnaround) {
+            } else if (mario->MegaMushroomStartFrames == 0 && mario->MegaMushroomEndFrames == 0 && mario->action != PlayerAction.Skidding && !mario->IsTurnaround) {
                 if (!mario->IsInShell && ((FPMath.Abs(physicsObject->Velocity.X) < FP._0_50 && mario->IsCrouching) || physicsObject->IsOnSlipperyGround) && (rightOrLeft)) {
                     mario->FacingRight = inputs.Right.IsDown;
                 } else if (mario->IsInKnockback || (physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
@@ -1049,7 +1046,6 @@ namespace Quantum {
                 mario->IsSpinnerFlying = false;
                 mario->IsPropellerFlying = false;
                 mario->IsCrouching = false;
-                mario->IsSkidding = false;
                 mario->IsInShell = false;
                 mario->IsInKnockback = false;
                 mario->IsInWeakKnockback = false;
@@ -1254,7 +1250,7 @@ namespace Quantum {
             case PowerupState.FireFlower:
             case PowerupState.HammerSuit: {
                 if (!fireballReady || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
-                    || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsSkidding || mario->IsTurnaround) {
+                    || mario->IsSpinnerFlying || mario->IsDrilling || mario->action == PlayerAction.Skidding || mario->IsTurnaround) {
                     return;
                 }
 
@@ -1381,7 +1377,6 @@ namespace Quantum {
             mario->IsSpinnerFlying = false;
             mario->IsCrouching |= physicsObject->IsTouchingGround && mario->IsSliding;
             mario->IsSliding = false;
-            mario->IsSkidding = false;
             mario->IsTurnaround = false;
             mario->UsedPropellerThisJump = false;
             mario->IsInShell = false;

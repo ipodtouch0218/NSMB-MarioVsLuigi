@@ -21,6 +21,11 @@ namespace Quantum {
         public int getActionFlags(PlayerAction action) {
             int actionFlags = 0;
             switch (action) {
+                // is a cutscene
+                case PlayerAction.Death:
+                    actionFlags |= (int) ActionFlags.Cutscene;
+                    break;
+
                 case var x when (x >= PlayerAction.Idle && x <= PlayerAction.Sliding) ||
                             (x >= PlayerAction.PropellerSpin && x <= PlayerAction.PropellerDrill):
                     actionFlags |= (int) ActionFlags.AllowGroundBump;
@@ -56,12 +61,13 @@ namespace Quantum {
             return actionFlags;
         }
 
-        public PlayerAction setPlayerAction(PlayerAction playerAction) {
+        public PlayerAction setPlayerAction(PlayerAction playerAction, int actionArg = 0) {
             prevAction = action;
             action = playerAction;
 
             actionTimer = 0;
             actionState = 0;
+            actionArg = actionArg;
 
             actionFlags = getActionFlags(action);
 
@@ -120,11 +126,9 @@ namespace Quantum {
             }
 
             return (input.Sprint.IsDown || forceHold)
-                && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
-                && !IsInKnockback && KnockbackGetupFrames == 0 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead
-                && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(item) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
-                && !IsGroundpounding && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown)
-                && !(aboveHead && physicsObject->IsUnderwater);
+                && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom
+                && (actionFlags & (int)ActionFlags.AllowHold) != 0 && (f.Exists(item) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
+                && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown) && !(aboveHead && physicsObject->IsUnderwater);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario, EntityRef item) {
@@ -231,7 +235,6 @@ namespace Quantum {
             IsDrilling = false;
             IsSliding = false;
             IsCrouching = false;
-            IsSkidding = false;
             IsTurnaround = false;
             IsGroundpounding = false;
             IsInKnockback = false;
@@ -397,7 +400,6 @@ namespace Quantum {
             IsTurnaround = false;
             IsInKnockback = false;
             IsGroundpounding = false;
-            IsSkidding = false;
             IsInShell = false;
             IsTurnaround = false;
             SwimForceJumpTimer = 0;
