@@ -89,7 +89,7 @@ namespace Quantum {
                     mario->DoEntityBounce = !mario->HasActionFlags(ActionFlags.NoEnemyBounce);
                 }
                 if (mario->action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin);
-                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerDrill);
+                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerFall, 1);
 
             } else if (mario->IsCrouchedInShell) {
                 mario->FacingRight = damageDirection.X < 0;
