@@ -130,10 +130,10 @@ namespace Quantum {
                         mario->IsGroundpounding = false;
                         bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
                     }
-                    mario->DoEntityBounce = true;
+                    mario->DoEntityBounce = (mario->actionFlags & (int) ActionFlags.NoEnemyBounce) == 0;
                 } else {
                     bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
-                    mario->DoEntityBounce = !mario->IsGroundpounding;
+                    mario->DoEntityBounce = (mario->actionFlags & (int) ActionFlags.NoEnemyBounce) == 0;
                 }
                 if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
                 else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);
