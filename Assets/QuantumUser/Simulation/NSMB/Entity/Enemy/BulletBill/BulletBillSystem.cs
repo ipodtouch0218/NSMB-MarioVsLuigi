@@ -116,7 +116,7 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, bulletBillTransform->Position + FPVector2.Up * FP._0_10, marioTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > 0;
-            bool groundpounded = attackedFromAbove && mario->hasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
+            bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 bulletBill->Kill(f, bulletBillEntity, marioEntity, true);
@@ -130,13 +130,13 @@ namespace Quantum {
                         mario->IsGroundpounding = false;
                         bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
                     }
-                    mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
+                    mario->DoEntityBounce = !mario->HasActionFlags(ActionFlags.NoEnemyBounce);
                 } else {
                     bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
-                    mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
+                    mario->DoEntityBounce = !mario->HasActionFlags(ActionFlags.NoEnemyBounce);
                 }
-                if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
-                else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);
+                if (mario->action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin);
+                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerDrill);
 
             } else if (!mario->IsCrouchedInShell && mario->IsDamageable) {
                 mario->Powerdown(f, marioEntity, false);

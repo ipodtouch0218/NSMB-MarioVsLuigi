@@ -233,10 +233,10 @@ namespace Quantum {
                 return;
             }
 
-            bool groundpounded = attackedFromAbove && mario->hasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
+            bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (isSpiny) {
                 // Do damage
-                if (mario->hasActionFlags(ActionFlags.IsShelled)) {
+                if (mario->HasActionFlags(ActionFlags.IsShelled)) {
                     mario->FacingRight = damageDirection.X < 0;
                     marioPhysicsObject->Velocity.X = 0;
 
@@ -290,7 +290,7 @@ namespace Quantum {
                         koopaEnemy->IsDead = true;
                         koopaPhysicsObject->IsFrozen = true;
 
-                    } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->hasActionFlags(ActionFlags.StrongAction)) {
+                    } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->HasActionFlags(ActionFlags.StrongAction)) {
                         koopa->EnterShell(f, koopaEntity, marioEntity, false, false);
                     }
                     mario->DoEntityBounce = true;

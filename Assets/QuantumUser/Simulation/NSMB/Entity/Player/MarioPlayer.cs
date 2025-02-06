@@ -18,7 +18,7 @@ namespace Quantum {
             }
         }
 
-        public int getActionFlags(PlayerAction action) {
+        public int GetActionFlags(PlayerAction action) {
             int actionFlags = 0;
             switch (action) {
                 // is a cutscene
@@ -28,7 +28,7 @@ namespace Quantum {
 
                 case var x when (x >= PlayerAction.Idle && x <= PlayerAction.Sliding) ||
                             (x >= PlayerAction.PropellerSpin && x <= PlayerAction.PropellerDrill):
-                    actionFlags |= (int) ActionFlags.AllowGroundBump;
+                    actionFlags |= (int) (ActionFlags.AllowGroundBump | ActionFlags.CameraChange);
                     break;
 
                 // all one star
@@ -61,7 +61,7 @@ namespace Quantum {
             return actionFlags;
         }
 
-        public PlayerAction setPlayerAction(PlayerAction playerAction, int arg = 0) {
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0) {
             prevAction = action;
             action = playerAction;
 
@@ -69,12 +69,12 @@ namespace Quantum {
             actionState = 0;
             actionArg = arg;
 
-            actionFlags = getActionFlags(action);
+            actionFlags = GetActionFlags(action);
 
             return action;
         }
 
-        public bool hasActionFlags(ActionFlags actionFlags) {
+        public bool HasActionFlags(ActionFlags actionFlags) {
             return (this.actionFlags & (int)actionFlags) != 0;
         }
 
@@ -131,7 +131,7 @@ namespace Quantum {
 
             return (input.Sprint.IsDown || forceHold)
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom
-                && hasActionFlags(ActionFlags.AllowHold) && (f.Exists(item) || physicsObject->IsTouchingGround)
+                && HasActionFlags(ActionFlags.AllowHold) && (f.Exists(item) || physicsObject->IsTouchingGround)
                 && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown) && !(aboveHead && physicsObject->IsUnderwater);
         }
 
@@ -155,7 +155,7 @@ namespace Quantum {
                 } else {
                     arr = physicsInfo.SwimMaxVelocity;
                 }
-            } else if ((IsSpinnerFlying || IsPropellerFlying) && CurrentPowerupState != PowerupState.MegaMushroom) {
+            } else if ((action == PlayerAction.SpinBlockSpin || action == PlayerAction.PropellerSpin) && CurrentPowerupState != PowerupState.MegaMushroom) {
                 arr = physicsInfo.FlyingMaxVelocity;
             } else {
                 arr = physicsInfo.WalkMaxVelocity;
@@ -281,9 +281,9 @@ namespace Quantum {
             }
 
             if (action == PlayerAction.PropellerDrill) {
-                setPlayerAction(PlayerAction.SpinBlockDrill, 1);
-            } else if (hasActionFlags(ActionFlags.IsShelled)) {
-                setPlayerAction(PlayerAction.Walk);
+                SetPlayerAction(PlayerAction.SpinBlockDrill, 1);
+            } else if (HasActionFlags(ActionFlags.IsShelled)) {
+                SetPlayerAction(PlayerAction.Walk);
             }
 
             if (!IsDead) {
@@ -414,7 +414,7 @@ namespace Quantum {
 
         public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, EntityRef attacker) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            if (hasActionFlags(ActionFlags.Intangible)) {
+            if (HasActionFlags(ActionFlags.Intangible)) {
                 return;
             }
 

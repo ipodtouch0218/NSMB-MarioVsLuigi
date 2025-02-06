@@ -70,7 +70,7 @@ namespace Quantum {
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
-            bool groundpounded = attackedFromAbove && mario->hasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
+            bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
                 mario->DoEntityBounce |= mario->IsDrilling;
@@ -79,17 +79,17 @@ namespace Quantum {
 
             if (attackedFromAbove) {
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                    if (!mario->hasActionFlags(ActionFlags.NoEnemyBounce)) {
+                    if (!mario->HasActionFlags(ActionFlags.NoEnemyBounce)) {
                         mario->IsGroundpounding = false;
                         goomba->Kill(f, goombaEntity, marioEntity, false);
                     }
-                    mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
+                    mario->DoEntityBounce = !mario->HasActionFlags(ActionFlags.NoEnemyBounce);
                 } else {
                     goomba->Kill(f, goombaEntity, marioEntity, false);
-                    mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
+                    mario->DoEntityBounce = !mario->HasActionFlags(ActionFlags.NoEnemyBounce);
                 }
-                if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
-                else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);
+                if (mario->action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin);
+                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerDrill);
 
             } else if (mario->IsCrouchedInShell) {
                 mario->FacingRight = damageDirection.X < 0;

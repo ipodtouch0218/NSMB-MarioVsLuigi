@@ -39,7 +39,7 @@ namespace Quantum {
             var camera = filter.Camera;
 
             FP targetSize;
-            if (mario->IsPropellerFlying || mario->IsSpinnerFlying) {
+            if (mario->HasActionFlags(ActionFlags.CameraChange)) {
                 targetSize = 8;
             } else {
                 targetSize = 7;

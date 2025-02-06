@@ -112,7 +112,7 @@ namespace Quantum {
 
             bool swimming = physicsObject->IsUnderwater;
             if (!physicsObject->IsTouchingGround || swimming) {
-                mario->setPlayerAction(PlayerAction.Skidding);
+                mario->SetPlayerAction(PlayerAction.Skidding);
             }
 
             bool run = (inputs.Sprint.IsDown || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->IsPropellerFlying) & !mario->IsSpinnerFlying;
@@ -174,7 +174,7 @@ namespace Quantum {
             } else if (mario->IsTurnaround && !physicsObject->IsOnSlipperyGround) {
                 // Can't fast turnaround on ice.
                 mario->IsTurnaround = physicsObject->IsTouchingGround && !mario->IsCrouching && xVelAbs < physics.WalkMaxVelocity[1] && !physicsObject->IsTouchingLeftWall && !physicsObject->IsTouchingRightWall;
-                if (mario->IsTurnaround) mario->setPlayerAction(PlayerAction.Skidding);
+                if (mario->IsTurnaround) mario->SetPlayerAction(PlayerAction.Skidding);
 
                 physicsObject->Velocity.X += (physics.FastTurnaroundAcceleration * (mario->FacingRight ? -1 : 1) * f.DeltaTime);
             } else if ((inputs.Left ^ inputs.Right)
@@ -212,7 +212,7 @@ namespace Quantum {
                     mario->IsTurnaround = false;
                     if (physicsObject->IsTouchingGround) {
                         if (!swimming && xVelAbs >= physics.SkiddingMinimumVelocity && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom) {
-                            mario->setPlayerAction(PlayerAction.Skidding);
+                            mario->SetPlayerAction(PlayerAction.Skidding);
                             mario->FacingRight = sign == 1;
                         }
 
@@ -369,7 +369,7 @@ namespace Quantum {
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
                 spinner->PlatformWaitFrames = 6;
 
-                mario->setPlayerAction(PlayerAction.SpinBlockSpin);
+                mario->SetPlayerAction(PlayerAction.SpinBlockSpin);
 
                 /*
                 var contacts = f.ResolveList(physicsObject->Contacts);

@@ -67,6 +67,7 @@ namespace Quantum {
     StrongAction = 16448,
     AllowHold = 32896,
     Cutscene = 65792,
+    CameraChange = 131584,
   }
   public enum GameState : byte {
     PreGameRoom,

@@ -171,19 +171,19 @@ namespace Quantum {
                 if (attackedFromAbove) {
                     // Light
                     bool mini = mario->CurrentPowerupState == PowerupState.MiniMushroom;
-                    if (!mini || mario->hasActionFlags(ActionFlags.StrongAction)) {
-                        Light(f, bobombEntity, bobomb, mini || !mario->hasActionFlags(ActionFlags.StrongAction));
+                    if (!mini || mario->HasActionFlags(ActionFlags.StrongAction)) {
+                        Light(f, bobombEntity, bobomb, mini || !mario->HasActionFlags(ActionFlags.StrongAction));
                     }
 
-                    if (!mini && mario->hasActionFlags(ActionFlags.StrongAction)) {
+                    if (!mini && mario->HasActionFlags(ActionFlags.StrongAction)) {
                         bobomb->Kick(f, bobombEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
                     } else {
-                        mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
+                        mario->DoEntityBounce = !mario->HasActionFlags(ActionFlags.NoEnemyBounce);
                     }
-                    if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
-                    else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);
+                    if (mario->action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin);
+                    else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerDrill);
 
-                } else if (mario->hasActionFlags(ActionFlags.IsShelled)) {
+                } else if (mario->HasActionFlags(ActionFlags.IsShelled)) {
                     // Bounce off blue shell crouched player
                     var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
                     bobombEnemy->ChangeFacingRight(f, bobombEntity, damageDirection.X < 0);

@@ -74,6 +74,7 @@ enum ActionFlags : Int32 {
     StrongAction = 16448, // used for things like ground pounds
 	AllowHold = 32896,
 	Cutscene = 65792,
+	CameraChange = 131584,
 }
 
 component MarioPlayer {
