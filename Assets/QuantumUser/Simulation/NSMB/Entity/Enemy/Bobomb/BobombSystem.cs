@@ -183,7 +183,7 @@ namespace Quantum {
                     if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
                     else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);
 
-                } else if (mario->IsCrouchedInShell) {
+                } else if (mario->hasActionFlags(ActionFlags.IsShelled)) {
                     // Bounce off blue shell crouched player
                     var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
                     bobombEnemy->ChangeFacingRight(f, bobombEntity, damageDirection.X < 0);

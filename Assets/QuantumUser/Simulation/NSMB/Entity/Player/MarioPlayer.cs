@@ -131,7 +131,7 @@ namespace Quantum {
 
             return (input.Sprint.IsDown || forceHold)
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom
-                && (actionFlags & (int)ActionFlags.AllowHold) != 0 && (f.Exists(item) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
+                && hasActionFlags(ActionFlags.AllowHold) && (f.Exists(item) || physicsObject->IsTouchingGround)
                 && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown) && !(aboveHead && physicsObject->IsUnderwater);
         }
 

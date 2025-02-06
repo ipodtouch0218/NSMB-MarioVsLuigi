@@ -29,7 +29,7 @@ enum JumpState : Byte {
     TripleJump,
 }
 
-enum PlayerAction : Int32 {
+enum PlayerAction : Byte {
     Idle,
     Walk,
 	Skidding,
@@ -38,6 +38,7 @@ enum PlayerAction : Int32 {
     SingleJump,
     DoubleJump,
     TripleJump,
+	Freefall,
     Wallkick,
     GroundPound,
     SoftKnockback,
@@ -52,6 +53,7 @@ enum PlayerAction : Int32 {
     PropellerSpin,
     PropellerDrill,
 	Death,
+	EnteringPipe,
 }
 
 enum ActionFlags : Int32 {
