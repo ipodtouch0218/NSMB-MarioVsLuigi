@@ -18,6 +18,56 @@ namespace Quantum {
             }
         }
 
+        public int getActionFlags(PlayerAction action) {
+            int actionFlags = 0;
+            switch (action) {
+                case var x when (x >= PlayerAction.Idle && x <= PlayerAction.Sliding) ||
+                            (x >= PlayerAction.PropellerSpin && x <= PlayerAction.PropellerDrill):
+                    actionFlags |= (int) ActionFlags.AllowGroundBump;
+                    break;
+
+                // all one star
+                case var x when x >= PlayerAction.SingleJump && x <= PlayerAction.Wallkick:
+                    actionFlags |= (int) ActionFlags.AirAction;
+                    break;
+
+                // knockback actions are intangible
+                case var x when x >= PlayerAction.SoftKnockback && x <= PlayerAction.HardKnockback:
+                    actionFlags |= (int) ActionFlags.Intangible;
+                    break;
+
+                // these don't let you bounce
+                case PlayerAction.SpinBlockDrill:
+                case PlayerAction.BlueShellJump:
+                case PlayerAction.GroundPound:
+                    actionFlags |= (int) ActionFlags.NoPlayerBounce;
+                    break;
+
+                // is shelled
+                case var x when x >= PlayerAction.BlueShellCrouch && x <= PlayerAction.BlueShellGroundPound:
+                    actionFlags |= (int) ActionFlags.IsShelled;
+                    break;
+
+                // takes 3 stars from the start
+                case PlayerAction.PropellerDrill | PlayerAction.SpinBlockDrill:
+                    actionFlags |= (int) ActionFlags.Takes3Stars;
+                    break;
+            }
+            return actionFlags;
+        }
+
+        public PlayerAction setPlayerAction(PlayerAction playerAction) {
+            prevAction = action;
+            action = playerAction;
+
+            actionTimer = 0;
+            actionState = 0;
+
+            actionFlags = getActionFlags(action);
+
+            return action;
+        }
+
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
             if (!f.Exists(HeldEntity)) {
                 return default;

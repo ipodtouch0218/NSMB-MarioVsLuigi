@@ -79,6 +79,29 @@ namespace Quantum {
     MegaMushroom,
     HammerSuit
   }
+
+  public enum PlayerAction : int {
+    Idle,
+    Walk,
+    Crouch,
+    Sliding,
+    SingleJump,
+    DoubleJump,
+    TripleJump,
+    Wallkick,
+    GroundPound,
+    SoftKnockback,
+    NormalKnockback,
+    HardKnockback,
+    SpinBlockDrill,
+    BlueShellCrouch,
+    BlueShellSliding,
+    BlueShellJump,
+    BlueShellGroundPound,
+    PropellerSpin,
+    PropellerDrill,
+   }
+
   [System.FlagsAttribute()]
   public enum InputButtons : int {
     Up = 1 << 0,
@@ -91,6 +114,25 @@ namespace Quantum {
     FireballPowerupAction = 1 << 7,
     PropellerPowerupAction = 1 << 8,
   }
+
+  public enum ActionFlags : int {
+    Intangible = 1 << 0,
+    GivesSoftKnockback = 1 << 1,
+    GivesNormalKnockback = 1 << 2,
+    GivesHardKnockback = 1 << 3,
+    Takes0Stars = 1 << 4, // deals knockback, but no stars
+    Takes1Star = 1 << 5,
+    Takes3Stars = 1 << 6,
+    IsShelled = 1 << 7,
+    Attacking = 1 << 8,
+    NoPlayerBounce = 1 << 9,
+    NoEnemyBounce = 1 << 10,
+    AirAction = 1 << 11,
+    WaterAction = 1 << 12,
+    AllowGroundBump = 1 << 13,
+    StrongAction = 1 << 14, // used for things like ground pounds
+  }
+
   public static unsafe partial class FlagsExtensions {
     public static Boolean IsFlagSet(this InputButtons self, InputButtons flag) {
       return (self & flag) == flag;
@@ -2168,6 +2210,21 @@ namespace Quantum {
     [FieldOffset(108)]
     [ExcludeFromPrototype()]
     public QBoolean IsInShell;
+    [FieldOffset(290)]
+    [ExcludeFromPrototype()]
+    public PlayerAction action;
+    [FieldOffset(291)]
+    [ExcludeFromPrototype()]
+    public PlayerAction prevAction;
+    [FieldOffset(292)]
+    [ExcludeFromPrototype()]
+    public Byte actionTimer;
+    [FieldOffset(293)]
+    [ExcludeFromPrototype()]
+    public Byte actionState;
+    [FieldOffset(294)]
+    [ExcludeFromPrototype()]
+    public Int32 actionFlags;
     [FieldOffset(29)]
     [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
