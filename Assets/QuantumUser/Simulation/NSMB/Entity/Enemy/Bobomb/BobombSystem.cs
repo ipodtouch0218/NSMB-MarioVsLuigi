@@ -178,7 +178,7 @@ namespace Quantum {
                     if (!mini && mario->hasActionFlags(ActionFlags.StrongAction)) {
                         bobomb->Kick(f, bobombEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
                     } else {
-                        mario->DoEntityBounce = (mario->actionFlags & (int) ActionFlags.NoEnemyBounce) == 0;
+                        mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
                     }
                     if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
                     else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);

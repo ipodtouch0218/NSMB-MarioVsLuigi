@@ -236,7 +236,7 @@ namespace Quantum {
             bool groundpounded = attackedFromAbove && mario->hasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (isSpiny) {
                 // Do damage
-                if ((mario->actionFlags & (int)ActionFlags.IsShelled) != 0) {
+                if (mario->hasActionFlags(ActionFlags.IsShelled)) {
                     mario->FacingRight = damageDirection.X < 0;
                     marioPhysicsObject->Velocity.X = 0;
 

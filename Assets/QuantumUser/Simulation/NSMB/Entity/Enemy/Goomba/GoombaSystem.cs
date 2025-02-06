@@ -79,14 +79,14 @@ namespace Quantum {
 
             if (attackedFromAbove) {
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                    if ((mario->actionFlags & (int)ActionFlags.NoEnemyBounce) == 0) {
+                    if (!mario->hasActionFlags(ActionFlags.NoEnemyBounce)) {
                         mario->IsGroundpounding = false;
                         goomba->Kill(f, goombaEntity, marioEntity, false);
                     }
-                    mario->DoEntityBounce = (mario->actionFlags & (int) ActionFlags.NoEnemyBounce) == 0;
+                    mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
                 } else {
                     goomba->Kill(f, goombaEntity, marioEntity, false);
-                    mario->DoEntityBounce = (mario->actionFlags & (int) ActionFlags.NoEnemyBounce) == 0;
+                    mario->DoEntityBounce = !mario->hasActionFlags(ActionFlags.NoEnemyBounce);
                 }
                 if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
                 else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);
