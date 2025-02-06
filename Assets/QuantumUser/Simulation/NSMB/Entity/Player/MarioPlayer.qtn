@@ -309,7 +309,7 @@ event MarioPlayerReceivedKnockback {
 	nothashed Frame Frame;
 	entity_ref Entity;
 	entity_ref Attacker;
-	bool Weak;
+	PlayerAction Action;
 }
 
 event MarioPlayerEnteredPipe {

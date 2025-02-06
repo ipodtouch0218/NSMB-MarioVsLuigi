@@ -369,17 +369,7 @@ namespace Quantum {
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
                 spinner->PlatformWaitFrames = 6;
 
-                mario->IsTurnaround = false;
-                mario->IsSliding = false;
-                mario->WallslideEndFrames = 0;
-                mario->IsGroundpounding = false;
-                mario->GroundpoundStartFrames = 0;
-                mario->IsDrilling = false;
-                mario->IsSpinnerFlying = true;
-                mario->IsPropellerFlying = false;
-                mario->JumpBufferFrames = 0;
-                physicsObject->WasTouchingGround = false;
-                physicsObject->IsTouchingGround = false;
+                mario->setPlayerAction(PlayerAction.SpinBlockSpin);
 
                 /*
                 var contacts = f.ResolveList(physicsObject->Contacts);

@@ -228,23 +228,6 @@ namespace Quantum {
                 }
                 DeathAnimationFrames = 36;
             }
-
-            // OnSpinner = null;
-            CurrentPipe = default;
-            IsInShell = false;
-            IsPropellerFlying = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            IsSpinnerFlying = false;
-            IsDrilling = false;
-            IsSliding = false;
-            IsCrouching = false;
-            IsTurnaround = false;
-            IsGroundpounding = false;
-            IsInKnockback = false;
-            WallslideRight = false;
-            WallslideLeft = false;
-            SwimForceJumpTimer = 0;
             
             /*
             IsWaterWalking = false;
@@ -278,7 +261,7 @@ namespace Quantum {
             switch (CurrentPowerupState) {
             case PowerupState.MiniMushroom:
             case PowerupState.NoPowerup: {
-                Death(f,entity, false);
+                Death(f, entity, false);
                 break;
             }
             case PowerupState.Mushroom: {
@@ -297,12 +280,11 @@ namespace Quantum {
             }
             }
 
-            IsDrilling &= !IsPropellerFlying;
-            IsPropellerFlying = false;
-            IsInShell = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            UsedPropellerThisJump = false;
+            if (action == PlayerAction.PropellerDrill) {
+                setPlayerAction(PlayerAction.SpinBlockDrill, 1);
+            } else if (hasActionFlags(ActionFlags.IsShelled)) {
+                setPlayerAction(PlayerAction.Walk);
+            }
 
             if (!IsDead) {
                 DamageInvincibilityFrames = 2 * 60;
@@ -430,33 +412,24 @@ namespace Quantum {
             f.Events.MarioPlayerRespawned(f, entity);
         }
 
-        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker) {
+        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, EntityRef attacker) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            if (physicsObject->IsUnderwater) {
-                weak = false;
-            }
-
-            if (IsInKnockback && ((IsInWeakKnockback && weak) || !IsInWeakKnockback)) {
+            if (hasActionFlags(ActionFlags.Intangible)) {
                 return;
             }
 
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
-            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
+            if (freezable->IsFrozen(f)) {
                 return;
             }
+            bool weak = action == PlayerAction.SoftKnockback;
 
-            if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
+            /*if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
                 SpawnStars(f, entity, starsToDrop - 1);
                 Powerdown(f, entity, false);
                 return;
-            }
+            }*/
 
-            if (IsInKnockback || IsInWeakKnockback) {
-                starsToDrop = Math.Min(1, starsToDrop);
-            }
-
-            IsInKnockback = true;
-            IsInWeakKnockback = weak;
             KnockbackWasOriginallyFacingRight = FacingRight;
             KnockbackTick = f.Number;
 
@@ -483,21 +456,9 @@ namespace Quantum {
                 f.Has<Projectile>(attacker) ? 0 : Constants._4_50
             );
 
-            //IsOnGround = false;
-            //PreviousTickIsOnGround = false;
-            IsInShell = false;
-            IsGroundpounding = false;
-            IsSpinnerFlying = false;
-            IsPropellerFlying = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            IsSliding = false;
-            IsDrilling = false;
-            WallslideLeft = WallslideRight = false;
-
             SpawnStars(f, entity, starsToDrop);
             //HandleLayerState();
-            f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, weak);
+            f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, action);
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
