@@ -121,7 +121,7 @@ namespace Quantum {
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
             if (upDot >= PhysicsObjectSystem.GroundMaxAngle) {
                 // Top
-                if ((mario->actionFlags & (int)ActionFlags.StrongAction) != 0) {
+                if (mario->hasActionFlags(ActionFlags.StrongAction)) {
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.Groundpounded);
                     return;
                 }

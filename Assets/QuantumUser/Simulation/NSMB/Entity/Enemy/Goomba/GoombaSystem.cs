@@ -70,7 +70,7 @@ namespace Quantum {
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
-            bool groundpounded = attackedFromAbove && (mario->actionFlags & (int) ActionFlags.StrongAction) != 0 && mario->CurrentPowerupState != PowerupState.MiniMushroom;
+            bool groundpounded = attackedFromAbove && mario->hasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
                 mario->DoEntityBounce |= mario->IsDrilling;

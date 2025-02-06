@@ -171,11 +171,11 @@ namespace Quantum {
                 if (attackedFromAbove) {
                     // Light
                     bool mini = mario->CurrentPowerupState == PowerupState.MiniMushroom;
-                    if (!mini || (mario->actionFlags & (int) ActionFlags.StrongAction) != 0) {
-                        Light(f, bobombEntity, bobomb, mini || (mario->actionFlags & (int) ActionFlags.StrongAction) == 0);
+                    if (!mini || mario->hasActionFlags(ActionFlags.StrongAction)) {
+                        Light(f, bobombEntity, bobomb, mini || !mario->hasActionFlags(ActionFlags.StrongAction));
                     }
 
-                    if (!mini && (mario->actionFlags & (int) ActionFlags.StrongAction) != 0) {
+                    if (!mini && mario->hasActionFlags(ActionFlags.StrongAction)) {
                         bobomb->Kick(f, bobombEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
                     } else {
                         mario->DoEntityBounce = (mario->actionFlags & (int) ActionFlags.NoEnemyBounce) == 0;

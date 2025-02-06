@@ -74,8 +74,8 @@ namespace Quantum {
             return action;
         }
 
-        public bool checkActionFlags(int actionFlags) {
-            return (this.actionFlags & actionFlags) != 0;
+        public bool hasActionFlags(ActionFlags actionFlags) {
+            return (this.actionFlags & (int)actionFlags) != 0;
         }
 
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
