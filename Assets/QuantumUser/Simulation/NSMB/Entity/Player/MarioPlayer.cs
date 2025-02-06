@@ -61,7 +61,7 @@ namespace Quantum {
             return actionFlags;
         }
 
-        public PlayerAction SetPlayerAction(Frame f, PlayerAction playerAction, int arg = 0, EntityRef entityA = default, EntityRef entityB = default) {
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = default, EntityRef entityA = default, EntityRef entityB = default) {
             prevAction = action;
             action = playerAction;
 
@@ -281,9 +281,9 @@ namespace Quantum {
             }
 
             if (action == PlayerAction.PropellerDrill) {
-                SetPlayerAction(PlayerAction.SpinBlockDrill, 1);
+                SetPlayerAction(f, PlayerAction.SpinBlockDrill, 1);
             } else if (HasActionFlags(ActionFlags.IsShelled)) {
-                SetPlayerAction(PlayerAction.Walk);
+                SetPlayerAction(f, PlayerAction.Walk);
             }
 
             if (!IsDead) {
