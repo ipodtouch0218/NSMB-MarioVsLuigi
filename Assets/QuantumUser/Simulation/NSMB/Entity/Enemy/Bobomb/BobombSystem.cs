@@ -179,9 +179,9 @@ namespace Quantum {
                         bobomb->Kick(f, bobombEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
                     } else {
                         mario->DoEntityBounce = true;
-                        mario->IsGroundpounding = false;
                     }
-                    mario->IsDrilling = false;
+                    if (mario->action == PlayerAction.SpinBlockSpin) mario->setPlayerAction(PlayerAction.SpinBlockSpin);
+                    else if (mario->action == PlayerAction.PropellerDrill) mario->setPlayerAction(PlayerAction.PropellerDrill);
 
                 } else if (mario->IsCrouchedInShell) {
                     // Bounce off blue shell crouched player
