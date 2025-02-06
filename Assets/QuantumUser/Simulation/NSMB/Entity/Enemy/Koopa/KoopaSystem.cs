@@ -290,7 +290,7 @@ namespace Quantum {
                         koopaEnemy->IsDead = true;
                         koopaPhysicsObject->IsFrozen = true;
 
-                    } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->IsGroundpoundActive) {
+                    } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || (mario->actionFlags & (int) ActionFlags.StrongAction) != 0) {
                         koopa->EnterShell(f, koopaEntity, marioEntity, false, false);
                     }
                     mario->DoEntityBounce = true;
