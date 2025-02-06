@@ -32,6 +32,7 @@ enum JumpState : Byte {
 enum PlayerAction : Int32 {
     Idle,
     Walk,
+	Skidding,
     Crouch,
     Sliding,
     SingleJump,
@@ -42,6 +43,7 @@ enum PlayerAction : Int32 {
     SoftKnockback,
     NormalKnockback,
     HardKnockback,
+	SpinBlockSpin,
     SpinBlockDrill,
     BlueShellCrouch,
     BlueShellSliding,
@@ -49,6 +51,7 @@ enum PlayerAction : Int32 {
     BlueShellGroundPound,
     PropellerSpin,
     PropellerDrill,
+	Death,
 }
 
 enum ActionFlags : Int32 {
@@ -67,6 +70,8 @@ enum ActionFlags : Int32 {
     WaterAction = 4112,
     AllowGroundBump = 8224,
     StrongAction = 16448, // used for things like ground pounds
+	AllowHold = 32896,
+	Cutscene = 65792,
 }
 
 component MarioPlayer {

@@ -65,6 +65,8 @@ namespace Quantum {
     WaterAction = 4112,
     AllowGroundBump = 8224,
     StrongAction = 16448,
+    AllowHold = 32896,
+    Cutscene = 65792,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -82,6 +84,7 @@ namespace Quantum {
   public enum PlayerAction : int {
     Idle,
     Walk,
+    Skidding,
     Crouch,
     Sliding,
     SingleJump,
@@ -92,6 +95,7 @@ namespace Quantum {
     SoftKnockback,
     NormalKnockback,
     HardKnockback,
+    SpinBlockSpin,
     SpinBlockDrill,
     BlueShellCrouch,
     BlueShellSliding,
@@ -99,6 +103,7 @@ namespace Quantum {
     BlueShellGroundPound,
     PropellerSpin,
     PropellerDrill,
+    Death,
   }
   public enum PowerupReserveResult : byte {
     None,
