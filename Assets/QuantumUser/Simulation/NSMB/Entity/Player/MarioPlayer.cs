@@ -281,9 +281,9 @@ namespace Quantum {
             }
 
             if (action == PlayerAction.PropellerDrill) {
-                SetPlayerAction(f, PlayerAction.SpinBlockDrill, 1);
+                SetPlayerAction(PlayerAction.SpinBlockDrill, 1);
             } else if (HasActionFlags(ActionFlags.IsShelled)) {
-                SetPlayerAction(f, PlayerAction.Walk);
+                SetPlayerAction(PlayerAction.Walk);
             }
 
             if (!IsDead) {
