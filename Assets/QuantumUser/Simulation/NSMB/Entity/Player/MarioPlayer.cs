@@ -61,17 +61,21 @@ namespace Quantum {
             return actionFlags;
         }
 
-        public PlayerAction setPlayerAction(PlayerAction playerAction, int actionArg = 0) {
+        public PlayerAction setPlayerAction(PlayerAction playerAction, int arg = 0) {
             prevAction = action;
             action = playerAction;
 
             actionTimer = 0;
             actionState = 0;
-            actionArg = actionArg;
+            actionArg = arg;
 
             actionFlags = getActionFlags(action);
 
             return action;
+        }
+
+        public bool checkActionFlags(int actionFlags) {
+            return (this.actionFlags & actionFlags) != 0;
         }
 
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
