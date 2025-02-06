@@ -953,23 +953,18 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (mario->IsInKnockback) {
+            if (mario->action >= PlayerAction.SoftKnockback || mario->action <= PlayerAction.HardKnockback) {
                 bool swimming = physicsObject->IsUnderwater;
                 int framesInKnockback = f.Number - mario->KnockbackTick;
                 if (mario->DoEntityBounce
                     || (swimming && framesInKnockback > 90)
                     || (!swimming && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) < FP._0_33 && framesInKnockback > 30)
                     || (!swimming && physicsObject->IsTouchingGround && framesInKnockback > 120)
-                    || (!swimming && mario->IsInWeakKnockback && framesInKnockback > 30)) {
+                    || (!swimming && mario->action == PlayerAction.SoftKnockback && framesInKnockback > 30)) {
 
                     mario->ResetKnockback(f, entity);
                     return;
                 }
-
-                mario->WallslideLeft = false;
-                mario->WallslideRight = false;
-                mario->IsCrouching = false;
-                mario->IsInShell = false;
             }
         }
 
@@ -1951,6 +1946,7 @@ namespace Quantum {
             if (marioAShell && marioBShell) {
                 marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, true, marioBEntity);
                 marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, true, marioAEntity);
+                marioB->SetPlayerAction(PlayerAction.NormalKnockback, dropStars ? 1 : 0 | (1 << 8));
                 return;
             } else if (marioAShell) {
                 if (!marioBAbove) {

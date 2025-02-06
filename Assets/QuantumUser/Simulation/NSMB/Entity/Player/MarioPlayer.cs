@@ -61,7 +61,7 @@ namespace Quantum {
             return actionFlags;
         }
 
-        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0) {
+        public PlayerAction SetPlayerAction(Frame f, PlayerAction playerAction, int arg = 0, EntityRef entityA = default, EntityRef entityB = default) {
             prevAction = action;
             action = playerAction;
 
@@ -412,7 +412,7 @@ namespace Quantum {
             f.Events.MarioPlayerRespawned(f, entity);
         }
 
-        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, EntityRef attacker) {
+        public void DoKnockback(Frame f, EntityRef entity, EntityRef attacker) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             if (HasActionFlags(ActionFlags.Intangible)) {
                 return;
@@ -422,7 +422,9 @@ namespace Quantum {
             if (freezable->IsFrozen(f)) {
                 return;
             }
+
             bool weak = action == PlayerAction.SoftKnockback;
+            bool fromRight = (actionArg & 1 << 8) != 0;
 
             /*if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
                 SpawnStars(f, entity, starsToDrop - 1);
@@ -446,7 +448,7 @@ namespace Quantum {
 
             physicsObject->Velocity = new FPVector2(
                 (fromRight ? -1 : 1) *
-                    (starsToDrop + 1) *
+                    (actionArg + 1) *
                     FP._1_50 *
                     (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
                     (CurrentPowerupState == PowerupState.MiniMushroom ? Constants._2_50 : 1) *
@@ -456,7 +458,7 @@ namespace Quantum {
                 f.Has<Projectile>(attacker) ? 0 : Constants._4_50
             );
 
-            SpawnStars(f, entity, starsToDrop);
+            SpawnStars(f, entity, actionArg);
             //HandleLayerState();
             f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, action);
         }
@@ -465,11 +467,8 @@ namespace Quantum {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             KnockbackGetupFrames = (byte) (IsInWeakKnockback || physicsObject->IsUnderwater ? 0 : 25);
             DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
-            ////DoEntityBounce = false;
-            IsInKnockback = false;
-            IsInWeakKnockback = false;
-            //IsForwardsKnockback = false;
             FacingRight = KnockbackWasOriginallyFacingRight;
+            SetPlayerAction(PlayerAction.Idle);
             
             physicsObject->Velocity.X = 0;
         }
