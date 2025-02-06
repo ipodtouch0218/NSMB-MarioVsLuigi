@@ -1832,7 +1832,8 @@ namespace Quantum {
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                         mario->Death(f, marioEntity, false);
                     } else {
-                        mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, true, projectileEntity);
+                        int args = (dropStars ? 1 : 0) | (!projectile->FacingRight ? MarioPlayer.DropStarRight : 0);
+                        mario->SetPlayerAction(PlayerAction.SoftKnockback, args, f, marioEntity, projectileEntity);
                     }
                     break;
                 case ProjectileEffectType.Freeze:
@@ -1841,7 +1842,8 @@ namespace Quantum {
                     } else if (dropStars) {
                         IceBlockSystem.Freeze(f, marioEntity);
                     } else {
-                        mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, true, projectileEntity);
+                        int args = (dropStars ? 1 : 0) | (!projectile->FacingRight ? MarioPlayer.DropStarRight : 0);
+                        mario->SetPlayerAction(PlayerAction.SoftKnockback, args, f, marioEntity, projectileEntity);
                     }
                     break;
                 }
@@ -1891,8 +1893,8 @@ namespace Quantum {
             bool marioAStarman = marioA->IsStarmanInvincible;
             bool marioBStarman = marioB->IsStarmanInvincible;
             if (marioAStarman && marioBStarman) {
-                marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, true, marioBEntity);
-                marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, true, marioAEntity);
+                marioA->SetPlayerAction(PlayerAction.SoftKnockback, (dropStars ? 1 : 0) | (fromRight ? MarioPlayer.DropStarRight : 0), f, marioAEntity, marioBEntity);
+                marioB->SetPlayerAction(PlayerAction.SoftKnockback, (dropStars ? 1 : 0) | (!fromRight ? MarioPlayer.DropStarRight : 0), f, marioBEntity, marioAEntity);
                 return;
             } else if (marioAStarman) {
                 MarioMarioAttackStarman(f, marioAEntity, marioBEntity, fromRight, dropStars);
@@ -1935,7 +1937,7 @@ namespace Quantum {
                 if (dropStars) {
                     marioA->Powerdown(f, marioAEntity, false);
                 } else {
-                    marioA->DoKnockback(f, marioAEntity, fromRight, 0, true, marioBEntity);
+                    marioA->SetPlayerAction(PlayerAction.SoftKnockback, dropStars ? 1 : 0 | (fromRight ? MarioPlayer.DropStarRight : 0), f, marioAEntity, marioBEntity);
                 }
                 return;
             }
@@ -1944,9 +1946,8 @@ namespace Quantum {
             bool marioAShell = marioA->IsInShell;
             bool marioBShell = marioB->IsInShell;
             if (marioAShell && marioBShell) {
-                marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, true, marioBEntity);
-                marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, true, marioAEntity);
-                marioB->SetPlayerAction(PlayerAction.NormalKnockback, dropStars ? 1 : 0 | (1 << 8));
+                marioA->SetPlayerAction(PlayerAction.SoftKnockback, dropStars ? 1 : 0 | (fromRight ? MarioPlayer.DropStarRight : 0), f, marioAEntity, marioBEntity);
+                marioB->SetPlayerAction(PlayerAction.SoftKnockback, dropStars ? 1 : 0 | (!fromRight ? MarioPlayer.DropStarRight : 0), f, marioBEntity, marioAEntity);
                 return;
             } else if (marioAShell) {
                 if (!marioBAbove) {

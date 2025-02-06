@@ -8,6 +8,7 @@ namespace Quantum {
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+        public const int DropStarRight = 1 << 8;
 
         public byte GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
@@ -61,7 +62,7 @@ namespace Quantum {
             return actionFlags;
         }
 
-        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = default, EntityRef entityA = default, EntityRef entityB = default) {
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef entityA = default, EntityRef entityB = default) {
             prevAction = action;
             action = playerAction;
 
@@ -424,8 +425,9 @@ namespace Quantum {
             }
 
             bool weak = action == PlayerAction.SoftKnockback;
-            bool fromRight = (actionArg & 1 << 8) != 0;
+            bool fromRight = (actionArg & DropStarRight) != 0;
 
+            int droppedStars = actionArg % 256;
             /*if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
                 SpawnStars(f, entity, starsToDrop - 1);
                 Powerdown(f, entity, false);
@@ -448,7 +450,7 @@ namespace Quantum {
 
             physicsObject->Velocity = new FPVector2(
                 (fromRight ? -1 : 1) *
-                    (actionArg + 1) *
+                    (droppedStars + 1) *
                     FP._1_50 *
                     (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
                     (CurrentPowerupState == PowerupState.MiniMushroom ? Constants._2_50 : 1) *
@@ -458,7 +460,7 @@ namespace Quantum {
                 f.Has<Projectile>(attacker) ? 0 : Constants._4_50
             );
 
-            SpawnStars(f, entity, actionArg);
+            SpawnStars(f, entity, droppedStars);
             //HandleLayerState();
             f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, action);
         }

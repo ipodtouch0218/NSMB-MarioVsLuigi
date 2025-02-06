@@ -51,6 +51,7 @@ enum PlayerAction : Byte {
     BlueShellJump,
     BlueShellGroundPound,
     PropellerSpin,
+	PropellerFall,
     PropellerDrill,
 	Death,
 	EnteringPipe,

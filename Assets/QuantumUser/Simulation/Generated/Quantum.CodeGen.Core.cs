@@ -104,6 +104,7 @@ namespace Quantum {
     BlueShellJump,
     BlueShellGroundPound,
     PropellerSpin,
+    PropellerFall,
     PropellerDrill,
     Death,
     EnteringPipe,
