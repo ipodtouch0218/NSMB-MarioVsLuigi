@@ -293,7 +293,7 @@ namespace Quantum {
                     } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->HasActionFlags(ActionFlags.StrongAction)) {
                         koopa->EnterShell(f, koopaEntity, marioEntity, false, false);
                     }
-                    mario->DoEntityBounce = true;
+                    mario->CheckEntityBounce();
                     koopaHoldable->PreviousHolder = marioEntity;
                     koopaHoldable->IgnoreOwnerFrames = 5;
                 } else {

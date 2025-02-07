@@ -39,8 +39,10 @@ enum PlayerAction : Byte {
     DoubleJump,
     TripleJump,
 	Freefall,
+	WallSlide,
     Wallkick,
     GroundPound,
+	MiniGroundpound,
     SoftKnockback,
     NormalKnockback,
     HardKnockback,
@@ -54,6 +56,7 @@ enum PlayerAction : Byte {
 	PropellerFall,
     PropellerDrill,
 	Death,
+	LavaDeath,
 	EnteringPipe,
 }
 
