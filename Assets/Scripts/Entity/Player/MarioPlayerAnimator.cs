@@ -258,7 +258,7 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            SetParticleEmission(drillParticle, !disableParticles && mario->IsDrilling);
+            SetParticleEmission(drillParticle, !disableParticles && (mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill));
             SetParticleEmission(sparkles, !disableParticles && mario->IsStarmanInvincible);
             SetParticleEmission(iceSkiddingParticle, !disableParticles && physicsObject->IsOnSlipperyGround && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
             SetParticleEmission(waterSkiddingParticle, !disableParticles && onWater && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
@@ -279,7 +279,7 @@ namespace NSMB.Entities.Player {
             waterSkiddingParticle.transform.localScale = flip;
             waterRunningParticle.transform.localScale = flip;
 
-            dustPlayer.SetSoundData((mario->IsInShell || mario->IsSliding || mario->IsCrouchedInShell) ? shellSlideData : wallSlideData);
+            dustPlayer.SetSoundData((mario->HasActionFlags(ActionFlags.IsShelled) || mario->IsSliding) ? shellSlideData : wallSlideData);
             drillPlayer.SetSoundData(mario->IsPropellerFlying ? propellerDrillData : spinnerDrillData);
             bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, physicsCollider->Shape.Box.Extents.Y.AsFloat * 2);
 
@@ -379,8 +379,9 @@ namespace NSMB.Entities.Player {
                 modelRotationTarget *= Quaternion.Euler(0, spinner->AngularVelocity.AsFloat * delta, 0);
                 modelRotateInstantly = true;
 
-            } else if (mario->IsSpinnerFlying || mario->IsPropellerFlying) {
-                modelRotationTarget *= Quaternion.Euler(0, (-1200 - ((mario->PropellerLaunchFrames / 60f) * 1400) - (mario->IsDrilling ? 900 : 0) + (mario->IsPropellerFlying && mario->PropellerSpinFrames == 0 && physicsObject->Velocity.Y < 0 ? 700 : 0)) * delta, 0);
+            } else if (mario->action == PlayerAction.SpinBlockSpin || mario->action == PlayerAction.PropellerSpin ||
+                mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) {
+                modelRotationTarget *= Quaternion.Euler(0, (-1200 - ((mario->PropellerLaunchFrames / 60f) * 1400) -((mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) ? 900 : 0) + (mario->IsPropellerFlying && mario->PropellerSpinFrames == 0 && physicsObject->Velocity.Y < 0 ? 700 : 0)) * delta, 0);
                 modelRotateInstantly = true;
 
             } else if (mario->IsWallsliding) {
@@ -389,7 +390,9 @@ namespace NSMB.Entities.Player {
                 modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 110 : 250, 0);
             }
 
-            propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((mario->IsSpinnerFlying || mario->IsPropellerFlying || mario->UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
+            propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((
+                mario->action == PlayerAction.SpinBlockSpin || mario->action == PlayerAction.PropellerSpin ||
+                mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill || mario->UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
 
             wasTurnaround = mario->IsTurnaround;
         }
@@ -466,7 +469,7 @@ namespace NSMB.Entities.Player {
             float animatedVelocity = Mathf.Abs(physicsObject->Velocity.X.AsFloat);
             if (mario->IsStuckInBlock) {
                 animatedVelocity = 0;
-            } else if (mario->IsPropellerFlying) {
+            } else if (mario->action == PlayerAction.PropellerSpin) {
                 animatedVelocity = 2f;
             } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom && (left || right)) {
                 animatedVelocity = 4.5f;
@@ -676,7 +679,7 @@ namespace NSMB.Entities.Player {
                 PlaySound(SoundEffect.World_Ice_Skidding);
                 return;
             }
-            if (mario->IsPropellerFlying) {
+            if (mario->action == PlayerAction.PropellerSpin) {
                 PlaySound(SoundEffect.Powerup_PropellerMushroom_Kick);
                 return;
             }

@@ -197,6 +197,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             QuantumUtils.Increment(ref mario->actionTimer);
+            UnityEngine.Debug.Log($"Timer [{mario->actionTimer}]");
             if (inputs.Down.IsDown && mario->actionTimer > (mario->actionArg == 1 ? 20 : 30)) {
                 mario->SetPlayerAction(PlayerAction.PropellerDrill);
             }
@@ -217,6 +218,7 @@ namespace Quantum {
                     f.Events.MarioPlayerPropellerSpin(f, filter.Entity);
                 }
             }
+            mario->SetAirOrGroundAction(physicsObject, checkAir: false);
         }
 
         public void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -230,7 +232,7 @@ namespace Quantum {
             }
 
             if (QuantumUtils.Decrement(ref mario->PropellerDrillHoldFrames)) {
-                mario->SetPlayerAction(PlayerAction.PropellerFall, 1);
+                mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
             }
         }
 
@@ -655,8 +657,6 @@ namespace Quantum {
 
             mario->WallslideEndFrames = 0;
             mario->GroundpoundStartFrames = 0;
-            mario->IsSpinnerFlying &= mario->DoEntityBounce;
-            mario->IsPropellerFlying &= mario->DoEntityBounce;
             mario->JumpBufferFrames = 0;
             physicsObject->WasTouchingGround = false;
             physicsObject->IsTouchingGround = false;
@@ -1003,7 +1003,7 @@ namespace Quantum {
             }
             
             // Bodge: i can't find the desync...
-            mario->IsGroundpoundActive &= mario->IsGroundpounding;
+            // mario->IsGroundpoundActive &= mario->IsGroundpounding;
         }
 
         private bool AllowGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -1437,8 +1437,26 @@ namespace Quantum {
                 f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
                 break;
             }
+            // this is a debug thing, remove when being merged!
             default: {
-                mario->SetPlayerAction(PlayerAction.PowerupShoot, (int) PowerupState.NoPowerup);
+                if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || (mario->IsSpinnerFlying && mario->IsDrilling) || mario->IsPropellerFlying || mario->WalljumpFrames > 0) {
+                    return;
+                }
+
+                mario->PropellerLaunchFrames = physics.PropellerLaunchFrames;
+                mario->UsedPropellerThisJump = true;
+                mario->SetPlayerAction(PlayerAction.PropellerSpin);
+
+                mario->JumpState = JumpState.None;
+                mario->CoyoteTimeFrames = 0;
+
+                // Fix sticky ground
+                physicsObject->WasTouchingGround = false;
+                physicsObject->IsTouchingGround = false;
+                physicsObject->HoverFrames = 0;
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, FPVector2.Up * FP._0_05 * f.UpdateRate, filter.Entity, stage);
+
+                f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
                 break;
             }
             }
