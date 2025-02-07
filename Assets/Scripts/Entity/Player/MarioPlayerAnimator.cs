@@ -1110,10 +1110,10 @@ namespace NSMB.Entities.Player {
 
             // Voice SFX
             switch (e.JumpState) {
-            case JumpState.DoubleJump:
+            case PlayerAction.DoubleJump:
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: (byte) UnityEngine.Random.Range(1, 3));
                 break;
-            case JumpState.TripleJump:
+            case PlayerAction.TripleJump:
                 PlaySound(SoundEffect.Player_Voice_TripleJump);
                 break;
             }
