@@ -72,6 +72,7 @@ namespace Quantum {
 
             actionFlags = GetActionFlags(action);
 
+            UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}]");
             return action;
         }
 
@@ -414,6 +415,7 @@ namespace Quantum {
             SwimForceJumpTimer = 0;
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = false;
+            SetPlayerAction(PlayerAction.Freefall);
 
             f.Events.MarioPlayerRespawned(f, entity);
         }
