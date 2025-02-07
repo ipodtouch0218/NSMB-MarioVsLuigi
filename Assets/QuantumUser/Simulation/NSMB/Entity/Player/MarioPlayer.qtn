@@ -42,7 +42,7 @@ enum PlayerAction : Byte {
 	WallSlide,
     Wallkick,
     GroundPound,
-	MiniGroundpound,
+	MiniGroundPound,
     SoftKnockback,
     NormalKnockback,
     HardKnockback,
@@ -57,6 +57,7 @@ enum PlayerAction : Byte {
     PropellerDrill,
 	Death,
 	LavaDeath,
+	Respawning,
 	EnteringPipe,
 }
 

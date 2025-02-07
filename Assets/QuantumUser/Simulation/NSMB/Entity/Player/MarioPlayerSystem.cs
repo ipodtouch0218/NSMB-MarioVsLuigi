@@ -849,7 +849,7 @@ namespace Quantum {
                     return;
                 }
 
-                mario->SetPlayerAction(PlayerAction.GroundPound);
+                mario->SetPlayerAction(mario->CurrentPowerupState == PowerupState.MiniMushroom ? PlayerAction.MiniGroundPound : PlayerAction.GroundPound);
                 mario->JumpState = JumpState.None;
                 physicsObject->Velocity = physics.GroundpoundStartVelocity;
                 mario->GroundpoundStartFrames = mario->CurrentPowerupState == PowerupState.MegaMushroom ? physics.GroundpoundStartMegaFrames : physics.GroundpoundStartFrames;
@@ -863,7 +863,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (!mario->IsGroundpounding || mario->GroundpoundStartFrames == 0) {
+            if (mario->action != PlayerAction.GroundPound || mario->action != PlayerAction.MiniGroundPound || mario->GroundpoundStartFrames == 0) {
                 return;
             }
 
@@ -1910,12 +1910,8 @@ namespace Quantum {
                 // Both mega
                 if (marioAAbove) {
                     marioA->CheckEntityBounce(true);
-                    marioA->IsGroundpounding = false;
-                    marioA->IsDrilling = false;
                 } else if (marioBAbove) {
                     marioB->CheckEntityBounce(true);
-                    marioB->IsGroundpounding = false;
-                    marioB->IsDrilling = false;
                 } else {
                     marioA->SetPlayerAction(PlayerAction.SoftKnockback, fromRight ? MarioPlayer.DropStarRight : 0, f, marioAEntity, marioBEntity);
                     marioB->SetPlayerAction(PlayerAction.SoftKnockback, !fromRight ? MarioPlayer.DropStarRight : 0, f, marioBEntity, marioAEntity);
@@ -2100,14 +2096,12 @@ namespace Quantum {
                 // Attacker is mini, they arent. special rules.
                 if (groundpounded) {
                     defenderMario->SetPlayerAction(PlayerAction.HardKnockback, (dropStars ? 3 : 0) + (!fromRight ? MarioPlayer.DropStarRight : 0), f, defender, attacker);
-                    attackerMario->CheckEntityBounce(true); // regular groundpound has the flag disabled
                 }
             } else if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {
                 // We are big, groundpounding a mini opponent. squish.
                 defenderMario->SpawnStars(f, defender, 3);
                 //defenderMario->Death(f, defender, false, false);
                 defenderMario->SetPlayerAction(PlayerAction.Death, 0, f, defender);
-                attackerMario->CheckEntityBounce(true);
             } else {
                 // Normal knockbacks
                 if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {
@@ -2119,12 +2113,12 @@ namespace Quantum {
                     } else {
                         if (attackerMario->action == PlayerAction.PropellerDrill) {
                             attackerMario->SetPlayerAction(PlayerAction.PropellerFall, 1);
-                            attackerMario->CheckEntityBounce(true);
                         }
                         defenderMario->SetPlayerAction(groundpounded ? PlayerAction.HardKnockback : PlayerAction.NormalKnockback, dropStars ? (groundpounded ? 3 : 1) : 0 + (!fromRight ? MarioPlayer.DropStarRight : 0), f, defender, attacker);
                     }
                 }
             }
+            attackerMario->CheckEntityBounce(true);
         }
         #endregion
 
