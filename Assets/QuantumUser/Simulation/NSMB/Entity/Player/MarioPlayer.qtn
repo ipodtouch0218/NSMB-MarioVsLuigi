@@ -58,6 +58,7 @@ enum PlayerAction : Byte {
     PropellerSpin,
 	PropellerFall,
     PropellerDrill,
+	PowerupShoot,
 	Pushing,
 	Death,
 	LavaDeath,

@@ -84,13 +84,16 @@ namespace Quantum {
   }
   public enum PlayerAction : byte {
     Idle,
+    HoldIdle,
     Walk,
+    HoldWalk,
     Skidding,
     Crouch,
     Sliding,
     SingleJump,
     DoubleJump,
     TripleJump,
+    HoldJump,
     Freefall,
     WallSlide,
     Wallkick,
@@ -108,8 +111,10 @@ namespace Quantum {
     PropellerSpin,
     PropellerFall,
     PropellerDrill,
+    Pushing,
     Death,
     LavaDeath,
+    Respawning,
     EnteringPipe,
   }
   public enum PowerupReserveResult : byte {

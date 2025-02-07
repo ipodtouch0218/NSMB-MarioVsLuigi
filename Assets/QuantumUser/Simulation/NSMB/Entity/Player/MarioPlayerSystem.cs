@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -69,6 +70,7 @@ namespace Quantum {
                 input = default;
             }
 
+            HandleActions(f, ref filter, physics, ref input, stage);
             HandlePowerups(f, ref filter, physics, ref input, stage);
             HandleBreakingBlocks(f, ref filter, physics, ref input, stage);
             HandleCrouching(f, ref filter, physics, ref input);
@@ -85,6 +87,100 @@ namespace Quantum {
             HandleFacingDirection(f, ref filter, physics, ref input);
             HandlePipes(f, ref filter, physics, stage);
             HandleHitbox(f, ref filter, physics);
+        }
+
+        #region Actions
+        public void ActionGroundPound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+
+        }
+
+        public void ActionSpinBlockSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+            if (inputs.Down.IsDown) {
+                mario->SetPlayerAction(PlayerAction.SpinBlockDrill);
+            }
+
+            // Start drill
+            if (physicsObject->Velocity.Y < 0) {
+                physicsObject->Velocity.X = 0;
+                mario->SetPlayerAction(PlayerAction.SpinBlockDrill);
+            }
+        }
+
+        public void ActionPropellerSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            QuantumUtils.Increment(ref mario->actionTimer);
+            if (inputs.Down.IsDown && mario->actionTimer > 30) {
+                mario->SetPlayerAction(PlayerAction.PropellerDrill);
+            }
+            if (!QuantumUtils.Decrement(ref mario->PropellerLaunchFrames)) {
+                FP remainingTime = (FP) mario->PropellerLaunchFrames / 60;
+                if (mario->PropellerLaunchFrames > 52) {
+                    physicsObject->Velocity.Y = physics.PropellerLaunchVelocity;
+                } else {
+                    FP targetVelocity = physics.PropellerLaunchVelocity - (remainingTime < Constants._0_40 ? (1 - (remainingTime * Constants._2_50)) * physics.PropellerLaunchVelocity : 0);
+                    physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (24 * f.DeltaTime), targetVelocity);
+                }
+            } else {
+                if (physicsObject->IsTouchingGround) {
+                    mario->PropellerSpinFrames = 0;
+                    mario->UsedPropellerThisJump = false;
+                } else if (inputs.PowerupAction.IsDown && physicsObject->Velocity.Y < -FP._0_10 && mario->PropellerSpinFrames < physics.PropellerSpinFrames / 4) {
+                    mario->PropellerSpinFrames = physics.PropellerSpinFrames;
+                    f.Events.MarioPlayerPropellerSpin(f, filter.Entity);
+                }
+            }
+        }
+
+        public void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+            var mario = filter.MarioPlayer;
+            if (!inputs.Down.IsDown) {
+                mario->SetPlayerAction(PlayerAction.PropellerDrill);
+            }
+        }
+
+        #endregion
+
+        public void HandleActions(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+            var mario = filter.MarioPlayer;
+            switch (mario->action) {
+                case PlayerAction.Idle: break;
+	            case PlayerAction.HoldIdle:
+                case PlayerAction.Walk:
+                case PlayerAction.HoldWalk:
+                case PlayerAction.Skidding:
+                case PlayerAction.Crouch:
+                case PlayerAction.Sliding:
+                case PlayerAction.SingleJump:
+                case PlayerAction.DoubleJump:
+                case PlayerAction.TripleJump:
+	            case PlayerAction.HoldJump: break;
+	            case PlayerAction.Freefall:
+	            case PlayerAction.WallSlide:
+                case PlayerAction.Wallkick:
+                case PlayerAction.GroundPound: ActionGroundPound(f, ref filter, physics, ref inputs); break;
+	            case PlayerAction.MiniGroundPound: ActionGroundPound(f, ref filter, physics, ref inputs); break; // same move, different flags
+                case PlayerAction.SoftKnockback:
+                case PlayerAction.NormalKnockback:
+                case PlayerAction.HardKnockback:
+	            case PlayerAction.SpinBlockSpin:
+                case PlayerAction.SpinBlockDrill:
+                case PlayerAction.BlueShellCrouch:
+                case PlayerAction.BlueShellSliding:
+                case PlayerAction.BlueShellJump:
+                case PlayerAction.BlueShellGroundPound:
+                case PlayerAction.PropellerSpin: ActionPropellerSpin(f, ref filter, physics, ref inputs); break;
+	            case PlayerAction.PropellerFall:
+                case PlayerAction.PropellerDrill: ActionPropellerDrill(f, ref filter, physics, ref inputs); break;
+	            case PlayerAction.Pushing:
+	            case PlayerAction.Death:
+	            case PlayerAction.LavaDeath:
+	            case PlayerAction.Respawning:
+	            case PlayerAction.EnteringPipe: break;
+            }
         }
 
         public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
@@ -756,6 +852,7 @@ namespace Quantum {
             }
         }
 
+
         public void HandleGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGroundpound");
             var mario = filter.MarioPlayer;
@@ -771,7 +868,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 
             if (inputs.Down.IsDown && allowGroundpoundStart) {
-                TryStartGroundpound(f, ref filter, physics, ref inputs, stage);
+                // TryStartGroundpound(f, ref filter, physics, ref inputs, stage);
             }
 
             if (mario->action == PlayerAction.PropellerDrill && inputs.Down.IsDown) {
@@ -811,7 +908,7 @@ namespace Quantum {
             mario->IsGroundpoundActive &= mario->IsGroundpounding;
         }
 
-        private void TryStartGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private bool AllowGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.TryStartGroundpound");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -820,42 +917,28 @@ namespace Quantum {
                 || mario->HeldEntity.IsValid || mario->IsCrouching || mario->IsSliding || mario->IsInShell
                 || mario->IsWallsliding || mario->GroundpoundCooldownFrames > 0 || physicsObject->IsUnderwater
                 || f.Exists(mario->CurrentPipe)) {
-                return;
+                return false;
             }
 
             /// * intentional: remove left/right requirement when groundpounding
             if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && (inputs.Left.IsDown || inputs.Right.IsDown)) {
-                return;
+                return false;
             }
             // */
-
-            if (mario->action == PlayerAction.SpinBlockSpin) {
-                // Start drill
-                if (physicsObject->Velocity.Y < 0) {
-                    physicsObject->Velocity.X = 0;
-                    mario->SetPlayerAction(PlayerAction.SpinBlockDrill);
-                }
-            } else if (mario->action == PlayerAction.PropellerDrill) {
-                // Start propeller drill
-                if (mario->PropellerDrillCooldown == 0) {
-                    mario->PropellerLaunchFrames = 0;
-                    mario->SetPlayerAction(PlayerAction.PropellerDrill);
-                }
-            } else {
-                // Start groundpound
-                // Check if high enough above ground
-                var transform = filter.Transform;
-                if (PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position, FPVector2.Down, FP._0_50, out _)) {
-                    return;
-                }
-
-                mario->SetPlayerAction(mario->CurrentPowerupState == PowerupState.MiniMushroom ? PlayerAction.MiniGroundPound : PlayerAction.GroundPound);
-                mario->JumpState = JumpState.None;
-                physicsObject->Velocity = physics.GroundpoundStartVelocity;
-                mario->GroundpoundStartFrames = mario->CurrentPowerupState == PowerupState.MegaMushroom ? physics.GroundpoundStartMegaFrames : physics.GroundpoundStartFrames;
-
-                f.Events.MarioPlayerGroundpoundStarted(f, filter.Entity);
+            // Start groundpound
+            // Check if high enough above ground
+            var transform = filter.Transform;
+            if (PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position, FPVector2.Down, FP._0_50, out _)) {
+                return false;
             }
+
+            mario->SetPlayerAction(mario->CurrentPowerupState == PowerupState.MiniMushroom ? PlayerAction.MiniGroundPound : PlayerAction.GroundPound);
+            mario->JumpState = JumpState.None;
+            physicsObject->Velocity = physics.GroundpoundStartVelocity;
+            mario->GroundpoundStartFrames = mario->CurrentPowerupState == PowerupState.MegaMushroom ? physics.GroundpoundStartMegaFrames : physics.GroundpoundStartFrames;
+
+            f.Events.MarioPlayerGroundpoundStarted(f, filter.Entity);
+            return true;
         }
 
         private void HandleGroundpoundStartAnimation(ref Filter filter, MarioPlayerPhysicsInfo physics) {
@@ -1187,26 +1270,7 @@ namespace Quantum {
             mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
             mario->IsPropellerFlying &= !physicsObject->IsUnderwater;
             if (mario->IsPropellerFlying) {
-                if (!QuantumUtils.Decrement(ref mario->PropellerLaunchFrames)) {
-                    FP remainingTime = (FP) mario->PropellerLaunchFrames / 60;
-                    if (mario->PropellerLaunchFrames > 52) {
-                        physicsObject->Velocity.Y = physics.PropellerLaunchVelocity;
-                    } else {
-                        FP targetVelocity = physics.PropellerLaunchVelocity - (remainingTime < Constants._0_40 ? (1 - (remainingTime * Constants._2_50)) * physics.PropellerLaunchVelocity : 0);
-                        physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (24 * f.DeltaTime), targetVelocity);
-                    }
-                } else {
-                    if (physicsObject->IsTouchingGround) {
-                        mario->PropellerSpinFrames = 0;
-                        mario->UsedPropellerThisJump = false;
-                        if (!mario->IsDrilling) {
-                            mario->IsPropellerFlying = false;
-                        }
-                    } else if (inputs.PowerupAction.IsDown && !mario->IsDrilling && physicsObject->Velocity.Y < -FP._0_10 && mario->PropellerSpinFrames < physics.PropellerSpinFrames / 4) {
-                        mario->PropellerSpinFrames = physics.PropellerSpinFrames;
-                        f.Events.MarioPlayerPropellerSpin(f, filter.Entity);
-                    }
-                }
+                
             }
 
             PowerupState state = mario->CurrentPowerupState;
@@ -1278,14 +1342,9 @@ namespace Quantum {
 
                 mario->PropellerLaunchFrames = physics.PropellerLaunchFrames;
                 mario->UsedPropellerThisJump = true;
-                mario->PropellerDrillCooldown = 30;
+                mario->SetPlayerAction(PlayerAction.PropellerSpin);
 
-                mario->IsPropellerFlying = true;
-                mario->IsSpinnerFlying = false;
-                mario->IsCrouching = false;
                 mario->JumpState = JumpState.None;
-                mario->WallslideLeft = false;
-                mario->WallslideRight = false;
                 mario->CoyoteTimeFrames = 0;
 
                 // Fix sticky ground
