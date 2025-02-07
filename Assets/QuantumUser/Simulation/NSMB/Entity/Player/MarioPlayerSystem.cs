@@ -91,6 +91,50 @@ namespace Quantum {
         }
 
         #region Actions
+        public void ActionWallSlide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            FPVector2 currentWallDirection;
+            if (mario->actionArg == 0) {
+                currentWallDirection = FPVector2.Left;
+            } else if (mario->actionArg != 0) {
+                currentWallDirection = FPVector2.Right;
+            } else if (inputs.Left.IsDown ^ inputs.Right.IsDown) {
+                if (inputs.Left.IsDown) {
+                    currentWallDirection = FPVector2.Left;
+                } else if (inputs.Right.IsDown) {
+                    currentWallDirection = FPVector2.Right;
+                } else {
+                    return;
+                }
+            } else {
+                return;
+            }
+
+            HandleWallslideStopChecks(ref filter, ref inputs, currentWallDirection);
+
+            if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
+                mario->SetPlayerAction(PlayerAction.Freefall);
+                return;
+            }
+
+            // Walljump check
+            physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
+            mario->FacingRight = mario->WallslideLeft;
+            if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
+                // Perform walljump
+                physicsObject->Velocity = new(physics.WalljumpHorizontalVelocity * (mario->WallslideLeft ? 1 : -1), mario->CurrentPowerupState == PowerupState.MiniMushroom ? physics.WalljumpMiniVerticalVelocity : physics.WalljumpVerticalVelocity);
+                mario->JumpState = JumpState.SingleJump;
+                physicsObject->IsTouchingGround = false;
+
+                f.Events.MarioPlayerWalljumped(f, filter.Entity, filter.Transform->Position, mario->WallslideRight);
+                mario->WalljumpFrames = 16;
+                mario->SetPlayerAction(PlayerAction.Wallkick);
+                mario->WallslideEndFrames = 0;
+                mario->JumpBufferFrames = 0;
+            }
+        }
         public void ActionGroundPound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -228,7 +272,7 @@ namespace Quantum {
                 case PlayerAction.TripleJump:
 	            case PlayerAction.HoldJump: break;
 	            case PlayerAction.Freefall:
-	            case PlayerAction.WallSlide:
+	            case PlayerAction.WallSlide:            ActionWallSlide(f, ref filter, physics, ref inputs); break;
                 case PlayerAction.Wallkick:
                 case PlayerAction.GroundPound:          ActionGroundPound(f, ref filter, physics, ref inputs); break;
 	            case PlayerAction.MiniGroundPound:      ActionGroundPound(f, ref filter, physics, ref inputs); break; // same move, different flags
@@ -733,58 +777,13 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
+            FPVector2 currentWallDirection;
             if (mario->IsInShell || mario->IsGroundpounding || mario->IsCrouching || mario->IsDrilling 
                 || mario->IsSpinnerFlying || mario->IsInKnockback || physicsObject->IsUnderwater) {
                 return;
             }
 
-            FPVector2 currentWallDirection;
-            if (mario->WallslideLeft) {
-                currentWallDirection = FPVector2.Left;
-            } else if (mario->WallslideRight) {
-                currentWallDirection = FPVector2.Right;
-            } else if (inputs.Left.IsDown ^ inputs.Right.IsDown) {
-                if (inputs.Left.IsDown) {
-                    currentWallDirection = FPVector2.Left;
-                } else if (inputs.Right.IsDown) {
-                    currentWallDirection = FPVector2.Right;
-                } else {
-                    return;
-                }
-            } else {
-                return;
-            }
-
-            if (mario->IsWallsliding) {
-                HandleWallslideStopChecks(ref filter, ref inputs, currentWallDirection);
-            }
-
-            if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
-                mario->WallslideRight = false;
-                mario->WallslideLeft = false;
-                return;
-            }
-
-            if (mario->IsWallsliding) {
-                // Walljump check
-                physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
-                mario->FacingRight = mario->WallslideLeft;
-                if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
-                    // Perform walljump
-                    physicsObject->Velocity = new(physics.WalljumpHorizontalVelocity * (mario->WallslideLeft ? 1 : -1), mario->CurrentPowerupState == PowerupState.MiniMushroom ? physics.WalljumpMiniVerticalVelocity : physics.WalljumpVerticalVelocity);
-                    mario->JumpState = JumpState.SingleJump;
-                    physicsObject->IsTouchingGround = false;
-                    mario->DoEntityBounce = false;
-                    // timeSinceLastBumpSound = 0;
-
-                    f.Events.MarioPlayerWalljumped(f, filter.Entity, filter.Transform->Position, mario->WallslideRight);
-                    mario->WalljumpFrames = 16;
-                    mario->WallslideRight = false;
-                    mario->WallslideLeft = false;
-                    mario->WallslideEndFrames = 0;
-                    mario->JumpBufferFrames = 0;
-                }
-            } else if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
+            if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 // Walljump starting check
                 bool canWallslide = !mario->IsInShell && physicsObject->Velocity.Y < -FP._0_10 && !mario->IsGroundpounding && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && !mario->IsSpinnerFlying && !mario->IsDrilling && !mario->IsCrouching && !mario->IsSliding && !mario->IsInKnockback && mario->PropellerLaunchFrames == 0;
                 if (!canWallslide) {
@@ -810,7 +809,7 @@ namespace Quantum {
                 }
 
                 // Check 8
-                if (!((currentWallDirection == FPVector2.Right && mario->FacingRight) || (currentWallDirection == FPVector2.Left && !mario->FacingRight))) {
+                /*if (!((currentWallDirection == FPVector2.Right && mario->FacingRight) || (currentWallDirection == FPVector2.Left && !mario->FacingRight))) {
                     return;
                 }
 
@@ -821,7 +820,7 @@ namespace Quantum {
 
                 if (mario->IsWallsliding) {
                     mario->IsPropellerFlying = false;
-                }
+                }*/
             }
         }
 
