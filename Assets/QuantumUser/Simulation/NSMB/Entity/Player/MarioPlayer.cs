@@ -377,18 +377,14 @@ namespace Quantum {
             FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
             transform->Position = spawnpoint;
             f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
-            
-            IsDead = true;
+
+            //IsDead = true;
+            action = PlayerAction.GroundPound;
             f.Unsafe.GetPointer<Freezable>(entity)->FrozenCubeEntity = EntityRef.None;
-            IsRespawning = true;
             FacingRight = true;
-            WallslideLeft = false;
-            WallslideRight = false;
             WallslideEndFrames = 0;
             WalljumpFrames = 0;
-            IsPropellerFlying = false;
             UsedPropellerThisJump = false;
-            IsSpinnerFlying = false;
             PropellerLaunchFrames = 0;
             PropellerSpinFrames = 0;
             JumpState = JumpState.None;
@@ -400,13 +396,6 @@ namespace Quantum {
             MegaMushroomStartFrames = 0;
             MegaMushroomEndFrames = 0;
             // f.ResolveHashSet(WaterColliders).Clear();
-            IsCrouching = false;
-            IsSliding = false;
-            IsTurnaround = false;
-            IsInKnockback = false;
-            IsGroundpounding = false;
-            IsInShell = false;
-            IsTurnaround = false;
             SwimForceJumpTimer = 0;
 
             physicsObject->IsFrozen = true;
@@ -424,7 +413,6 @@ namespace Quantum {
             DamageInvincibilityFrames = 120;
             CoyoteTimeFrames = 0;
             SwimForceJumpTimer = 0;
-
             physicsObject->IsFrozen = false;
             physicsObject->DisableCollision = false;
 

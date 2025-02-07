@@ -1789,12 +1789,11 @@ namespace Quantum {
             var collider = filter.PhysicsCollider;
             var entity = filter.Entity;
 
+            // ignore cutscene actions
             if (!mario->HasActionFlags(ActionFlags.Cutscene)) {
                 if (transform->Position.Y + (collider->Shape.Box.Extents.Y * 2) < stage.StageWorldMin.Y) {
                     // Death via pit
                     mario->SetPlayerAction(PlayerAction.Death);
-                } else {
-                    return false;
                 }
             }
 
@@ -1810,7 +1809,7 @@ namespace Quantum {
 
             // Waiting to prerespawn
             if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
-                mario->PreRespawn(f, entity, stage);
+                //mario->PreRespawn(f, entity, stage);
                 f.Events.StartCameraFadeIn(f, entity);
                 return true;
 
