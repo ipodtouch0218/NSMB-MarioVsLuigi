@@ -438,7 +438,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamPropellerSpin,    mario->action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames > 0);
             animator.SetBool(ParamPropellerStart,   mario->action == PlayerAction.PropellerSpin && mario->PropellerLaunchFrames > 0); // confusing
             animator.SetBool(ParamCrouching,        mario->action == PlayerAction.Crouch);
-            animator.SetBool(ParamGroundpound,      mario->action == PlayerAction.GroundPound || mario->action == PlayerAction.MiniGroundPound);
+            animator.SetBool(ParamGroundpound,      mario->action == PlayerAction.GroundPound);
             animator.SetBool(ParamSliding,          mario->action == PlayerAction.Sliding);
             animator.SetBool(ParamKnockback,        mario->action == PlayerAction.NormalKnockback || mario->action == PlayerAction.HardKnockback);
             animator.SetBool(ParamFacingRight,      (left ^ right) ? right : mario->FacingRight);

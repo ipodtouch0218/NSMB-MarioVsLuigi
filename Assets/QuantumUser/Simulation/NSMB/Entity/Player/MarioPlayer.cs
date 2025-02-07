@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using System;
+using System.Drawing.Drawing2D;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -20,48 +21,43 @@ namespace Quantum {
         }
 
         public int GetActionFlags(PlayerAction action) {
-            int actionFlags = 0;
-            switch (action) {
-            // is a cutscene
-            case PlayerAction.Respawning:
-            case PlayerAction.LavaDeath:
-            case PlayerAction.Death:
-                actionFlags |= (int) ActionFlags.Cutscene;
-                break;
-
-            case var x when (x >= PlayerAction.Idle && x <= PlayerAction.Sliding) ||
-                        (x >= PlayerAction.PropellerSpin && x <= PlayerAction.PropellerDrill):
-                actionFlags |= (int) (ActionFlags.AllowGroundBump | ActionFlags.CameraChange);
-                break;
-
-            // all one star
-            case var x when x >= PlayerAction.SingleJump && x <= PlayerAction.Wallkick:
-                actionFlags |= (int) ActionFlags.AirAction;
-                break;
-
-            // knockback actions are intangible
-            case var x when x >= PlayerAction.SoftKnockback && x <= PlayerAction.HardKnockback:
-                actionFlags |= (int) ActionFlags.Intangible;
-                break;
-
-            // these don't let you bounce
-            case PlayerAction.SpinBlockDrill:
-            case PlayerAction.BlueShellJump:
-            case PlayerAction.GroundPound:
-                actionFlags |= (int) ActionFlags.NoPlayerBounce;
-                break;
-
-            // is shelled
-            case var x when x >= PlayerAction.BlueShellCrouch && x <= PlayerAction.BlueShellGroundPound:
-                actionFlags |= (int) ActionFlags.IsShelled;
-                break;
-
-            // takes 3 stars from the start
-            case PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill:
-                actionFlags |= (int) ActionFlags.Takes3Stars;
-                break;
-            }
-            return actionFlags;
+            return action switch {
+                PlayerAction.Idle                   => (int) (ActionFlags.AllowGroundBump),
+                PlayerAction.HoldIdle               => (int) (ActionFlags.AllowGroundBump),
+                PlayerAction.Walk                   => (int) (ActionFlags.AllowGroundBump),
+                PlayerAction.HoldWalk               => (int) (ActionFlags.AllowGroundBump),
+                PlayerAction.Skidding               => (int) (ActionFlags.AllowGroundBump),
+                PlayerAction.Crouch                 => (int) (ActionFlags.AllowGroundBump),
+                PlayerAction.Sliding                => (int) (ActionFlags.Attacking),
+                PlayerAction.SingleJump             => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.DoubleJump             => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.TripleJump             => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.HoldJump               => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.Freefall               => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.WallSlide              => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.Wallkick               => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.GroundPound            => (int) (ActionFlags.AirAction | ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction), // the 3 stars flag gets applied later
+                // PlayerAction.MiniGroundPound        => (int) (ActionFlags.AirAction), // has player bounce
+                PlayerAction.SoftKnockback          => (int) (ActionFlags.Intangible),
+                PlayerAction.NormalKnockback        => (int) (ActionFlags.Intangible),
+                PlayerAction.HardKnockback          => (int) (ActionFlags.Intangible),
+                PlayerAction.SpinBlockSpin          => (int) (ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.SpinBlockDrill         => (int) (ActionFlags.AirAction | ActionFlags.Takes3Stars | ActionFlags.GivesHardKnockback | ActionFlags.NoPlayerBounce),
+                PlayerAction.BlueShellCrouch        => (int) (ActionFlags.IsShelled),
+                PlayerAction.BlueShellSliding       => (int) (ActionFlags.IsShelled | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.NoPlayerBounce),
+                PlayerAction.BlueShellJump          => (int) (ActionFlags.IsShelled | ActionFlags.AirAction | ActionFlags.Takes1Star), // the no player bounce based off actionArg
+                // PlayerAction.BlueShellGroundPound   => (int) (ActionFlags.IsShelled | ActionFlags.AirAction | ActionFlags.NoPlayerBounce),
+                PlayerAction.PropellerSpin          => (int) (ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.PropellerFall          => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.PropellerDrill         => (int) (ActionFlags.AirAction | ActionFlags.Takes3Stars | ActionFlags.GivesHardKnockback),
+                PlayerAction.PowerupShoot           => 0, // will be set in the action
+                PlayerAction.Pushing                => (int) (ActionFlags.AllowGroundBump),
+                PlayerAction.Death                  => (int) (ActionFlags.Cutscene),
+                PlayerAction.LavaDeath              => (int) (ActionFlags.Cutscene),
+                PlayerAction.Respawning             => (int) (ActionFlags.Cutscene),
+                PlayerAction.EnteringPipe           => (int) (ActionFlags.Cutscene),
+                _                                   => 0 // null
+            };
         }
 
         public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef entityA = default, EntityRef entityB = default) {

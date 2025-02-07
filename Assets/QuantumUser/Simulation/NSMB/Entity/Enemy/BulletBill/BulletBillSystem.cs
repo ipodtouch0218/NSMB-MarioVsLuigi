@@ -126,8 +126,8 @@ namespace Quantum {
 
             if (attackedFromAbove) {
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                    if (mario->IsGroundpounding) {
-                        mario->IsGroundpounding = false;
+                    if (mario->HasActionFlags(ActionFlags.StrongAction)) {
+                        mario->SetPlayerAction(PlayerAction.Freefall);
                         bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
                     }
                     mario->CheckEntityBounce();
