@@ -489,7 +489,7 @@ namespace Quantum {
 
         public void ResetKnockback(Frame f, EntityRef entity) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            KnockbackGetupFrames = (byte) (IsInWeakKnockback || physicsObject->IsUnderwater ? 0 : 25);
+            KnockbackGetupFrames = (byte) (action == PlayerAction.SoftKnockback || physicsObject->IsUnderwater ? 0 : 25);
             DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
             FacingRight = KnockbackWasOriginallyFacingRight;
             SetPlayerAction(PlayerAction.Idle);

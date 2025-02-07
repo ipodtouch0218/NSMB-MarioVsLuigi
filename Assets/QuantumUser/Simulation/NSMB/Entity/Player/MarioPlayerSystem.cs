@@ -718,11 +718,11 @@ namespace Quantum {
             }
 
             // Can't crouch while sliding, flying, or mega.
-            if (mario->IsSliding || mario->IsPropellerFlying || mario->IsSpinnerFlying || mario->IsInKnockback || mario->CurrentPowerupState == PowerupState.MegaMushroom
+            /*if (mario->IsSliding || mario->IsPropellerFlying || mario->IsSpinnerFlying || mario->IsInKnockback || mario->CurrentPowerupState == PowerupState.MegaMushroom
                 || mario->IsWallsliding) {
                 mario->IsCrouching = false;
                 return;
-            }
+            }*/
 
             /*
             // TODO: magic number
