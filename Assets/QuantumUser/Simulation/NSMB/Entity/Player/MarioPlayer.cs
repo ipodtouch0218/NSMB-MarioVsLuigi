@@ -232,10 +232,6 @@ namespace Quantum {
         }
 
         public void Death(Frame f, EntityRef entity, bool fire, bool stars = true) {
-            if (IsDead) {
-                return;
-            }
-
             FireDeath = fire;
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
 

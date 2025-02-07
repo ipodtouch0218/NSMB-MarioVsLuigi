@@ -111,6 +111,7 @@ namespace Quantum {
     PropellerSpin,
     PropellerFall,
     PropellerDrill,
+    PowerupShoot,
     Pushing,
     Death,
     LavaDeath,
