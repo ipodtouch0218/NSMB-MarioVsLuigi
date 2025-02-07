@@ -212,7 +212,7 @@ signal OnMarioPlayerBecameInvincible(EntityRef entity);
 event MarioPlayerJumped {
 	nothashed Frame Frame;
 	entity_ref Entity;
-	nothashed JumpState JumpState;
+	nothashed PlayerAction JumpState;
 	nothashed bool WasBounce;
 }
 

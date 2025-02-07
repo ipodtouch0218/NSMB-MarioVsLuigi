@@ -488,6 +488,15 @@ namespace Quantum {
             return Constants.WeirdSlopeConstant * floorAngle;
         }
 
+        private static PlayerAction ConvertJumpState(JumpState state) {
+            return state switch {
+                JumpState.SingleJump => PlayerAction.SingleJump,
+                JumpState.DoubleJump => PlayerAction.DoubleJump,
+                JumpState.TripleJump => PlayerAction.TripleJump,
+                _ => default
+            };
+        }
+
         private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleJumping");
             var mario = filter.MarioPlayer;
@@ -558,12 +567,9 @@ namespace Quantum {
             bool topSpeed = FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
             bool canSpecialJump = topSpeed && !inputs.Down.IsDown && (doJump || (mario->DoEntityBounce && inputs.Jump.IsDown)) && mario->JumpState != JumpState.None && !mario->IsSpinnerFlying && !mario->IsPropellerFlying && ((f.Number - mario->LandedFrame < 12) || mario->DoEntityBounce) && !mario->HeldEntity.IsValid && mario->JumpState != JumpState.TripleJump && !mario->IsCrouching && !mario->IsInShell && (physicsObject->Velocity.X < 0 != mario->FacingRight) /* && !Runner.GetPhysicsScene2D().Raycast(body.Position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround) */;
 
-            mario->IsTurnaround = false;
-            mario->IsSliding = false;
             mario->WallslideEndFrames = 0;
             mario->IsGroundpounding = false;
             mario->GroundpoundStartFrames = 0;
-            mario->IsDrilling = false;
             mario->IsSpinnerFlying &= mario->DoEntityBounce;
             mario->IsPropellerFlying &= mario->DoEntityBounce;
             mario->JumpBufferFrames = 0;
@@ -602,9 +608,10 @@ namespace Quantum {
                 mario->JumpState = JumpState.SingleJump;
             }
 
+            mario->SetPlayerAction(ConvertJumpState(mario->JumpState));
             physicsObject->Velocity.Y = newY;
 
-            f.Events.MarioPlayerJumped(f, filter.Entity, mario->JumpState, mario->DoEntityBounce);
+            f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), mario->DoEntityBounce);
             if (mario->DoEntityBounce) {
                 mario->IsCrouching = false;
                 mario->PropellerDrillCooldown = 30;
@@ -687,25 +694,25 @@ namespace Quantum {
                 } else {
                     terminalVelocity = -8;
                 }
-            } else if (physicsObject->IsUnderwater && !(mario->IsGroundpounding || mario->IsDrilling)) {
+            } else if (physicsObject->IsUnderwater) {
                 terminalVelocity = inputs.Jump.IsDown ? physics.SwimTerminalVelocityButtonHeld : physics.SwimTerminalVelocity;
                 physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y, physics.SwimMaxVerticalVelocity);
-            } else if (mario->IsSpinnerFlying) {
-                terminalVelocity = mario->IsDrilling ? physics.TerminalVelocityDrilling : physics.TerminalVelocityFlying;
-            } else if (mario->IsPropellerFlying) {
-                if (mario->IsDrilling) {
-                    terminalVelocity = physics.TerminalVelocityDrilling;
+            } else if (mario->action == PlayerAction.SpinBlockSpin) {
+                 terminalVelocity = physics.TerminalVelocityFlying;
+            } else if (mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) {
+                terminalVelocity = physics.TerminalVelocityDrilling;
+                if (mario->action == PlayerAction.PropellerDrill) {
                     physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -maxWalkSpeed * FP._0_25, maxWalkSpeed * FP._0_25);
-                } else {
-                    FP remainingTime = mario->PropellerLaunchFrames * f.DeltaTime;
-                    // TODO remove magic number
-                    FP htv = maxWalkSpeed + (Constants._1_18 * (remainingTime * 2));
-                    terminalVelocity = mario->PropellerSpinFrames > 0 ? physics.TerminalVelocityPropellerSpin : physics.TerminalVelocityPropeller;
-                    physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -htv, htv);
                 }
-            } else if (mario->IsWallsliding) {
+            } else if (mario->action == PlayerAction.PropellerSpin) {
+                FP remainingTime = mario->PropellerLaunchFrames * f.DeltaTime;
+                // TODO remove magic number
+                FP htv = maxWalkSpeed + (Constants._1_18 * (remainingTime * 2));
+                terminalVelocity = mario->PropellerSpinFrames > 0 ? physics.TerminalVelocityPropellerSpin : physics.TerminalVelocityPropeller;
+                physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -htv, htv);
+            } else if (mario->action == PlayerAction.WallSlide) {
                 terminalVelocity = physics.TerminalVelocityWallslide;
-            } else if (mario->IsGroundpounding) {
+            } else if (mario->action == PlayerAction.GroundPound || mario->action == PlayerAction.BlueShellGroundPound || mario->action == PlayerAction.MiniGroundPound) {
                 terminalVelocity = physics.TerminalVelocityGroundpound;
                 physicsObject->Velocity.X = 0;
             } else {
@@ -1464,7 +1471,7 @@ namespace Quantum {
                 mario->JumpBufferFrames = 0;
                 mario->IsCrouching = false;
 
-                f.Events.MarioPlayerJumped(f, filter.Entity, JumpState.None, false);
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(JumpState.None), false);
             }
         }
 

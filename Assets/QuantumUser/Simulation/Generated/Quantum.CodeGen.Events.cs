@@ -424,7 +424,7 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventMarioPlayerJumped MarioPlayerJumped(Frame Frame, EntityRef Entity, JumpState JumpState, QBoolean WasBounce) {
+      public EventMarioPlayerJumped MarioPlayerJumped(Frame Frame, EntityRef Entity, PlayerAction JumpState, QBoolean WasBounce) {
         var ev = _f.Context.AcquireEvent<EventMarioPlayerJumped>(EventMarioPlayerJumped.ID);
         ev.Frame = Frame;
         ev.Entity = Entity;
@@ -1695,7 +1695,7 @@ namespace Quantum {
     public new const Int32 ID = 37;
     public Frame Frame;
     public EntityRef Entity;
-    public JumpState JumpState;
+    public PlayerAction JumpState;
     public QBoolean WasBounce;
     protected EventMarioPlayerJumped(Int32 id, EventFlags flags) : 
         base(id, flags) {
