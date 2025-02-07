@@ -378,8 +378,7 @@ namespace Quantum {
             transform->Position = spawnpoint;
             f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
 
-            //IsDead = true;
-            action = PlayerAction.GroundPound;
+            IsDead = true;
             f.Unsafe.GetPointer<Freezable>(entity)->FrozenCubeEntity = EntityRef.None;
             FacingRight = true;
             WallslideEndFrames = 0;

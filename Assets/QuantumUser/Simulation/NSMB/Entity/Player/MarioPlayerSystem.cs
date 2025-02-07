@@ -255,6 +255,19 @@ namespace Quantum {
             }
         }
 
+        public void ActionRespawning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+            var mario = filter.MarioPlayer;
+            mario->actionState++;
+            if (mario->actionState == 0) {
+                mario->PreRespawn(f, filter.Entity, stage);
+                if (QuantumUtils.Decrement(ref mario->RespawnFrames)) {
+                    mario->actionState++;
+                }
+            } else if (mario->actionState == 1) {
+                mario->Respawn(f, filter.Entity);
+            }
+        }
+
         #endregion
 
         public void HandleActions(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -292,7 +305,7 @@ namespace Quantum {
 	            case PlayerAction.Pushing:
 	            case PlayerAction.Death:                ActionDeath(f, ref filter, physics, ref inputs); break;
 	            case PlayerAction.LavaDeath:            ActionLavaDeath(f, ref filter, physics, ref inputs); break;
-                case PlayerAction.Respawning:
+                case PlayerAction.Respawning:           ActionRespawning(f, ref filter, physics, ref inputs, stage); break;
 	            case PlayerAction.EnteringPipe: break;
             }
         }
@@ -1799,12 +1812,8 @@ namespace Quantum {
 
             // Respawn timers
             // Actually respawning
-            if (mario->IsRespawning) {
-                if (QuantumUtils.Decrement(ref mario->RespawnFrames)) {
-                    mario->Respawn(f, entity);
-                    return false;
-                }
-                return true;
+            if (mario->action == PlayerAction.Respawning) {
+                return false;
             }
 
             // Waiting to prerespawn
@@ -2231,7 +2240,7 @@ namespace Quantum {
             filter.UseCulling = false;
             while (filter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
                 mario->Lives = (byte) f.Global->Rules.Lives;
-                mario->PreRespawn(f, entity, stage);
+                mario->SetPlayerAction(PlayerAction.Respawning);
             }
         }
 
