@@ -22,42 +22,44 @@ namespace Quantum {
         public int GetActionFlags(PlayerAction action) {
             int actionFlags = 0;
             switch (action) {
-                // is a cutscene
-                case PlayerAction.Death:
-                    actionFlags |= (int) ActionFlags.Cutscene;
-                    break;
+            // is a cutscene
+            case PlayerAction.Respawning:
+            case PlayerAction.LavaDeath:
+            case PlayerAction.Death:
+                actionFlags |= (int) ActionFlags.Cutscene;
+                break;
 
-                case var x when (x >= PlayerAction.Idle && x <= PlayerAction.Sliding) ||
-                            (x >= PlayerAction.PropellerSpin && x <= PlayerAction.PropellerDrill):
-                    actionFlags |= (int) (ActionFlags.AllowGroundBump | ActionFlags.CameraChange);
-                    break;
+            case var x when (x >= PlayerAction.Idle && x <= PlayerAction.Sliding) ||
+                        (x >= PlayerAction.PropellerSpin && x <= PlayerAction.PropellerDrill):
+                actionFlags |= (int) (ActionFlags.AllowGroundBump | ActionFlags.CameraChange);
+                break;
 
-                // all one star
-                case var x when x >= PlayerAction.SingleJump && x <= PlayerAction.Wallkick:
-                    actionFlags |= (int) ActionFlags.AirAction;
-                    break;
+            // all one star
+            case var x when x >= PlayerAction.SingleJump && x <= PlayerAction.Wallkick:
+                actionFlags |= (int) ActionFlags.AirAction;
+                break;
 
-                // knockback actions are intangible
-                case var x when x >= PlayerAction.SoftKnockback && x <= PlayerAction.HardKnockback:
-                    actionFlags |= (int) ActionFlags.Intangible;
-                    break;
+            // knockback actions are intangible
+            case var x when x >= PlayerAction.SoftKnockback && x <= PlayerAction.HardKnockback:
+                actionFlags |= (int) ActionFlags.Intangible;
+                break;
 
-                // these don't let you bounce
-                case PlayerAction.SpinBlockDrill:
-                case PlayerAction.BlueShellJump:
-                case PlayerAction.GroundPound:
-                    actionFlags |= (int) ActionFlags.NoPlayerBounce;
-                    break;
+            // these don't let you bounce
+            case PlayerAction.SpinBlockDrill:
+            case PlayerAction.BlueShellJump:
+            case PlayerAction.GroundPound:
+                actionFlags |= (int) ActionFlags.NoPlayerBounce;
+                break;
 
-                // is shelled
-                case var x when x >= PlayerAction.BlueShellCrouch && x <= PlayerAction.BlueShellGroundPound:
-                    actionFlags |= (int) ActionFlags.IsShelled;
-                    break;
+            // is shelled
+            case var x when x >= PlayerAction.BlueShellCrouch && x <= PlayerAction.BlueShellGroundPound:
+                actionFlags |= (int) ActionFlags.IsShelled;
+                break;
 
-                // takes 3 stars from the start
-                case PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill:
-                    actionFlags |= (int) ActionFlags.Takes3Stars;
-                    break;
+            // takes 3 stars from the start
+            case PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill:
+                actionFlags |= (int) ActionFlags.Takes3Stars;
+                break;
             }
             return actionFlags;
         }
@@ -74,6 +76,14 @@ namespace Quantum {
 
             UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}]");
             return action;
+        }
+
+        public PlayerAction SetAirOrGroundAction(PhysicsObject* physicsObject) {
+            if (physicsObject->IsTouchingGround) {
+                return SetPlayerAction(PlayerAction.Idle);
+            } else {
+                return SetPlayerAction(PlayerAction.Freefall);
+            }
         }
 
         public bool HasActionFlags(ActionFlags actionFlags) {
