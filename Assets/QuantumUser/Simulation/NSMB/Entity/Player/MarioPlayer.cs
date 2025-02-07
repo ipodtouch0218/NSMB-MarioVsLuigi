@@ -79,6 +79,29 @@ namespace Quantum {
             return (this.actionFlags & (int)actionFlags) != 0;
         }
 
+        public void AddActionFlags(ActionFlags actionFlags) {
+            this.actionFlags |= (int)actionFlags;
+        }
+
+        public void ClearActionFlags(ActionFlags actionFlags) {
+            this.actionFlags &= ~(int)actionFlags;
+        }
+
+        public void CheckEntityBounce(bool checkPlayer = false) {
+            if (!checkPlayer) {
+                if (HasActionFlags(ActionFlags.NoEnemyBounce)) {
+                    DoEntityBounce = false;
+                    return;
+                }
+            } else {
+                if (HasActionFlags(ActionFlags.NoPlayerBounce)) {
+                    DoEntityBounce = false;
+                    return;
+                }
+            }
+            DoEntityBounce = true;
+        }
+
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
             if (!f.Exists(HeldEntity)) {
                 return default;
