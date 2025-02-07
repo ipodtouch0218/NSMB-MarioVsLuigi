@@ -749,10 +749,10 @@ namespace NSMB.Entities.Player {
                 SpawnParticle("Prefabs/Particle/PlayerBounce", attackerTransform->Position.ToUnityVector3());
             }
 
-            PlaySound(e.Weak ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+            PlaySound(e.Action == PlayerAction.SoftKnockback ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
 
             if (Utils.Utils.IsMarioLocal(e.Entity)) {
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, e.Weak ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, e.Action == PlayerAction.SoftKnockback ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
             }
         }
 

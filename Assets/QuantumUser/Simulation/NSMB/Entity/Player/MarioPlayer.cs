@@ -55,7 +55,7 @@ namespace Quantum {
                     break;
 
                 // takes 3 stars from the start
-                case PlayerAction.PropellerDrill | PlayerAction.SpinBlockDrill:
+                case PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill:
                     actionFlags |= (int) ActionFlags.Takes3Stars;
                     break;
             }
@@ -236,7 +236,6 @@ namespace Quantum {
                 return;
             }
 
-            IsDead = true;
             FireDeath = fire;
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
 
@@ -310,7 +309,7 @@ namespace Quantum {
                 SetPlayerAction(PlayerAction.Walk);
             }
 
-            if (!IsDead) {
+            if (action != PlayerAction.Death && action != PlayerAction.LavaDeath) {
                 DamageInvincibilityFrames = 2 * 60;
                 f.Events.MarioPlayerTookDamage(f, entity);
             }
@@ -516,15 +515,9 @@ namespace Quantum {
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(mario);
             marioTransform->Position.X = pipeTransform->Position.X;
 
-            IsCrouching = false;
-            IsSliding = false;
-            IsPropellerFlying = false;
             UsedPropellerThisJump = false;
             PropellerLaunchFrames = 0;
             PropellerSpinFrames = 0;
-            IsSpinnerFlying = false;
-            IsInShell = false;
-            PipeEntering = true;
 
             if (InvincibilityFrames > 0) {
                 InvincibilityFrames += (ushort) (PipeFrames * 2);

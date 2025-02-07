@@ -92,8 +92,10 @@ namespace Quantum {
     DoubleJump,
     TripleJump,
     Freefall,
+    WallSlide,
     Wallkick,
     GroundPound,
+    MiniGroundPound,
     SoftKnockback,
     NormalKnockback,
     HardKnockback,
@@ -107,6 +109,7 @@ namespace Quantum {
     PropellerFall,
     PropellerDrill,
     Death,
+    LavaDeath,
     EnteringPipe,
   }
   public enum PowerupReserveResult : byte {
