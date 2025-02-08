@@ -381,7 +381,9 @@ namespace NSMB.Entities.Player {
 
             } else if (mario->action == PlayerAction.SpinBlockSpin || mario->action == PlayerAction.PropellerSpin ||
                 mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) {
-                modelRotationTarget *= Quaternion.Euler(0, (-1200 - ((mario->PropellerLaunchFrames / 60f) * 1400) -((mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) ? 900 : 0) + (mario->IsPropellerFlying && mario->PropellerSpinFrames == 0 && physicsObject->Velocity.Y < 0 ? 700 : 0)) * delta, 0);
+                modelRotationTarget *= Quaternion.Euler(0, (-1200 - ((mario->PropellerLaunchFrames / 60f) * 1400)
+                    - ((mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) ? 900 : 0)
+                    + (mario->action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames == 0 && physicsObject->Velocity.Y < 0 ? 700 : 0)) * delta, 0);
                 modelRotateInstantly = true;
 
             } else if (mario->IsWallsliding) {
@@ -437,7 +439,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamOnGround,         physicsObject->IsTouchingGround || mario->IsStuckInBlock || mario->CoyoteTimeFrames > 0);
             animator.SetBool(ParamInvincible,       mario->IsStarmanInvincible);
             animator.SetBool(ParamSkidding,         mario->action == PlayerAction.Skidding);
-            animator.SetBool(ParamPropeller,        mario->action == PlayerAction.PropellerFall); // little confused on this one, where is IsPropellerFlying used?
+            animator.SetBool(ParamPropeller,        mario->action == PlayerAction.PropellerSpin); // little confused on this one, where is IsPropellerFlying used?
             animator.SetBool(ParamPropellerSpin,    mario->action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames > 0);
             animator.SetBool(ParamPropellerStart,   mario->action == PlayerAction.PropellerSpin && mario->PropellerLaunchFrames > 0); // confusing
             animator.SetBool(ParamCrouching,        mario->action == PlayerAction.Crouch);

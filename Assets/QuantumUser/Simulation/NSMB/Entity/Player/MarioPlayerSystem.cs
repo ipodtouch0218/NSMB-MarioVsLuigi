@@ -100,12 +100,20 @@ namespace Quantum {
         public void ActionSingleDoubleJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
-            if (inputs.Down.IsDown && AllowGroundpound(f, ref filter, physics, ref inputs, stage)) {
-                mario->SetPlayerAction(PlayerAction.GroundPound);
-                mario->CurrentPowerupState = PowerupState.FireFlower;
+            if (EnableGroundpound(f, ref filter, physics, ref inputs, stage)) {
+                mario->CurrentPowerupState = PowerupState.PropellerMushroom;
             }
 
             EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
+            EnablePropellerPowerup(f, ref filter, physics, ref inputs, stage, mario->CurrentPowerupState);
+
+            mario->SetGroundAction(physicsObject);
+        }
+        public void ActionTripleJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            EnableGroundpound(f, ref filter, physics, ref inputs, stage);
             EnablePropellerPowerup(f, ref filter, physics, ref inputs, stage, mario->CurrentPowerupState);
 
             mario->SetGroundAction(physicsObject);
@@ -114,9 +122,9 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (inputs.Down.IsDown && AllowGroundpound(f, ref filter, physics, ref inputs, stage)) {
-                mario->SetPlayerAction(PlayerAction.GroundPound);
-            }
+            EnableGroundpound(f, ref filter, physics, ref inputs, stage);
+            EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
+            EnablePropellerPowerup(f, ref filter, physics, ref inputs, stage, mario->CurrentPowerupState);
 
             mario->SetGroundAction(physicsObject);
         }
@@ -322,6 +330,9 @@ namespace Quantum {
 
         #endregion
 
+        /*
+         * These are a set of methods that help actions function.
+         */
         #region Action Helpers
         public void HandleActions(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
@@ -334,8 +345,8 @@ namespace Quantum {
                 case PlayerAction.Crouch:
                 case PlayerAction.Sliding:
                 case PlayerAction.SingleJump:           ActionSingleDoubleJump(f, ref filter, physics, ref inputs, stage); break;
-                case PlayerAction.DoubleJump:
-                case PlayerAction.TripleJump:
+                case PlayerAction.DoubleJump:           ActionSingleDoubleJump(f, ref filter, physics, ref inputs, stage); break;
+                case PlayerAction.TripleJump:           ActionTripleJump(f, ref filter, physics, ref inputs, stage); break;
 	            case PlayerAction.HoldJump: break;
 	            case PlayerAction.Freefall:             ActionFreefall(f, ref filter, physics, ref inputs, stage); break;
 	            case PlayerAction.WallSlide:            ActionWallSlide(f, ref filter, physics, ref inputs, stage); break;
@@ -361,8 +372,12 @@ namespace Quantum {
             }
         }
 
-        private void EnableShootingPowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, PowerupState state) {
-            if (!inputs.PowerupAction.WasPressed) return;
+        /// <summary>
+        /// Add this to an action to allow the player to shoot something while in that action.
+        /// </summary>
+        /// <returns>if we could launch a projectile or not.</returns>
+        private bool EnableShootingPowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, PowerupState state) {
+            if (!inputs.PowerupAction.WasPressed) return false;
             var mario = filter.MarioPlayer;
             switch (state) {
             case PowerupState.IceFlower:
@@ -370,7 +385,7 @@ namespace Quantum {
             case PowerupState.HammerSuit: {
                 byte activeProjectiles = mario->CurrentProjectiles;
                 if (activeProjectiles >= physics.MaxProjecitles) {
-                    return;
+                    return false;
                 }
 
                 if (activeProjectiles < 2) {
@@ -381,22 +396,26 @@ namespace Quantum {
                     mario->CurrentVolley++;
                 } else {
                     // No more left in volley
-                    return;
+                    return false;
                 }
 
                 mario->SetPlayerAction(PlayerAction.PowerupShoot, (int) state);
                 break;
             }
             }
+            return true;
         }
-
-        private void EnablePropellerPowerup(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage, PowerupState state) {
-            if (state != PowerupState.PropellerMushroom) return;
-            if (!inputs.PropellerPowerupAction.WasPressed) return;
+        /// <summary>
+        /// Attach this to a function to allow the player to use the propeller suit's action.
+        /// </summary>
+        /// <returns>if the propeller was used.</returns>
+        private bool EnablePropellerPowerup(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage, PowerupState state) {
+            if (state != PowerupState.PropellerMushroom) return false;
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            if (!inputs.PowerupAction.WasPressed) return false;
             if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || mario->WalljumpFrames > 0) {
-                return;
+                return false;
             }
 
             mario->PropellerLaunchFrames = physics.PropellerLaunchFrames;
@@ -413,6 +432,137 @@ namespace Quantum {
             PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, FPVector2.Up * FP._0_05 * f.UpdateRate, filter.Entity, stage);
 
             f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
+            return true;
+        }
+        /// <summary>
+        /// Attach this to an action to allow the player to ground pound.
+        /// </summary>
+        /// <returns>if the ground pound was successful or not.</returns>
+        private bool EnableGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.TryStartGroundpound");
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            if (physicsObject->IsTouchingGround || mario->GroundpoundCooldownFrames > 0 || physicsObject->IsUnderwater
+                || f.Exists(mario->CurrentPipe)) {
+                return false;
+            }
+
+            if (!(inputs.Down.IsDown)) {
+                return false;
+            }
+
+            /// * intentional: remove left/right requirement when groundpounding
+            if ((inputs.Left.IsDown || inputs.Right.IsDown)) {
+                return false;
+            }
+            // */
+            // Start groundpound
+            // Check if high enough above ground
+            var transform = filter.Transform;
+            if (PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position, FPVector2.Down, FP._0_50, out _)) {
+                return false;
+            }
+
+            mario->SetPlayerAction(PlayerAction.GroundPound);
+            mario->JumpState = JumpState.None;
+            physicsObject->Velocity = physics.GroundpoundStartVelocity;
+            mario->GroundpoundStartFrames = mario->CurrentPowerupState == PowerupState.MegaMushroom ? physics.GroundpoundStartMegaFrames : physics.GroundpoundStartFrames;
+
+            f.Events.MarioPlayerGroundpoundStarted(f, filter.Entity);
+            return true;
+        }
+
+        private void HandleGroundpoundStartAnimation(ref Filter filter, MarioPlayerPhysicsInfo physics) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGroundpoundStartAnimation");
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            if (mario->GroundpoundStartFrames == 0) {
+                return;
+            }
+
+            if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
+                mario->AddActionFlags(ActionFlags.Takes3Stars | ActionFlags.StrongAction | ActionFlags.BreaksBlocks);
+                if (mario->CurrentPowerupState == PowerupState.BlueShell) {
+                    mario->AddActionFlags(ActionFlags.IsShelled);
+                }
+            }
+
+            physicsObject->Velocity = mario->GroundpoundStartFrames switch {
+                0 => FPVector2.Up * physics.TerminalVelocityGroundpound,
+                >= 4 => physics.GroundpoundStartVelocity,
+                _ => FPVector2.Zero
+            };
+        }
+
+        private void HandleGroundpoundBlockCollision(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage, bool isGroundpound) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGroundpoundBlockCollision");
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            if (!(physicsObject->IsTouchingGround)) {
+                return;
+            }
+
+            // drilling also uses this
+            if (isGroundpound) {
+                f.Events.MarioPlayerGroundpounded(f, filter.Entity);
+            }
+
+            bool interactedAny = false;
+            bool continueGroundpound = true;
+            bool? playBumpSound = null;
+            QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
+            foreach (var contact in contacts) {
+                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+                    continue;
+                }
+
+                // Floor tiles.
+                if (f.Exists(contact.Entity)) {
+                    // Manual Fix: allow ice block groundpound continues
+                    bool ice = f.Has<IceBlock>(contact.Entity);
+                    continueGroundpound &= ice;
+                    interactedAny |= ice;
+                } else {
+                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTile tile = f.FindAsset(tileInstance.Tile);
+                    if (tile is IInteractableTile it) {
+                        continueGroundpound &= it.Interact(f, filter.Entity, InteractionDirection.Down,
+                            new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
+                        interactedAny = true;
+
+                        playBumpSound &= (playBumpSound ?? true) & tempPlayBumpSound;
+                    }
+                }
+            }
+
+            if (playBumpSound ?? false) {
+                f.Events.PlayBumpSound(f, filter.Entity);
+            }
+
+            continueGroundpound &= interactedAny;
+            if (!continueGroundpound) {
+                // remove these flags
+                mario->ClearActionFlags(ActionFlags.BreaksBlocks | ActionFlags.Takes3Stars | ActionFlags.StrongAction);
+                return;
+            }
+
+            if (physicsObject->IsOnSlideableGround && !mario->HasActionFlags(ActionFlags.IsShelled) && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
+                mario->SetPlayerAction(PlayerAction.Sliding);
+                physicsObject->Velocity.X = FPMath.Sign(physicsObject->FloorAngle) * physics.SlideMaxVelocity;
+            }
+
+            // confusing code
+            /*if (mario->IsDrilling) {
+                mario->IsSpinnerFlying &= continueGroundpound;
+                mario->IsPropellerFlying &= continueGroundpound;
+                mario->IsDrilling = continueGroundpound;
+                if (continueGroundpound) {
+                    physicsObject->IsTouchingGround = false;
+                }
+            }*/
         }
         #endregion
 
@@ -1074,129 +1224,6 @@ namespace Quantum {
             // mario->IsGroundpoundActive &= mario->IsGroundpounding;
         }
 
-        private bool AllowGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
-            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.TryStartGroundpound");
-            var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
-
-            if (physicsObject->IsTouchingGround || mario->GroundpoundCooldownFrames > 0 || physicsObject->IsUnderwater
-                || f.Exists(mario->CurrentPipe)) {
-                return false;
-            }
-
-            /// * intentional: remove left/right requirement when groundpounding
-            if ((inputs.Left.IsDown || inputs.Right.IsDown)) {
-                return false;
-            }
-            // */
-            // Start groundpound
-            // Check if high enough above ground
-            var transform = filter.Transform;
-            if (PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position, FPVector2.Down, FP._0_50, out _)) {
-                return false;
-            }
-
-            mario->SetPlayerAction(PlayerAction.GroundPound);
-            mario->JumpState = JumpState.None;
-            physicsObject->Velocity = physics.GroundpoundStartVelocity;
-            mario->GroundpoundStartFrames = mario->CurrentPowerupState == PowerupState.MegaMushroom ? physics.GroundpoundStartMegaFrames : physics.GroundpoundStartFrames;
-
-            f.Events.MarioPlayerGroundpoundStarted(f, filter.Entity);
-            return true;
-        }
-
-        private void HandleGroundpoundStartAnimation(ref Filter filter, MarioPlayerPhysicsInfo physics) {
-            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGroundpoundStartAnimation");
-            var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
-
-            if (mario->GroundpoundStartFrames == 0) {
-                return;
-            }
-
-            if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
-                mario->AddActionFlags(ActionFlags.Takes3Stars | ActionFlags.StrongAction | ActionFlags.BreaksBlocks);
-                if (mario->CurrentPowerupState == PowerupState.BlueShell) {
-                    mario->AddActionFlags(ActionFlags.IsShelled);
-                }
-            }
-
-            physicsObject->Velocity = mario->GroundpoundStartFrames switch {
-                   0 => FPVector2.Up * physics.TerminalVelocityGroundpound,
-                >= 4 => physics.GroundpoundStartVelocity,
-                   _ => FPVector2.Zero
-            };
-        }
-
-        private void HandleGroundpoundBlockCollision(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage, bool isGroundpound) {
-            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGroundpoundBlockCollision");
-            var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
-
-            if (!(physicsObject->IsTouchingGround)) {
-                return;
-            }
-
-            // drilling also uses this
-            if (isGroundpound) {
-                f.Events.MarioPlayerGroundpounded(f, filter.Entity);
-            }
-
-            bool interactedAny = false;
-            bool continueGroundpound = true;
-            bool? playBumpSound = null;
-            QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
-            foreach (var contact in contacts) {
-                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
-                    continue;
-                }
-
-                // Floor tiles.
-                if (f.Exists(contact.Entity)) {
-                    // Manual Fix: allow ice block groundpound continues
-                    bool ice = f.Has<IceBlock>(contact.Entity);
-                    continueGroundpound &= ice;
-                    interactedAny |= ice;
-                } else {
-                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
-                    StageTile tile = f.FindAsset(tileInstance.Tile);
-                    if (tile is IInteractableTile it) {
-                        continueGroundpound &= it.Interact(f, filter.Entity, InteractionDirection.Down,
-                            new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
-                        interactedAny = true;
-
-                        playBumpSound &= (playBumpSound ?? true) & tempPlayBumpSound;
-                    }
-                }
-            }
-
-            if (playBumpSound ?? false) {
-                f.Events.PlayBumpSound(f, filter.Entity);
-            }
-
-            continueGroundpound &= interactedAny;
-            if (!continueGroundpound) {
-                // remove these flags
-                mario->ClearActionFlags(ActionFlags.BreaksBlocks | ActionFlags.Takes3Stars | ActionFlags.StrongAction);
-                return;
-            }
-
-            if (physicsObject->IsOnSlideableGround && !mario->HasActionFlags(ActionFlags.IsShelled) && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
-                mario->SetPlayerAction(PlayerAction.Sliding);
-                physicsObject->Velocity.X = FPMath.Sign(physicsObject->FloorAngle) * physics.SlideMaxVelocity;
-            }
-
-            // confusing code
-            /*if (mario->IsDrilling) {
-                mario->IsSpinnerFlying &= continueGroundpound;
-                mario->IsPropellerFlying &= continueGroundpound;
-                mario->IsDrilling = continueGroundpound;
-                if (continueGroundpound) {
-                    physicsObject->IsTouchingGround = false;
-                }
-            }*/
-        }
-
         public void HandleKnockback(Frame f, ref Filter filter) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleKnockback");
             var entity = filter.Entity;
@@ -1414,6 +1441,7 @@ namespace Quantum {
         // this refrs to things that run every frame
         private void HandleGlobals(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
             QuantumUtils.Decrement(ref mario->GroundpoundCooldownFrames);
             QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 
@@ -1426,6 +1454,8 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref mario->ProjectileVolleyFrames)) {
                 mario->CurrentVolley = 0;
             }
+
+            mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
         }
 
         private void HandlePowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -1445,7 +1475,6 @@ namespace Quantum {
                 }
             }*/
 
-            mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
             mario->IsPropellerFlying &= !physicsObject->IsUnderwater;
             if (mario->IsPropellerFlying) {
                 

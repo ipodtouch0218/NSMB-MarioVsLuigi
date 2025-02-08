@@ -138,7 +138,7 @@ namespace NSMB.Entities.World {
             if (lightSplashPrefab
                 && f.Unsafe.TryGetPointer(e.Splasher, out MarioPlayer* mario)
                 && mario->CurrentPowerupState == PowerupState.MiniMushroom && mario->action != PlayerAction.GroundPound
-                && !mario->IsDead) {
+                && !mario->HasActionFlags(ActionFlags.Cutscene)) {
                 // Mini mario splashed
                 //prefab = lightSplashPrefab;
                 light = true;
