@@ -213,6 +213,7 @@ MonoBehaviour:
     - rid: 4372145401587826696
     - rid: 4372145401587826697
     - rid: 4372145401587826698
+    - rid: 4372145401587826699
   - Components:
     - rid: 8707424676512530432
     - rid: 8707424676512530433
@@ -225,6 +226,7 @@ MonoBehaviour:
     - rid: 8707424676512530440
     - rid: 8707424676512530441
     - rid: 8707424676512530442
+    - rid: 8707424676512530443
   - Components:
     - rid: 1924993351245889536
     - rid: 1924993351245889537
@@ -1264,6 +1266,10 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 4372145401587826691
+      type: {class: ComboKeeperPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Combo: 0
+    - rid: 4372145401587826692
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Offset:
@@ -1273,7 +1279,7 @@ MonoBehaviour:
             RawValue: 26214
         BroadRadius:
           RawValue: 39322
-    - rid: 4372145401587826692
+    - rid: 4372145401587826693
       type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Spawnpoint:
@@ -1285,7 +1291,7 @@ MonoBehaviour:
           Value: 0
         DisableRespawning:
           Value: 0
-    - rid: 4372145401587826693
+    - rid: 4372145401587826694
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         IceBlockSize:
@@ -1306,17 +1312,17 @@ MonoBehaviour:
           Value: 1
         IsFlying:
           Value: 0
-    - rid: 4372145401587826694
+    - rid: 4372145401587826695
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         HoldAboveHead:
           Value: 0
-    - rid: 4372145401587826695
+    - rid: 4372145401587826696
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         ColliderDisabled:
           Value: 0
-    - rid: 4372145401587826696
+    - rid: 4372145401587826697
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         SpawnPowerupWhenStomped:
@@ -1340,7 +1346,7 @@ MonoBehaviour:
             RawValue: 39322
           Y:
             RawValue: 65536
-    - rid: 4372145401587826697
+    - rid: 4372145401587826698
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Gravity:
@@ -1360,7 +1366,7 @@ MonoBehaviour:
           Value: 0
         BreakMegaObjects:
           Value: 0
-    - rid: 4372145401587826698
+    - rid: 4372145401587826699
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
@@ -2253,6 +2259,10 @@ MonoBehaviour:
         CallbackFlags:
           Value: 4095
     - rid: 8707424676512530435
+      type: {class: ComboKeeperPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        Combo: 0
+    - rid: 8707424676512530436
       type: {class: CullablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Offset:
@@ -2262,7 +2272,7 @@ MonoBehaviour:
             RawValue: 26214
         BroadRadius:
           RawValue: 39322
-    - rid: 8707424676512530436
+    - rid: 8707424676512530437
       type: {class: EnemyPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Spawnpoint:
@@ -2274,7 +2284,7 @@ MonoBehaviour:
           Value: 0
         DisableRespawning:
           Value: 0
-    - rid: 8707424676512530437
+    - rid: 8707424676512530438
       type: {class: FreezablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         IceBlockSize:
@@ -2295,17 +2305,17 @@ MonoBehaviour:
           Value: 1
         IsFlying:
           Value: 0
-    - rid: 8707424676512530438
+    - rid: 8707424676512530439
       type: {class: HoldablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         HoldAboveHead:
           Value: 0
-    - rid: 8707424676512530439
+    - rid: 8707424676512530440
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         ColliderDisabled:
           Value: 0
-    - rid: 8707424676512530440
+    - rid: 8707424676512530441
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         SpawnPowerupWhenStomped:
@@ -2329,7 +2339,7 @@ MonoBehaviour:
             RawValue: 39322
           Y:
             RawValue: 65536
-    - rid: 8707424676512530441
+    - rid: 8707424676512530442
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Gravity:
@@ -2349,7 +2359,7 @@ MonoBehaviour:
           Value: 0
         BreakMegaObjects:
           Value: 0
-    - rid: 8707424676512530442
+    - rid: 8707424676512530443
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0

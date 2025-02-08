@@ -57,14 +57,17 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [ArianLust](https://github.com/ArianLust)
 * [AtwerJ](https://github.com/AtwerJ)
 * [Ave](https://github.com/AutumnLeafy)
+* [BluCorDev](https://github.com/BluCorDev)
 * [Cubby Crazes](https://github.com/CubbyCrazes)
 * [davart154](https://github.com/davart154)
 * [DonKaiStorm](https://github.com/DonKaiStorm)
 * [GithubSPerez](https://github.com/GithubSPerez)
 * GradedWarrior
 * [Jeffjewett27](https://github.com/Jeffjewett27)
+* [KingKittyTurnip](https://github.com/KingKittyTurnip)
 * [kittenchilly](https://github.com/kittenchilly)
 * [Kraken](https://github.com/KrakHub)
+* [MiiBumm](https://github.com/MiiBumm)
 * [mindnomad](https://github.com/mindnomad)
 * [Pordrack](https://github.com/Pordrack)
 * [skarph](https://github.com/skarph)
@@ -75,6 +78,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [xFrostyCake123](https://github.com/xFrostyCake123)
 * [VLC](https://github.com/vlcoo)
 * [Zest](https://github.com/zestydevy)
+* _ZombleBobble
 
 ### Music:
 * Cubby Crazes

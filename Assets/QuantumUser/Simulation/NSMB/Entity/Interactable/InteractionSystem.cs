@@ -143,6 +143,11 @@ namespace Quantum {
                         TryCollideWithEntity(fts, entity, hits[i].Entity);
                     }
                 }
+                if (f.Physics2D.TryGetQueryHits(interactable->OverlapLevelSeamQueryRef, out hits)) {
+                    for (int i = 0; i < hits.Count; i++) {
+                        TryCollideWithEntity(fts, entity, hits[i].Entity);
+                    }
+                }
 
                 // Collide with physical objects
                 if (f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
@@ -168,7 +173,7 @@ namespace Quantum {
                 return;
             }
 
-            if (!f.TryGetPointer(entityB, out Interactable* entityBInteractable) || entityBInteractable->ColliderDisabled) {
+            if (f.TryGetPointer(entityB, out Interactable* entityBInteractable) && entityBInteractable->ColliderDisabled) {
                 return;
             }
 

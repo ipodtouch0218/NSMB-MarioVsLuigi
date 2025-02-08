@@ -1059,8 +1059,8 @@ namespace Quantum {
             var extents = shape.Box.Extents;
 
             FPVector2 origin = position + shape.Centroid;
-            Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents);
-            Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents);
+            Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents, extend: false);
+            Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents, extend: false);
 
             int count = 0;
             for (int x = min.x; x <= max.x; x++) {

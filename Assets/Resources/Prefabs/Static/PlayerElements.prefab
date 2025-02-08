@@ -1010,7 +1010,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1653659855, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
+  m_Sprite: {fileID: 2010020060, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1034,7 +1034,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDisplaying: 1
   runInEditor: 0
-  frame: 0
+  frame: 2.48685
   fps: 8.571428
   frames:
   - {fileID: -1653659855, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
@@ -1636,7 +1636,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1653659855, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
+  m_Sprite: {fileID: 2010020060, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1660,7 +1660,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDisplaying: 1
   runInEditor: 0
-  frame: 0
+  frame: 2.48685
   fps: 8.571428
   frames:
   - {fileID: -1653659855, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
@@ -5203,7 +5203,7 @@ GameObject:
   - component: {fileID: 7207626703234073965}
   - component: {fileID: 780304165651409904}
   m_Layer: 5
-  m_Name: Parent
+  m_Name: DisableDuringResults
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6844,7 +6844,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1653659855, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
+  m_Sprite: {fileID: 2010020060, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -6868,7 +6868,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDisplaying: 1
   runInEditor: 0
-  frame: 0
+  frame: 2.48685
   fps: 8.571428
   frames:
   - {fileID: -1653659855, guid: 2409b6fca6131e64e975d45ac58caecb, type: 3}
@@ -14828,7 +14828,6 @@ RectTransform:
   - {fileID: 7207626703234073965}
   - {fileID: 1310746913248571851}
   - {fileID: 2059523408431071351}
-  - {fileID: 6453704436573441194}
   m_Father: {fileID: 9028073301653552347}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -14863,6 +14862,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerElements: {fileID: 2058053739306675502}
+  toggler: {fileID: 780304165651409904}
   playerTrackTemplate: {fileID: 1664770316685335005}
   starTrackTemplate: {fileID: 5220781289269746384}
   storedItemNull: {fileID: -4773353537684922170, guid: a87d3b028baa82640b06b88398a8c4f0,
@@ -15068,14 +15068,14 @@ Canvas:
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 1
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &4831391214738615404
 MonoBehaviour:
@@ -15201,7 +15201,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 112.1
+  m_fontSize: 90.05
   m_fontSizeBase: 42
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -16811,12 +16811,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6527823767786401461}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1981666707050521408}
+  m_Father: {fileID: 9028073301653552347}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -20103,14 +20103,14 @@ Canvas:
   m_PlaneDistance: 1000
   m_PixelPerfect: 1
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!1 &7866242480031219371
 GameObject:
@@ -20724,6 +20724,7 @@ RectTransform:
   m_Children:
   - {fileID: 2529117407802911008}
   - {fileID: 1981666707050521408}
+  - {fileID: 6453704436573441194}
   m_Father: {fileID: 8624746398580605433}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

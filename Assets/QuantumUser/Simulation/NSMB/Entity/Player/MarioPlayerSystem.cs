@@ -61,6 +61,9 @@ namespace Quantum {
             }
 
             if (HandleStuckInBlock(f, ref filter, stage)) {
+                HandleCrouching(f, ref filter, physics);
+                HandleFacingDirection(f, ref filter, physics);
+                HandleHitbox(f, ref filter, physics);
                 return;
             }
             HandleKnockback(f, ref filter);
@@ -1905,9 +1908,7 @@ namespace Quantum {
                 }
             }
 
-            if (projectileAsset.DestroyOnHit) {
-                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            }
+            f.Signals.OnProjectileHitEntity(f, projectileEntity, marioEntity);
         }
 
         public static void OnMarioMarioInteraction(Frame f, EntityRef marioAEntity, EntityRef marioBEntity) {
