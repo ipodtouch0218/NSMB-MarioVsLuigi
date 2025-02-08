@@ -71,6 +71,7 @@ namespace Quantum {
             }
 
             HandleActions(f, ref filter, physics, ref input, stage);
+            HandleGlobals(f, ref filter, physics, ref input, stage);
             HandlePowerups(f, ref filter, physics, ref input, stage);
             HandleBreakingBlocks(f, ref filter, physics, ref input, stage);
             HandleCrouching(f, ref filter, physics, ref input);
@@ -94,26 +95,30 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            mario->SetAirOrGroundAction(physicsObject);
+            mario->SetAirAction(physicsObject);
         }
         public void ActionSingleDoubleJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
             if (inputs.Down.IsDown && AllowGroundpound(f, ref filter, physics, ref inputs, stage)) {
                 mario->SetPlayerAction(PlayerAction.GroundPound);
+                mario->CurrentPowerupState = PowerupState.FireFlower;
             }
+
+            EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
+            EnablePropellerPowerup(f, ref filter, physics, ref inputs, stage, mario->CurrentPowerupState);
+
+            mario->SetGroundAction(physicsObject);
         }
         public void ActionFreefall(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (physicsObject->IsTouchingGround) {
-                mario->SetAirOrGroundAction(physicsObject);
-                return;
-            }
-
             if (inputs.Down.IsDown && AllowGroundpound(f, ref filter, physics, ref inputs, stage)) {
                 mario->SetPlayerAction(PlayerAction.GroundPound);
             }
+
+            mario->SetGroundAction(physicsObject);
         }
         public void ActionWallSlide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
@@ -163,6 +168,8 @@ namespace Quantum {
                 mario->WallslideEndFrames = 0;
                 mario->JumpBufferFrames = 0;
             }
+
+            mario->SetGroundAction(physicsObject);
         }
 
         public void ActionGroundPound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -176,12 +183,16 @@ namespace Quantum {
             if (physicsObject->IsTouchingGround && physicsObject->WasTouchingGround && !inputs.Down.IsDown) {
                 // Cancel from being grounded
                 mario->GroundpoundStandFrames = 15;
-                mario->SetAirOrGroundAction(physicsObject);
+                mario->SetGroundAction(physicsObject);
             } else if (inputs.Up.IsDown && mario->GroundpoundStartFrames == 0) {
                 // Cancel from hitting "up"
                 mario->GroundpoundCooldownFrames = 12;
-                mario->SetAirOrGroundAction(physicsObject);
+                mario->SetAirAction(physicsObject);
             }
+
+            // flags such as ActionFlags.BreaksBlocks are added here
+            HandleGroundpoundStartAnimation(ref filter, physics);
+            HandleGroundpoundBlockCollision(f, ref filter, physics, stage, true);
         }
 
         public void ActionSpinBlockSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -224,7 +235,7 @@ namespace Quantum {
                     f.Events.MarioPlayerPropellerSpin(f, filter.Entity);
                 }
             }
-            mario->SetAirOrGroundAction(physicsObject, checkAir: false);
+            mario->SetGroundAction(physicsObject);
         }
 
         public void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -240,6 +251,7 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref mario->PropellerDrillHoldFrames)) {
                 mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
             }
+            HandleGroundpoundBlockCollision(f, ref filter, physics, stage, false);
         }
 
         public void ActionPowerupShoot(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -277,7 +289,8 @@ namespace Quantum {
 
             // Weird interaction in the main game...
             mario->WalljumpFrames = 0;
-            mario->SetAirOrGroundAction(physicsObject); // return action to idle
+            mario->SetGroundAction(physicsObject); // return action to idle
+            mario->SetAirAction(physicsObject); // return action to freefall if air
         }
 
         public void ActionDeath(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -309,6 +322,7 @@ namespace Quantum {
 
         #endregion
 
+        #region Action Helpers
         public void HandleActions(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             switch (mario->action) {
@@ -346,6 +360,61 @@ namespace Quantum {
 	            case PlayerAction.EnteringPipe: break;
             }
         }
+
+        private void EnableShootingPowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, PowerupState state) {
+            if (!inputs.PowerupAction.WasPressed) return;
+            var mario = filter.MarioPlayer;
+            switch (state) {
+            case PowerupState.IceFlower:
+            case PowerupState.FireFlower:
+            case PowerupState.HammerSuit: {
+                byte activeProjectiles = mario->CurrentProjectiles;
+                if (activeProjectiles >= physics.MaxProjecitles) {
+                    return;
+                }
+
+                if (activeProjectiles < 2) {
+                    // Always allow if < 2
+                    mario->CurrentVolley = (byte) (activeProjectiles + 1);
+                } else if (mario->CurrentVolley < physics.ProjectileVolleySize) {
+                    // Allow in this volley
+                    mario->CurrentVolley++;
+                } else {
+                    // No more left in volley
+                    return;
+                }
+
+                mario->SetPlayerAction(PlayerAction.PowerupShoot, (int) state);
+                break;
+            }
+            }
+        }
+
+        private void EnablePropellerPowerup(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage, PowerupState state) {
+            if (state != PowerupState.PropellerMushroom) return;
+            if (!inputs.PropellerPowerupAction.WasPressed) return;
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+            if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || mario->WalljumpFrames > 0) {
+                return;
+            }
+
+            mario->PropellerLaunchFrames = physics.PropellerLaunchFrames;
+            mario->UsedPropellerThisJump = true;
+            mario->SetPlayerAction(PlayerAction.PropellerSpin);
+
+            mario->JumpState = JumpState.None;
+            mario->CoyoteTimeFrames = 0;
+
+            // Fix sticky ground
+            physicsObject->WasTouchingGround = false;
+            physicsObject->IsTouchingGround = false;
+            physicsObject->HoverFrames = 0;
+            PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, FPVector2.Up * FP._0_05 * f.UpdateRate, filter.Entity, stage);
+
+            f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
+        }
+        #endregion
 
         public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWalkingRunning");
@@ -901,8 +970,8 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (f.Exists(mario->CurrentPipe) || mario->IsInShell || mario->IsCrouchedInShell
-                || (mario->IsGroundpounding && !physicsObject->IsTouchingGround) 
+            if (f.Exists(mario->CurrentPipe) || mario->HasActionFlags(ActionFlags.IsShelled)
+                || (mario->action == PlayerAction.GroundPound && !physicsObject->IsTouchingGround) 
                 || (mario->IsCrouching && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05)) {
                 return;
             }
@@ -951,14 +1020,14 @@ namespace Quantum {
             */
 
             bool wasCrouching = mario->IsCrouching;
-            mario->IsCrouching = 
+            /*mario->IsCrouching = 
                 (
                     (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding) 
                     || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
                     /* || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics)) */
-                ) 
-                && !mario->HeldEntity.IsValid 
-                && !mario->IsInShell;
+                //) 
+                //&& !mario->HeldEntity.IsValid 
+                //&& !mario->IsInShell;*/
 
             if (mario->IsCrouching && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                 var contacts = f.ResolveList(physicsObject->Contacts);
@@ -987,24 +1056,19 @@ namespace Quantum {
             }
 
             bool allowGroundpoundStart = mario->GroundpoundCooldownFrames == 1 || mario->IsPropellerFlying || mario->IsSpinnerFlying;
-            QuantumUtils.Decrement(ref mario->GroundpoundCooldownFrames);
-            QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
 
             // if (inputs.Down.IsDown && allowGroundpoundStart) {
                 // TryStartGroundpound(f, ref filter, physics, ref inputs, stage);
             //}
 
-            HandleGroundpoundStartAnimation(ref filter, physics);
-            HandleGroundpoundBlockCollision(f, ref filter, physics, stage);
-
-            if (physicsObject->IsUnderwater && (mario->IsGroundpounding || mario->IsDrilling)) {
+            /*if (physicsObject->IsUnderwater && (mario->IsGroundpounding || mario->IsDrilling)) {
                 physicsObject->Velocity.Y += physics.SwimGroundpoundDeceleration * f.DeltaTime;
                 if (physicsObject->Velocity.Y >= physics.SwimTerminalVelocityButtonHeld) {
                     // do nothing?
                 }
             } else if (mario->IsGroundpounding) {
                 
-            }
+            }*/
             
             // Bodge: i can't find the desync...
             // mario->IsGroundpoundActive &= mario->IsGroundpounding;
@@ -1046,12 +1110,12 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (mario->action != PlayerAction.GroundPound || mario->GroundpoundStartFrames == 0) {
+            if (mario->GroundpoundStartFrames == 0) {
                 return;
             }
 
             if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
-                mario->AddActionFlags(ActionFlags.Takes3Stars | ActionFlags.StrongAction);
+                mario->AddActionFlags(ActionFlags.Takes3Stars | ActionFlags.StrongAction | ActionFlags.BreaksBlocks);
                 if (mario->CurrentPowerupState == PowerupState.BlueShell) {
                     mario->AddActionFlags(ActionFlags.IsShelled);
                 }
@@ -1064,16 +1128,17 @@ namespace Quantum {
             };
         }
 
-        private void HandleGroundpoundBlockCollision(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
+        private void HandleGroundpoundBlockCollision(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage, bool isGroundpound) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGroundpoundBlockCollision");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            if (!(physicsObject->IsTouchingGround && ((mario->IsGroundpounding && mario->IsGroundpoundActive) || mario->IsDrilling))) {
+            if (!(physicsObject->IsTouchingGround)) {
                 return;
             }
 
-            if (mario->action != PlayerAction.PropellerDrill || mario->action != PlayerAction.SpinBlockDrill) {
+            // drilling also uses this
+            if (isGroundpound) {
                 f.Events.MarioPlayerGroundpounded(f, filter.Entity);
             }
 
@@ -1110,22 +1175,26 @@ namespace Quantum {
             }
 
             continueGroundpound &= interactedAny;
-            mario->IsGroundpoundActive &= continueGroundpound;
+            if (!continueGroundpound) {
+                // remove these flags
+                mario->ClearActionFlags(ActionFlags.BreaksBlocks | ActionFlags.Takes3Stars | ActionFlags.StrongAction);
+                return;
+            }
 
-            if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
-                mario->IsGroundpounding = false;
-                mario->IsSliding = true;
+            if (physicsObject->IsOnSlideableGround && !mario->HasActionFlags(ActionFlags.IsShelled) && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
+                mario->SetPlayerAction(PlayerAction.Sliding);
                 physicsObject->Velocity.X = FPMath.Sign(physicsObject->FloorAngle) * physics.SlideMaxVelocity;
             }
 
-            if (mario->IsDrilling) {
+            // confusing code
+            /*if (mario->IsDrilling) {
                 mario->IsSpinnerFlying &= continueGroundpound;
                 mario->IsPropellerFlying &= continueGroundpound;
                 mario->IsDrilling = continueGroundpound;
                 if (continueGroundpound) {
                     physicsObject->IsTouchingGround = false;
                 }
-            }
+            }*/
         }
 
         public void HandleKnockback(Frame f, ref Filter filter) {
@@ -1206,8 +1275,6 @@ namespace Quantum {
                 mario->WallslideLeft = false;
                 mario->WallslideRight = false;
                 mario->IsTurnaround = false;
-                mario->IsGroundpoundActive = false;
-                mario->IsGroundpounding = false;
                 mario->IsDrilling = false;
                 mario->IsSpinnerFlying = false;
                 mario->IsPropellerFlying = false;
@@ -1285,7 +1352,7 @@ namespace Quantum {
                     FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
                     if (upDot > PhysicsObjectSystem.GroundMaxAngle) {
                         // Ground contact... only allow if groundpounding
-                        if (!mario->IsGroundpoundActive) {
+                        if (mario->action == PlayerAction.GroundPound && mario->HasActionFlags(ActionFlags.BreaksBlocks)) {
                             continue;
                         }
                         direction = InteractionDirection.Down;
@@ -1344,10 +1411,12 @@ namespace Quantum {
             return false;
         }
 
-        private void HandlePowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
-            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandlePowerups");
+        // this refrs to things that run every frame
+        private void HandleGlobals(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
+            QuantumUtils.Decrement(ref mario->GroundpoundCooldownFrames);
+            QuantumUtils.Decrement(ref mario->PropellerDrillCooldown);
+
 
             if (QuantumUtils.Decrement(ref mario->InvincibilityFrames)) {
                 mario->Combo = 0;
@@ -1357,8 +1426,14 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref mario->ProjectileVolleyFrames)) {
                 mario->CurrentVolley = 0;
             }
+        }
 
-            physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15 && (!mario->IsInKnockback || mario->IsInWeakKnockback);
+        private void HandlePowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandlePowerups");
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            /*physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15 && (!mario->IsInKnockback || mario->IsInWeakKnockback);
             if (physicsObject->IsWaterSolid && !physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                 // Check if we landed on water
                 var contacts = f.ResolveList(physicsObject->Contacts);
@@ -1368,106 +1443,12 @@ namespace Quantum {
                         break;
                     }
                 }
-            }
+            }*/
 
             mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
             mario->IsPropellerFlying &= !physicsObject->IsUnderwater;
             if (mario->IsPropellerFlying) {
                 
-            }
-
-            PowerupState state = mario->CurrentPowerupState;
-            if (mario->MegaMushroomStartFrames > 0) {
-                return;
-            }
-
-            if (!(inputs.PowerupAction.WasPressed 
-                || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed && !physicsObject->IsTouchingGround && !mario->IsWallsliding) 
-                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower || state == PowerupState.HammerSuit) && inputs.FireballPowerupAction.WasPressed))) {
-                return;
-            }
-
-            if (mario->IsDead || filter.Freezable->IsFrozen(f) || mario->IsGroundpounding || mario->IsInKnockback || f.Exists(mario->CurrentPipe)
-                || mario->HeldEntity.IsValid || mario->IsCrouching || mario->IsSliding) {
-                return;
-            }
-
-            switch (mario->CurrentPowerupState) {
-            case PowerupState.IceFlower:
-            case PowerupState.FireFlower:
-            case PowerupState.HammerSuit: {
-                if (!fireballReady || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
-                    || mario->IsSpinnerFlying || mario->IsDrilling || mario->action == PlayerAction.Skidding || mario->IsTurnaround) {
-                    return;
-                }
-
-                byte activeProjectiles = mario->CurrentProjectiles;
-                if (activeProjectiles >= physics.MaxProjecitles) {
-                    return;
-                }
-
-                if (activeProjectiles < 2) {
-                    // Always allow if < 2
-                    mario->CurrentVolley = (byte) (activeProjectiles + 1);
-                } else if (mario->CurrentVolley < physics.ProjectileVolleySize) {
-                    // Allow in this volley
-                    mario->CurrentVolley++;
-                } else {
-                    // No more left in volley
-                    return;
-                }
-
-                mario->SetPlayerAction(PlayerAction.PowerupShoot, (int) mario->CurrentPowerupState);
-                break;
-            }
-            case PowerupState.PropellerMushroom: {
-                // check these actions
-                if (mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerSpin) {
-                    return;
-                }
-
-                if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || mario->WalljumpFrames > 0) {
-                    return;
-                }
-
-                mario->PropellerLaunchFrames = physics.PropellerLaunchFrames;
-                mario->UsedPropellerThisJump = true;
-                mario->SetPlayerAction(PlayerAction.PropellerSpin);
-
-                mario->JumpState = JumpState.None;
-                mario->CoyoteTimeFrames = 0;
-
-                // Fix sticky ground
-                physicsObject->WasTouchingGround = false;
-                physicsObject->IsTouchingGround = false;
-                physicsObject->HoverFrames = 0;
-                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, FPVector2.Up * FP._0_05 * f.UpdateRate, filter.Entity, stage);
-
-                f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
-                break;
-            }
-            // this is a debug thing, remove when being merged!
-            default: {
-                if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || (mario->IsSpinnerFlying && mario->IsDrilling) || mario->IsPropellerFlying || mario->WalljumpFrames > 0) {
-                    return;
-                }
-
-                mario->PropellerLaunchFrames = physics.PropellerLaunchFrames;
-                mario->UsedPropellerThisJump = true;
-                mario->SetPlayerAction(PlayerAction.PropellerSpin);
-
-                mario->JumpState = JumpState.None;
-                mario->CoyoteTimeFrames = 0;
-
-                // Fix sticky ground
-                physicsObject->WasTouchingGround = false;
-                physicsObject->IsTouchingGround = false;
-                physicsObject->HoverFrames = 0;
-                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, FPVector2.Up * FP._0_05 * f.UpdateRate, filter.Entity, stage);
-
-                f.Events.MarioPlayerUsedPropeller(f, filter.Entity);
-                break;
-            }
             }
         }
 
@@ -1674,8 +1655,8 @@ namespace Quantum {
 
             FPVector2 iceBlockSize = collider->Shape.Box.Extents;
             FP newHeight;
-            bool crouchHitbox = mario->CurrentPowerupState >= PowerupState.Mushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
-            bool smallHitbox = (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->IsGroundpounding;
+            bool crouchHitbox = mario->CurrentPowerupState >= PowerupState.Mushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && mario->action != PlayerAction.GroundPound) || mario->IsInShell || mario->IsSliding);
+            bool smallHitbox = (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->action != PlayerAction.GroundPound;
             if (mario->CurrentPowerupState <= PowerupState.MiniMushroom || smallHitbox) {
                 newHeight = physics.SmallHitboxHeight;
                 if (smallHitbox) {
@@ -2132,10 +2113,10 @@ namespace Quantum {
 
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             // Crouched in shell stomps
-            if (marioA->IsCrouchedInShell && marioAPhysics->IsTouchingGround && marioBAbove && !marioB->IsGroundpoundActive && !marioB->IsDrilling) {
+            if (marioA->IsCrouchedInShell && marioAPhysics->IsTouchingGround && marioBAbove && !marioB->HasActionFlags(ActionFlags.Takes3Stars)) {
                 MarioMarioBlueShellStomp(f, stage, marioBEntity, marioAEntity, fromRight);
                 return;
-            } else if (marioB->IsCrouchedInShell && marioBPhysics->IsTouchingGround && marioAAbove && !marioA->IsGroundpoundActive && !marioA->IsDrilling) {
+            } else if (marioB->IsCrouchedInShell && marioBPhysics->IsTouchingGround && marioAAbove && !marioA->HasActionFlags(ActionFlags.Takes3Stars)) {
                 MarioMarioBlueShellStomp(f, stage, marioAEntity, marioBEntity, fromRight);
                 return;
             }

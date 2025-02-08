@@ -74,11 +74,16 @@ namespace Quantum {
             return action;
         }
 
-        public PlayerAction SetAirOrGroundAction(PhysicsObject* physicsObject, bool checkGround = true, bool checkAir = true) {
-            if (physicsObject->IsTouchingGround && checkGround) {
-                return SetPlayerAction(PlayerAction.Idle);
-            } else if (checkAir) {
-                return SetPlayerAction(PlayerAction.Freefall);
+        public PlayerAction SetGroundAction(PhysicsObject* physicsObject, PlayerAction groundAction = PlayerAction.Idle) {
+            if (physicsObject->IsTouchingGround) {
+                return SetPlayerAction(groundAction);
+            }
+            return action;
+        }
+
+        public PlayerAction SetAirAction(PhysicsObject* physicsObject, PlayerAction airAction = PlayerAction.Freefall) {
+            if (!physicsObject->IsTouchingGround) {
+                return SetPlayerAction(airAction);
             }
             return action;
         }

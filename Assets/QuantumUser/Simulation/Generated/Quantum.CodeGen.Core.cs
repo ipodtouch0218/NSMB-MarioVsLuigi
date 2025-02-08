@@ -54,7 +54,7 @@ namespace Quantum {
     GivesSoftKnockback = 2,
     GivesNormalKnockback = 4,
     GivesHardKnockback = 8,
-    Takes0Stars = 16,
+    BreaksBlocks = 16,
     Takes1Star = 32,
     Takes3Stars = 64,
     IsShelled = 128,
