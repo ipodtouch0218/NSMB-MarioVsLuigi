@@ -141,8 +141,6 @@ component MarioPlayer {
     [ExcludeFromPrototype] byte WalljumpFrames;
 
 	// Groundpound
-    [ExcludeFromPrototype] bool IsGroundpounding;
-	[ExcludeFromPrototype] bool IsGroundpoundActive;
 	[ExcludeFromPrototype] byte GroundpoundStartFrames;
 	[ExcludeFromPrototype] byte GroundpoundCooldownFrames;
 	[ExcludeFromPrototype] byte GroundpoundStandFrames;

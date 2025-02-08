@@ -143,6 +143,11 @@ namespace Quantum {
                 return;
             }
 
+            // Start wallslide
+            mario->WallslideRight = currentWallDirection == FPVector2.Right && physicsObject->IsTouchingRightWall;
+            mario->WallslideLeft = currentWallDirection == FPVector2.Left && physicsObject->IsTouchingLeftWall;
+            mario->WallslideEndFrames = 0;
+
             // Walljump check
             physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
             mario->FacingRight = mario->WallslideLeft;
@@ -159,6 +164,7 @@ namespace Quantum {
                 mario->JumpBufferFrames = 0;
             }
         }
+
         public void ActionGroundPound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -812,57 +818,55 @@ namespace Quantum {
             physicsObject->TerminalVelocity = terminalVelocity;
         }
 
-        public void HandleWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+        public bool AllowWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, bool isLeft) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWallslide");
 
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
             FPVector2 currentWallDirection;
-            if (mario->IsInShell || mario->IsGroundpounding || mario->IsCrouching || mario->IsDrilling 
-                || mario->IsSpinnerFlying || mario->IsInKnockback || physicsObject->IsUnderwater) {
-                return;
+            if (isLeft) {
+                currentWallDirection = FPVector2.Left;
+            } else if (!isLeft) {
+                currentWallDirection = FPVector2.Right;
+            } else if (inputs.Left.IsDown ^ inputs.Right.IsDown) {
+                if (inputs.Left.IsDown) {
+                    currentWallDirection = FPVector2.Left;
+                } else if (inputs.Right.IsDown) {
+                    currentWallDirection = FPVector2.Right;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
             }
 
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 // Walljump starting check
-                bool canWallslide = !mario->IsInShell && physicsObject->Velocity.Y < -FP._0_10 && !mario->IsGroundpounding && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && !mario->IsSpinnerFlying && !mario->IsDrilling && !mario->IsCrouching && !mario->IsSliding && !mario->IsInKnockback && mario->PropellerLaunchFrames == 0;
+                bool canWallslide = physicsObject->Velocity.Y < -FP._0_10 && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && mario->PropellerLaunchFrames == 0;
                 if (!canWallslide) {
-                    return;
+                    return false;
                 }
 
                 // Check 1
                 if (mario->WalljumpFrames > 0) {
-                    return;
+                    return false;
                 }
 
                 // Check 2
                 if (mario->WallslideEndFrames > 0) {
-                    return;
+                    return false;
                 }
 
                 // Check 4: already handled
                 // Check 5.2: already handled
 
-                //Check 6
-                if (mario->IsCrouching) {
-                    return;
-                }
-
                 // Check 8
-                /*if (!((currentWallDirection == FPVector2.Right && mario->FacingRight) || (currentWallDirection == FPVector2.Left && !mario->FacingRight))) {
-                    return;
+                if (!((currentWallDirection == FPVector2.Right && mario->FacingRight) || (currentWallDirection == FPVector2.Left && !mario->FacingRight))) {
+                    return false;
                 }
-
-                // Start wallslide
-                mario->WallslideRight = currentWallDirection == FPVector2.Right && physicsObject->IsTouchingRightWall;
-                mario->WallslideLeft = currentWallDirection == FPVector2.Left && physicsObject->IsTouchingLeftWall;
-                mario->WallslideEndFrames = 0;
-
-                if (mario->IsWallsliding) {
-                    mario->IsPropellerFlying = false;
-                }*/
             }
+            return true;
         }
 
         private static readonly FPVector2 WallslideLowerHeightOffset = new(0, FP._0_20);
@@ -1417,7 +1421,12 @@ namespace Quantum {
                 break;
             }
             case PowerupState.PropellerMushroom: {
-                if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || (mario->IsSpinnerFlying && mario->IsDrilling) || mario->IsPropellerFlying || mario->WalljumpFrames > 0) {
+                // check these actions
+                if (mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerSpin) {
+                    return;
+                }
+
+                if (mario->UsedPropellerThisJump || physicsObject->IsUnderwater || mario->WalljumpFrames > 0) {
                     return;
                 }
 
@@ -1613,8 +1622,6 @@ namespace Quantum {
             var interactable = f.Unsafe.GetPointer<Interactable>(filter.Entity);
             var currentPipe = f.Unsafe.GetPointer<EnterablePipe>(mario->CurrentPipe);
 
-            mario->IsGroundpounding = false;
-            mario->IsGroundpoundActive = false;
             interactable->ColliderDisabled = true;
             physicsObject->Velocity = mario->PipeDirection;
             physicsObject->DisableCollision = true;
@@ -2309,7 +2316,7 @@ namespace Quantum {
             var liquid = f.Unsafe.GetPointer<Liquid>(liquidEntity);
             *doSplash &= (!mario->IsDead || liquid->LiquidType == LiquidType.Water) && !f.Exists(mario->CurrentPipe);
 
-            if (!exit && mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding) {
+            if (!exit && mario->CurrentPowerupState == PowerupState.MiniMushroom && mario->action == PlayerAction.GroundPound) {
                 *doSplash = false;
             }
 
