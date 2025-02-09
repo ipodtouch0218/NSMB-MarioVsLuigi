@@ -445,10 +445,10 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamCrouching,        mario->action == PlayerAction.Crouch);
             animator.SetBool(ParamGroundpound,      mario->action == PlayerAction.GroundPound);
             animator.SetBool(ParamSliding,          mario->action == PlayerAction.Sliding);
-            animator.SetBool(ParamKnockback,        mario->action == PlayerAction.NormalKnockback || mario->action == PlayerAction.HardKnockback);
+            animator.SetBool(ParamKnockback,        mario->action is PlayerAction.NormalKnockback or PlayerAction.HardKnockback);
             animator.SetBool(ParamFacingRight,      (left ^ right) ? right : mario->FacingRight);
             animator.SetBool(ParamFlying,           mario->action == PlayerAction.SpinBlockSpin);
-            animator.SetBool(ParamDrill,            mario->action == PlayerAction.PropellerDrill || mario->action == PlayerAction.SpinBlockDrill);
+            animator.SetBool(ParamDrill,            mario->action is PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill);
             animator.SetBool(ParamDoubleJump,       mario->JumpState == JumpState.DoubleJump);
             animator.SetBool(ParamTripleJump,       mario->JumpState == JumpState.TripleJump);
             animator.SetBool(ParamHolding,          mario->HeldEntity.IsValid);

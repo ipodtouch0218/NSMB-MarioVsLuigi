@@ -598,9 +598,6 @@ namespace Quantum {
             }
 
             bool swimming = physicsObject->IsUnderwater;
-            if (!physicsObject->IsTouchingGround || swimming) {
-                //mario->SetPlayerAction(PlayerAction.Skidding);
-            }
 
             bool run = (inputs.Sprint.IsDown || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->IsPropellerFlying) & !mario->IsSpinnerFlying;
             int maxStage;
@@ -628,7 +625,6 @@ namespace Quantum {
                 }
             }
             int stage = mario->GetSpeedStage(physicsObject, physics);
-
             FP acc;
             if (swimming) {
                 if (physicsObject->IsTouchingGround) {
@@ -665,9 +661,9 @@ namespace Quantum {
 
                 physicsObject->Velocity.X += (physics.FastTurnaroundAcceleration * (mario->FacingRight ? -1 : 1) * f.DeltaTime);
             } else if ((inputs.Left ^ inputs.Right)
-                       && (mario->action != PlayerAction.Crouch || (mario->action == PlayerAction.BlueShellCrouch && !physicsObject->IsTouchingGround))
+                       /*&& (mario->action != PlayerAction.Crouch || (mario->action == PlayerAction.BlueShellCrouch && !physicsObject->IsTouchingGround))
                        && (mario->action < PlayerAction.SoftKnockback && mario->action > PlayerAction.HardKnockback)
-                       && mario->action != PlayerAction.Sliding) {
+                       && mario->action != PlayerAction.Sliding*/) {
 
                 // We can walk here
                 int direction = inputs.Left ? -1 : 1;
@@ -676,7 +672,6 @@ namespace Quantum {
                 }
 
                 bool reverse = physicsObject->Velocity.X != 0 && (direction != sign);
-
                 // Check that we're not going above our limit
                 FP max = maxArray[maxStage];
                 if (!swimming) {
@@ -699,7 +694,7 @@ namespace Quantum {
                     mario->IsTurnaround = false;
                     if (physicsObject->IsTouchingGround) {
                         if (!swimming && xVelAbs >= physics.SkiddingMinimumVelocity && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom) {
-                            mario->SetPlayerAction(PlayerAction.Skidding);
+                            //mario->SetPlayerAction(PlayerAction.Skidding);
                             mario->FacingRight = sign == 1;
                         }
 

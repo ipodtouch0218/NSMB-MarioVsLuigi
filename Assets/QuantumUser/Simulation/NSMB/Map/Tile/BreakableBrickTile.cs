@@ -35,7 +35,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
             } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 // Mega Mario
                 doBreak = BreakingRules.HasFlag(BreakableBy.MegaMario);
-            } else if (mario->IsInShell) {
+            } else if (mario->HasActionFlags(ActionFlags.BreaksBlocks | ActionFlags.IsShelled)) {
                 // Blue Shell
                 doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
             } else {
