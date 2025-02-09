@@ -28,7 +28,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
                 doBreak = direction switch {
                     // Small Mario
                     InteractionDirection.Down when mario->HasActionFlags(ActionFlags.BreaksBlocks) && mario->action == PlayerAction.GroundPound => BreakingRules.HasFlag(BreakableBy.SmallMarioGroundpound),
-                    InteractionDirection.Down when mario->action == PlayerAction.PropellerDrill || mario->action == PlayerAction.SpinBlockDrill => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
+                    InteractionDirection.Down when mario->action is PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
                     InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.SmallMario),
                     _ => false
                 };
@@ -42,7 +42,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
                 doBreak = direction switch {
                     // Large Mario
                     InteractionDirection.Down when mario->HasActionFlags(ActionFlags.BreaksBlocks) && mario->action == PlayerAction.GroundPound => BreakingRules.HasFlag(BreakableBy.LargeMarioGroundpound),
-                    InteractionDirection.Down when mario->action == PlayerAction.PropellerDrill || mario->action == PlayerAction.SpinBlockDrill => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
+                    InteractionDirection.Down when mario->action is PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
                     InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.LargeMario),
                     _ => false
                 };

@@ -135,8 +135,8 @@ namespace Quantum {
                     bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
                     mario->CheckEntityBounce();
                 }
-                if (mario->action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin);
-                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerDrill);
+                if (mario->action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, 1);
+                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
 
             } else if (!mario->IsCrouchedInShell && mario->IsDamageable) {
                 mario->Powerdown(f, marioEntity, false);

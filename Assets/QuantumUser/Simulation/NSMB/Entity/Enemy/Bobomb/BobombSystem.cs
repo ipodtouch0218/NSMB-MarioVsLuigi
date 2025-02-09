@@ -181,7 +181,7 @@ namespace Quantum {
                         mario->CheckEntityBounce();
                     }
                     if (mario->action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, 1);
-                    else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerFall, 1);
+                    else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
 
                 } else if (mario->HasActionFlags(ActionFlags.IsShelled)) {
                     // Bounce off blue shell crouched player

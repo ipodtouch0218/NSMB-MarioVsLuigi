@@ -16,7 +16,9 @@ namespace Quantum {
                 return;
             }
 
-            if (mario->IsCrouchedInShell || mario->IsInKnockback || mario->IsStuckInBlock
+            if (mario->HasActionFlags(ActionFlags.IsShelled)
+                || mario->action is PlayerAction.SoftKnockback or PlayerAction.NormalKnockback or PlayerAction.HardKnockback
+                || mario->IsStuckInBlock
                 || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->MegaMushroomEndFrames > 0) {
                 return;
             }

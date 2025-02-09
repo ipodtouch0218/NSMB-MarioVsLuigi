@@ -88,8 +88,8 @@ namespace Quantum {
                     goomba->Kill(f, goombaEntity, marioEntity, false);
                     mario->CheckEntityBounce();
                 }
-                if (mario->action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin);
-                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerFall, 1);
+                if (mario->action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, 1);
+                else if (mario->action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
 
             } else if (mario->IsCrouchedInShell) {
                 mario->FacingRight = damageDirection.X < 0;

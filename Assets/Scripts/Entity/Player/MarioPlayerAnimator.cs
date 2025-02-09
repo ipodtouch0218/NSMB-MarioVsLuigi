@@ -258,7 +258,7 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            SetParticleEmission(drillParticle, !disableParticles && (mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill));
+            SetParticleEmission(drillParticle, !disableParticles && (mario->action is PlayerAction.SpinBlockDrill or PlayerAction.PropellerDrill));
             SetParticleEmission(sparkles, !disableParticles && mario->IsStarmanInvincible);
             SetParticleEmission(iceSkiddingParticle, !disableParticles && physicsObject->IsOnSlipperyGround && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
             SetParticleEmission(waterSkiddingParticle, !disableParticles && onWater && ((mario->IsSkidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
@@ -379,10 +379,10 @@ namespace NSMB.Entities.Player {
                 modelRotationTarget *= Quaternion.Euler(0, spinner->AngularVelocity.AsFloat * delta, 0);
                 modelRotateInstantly = true;
 
-            } else if (mario->action == PlayerAction.SpinBlockSpin || mario->action == PlayerAction.PropellerSpin ||
-                mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) {
+            } else if (mario->action is PlayerAction.SpinBlockSpin or PlayerAction.PropellerSpin or
+                PlayerAction.SpinBlockDrill or PlayerAction.PropellerDrill) {
                 modelRotationTarget *= Quaternion.Euler(0, (-1200 - ((mario->PropellerLaunchFrames / 60f) * 1400)
-                    - ((mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill) ? 900 : 0)
+                    - ((mario->action is PlayerAction.SpinBlockDrill or PlayerAction.PropellerDrill) ? 900 : 0)
                     + (mario->action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames == 0 && physicsObject->Velocity.Y < 0 ? 700 : 0)) * delta, 0);
                 modelRotateInstantly = true;
 
@@ -393,8 +393,8 @@ namespace NSMB.Entities.Player {
             }
 
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((
-                mario->action == PlayerAction.SpinBlockSpin || mario->action == PlayerAction.PropellerSpin ||
-                mario->action == PlayerAction.SpinBlockDrill || mario->action == PlayerAction.PropellerDrill || mario->UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
+                mario->action is PlayerAction.SpinBlockSpin or PlayerAction.PropellerSpin
+                or PlayerAction.SpinBlockDrill or PlayerAction.PropellerDrill || mario->UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
 
             wasTurnaround = mario->IsTurnaround;
         }
