@@ -27,6 +27,7 @@ namespace Quantum {
                 var allPlayers = f.Filter<MarioPlayer, Transform2D>();
                 FP absDistance = 0;
                 FP smallestDistance = FP.UseableMax;
+                bool tooClose = false;
                 while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
                     QuantumUtils.WrappedDistance(stage, spawnpoint, marioTransform->Position, out FP distance);
                     FP abs = FPMath.Abs(distance);
@@ -34,6 +35,7 @@ namespace Quantum {
                     // Player is too close
                     if (abs < launcher->MinimumShootRadius) {
                         smallestDistance = FP.UseableMax;
+                        tooClose = true;
                         break;
                     }
 
@@ -44,7 +46,9 @@ namespace Quantum {
                 }
 
                 if (FPMath.Abs(smallestDistance) > launcher->MaximumShootRadius) {
-                    launcher->TimeToShootFrames = launcher->TimeToShoot;
+                    if (!tooClose) {
+                        launcher->TimeToShootFrames = launcher->TimeToShoot;
+                    }
                     continue;
                 }
 

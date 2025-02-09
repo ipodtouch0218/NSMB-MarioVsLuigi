@@ -96,8 +96,8 @@ public unsafe class CameraAnimator : ResizingCamera {
         }
 
         // Clamp
-        float cameraMinX = stage.CameraMinPosition.X.AsFloat - (ourCamera.orthographicSize * ourCamera.aspect);
-        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat + (ourCamera.orthographicSize * ourCamera.aspect);
+        float cameraMinX = stage.CameraMinPosition.X.AsFloat + (ourCamera.orthographicSize * ourCamera.aspect);
+        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat - (ourCamera.orthographicSize * ourCamera.aspect);
         newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
 
         float cameraMinY = stage.CameraMinPosition.Y.AsFloat + ourCamera.orthographicSize;

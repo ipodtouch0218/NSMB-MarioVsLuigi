@@ -758,7 +758,8 @@ namespace Quantum {
             bool wasCrouching = mario->IsCrouching;
             mario->IsCrouching = 
                 (
-                    (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding) 
+                    (inputs.Down.IsDown && mario->IsStuckInBlock)
+                    || (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding) 
                     || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
                     /* || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics)) */
                 ) 
