@@ -7,7 +7,7 @@ using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
-    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
+    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>,
         ISignalOnGameStarting, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
         ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
 
@@ -204,6 +204,10 @@ namespace Quantum {
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage, true);
         }
 
+        public void ActionKnockback(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+
+        }
+
         public void ActionSpinBlockSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
@@ -248,6 +252,11 @@ namespace Quantum {
 
         public void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
+            if (mario->CurrentPowerupState != PowerupState.PropellerMushroom) {
+                mario->SetPlayerAction(PlayerAction.SpinBlockDrill);
+                return;
+            }
+
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(PlayerAction.PropellerDrill);
             }
@@ -359,10 +368,10 @@ namespace Quantum {
 	            case PlayerAction.WallSlide:            ActionWallSlide(f, ref filter, physics, ref inputs, stage); break;
                 case PlayerAction.Wallkick:
                 case PlayerAction.GroundPound:          ActionGroundPound(f, ref filter, physics, ref inputs, stage); break;
-                case PlayerAction.SoftKnockback:
-                case PlayerAction.NormalKnockback:
-                case PlayerAction.HardKnockback:
-	            case PlayerAction.SpinBlockSpin:
+                case PlayerAction.SoftKnockback:        ActionKnockback(f, ref filter, physics, ref inputs, stage); break;
+                case PlayerAction.NormalKnockback:      ActionKnockback(f, ref filter, physics, ref inputs, stage); break;
+                case PlayerAction.HardKnockback:        ActionKnockback(f, ref filter, physics, ref inputs, stage); break;
+                case PlayerAction.SpinBlockSpin:
                 case PlayerAction.SpinBlockDrill:
                 case PlayerAction.BlueShellCrouch:
                 case PlayerAction.BlueShellSliding:
@@ -1133,14 +1142,17 @@ namespace Quantum {
 
             if (mario->WalljumpFrames > 0) {
                 mario->FacingRight = physicsObject->Velocity.X > 0;
-            } else if (!mario->IsInShell && !mario->IsSliding && mario->action != PlayerAction.Skidding && !mario->IsInKnockback && !mario->IsTurnaround) {
+                // TODO: make this a flag
+            } else if (!mario->HasActionFlags(ActionFlags.IsShelled) && mario->action is not PlayerAction.Sliding and not PlayerAction.Skidding
+                    and not PlayerAction.SoftKnockback and not PlayerAction.NormalKnockback and not PlayerAction.HardKnockback && !mario->IsTurnaround) {
                 if (rightOrLeft) {
                     mario->FacingRight = inputs.Right.IsDown;
                 }
             } else if (mario->MegaMushroomStartFrames == 0 && mario->MegaMushroomEndFrames == 0 && mario->action != PlayerAction.Skidding && !mario->IsTurnaround) {
                 if (!mario->IsInShell && ((FPMath.Abs(physicsObject->Velocity.X) < FP._0_50 && mario->IsCrouching) || physicsObject->IsOnSlipperyGround) && (rightOrLeft)) {
                     mario->FacingRight = inputs.Right.IsDown;
-                } else if (mario->IsInKnockback || (physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
+                } else if (mario->action is PlayerAction.SoftKnockback or PlayerAction.NormalKnockback or PlayerAction.HardKnockback
+                    || (physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && !mario->IsCrouching)) {
                     mario->FacingRight = physicsObject->Velocity.X > 0;
                 } else if ((!mario->IsInShell || mario->MegaMushroomStartFrames > 0) && (rightOrLeft)) {
                     mario->FacingRight = inputs.Right.IsDown;
