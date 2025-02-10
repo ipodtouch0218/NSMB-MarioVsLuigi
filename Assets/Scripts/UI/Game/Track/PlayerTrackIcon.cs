@@ -47,7 +47,9 @@ namespace NSMB.UI.Game.Track {
             transform.localScale = controllingCamera ? FlipY : TwoThirds;
 
             Frame f = PredictedFrame;
-            image.enabled &= flashRoutine != null || controllingCamera || !stage.HidePlayersOnMinimap;
+            if (flashRoutine == null) {
+                image.enabled = controllingCamera || !stage.HidePlayersOnMinimap;
+            }
             teamIcon.gameObject.SetActive(image.enabled && Settings.Instance.GraphicsColorblind && f.Global->Rules.TeamsEnabled && !controllingCamera);
         }
 

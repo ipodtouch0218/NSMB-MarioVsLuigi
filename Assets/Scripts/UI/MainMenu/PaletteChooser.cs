@@ -29,6 +29,10 @@ namespace NSMB.UI.MainMenu {
         private int selected;
         private bool initialized;
 
+        public void OnDisable() {
+            Close(false);
+        }
+
         public unsafe void Initialize() {
             if (initialized) {
                 return;

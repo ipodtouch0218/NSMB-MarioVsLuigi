@@ -1,6 +1,5 @@
 using Quantum;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 
@@ -40,6 +39,7 @@ namespace NSMB.UI.MainMenu {
 
         public void OnDisable() {
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+            Close(false);
         }
 
         public void SetEnabled(bool value) {

@@ -51,6 +51,9 @@ public unsafe class CameraAnimator : ResizingCamera {
         Frame fp = game.Frames.PredictedPrevious;
 
         if (!Target.IsValid || !f.Exists(Target) || !fp.Exists(Target)) {
+            if (BackgroundLoop.Instance) {
+                BackgroundLoop.Instance.Reposition(ourCamera);
+            }
             return;
         }
 
