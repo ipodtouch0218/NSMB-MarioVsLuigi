@@ -269,9 +269,9 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(bubblesParticle, !disableParticles && physicsObject->IsUnderwater);
 
             var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(EntityRef);
-            if (mario->IsCrouching || mario->IsSliding || mario->IsSkidding || mario->IsInShell) {
+            if (mario->action is PlayerAction.Crouch or PlayerAction.BlueShellCrouch or PlayerAction.Sliding or PlayerAction.Skidding || mario->HasActionFlags(ActionFlags.IsShelled)) {
                 dust.transform.localPosition = Vector2.zero;
-            } else if (mario->IsWallsliding) {
+            } else if (mario->action == PlayerAction.WallSlide) {
                 dust.transform.localPosition = physicsCollider->Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario->WallslideLeft ? new Vector2(-1, 1) : Vector2.one);
             }
             Vector3 flip = mario->FacingRight ? Vector3.one : new Vector3(-1, 1, 1);

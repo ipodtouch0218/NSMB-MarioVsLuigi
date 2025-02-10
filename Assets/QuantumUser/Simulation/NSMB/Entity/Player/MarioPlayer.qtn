@@ -54,7 +54,6 @@ enum PlayerAction : Byte {
     BlueShellSliding,
     BlueShellJump,
     PropellerSpin,
-	PropellerFall,
     PropellerDrill,
 	PowerupShoot,
 	Pushing,
@@ -83,6 +82,7 @@ enum ActionFlags : Int32 {
 	AllowHold = 32896,
 	Cutscene = 65792,
 	CameraChange = 131584,
+	DisableTurnaround = 263168,
 }
 
 component MarioPlayer {

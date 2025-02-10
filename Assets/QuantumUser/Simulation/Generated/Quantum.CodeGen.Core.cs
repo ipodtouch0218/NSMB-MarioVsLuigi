@@ -68,6 +68,7 @@ namespace Quantum {
     AllowHold = 32896,
     Cutscene = 65792,
     CameraChange = 131584,
+    DisableTurnaround = 263168,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -107,7 +108,6 @@ namespace Quantum {
     BlueShellSliding,
     BlueShellJump,
     PropellerSpin,
-    PropellerFall,
     PropellerDrill,
     PowerupShoot,
     Pushing,
