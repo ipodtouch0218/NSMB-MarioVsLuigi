@@ -322,7 +322,9 @@ namespace Quantum {
 
         private void ActionSpinBlockDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage, false);
+            mario->SetGroundAction(physicsObject);
         }
 
         private void ActionBlueShellSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -380,6 +382,7 @@ namespace Quantum {
 
         private void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
             if (mario->CurrentPowerupState != PowerupState.PropellerMushroom) {
                 mario->SetPlayerAction(PlayerAction.SpinBlockDrill);
                 return;
@@ -397,6 +400,7 @@ namespace Quantum {
                 mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
             }
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage, false);
+            mario->SetGroundAction(physicsObject);
         }
 
         private void ActionPowerupShoot(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
