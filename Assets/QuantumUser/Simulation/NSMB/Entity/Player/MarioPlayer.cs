@@ -7,7 +7,7 @@ namespace Quantum {
 
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
-        public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
+        public bool IsCrouchedInShell => action == PlayerAction.BlueShellCrouch;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public const int DropStarRight = 1 << 8;
 
@@ -22,36 +22,36 @@ namespace Quantum {
 
         public ActionFlags GetActionFlags(PlayerAction action) {
             return action switch {
-                PlayerAction.Idle                   => ActionFlags.AllowGroundBump,
-                PlayerAction.HoldIdle               => ActionFlags.AllowGroundBump,
-                PlayerAction.Walk                   => ActionFlags.AllowGroundBump,
-                PlayerAction.HoldWalk               => ActionFlags.AllowGroundBump,
-                PlayerAction.Skidding               => ActionFlags.AllowGroundBump,
-                PlayerAction.Crouch                 => ActionFlags.AllowGroundBump,
-                PlayerAction.Sliding                => ActionFlags.Attacking,
-                PlayerAction.SingleJump             => ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
-                PlayerAction.DoubleJump             => ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
-                PlayerAction.TripleJump             => ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
-                PlayerAction.HoldJump               => ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
-                PlayerAction.Freefall               => ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
+                PlayerAction.Idle                   => ActionFlags.AllowBump,
+                PlayerAction.HoldIdle               => ActionFlags.AllowBump,
+                PlayerAction.Walk                   => ActionFlags.AllowBump,
+                PlayerAction.HoldWalk               => ActionFlags.AllowBump,
+                PlayerAction.Skidding               => ActionFlags.AllowBump,
+                PlayerAction.Crouch                 => ActionFlags.AllowBump | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox,
+                PlayerAction.Sliding                => ActionFlags.AllowBump | ActionFlags.Attacking,
+                PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
+                PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
+                PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
+                PlayerAction.HoldJump               => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
+                PlayerAction.Freefall               => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
                 PlayerAction.WallSlide              => ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
                 PlayerAction.Wallkick               => ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
                 PlayerAction.GroundPound            => ActionFlags.AirAction | ActionFlags.DisableTurnaround | ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction, // the 3 stars flag gets applied later
                 // PlayerAction.MiniGroundPound        => (int) (ActionFlags.AirAction), // has player bounce
-                PlayerAction.SoftKnockback          => ActionFlags.Intangible,
-                PlayerAction.NormalKnockback        => ActionFlags.Intangible,
-                PlayerAction.HardKnockback          => ActionFlags.Intangible,
+                PlayerAction.SoftKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
+                PlayerAction.NormalKnockback        => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
+                PlayerAction.HardKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
                 PlayerAction.SpinBlockSpin          => ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
                 PlayerAction.SpinBlockDrill         => ActionFlags.AirAction | ActionFlags.Takes3Stars | ActionFlags.GivesHardKnockback | ActionFlags.NoPlayerBounce,
-                PlayerAction.BlueShellCrouch        => ActionFlags.IsShelled | ActionFlags.DisableTurnaround,
-                PlayerAction.BlueShellSliding       => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.BreaksBlocks | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.NoPlayerBounce,
-                PlayerAction.BlueShellJump          => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.AirAction | ActionFlags.Takes1Star, // the no player bounce based off actionArg
+                PlayerAction.BlueShellCrouch        => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox,
+                PlayerAction.BlueShellSliding       => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.BreaksBlocks | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.NoPlayerBounce,
+                PlayerAction.BlueShellJump          => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction | ActionFlags.Takes1Star, // the no player bounce based off actionArg
                 // PlayerAction.BlueShellGroundPound   => (int) (ActionFlags.IsShelled | ActionFlags.AirAction | ActionFlags.NoPlayerBounce),
                 PlayerAction.PropellerSpin          => ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
                 // PlayerAction.PropellerFall          => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
                 PlayerAction.PropellerDrill         => ActionFlags.AirAction | ActionFlags.Takes3Stars | ActionFlags.GivesHardKnockback,
-                PlayerAction.PowerupShoot           => 0, // will be set in the action
-                PlayerAction.Pushing                => ActionFlags.AllowGroundBump,
+                PlayerAction.PowerupShoot           => ActionFlags.AllowBump,
+                PlayerAction.Pushing                => ActionFlags.AllowBump,
                 PlayerAction.Death                  => ActionFlags.Cutscene,
                 PlayerAction.LavaDeath              => ActionFlags.Cutscene,
                 PlayerAction.Respawning             => ActionFlags.Cutscene,
@@ -106,6 +106,14 @@ namespace Quantum {
 
         public void ClearActionFlags(ActionFlags actionFlags) {
             this.actionFlags &= ~(int) actionFlags;
+        }
+
+        public void ToggleActionFlags(ActionFlags actionFlags, bool add) {
+            if (!add) {
+                ClearActionFlags(actionFlags);
+            } else {
+                AddActionFlags(actionFlags);
+            }
         }
 
         public void SetActionFlags(ActionFlags actionFlags) {
@@ -191,8 +199,8 @@ namespace Quantum {
         public bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {
             return CurrentPowerupState == PowerupState.MegaMushroom
                 || IsStarmanInvincible
-                || IsInShell
-                || (includeSliding && (IsSliding || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
+                || HasActionFlags(ActionFlags.Attacking)
+                || (includeSliding && (action == PlayerAction.Sliding || action == PlayerAction.BlueShellSliding) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
         }
 
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {

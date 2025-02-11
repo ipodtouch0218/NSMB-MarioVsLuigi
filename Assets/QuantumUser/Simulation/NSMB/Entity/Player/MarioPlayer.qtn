@@ -77,12 +77,15 @@ enum ActionFlags : Int32 {
     NoEnemyBounce = 1028,
     AirAction = 2056,
     WaterAction = 4112,
-    AllowGroundBump = 8224,
+    AllowBump = 8224,
     StrongAction = 16448, // used for things like ground pounds
 	AllowHold = 32896,
 	Cutscene = 65792,
 	CameraChange = 131584,
 	DisableTurnaround = 263168,
+	DisablePushing = 526336,
+	UsesSmallHitbox = 1052672,
+	UsesCrouchHitbox = 2105344,
 }
 
 component MarioPlayer {
@@ -118,7 +121,6 @@ component MarioPlayer {
 
 	// Walk/Running
     [ExcludeFromPrototype] bool FacingRight;
-    [ExcludeFromPrototype] bool IsSkidding;
     [ExcludeFromPrototype] bool IsTurnaround;
     [ExcludeFromPrototype] byte FastTurnaroundFrames;
     [ExcludeFromPrototype] byte SlowTurnaroundFrames;
@@ -149,21 +151,13 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte SwimForceJumpTimer;
 
 	// Knockback
-    [ExcludeFromPrototype] bool IsInKnockback;
-	[ExcludeFromPrototype] bool IsInWeakKnockback;
 	[ExcludeFromPrototype] bool KnockbackWasOriginallyFacingRight;
 	[ExcludeFromPrototype] int KnockbackTick;
 	[ExcludeFromPrototype] byte DamageInvincibilityFrames;
 	[ExcludeFromPrototype] byte KnockbackGetupFrames;
 	[ExcludeFromPrototype] byte CrushDamageInvincibilityFrames;
 
-	// Crouching
-    [ExcludeFromPrototype] bool IsCrouching;
-    [ExcludeFromPrototype] bool IsSliding;
-
 	// Block Interactions
-    [ExcludeFromPrototype] bool IsSpinnerFlying;
-	[ExcludeFromPrototype] bool IsDrilling;
 	[ExcludeFromPrototype] bool IsStuckInBlock;
 
 	// Powerups
@@ -180,10 +174,8 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte CurrentProjectiles;
 	[ExcludeFromPrototype] byte CurrentVolley;
 
-    [ExcludeFromPrototype] bool IsInShell;
     [ExcludeFromPrototype] byte ShellSlowdownFrames;
 
-    [ExcludeFromPrototype] bool IsPropellerFlying;
 	[ExcludeFromPrototype] byte PropellerLaunchFrames;
 	[ExcludeFromPrototype] byte PropellerSpinFrames;
 	[ExcludeFromPrototype] bool UsedPropellerThisJump;

@@ -132,7 +132,7 @@ namespace Quantum {
             } else {
                 // Side
                 bool rightContact = contact.Normal.X > 0;
-                if ((iceBlock->IsSliding && iceBlock->FacingRight == rightContact) || mario->IsInShell) {
+                if ((iceBlock->IsSliding && iceBlock->FacingRight == rightContact) || mario->HasActionFlags(ActionFlags.Attacking)) {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
                     bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->GetTeam(f) != holderMario->GetTeam(f);
                     mario->SetPlayerAction(dropStars ? PlayerAction.NormalKnockback : PlayerAction.SoftKnockback,
