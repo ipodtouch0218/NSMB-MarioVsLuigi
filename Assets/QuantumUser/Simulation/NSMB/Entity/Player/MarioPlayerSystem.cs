@@ -205,9 +205,7 @@ namespace Quantum {
             if (physicsObject->IsTouchingGround) EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
             EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
 
-            if (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround) {
-                mario->AddActionFlags(ActionFlags.UsesSmallHitbox);
-            }
+            mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
 
             mario->SetGroundAction(physicsObject);
         }
@@ -292,11 +290,13 @@ namespace Quantum {
                     // Cancel from being grounded
                     mario->GroundpoundStandFrames = 15;
                     mario->SetGroundAction(physicsObject);
+                    return;
                 }
             } else if (inputs.Up.IsDown && mario->GroundpoundStartFrames == 0) {
                 // Cancel from hitting "up"
                 mario->GroundpoundCooldownFrames = 12;
                 mario->SetAirAction(physicsObject);
+                return;
             }
 
             // flags such as ActionFlags.BreaksBlocks are added here
@@ -645,12 +645,14 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             if (!(physicsObject->IsTouchingGround)) {
+                mario->actionState = 0;
                 return;
             }
 
             // drilling also uses this
-            if (isGroundpound) {
+            if (isGroundpound && mario->actionState == 0) {
                 f.Events.MarioPlayerGroundpounded(f, filter.Entity);
+                mario->actionState++;
             }
 
             bool interactedAny = false;
