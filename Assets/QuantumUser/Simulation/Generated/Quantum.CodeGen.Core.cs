@@ -112,6 +112,7 @@ namespace Quantum {
     BlueShellJump,
     PropellerSpin,
     PropellerDrill,
+    MegaMushroom,
     PowerupShoot,
     Pushing,
     Death,

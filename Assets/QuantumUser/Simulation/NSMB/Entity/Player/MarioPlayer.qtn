@@ -55,6 +55,7 @@ enum PlayerAction : Byte {
     BlueShellJump,
     PropellerSpin,
     PropellerDrill,
+	MegaMushroom,
 	PowerupShoot,
 	Pushing,
 	Death,

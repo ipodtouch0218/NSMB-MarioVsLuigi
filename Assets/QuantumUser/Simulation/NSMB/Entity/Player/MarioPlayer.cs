@@ -50,6 +50,7 @@ namespace Quantum {
                 PlayerAction.PropellerSpin          => ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
                 // PlayerAction.PropellerFall          => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
                 PlayerAction.PropellerDrill         => ActionFlags.AirAction | ActionFlags.Takes3Stars | ActionFlags.GivesHardKnockback,
+                PlayerAction.MegaMushroom           => ActionFlags.Cutscene,
                 PlayerAction.PowerupShoot           => ActionFlags.AllowBump,
                 PlayerAction.Pushing                => ActionFlags.AllowBump,
                 PlayerAction.Death                  => ActionFlags.Cutscene,
