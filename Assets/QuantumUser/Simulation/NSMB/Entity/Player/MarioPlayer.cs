@@ -98,15 +98,15 @@ namespace Quantum {
         }
 
         public bool HasActionFlags(ActionFlags actionFlags) {
-            return (this.ActionFlags & (int)actionFlags) != 0;
+            return (this.CurrActionFlags & (int)actionFlags) != 0;
         }
 
         public void AddActionFlags(ActionFlags actionFlags) {
-            this.ActionFlags |= (int) actionFlags;
+            this.CurrActionFlags |= (int) actionFlags;
         }
 
         public void ClearActionFlags(ActionFlags actionFlags) {
-            this.ActionFlags &= ~(int) actionFlags;
+            this.CurrActionFlags &= ~(int) actionFlags;
         }
 
         public void ToggleActionFlags(ActionFlags actionFlags, bool add) {
@@ -118,7 +118,7 @@ namespace Quantum {
         }
 
         public void SetActionFlags(ActionFlags actionFlags) {
-            this.ActionFlags = (int) actionFlags;
+            this.CurrActionFlags = (int) actionFlags;
         }
 
         public void CheckEntityBounce(bool checkPlayer = false) {

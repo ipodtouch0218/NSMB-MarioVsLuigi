@@ -55,23 +55,21 @@ namespace Quantum {
     GivesNormalKnockback = 4,
     GivesHardKnockback = 8,
     BreaksBlocks = 16,
-    Takes1Star = 32,
-    Takes3Stars = 64,
-    IsShelled = 128,
-    Attacking = 256,
-    NoPlayerBounce = 512,
-    NoEnemyBounce = 1028,
-    AirAction = 2056,
-    WaterAction = 4112,
-    AllowBump = 8224,
-    StrongAction = 16448,
-    AllowHold = 32896,
-    Cutscene = 65792,
-    CameraChange = 131584,
-    DisableTurnaround = 263168,
-    DisablePushing = 526336,
-    UsesSmallHitbox = 1052672,
-    UsesCrouchHitbox = 2105344,
+    IsShelled = 32,
+    Attacking = 64,
+    NoPlayerBounce = 128,
+    NoEnemyBounce = 256,
+    AirAction = 512,
+    WaterAction = 1024,
+    AllowBump = 2048,
+    StrongAction = 4096,
+    AllowHold = 8192,
+    Cutscene = 16384,
+    CameraChange = 32768,
+    DisableTurnaround = 65536,
+    DisablePushing = 131072,
+    UsesSmallHitbox = 262144,
+    UsesCrouchHitbox = 524288,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -2037,7 +2035,7 @@ namespace Quantum {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     [FieldOffset(144)]
     public AssetRef<CharacterAsset> CharacterAsset;
-    [FieldOffset(80)]
+    [FieldOffset(84)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
     [FieldOffset(31)]
@@ -2061,16 +2059,16 @@ namespace Quantum {
     [FieldOffset(15)]
     [ExcludeFromPrototype()]
     public Byte Lives;
-    [FieldOffset(84)]
+    [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public QBoolean Disconnected;
-    [FieldOffset(100)]
+    [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public QBoolean IsDead;
-    [FieldOffset(96)]
+    [FieldOffset(100)]
     [ExcludeFromPrototype()]
     public QBoolean FireDeath;
-    [FieldOffset(104)]
+    [FieldOffset(108)]
     [ExcludeFromPrototype()]
     public QBoolean IsRespawning;
     [FieldOffset(7)]
@@ -2087,26 +2085,29 @@ namespace Quantum {
     public Byte NoLivesStarDirection;
     [FieldOffset(39)]
     [ExcludeFromPrototype()]
-    public PlayerAction action;
+    public PlayerAction Action;
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
-    public PlayerAction prevAction;
-    [FieldOffset(68)]
+    public PlayerAction PrevAction;
+    [FieldOffset(60)]
     [ExcludeFromPrototype()]
-    public Int32 actionFlags;
-    [FieldOffset(76)]
+    public Int32 CurrActionFlags;
+    [FieldOffset(56)]
     [ExcludeFromPrototype()]
-    public Int32 actionTimer;
-    [FieldOffset(72)]
+    public Int32 ActionTimer;
+    [FieldOffset(52)]
     [ExcludeFromPrototype()]
-    public Int32 actionState;
-    [FieldOffset(64)]
+    public Int32 ActionState;
+    [FieldOffset(48)]
     [ExcludeFromPrototype()]
-    public Int32 actionArg;
-    [FieldOffset(92)]
+    public Int32 ActionArg;
+    [FieldOffset(80)]
+    [ExcludeFromPrototype()]
+    public Int32 StarStealCount;
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(112)]
+    [FieldOffset(116)]
     [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
     [FieldOffset(8)]
@@ -2115,7 +2116,7 @@ namespace Quantum {
     [FieldOffset(30)]
     [ExcludeFromPrototype()]
     public Byte SlowTurnaroundFrames;
-    [FieldOffset(60)]
+    [FieldOffset(76)]
     [ExcludeFromPrototype()]
     public Int32 LastPushingFrame;
     [FieldOffset(33)]
@@ -2136,16 +2137,16 @@ namespace Quantum {
     [FieldOffset(2)]
     [ExcludeFromPrototype()]
     public Byte CoyoteTimeFrames;
-    [FieldOffset(56)]
+    [FieldOffset(72)]
     [ExcludeFromPrototype()]
     public Int32 LandedFrame;
-    [FieldOffset(88)]
+    [FieldOffset(92)]
     [ExcludeFromPrototype()]
     public QBoolean DoEntityBounce;
-    [FieldOffset(132)]
+    [FieldOffset(136)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideLeft;
-    [FieldOffset(136)]
+    [FieldOffset(140)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
     [FieldOffset(36)]
@@ -2166,10 +2167,10 @@ namespace Quantum {
     [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
-    [FieldOffset(116)]
+    [FieldOffset(120)]
     [ExcludeFromPrototype()]
     public QBoolean KnockbackWasOriginallyFacingRight;
-    [FieldOffset(52)]
+    [FieldOffset(68)]
     [ExcludeFromPrototype()]
     public Int32 KnockbackTick;
     [FieldOffset(6)]
@@ -2181,7 +2182,7 @@ namespace Quantum {
     [FieldOffset(3)]
     [ExcludeFromPrototype()]
     public Byte CrushDamageInvincibilityFrames;
-    [FieldOffset(108)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public QBoolean IsStuckInBlock;
     [FieldOffset(1)]
@@ -2199,7 +2200,7 @@ namespace Quantum {
     [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
-    [FieldOffset(120)]
+    [FieldOffset(124)]
     [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
     [FieldOffset(22)]
@@ -2223,7 +2224,7 @@ namespace Quantum {
     [FieldOffset(27)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
-    [FieldOffset(128)]
+    [FieldOffset(132)]
     [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(24)]
@@ -2235,7 +2236,7 @@ namespace Quantum {
     [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
-    [FieldOffset(48)]
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
     [FieldOffset(168)]
@@ -2244,7 +2245,7 @@ namespace Quantum {
     [FieldOffset(192)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
-    [FieldOffset(124)]
+    [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
     [FieldOffset(20)]
@@ -2277,12 +2278,13 @@ namespace Quantum {
         hash = hash * 31 + PreRespawnFrames.GetHashCode();
         hash = hash * 31 + RespawnFrames.GetHashCode();
         hash = hash * 31 + NoLivesStarDirection.GetHashCode();
-        hash = hash * 31 + (Byte)action;
-        hash = hash * 31 + (Byte)prevAction;
-        hash = hash * 31 + actionFlags.GetHashCode();
-        hash = hash * 31 + actionTimer.GetHashCode();
-        hash = hash * 31 + actionState.GetHashCode();
-        hash = hash * 31 + actionArg.GetHashCode();
+        hash = hash * 31 + (Byte)Action;
+        hash = hash * 31 + (Byte)PrevAction;
+        hash = hash * 31 + CurrActionFlags.GetHashCode();
+        hash = hash * 31 + ActionTimer.GetHashCode();
+        hash = hash * 31 + ActionState.GetHashCode();
+        hash = hash * 31 + ActionArg.GetHashCode();
+        hash = hash * 31 + StarStealCount.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + IsTurnaround.GetHashCode();
         hash = hash * 31 + FastTurnaroundFrames.GetHashCode();
@@ -2378,20 +2380,21 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->WallslideEndFrames);
         serializer.Stream.Serialize((Byte*)&p->JumpState);
         serializer.Stream.Serialize((Byte*)&p->PreviousJumpState);
-        serializer.Stream.Serialize((Byte*)&p->action);
-        serializer.Stream.Serialize((Byte*)&p->prevAction);
+        serializer.Stream.Serialize((Byte*)&p->Action);
+        serializer.Stream.Serialize((Byte*)&p->PrevAction);
         serializer.Stream.Serialize((Byte*)&p->CurrentPowerupState);
         serializer.Stream.Serialize((Byte*)&p->PreviousPowerupState);
         serializer.Stream.Serialize(&p->InvincibilityFrames);
         serializer.Stream.Serialize(&p->MegaMushroomFrames);
+        serializer.Stream.Serialize(&p->ActionArg);
+        serializer.Stream.Serialize(&p->ActionState);
+        serializer.Stream.Serialize(&p->ActionTimer);
+        serializer.Stream.Serialize(&p->CurrActionFlags);
         serializer.Stream.Serialize(&p->HoldStartFrame);
         serializer.Stream.Serialize(&p->KnockbackTick);
         serializer.Stream.Serialize(&p->LandedFrame);
         serializer.Stream.Serialize(&p->LastPushingFrame);
-        serializer.Stream.Serialize(&p->actionArg);
-        serializer.Stream.Serialize(&p->actionFlags);
-        serializer.Stream.Serialize(&p->actionState);
-        serializer.Stream.Serialize(&p->actionTimer);
+        serializer.Stream.Serialize(&p->StarStealCount);
         PlayerRef.Serialize(&p->PlayerRef, serializer);
         QBoolean.Serialize(&p->Disconnected, serializer);
         QBoolean.Serialize(&p->DoEntityBounce, serializer);
