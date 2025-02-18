@@ -208,6 +208,9 @@ namespace Quantum {
 
             mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
 
+            mario->StarStealCount = 1;
+            mario->StompAction = PlayerAction.NormalKnockback;
+
             mario->SetGroundAction(physicsObject);
         }
 
@@ -223,6 +226,8 @@ namespace Quantum {
 
             mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
 
+            mario->SetStompEvents();
+
             mario->SetGroundAction(physicsObject);
         }
 
@@ -235,6 +240,8 @@ namespace Quantum {
             EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
 
             EnableWallKick(f, ref filter, physics, ref inputs);
+
+            mario->SetStompEvents();
 
             mario->SetGroundAction(physicsObject);
         }
@@ -299,6 +306,8 @@ namespace Quantum {
             if (mario->ActionTimer >= 20) {
                 EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
             }
+            mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
+            mario->SetStompEvents();
             mario->SetGroundAction(physicsObject);
             QuantumUtils.Increment(ref mario->ActionTimer);
         }
@@ -341,6 +350,7 @@ namespace Quantum {
         private void ActionSpinBlockSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            mario->SetStompEvents();
             if (inputs.Down.IsDown) {
                 // Start drill
                 if (physicsObject->Velocity.Y < 0) {
@@ -354,6 +364,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage, false);
+            mario->SetStompEvents(PlayerAction.HardKnockback, 3);
             mario->SetGroundAction(physicsObject);
         }
 
@@ -407,6 +418,7 @@ namespace Quantum {
                     f.Events.MarioPlayerPropellerSpin(f, filter.Entity);
                 }
             }
+            mario->SetStompEvents();
             mario->SetGroundAction(physicsObject);
         }
 
@@ -430,6 +442,7 @@ namespace Quantum {
                 mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
             }
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage, false);
+            mario->SetStompEvents(PlayerAction.HardKnockback, 3);
             mario->SetGroundAction(physicsObject);
         }
 
@@ -509,7 +522,6 @@ namespace Quantum {
 
         public void HandleActions(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
-            mario->StarStealCount = 0;
             switch (mario->Action) {
             case PlayerAction.Idle:             ActionIdleWalking(f, ref filter, physics, ref inputs, stage); break;
             case PlayerAction.HoldIdle:         break;
@@ -747,7 +759,7 @@ namespace Quantum {
 
             if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
                 mario->AddActionFlags(ActionFlags.StrongAction | ActionFlags.BreaksBlocks);
-                mario->StarStealCount = 3;
+                mario->SetStompEvents(PlayerAction.HardKnockback, 3);
                 if (mario->CurrentPowerupState == PowerupState.BlueShell) {
                     mario->AddActionFlags(ActionFlags.IsShelled);
                 }
@@ -812,7 +824,7 @@ namespace Quantum {
             if (!continueGroundpound) {
                 // remove these flags
                 mario->ClearActionFlags(ActionFlags.BreaksBlocks | ActionFlags.StrongAction);
-                mario->StarStealCount = 3;
+                mario->ClearStompEvents();
                 return;
             }
 

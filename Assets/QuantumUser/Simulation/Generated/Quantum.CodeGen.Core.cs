@@ -51,25 +51,22 @@ namespace Quantum {
   
   public enum ActionFlags : int {
     Intangible = 1,
-    GivesSoftKnockback = 2,
-    GivesNormalKnockback = 4,
-    GivesHardKnockback = 8,
-    BreaksBlocks = 16,
-    IsShelled = 32,
-    Attacking = 64,
-    NoPlayerBounce = 128,
-    NoEnemyBounce = 256,
-    AirAction = 512,
-    WaterAction = 1024,
-    AllowBump = 2048,
-    StrongAction = 4096,
-    AllowHold = 8192,
-    Cutscene = 16384,
-    CameraChange = 32768,
-    DisableTurnaround = 65536,
-    DisablePushing = 131072,
-    UsesSmallHitbox = 262144,
-    UsesCrouchHitbox = 524288,
+    BreaksBlocks = 2,
+    IsShelled = 4,
+    Attacking = 8,
+    NoPlayerBounce = 16,
+    NoEnemyBounce = 32,
+    AirAction = 64,
+    WaterAction = 128,
+    AllowBump = 256,
+    StrongAction = 512,
+    AllowHold = 1024,
+    Cutscene = 2048,
+    CameraChange = 4096,
+    DisableTurnaround = 8192,
+    DisablePushing = 16384,
+    UsesSmallHitbox = 32768,
+    UsesCrouchHitbox = 65536,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -2041,10 +2038,10 @@ namespace Quantum {
     [FieldOffset(31)]
     [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
-    [FieldOffset(41)]
+    [FieldOffset(42)]
     [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
-    [FieldOffset(42)]
+    [FieldOffset(43)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
     [FieldOffset(160)]
@@ -2089,9 +2086,6 @@ namespace Quantum {
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
     public PlayerAction PrevAction;
-    [FieldOffset(60)]
-    [ExcludeFromPrototype()]
-    public Int32 CurrActionFlags;
     [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public Int32 ActionTimer;
@@ -2101,9 +2095,15 @@ namespace Quantum {
     [FieldOffset(48)]
     [ExcludeFromPrototype()]
     public Int32 ActionArg;
+    [FieldOffset(60)]
+    [ExcludeFromPrototype()]
+    public Int32 CurrActionFlags;
     [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public Int32 StarStealCount;
+    [FieldOffset(41)]
+    [ExcludeFromPrototype()]
+    public PlayerAction StompAction;
     [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
@@ -2280,11 +2280,12 @@ namespace Quantum {
         hash = hash * 31 + NoLivesStarDirection.GetHashCode();
         hash = hash * 31 + (Byte)Action;
         hash = hash * 31 + (Byte)PrevAction;
-        hash = hash * 31 + CurrActionFlags.GetHashCode();
         hash = hash * 31 + ActionTimer.GetHashCode();
         hash = hash * 31 + ActionState.GetHashCode();
         hash = hash * 31 + ActionArg.GetHashCode();
+        hash = hash * 31 + CurrActionFlags.GetHashCode();
         hash = hash * 31 + StarStealCount.GetHashCode();
+        hash = hash * 31 + (Byte)StompAction;
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + IsTurnaround.GetHashCode();
         hash = hash * 31 + FastTurnaroundFrames.GetHashCode();
@@ -2382,6 +2383,7 @@ namespace Quantum {
         serializer.Stream.Serialize((Byte*)&p->PreviousJumpState);
         serializer.Stream.Serialize((Byte*)&p->Action);
         serializer.Stream.Serialize((Byte*)&p->PrevAction);
+        serializer.Stream.Serialize((Byte*)&p->StompAction);
         serializer.Stream.Serialize((Byte*)&p->CurrentPowerupState);
         serializer.Stream.Serialize((Byte*)&p->PreviousPowerupState);
         serializer.Stream.Serialize(&p->InvincibilityFrames);

@@ -10,6 +10,7 @@ namespace Quantum {
         public bool IsCrouchedInShell => Action == PlayerAction.BlueShellCrouch;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public const int DropStarRight = 1 << 8;
+        public const int NoStarLoss = -1;
 
         public byte GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
@@ -29,27 +30,27 @@ namespace Quantum {
                 PlayerAction.Skidding               => ActionFlags.AllowBump,
                 PlayerAction.Crouch                 => ActionFlags.AllowBump | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox,
                 PlayerAction.Sliding                => ActionFlags.AllowBump | ActionFlags.Attacking,
-                PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.GivesNormalKnockback,
-                PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.GivesNormalKnockback,
-                PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.GivesNormalKnockback,
-                PlayerAction.HoldJump               => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.GivesNormalKnockback,
-                PlayerAction.Freefall               => ActionFlags.AllowBump | ActionFlags.AirAction | ActionFlags.GivesNormalKnockback,
-                PlayerAction.WallSlide              => ActionFlags.AirAction | ActionFlags.GivesNormalKnockback,
-                PlayerAction.Wallkick               => ActionFlags.AirAction | ActionFlags.GivesNormalKnockback,
+                PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
+                PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
+                PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
+                PlayerAction.HoldJump               => ActionFlags.AllowBump | ActionFlags.AirAction,
+                PlayerAction.Freefall               => ActionFlags.AllowBump | ActionFlags.AirAction,
+                PlayerAction.WallSlide              => ActionFlags.AirAction,
+                PlayerAction.Wallkick               => ActionFlags.AirAction,
                 PlayerAction.GroundPound            => ActionFlags.AirAction | ActionFlags.DisableTurnaround | ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction, // the 3 stars flag gets applied later
                 // PlayerAction.MiniGroundPound        => (int) (ActionFlags.AirAction), // has player bounce
                 PlayerAction.SoftKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
                 PlayerAction.NormalKnockback        => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
                 PlayerAction.HardKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
-                PlayerAction.SpinBlockSpin          => ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.GivesNormalKnockback,
-                PlayerAction.SpinBlockDrill         => ActionFlags.AirAction | ActionFlags.GivesHardKnockback | ActionFlags.NoPlayerBounce,
+                PlayerAction.SpinBlockSpin          => ActionFlags.AirAction | ActionFlags.CameraChange,
+                PlayerAction.SpinBlockDrill         => ActionFlags.AirAction | ActionFlags.NoPlayerBounce,
                 PlayerAction.BlueShellCrouch        => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox,
                 PlayerAction.BlueShellSliding       => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.BreaksBlocks | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.NoPlayerBounce,
                 PlayerAction.BlueShellJump          => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction, // the no player bounce based off ActionArg
                 // PlayerAction.BlueShellGroundPound   => (int) (ActionFlags.IsShelled | ActionFlags.AirAction | ActionFlags.NoPlayerBounce),
-                PlayerAction.PropellerSpin          => ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.GivesNormalKnockback,
+                PlayerAction.PropellerSpin          => ActionFlags.AirAction | ActionFlags.CameraChange,
                 // PlayerAction.PropellerFall          => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
-                PlayerAction.PropellerDrill         => ActionFlags.AirAction | ActionFlags.GivesHardKnockback,
+                PlayerAction.PropellerDrill         => ActionFlags.AirAction,
                 PlayerAction.MegaMushroom           => ActionFlags.Cutscene,
                 PlayerAction.PowerupShoot           => ActionFlags.AllowBump,
                 PlayerAction.Pushing                => ActionFlags.AllowBump,
@@ -69,6 +70,8 @@ namespace Quantum {
             ActionState = 0;
             ActionArg = arg;
 
+            StarStealCount = NoStarLoss;
+            StompAction = default;
             SetActionFlags(GetActionFlags(Action));
 
             UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}]");
@@ -119,6 +122,16 @@ namespace Quantum {
 
         public void SetActionFlags(ActionFlags actionFlags) {
             this.CurrActionFlags = (int) actionFlags;
+        }
+
+        public void SetStompEvents(PlayerAction victimAction = PlayerAction.NormalKnockback, int starsToDrop = 1) {
+            this.StarStealCount = starsToDrop;
+            this.StompAction = victimAction;
+        }
+
+        public void ClearStompEvents() {
+            this.StarStealCount = NoStarLoss;
+            this.StompAction = default;
         }
 
         public void CheckEntityBounce(bool checkPlayer = false) {

@@ -66,25 +66,22 @@ enum PlayerAction : Byte {
 
 enum ActionFlags : Int32 {
     Intangible = 1,
-    GivesSoftKnockback = 2,
-    GivesNormalKnockback = 4,
-    GivesHardKnockback = 8,
-    BreaksBlocks = 16,
-    IsShelled = 32,
-    Attacking = 64,
-    NoPlayerBounce = 128,
-    NoEnemyBounce = 256,
-    AirAction = 512,
-    WaterAction = 1024,
-    AllowBump = 2048,
-    StrongAction = 4096, // used for things like ground pounds
-	AllowHold = 8192,
-	Cutscene = 16384,
-	CameraChange = 32768,
-	DisableTurnaround = 65536,
-	DisablePushing = 131072,
-	UsesSmallHitbox = 262144,
-	UsesCrouchHitbox = 524288,
+    BreaksBlocks = 2,
+    IsShelled = 4,
+    Attacking = 8,
+    NoPlayerBounce = 16,
+    NoEnemyBounce = 32,
+    AirAction = 64,
+    WaterAction = 128,
+    AllowBump = 256,
+    StrongAction = 512, // used for things like ground pounds
+	AllowHold = 1024,
+	Cutscene = 2048,
+	CameraChange = 4096,
+	DisableTurnaround = 8192,
+	DisablePushing = 16384,
+	UsesSmallHitbox = 32768,
+	UsesCrouchHitbox = 65536,
 }
 
 component MarioPlayer {
@@ -113,11 +110,12 @@ component MarioPlayer {
 	// Actions
 	[ExcludeFromPrototype] PlayerAction Action;
 	[ExcludeFromPrototype] PlayerAction PrevAction;
-	[ExcludeFromPrototype] int CurrActionFlags;
 	[ExcludeFromPrototype] int ActionTimer;
 	[ExcludeFromPrototype] int ActionState;
 	[ExcludeFromPrototype] int ActionArg;
+	[ExcludeFromPrototype] int CurrActionFlags;
 	[ExcludeFromPrototype] int StarStealCount;
+	[ExcludeFromPrototype] PlayerAction StompAction;
 
 	// Walk/Running
     [ExcludeFromPrototype] bool FacingRight;
