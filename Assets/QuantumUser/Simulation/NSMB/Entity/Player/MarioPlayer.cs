@@ -7,7 +7,7 @@ namespace Quantum {
 
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
-        public bool IsCrouchedInShell => action == PlayerAction.BlueShellCrouch;
+        public bool IsCrouchedInShell => Action == PlayerAction.BlueShellCrouch;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public const int DropStarRight = 1 << 8;
 
@@ -45,7 +45,7 @@ namespace Quantum {
                 PlayerAction.SpinBlockDrill         => ActionFlags.AirAction | ActionFlags.Takes3Stars | ActionFlags.GivesHardKnockback | ActionFlags.NoPlayerBounce,
                 PlayerAction.BlueShellCrouch        => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox,
                 PlayerAction.BlueShellSliding       => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.BreaksBlocks | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.NoPlayerBounce,
-                PlayerAction.BlueShellJump          => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction | ActionFlags.Takes1Star, // the no player bounce based off actionArg
+                PlayerAction.BlueShellJump          => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction | ActionFlags.Takes1Star, // the no player bounce based off ActionArg
                 // PlayerAction.BlueShellGroundPound   => (int) (ActionFlags.IsShelled | ActionFlags.AirAction | ActionFlags.NoPlayerBounce),
                 PlayerAction.PropellerSpin          => ActionFlags.AirAction | ActionFlags.CameraChange | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback,
                 // PlayerAction.PropellerFall          => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
@@ -62,21 +62,21 @@ namespace Quantum {
         }
 
         public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef entityA = default, EntityRef entityB = default) {
-            prevAction = action;
-            action = playerAction;
+            PrevAction = Action;
+            Action = playerAction;
 
-            actionTimer = 0;
-            actionState = 0;
-            actionArg = arg;
+            ActionTimer = 0;
+            ActionState = 0;
+            ActionArg = arg;
 
-            SetActionFlags(GetActionFlags(action));
+            SetActionFlags(GetActionFlags(Action));
 
             UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}]");
-            return action;
+            return Action;
         }
 
         public bool SetPlayerActionOnce(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef entityA = default, EntityRef entityB = default) {
-            if (action == playerAction) {
+            if (Action == playerAction) {
                 return false;
             }
             SetPlayerAction(playerAction, arg, f, entityA, entityB);
@@ -87,26 +87,26 @@ namespace Quantum {
             if (physicsObject->IsTouchingGround) {
                 return SetPlayerAction(groundAction, actionArg);
             }
-            return action;
+            return Action;
         }
 
         public PlayerAction SetAirAction(PhysicsObject* physicsObject, PlayerAction airAction = PlayerAction.Freefall, int actionArg = 0) {
             if (!physicsObject->IsTouchingGround) {
                 return SetPlayerAction(airAction, actionArg);
             }
-            return action;
+            return Action;
         }
 
         public bool HasActionFlags(ActionFlags actionFlags) {
-            return (this.actionFlags & (int)actionFlags) != 0;
+            return (this.ActionFlags & (int)actionFlags) != 0;
         }
 
         public void AddActionFlags(ActionFlags actionFlags) {
-            this.actionFlags |= (int) actionFlags;
+            this.ActionFlags |= (int) actionFlags;
         }
 
         public void ClearActionFlags(ActionFlags actionFlags) {
-            this.actionFlags &= ~(int) actionFlags;
+            this.ActionFlags &= ~(int) actionFlags;
         }
 
         public void ToggleActionFlags(ActionFlags actionFlags, bool add) {
@@ -118,7 +118,7 @@ namespace Quantum {
         }
 
         public void SetActionFlags(ActionFlags actionFlags) {
-            this.actionFlags = (int) actionFlags;
+            this.ActionFlags = (int) actionFlags;
         }
 
         public void CheckEntityBounce(bool checkPlayer = false) {
@@ -201,7 +201,7 @@ namespace Quantum {
             return CurrentPowerupState == PowerupState.MegaMushroom
                 || IsStarmanInvincible
                 || HasActionFlags(ActionFlags.Attacking)
-                || (includeSliding && (action == PlayerAction.Sliding || action == PlayerAction.BlueShellSliding) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
+                || (includeSliding && (Action == PlayerAction.Sliding || Action == PlayerAction.BlueShellSliding) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
         }
 
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
@@ -213,7 +213,7 @@ namespace Quantum {
                 } else {
                     arr = physicsInfo.SwimMaxVelocity;
                 }
-            } else if ((action == PlayerAction.SpinBlockSpin || action == PlayerAction.PropellerSpin) && CurrentPowerupState != PowerupState.MegaMushroom) {
+            } else if ((Action == PlayerAction.SpinBlockSpin || Action == PlayerAction.PropellerSpin) && CurrentPowerupState != PowerupState.MegaMushroom) {
                 arr = physicsInfo.FlyingMaxVelocity;
             } else {
                 arr = physicsInfo.WalkMaxVelocity;
@@ -333,13 +333,13 @@ namespace Quantum {
             }
             }
 
-            if (action == PlayerAction.PropellerDrill) {
+            if (Action == PlayerAction.PropellerDrill) {
                 SetPlayerAction(PlayerAction.SpinBlockDrill, 1);
             } else if (HasActionFlags(ActionFlags.IsShelled)) {
                 SetPlayerAction(PlayerAction.Walk);
             }
 
-            if (action != PlayerAction.Death && action != PlayerAction.LavaDeath) {
+            if (Action != PlayerAction.Death && Action != PlayerAction.LavaDeath) {
                 DamageInvincibilityFrames = 2 * 60;
                 f.Events.MarioPlayerTookDamage(f, entity);
             }
@@ -464,10 +464,10 @@ namespace Quantum {
                 return;
             }
 
-            bool weak = action == PlayerAction.SoftKnockback;
-            bool fromRight = (actionArg & DropStarRight) != 0;
+            bool weak = Action == PlayerAction.SoftKnockback;
+            bool fromRight = (ActionArg & DropStarRight) != 0;
 
-            int droppedStars = actionArg % 256;
+            int droppedStars = ActionArg % 256;
             /*if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
                 SpawnStars(f, entity, starsToDrop - 1);
                 Powerdown(f, entity, false);
@@ -502,12 +502,12 @@ namespace Quantum {
 
             SpawnStars(f, entity, droppedStars);
             //HandleLayerState();
-            f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, action);
+            f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, Action);
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            KnockbackGetupFrames = (byte) (action == PlayerAction.SoftKnockback || physicsObject->IsUnderwater ? 0 : 25);
+            KnockbackGetupFrames = (byte) (Action == PlayerAction.SoftKnockback || physicsObject->IsUnderwater ? 0 : 25);
             DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
             FacingRight = KnockbackWasOriginallyFacingRight;
             SetPlayerAction(PlayerAction.Idle);
