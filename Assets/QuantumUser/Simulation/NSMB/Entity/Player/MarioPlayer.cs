@@ -75,7 +75,7 @@ namespace Quantum {
             StompAction = default;
             SetActionFlags(GetActionFlags(Action));
 
-            UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}]");
+            UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}] with Arg [{arg}]");
             return Action;
         }
 
