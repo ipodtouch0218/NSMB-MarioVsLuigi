@@ -136,7 +136,7 @@ namespace Quantum {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
                     bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->GetTeam(f) != holderMario->GetTeam(f);
                     mario->SetPlayerAction(dropStars ? PlayerAction.NormalKnockback : PlayerAction.SoftKnockback,
-                        dropStars ? 1 : 0 + (contact.Normal.X > 0 ? MarioPlayer.DropStarRight : 0), f, marioEntity, iceBlockEntity);
+                        dropStars ? 1 : 0 + (contact.Normal.X > 0 ? MarioPlayer.DropStarRight : 0), f, iceBlockEntity);
 
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.HitWall);
                     return;

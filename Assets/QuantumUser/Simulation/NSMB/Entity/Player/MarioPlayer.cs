@@ -62,13 +62,14 @@ namespace Quantum {
             };
         }
 
-        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef entityA = default, EntityRef entityB = default) {
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef actionObject = default) {
             PrevAction = Action;
             Action = playerAction;
 
             ActionTimer = 0;
             ActionState = 0;
             ActionArg = arg;
+            ActionObject = actionObject;
 
             StarStealCount = NoStarLoss;
             StompAction = default;
@@ -78,11 +79,11 @@ namespace Quantum {
             return Action;
         }
 
-        public bool SetPlayerActionOnce(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef entityA = default, EntityRef entityB = default) {
+        public bool SetPlayerActionOnce(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef actionObject = default) {
             if (Action == playerAction) {
                 return false;
             }
-            SetPlayerAction(playerAction, arg, f, entityA, entityB);
+            SetPlayerAction(playerAction, arg, f, actionObject);
             return true;
         }
 
@@ -467,55 +468,7 @@ namespace Quantum {
         }
 
         public void DoKnockback(Frame f, EntityRef entity, EntityRef attacker) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            if (HasActionFlags(ActionFlags.Intangible)) {
-                return;
-            }
-
-            var freezable = f.Unsafe.GetPointer<Freezable>(entity);
-            if (freezable->IsFrozen(f)) {
-                return;
-            }
-
-            bool weak = Action == PlayerAction.SoftKnockback;
-            bool fromRight = (ActionArg & DropStarRight) != 0;
-
-            int droppedStars = ActionArg % 256;
-            /*if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
-                SpawnStars(f, entity, starsToDrop - 1);
-                Powerdown(f, entity, false);
-                return;
-            }*/
-
-            KnockbackWasOriginallyFacingRight = FacingRight;
-            KnockbackTick = f.Number;
-
-            //IsInForwardsKnockback = FacingRight != fromRight;
-            //KnockbackAttacker = attacker;
-
-            // Don't go into walls
-            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
-
-            if (!weak && PhysicsObjectSystem.Raycast((FrameThreadSafe) f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
-                fromRight = !fromRight;
-            }
-
-            physicsObject->Velocity = new FPVector2(
-                (fromRight ? -1 : 1) *
-                    (droppedStars + 1) *
-                    FP._1_50 *
-                    (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
-                    (CurrentPowerupState == PowerupState.MiniMushroom ? Constants._2_50 : 1) *
-                    (weak ? FP._0_50 : 1),
-
-                // Don't go upwards if we got hit by a fireball
-                f.Has<Projectile>(attacker) ? 0 : Constants._4_50
-            );
-
-            SpawnStars(f, entity, droppedStars);
-            //HandleLayerState();
-            f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, Action);
+           
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {

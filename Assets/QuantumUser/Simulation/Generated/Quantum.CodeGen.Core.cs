@@ -67,6 +67,7 @@ namespace Quantum {
     DisablePushing = 16384,
     UsesSmallHitbox = 32768,
     UsesCrouchHitbox = 65536,
+    KillMiniStomp = 131072,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -2026,7 +2027,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 208;
+    public const Int32 SIZE = 216;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(152)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
@@ -2104,6 +2105,9 @@ namespace Quantum {
     [FieldOffset(41)]
     [ExcludeFromPrototype()]
     public PlayerAction StompAction;
+    [FieldOffset(168)]
+    [ExcludeFromPrototype()]
+    public EntityRef ActionObject;
     [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
@@ -2233,16 +2237,16 @@ namespace Quantum {
     [FieldOffset(25)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillHoldFrames;
-    [FieldOffset(184)]
+    [FieldOffset(192)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
     [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
-    [FieldOffset(168)]
+    [FieldOffset(176)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentPipe;
-    [FieldOffset(192)]
+    [FieldOffset(200)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
     [FieldOffset(128)]
@@ -2254,7 +2258,7 @@ namespace Quantum {
     [FieldOffset(19)]
     [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
-    [FieldOffset(176)]
+    [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentSpinner;
     public override Int32 GetHashCode() {
@@ -2286,6 +2290,7 @@ namespace Quantum {
         hash = hash * 31 + CurrActionFlags.GetHashCode();
         hash = hash * 31 + StarStealCount.GetHashCode();
         hash = hash * 31 + (Byte)StompAction;
+        hash = hash * 31 + ActionObject.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + IsTurnaround.GetHashCode();
         hash = hash * 31 + FastTurnaroundFrames.GetHashCode();
@@ -2415,6 +2420,7 @@ namespace Quantum {
         AssetRef.Serialize(&p->CharacterAsset, serializer);
         AssetRef.Serialize(&p->PhysicsAsset, serializer);
         AssetRef.Serialize(&p->ReserveItem, serializer);
+        EntityRef.Serialize(&p->ActionObject, serializer);
         EntityRef.Serialize(&p->CurrentPipe, serializer);
         EntityRef.Serialize(&p->CurrentSpinner, serializer);
         EntityRef.Serialize(&p->HeldEntity, serializer);

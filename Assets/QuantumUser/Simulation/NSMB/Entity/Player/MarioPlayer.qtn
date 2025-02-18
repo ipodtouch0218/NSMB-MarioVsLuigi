@@ -82,6 +82,7 @@ enum ActionFlags : Int32 {
 	DisablePushing = 16384,
 	UsesSmallHitbox = 32768,
 	UsesCrouchHitbox = 65536,
+	KillMiniStomp = 131072,
 }
 
 component MarioPlayer {
@@ -116,6 +117,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] int CurrActionFlags;
 	[ExcludeFromPrototype] int StarStealCount;
 	[ExcludeFromPrototype] PlayerAction StompAction;
+	[ExcludeFromPrototype] EntityRef ActionObject;
 
 	// Walk/Running
     [ExcludeFromPrototype] bool FacingRight;
