@@ -88,8 +88,8 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            EnableShootingPowerups(f, ref filter, physics, ref inputs, PowerupState.FireFlower);
-            EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
+            if (EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState)) return;
+            if (EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage)) return;
 
             if (physicsObject->Velocity.X != 0) {
                 mario->SetPlayerActionOnce(PlayerAction.Walk);
@@ -231,7 +231,6 @@ namespace Quantum {
 
             EnableWallKick(f, ref filter, physics, ref inputs);
 
-            mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
             mario->SetStompEvents();
             mario->SetGroundAction(physicsObject);
         }
