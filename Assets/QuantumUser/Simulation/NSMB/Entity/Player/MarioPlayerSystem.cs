@@ -131,6 +131,7 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             mario->CurrentPowerupState = PowerupState.PropellerMushroom;
+            mario->InvincibilityFrames = 500;
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk);
                 return;
@@ -201,10 +202,7 @@ namespace Quantum {
             // EnableWallKick(f, ref filter, physics, ref inputs);
 
             mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
-
-            mario->StarStealCount = 1;
-            mario->StompAction = PlayerAction.NormalKnockback;
-
+            mario->SetStompEvents();
             mario->SetGroundAction(physicsObject);
         }
 
@@ -219,9 +217,7 @@ namespace Quantum {
             EnableWallKick(f, ref filter, physics, ref inputs);
 
             mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
-
             mario->SetStompEvents();
-
             mario->SetGroundAction(physicsObject);
         }
 
@@ -235,8 +231,8 @@ namespace Quantum {
 
             EnableWallKick(f, ref filter, physics, ref inputs);
 
+            mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
             mario->SetStompEvents();
-
             mario->SetGroundAction(physicsObject);
         }
 
@@ -469,7 +465,20 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            QuantumUtils.Increment(ref mario->ActionTimer);
+            // got damaged
+            if (mario->CurrentPowerupState <= PowerupState.Mushroom) {
+                physicsObject->Velocity.Y = 0;
+                mario->SetPlayerAction(PlayerAction.SpinBlockDrill);
+                return;
+            } else if (mario->CurrentPowerupState != PowerupState.PropellerMushroom) {
+                mario->SetAirAction(physicsObject);
+                return;
+            }
+
+            // debug code
+            if (mario->ActionTimer == 20) {
+                mario->Powerdown(f, filter.Entity, true);
+            }
             if (inputs.Down.IsDown && mario->ActionTimer > (mario->ActionArg == 1 ? 20 : 30)) {
                 mario->SetPlayerAction(PlayerAction.PropellerDrill);
             }
@@ -492,13 +501,19 @@ namespace Quantum {
             }
             mario->SetStompEvents();
             mario->SetGroundAction(physicsObject);
+            QuantumUtils.Increment(ref mario->ActionTimer);
         }
 
         private void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
-            if (mario->CurrentPowerupState != PowerupState.PropellerMushroom) {
+
+            // got damaged revert to Spin Block Drill
+            if (mario->CurrentPowerupState <= PowerupState.Mushroom) {
                 mario->SetPlayerAction(PlayerAction.SpinBlockDrill);
+                return;
+            } else if (mario->CurrentPowerupState != PowerupState.PropellerMushroom) {
+                mario->SetAirAction(physicsObject);
                 return;
             }
 
