@@ -100,13 +100,6 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte Lives;
 
 	[ExcludeFromPrototype] bool Disconnected;
-	[ExcludeFromPrototype] bool IsDead;
-	[ExcludeFromPrototype] bool FireDeath;
-	[ExcludeFromPrototype] bool IsRespawning;
-	[ExcludeFromPrototype] byte DeathAnimationFrames;
-	[ExcludeFromPrototype] byte PreRespawnFrames;
-	[ExcludeFromPrototype] byte RespawnFrames;
-	[ExcludeFromPrototype] byte NoLivesStarDirection;
 
 	// Actions
 	[ExcludeFromPrototype] PlayerAction Action;

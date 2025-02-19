@@ -210,7 +210,7 @@ namespace NSMB.Entities.Player {
 
             if (f.Global->GameState >= GameState.Ended && !forceUpdate) {
                 animator.speed = 0;
-                models.SetActive(!mario->IsRespawning);
+                models.SetActive(mario->Action != PlayerAction.Respawning);
                 SetParticleEmission(drillParticle, false);
                 SetParticleEmission(sparkles, false);
                 SetParticleEmission(iceSkiddingParticle, false);
@@ -265,7 +265,7 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(waterRunningParticle, !disableParticles && !waterSkiddingParticle.isPlaying && onWater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
             SetParticleEmission(dust, !disableParticles && !iceSkiddingParticle.isPlaying && !waterSkiddingParticle.isPlaying && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->Action == PlayerAction.Skidding || (mario->Action is PlayerAction.Crouch or PlayerAction.BlueShellCrouch && !physicsObject->IsOnSlipperyGround)) && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->Action is PlayerAction.Sliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->HasActionFlags(ActionFlags.IsShelled)) && physicsObject->IsTouchingGround)) && !f.Exists(mario->CurrentPipe));
             SetParticleEmission(giantParticle, !disableParticles && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
-            SetParticleEmission(fireParticle, mario->IsDead && !mario->IsRespawning && mario->FireDeath && !physicsObject->IsFrozen);
+            SetParticleEmission(fireParticle, mario->Action == PlayerAction.LavaDeath && !physicsObject->IsFrozen);
             SetParticleEmission(bubblesParticle, !disableParticles && physicsObject->IsUnderwater);
 
             var physicsCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(EntityRef);
@@ -353,7 +353,7 @@ namespace NSMB.Entities.Player {
                 modelRotateInstantly = true;
 
             } else if (mario->IsDead) {
-                if (mario->FireDeath && mario->DeathAnimationFrames == 0) {
+                if (mario->Action == PlayerAction.LavaDeath && mario->ActionTimer < 36) {
                     modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 110 : 250, 0);
                 } else {
                     modelRotationTarget = Quaternion.Euler(0, 180, 0);
@@ -547,7 +547,7 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
-            models.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
+            models.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (mario->Action != PlayerAction.Respawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;
@@ -901,7 +901,7 @@ namespace NSMB.Entities.Player {
             animator.SetTrigger("deathup");
 
             var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            if (mario->FireDeath && !NetworkHandler.IsReplayFastForwarding) {
+            if (mario->Action == PlayerAction.LavaDeath && !NetworkHandler.IsReplayFastForwarding) {
                 PlaySound(SoundEffect.Player_Voice_LavaDeath);
             }
         }

@@ -9,6 +9,7 @@ namespace Quantum {
         public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => Action == PlayerAction.BlueShellCrouch;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+        public bool IsDead => Action is PlayerAction.Death or PlayerAction.LavaDeath;
         public const int DropStarRight = 1 << 8;
         public const int NoStarLoss = -1;
 
@@ -279,45 +280,6 @@ namespace Quantum {
             ReserveItem = newItem;
         }
 
-        public void Death(Frame f, EntityRef entity, bool fire, bool stars = true) {
-            FireDeath = fire;
-            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
-
-            PreRespawnFrames = 180;
-            RespawnFrames = 78;
-
-            if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
-                SpawnStars(f, entity, 1);
-                DeathAnimationFrames = (Stars > 0) ? (byte) 30 : (byte) 36;
-            } else {
-                if (stars) {
-                    SpawnStars(f, entity, 1);
-                }
-                DeathAnimationFrames = 36;
-            }
-            
-            /*
-            IsWaterWalking = false;
-            IsFrozen = false;
-           
-            if (FrozenCube) {
-                Runner.Despawn(FrozenCube.Object);
-            }
-            */
-
-            if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
-                holdable->DropWithoutThrowing(f, HeldEntity);
-            }
-
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            physicsObject->IsFrozen = true;
-            physicsObject->DisableCollision = true;
-            physicsObject->CurrentData = default;
-
-            f.Signals.OnMarioPlayerDied(entity);
-            f.Events.MarioPlayerDied(f, entity, fire);
-        }
-
         public bool Powerdown(Frame f, EntityRef entity, bool ignoreInvincible) {
             if (!ignoreInvincible && !IsDamageable) {
                 return false;
@@ -328,7 +290,7 @@ namespace Quantum {
             switch (CurrentPowerupState) {
             case PowerupState.MiniMushroom:
             case PowerupState.NoPowerup: {
-                Death(f, entity, false);
+                SetPlayerAction(PlayerAction.Death, (!f.Global->Rules.IsLivesEnabled || Lives > 0) ? 0 : 2, f, entity);
                 break;
             }
             case PowerupState.Mushroom: {
@@ -347,12 +309,6 @@ namespace Quantum {
             }
             }
 
-            if (Action == PlayerAction.PropellerDrill) {
-                SetPlayerAction(PlayerAction.SpinBlockDrill, 1);
-            } else if (HasActionFlags(ActionFlags.IsShelled)) {
-                SetPlayerAction(PlayerAction.Walk);
-            }
-
             if (Action != PlayerAction.Death && Action != PlayerAction.LavaDeath) {
                 DamageInvincibilityFrames = 2 * 60;
                 f.Events.MarioPlayerTookDamage(f, entity);
@@ -365,18 +321,6 @@ namespace Quantum {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             bool fastStars = amount > 2 && Stars > 2;
             int starDirection = FacingRight ? 1 : 2;
-
-            if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
-                fastStars = true;
-                NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
-                starDirection = NoLivesStarDirection;
-
-                starDirection = starDirection switch {
-                    2 => 1,
-                    1 => 2,
-                    _ => starDirection
-                };
-            }
 
             int droppedStars = 0;
             while (amount > 0) {
@@ -409,66 +353,6 @@ namespace Quantum {
                 f.Events.MarioPlayerDroppedStar(f, entity);
                 GameLogicSystem.CheckForGameEnd(f);
             }
-        }
-
-        public void PreRespawn(Frame f, EntityRef entity, VersusStageData stage) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-
-            RespawnFrames = 78;
-
-            if ((f.Global->Rules.IsLivesEnabled && Lives == 0) || Disconnected) {
-                f.Destroy(entity);
-                return;
-            }
-
-            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
-            transform->Position = spawnpoint;
-            f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
-
-            IsDead = true;
-            f.Unsafe.GetPointer<Freezable>(entity)->FrozenCubeEntity = EntityRef.None;
-            FacingRight = true;
-            WallslideEndFrames = 0;
-            WalljumpFrames = 0;
-            UsedPropellerThisJump = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            JumpState = JumpState.None;
-            PreviousPowerupState = CurrentPowerupState = PowerupState.NoPowerup;
-            //animationController.DisableAllModels();
-            DamageInvincibilityFrames = 0;
-            InvincibilityFrames = 0;
-            MegaMushroomFrames = 0;
-            MegaMushroomStartFrames = 0;
-            MegaMushroomEndFrames = 0;
-            // f.ResolveHashSet(WaterColliders).Clear();
-            SwimForceJumpTimer = 0;
-
-            physicsObject->IsFrozen = true;
-            physicsObject->Velocity = FPVector2.Zero;
-            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
-
-            f.Events.MarioPlayerPreRespawned(f, entity);
-        }
-
-        public void Respawn(Frame f, EntityRef entity) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-
-            IsDead = false;
-            IsRespawning = false;
-            DamageInvincibilityFrames = 120;
-            CoyoteTimeFrames = 0;
-            SwimForceJumpTimer = 0;
-            physicsObject->IsFrozen = false;
-            physicsObject->DisableCollision = false;
-            SetPlayerAction(PlayerAction.Freefall);
-
-            f.Events.MarioPlayerRespawned(f, entity);
-        }
-
-        public void DoKnockback(Frame f, EntityRef entity, EntityRef attacker) {
-           
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {

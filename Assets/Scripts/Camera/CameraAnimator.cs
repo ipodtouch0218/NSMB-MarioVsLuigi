@@ -90,7 +90,7 @@ public unsafe class CameraAnimator : ResizingCamera {
         Vector2 cameraFocus = Vector2.Lerp(targetTransformPrevious->Position.ToUnityVector2(), targetTransformCurrent->Position.ToUnityVector2(), game.InterpolationFactor);
         cameraFocus.y += playerHeight * 0.5f;
 
-        if (!targetMario->IsDead || targetMario->IsRespawning) {
+        if (!targetMario->IsDead || targetMario->Action != PlayerAction.Respawning) {
             float cameraHalfHeight = ourCamera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
             newPosition.y = Mathf.Clamp(newPosition.y, cameraFocus.y - cameraHalfHeight, cameraFocus.y + cameraHalfHeight);
         }

@@ -55,7 +55,7 @@ namespace Quantum {
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
 
-            if (!mario->IsDead && !mario->IsRespawning) {
+            if (!mario->IsDead && mario->Action != PlayerAction.Respawning) {
                 camera->LastPlayerPosition = transform->Position;
             }
 
