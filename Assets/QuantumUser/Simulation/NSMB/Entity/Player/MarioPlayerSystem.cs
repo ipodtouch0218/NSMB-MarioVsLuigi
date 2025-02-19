@@ -130,9 +130,7 @@ namespace Quantum {
         private void ActionCrouching(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
-            mario->Stars = 5;
-            mario->SetPlayerAction(PlayerAction.HardKnockback, 3, f, filter.Entity);
-            return;
+            mario->CurrentPowerupState = PowerupState.PropellerMushroom;
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk);
                 return;
@@ -435,9 +433,11 @@ namespace Quantum {
         private void ActionSpinBlockDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
-            HandleGroundpoundBlockCollision(f, ref filter, physics, stage, false);
             mario->SetStompEvents(PlayerAction.HardKnockback, 3);
-            mario->SetGroundAction(physicsObject);
+
+            if (!HandleGroundpoundBlockCollision(f, ref filter, physics, stage, false)) {
+                mario->SetGroundAction(physicsObject);
+            }
         }
 
         private void ActionBlueShellSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -918,7 +918,7 @@ namespace Quantum {
                     physicsObject->IsTouchingGround = false;
                 }
             }*/
-            return interactedAny;
+            return continueGroundpound;
         }
 
         public void BlueShellPhysics(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
