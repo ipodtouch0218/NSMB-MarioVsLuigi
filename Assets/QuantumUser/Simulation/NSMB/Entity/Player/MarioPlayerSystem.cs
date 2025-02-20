@@ -1304,7 +1304,7 @@ namespace Quantum {
                 }
             }
 
-            if (mario->Action == PlayerAction.GroundPound || mario->HasActionFlags(ActionFlags.IsShelled) || f.Exists(mario->CurrentPipe) || mario->JumpLandingFrames > 0
+            if (mario->HasActionFlags(ActionFlags.IrregularVelocity) || f.Exists(mario->CurrentPipe) || mario->JumpLandingFrames > 0
                 || !(mario->WalljumpFrames <= 0 || physicsObject->IsTouchingGround || physicsObject->Velocity.Y < 0)) {
                 return;
             }

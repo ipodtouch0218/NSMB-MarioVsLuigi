@@ -69,6 +69,7 @@ namespace Quantum {
     UsesCrouchHitbox = 65536,
     KillMiniStomp = 131072,
     StarSpinAction = 262144,
+    IrregularVelocity = 524288,
   }
   public enum GameState : byte {
     PreGameRoom,
