@@ -149,7 +149,6 @@ component MarioPlayer {
 	[ExcludeFromPrototype] bool KnockbackWasOriginallyFacingRight;
 	[ExcludeFromPrototype] int KnockbackTick;
 	[ExcludeFromPrototype] byte DamageInvincibilityFrames;
-	[ExcludeFromPrototype] byte KnockbackGetupFrames;
 	[ExcludeFromPrototype] byte CrushDamageInvincibilityFrames;
 
 	// Block Interactions

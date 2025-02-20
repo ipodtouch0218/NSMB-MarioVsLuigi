@@ -446,7 +446,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamCrouching,        mario->Action is PlayerAction.Crouch or PlayerAction.CrouchAir);
             animator.SetBool(ParamGroundpound,      mario->Action == PlayerAction.GroundPound);
             animator.SetBool(ParamSliding,          mario->Action == PlayerAction.Sliding);
-            animator.SetBool(ParamKnockback,        mario->Action is PlayerAction.NormalKnockback or PlayerAction.HardKnockback);
+            animator.SetBool(ParamKnockback,        (mario->Action is PlayerAction.NormalKnockback or PlayerAction.HardKnockback) && mario->ActionState < 2);
             animator.SetBool(ParamFacingRight,      (left ^ right) ? right : mario->FacingRight);
             animator.SetBool(ParamFlying,           mario->Action == PlayerAction.SpinBlockSpin);
             animator.SetBool(ParamDrill,            mario->Action is PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill);
@@ -548,7 +548,7 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
-            models.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (mario->Action != PlayerAction.Respawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
+            models.SetActive(f.Global->GameState >= GameState.Playing && (mario->MegaMushroomStartFrames > 0 || (mario->Action != PlayerAction.Respawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && remainingDamageInvincibility * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;

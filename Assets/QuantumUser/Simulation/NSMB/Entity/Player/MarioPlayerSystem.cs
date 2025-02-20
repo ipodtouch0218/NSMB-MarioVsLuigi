@@ -114,6 +114,7 @@ namespace Quantum {
                 } else {
                     mario->SetPlayerAction(PlayerAction.BlueShellCrouch);
                 }
+                return;
             }
 
             if (mario->Action == PlayerAction.Walk) {
@@ -121,6 +122,7 @@ namespace Quantum {
                                 && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * Constants._0_90
                                 && (physicsObject->Velocity.X > 0) == mario->FacingRight) {
                     mario->SetPlayerAction(PlayerAction.BlueShellSliding);
+                    return;
                 }
             }
             if (JumpHandler(f, ref filter, physics, ref inputs)) {
@@ -133,10 +135,6 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var entity = filter.Entity;
-            // debug code
-            mario->CurrentPowerupState = PowerupState.PropellerMushroom;
-            mario->InvincibilityFrames = 5000;
-            mario->Stars = 5;
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk);
                 return;
@@ -173,7 +171,7 @@ namespace Quantum {
             }
 
             QuantumUtils.Increment(ref mario->ActionTimer);
-            mario->SetAirAction(physicsObject, PlayerAction.CrouchAir, 1);
+            mario->SetAirAction(physicsObject, PlayerAction.CrouchAir, 1, true);
         }
 
         private void ActionCrouchAir(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
@@ -221,9 +219,11 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
 
             mario->JumpState = (mario->Action == PlayerAction.SingleJump) ? JumpState.SingleJump : JumpState.DoubleJump;
-            EnableGroundpound(f, ref filter, physics, ref inputs, stage);
-            EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
-            EnablePropellerPowerup(f, ref filter, physics, ref inputs, PowerupState.PropellerMushroom, stage);
+            if (EnableGroundpound(f, ref filter, physics, ref inputs, stage)
+                || EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState) == HelperState.Success
+                || EnablePropellerPowerup(f, ref filter, physics, ref inputs, PowerupState.PropellerMushroom, stage) == HelperState.Success) {
+                return;
+            }
 
             // EnableWallKick(f, ref filter, physics, ref inputs);
 
@@ -445,7 +445,11 @@ namespace Quantum {
                     mario->ActionTimer = 0;
                 }
             } else if (mario->ActionState == 2) {
-                if (mario->ActionTimer >= 10) {
+                int getupDelay = mario->Action == PlayerAction.SoftKnockback || physicsObject->IsUnderwater ? 0 : 25;
+                if (mario->ActionTimer >= getupDelay) {
+                    mario->DamageInvincibilityFrames = 60;
+                    mario->FacingRight = mario->KnockbackWasOriginallyFacingRight;
+                    physicsObject->Velocity = FPVector2.Zero;
                     mario->SetGroundAction(physicsObject);
                     mario->SetAirAction(physicsObject);
                     return;

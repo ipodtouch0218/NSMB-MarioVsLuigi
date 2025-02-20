@@ -97,7 +97,11 @@ namespace Quantum {
         }
 
         public PlayerAction SetAirAction(PhysicsObject* physicsObject, PlayerAction airAction = PlayerAction.Freefall, int actionArg = 0, bool ignCoyote = false) {
-            if (!physicsObject->IsTouchingGround && (CoyoteTimeFrames <= 0 || ignCoyote)) {
+            if (ignCoyote) {
+                CoyoteTimeFrames = 0;
+            }
+
+            if (!physicsObject->IsTouchingGround && (CoyoteTimeFrames <= 0)) {
                 return SetPlayerAction(airAction, actionArg);
             }
             return Action;
@@ -358,8 +362,6 @@ namespace Quantum {
 
         public void ResetKnockback(Frame f, EntityRef entity) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            KnockbackGetupFrames = (byte) (Action == PlayerAction.SoftKnockback || physicsObject->IsUnderwater ? 0 : 25);
-            DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
             FacingRight = KnockbackWasOriginallyFacingRight;
             SetPlayerAction(PlayerAction.Idle);
             
