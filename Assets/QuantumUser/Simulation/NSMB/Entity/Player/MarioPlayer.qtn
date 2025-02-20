@@ -36,6 +36,7 @@ enum PlayerAction : Byte {
 	HoldWalk,
 	Skidding,
     Crouch,
+	CrouchAir,
     Sliding,
     SingleJump,
     DoubleJump,
@@ -83,6 +84,7 @@ enum ActionFlags : Int32 {
 	UsesSmallHitbox = 32768,
 	UsesCrouchHitbox = 65536,
 	KillMiniStomp = 131072,
+	StarSpinAction = 262144,
 }
 
 component MarioPlayer {

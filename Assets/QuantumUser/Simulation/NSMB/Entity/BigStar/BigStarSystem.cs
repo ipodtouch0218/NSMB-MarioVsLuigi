@@ -128,7 +128,7 @@ namespace Quantum {
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            if (mario->IsDead) {
+            if (mario->IsDead || mario->HasActionFlags(ActionFlags.Intangible) || mario->HasActionFlags(ActionFlags.Cutscene)) {
                 return;
             }
 

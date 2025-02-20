@@ -30,6 +30,7 @@ namespace Quantum {
                 PlayerAction.HoldWalk               => ActionFlags.AllowBump,
                 PlayerAction.Skidding               => ActionFlags.AllowBump,
                 PlayerAction.Crouch                 => ActionFlags.AllowBump | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox,
+                PlayerAction.CrouchAir              => ActionFlags.AllowBump | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction,
                 PlayerAction.Sliding                => ActionFlags.AllowBump | ActionFlags.Attacking,
                 PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
                 PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
@@ -55,10 +56,10 @@ namespace Quantum {
                 PlayerAction.MegaMushroom           => ActionFlags.Cutscene,
                 PlayerAction.PowerupShoot           => ActionFlags.AllowBump,
                 PlayerAction.Pushing                => ActionFlags.AllowBump,
-                PlayerAction.Death                  => ActionFlags.Cutscene,
-                PlayerAction.LavaDeath              => ActionFlags.Cutscene,
-                PlayerAction.Respawning             => ActionFlags.Cutscene,
-                PlayerAction.EnteringPipe           => ActionFlags.Cutscene,
+                PlayerAction.Death                  => ActionFlags.Cutscene | ActionFlags.Intangible,
+                PlayerAction.LavaDeath              => ActionFlags.Cutscene | ActionFlags.Intangible,
+                PlayerAction.Respawning             => ActionFlags.Cutscene | ActionFlags.Intangible,
+                PlayerAction.EnteringPipe           => ActionFlags.Cutscene | ActionFlags.Intangible,
                 _                                   => 0 // null
             };
         }
@@ -95,8 +96,8 @@ namespace Quantum {
             return Action;
         }
 
-        public PlayerAction SetAirAction(PhysicsObject* physicsObject, PlayerAction airAction = PlayerAction.Freefall, int actionArg = 0) {
-            if (!physicsObject->IsTouchingGround) {
+        public PlayerAction SetAirAction(PhysicsObject* physicsObject, PlayerAction airAction = PlayerAction.Freefall, int actionArg = 0, bool ignCoyote = false) {
+            if (!physicsObject->IsTouchingGround && (CoyoteTimeFrames <= 0 || ignCoyote)) {
                 return SetPlayerAction(airAction, actionArg);
             }
             return Action;

@@ -353,7 +353,8 @@ namespace NSMB.Entities.Player {
                 modelRotateInstantly = true;
 
             } else if (mario->IsDead) {
-                if (mario->Action == PlayerAction.LavaDeath && mario->ActionTimer < 36) {
+                int deathUpFlag = 1 << 8;
+                if (mario->Action == PlayerAction.LavaDeath && (mario->ActionState & deathUpFlag) != 0) {
                     modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 110 : 250, 0);
                 } else {
                     modelRotationTarget = Quaternion.Euler(0, 180, 0);
@@ -433,16 +434,16 @@ namespace NSMB.Entities.Player {
 
             f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* heldObject);
 
-            animator.SetBool(ParamDead,             mario->Action == PlayerAction.Death);
+            animator.SetBool(ParamDead,             mario->IsDead);
             animator.SetBool(ParamOnLeft,           mario->Action == PlayerAction.WallSlide && mario->ActionArg == 0);
             animator.SetBool(ParamOnRight,          mario->Action == PlayerAction.WallSlide && mario->ActionArg != 0);
             animator.SetBool(ParamOnGround,         physicsObject->IsTouchingGround || mario->IsStuckInBlock || mario->CoyoteTimeFrames > 0);
-            animator.SetBool(ParamInvincible,       mario->IsStarmanInvincible);
+            animator.SetBool(ParamInvincible,       mario->HasActionFlags(ActionFlags.StarSpinAction));
             animator.SetBool(ParamSkidding,         mario->Action == PlayerAction.Skidding);
             animator.SetBool(ParamPropeller,        mario->Action == PlayerAction.PropellerSpin); // little confused on this one, where is IsPropellerFlying used?
             animator.SetBool(ParamPropellerSpin,    mario->Action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames > 0);
             animator.SetBool(ParamPropellerStart,   mario->Action == PlayerAction.PropellerSpin && mario->PropellerLaunchFrames > 0); // confusing
-            animator.SetBool(ParamCrouching,        mario->Action == PlayerAction.Crouch);
+            animator.SetBool(ParamCrouching,        mario->Action is PlayerAction.Crouch or PlayerAction.CrouchAir);
             animator.SetBool(ParamGroundpound,      mario->Action == PlayerAction.GroundPound);
             animator.SetBool(ParamSliding,          mario->Action == PlayerAction.Sliding);
             animator.SetBool(ParamKnockback,        mario->Action is PlayerAction.NormalKnockback or PlayerAction.HardKnockback);

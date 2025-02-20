@@ -68,6 +68,7 @@ namespace Quantum {
     UsesSmallHitbox = 32768,
     UsesCrouchHitbox = 65536,
     KillMiniStomp = 131072,
+    StarSpinAction = 262144,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -89,6 +90,7 @@ namespace Quantum {
     HoldWalk,
     Skidding,
     Crouch,
+    CrouchAir,
     Sliding,
     SingleJump,
     DoubleJump,
