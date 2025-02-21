@@ -139,8 +139,6 @@ namespace Quantum {
             var entity = filter.Entity;
             var inputs = filter.Inputs;
 
-            // debug code
-            mario->CurrentPowerupState = PowerupState.PropellerMushroom;
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk, f);
                 return;
@@ -2029,7 +2027,7 @@ namespace Quantum {
 
 
             if (QuantumUtils.Decrement(ref mario->InvincibilityFrames)) {
-                f.Unsafe.GetPointer<ComboKeeper>(filter.Entity)->Combo = 0;
+                //f.Unsafe.GetPointer<ComboKeeper>(filter.Entity)->Combo = 0;
             }
             QuantumUtils.Decrement(ref mario->PropellerSpinFrames);
             QuantumUtils.Decrement(ref mario->ProjectileDelayFrames);
