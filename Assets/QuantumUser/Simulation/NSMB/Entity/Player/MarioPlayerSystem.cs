@@ -49,7 +49,6 @@ namespace Quantum {
             var physics = f.FindAsset(filter.MarioPlayer->PhysicsAsset);
             var freezable = filter.Freezable;
             if (HandleDeathAndRespawning(f, ref filter, stage)) {
-                HandleTerminalVelocity(f, ref filter, physics);
                 return;
             }
             if (HandleMegaMushroom(f, ref filter, physics, stage)) {
@@ -61,39 +60,37 @@ namespace Quantum {
             }
 
             if (HandleStuckInBlock(f, ref filter, stage)) {
-                HandleCrouching(f, ref filter, physics);
-                HandleFacingDirection(f, ref filter, physics);
-                HandleHitbox(f, ref filter, physics);
                 return;
             }
             //HandleKnockback(f, ref filter);
 
-            HandleJumping(f, ref filter, physics, ref input);
-            HandleActions(f, ref filter, physics, ref input, stage);
-            HandleGlobals(f, ref filter, physics, ref input, stage);
-            HandlePowerups(f, ref filter, physics, ref input, stage);
-            HandleBreakingBlocks(f, ref filter, physics, ref input, stage);
+            HandleJumping(f, ref filter, physics);
+            HandleActions(f, ref filter, physics, stage);
+            HandleGlobals(f, ref filter, physics, stage);
+            HandlePowerups(f, ref filter, physics, stage);
+            HandleBreakingBlocks(f, ref filter, physics, stage);
             //HandleGroundpound(f, ref filter, physics, ref input, stage);
             //HandleSliding(f, ref filter, physics, ref input);
-            HandleWalkingRunning(f, ref filter, physics, ref input);
+            HandleWalkingRunning(f, ref filter, physics);
             HandleSpinners(f, ref filter, stage);
-            HandleSwimming(f, ref filter, physics, ref input);
+            HandleSwimming(f, ref filter, physics);
             //HandleBlueShell(f, ref filter, physics, ref input, stage);
             //HandleWallslide(f, ref filter, physics, ref input);
-            HandleGravity(f, ref filter, physics, ref input);
-            HandleTerminalVelocity(f, ref filter, physics, ref input);
-            HandleFacingDirection(f, ref filter, physics, ref input);
+            HandleGravity(f, ref filter, physics);
+            HandleTerminalVelocity(f, ref filter, physics);
+            HandleFacingDirection(f, ref filter, physics);
             HandlePipes(f, ref filter, physics, stage);
             HandleHitbox(f, ref filter, physics);
         }
 
         #region Actions
-        private void ActionIdleWalking(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionIdleWalking(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
-            if (EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState) == HelperState.Success) return;
-            if (EnablePropellerPowerup(f, ref filter, physics, ref inputs, PowerupState.PropellerMushroom, stage) == HelperState.Success) return;
+            if (EnableShootingPowerups(f, ref filter, physics, mario->CurrentPowerupState) == HelperState.Success) return;
+            if (EnablePropellerPowerup(f, ref filter, physics, PowerupState.PropellerMushroom, stage) == HelperState.Success) return;
 
             if (physicsObject->Velocity.X != 0) {
                 mario->SetPlayerActionOnce(PlayerAction.Walk, f);
@@ -136,10 +133,12 @@ namespace Quantum {
             mario->SetAirAction(physicsObject, f);
         }
 
-        private void ActionCrouching(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionCrouching(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var entity = filter.Entity;
+            var inputs = filter.Inputs;
+
             // debug code
             mario->CurrentPowerupState = PowerupState.PropellerMushroom;
             if (!inputs.Down.IsDown) {
@@ -181,23 +180,25 @@ namespace Quantum {
             mario->SetAirAction(physicsObject, f, PlayerAction.CrouchAir, 1, true);
         }
 
-        private void ActionCrouchAir(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionCrouchAir(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (!inputs.Down.IsDown && physicsObject->Velocity.Y < 0) {
                 // you can double jump if you do this in the original game
                 mario->SetPlayerAction(PlayerAction.SingleJump, f);
                 return;
             }
-            EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
+            EnablePropellerPowerup(f, ref filter, physics, mario->CurrentPowerupState, stage);
 
             mario->SetGroundAction(physicsObject, f, PlayerAction.Crouch);
         }
 
-        private void ActionSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             /*if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk);
@@ -221,9 +222,10 @@ namespace Quantum {
             mario->SetAirAction(physicsObject, f);
         }
 
-        private void ActionBounce(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionBounce(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             int args = 0;
             PlayerAction newAction = PlayerAction.SingleJump;
@@ -264,14 +266,15 @@ namespace Quantum {
             mario->SetPlayerAction(newAction, f, args);
         }
 
-        private void ActionSingleDoubleJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionSingleDoubleJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             mario->JumpState = (mario->Action == PlayerAction.SingleJump) ? JumpState.SingleJump : JumpState.DoubleJump;
-            if (EnableGroundpound(f, ref filter, physics, ref inputs, stage)
-                || EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState) == HelperState.Success
-                || EnablePropellerPowerup(f, ref filter, physics, ref inputs, PowerupState.PropellerMushroom, stage) == HelperState.Success) {
+            if (EnableGroundpound(f, ref filter, physics, stage)
+                || EnableShootingPowerups(f, ref filter, physics, mario->CurrentPowerupState) == HelperState.Success
+                || EnablePropellerPowerup(f, ref filter, physics, PowerupState.PropellerMushroom, stage) == HelperState.Success) {
                 return;
             }
 
@@ -286,15 +289,16 @@ namespace Quantum {
             mario->SetGroundAction(physicsObject, f);
         }
 
-        private void ActionTripleJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionTripleJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
-            EnableGroundpound(f, ref filter, physics, ref inputs, stage);
-            if (physicsObject->IsTouchingGround) EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
-            EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
+            EnableGroundpound(f, ref filter, physics, stage);
+            if (physicsObject->IsTouchingGround) EnableShootingPowerups(f, ref filter, physics, mario->CurrentPowerupState);
+            EnablePropellerPowerup(f, ref filter, physics, mario->CurrentPowerupState, stage);
 
-            EnableWallKick(f, ref filter, physics, ref inputs);
+            EnableWallKick(f, ref filter, physics);
 
             mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox | ActionFlags.StarSpinAction, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
             mario->SetStompEvents();
@@ -314,13 +318,14 @@ namespace Quantum {
             mario->SetGroundAction(physicsObject, f);
         }
 
-        private void ActionFreefall(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionFreefall(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
-            EnableGroundpound(f, ref filter, physics, ref inputs, stage);
-            EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
-            EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
+            EnableGroundpound(f, ref filter, physics, stage);
+            EnableShootingPowerups(f, ref filter, physics, mario->CurrentPowerupState);
+            EnablePropellerPowerup(f, ref filter, physics, mario->CurrentPowerupState, stage);
 
             // EnableWallKick(f, ref filter, physics, ref inputs);
 
@@ -328,9 +333,10 @@ namespace Quantum {
             mario->SetGroundAction(physicsObject, f);
         }
 
-        private void ActionWallSlide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionWallSlide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             FPVector2 currentWallDirection;
             if (mario->ActionArg == 0) {
@@ -371,9 +377,10 @@ namespace Quantum {
             mario->SetGroundAction(physicsObject, f);
         }
 
-        private void ActionWallKick(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionWallKick(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
             if (mario->ActionTimer == 0) {
                 // Perform walljump
                 physicsObject->Velocity = new(physics.WalljumpHorizontalVelocity * (mario->WallslideLeft ? 1 : -1), mario->CurrentPowerupState == PowerupState.MiniMushroom ? physics.WalljumpMiniVerticalVelocity : physics.WalljumpVerticalVelocity);
@@ -384,9 +391,9 @@ namespace Quantum {
                 mario->WallslideEndFrames = 0;
                 mario->JumpBufferFrames = 0;
             }
-            EnableShootingPowerups(f, ref filter, physics, ref inputs, mario->CurrentPowerupState);
+            EnableShootingPowerups(f, ref filter, physics, mario->CurrentPowerupState);
             if (mario->ActionTimer >= 20) {
-                EnablePropellerPowerup(f, ref filter, physics, ref inputs, mario->CurrentPowerupState, stage);
+                EnablePropellerPowerup(f, ref filter, physics, mario->CurrentPowerupState, stage);
             }
             mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox | ActionFlags.StarSpinAction, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
             mario->SetStompEvents();
@@ -394,9 +401,10 @@ namespace Quantum {
             QuantumUtils.Increment(ref mario->ActionTimer);
         }
 
-        private void ActionGroundPound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionGroundPound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                 // remove these flags
@@ -426,10 +434,11 @@ namespace Quantum {
             }
         }
 
-        private void ActionKnockback(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionKnockback(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var entity = filter.Entity;
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+            var inputs = filter.Inputs;
 
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
 
@@ -509,9 +518,10 @@ namespace Quantum {
             QuantumUtils.Increment(ref mario->ActionTimer);
         }
 
-        private void ActionSpinBlockSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionSpinBlockSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
             mario->SetStompEvents();
             if (inputs.Down.IsDown) {
                 // Start drill
@@ -523,9 +533,10 @@ namespace Quantum {
             }
         }
 
-        private void ActionSpinBlockDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionSpinBlockDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
             if (mario->ActionArg != 0) {
                 mario->AddActionFlags(ActionFlags.NoEnemyBounce | ActionFlags.NoPlayerBounce);
                 mario->SetStompEvents(PlayerAction.SoftKnockback, 1);
@@ -538,9 +549,10 @@ namespace Quantum {
             }
         }
 
-        private void ActionBlueShellSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionBlueShellSliding(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             BlueShellPhysics(f, ref filter, physics, ref inputs, stage);
 
@@ -549,9 +561,10 @@ namespace Quantum {
             }
         }
 
-        private void ActionBlueShellJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionBlueShellJump(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (mario->ActionArg != 0) {
                 mario->AddActionFlags(ActionFlags.BreaksBlocks);
@@ -563,9 +576,10 @@ namespace Quantum {
             }
         }
 
-        private void ActionPropellerSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionPropellerSpin(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             // got damaged
             if (mario->CurrentPowerupState <= PowerupState.Mushroom) {
@@ -604,9 +618,10 @@ namespace Quantum {
             QuantumUtils.Increment(ref mario->ActionTimer);
         }
 
-        private void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionPropellerDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             // got damaged revert to Spin Block Drill
             if (mario->CurrentPowerupState <= PowerupState.Mushroom) {
@@ -632,16 +647,17 @@ namespace Quantum {
             }
         }
 
-        private void ActionMegaMushroom(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionMegaMushroom(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
             var collider = filter.PhysicsCollider;
         }
 
-        private void ActionPowerupShoot(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionPowerupShoot(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             EntityPrototype tmpProj = null;
             switch (mario->ActionArg) {
@@ -679,11 +695,12 @@ namespace Quantum {
             mario->SetAirAction(physicsObject, f); // return Action to freefall if air
         }
 
-        private void ActionDeath(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionDeath(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var entity = filter.Entity;
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
 
             // disable inputs
@@ -768,11 +785,12 @@ namespace Quantum {
             QuantumUtils.Increment(ref mario->ActionTimer);
         }
 
-        private void ActionRespawning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void ActionRespawning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var entity = filter.Entity;
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var inputs = filter.Inputs;
             switch (mario->ActionState) {
             case 0: {
                 if (mario->ActionTimer == 0) {
@@ -831,43 +849,43 @@ namespace Quantum {
             QuantumUtils.Increment(ref mario->ActionTimer);
         }
 
-        public void HandleActions(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        public void HandleActions(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleActions");
             var mario = filter.MarioPlayer;
             switch (mario->Action) {
-            case PlayerAction.Idle:             ActionIdleWalking(f, ref filter, physics, ref inputs, stage); break;
+            case PlayerAction.Idle:             ActionIdleWalking(f, ref filter, physics, stage); break;
             case PlayerAction.HoldIdle:         break;
-            case PlayerAction.Walk:             ActionIdleWalking(f, ref filter, physics, ref inputs, stage); break;
+            case PlayerAction.Walk:             ActionIdleWalking(f, ref filter, physics, stage); break;
             case PlayerAction.HoldWalk:         break;
             case PlayerAction.Skidding:         break;
-            case PlayerAction.Crouch:           ActionCrouching(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.CrouchAir:        ActionCrouchAir(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.Sliding:          ActionSliding(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.Bounce:           ActionBounce(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.SingleJump:       ActionSingleDoubleJump(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.DoubleJump:       ActionSingleDoubleJump(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.TripleJump:       ActionTripleJump(f, ref filter, physics, ref inputs, stage); break;
+            case PlayerAction.Crouch:           ActionCrouching(f, ref filter, physics, stage); break;
+            case PlayerAction.CrouchAir:        ActionCrouchAir(f, ref filter, physics, stage); break;
+            case PlayerAction.Sliding:          ActionSliding(f, ref filter, physics, stage); break;
+            case PlayerAction.Bounce:           ActionBounce(f, ref filter, physics, stage); break;
+            case PlayerAction.SingleJump:       ActionSingleDoubleJump(f, ref filter, physics, stage); break;
+            case PlayerAction.DoubleJump:       ActionSingleDoubleJump(f, ref filter, physics, stage); break;
+            case PlayerAction.TripleJump:       ActionTripleJump(f, ref filter, physics, stage); break;
             case PlayerAction.HoldJump:         break;
-            case PlayerAction.Freefall:         ActionFreefall(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.WallSlide:        ActionWallSlide(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.Wallkick:         ActionWallKick(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.GroundPound:      ActionGroundPound(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.SoftKnockback:    ActionKnockback(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.NormalKnockback:  ActionKnockback(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.HardKnockback:    ActionKnockback(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.SpinBlockSpin:    ActionSpinBlockSpin(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.SpinBlockDrill:   ActionSpinBlockDrill(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.BlueShellCrouch:  ActionCrouching(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.BlueShellSliding: ActionBlueShellSliding(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.BlueShellJump:    ActionBlueShellJump(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.PropellerSpin:    ActionPropellerSpin(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.PropellerDrill:   ActionPropellerDrill(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.MegaMushroom:     ActionMegaMushroom(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.PowerupShoot:     ActionPowerupShoot(f, ref filter, physics, ref inputs, stage); break;
+            case PlayerAction.Freefall:         ActionFreefall(f, ref filter, physics, stage); break;
+            case PlayerAction.WallSlide:        ActionWallSlide(f, ref filter, physics, stage); break;
+            case PlayerAction.Wallkick:         ActionWallKick(f, ref filter, physics, stage); break;
+            case PlayerAction.GroundPound:      ActionGroundPound(f, ref filter, physics, stage); break;
+            case PlayerAction.SoftKnockback:    ActionKnockback(f, ref filter, physics, stage); break;
+            case PlayerAction.NormalKnockback:  ActionKnockback(f, ref filter, physics, stage); break;
+            case PlayerAction.HardKnockback:    ActionKnockback(f, ref filter, physics, stage); break;
+            case PlayerAction.SpinBlockSpin:    ActionSpinBlockSpin(f, ref filter, physics, stage); break;
+            case PlayerAction.SpinBlockDrill:   ActionSpinBlockDrill(f, ref filter, physics, stage); break;
+            case PlayerAction.BlueShellCrouch:  ActionCrouching(f, ref filter, physics, stage); break;
+            case PlayerAction.BlueShellSliding: ActionBlueShellSliding(f, ref filter, physics, stage); break;
+            case PlayerAction.BlueShellJump:    ActionBlueShellJump(f, ref filter, physics, stage); break;
+            case PlayerAction.PropellerSpin:    ActionPropellerSpin(f, ref filter, physics, stage); break;
+            case PlayerAction.PropellerDrill:   ActionPropellerDrill(f, ref filter, physics, stage); break;
+            case PlayerAction.MegaMushroom:     ActionMegaMushroom(f, ref filter, physics, stage); break;
+            case PlayerAction.PowerupShoot:     ActionPowerupShoot(f, ref filter, physics, stage); break;
             case PlayerAction.Pushing:          break;
-            case PlayerAction.Death:            ActionDeath(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.LavaDeath:        ActionDeath(f, ref filter, physics, ref inputs, stage); break;
-            case PlayerAction.Respawning:       ActionRespawning(f, ref filter, physics, ref inputs, stage); break;
+            case PlayerAction.Death:            ActionDeath(f, ref filter, physics, stage); break;
+            case PlayerAction.LavaDeath:        ActionDeath(f, ref filter, physics, stage); break;
+            case PlayerAction.Respawning:       ActionRespawning(f, ref filter, physics, stage); break;
             case PlayerAction.EnteringPipe:     break;
             }
         }
@@ -964,8 +982,10 @@ namespace Quantum {
         /// <b>HelperState.MatchFail</b> if the powerup state does match a shooting powerup, but cannot shoot a projectile<br></br>
         /// <b>HelperState.Success</b> if we could shoot a projectile.<br></br>
         /// </returns>
-        private HelperState EnableShootingPowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, PowerupState state) {
+        private HelperState EnableShootingPowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, PowerupState state) {
+            var inputs = filter.Inputs;
             if (!inputs.PowerupAction.WasPressed) return HelperState.NotActive;
+
             var mario = filter.MarioPlayer;
             switch (state) {
             case PowerupState.IceFlower:
@@ -1003,7 +1023,8 @@ namespace Quantum {
         /// <b>HelperState.MatchFail</b> if the powerup state does match a shooting powerup, but cannot shoot a projectile<br></br>
         /// <b>HelperState.Success</b> if we could shoot a projectile.<br></br>
         /// </returns>
-        private HelperState EnablePropellerPowerup(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, PowerupState state, VersusStageData stage) {
+        private HelperState EnablePropellerPowerup(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, PowerupState state, VersusStageData stage) {
+            var inputs = filter.Inputs;
             if (!inputs.PowerupAction.WasPressed) return HelperState.NotActive;
             if (state != PowerupState.PropellerMushroom) return HelperState.Mismatch;
             var mario = filter.MarioPlayer;
@@ -1038,9 +1059,10 @@ namespace Quantum {
         /// <param name="inputs"></param>
         /// <param name="wallslide">if true then allow the player to wallslide.</param>
         /// <returns>if the wallslide was possible or not.</returns>
-        private bool EnableWallKick(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, bool wallslide = true) {
+        private bool EnableWallKick(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, bool wallslide = true) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             FPVector2 currentWallDirection;
             if (mario->WallslideLeft) {
@@ -1110,10 +1132,11 @@ namespace Quantum {
         /// Attach this to an Action to allow the player to ground pound.
         /// </summary>
         /// <returns>if the ground pound was successful or not.</returns>
-        private bool EnableGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage, bool ignoreLeftRight = false, bool ignorePrevDown = false) {
+        private bool EnableGroundpound(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage, bool ignoreLeftRight = false, bool ignorePrevDown = false) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.TryStartGroundpound");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (!ignorePrevDown) {
                 mario->PreActionInput.Down = inputs.Down;
@@ -1257,7 +1280,6 @@ namespace Quantum {
 
         public void BlueShellPhysics(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleBlueShell");
-            ref var inputs = ref filter.Inputs;
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
@@ -1340,10 +1362,11 @@ namespace Quantum {
         }
         #endregion
 
-        public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+        public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWalkingRunning");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (!QuantumUtils.Decrement(ref mario->WalljumpFrames)) {
                 return;
@@ -1573,10 +1596,11 @@ namespace Quantum {
             };
         }
 
-        private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+        private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleJumping");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (inputs.Jump.WasPressed) {
                 // Jump buffer
@@ -1631,10 +1655,11 @@ namespace Quantum {
             }
         }
 
-        public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+        public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGravity");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (physicsObject->IsTouchingGround && !physicsObject->IsUnderwater) {
                 physicsObject->Gravity = FPVector2.Up * physics.GravityAcceleration[0];
@@ -1670,11 +1695,12 @@ namespace Quantum {
             physicsObject->Gravity = FPVector2.Up * gravity;
         }
 
-        public void HandleTerminalVelocity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+        public void HandleTerminalVelocity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleTerminalVelocity");
 
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             FP maxWalkSpeed = physics.WalkMaxVelocity[physics.WalkSpeedStage];
             FP terminalVelocity;
@@ -1806,10 +1832,11 @@ namespace Quantum {
         }
 
 
-        public void HandleFacingDirection(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
+        public void HandleFacingDirection(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleFacingDirection");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             if (f.Exists(mario->CurrentPipe) || mario->HasActionFlags(ActionFlags.DisableTurnaround)) {
                 return;
@@ -1994,7 +2021,7 @@ namespace Quantum {
         }
 
         // this refrs to things that run every frame
-        private void HandleGlobals(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void HandleGlobals(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             QuantumUtils.Decrement(ref mario->GroundpoundCooldownFrames);
@@ -2013,7 +2040,7 @@ namespace Quantum {
             mario->UsedPropellerThisJump &= !physicsObject->IsTouchingGround;
         }
 
-        private void HandlePowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
+        private void HandlePowerups(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandlePowerups");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
