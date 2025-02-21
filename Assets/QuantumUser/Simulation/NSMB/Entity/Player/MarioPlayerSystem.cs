@@ -272,7 +272,7 @@ namespace Quantum {
             mario->JumpState = (mario->Action == PlayerAction.SingleJump) ? JumpState.SingleJump : JumpState.DoubleJump;
             if (EnableGroundpound(f, ref filter, physics, stage)
                 || EnableShootingPowerups(f, ref filter, physics, mario->CurrentPowerupState) == HelperState.Success
-                || EnablePropellerPowerup(f, ref filter, physics, PowerupState.PropellerMushroom, stage) == HelperState.Success) {
+                || EnablePropellerPowerup(f, ref filter, physics, mario->CurrentPowerupState, stage) == HelperState.Success) {
                 return;
             }
 
