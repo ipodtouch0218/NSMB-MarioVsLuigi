@@ -218,12 +218,52 @@ namespace Quantum {
 
         private void ActionBounce(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, VersusStageData stage) {
             var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
             int args = 0;
             PlayerAction newAction = PlayerAction.SingleJump;
 
+            if (mario->DoEntityBounce) {
+                mario->PropellerDrillCooldown = 30;
+            }
+
+            bool topSpeed = FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
+            bool canSpecialJump = topSpeed && inputs.Jump.IsDown && mario->JumpState != JumpState.None && !mario->HeldEntity.IsValid && mario->JumpState != JumpState.TripleJump && (physicsObject->Velocity.X < 0 != mario->FacingRight) /* && !Runner.GetPhysicsScene2D().Raycast(body.Position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround) */;
+
+            mario->WallslideEndFrames = 0;
+            mario->GroundpoundStartFrames = 0;
+            mario->JumpBufferFrames = 0;
+            physicsObject->WasTouchingGround = false;
+            physicsObject->IsTouchingGround = false;
+
+            // Disable koyote time
+            mario->CoyoteTimeFrames = 0;
+
+            PowerupState effectiveState = mario->CurrentPowerupState;
+            if (effectiveState == PowerupState.MegaMushroom && mario->DoEntityBounce) {
+                effectiveState = PowerupState.NoPowerup;
+            }
+
+            // TODO: fix magic
+            FP alpha = FPMath.Clamp01(FPMath.Abs(physicsObject->Velocity.X) - physics.WalkMaxVelocity[1] + (physics.WalkMaxVelocity[1] * FP._0_50));
+            FP newY = effectiveState switch {
+                PowerupState.MegaMushroom => physics.JumpMegaVelocity + FPMath.Lerp(0, physics.JumpMegaSpeedBonusVelocity, alpha),
+                PowerupState.MiniMushroom => physics.JumpMiniVelocity + FPMath.Lerp(0, physics.JumpMiniSpeedBonusVelocity, alpha),
+                _ => physics.JumpVelocity + FPMath.Lerp(0, physics.JumpSpeedBonusVelocity, alpha),
+            };
+            if (FPMath.Sign(physicsObject->Velocity.X) != 0 && FPMath.Sign(physicsObject->Velocity.X) != FPMath.Sign(physicsObject->FloorAngle)) {
+                // TODO: what.
+                newY += FPMath.Abs(physicsObject->FloorAngle) * FP._0_01 * alpha;
+            }
             // set the action based off the action right before this
             switch (mario->PrevAction) {
-            case PlayerAction.SingleJump : newAction = PlayerAction.DoubleJump; break;
+            case PlayerAction x when x is PlayerAction.SingleJump or PlayerAction.DoubleJump or PlayerAction.TripleJump: {
+                mario->JumpState = JumpState.SingleJump;
+                JumpHandler(f, ref filter, physics, ref inputs, skipJumpCheck: true);
+
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), mario->DoEntityBounce);
+                return;
+            }
             default: break;
             }
             mario->SetPlayerAction(newAction, f, args);
@@ -855,7 +895,7 @@ namespace Quantum {
             Success
         }
 
-        private bool JumpHandler(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, PlayerAction? targetAction = null, int actionArg = 0) {
+        private bool JumpHandler(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, PlayerAction? targetAction = null, int actionArg = 0, bool skipJumpCheck = false) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -863,7 +903,7 @@ namespace Quantum {
                 (mario->JumpBufferFrames > 0 && (physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0))
                 || (!physicsObject->IsUnderwater && mario->SwimForceJumpTimer == 10);
 
-            if (!doJump) return false;
+            if (!doJump &! skipJumpCheck) return false;
             bool topSpeed = FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
             bool canSpecialJump = topSpeed && !inputs.Down.IsDown && (doJump || (mario->DoEntityBounce && inputs.Jump.IsDown)) && mario->JumpState != JumpState.None && ((f.Number - mario->LandedFrame < 12) || mario->DoEntityBounce) && !mario->HeldEntity.IsValid && mario->JumpState != JumpState.TripleJump && (physicsObject->Velocity.X < 0 != mario->FacingRight) /* && !Runner.GetPhysicsScene2D().Raycast(body.Position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround) */;
 
@@ -1573,13 +1613,8 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->SwimForceJumpTimer);
             QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
-
-            if (!mario->DoEntityBounce) {
-                return;
-            }
-
-            if (!mario->DoEntityBounce
-                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
+            return;
+            if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
                 && !f.Exists(mario->HeldEntity) && !mario->HasActionFlags(ActionFlags.IsShelled)) {
                 // Jump of spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
@@ -1604,43 +1639,6 @@ namespace Quantum {
                 mario->CurrentSpinner = EntityRef.None;
                 return;
             }
-
-            bool topSpeed = FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
-            bool canSpecialJump = topSpeed && !inputs.Down.IsDown && (doJump || (mario->DoEntityBounce && inputs.Jump.IsDown)) && mario->JumpState != JumpState.None && ((f.Number - mario->LandedFrame < 12) || mario->DoEntityBounce) && !mario->HeldEntity.IsValid && mario->JumpState != JumpState.TripleJump && (physicsObject->Velocity.X < 0 != mario->FacingRight) /* && !Runner.GetPhysicsScene2D().Raycast(body.Position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround) */;
-
-            mario->WallslideEndFrames = 0;
-            mario->GroundpoundStartFrames = 0;
-            mario->JumpBufferFrames = 0;
-            physicsObject->WasTouchingGround = false;
-            physicsObject->IsTouchingGround = false;
-
-            // Disable koyote time
-            mario->CoyoteTimeFrames = 0;
-
-            PowerupState effectiveState = mario->CurrentPowerupState;
-            if (effectiveState == PowerupState.MegaMushroom && mario->DoEntityBounce) {
-                effectiveState = PowerupState.NoPowerup;
-            }
-
-            // TODO: fix magic
-            FP alpha = FPMath.Clamp01(FPMath.Abs(physicsObject->Velocity.X) - physics.WalkMaxVelocity[1] + (physics.WalkMaxVelocity[1] * FP._0_50));
-            FP newY = effectiveState switch {
-                PowerupState.MegaMushroom => physics.JumpMegaVelocity + FPMath.Lerp(0, physics.JumpMegaSpeedBonusVelocity, alpha),
-                PowerupState.MiniMushroom => physics.JumpMiniVelocity + FPMath.Lerp(0, physics.JumpMiniSpeedBonusVelocity, alpha),
-                _ => physics.JumpVelocity + FPMath.Lerp(0, physics.JumpSpeedBonusVelocity, alpha),
-            };
-            if (FPMath.Sign(physicsObject->Velocity.X) != 0 && FPMath.Sign(physicsObject->Velocity.X) != FPMath.Sign(physicsObject->FloorAngle)) {
-                // TODO: what.
-                newY += FPMath.Abs(physicsObject->FloorAngle) * FP._0_01 * alpha;
-            }
-
-            physicsObject->Velocity.Y = newY;
-
-            f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), mario->DoEntityBounce);
-            if (mario->DoEntityBounce) {
-                mario->PropellerDrillCooldown = 30;
-            }
-            mario->DoEntityBounce = false;
         }
 
         public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs) {
@@ -2539,9 +2537,9 @@ namespace Quantum {
             if (marioAMega && marioBMega) {
                 // Both mega
                 if (marioAAbove) {
-                    marioA->CheckEntityBounce(true);
+                    marioA->CheckEntityBounce(f, true);
                 } else if (marioBAbove) {
-                    marioB->CheckEntityBounce(true);
+                    marioB->CheckEntityBounce(f, true);
                 } else {
                     marioA->SetPlayerAction(PlayerAction.SoftKnockback, f, fromRight ? MarioPlayer.DropStarRight : 0, marioBEntity);
                     marioB->SetPlayerAction(PlayerAction.SoftKnockback, f, !fromRight ? MarioPlayer.DropStarRight : 0, marioAEntity);
@@ -2711,7 +2709,7 @@ namespace Quantum {
             defenderPhysicsObject->Velocity.X = defenderPhysics.WalkMaxVelocity[defenderPhysics.RunSpeedStage] * defenderPhysics.WalkBlueShellMultiplier * (goLeft ? -1 : 1);
 
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
-            attackerMario->CheckEntityBounce(true);
+            attackerMario->CheckEntityBounce(f, true);
         }
 
         private static void MarioMarioStomp(Frame f, EntityRef attacker, EntityRef defender, bool fromRight, bool dropStars) {
@@ -2740,7 +2738,7 @@ namespace Quantum {
                     defenderMario->SetPlayerAction(attackerMario->StompAction, f, dropStars ? attackerMario->StarStealCount : 0 + (!fromRight ? MarioPlayer.DropStarRight : 0), attacker);
                 }
             }
-            attackerMario->CheckEntityBounce(true);
+            attackerMario->CheckEntityBounce(f, true);
         }
         #endregion
 

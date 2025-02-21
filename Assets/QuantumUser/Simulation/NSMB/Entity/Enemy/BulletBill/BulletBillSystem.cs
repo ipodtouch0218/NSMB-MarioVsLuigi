@@ -120,7 +120,7 @@ namespace Quantum {
             
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 bulletBill->Kill(f, bulletBillEntity, marioEntity, true);
-                mario->CheckEntityBounce();
+                mario->CheckEntityBounce(f);
                 return;
             }
 
@@ -130,10 +130,10 @@ namespace Quantum {
                         mario->SetPlayerAction(PlayerAction.Freefall, f);
                         bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
                     }
-                    mario->CheckEntityBounce();
+                    mario->CheckEntityBounce(f);
                 } else {
                     bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
-                    mario->CheckEntityBounce();
+                    mario->CheckEntityBounce(f);
                 }
                 if (mario->Action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
                 else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);

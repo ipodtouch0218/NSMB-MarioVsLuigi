@@ -73,7 +73,7 @@ namespace Quantum {
             bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
-                mario->CheckEntityBounce();
+                mario->CheckEntityBounce(f);
                 return;
             }
 
@@ -83,10 +83,10 @@ namespace Quantum {
                         mario->SetPlayerAction(PlayerAction.Freefall, f);
                         goomba->Kill(f, goombaEntity, marioEntity, false);
                     }
-                    mario->CheckEntityBounce();
+                    mario->CheckEntityBounce(f);
                 } else {
                     goomba->Kill(f, goombaEntity, marioEntity, false);
-                    mario->CheckEntityBounce();
+                    mario->CheckEntityBounce(f);
                 }
                 if (mario->Action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
                 else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
