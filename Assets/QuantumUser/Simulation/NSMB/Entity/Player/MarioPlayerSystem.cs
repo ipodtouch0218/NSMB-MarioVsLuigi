@@ -128,6 +128,7 @@ namespace Quantum {
                 }
             }
             if (JumpHandler(f, ref filter, physics, ref inputs)) {
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), false);
                 return;
             }
             mario->SetAirAction(physicsObject, f);
@@ -234,24 +235,28 @@ namespace Quantum {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.SingleJump;
                 JumpHandler(f, ref filter, physics, ref inputs, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
             case PlayerAction.DoubleJump: {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.DoubleJump;
                 JumpHandler(f, ref filter, physics, ref inputs, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
             case PlayerAction.TripleJump: {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.TripleJump;
                 JumpHandler(f, ref filter, physics, ref inputs, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
             case PlayerAction.CrouchAir: {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.None;
                 JumpHandler(f, ref filter, physics, ref inputs, PlayerAction.SingleJump, 1, true, true);
+                f.Events.MarioPlayerJumped(f, filter.Entity, mario->PrevAction, true);
                 return;
             }
             case PlayerAction.PropellerDrill or PlayerAction.PropellerSpin: {
@@ -282,6 +287,7 @@ namespace Quantum {
             mario->SetStompEvents();
             
             if (JumpHandler(f, ref filter, physics, ref inputs)) {
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), false);
                 return;
             }
             mario->SetGroundAction(physicsObject, f);
@@ -311,6 +317,7 @@ namespace Quantum {
             }
 
             if (JumpHandler(f, ref filter, physics, ref inputs)) {
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), false);
                 return;
             }
             mario->SetGroundAction(physicsObject, f);
@@ -957,9 +964,6 @@ namespace Quantum {
             }
             physicsObject->Velocity.Y = newY;
 
-            if (targetAction == null) {
-                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), mario->Action == PlayerAction.Bounce);
-            }
             if (physicsObject->IsWaterSolid) {
                 // Check if we jumped off the water
                 var contacts = f.ResolveList(physicsObject->Contacts);
@@ -2659,57 +2663,60 @@ namespace Quantum {
             // Pushing
             bool marioAMini = marioA->CurrentPowerupState == PowerupState.MiniMushroom;
             bool marioBMini = marioB->CurrentPowerupState == PowerupState.MiniMushroom;
-            if (marioA->HasActionFlags(ActionFlags.AllowBump) && !marioB->HasActionFlags(ActionFlags.AllowBump)) {
-                // Collided with them
-                var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
-                var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
 
-                if (marioAMini ^ marioBMini) {
-                    // Minis
-                    if (marioAMini) {
-                        marioA->SetPlayerAction(PlayerAction.NormalKnockback, f, (dropStars ? 1 : 0) + (fromRight ? MarioPlayer.DropStarRight : 0), marioBEntity);
-                    }
-                    if (marioBMini) {
-                        marioB->SetPlayerAction(PlayerAction.NormalKnockback, f, (dropStars ? 1 : 0) + (!fromRight ? MarioPlayer.DropStarRight : 0), marioAEntity);
-                    }
-                } else if (FPMath.Abs(marioAPhysics->Velocity.X) > marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.WalkSpeedStage]
-                           || FPMath.Abs(marioBPhysics->Velocity.X) > marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.WalkSpeedStage]) {
-                    
-                    // Bump
+            // Collided with them
+            var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
+            var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
+
+            if (marioAMini ^ marioBMini) {
+                // Minis
+                if (marioAMini && marioA->HasActionFlags(ActionFlags.AllowBump)) {
+                    marioA->SetPlayerAction(PlayerAction.NormalKnockback, f, (dropStars ? 1 : 0) + (fromRight ? MarioPlayer.DropStarRight : 0), marioBEntity);
+                }
+                if (marioBMini && marioB->HasActionFlags(ActionFlags.AllowBump)) {
+                    marioB->SetPlayerAction(PlayerAction.NormalKnockback, f, (dropStars ? 1 : 0) + (!fromRight ? MarioPlayer.DropStarRight : 0), marioAEntity);
+                }
+            } else if (FPMath.Abs(marioAPhysics->Velocity.X) > marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.WalkSpeedStage]
+                        || FPMath.Abs(marioBPhysics->Velocity.X) > marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.WalkSpeedStage]) {
+
+                // Bump
+                if (marioA->HasActionFlags(ActionFlags.AllowBump)) {
                     if (marioAPhysics->IsTouchingGround) {
                         marioA->SetPlayerAction(PlayerAction.SoftKnockback, f, (dropStars ? 1 : 0) + (fromRight ? MarioPlayer.DropStarRight : 0), marioBEntity);
                     } else {
                         marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
                     }
+                }
 
-                    if (marioBPhysics->IsTouchingGround) {
+                if (marioB->HasActionFlags(ActionFlags.AllowBump)) {
+                    if (marioBPhysics->IsTouchingGround && marioB->HasActionFlags(ActionFlags.AllowBump)) {
                         marioB->SetPlayerAction(PlayerAction.SoftKnockback, f, (dropStars ? 1 : 0) + (!fromRight ? MarioPlayer.DropStarRight : 0), marioAEntity);
                     } else {
                         marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
                     }
-                } else {
-                    // Collide
-                    int directionToOtherPlayer = fromRight ? -1 : 1;
-                    var marioACollider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioAEntity);
-                    var marioBCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioBEntity);
-                    FP overlap = (marioACollider->Shape.Box.Extents.X + marioBCollider->Shape.Box.Extents.X - FPMath.Abs(marioAPosition.X - marioBPosition.X)) / 2;
+                }
+            } else {
+                // Collide
+                int directionToOtherPlayer = fromRight ? -1 : 1;
+                var marioACollider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioAEntity);
+                var marioBCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioBEntity);
+                FP overlap = (marioACollider->Shape.Box.Extents.X + marioBCollider->Shape.Box.Extents.X - FPMath.Abs(marioAPosition.X - marioBPosition.X)) / 2;
 
-                    if (overlap > 0) {
-                        // Move 
-                        PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(overlap * directionToOtherPlayer * f.UpdateRate, 0), marioAEntity, stage);
-                        PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(overlap * -directionToOtherPlayer * f.UpdateRate, 0), marioBEntity, stage);
+                if (overlap > 0) {
+                    // Move 
+                    PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(overlap * directionToOtherPlayer * f.UpdateRate, 0), marioAEntity, stage);
+                    PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(overlap * -directionToOtherPlayer * f.UpdateRate, 0), marioBEntity, stage);
 
-                        // Transfer velocity
-                        FP avgVelocityX = (marioAPhysics->Velocity.X + marioBPhysics->Velocity.X) * FP._0_75;
+                    // Transfer velocity
+                    FP avgVelocityX = (marioAPhysics->Velocity.X + marioBPhysics->Velocity.X) * FP._0_75;
 
-                        if (FPMath.Abs(marioAPhysics->Velocity.X) > 1) {
-                            marioA->LastPushingFrame = f.Number;
-                            marioAPhysics->Velocity.X = avgVelocityX;
-                        }
-                        if (FPMath.Abs(marioBPhysics->Velocity.X) > 1) {
-                            marioB->LastPushingFrame = f.Number;
-                            marioBPhysics->Velocity.X = avgVelocityX;
-                        }
+                    if (FPMath.Abs(marioAPhysics->Velocity.X) > 1) {
+                        marioA->LastPushingFrame = f.Number;
+                        marioAPhysics->Velocity.X = avgVelocityX;
+                    }
+                    if (FPMath.Abs(marioBPhysics->Velocity.X) > 1) {
+                        marioB->LastPushingFrame = f.Number;
+                        marioBPhysics->Velocity.X = avgVelocityX;
                     }
                 }
             }

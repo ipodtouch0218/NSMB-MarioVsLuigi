@@ -68,7 +68,10 @@ namespace Quantum {
 
         public PlayerAction SetPlayerAction(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default) {
             PrevAction = Action;
-            PreActionInput = *f.GetPlayerInput(PlayerRef);
+            PreActionInput = default;
+            if (f.GetPlayerInput(PlayerRef) != null) {
+                PreActionInput = *f.GetPlayerInput(PlayerRef);
+            }
 
             Action = playerAction;
 
