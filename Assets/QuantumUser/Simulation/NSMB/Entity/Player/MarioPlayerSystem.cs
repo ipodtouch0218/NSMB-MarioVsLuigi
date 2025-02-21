@@ -144,7 +144,7 @@ namespace Quantum {
                 return;
             }
 
-            if (JumpHandler(f, ref filter, physics, ref inputs, PlayerAction.SingleJump)) {
+            if (JumpHandler(f, ref filter, physics, ref inputs, PlayerAction.CrouchAir)) {
                 f.Events.MarioPlayerJumped(f, entity, PlayerAction.CrouchAir, false);
                 return;
             }
