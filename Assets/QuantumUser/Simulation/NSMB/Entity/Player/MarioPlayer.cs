@@ -26,9 +26,7 @@ namespace Quantum {
         public ActionFlags GetActionFlags(PlayerAction action) {
             return action switch {
                 PlayerAction.Idle                   => ActionFlags.AllowBump,
-                PlayerAction.HoldIdle               => ActionFlags.AllowBump,
                 PlayerAction.Walk                   => ActionFlags.AllowBump | ActionFlags.AllowHold,
-                PlayerAction.HoldWalk               => ActionFlags.AllowBump,
                 PlayerAction.Skidding               => ActionFlags.AllowBump,
                 PlayerAction.Crouch                 => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
                 PlayerAction.CrouchAir              => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction,
@@ -37,8 +35,11 @@ namespace Quantum {
                 PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
                 PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
                 PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
-                PlayerAction.HoldJump               => ActionFlags.AllowBump | ActionFlags.AirAction,
                 PlayerAction.Freefall               => ActionFlags.AllowBump | ActionFlags.AirAction,
+                PlayerAction.HoldIdle               => ActionFlags.AllowBump | ActionFlags.Holding,
+                PlayerAction.HoldWalk               => ActionFlags.AllowBump | ActionFlags.Holding,
+                PlayerAction.HoldJump               => ActionFlags.AllowBump | ActionFlags.Holding | ActionFlags.AirAction,
+                PlayerAction.HoldFall               => ActionFlags.AllowBump | ActionFlags.Holding | ActionFlags.AirAction,
                 PlayerAction.WallSlide              => ActionFlags.AirAction,
                 PlayerAction.Wallkick               => ActionFlags.AirAction,
                 PlayerAction.GroundPound            => ActionFlags.AirAction | ActionFlags.DisableTurnaround | ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction | ActionFlags.IrregularVelocity, // the 3 stars flag gets applied later
@@ -66,11 +67,23 @@ namespace Quantum {
             };
         }
 
-        public PlayerAction SetPlayerAction(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default) {
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default, bool throwItem = false, bool dropItem = false) {
             PrevAction = Action;
             PreActionInput = default;
             if (f.GetPlayerInput(PlayerRef) != null) {
                 PreActionInput = *f.GetPlayerInput(PlayerRef);
+            }
+
+            if (throwItem) {
+                Holdable* heldItem;
+                if (f.Unsafe.TryGetPointer(HeldEntity, out heldItem)) {
+                    heldItem->Throw(f, actionObject);
+                }
+            } else if (dropItem) {
+                Holdable* heldItem;
+                if (f.Unsafe.TryGetPointer(HeldEntity, out heldItem)) {
+                    heldItem->DropWithoutThrowing(f, actionObject);
+                }
             }
 
             Action = playerAction;
@@ -220,7 +233,7 @@ namespace Quantum {
 
             return (input.Sprint.IsDown || forceHold)
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom
-                && HasActionFlags(ActionFlags.AllowHold) && (f.Exists(item) || physicsObject->IsTouchingGround)
+                && (HasActionFlags(ActionFlags.AllowHold) || HasActionFlags(ActionFlags.Holding)) && (f.Exists(item) || physicsObject->IsTouchingGround)
                 && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown) && !(aboveHead && physicsObject->IsUnderwater);
         }
 

@@ -31,9 +31,7 @@ enum JumpState : Byte {
 
 enum PlayerAction : Byte {
     Idle,
-	HoldIdle,
     Walk,
-	HoldWalk,
 	Skidding,
     Crouch,
 	CrouchAir,
@@ -42,8 +40,11 @@ enum PlayerAction : Byte {
     SingleJump,
     DoubleJump,
     TripleJump,
-	HoldJump,
 	Freefall,
+	HoldIdle,
+	HoldWalk,
+	HoldJump,
+	HoldFall,
 	WallSlide,
     Wallkick,
     GroundPound,
@@ -87,6 +88,7 @@ enum ActionFlags : Int32 {
 	KillMiniStomp = 131072,
 	StarSpinAction = 262144,
 	IrregularVelocity = 524288,
+	Holding = 1048576,
 }
 
 component MarioPlayer {

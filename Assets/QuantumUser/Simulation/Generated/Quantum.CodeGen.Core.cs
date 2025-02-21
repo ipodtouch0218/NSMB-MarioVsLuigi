@@ -70,6 +70,7 @@ namespace Quantum {
     KillMiniStomp = 131072,
     StarSpinAction = 262144,
     IrregularVelocity = 524288,
+    Holding = 1048576,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -86,9 +87,7 @@ namespace Quantum {
   }
   public enum PlayerAction : byte {
     Idle,
-    HoldIdle,
     Walk,
-    HoldWalk,
     Skidding,
     Crouch,
     CrouchAir,
@@ -97,8 +96,11 @@ namespace Quantum {
     SingleJump,
     DoubleJump,
     TripleJump,
-    HoldJump,
     Freefall,
+    HoldIdle,
+    HoldWalk,
+    HoldJump,
+    HoldFall,
     WallSlide,
     Wallkick,
     GroundPound,
