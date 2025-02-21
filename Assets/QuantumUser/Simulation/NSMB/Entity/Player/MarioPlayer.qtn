@@ -38,6 +38,7 @@ enum PlayerAction : Byte {
     Crouch,
 	CrouchAir,
     Sliding,
+	Bounce,
     SingleJump,
     DoubleJump,
     TripleJump,
@@ -107,6 +108,7 @@ component MarioPlayer {
 	// Actions
 	[ExcludeFromPrototype] PlayerAction Action;
 	[ExcludeFromPrototype] PlayerAction PrevAction;
+	[ExcludeFromPrototype] Input PreActionInput;
 	[ExcludeFromPrototype] int ActionTimer;
 	[ExcludeFromPrototype] int ActionState;
 	[ExcludeFromPrototype] int ActionArg;

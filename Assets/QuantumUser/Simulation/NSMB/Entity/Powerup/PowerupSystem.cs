@@ -225,8 +225,8 @@ namespace Quantum {
 
             if (newState == PowerupState.MegaMushroom) {
                 mario->MegaMushroomStartFrames = 90;
-                mario->SetGroundAction(marioPhysicsObject);
-                mario->SetAirAction(marioPhysicsObject);
+                mario->SetGroundAction(marioPhysicsObject, f);
+                mario->SetAirAction(marioPhysicsObject, f);
                 if (marioPhysicsObject->IsTouchingGround) {
                     mario->JumpState = JumpState.None;
                 }

@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using System;
 using System.Drawing.Drawing2D;
+using static Quantum.Core.FrameBase;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -32,6 +33,7 @@ namespace Quantum {
                 PlayerAction.Crouch                 => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
                 PlayerAction.CrouchAir              => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction,
                 PlayerAction.Sliding                => ActionFlags.AllowBump | ActionFlags.Attacking | ActionFlags.IrregularVelocity,
+                // PlayerAction.Bounce                 => 0 all this action does is set to another action
                 PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
                 PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
                 PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
@@ -64,8 +66,10 @@ namespace Quantum {
             };
         }
 
-        public PlayerAction SetPlayerAction(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef actionObject = default) {
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default) {
             PrevAction = Action;
+            PreActionInput = *f.GetPlayerInput(PlayerRef);
+
             Action = playerAction;
 
             ActionTimer = 0;
@@ -81,28 +85,28 @@ namespace Quantum {
             return Action;
         }
 
-        public bool SetPlayerActionOnce(PlayerAction playerAction, int arg = 0, Frame f = null, EntityRef actionObject = default) {
+        public bool SetPlayerActionOnce(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default) {
             if (Action == playerAction) {
                 return false;
             }
-            SetPlayerAction(playerAction, arg, f, actionObject);
+            SetPlayerAction(playerAction, f, arg, actionObject);
             return true;
         }
 
-        public PlayerAction SetGroundAction(PhysicsObject* physicsObject, PlayerAction groundAction = PlayerAction.Idle, int actionArg = 0) {
+        public PlayerAction SetGroundAction(PhysicsObject* physicsObject, Frame f, PlayerAction groundAction = PlayerAction.Idle, int actionArg = 0) {
             if (physicsObject->IsTouchingGround) {
-                return SetPlayerAction(groundAction, actionArg);
+                return SetPlayerAction(groundAction, f, actionArg);
             }
             return Action;
         }
 
-        public PlayerAction SetAirAction(PhysicsObject* physicsObject, PlayerAction airAction = PlayerAction.Freefall, int actionArg = 0, bool ignCoyote = false) {
+        public PlayerAction SetAirAction(PhysicsObject* physicsObject, Frame f, PlayerAction airAction = PlayerAction.Freefall, int actionArg = 0, bool ignCoyote = false) {
             if (ignCoyote) {
                 CoyoteTimeFrames = 0;
             }
 
             if (!physicsObject->IsTouchingGround && (CoyoteTimeFrames <= 0)) {
-                return SetPlayerAction(airAction, actionArg);
+                return SetPlayerAction(airAction, f, actionArg);
             }
             return Action;
         }
@@ -295,7 +299,7 @@ namespace Quantum {
             switch (CurrentPowerupState) {
             case PowerupState.MiniMushroom:
             case PowerupState.NoPowerup: {
-                SetPlayerAction(PlayerAction.Death, (!f.Global->Rules.IsLivesEnabled || Lives > 0) ? 0 : 2, f, entity);
+                SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || Lives > 0) ? 0 : 2, entity);
                 break;
             }
             case PowerupState.Mushroom: {
@@ -363,7 +367,7 @@ namespace Quantum {
         public void ResetKnockback(Frame f, EntityRef entity) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             FacingRight = KnockbackWasOriginallyFacingRight;
-            SetPlayerAction(PlayerAction.Idle);
+            SetPlayerAction(PlayerAction.Idle, f);
             
             physicsObject->Velocity.X = 0;
         }

@@ -93,6 +93,7 @@ namespace Quantum {
     Crouch,
     CrouchAir,
     Sliding,
+    Bounce,
     SingleJump,
     DoubleJump,
     TripleJump,
@@ -2030,8 +2031,10 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 200;
+    public const Int32 SIZE = 312;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(308)]
+    private fixed Byte _alignment_padding_[4];
     [FieldOffset(136)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     [FieldOffset(128)]
@@ -2069,6 +2072,9 @@ namespace Quantum {
     [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public PlayerAction PrevAction;
+    [FieldOffset(200)]
+    [ExcludeFromPrototype()]
+    public Input PreActionInput;
     [FieldOffset(52)]
     [ExcludeFromPrototype()]
     public Int32 ActionTimer;
@@ -2256,6 +2262,7 @@ namespace Quantum {
         hash = hash * 31 + Disconnected.GetHashCode();
         hash = hash * 31 + (Byte)Action;
         hash = hash * 31 + (Byte)PrevAction;
+        hash = hash * 31 + PreActionInput.GetHashCode();
         hash = hash * 31 + ActionTimer.GetHashCode();
         hash = hash * 31 + ActionState.GetHashCode();
         hash = hash * 31 + ActionArg.GetHashCode();
@@ -2388,6 +2395,7 @@ namespace Quantum {
         EntityRef.Serialize(&p->CurrentSpinner, serializer);
         EntityRef.Serialize(&p->HeldEntity, serializer);
         FPVector2.Serialize(&p->PipeDirection, serializer);
+        Quantum.Input.Serialize(&p->PreActionInput, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]

@@ -80,7 +80,7 @@ namespace Quantum {
             if (attackedFromAbove) {
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                     if (mario->HasActionFlags(ActionFlags.StrongAction)) {
-                        mario->SetPlayerAction(PlayerAction.Freefall);
+                        mario->SetPlayerAction(PlayerAction.Freefall, f);
                         goomba->Kill(f, goombaEntity, marioEntity, false);
                     }
                     mario->CheckEntityBounce();
@@ -88,8 +88,8 @@ namespace Quantum {
                     goomba->Kill(f, goombaEntity, marioEntity, false);
                     mario->CheckEntityBounce();
                 }
-                if (mario->Action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, 1);
-                else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, 1);
+                if (mario->Action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
+                else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
 
             } else if (mario->IsCrouchedInShell) {
                 mario->FacingRight = damageDirection.X < 0;
