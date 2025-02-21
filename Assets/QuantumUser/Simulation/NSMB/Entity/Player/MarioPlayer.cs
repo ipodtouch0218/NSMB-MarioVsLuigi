@@ -27,7 +27,7 @@ namespace Quantum {
             return action switch {
                 PlayerAction.Idle                   => ActionFlags.AllowBump,
                 PlayerAction.HoldIdle               => ActionFlags.AllowBump,
-                PlayerAction.Walk                   => ActionFlags.AllowBump,
+                PlayerAction.Walk                   => ActionFlags.AllowBump | ActionFlags.AllowHold,
                 PlayerAction.HoldWalk               => ActionFlags.AllowBump,
                 PlayerAction.Skidding               => ActionFlags.AllowBump,
                 PlayerAction.Crouch                 => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
@@ -146,6 +146,11 @@ namespace Quantum {
         }
 
         public bool CheckEntityBounce(Frame f, bool checkPlayer = false) {
+            // invincible players should never bounce
+            if (IsStarmanInvincible) {
+                return false;
+            }
+
             if (!checkPlayer) {
                 if (HasActionFlags(ActionFlags.NoEnemyBounce)) {
                     return false;

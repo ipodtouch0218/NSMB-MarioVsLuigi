@@ -222,31 +222,39 @@ namespace Quantum {
 
             int args = 0;
             PlayerAction newAction = PlayerAction.SingleJump;
-
-            mario->PropellerDrillCooldown = 30;
-
  
             // set the action based off the action right before this
             switch (mario->PrevAction) {
             case PlayerAction.SingleJump: {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.SingleJump;
-                JumpHandler(f, ref filter, physics, ref inputs, skipJumpCheck: true, checkJumpDown: true);
+                JumpHandler(f, ref filter, physics, ref inputs, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
                 return;
             }
             case PlayerAction.DoubleJump: {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.DoubleJump;
-                JumpHandler(f, ref filter, physics, ref inputs, skipJumpCheck: true, checkJumpDown: true);
+                JumpHandler(f, ref filter, physics, ref inputs, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
                 return;
             }
             case PlayerAction.TripleJump: {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.TripleJump;
-                JumpHandler(f, ref filter, physics, ref inputs, skipJumpCheck: true, checkJumpDown: true);
+                JumpHandler(f, ref filter, physics, ref inputs, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
                 return;
             }
-            default: break;
+            case PlayerAction.CrouchAir: {
+                mario->LandedFrame = f.Number;
+                mario->JumpState = JumpState.None;
+                JumpHandler(f, ref filter, physics, ref inputs, PlayerAction.SingleJump, 1, true, true);
+                return;
+            }
+            case PlayerAction.PropellerDrill or PlayerAction.PropellerSpin: {
+                mario->PropellerDrillCooldown = 30;
+                physicsObject->Velocity.Y = physics.PropellerLaunchVelocity;
+                mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
+                return;
+            }
             }
             mario->SetPlayerAction(newAction, f, args);
         }
@@ -718,7 +726,6 @@ namespace Quantum {
                         physicsObject->Gravity = DeathUpGravity;
                         physicsObject->Velocity = DeathUpForce;
                         physicsObject->IsFrozen = false;
-                        physicsObject->DisableCollision = true;
                         f.Events.MarioPlayerDeathUp(f, filter.Entity);
                     }
                     if (!doRespawn) {
@@ -882,7 +889,7 @@ namespace Quantum {
                 || (!physicsObject->IsUnderwater && mario->SwimForceJumpTimer == 10);
 
             if (!doJump &! skipJumpCheck) return false;
-            bool topSpeed = true;//FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
+            bool topSpeed = FPMath.Abs(physicsObject->Velocity.X) >= (physics.WalkMaxVelocity[physics.RunSpeedStage] - FP._0_10);
             bool canSpecialJump = topSpeed && !inputs.Down.IsDown && (doJump || skipJumpCheck) && (!checkJumpDown || inputs.Jump.IsDown) && mario->JumpState is not JumpState.None and not JumpState.TripleJump && (f.Number - mario->LandedFrame < 12) && !mario->HeldEntity.IsValid && (physicsObject->Velocity.X < 0 != mario->FacingRight) /* && !Runner.GetPhysicsScene2D().Raycast(body.Position + new Vector2(0, 0.1f), Vector2.up, 1f, Layers.MaskSolidGround) */;
 
             mario->WallslideEndFrames = 0;
