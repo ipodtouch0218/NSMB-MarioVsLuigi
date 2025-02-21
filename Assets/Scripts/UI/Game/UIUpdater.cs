@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace NSMB.UI.Game {
@@ -24,6 +25,7 @@ namespace NSMB.UI.Game {
 
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
+        [SerializeField] private CanvasGroup toggler;
         [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
@@ -56,6 +58,7 @@ namespace NSMB.UI.Game {
             BigStarAnimator.BigStarInitialized += OnBigStarInitialized;
             BigStarAnimator.BigStarDestroyed += OnBigStarDestroyed;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            Settings.Controls.Debug.ToggleHUD.performed += OnToggleHUD;
             OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
@@ -65,6 +68,7 @@ namespace NSMB.UI.Game {
             BigStarAnimator.BigStarInitialized -= OnBigStarInitialized;
             BigStarAnimator.BigStarDestroyed -= OnBigStarDestroyed;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            Settings.Controls.Debug.ToggleHUD.performed -= OnToggleHUD;
         }
 
         public void Initialize(QuantumGame game, Frame f) {
@@ -125,10 +129,6 @@ namespace NSMB.UI.Game {
             if (!Target.IsValid
                 || !f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
                 return;
-            }
-
-            if (uiHidden) {
-                ToggleUI(f, false);
             }
 
             UpdateStoredItemUI(mario, previousTarget == Target);
@@ -433,6 +433,10 @@ namespace NSMB.UI.Game {
             if (slotIndex != -1) {
                 game.SendCommand(game.GetLocalPlayerSlots()[slotIndex], new CommandSpawnReserveItem());
             }
+        }
+
+        private void OnToggleHUD(InputAction.CallbackContext context) {
+            toggler.alpha = (toggler.alpha > 0) ? 0 : 1;
         }
     }
 }

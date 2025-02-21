@@ -7,14 +7,17 @@ Amy54Desu
 ArianLust
 AtwerJ
 Ave
+BluCorDev
 Cubby Crazes
 davart154
 DonKaiStorm
 GithubSPerez
 GradedWarrior
 Jeffjewett27
+KingKittyTurnip
 kittenchilly
 Kraken
+MiiBumm
 mindnomad
 Pordrack
 skarph
@@ -25,6 +28,7 @@ Tombuntu
 xFrostyCake123
 VLC
 Zest
+_ZombleBobble
 
 <color=yellow>{ui.about.credits.music}</color>
 Cubby Crazes

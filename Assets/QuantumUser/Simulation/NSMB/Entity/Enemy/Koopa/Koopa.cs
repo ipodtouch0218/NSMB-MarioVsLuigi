@@ -9,12 +9,12 @@ namespace Quantum {
             IsInShell = false;
             IsKicked = false;
             IsFlipped = false;
-            Combo = 0;
             CurrentSpeed = Speed;
             holdable->Holder = default;
             holdable->PreviousHolder = default;
 
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
+            f.Unsafe.GetPointer<ComboKeeper>(entity)->Combo = 0;
         }
 
         public void EnterShell(Frame f, EntityRef entity, EntityRef initiator, bool flipped, bool groundpounded) {
@@ -26,12 +26,12 @@ namespace Quantum {
             }
             */
             CurrentSpeed = 0;
-            Combo = 0;
             IsInShell = true;
             IsKicked = false;
             IsFlipped |= flipped;
-
             WakeupFrames = 15 * 60;
+
+            f.Unsafe.GetPointer<ComboKeeper>(entity)->Combo = 0;
         }
 
         public void Kick(Frame f, EntityRef entity, EntityRef initiator, FP speed) {
@@ -41,8 +41,8 @@ namespace Quantum {
 
             IsKicked = true;
             IsInShell = true;
-            Combo = 1;
             CurrentSpeed = KickSpeed + speed;
+            f.Unsafe.GetPointer<ComboKeeper>(entity)->Combo = 1;
 
             f.Events.PlayComboSound(f, entity, 0);
             f.Events.KoopaKicked(f, entity, false);
@@ -86,10 +86,8 @@ namespace Quantum {
             physicsObject->Gravity = new FPVector2(0, -Constants._14_75);
 
             byte combo;
-            if (f.Unsafe.TryGetPointer(killerEntity, out MarioPlayer* mario)) {
-                combo = mario->Combo++;
-            } else if (f.Unsafe.TryGetPointer(killerEntity, out Koopa* koopa)) {
-                combo = koopa->Combo++;
+            if (f.Unsafe.TryGetPointer(killerEntity, out ComboKeeper* comboKeeper)) {
+                combo = comboKeeper->Combo++;
             } else {
                 combo = 0;
             }

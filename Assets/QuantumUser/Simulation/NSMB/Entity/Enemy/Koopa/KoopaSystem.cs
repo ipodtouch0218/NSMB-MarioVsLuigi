@@ -382,9 +382,7 @@ namespace Quantum {
             }
             }
 
-            if (projectileAsset.DestroyOnHit) {
-                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            }
+            f.Signals.OnProjectileHitEntity(f, projectileEntity, koopaEntity);
         }
 
         public static void OnKoopaBooInteraction(Frame f, EntityRef koopaEntity, EntityRef booEntity) {

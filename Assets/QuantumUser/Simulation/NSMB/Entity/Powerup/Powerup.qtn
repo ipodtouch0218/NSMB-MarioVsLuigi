@@ -25,8 +25,8 @@ enum PowerupState : Byte {
     IceFlower,
     PropellerMushroom,
     BlueShell,
-    MegaMushroom,
-	HammerSuit
+	HammerSuit,
+    MegaMushroom
 }
 
 enum PowerupReserveResult : Byte {

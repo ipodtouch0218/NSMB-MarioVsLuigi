@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [ExecuteAlways, RequireComponent(typeof(RectTransform))]
-public class ScaleWithParent : UIBehaviour {
+public class ScaleWithParent : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private float targetWidth = 1000, aspectRatio = (16f/9f);
@@ -11,7 +11,8 @@ public class ScaleWithParent : UIBehaviour {
     private DrivenRectTransformTracker tracker;
     private int width, height;
 
-    protected override void OnValidate() {
+#if UNITY_EDITOR
+    public void OnValidate() {
         ValidationUtility.SafeOnValidate(() => {
             if (!this) {
                 return;
@@ -19,13 +20,14 @@ public class ScaleWithParent : UIBehaviour {
             OnRectTransformDimensionsChange();
         });
     }
+#endif
 
-    protected override void OnEnable() {
+    public void OnEnable() {
         tracker.Add(this, (RectTransform) transform, DrivenTransformProperties.Scale | DrivenTransformProperties.Anchors | DrivenTransformProperties.SizeDelta | DrivenTransformProperties.AnchoredPosition);
         OnRectTransformDimensionsChange();
     }
 
-    protected override void OnDisable() {
+    public void OnDisable() {
         tracker.Clear();
     }
 
@@ -35,9 +37,22 @@ public class ScaleWithParent : UIBehaviour {
             width = Screen.width;
             height = Screen.height;
         }
+
+        Transform tf = transform;
+        do {
+            if (tf.hasChanged) {
+                OnRectTransformDimensionsChange();
+                tf.hasChanged = false;
+                break;
+            }
+        } while (tf = tf.parent);
     }
 
-    protected override void OnRectTransformDimensionsChange() {
+    public void OnTransformParentChanged() {
+        OnRectTransformDimensionsChange();
+    }
+
+    public void OnRectTransformDimensionsChange() {
         RectTransform rt = (RectTransform) transform;
         RectTransform parent = (RectTransform) rt.parent;
 

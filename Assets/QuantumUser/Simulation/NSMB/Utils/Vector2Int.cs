@@ -1,7 +1,7 @@
 using System;
 
 namespace Quantum {
-    [System.Serializable]
+    [Serializable]
     public unsafe partial struct Vector2Int : IEquatable<Vector2Int> {
 
         public Vector2Int(int x, int y) {
@@ -15,6 +15,10 @@ namespace Quantum {
 
         public override bool Equals(object obj) {
             return obj is Vector2Int other && this.Equals(other);
+        }
+
+        public override string ToString() {
+            return $"({x},{y})";
         }
 
         public static bool operator ==(Vector2Int a, Vector2Int b) {

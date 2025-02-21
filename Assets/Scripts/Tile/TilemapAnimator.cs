@@ -33,6 +33,7 @@ public class TilemapAnimator : MonoBehaviour {
         if (QuantumRunner.DefaultGame != null) {
             RefreshMap(QuantumRunner.DefaultGame.Frames.Verified);
         }
+        tilemap.RefreshAllTiles();
     }
 
     private void OnGameStateChanged(EventGameStateChanged e) {

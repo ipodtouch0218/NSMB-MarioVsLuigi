@@ -86,9 +86,7 @@ namespace Quantum {
             }
             }
 
-            if (projectileAsset.DestroyOnHit) {
-                ProjectileSystem.Destroy(f, projectileEntity, projectileAsset.DestroyParticleEffect);
-            }
+            f.Signals.OnProjectileHitEntity(f, projectileEntity, piranhaPlantEntity);
         }
 
         public void OnPiranhaPlantMarioInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef marioEntity) {

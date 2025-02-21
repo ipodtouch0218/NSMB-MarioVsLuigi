@@ -141,7 +141,7 @@ namespace Quantum {
 
             FP maxY = heightY < vOrtho * 2 ? (cameraMin.Y + vOrtho) : (cameraMin.Y + heightY - vOrtho);
 
-            position.X = FPMath.Clamp(position.X, cameraMin.X + xOrtho, cameraMax.X - xOrtho);
+            // position.X = FPMath.Clamp(position.X, cameraMin.X + xOrtho, cameraMax.X - xOrtho);
             position.Y = FPMath.Clamp(position.Y, cameraMin.Y + vOrtho, maxY);
 
             return position;

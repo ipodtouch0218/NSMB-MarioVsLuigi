@@ -19,10 +19,8 @@ namespace Quantum {
 
             // Combo sound
             byte combo;
-            if (f.Unsafe.TryGetPointer(killerEntity, out MarioPlayer* mario)) {
-                combo = mario->Combo++;
-            } else if (f.Unsafe.TryGetPointer(killerEntity, out Koopa* koopa)) {
-                combo = koopa->Combo++;
+            if (f.Unsafe.TryGetPointer(killerEntity, out ComboKeeper* comboKeeper)) {
+                combo = comboKeeper->Combo++;
             } else {
                 combo = 0;
             }

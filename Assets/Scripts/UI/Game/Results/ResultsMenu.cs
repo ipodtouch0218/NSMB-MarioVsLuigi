@@ -90,33 +90,7 @@ public class ResultsMenu : QuantumSceneViewComponent {
             return;
         }
 
-        switch (cursor) {
-        case 0:
-            if (!votedToContinue) {
-                foreach (int slot in Game.GetLocalPlayerSlots()) {
-                    Game.SendCommand(slot, new CommandEndGameContinue());
-                }
-                sfx.PlayOneShot(SoundEffect.UI_Decide);
-                votedToContinue = true;
-                Select(0);
-            }
-            break;
-        case 1:
-            saveReplay = !saveReplay;
-            checkmark.enabled = saveReplay;
-            sfx.PlayOneShot(SoundEffect.UI_Decide);
-            break;
-        case 2:
-            if (exitPrompt) {
-                NetworkHandler.Runner.Shutdown();
-            } else {
-                exitPrompt = true;
-                labels[2].text = "» " + GlobalController.Instance.translationManager.GetTranslation(exitPrompt ? "ui.generic.confirmation" : "ui.pause.quit");
-            }
-            sfx.PlayOneShot(SoundEffect.UI_Decide);
-            break;
-        }
-
+        Click(cursor);
     }
 
     public void IncrementOption(int adjustment) {
@@ -152,6 +126,37 @@ public class ResultsMenu : QuantumSceneViewComponent {
         Deselect(index);
         labels[index].text = "» " + labels[index].text;
         labels[index].color = labelSelectedColor;
+    }
+
+    public void Click(int index) {
+        Select(index);
+
+        switch (cursor) {
+        case 0:
+            if (!votedToContinue) {
+                foreach (int slot in Game.GetLocalPlayerSlots()) {
+                    Game.SendCommand(slot, new CommandEndGameContinue());
+                }
+                sfx.PlayOneShot(SoundEffect.UI_Decide);
+                votedToContinue = true;
+                Select(0);
+            }
+            break;
+        case 1:
+            saveReplay = !saveReplay;
+            checkmark.enabled = saveReplay;
+            sfx.PlayOneShot(SoundEffect.UI_Decide);
+            break;
+        case 2:
+            if (exitPrompt) {
+                NetworkHandler.Runner.Shutdown();
+            } else {
+                exitPrompt = true;
+                labels[2].text = "» " + GlobalController.Instance.translationManager.GetTranslation(exitPrompt ? "ui.generic.confirmation" : "ui.pause.quit");
+            }
+            sfx.PlayOneShot(SoundEffect.UI_Decide);
+            break;
+        }
     }
 
     private void OnLanguageChanged(TranslationManager tm) {

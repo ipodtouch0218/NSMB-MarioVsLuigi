@@ -4,7 +4,8 @@ namespace Quantum {
     public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnStageReset {
 
         public override void OnInit(Frame f) {
-            f.Context.Interactions.Register<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioInteraction);
+            f.Context.Interactions.Register<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioHitboxInteraction);
+            f.Context.Interactions.Register<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioPlatformInteraction);
         }
 
         private static bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {
@@ -45,17 +46,15 @@ namespace Quantum {
                 ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->MinimumHeight, true);
                 breakable->IsDestroyed = true;
 
-
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
                 FPVector2 velocity = marioPhysicsObject->PreviousFrameVelocity;
-
-
-                FP before = f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position.X;
-                FP leftoverVelocity = (FPMath.Abs(velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (velocity.X > 0 ? 1 : -1);
-                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
-                marioPhysicsObject->Velocity.X = velocity.X;
-                FP after = f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position.X;
-
+                
+                if (contact.HasValue) {
+                    FP before = f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position.X;
+                    FP leftoverVelocity = (FPMath.Abs(velocity.X) - (contact.Value.Distance * f.UpdateRate)) * (velocity.X > 0 ? 1 : -1);
+                    PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset));
+                    marioPhysicsObject->Velocity.X = velocity.X;
+                }
                 return true;
             }
 
@@ -77,7 +76,11 @@ namespace Quantum {
         }
 
         #region Interactions
-        private static void OnBreakableObjectMarioInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
+        private static void OnBreakableObjectMarioHitboxInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity) {
+            TryInteraction(f, breakableObjectEntity, marioEntity);
+        }
+
+        private static void OnBreakableObjectMarioPlatformInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
             TryInteraction(f, breakableObjectEntity, marioEntity, contact);
         }
         #endregion
