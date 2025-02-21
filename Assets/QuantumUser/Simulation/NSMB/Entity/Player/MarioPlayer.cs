@@ -145,19 +145,18 @@ namespace Quantum {
             this.StompAction = default;
         }
 
-        public void CheckEntityBounce(Frame f, bool checkPlayer = false) {
+        public bool CheckEntityBounce(Frame f, bool checkPlayer = false) {
             if (!checkPlayer) {
                 if (HasActionFlags(ActionFlags.NoEnemyBounce)) {
-                    DoEntityBounce = false;
-                    return;
+                    return false;
                 }
             } else {
                 if (HasActionFlags(ActionFlags.NoPlayerBounce)) {
-                    DoEntityBounce = false;
-                    return;
+                    return false;
                 }
             }
             SetPlayerAction(PlayerAction.Bounce, f);
+            return true;
         }
 
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {

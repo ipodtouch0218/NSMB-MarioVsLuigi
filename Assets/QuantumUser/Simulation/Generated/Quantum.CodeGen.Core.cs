@@ -2096,10 +2096,10 @@ namespace Quantum {
     [FieldOffset(152)]
     [ExcludeFromPrototype()]
     public EntityRef ActionObject;
-    [FieldOffset(92)]
+    [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(100)]
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
     [FieldOffset(7)]
@@ -2132,13 +2132,10 @@ namespace Quantum {
     [FieldOffset(68)]
     [ExcludeFromPrototype()]
     public Int32 LandedFrame;
-    [FieldOffset(88)]
-    [ExcludeFromPrototype()]
-    public QBoolean DoEntityBounce;
-    [FieldOffset(120)]
+    [FieldOffset(116)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideLeft;
-    [FieldOffset(124)]
+    [FieldOffset(120)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
     [FieldOffset(31)]
@@ -2159,7 +2156,7 @@ namespace Quantum {
     [FieldOffset(29)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
-    [FieldOffset(104)]
+    [FieldOffset(100)]
     [ExcludeFromPrototype()]
     public QBoolean KnockbackWasOriginallyFacingRight;
     [FieldOffset(64)]
@@ -2171,7 +2168,7 @@ namespace Quantum {
     [FieldOffset(3)]
     [ExcludeFromPrototype()]
     public Byte CrushDamageInvincibilityFrames;
-    [FieldOffset(96)]
+    [FieldOffset(92)]
     [ExcludeFromPrototype()]
     public QBoolean IsStuckInBlock;
     [FieldOffset(1)]
@@ -2189,7 +2186,7 @@ namespace Quantum {
     [FieldOffset(14)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
-    [FieldOffset(108)]
+    [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
     [FieldOffset(18)]
@@ -2213,7 +2210,7 @@ namespace Quantum {
     [FieldOffset(23)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
-    [FieldOffset(116)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(20)]
@@ -2234,7 +2231,7 @@ namespace Quantum {
     [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
-    [FieldOffset(112)]
+    [FieldOffset(108)]
     [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
     [FieldOffset(17)]
@@ -2282,7 +2279,6 @@ namespace Quantum {
         hash = hash * 31 + JumpBufferFrames.GetHashCode();
         hash = hash * 31 + CoyoteTimeFrames.GetHashCode();
         hash = hash * 31 + LandedFrame.GetHashCode();
-        hash = hash * 31 + DoEntityBounce.GetHashCode();
         hash = hash * 31 + WallslideLeft.GetHashCode();
         hash = hash * 31 + WallslideRight.GetHashCode();
         hash = hash * 31 + WallslideEndFrames.GetHashCode();
@@ -2377,7 +2373,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->StarStealCount);
         PlayerRef.Serialize(&p->PlayerRef, serializer);
         QBoolean.Serialize(&p->Disconnected, serializer);
-        QBoolean.Serialize(&p->DoEntityBounce, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IsStuckInBlock, serializer);
         QBoolean.Serialize(&p->IsTurnaround, serializer);
