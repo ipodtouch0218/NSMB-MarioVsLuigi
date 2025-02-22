@@ -1,8 +1,9 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
-    public unsafe class HoldableObjectSystem : SystemMainThreadFilter<HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
+    public unsafe class HoldableObjectSystem : SystemMainThreadFilterStage<HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
         ISignalOnTryLiquidSplash, ISignalOnEntityFreeze {
         
         public struct Filter {
@@ -16,7 +17,7 @@ namespace Quantum {
             f.Context.RegisterPreContactCallback(f, OnPreContactCallback);
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var holdable = filter.Holdable;
 
             QuantumUtils.Decrement(ref holdable->IgnoreOwnerFrames);
@@ -35,10 +36,19 @@ namespace Quantum {
                 return;
             }
 
-            filter.PhysicsObject->Velocity = FPVector2.Zero;
-            filter.PhysicsObject->WasTouchingGround = false;
-            filter.PhysicsObject->IsTouchingGround = false;
-            filter.Transform->Position = holderTransform->Position + mario->GetHeldItemOffset(f, holdable->Holder);
+            var physicsObject = filter.PhysicsObject;
+            physicsObject->Velocity = FPVector2.Zero;
+            physicsObject->WasTouchingGround = false;
+            physicsObject->IsTouchingGround = false;
+
+            var transform = filter.Transform;
+            FPVector2 newPos = holderTransform->Position + mario->GetHeldItemOffset(f, holdable->Holder);
+
+            if (FPMath.Abs(transform->Position.X - newPos.X) > stage.TileDimensions.x / 4) {
+                transform->Teleport(f, newPos);
+            } else {
+                transform->Position = newPos;
+            }
         }
 
         public void OnPreContactCallback(FrameThreadSafe f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContact) {

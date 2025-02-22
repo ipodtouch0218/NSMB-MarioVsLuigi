@@ -9,6 +9,7 @@ public class ProjectileAnimator : QuantumEntityViewComponent {
     //---Serialized Variables
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private Animator animator;
+    [SerializeField] private LegacyAnimateSpriteRenderer legacySpriteAnimator;
     [SerializeField] private Color sameTeamColor, differentTeamColor;
 
     //---Private Variables
@@ -17,6 +18,12 @@ public class ProjectileAnimator : QuantumEntityViewComponent {
     public void OnValidate() {
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
         this.SetIfNull(ref animator, UnityExtensions.GetComponentType.Children);
+        this.SetIfNull(ref legacySpriteAnimator, UnityExtensions.GetComponentType.Children);
+    }
+
+    public void Start() {
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
 
     public override unsafe void OnActivate(Frame f) {
@@ -28,7 +35,8 @@ public class ProjectileAnimator : QuantumEntityViewComponent {
         if (projectile->FacingRight) {
             if (sRenderer) {
                 sRenderer.flipX = true;
-            } else if (animator) {
+            }
+            if (animator) {
                 animator.Play("Left");
             }
         }
@@ -75,5 +83,23 @@ public class ProjectileAnimator : QuantumEntityViewComponent {
             }
         }
         return false;
+    }
+
+    private void OnGameResynced(CallbackGameResynced e) {
+        if (animator) {
+            animator.enabled = true;
+        }
+        if (legacySpriteAnimator) {
+            legacySpriteAnimator.enabled = true;
+        }
+    }
+
+    private void OnGameEnded(EventGameEnded e) {
+        if (animator) {
+            animator.enabled = false;
+        }
+        if (legacySpriteAnimator) {
+            legacySpriteAnimator.enabled = false;
+        }
     }
 }

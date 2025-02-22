@@ -14,6 +14,21 @@ public unsafe class WrappingEntityView : QuantumEntityView {
 
         base.ApplyTransform(ref param);
 
+        /*
+        // Directly set position for freezables based on ice block
+        Frame f = Game.Frames.Predicted;
+
+        if (EntityViewUpdater
+            && f.Unsafe.TryGetPointer(EntityRef, out Freezable* freezable)) {
+
+            QuantumEntityView iceBlockView = EntityViewUpdater.GetView(freezable->FrozenCubeEntity);
+            if (iceBlockView) {
+                Debug.Log("g");
+                transform.position = iceBlockView.transform.position + freezable->Offset.ToUnityVector3();
+            }
+        }
+        */
+
         Vector3 newPosition = transform.position;
         newPosition.z = previousZ;
         transform.SetPositionAndRotation(newPosition, previousRotation);

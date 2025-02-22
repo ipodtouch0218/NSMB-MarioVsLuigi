@@ -111,6 +111,7 @@ MonoBehaviour:
   - {fileID: 7518829234646223683, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   - {fileID: 2147156700845412417, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   - {fileID: -1837141360104208851, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 7821411591339125535}
   image: {fileID: 0}
 --- !u!1 &7523289063499453450
@@ -595,9 +596,9 @@ MonoBehaviour:
   Prototype:
     IceBlockSize:
       X:
-        RawValue: 39322
+        RawValue: 42598
       Y:
-        RawValue: 39322
+        RawValue: 42598
     AutoBreakFrames: 180
     AutoBreakGrabAdditionalFrames: 0
     AutoBreakWhileHeld:

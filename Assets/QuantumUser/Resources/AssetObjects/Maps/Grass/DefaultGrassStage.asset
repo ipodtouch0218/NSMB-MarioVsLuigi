@@ -228,9 +228,9 @@ MonoBehaviour:
       data:
         IceBlockSize:
           X:
-            RawValue: 39322
+            RawValue: 42598
           Y:
-            RawValue: 39322
+            RawValue: 42598
         AutoBreakFrames: 180
         AutoBreakGrabAdditionalFrames: 0
         AutoBreakWhileHeld:
@@ -433,9 +433,9 @@ MonoBehaviour:
       data:
         IceBlockSize:
           X:
-            RawValue: 39322
+            RawValue: 42598
           Y:
-            RawValue: 39322
+            RawValue: 42598
         AutoBreakFrames: 180
         AutoBreakGrabAdditionalFrames: 0
         AutoBreakWhileHeld:
@@ -866,9 +866,9 @@ MonoBehaviour:
       data:
         IceBlockSize:
           X:
-            RawValue: 39322
+            RawValue: 42598
           Y:
-            RawValue: 39322
+            RawValue: 42598
         AutoBreakFrames: 180
         AutoBreakGrabAdditionalFrames: 0
         AutoBreakWhileHeld:
