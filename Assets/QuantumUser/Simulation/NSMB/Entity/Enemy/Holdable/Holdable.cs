@@ -19,7 +19,7 @@ namespace Quantum {
             f.Signals.OnThrowHoldable(entity, PreviousHolder, true, true);
         }
 
-        public void Throw(Frame f, EntityRef entity) {
+        public void Throw(Frame f, EntityRef entity, bool isDrop) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(Holder);
             var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(Holder);
             mario->HeldEntity = default;
@@ -45,7 +45,7 @@ namespace Quantum {
             }
             softDrop &= !marioPhysicsObject->IsUnderwater;
 
-            f.Signals.OnThrowHoldable(entity, PreviousHolder, softDrop, false);
+            f.Signals.OnThrowHoldable(entity, PreviousHolder, isDrop, false);
         }
     }
 }

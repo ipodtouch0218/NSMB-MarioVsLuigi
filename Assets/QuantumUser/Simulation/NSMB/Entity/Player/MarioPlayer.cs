@@ -32,10 +32,10 @@ namespace Quantum {
                 PlayerAction.CrouchAir              => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction,
                 PlayerAction.Sliding                => ActionFlags.AllowBump | ActionFlags.Attacking | ActionFlags.IrregularVelocity,
                 // PlayerAction.Bounce                 => 0 all this action does is set to another action
-                PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
-                PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
-                PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AirAction,
-                PlayerAction.Freefall               => ActionFlags.AllowBump | ActionFlags.AirAction,
+                PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AllowHold | ActionFlags.AirAction,
+                PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AllowHold | ActionFlags.AirAction,
+                PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AllowHold |ActionFlags.AirAction,
+                PlayerAction.Freefall               => ActionFlags.AllowBump | ActionFlags.AllowHold | ActionFlags.AirAction,
                 PlayerAction.HoldIdle               => ActionFlags.AllowBump | ActionFlags.Holding,
                 PlayerAction.HoldWalk               => ActionFlags.AllowBump | ActionFlags.Holding,
                 PlayerAction.HoldJump               => ActionFlags.AllowBump | ActionFlags.Holding | ActionFlags.AirAction,
@@ -67,7 +67,25 @@ namespace Quantum {
             };
         }
 
-        public PlayerAction SetPlayerAction(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default, bool throwItem = false, bool dropItem = false) {
+        public void DropItem(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* heldItem)) {
+                heldItem->Throw(f, entity, true);
+            }
+        }
+
+        public void ThrowItem(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* heldItem)) {
+                heldItem->Throw(f, entity, false);
+            }
+        }
+
+        public void DiscardItem(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* heldItem)) {
+                heldItem->DropWithoutThrowing(f, entity);
+            }
+        }
+
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default, bool throwItem = false, bool dropItem = false, bool discardItem = false, EntityRef actionObjectB = default) {
             PrevAction = Action;
             PreActionInput = default;
             if (f.GetPlayerInput(PlayerRef) != null) {
@@ -75,15 +93,11 @@ namespace Quantum {
             }
 
             if (throwItem) {
-                Holdable* heldItem;
-                if (f.Unsafe.TryGetPointer(HeldEntity, out heldItem)) {
-                    heldItem->Throw(f, actionObject);
-                }
+                ThrowItem(f, actionObjectB);
             } else if (dropItem) {
-                Holdable* heldItem;
-                if (f.Unsafe.TryGetPointer(HeldEntity, out heldItem)) {
-                    heldItem->DropWithoutThrowing(f, actionObject);
-                }
+                DropItem(f, actionObjectB);
+            } else if (discardItem) {
+                DiscardItem(f, actionObjectB);
             }
 
             Action = playerAction;
@@ -109,20 +123,40 @@ namespace Quantum {
             return true;
         }
 
-        public PlayerAction SetGroundAction(PhysicsObject* physicsObject, Frame f, PlayerAction groundAction = PlayerAction.Idle, int actionArg = 0) {
+        public PlayerAction SetGroundAction(PhysicsObject* physicsObject, Frame f, PlayerAction? groundAction = null, int actionArg = 0) {
             if (physicsObject->IsTouchingGround) {
-                return SetPlayerAction(groundAction, f, actionArg);
+                PlayerAction targetAction;
+                if (groundAction == null) {
+                    if (HasActionFlags(ActionFlags.Holding)) {
+                        targetAction = physicsObject->Velocity.X != 0 ? PlayerAction.HoldWalk : PlayerAction.HoldIdle;
+                    } else {
+                        targetAction = physicsObject->Velocity.X != 0 ? PlayerAction.Walk : PlayerAction.Idle;
+                    }
+                } else {
+                    targetAction = groundAction.GetValueOrDefault();
+                }
+                return SetPlayerAction(targetAction, f, actionArg);
             }
             return Action;
         }
 
-        public PlayerAction SetAirAction(PhysicsObject* physicsObject, Frame f, PlayerAction airAction = PlayerAction.Freefall, int actionArg = 0, bool ignCoyote = false) {
+        public PlayerAction SetAirAction(PhysicsObject* physicsObject, Frame f, PlayerAction? airAction = null, int actionArg = 0, bool ignCoyote = false) {
             if (ignCoyote) {
                 CoyoteTimeFrames = 0;
             }
 
             if (!physicsObject->IsTouchingGround && (CoyoteTimeFrames <= 0)) {
-                return SetPlayerAction(airAction, f, actionArg);
+                PlayerAction targetAction;
+                if (airAction == null) {
+                    if (HasActionFlags(ActionFlags.Holding)) {
+                        targetAction = PlayerAction.HoldFall;
+                    } else {
+                        targetAction = PlayerAction.Freefall;
+                    }
+                } else {
+                    targetAction = airAction.GetValueOrDefault();
+                }
+                return SetPlayerAction(targetAction, f, actionArg);
             }
             return Action;
         }
@@ -319,8 +353,8 @@ namespace Quantum {
             switch (CurrentPowerupState) {
             case PowerupState.MiniMushroom:
             case PowerupState.NoPowerup: {
-                SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || Lives > 0) ? 0 : 2, entity);
-                break;
+                SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || Lives > 0) ? 0 : 2, entity, discardItem: true);
+                return true;
             }
             case PowerupState.Mushroom: {
                 CurrentPowerupState = PowerupState.NoPowerup;
@@ -338,10 +372,8 @@ namespace Quantum {
             }
             }
 
-            if (Action != PlayerAction.Death && Action != PlayerAction.LavaDeath) {
-                DamageInvincibilityFrames = 2 * 60;
-                f.Events.MarioPlayerTookDamage(f, entity);
-            }
+            DamageInvincibilityFrames = 2 * 60;
+            f.Events.MarioPlayerTookDamage(f, entity);
             return true;
         }
 
