@@ -1,6 +1,7 @@
 using NSMB.Extensions;
 using Quantum;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,8 +13,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     //---Private Variables
     private readonly Dictionary<EntityRef, AudioSource> entityBreakBlockSounds = new();
-    private readonly Dictionary<EventKey, TileChangeData> eventData = new();
-    private readonly Dictionary<Vector3Int, List<TileEventData>> tileStack = new();
+    private readonly Dictionary<EventKey, Vector3Int> tileEventPositions = new();
     private VersusStageData stage;
 
 
@@ -42,75 +42,45 @@ public class TilemapAnimator : MonoBehaviour {
         }
     }
 
-    private void OnEventConfirmed(CallbackEventConfirmed e) {
-        EventKey id = e.EventKey;
-
-        if (eventData.TryGetValue(id, out var data)) {
-            if (tileStack.TryGetValue(data.position, out var stack)) {
-                var root = stack[0];
-                root.ChangeData = data;
-                stack[0] = root;
-
-                stack.RemoveAll(ted => ted.Equals(id));
-            }
-
-            eventData.Remove(id);
-        }
-    }
-
     private void OnEventCanceled(CallbackEventCanceled e) {
         EventKey id = e.EventKey;
 
-        if (!eventData.TryGetValue(id, out var data)) {
+        if (!tileEventPositions.TryGetValue(id, out Vector3Int coords)) {
             return;
         }
 
-        if (tileStack.TryGetValue(data.position, out var stack)) {
-            if (stack[^1].Id.Equals(id)) {
-                // Revert
-                var root = stack[0].ChangeData;
+        // This is a tile change event.
+        // Refer back to the simulation
+        Frame f = e.Game.Frames.Predicted;
+        StageTileInstance tileInstance = stage.GetTileRelative(f, coords.x, coords.y);
 
-                tilemap.SetTile(root.position, root.tile);
-                tilemap.SetTransformMatrix(root.position, root.transform);
-                tilemap.RefreshTile(root.position);
-            }
+        var tile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);
+        TileBase unityTile = tile ? tile.Tile : null;
+        Matrix4x4 mat = Matrix4x4.TRS(default, Quaternion.Euler(0, 0, tileInstance.Rotation.AsFloat), new Vector3(tileInstance.Scale.X.AsFloat, tileInstance.Scale.Y.AsFloat, 1));
 
-            stack.RemoveAll(ted => ted.Equals(id));
-        }
+        tilemap.SetTile(coords, unityTile);
+        tilemap.SetTransformMatrix(coords, mat);
+        tilemap.RefreshTile(coords);
 
-        eventData.Remove(id);
+        tileEventPositions.Remove(id);
+    }
+
+    private void OnEventConfirmed(CallbackEventConfirmed e) {
+        tileEventPositions.Remove(e.EventKey);
     }
 
     private void OnTileChanged(EventTileChanged e) {
         Vector3Int coords = new(e.TileX, e.TileY, 0);
 
-        if (!tileStack.ContainsKey(coords)) {
-            tileStack[coords] = new() {
-                new TileEventData {
-                    Id = default,
-                    ChangeData = new TileChangeData {
-                        position = coords,
-                        tile = tilemap.GetTile(coords),
-                        transform = tilemap.GetTransformMatrix(coords)
-                    }
-                }
-            };
-        }
-
         var tile = QuantumUnityDB.GetGlobalAsset(e.NewTile.Tile);
         TileBase unityTile = tile ? tile.Tile : null;
+        Matrix4x4 mat = Matrix4x4.TRS(default, Quaternion.Euler(0, 0, e.NewTile.Rotation.AsFloat), new Vector3(e.NewTile.Scale.X.AsFloat, e.NewTile.Scale.Y.AsFloat, 1));
 
         tilemap.SetTile(coords, unityTile);
-        Matrix4x4 mat = Matrix4x4.TRS(default, Quaternion.Euler(0, 0, e.NewTile.Rotation.AsFloat), new Vector3(e.NewTile.Scale.X.AsFloat, e.NewTile.Scale.Y.AsFloat, 1));
         tilemap.SetTransformMatrix(coords, mat);
-
-        eventData[(EventKey) e] = new TileChangeData {
-            position = coords,
-            tile = unityTile,
-            transform = mat
-        };
-
         tilemap.RefreshTile(coords);
+        
+        tileEventPositions[(EventKey) e] = coords;
     }
 
     private unsafe void OnTileBroken(EventTileBroken e) {
