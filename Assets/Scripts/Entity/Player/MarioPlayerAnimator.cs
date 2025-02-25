@@ -263,7 +263,7 @@ namespace NSMB.Entities.Player {
             SetParticleEmission(iceSkiddingParticle, !disableParticles && physicsObject->IsOnSlipperyGround && ((mario->Action == PlayerAction.Skidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
             SetParticleEmission(waterSkiddingParticle, !disableParticles && onWater && ((mario->Action == PlayerAction.Skidding && physicsObject->Velocity.SqrMagnitude.AsFloat > 0.25f) || mario->FastTurnaroundFrames > 0));
             SetParticleEmission(waterRunningParticle, !disableParticles && !waterSkiddingParticle.isPlaying && onWater && FPMath.Abs(physicsObject->Velocity.X) > FP._0_10);
-            SetParticleEmission(dust, !disableParticles && !iceSkiddingParticle.isPlaying && !waterSkiddingParticle.isPlaying && (mario->IsWallsliding || (physicsObject->IsTouchingGround && ((mario->Action == PlayerAction.Skidding || (mario->Action is PlayerAction.Crouch or PlayerAction.BlueShellCrouch && !physicsObject->IsOnSlipperyGround)) && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->Action is PlayerAction.Sliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->HasActionFlags(ActionFlags.IsShelled)) && physicsObject->IsTouchingGround)) && !f.Exists(mario->CurrentPipe));
+            SetParticleEmission(dust, !disableParticles && !iceSkiddingParticle.isPlaying && !waterSkiddingParticle.isPlaying && (mario->Action == PlayerAction.WallSlide || (physicsObject->IsTouchingGround && ((mario->Action == PlayerAction.Skidding || (mario->Action is PlayerAction.Crouch or PlayerAction.BlueShellCrouch && !physicsObject->IsOnSlipperyGround)) && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f)) || mario->FastTurnaroundFrames > 0 || (((mario->Action is PlayerAction.Sliding && Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.25f) || mario->HasActionFlags(ActionFlags.IsShelled)) && physicsObject->IsTouchingGround)) && !f.Exists(mario->CurrentPipe));
             SetParticleEmission(giantParticle, !disableParticles && mario->CurrentPowerupState == PowerupState.MegaMushroom && mario->MegaMushroomStartFrames == 0);
             SetParticleEmission(fireParticle, mario->Action == PlayerAction.LavaDeath && !physicsObject->IsFrozen);
             SetParticleEmission(bubblesParticle, !disableParticles && physicsObject->IsUnderwater);
@@ -387,7 +387,7 @@ namespace NSMB.Entities.Player {
                     + (mario->Action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames == 0 && physicsObject->Velocity.Y < 0 ? 700 : 0)) * delta, 0);
                 modelRotateInstantly = true;
 
-            } else if (mario->IsWallsliding) {
+            } else if (mario->Action == PlayerAction.WallSlide) {
                 modelRotationTarget = Quaternion.Euler(0, mario->WallslideRight ? 110 : 250, 0);
             } else {
                 modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 110 : 250, 0);

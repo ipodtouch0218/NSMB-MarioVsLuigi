@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using System.Drawing.Drawing2D;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -296,7 +297,7 @@ namespace Quantum {
                 return;
             }
 
-            // EnableWallKick(f, ref filter, physics, ref inputs);
+            EnableWallKick(f, ref filter, physics);
 
             mario->ToggleActionFlags(ActionFlags.UsesSmallHitbox | ActionFlags.StarSpinAction, mario->IsStarmanInvincible && !physicsObject->IsTouchingGround);
             mario->SetStompEvents();
@@ -350,7 +351,7 @@ namespace Quantum {
             EnableShootingPowerups(f, ref filter, physics, mario->CurrentPowerupState);
             EnablePropellerPowerup(f, ref filter, physics, mario->CurrentPowerupState, stage);
 
-            // EnableWallKick(f, ref filter, physics, ref inputs);
+            EnableWallKick(f, ref filter, physics);
 
             mario->SetStompEvents();
             mario->SetGroundAction(physicsObject, f);
@@ -413,9 +414,9 @@ namespace Quantum {
                 return;
             }
 
-            HandleWallslideStopChecks(ref filter, ref inputs, currentWallDirection);
+            HandleWallslideStopChecks(ref filter, currentWallDirection);
 
-            if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
+            if (mario->ActionTimer > 30) {
                 mario->SetPlayerAction(PlayerAction.Freefall, f);
                 return;
             }
@@ -427,12 +428,14 @@ namespace Quantum {
 
             // Walljump check
             physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
-            mario->FacingRight = mario->WallslideLeft;
-            if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
+            mario->FacingRight = mario->ActionArg != 0;
+            if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0) {
                 mario->SetPlayerAction(PlayerAction.Wallkick, f);
+                return;
             }
 
             mario->SetGroundAction(physicsObject, f);
+            QuantumUtils.Increment(ref mario->ActionTimer);
         }
 
         private void ActionWallKick(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
@@ -492,7 +495,7 @@ namespace Quantum {
             }
         }
 
-        private void ActionKnockback(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
+        private void ActionKnockback(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage, bool isSoftKnockback) {
             var mario = filter.MarioPlayer;
             var entity = filter.Entity;
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
@@ -542,7 +545,7 @@ namespace Quantum {
                     f.Events.MarioPlayerReceivedKnockback(f, entity, mario->ActionObject, mario->Action);
                 }
 
-                if (physicsObject->IsTouchingGround) {
+                if (physicsObject->IsTouchingGround || isSoftKnockback) {
                     mario->ActionState++;
                     mario->ActionTimer = 0;
                 }
@@ -550,10 +553,11 @@ namespace Quantum {
                 int getUpTimes = mario->Action switch {
                     PlayerAction.NormalKnockback => 30,
                     PlayerAction.HardKnockback => 30,
+                    PlayerAction.SoftKnockback => 60,
                     _ => -1,
                 };
 
-                if (!physicsObject->IsTouchingGround) {
+                if (!physicsObject->IsTouchingGround && !isSoftKnockback) {
                     mario->ActionTimer = 0;
                 }
 
@@ -562,7 +566,7 @@ namespace Quantum {
                     mario->ActionTimer = 0;
                 }
             } else if (mario->ActionState == 2) {
-                int getupDelay = mario->Action == PlayerAction.SoftKnockback || physicsObject->IsUnderwater ? 0 : 25;
+                int getupDelay = isSoftKnockback || physicsObject->IsUnderwater ? 0 : 25;
                 if (mario->ActionTimer >= getupDelay) {
                     mario->DamageInvincibilityFrames = 60;
                     mario->FacingRight = mario->KnockbackWasOriginallyFacingRight;
@@ -663,6 +667,9 @@ namespace Quantum {
                     physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (24 * f.DeltaTime), targetVelocity);
                 }
             } else {
+                if (EnableWallKick(f, ref filter, physics)) {
+                    return;
+                }
                 if (physicsObject->IsTouchingGround) {
                     mario->PropellerSpinFrames = 0;
                     mario->UsedPropellerThisJump = false;
@@ -929,9 +936,9 @@ namespace Quantum {
             case PlayerAction.WallSlide:        ActionWallSlide(f, ref filter, physics, stage); break;
             case PlayerAction.Wallkick:         ActionWallKick(f, ref filter, physics, stage); break;
             case PlayerAction.GroundPound:      ActionGroundPound(f, ref filter, physics, stage); break;
-            case PlayerAction.SoftKnockback:    ActionKnockback(f, ref filter, physics, stage); break;
-            case PlayerAction.NormalKnockback:  ActionKnockback(f, ref filter, physics, stage); break;
-            case PlayerAction.HardKnockback:    ActionKnockback(f, ref filter, physics, stage); break;
+            case PlayerAction.SoftKnockback:    ActionKnockback(f, ref filter, physics, stage, true); break;
+            case PlayerAction.NormalKnockback:  ActionKnockback(f, ref filter, physics, stage, false); break;
+            case PlayerAction.HardKnockback:    ActionKnockback(f, ref filter, physics, stage, false); break;
             case PlayerAction.SpinBlockSpin:    ActionSpinBlockSpin(f, ref filter, physics, stage); break; // action works, spinner doesn't
             case PlayerAction.SpinBlockDrill:   ActionSpinBlockDrill(f, ref filter, physics, stage); break;
             case PlayerAction.BlueShellCrouch:  ActionCrouching(f, ref filter, physics, stage); break;
@@ -941,7 +948,7 @@ namespace Quantum {
             case PlayerAction.PropellerDrill:   ActionPropellerDrill(f, ref filter, physics, stage); break;
             case PlayerAction.MegaMushroom:     ActionMegaMushroom(f, ref filter, physics, stage); break; // no code
             case PlayerAction.PowerupShoot:     ActionPowerupShoot(f, ref filter, physics, stage); break;
-            case PlayerAction.Pushing:          ActionIdleWalking(f, ref filter, physics, stage); break; // yeah same function
+            case PlayerAction.Pushing:          ActionIdleWalking(f, ref filter, physics, stage); break;
             case PlayerAction.Death:            ActionDeath(f, ref filter, physics, stage); break;
             case PlayerAction.LavaDeath:        ActionDeath(f, ref filter, physics, stage); break;
             case PlayerAction.Respawning:       ActionRespawning(f, ref filter, physics, stage); break;
@@ -1121,6 +1128,10 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
 
+            if (!physicsObject->IsTouchingLeftWall && !physicsObject->IsTouchingRightWall) {
+                return false;
+            }
+
             FPVector2 currentWallDirection;
             if (mario->WallslideLeft) {
                 currentWallDirection = FPVector2.Left;
@@ -1138,45 +1149,25 @@ namespace Quantum {
                 return false;
             }
 
-            if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
-                mario->WallslideRight = false;
-                mario->WallslideLeft = false;
+            // Walljump starting check
+            bool canWallslide = physicsObject->Velocity.Y < -FP._0_10 && !physicsObject->IsTouchingGround && mario->CurrentPowerupState != PowerupState.MegaMushroom;
+            if (!canWallslide) {
                 return false;
             }
 
-            if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                // Walljump starting check
-                bool canWallslide = physicsObject->Velocity.Y < -FP._0_10 && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && mario->PropellerLaunchFrames == 0;
-                if (!canWallslide) {
-                    return false;
-                }
+            // Check 4: already handled
+            // Check 5.2: already handled
 
-                // Check 1
-                if (mario->WalljumpFrames > 0) {
-                    return false;
-                }
-
-                // Check 2
-                if (mario->WallslideEndFrames > 0) {
-                    return false;
-                }
-
-                // Check 4: already handled
-                // Check 5.2: already handled
-
-                // Check 8
-                if (!((currentWallDirection == FPVector2.Right && mario->FacingRight) || (currentWallDirection == FPVector2.Left && !mario->FacingRight))) {
-                    return false;
-                }
-
-                // Start wallslide
-                mario->WallslideRight = currentWallDirection == FPVector2.Right && physicsObject->IsTouchingRightWall;
-                mario->WallslideLeft = currentWallDirection == FPVector2.Left && physicsObject->IsTouchingLeftWall;
-                mario->WallslideEndFrames = 0;
+            // Check 8
+            if (!((currentWallDirection == FPVector2.Right && mario->FacingRight) || (currentWallDirection == FPVector2.Left && !mario->FacingRight))) {
+                return false;
             }
 
+            // Start wallslide
+            bool isLeft = currentWallDirection == FPVector2.Left && physicsObject->IsTouchingLeftWall;
+
             if (wallslide) {
-                mario->SetPlayerAction(PlayerAction.WallSlide, f);
+                mario->SetPlayerAction(PlayerAction.WallSlide, f, isLeft ? 0 : 1);
                 return true;
             } else if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0) {
                 mario->SetPlayerAction(PlayerAction.Wallkick, f);
@@ -1813,73 +1804,16 @@ namespace Quantum {
             physicsObject->TerminalVelocity = terminalVelocity;
         }
 
-        public bool AllowWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, ref Input inputs, bool isLeft) {
-            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWallslide");
-
-            var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
-
-            FPVector2 currentWallDirection;
-            if (isLeft) {
-                currentWallDirection = FPVector2.Left;
-            } else if (!isLeft) {
-                currentWallDirection = FPVector2.Right;
-            } else if (inputs.Left.IsDown ^ inputs.Right.IsDown) {
-                if (inputs.Left.IsDown) {
-                    currentWallDirection = FPVector2.Left;
-                } else if (inputs.Right.IsDown) {
-                    currentWallDirection = FPVector2.Right;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-            if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
-                // Walljump starting check
-                bool canWallslide = physicsObject->Velocity.Y < -FP._0_10 && !physicsObject->IsTouchingGround && !mario->HeldEntity.IsValid && mario->CurrentPowerupState != PowerupState.MegaMushroom && mario->PropellerLaunchFrames == 0;
-                if (!canWallslide) {
-                    return false;
-                }
-
-                // Check 1
-                if (mario->WalljumpFrames > 0) {
-                    return false;
-                }
-
-                // Check 2
-                if (mario->WallslideEndFrames > 0) {
-                    return false;
-                }
-
-                // Check 4: already handled
-                // Check 5.2: already handled
-
-                // Check 8
-                if (!((currentWallDirection == FPVector2.Right && mario->FacingRight) || (currentWallDirection == FPVector2.Left && !mario->FacingRight))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         private static readonly FPVector2 WallslideLowerHeightOffset = new(0, FP._0_20);
-        private void HandleWallslideStopChecks(ref Filter filter, ref Input inputs, FPVector2 wallDirection) {
+        private void HandleWallslideStopChecks(ref Filter filter, FPVector2 wallDirection) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWallslideStopChecks");
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
 
             // TODO bool floorCheck = !Runner.GetPhysicsScene2D().Raycast(body.Position, Vector2.down, 0.1f, Layers.MaskAnyGround);
             bool moveDownCheck = physicsObject->Velocity.Y < 0;
             // TODO bool heightLowerCheck = Runner.GetPhysicsScene2D().Raycast(body.Position + WallSlideLowerHeightOffset, wallDirection, MainHitbox.size.x * 2, Layers.MaskSolidGround);
-            if (physicsObject->IsTouchingGround || !moveDownCheck /* || !heightLowerCheck */) {
-                mario->WallslideRight = false;
-                mario->WallslideLeft = false;
-                mario->WallslideEndFrames = 0;
-                return;
-            }
-
             if ((wallDirection == FPVector2.Left && (!inputs.Left.IsDown || !physicsObject->IsTouchingLeftWall)) || (wallDirection == FPVector2.Right && (!inputs.Right.IsDown || !physicsObject->IsTouchingRightWall))) {
                 if (mario->WallslideEndFrames == 0) {
                     mario->WallslideEndFrames = 16;
@@ -2470,7 +2404,7 @@ namespace Quantum {
             if (!mario->HasActionFlags(ActionFlags.Cutscene)) {
                 if (transform->Position.Y + (collider->Shape.Box.Extents.Y * 2) < stage.StageWorldMin.Y) {
                     // Death via pit
-                    mario->SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || mario->Lives > 0) ? 1 : 2);
+                    mario->SetPlayerAction(PlayerAction.Death, f, mario->GetDeathArgs(f), discardItem: true);
                 }
             }
             return false;
@@ -2552,7 +2486,7 @@ namespace Quantum {
                 case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
                 case ProjectileEffectType.Fire:
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                        mario->SetPlayerAction(PlayerAction.LavaDeath, f, (!f.Global->Rules.IsLivesEnabled || mario->Lives > 0) ? 0 : 2);
+                        mario->SetPlayerAction(PlayerAction.LavaDeath, f, mario->GetDeathArgs(f), discardItem: true);
                     } else {
                         int args = (dropStars ? 1 : 0) + (!projectile->FacingRight ? MarioPlayer.DropStarRight : 0);
                         mario->SetPlayerAction(PlayerAction.SoftKnockback, f, args, projectileEntity);
@@ -2560,7 +2494,7 @@ namespace Quantum {
                     break;
                 case ProjectileEffectType.Freeze:
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                        mario->SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || mario->Lives > 0) ? 0 : 2);
+                        mario->SetPlayerAction(PlayerAction.Death, f, mario->GetDeathArgs(f), discardItem: true);
                     } else if (dropStars) {
                         IceBlockSystem.Freeze(f, marioEntity);
                     } else {
@@ -2829,7 +2763,7 @@ namespace Quantum {
                 defenderMario->SpawnStars(f, defender, attackerMario->StarStealCount);
                 //defenderMario->Death(f, defender, false, false);
                 if (killMini) {
-                    defenderMario->SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || defenderMario->Lives > 0) ? 0 : 2, defender);
+                    defenderMario->SetPlayerAction(PlayerAction.Death, f, defenderMario->GetDeathArgs(f), defender, discardItem: true);
                 }
             } else {
                 // Normal knockbacks
@@ -2889,11 +2823,11 @@ namespace Quantum {
                     break;
                 case LiquidType.Lava:
                     // Kill, fire death
-                    mario->SetPlayerAction(PlayerAction.LavaDeath, f, (!f.Global->Rules.IsLivesEnabled || mario->Lives > 0) ? 0 : 2);
+                    mario->SetPlayerAction(PlayerAction.LavaDeath, f, mario->GetDeathArgs(f), discardItem: true);
                     break;
                 case LiquidType.Poison:
                     // Kill, normal death
-                    mario->SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || mario->Lives > 0) ? 0 : 2);
+                    mario->SetPlayerAction(PlayerAction.Death, f, mario->GetDeathArgs(f), discardItem: true);
                     break;
                 }
             }

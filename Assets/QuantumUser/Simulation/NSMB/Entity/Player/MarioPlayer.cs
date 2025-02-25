@@ -7,7 +7,6 @@ namespace Quantum {
     public unsafe partial struct MarioPlayer {
 
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
-        public bool IsWallsliding => WallslideLeft || WallslideRight;
         public bool IsCrouchedInShell => Action == PlayerAction.BlueShellCrouch;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public bool IsDead => Action is PlayerAction.Death or PlayerAction.LavaDeath;
@@ -20,6 +19,14 @@ namespace Quantum {
                 return 0;
             } else {
                 return data->RealTeam;
+            }
+        }
+
+        public int GetDeathArgs(Frame f) {
+            if (!f.Global->Rules.IsLivesEnabled || Lives > 0) {
+                return 0;
+            } else {
+                return 2;
             }
         }
 
@@ -353,7 +360,7 @@ namespace Quantum {
             switch (CurrentPowerupState) {
             case PowerupState.MiniMushroom:
             case PowerupState.NoPowerup: {
-                SetPlayerAction(PlayerAction.Death, f, (!f.Global->Rules.IsLivesEnabled || Lives > 0) ? 0 : 2, entity, discardItem: true);
+                SetPlayerAction(PlayerAction.Death, f, GetDeathArgs(f), entity, discardItem: true);
                 return true;
             }
             case PowerupState.Mushroom: {
@@ -414,14 +421,6 @@ namespace Quantum {
                 f.Events.MarioPlayerDroppedStar(f, entity);
                 GameLogicSystem.CheckForGameEnd(f);
             }
-        }
-
-        public void ResetKnockback(Frame f, EntityRef entity) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            FacingRight = KnockbackWasOriginallyFacingRight;
-            SetPlayerAction(PlayerAction.Idle, f);
-            
-            physicsObject->Velocity.X = 0;
         }
 
         public void EnterPipe(Frame f, EntityRef mario, EntityRef pipe) {
