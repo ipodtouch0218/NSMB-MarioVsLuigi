@@ -153,8 +153,6 @@ namespace Quantum {
             var entity = filter.Entity;
             var inputs = filter.Inputs;
 
-            mario->Stars += 9;
-
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk, f);
                 return;
@@ -769,7 +767,6 @@ namespace Quantum {
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
-            mario->ActionArg = Math.Max(mario->ActionArg, 2);
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
 
             // disable inputs
@@ -804,7 +801,7 @@ namespace Quantum {
                 if (!doRespawn && mario->Stars > 0) {
                     var volly = 33;
                     var speed = Math.Floor((decimal)((mario->ActionArg - 2) / 5)) * 3;
-                    if (mario->ActionTimer == volly - Math.Min(speed, volly - 4)) {
+                    if (mario->ActionTimer == volly - Math.Min(speed, volly - 8)) {
                         // alternate
                         mario->FacingRight = !mario->FacingRight;
 
