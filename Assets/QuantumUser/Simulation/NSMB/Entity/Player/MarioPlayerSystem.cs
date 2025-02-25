@@ -137,6 +137,9 @@ namespace Quantum {
                     return;
                 }
             }
+            if (EnableSpinner(f, ref filter, physics)) {
+                return;
+            }
             if (JumpHandler(f, ref filter, physics, mario->HasActionFlags(ActionFlags.Holding) ? PlayerAction.HoldJump : null)) {
                 f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), false);
                 return;
@@ -262,6 +265,12 @@ namespace Quantum {
                 mario->PropellerDrillCooldown = 30;
                 physicsObject->Velocity.Y = physics.PropellerLaunchVelocity;
                 mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
+                return;
+            }
+            case PlayerAction.SpinBlockSpin or PlayerAction.SpinBlockDrill: {
+                physicsObject->Velocity.Y = physics.PropellerLaunchVelocity; // ?
+                mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
+                f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
             default: {
@@ -390,8 +399,14 @@ namespace Quantum {
             FPVector2 currentWallDirection;
             if (isLeft) {
                 currentWallDirection = FPVector2.Left;
+                if (inputs.Left.IsDown) {
+                    mario->ActionTimer = -1;
+                }
             } else {
                 currentWallDirection = FPVector2.Right;
+                if (inputs.Right.IsDown) {
+                    mario->ActionTimer = -1;
+                }
             }
 
             HandleWallslideStopChecks(ref filter, currentWallDirection);
@@ -480,7 +495,7 @@ namespace Quantum {
             }
         }
 
-        private void ActionKnockback(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage, bool isSoftKnockback) {
+        private void ActionKnockback(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var entity = filter.Entity;
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
@@ -508,7 +523,7 @@ namespace Quantum {
             }
 
             // disable inputs
-            inputs = default;
+            filter.Inputs = default;
 
             if (mario->ActionState == 0) {
                 if (mario->ActionTimer == 0) {
@@ -530,7 +545,7 @@ namespace Quantum {
                     f.Events.MarioPlayerReceivedKnockback(f, entity, mario->ActionObject, mario->Action);
                 }
 
-                if (physicsObject->IsTouchingGround || isSoftKnockback) {
+                if (physicsObject->IsTouchingGround || weak) {
                     mario->ActionState++;
                     mario->ActionTimer = 0;
                 }
@@ -542,7 +557,7 @@ namespace Quantum {
                     _ => -1,
                 };
 
-                if (!physicsObject->IsTouchingGround && !isSoftKnockback) {
+                if (!physicsObject->IsTouchingGround && !weak) {
                     mario->ActionTimer = 0;
                 }
 
@@ -551,7 +566,7 @@ namespace Quantum {
                     mario->ActionTimer = 0;
                 }
             } else if (mario->ActionState == 2) {
-                int getupDelay = isSoftKnockback || physicsObject->IsUnderwater ? 0 : 25;
+                int getupDelay = weak || physicsObject->IsUnderwater ? 0 : 25;
                 if (mario->ActionTimer >= getupDelay) {
                     mario->DamageInvincibilityFrames = 60;
                     mario->FacingRight = mario->KnockbackWasOriginallyFacingRight;
@@ -578,13 +593,14 @@ namespace Quantum {
                     return;
                 }
             }
+            mario->SetGroundAction(physicsObject, f);
         }
 
         private void ActionSpinBlockDrill(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
-            if (mario->ActionArg != 0) {
+            if (mario->ActionArg == 2) {
                 mario->AddActionFlags(ActionFlags.NoEnemyBounce | ActionFlags.NoPlayerBounce);
                 mario->SetStompEvents(PlayerAction.SoftKnockback, 1);
             } else {
@@ -631,7 +647,7 @@ namespace Quantum {
             // got damaged
             if (mario->CurrentPowerupState <= PowerupState.Mushroom) {
                 physicsObject->Velocity.Y = 0;
-                mario->SetPlayerAction(PlayerAction.SpinBlockDrill, f, 1);
+                mario->SetPlayerAction(PlayerAction.SpinBlockDrill, f, 2);
                 return;
             } else if (mario->CurrentPowerupState != PowerupState.PropellerMushroom) {
                 mario->SetAirAction(physicsObject, f);
@@ -754,7 +770,7 @@ namespace Quantum {
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
 
             // disable inputs
-            inputs = default;
+            filter.Inputs = default;
 
             int deathUpFlag = 1 << 8;
             int actionState = mario->ActionState % deathUpFlag;
@@ -921,10 +937,10 @@ namespace Quantum {
             case PlayerAction.WallSlide:        ActionWallSlide(f, ref filter, physics, stage); break;
             case PlayerAction.Wallkick:         ActionWallKick(f, ref filter, physics, stage); break;
             case PlayerAction.GroundPound:      ActionGroundPound(f, ref filter, physics, stage); break;
-            case PlayerAction.SoftKnockback:    ActionKnockback(f, ref filter, physics, stage, true); break;
-            case PlayerAction.NormalKnockback:  ActionKnockback(f, ref filter, physics, stage, false); break;
-            case PlayerAction.HardKnockback:    ActionKnockback(f, ref filter, physics, stage, false); break;
-            case PlayerAction.SpinBlockSpin:    ActionSpinBlockSpin(f, ref filter, physics, stage); break; // action works, spinner doesn't
+            case PlayerAction.SoftKnockback:    ActionKnockback(f, ref filter, physics, stage); break;
+            case PlayerAction.NormalKnockback:  ActionKnockback(f, ref filter, physics, stage); break;
+            case PlayerAction.HardKnockback:    ActionKnockback(f, ref filter, physics, stage); break;
+            case PlayerAction.SpinBlockSpin:    ActionSpinBlockSpin(f, ref filter, physics, stage); break;
             case PlayerAction.SpinBlockDrill:   ActionSpinBlockDrill(f, ref filter, physics, stage); break;
             case PlayerAction.BlueShellCrouch:  ActionCrouching(f, ref filter, physics, stage); break;
             case PlayerAction.BlueShellSliding: ActionBlueShellSliding(f, ref filter, physics, stage); break;
@@ -1023,6 +1039,42 @@ namespace Quantum {
             }
             return true;
         }
+
+        private bool EnableSpinner(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+            var inputs = filter.Inputs;
+
+            // I don't think this uses the jump buffer
+            if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
+                && inputs.Jump.WasPressed) {
+                // Jump of spinner
+                physicsObject->IsTouchingGround = false;
+                physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
+                spinner->PlatformWaitFrames = 6;
+
+                mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f);
+
+                /*
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                for (int i = contacts.Count - 1; i >= 0; i--) {
+                    if (contacts[i].Entity == mario->CurrentSpinner) {
+                        contacts.RemoveAtUnordered(i);
+                    }
+                }
+                */
+
+                // Disable koyote time
+                mario->CoyoteTimeFrames = 0;
+
+                f.Events.MarioPlayerUsedSpinner(f, filter.Entity, mario->CurrentSpinner);
+
+                mario->CurrentSpinner = EntityRef.None;
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add this to an Action to allow the player to shoot something while in that Action.
         /// </summary>
@@ -1651,31 +1703,6 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->SwimForceJumpTimer);
             QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
-
-            if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
-                && !f.Exists(mario->HeldEntity) && !mario->HasActionFlags(ActionFlags.IsShelled)) {
-                // Jump of spinner
-                physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
-                spinner->PlatformWaitFrames = 6;
-
-                mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f);
-
-                /*
-                var contacts = f.ResolveList(physicsObject->Contacts);
-                for (int i = contacts.Count - 1; i >= 0; i--) {
-                    if (contacts[i].Entity == mario->CurrentSpinner) {
-                        contacts.RemoveAtUnordered(i);
-                    }
-                }
-                */
-
-                // Disable koyote time
-                mario->CoyoteTimeFrames = 0;
-
-                f.Events.MarioPlayerUsedSpinner(f, filter.Entity, mario->CurrentSpinner);
-
-                mario->CurrentSpinner = EntityRef.None;
-            }
         }
 
         public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
