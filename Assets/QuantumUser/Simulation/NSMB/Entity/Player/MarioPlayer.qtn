@@ -136,8 +136,6 @@ component MarioPlayer {
 	[ExcludeFromPrototype] int LandedFrame;
 
 	// Wallslide
-	[ExcludeFromPrototype] bool WallslideLeft;
-	[ExcludeFromPrototype] bool WallslideRight;
 	[ExcludeFromPrototype] byte WallslideEndFrames;
     [ExcludeFromPrototype] byte WalljumpFrames;
 

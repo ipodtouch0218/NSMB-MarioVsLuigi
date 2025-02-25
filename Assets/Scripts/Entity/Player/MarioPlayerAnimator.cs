@@ -272,7 +272,7 @@ namespace NSMB.Entities.Player {
             if (mario->Action is PlayerAction.Crouch or PlayerAction.BlueShellCrouch or PlayerAction.Sliding or PlayerAction.Skidding || mario->HasActionFlags(ActionFlags.IsShelled)) {
                 dust.transform.localPosition = Vector2.zero;
             } else if (mario->Action == PlayerAction.WallSlide) {
-                dust.transform.localPosition = physicsCollider->Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario->WallslideLeft ? new Vector2(-1, 1) : Vector2.one);
+                dust.transform.localPosition = physicsCollider->Shape.Box.Extents.ToUnityVector2() * 1.5f * (mario->ActionArg == 0 ? new Vector2(-1, 1) : Vector2.one);
             }
             Vector3 flip = mario->FacingRight ? Vector3.one : new Vector3(-1, 1, 1);
             iceSkiddingParticle.transform.localScale = flip;
@@ -388,7 +388,7 @@ namespace NSMB.Entities.Player {
                 modelRotateInstantly = true;
 
             } else if (mario->Action == PlayerAction.WallSlide) {
-                modelRotationTarget = Quaternion.Euler(0, mario->WallslideRight ? 110 : 250, 0);
+                modelRotationTarget = Quaternion.Euler(0, mario->ActionArg != 0 ? 110 : 250, 0);
             } else {
                 modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 110 : 250, 0);
             }
