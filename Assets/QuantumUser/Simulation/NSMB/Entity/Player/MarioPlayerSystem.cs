@@ -153,6 +153,8 @@ namespace Quantum {
             var entity = filter.Entity;
             var inputs = filter.Inputs;
 
+            mario->Stars += 9;
+
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk, f);
                 return;
@@ -268,7 +270,7 @@ namespace Quantum {
                 return;
             }
             case PlayerAction.SpinBlockSpin or PlayerAction.SpinBlockDrill: {
-                physicsObject->Velocity.Y = physics.PropellerLaunchVelocity; // ?
+                physicsObject->Velocity.Y = physics.JumpVelocity; // ?
                 mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
                 f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
@@ -767,6 +769,7 @@ namespace Quantum {
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
+            mario->ActionArg = Math.Max(mario->ActionArg, 2);
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
 
             // disable inputs
@@ -774,15 +777,17 @@ namespace Quantum {
 
             int deathUpFlag = 1 << 8;
             int actionState = mario->ActionState % deathUpFlag;
+
+            bool doRespawn = mario->ActionArg < 2;
             switch (actionState) {
             case 0: {
                 int endFrame = 160;
-                bool doRespawn = mario->ActionArg != 2;
                 if (mario->ActionTimer == 0) {
                     if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref mario->Lives)) || mario->Disconnected) {
                         mario->ActionTimer += 6;
                     }
                     mario->SpawnStars(f, entity, 1);
+                    mario->ActionArg++;
 
                     if (f.Exists(mario->HeldEntity) && f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
                         holdable->DropWithoutThrowing(f, mario->HeldEntity);
@@ -795,19 +800,23 @@ namespace Quantum {
                     f.Signals.OnMarioPlayerDied(entity);
                     f.Events.MarioPlayerDied(f, entity, mario->Action == PlayerAction.LavaDeath);
                 }
+                
+                if (!doRespawn && mario->Stars > 0) {
+                    var volly = 33;
+                    var speed = Math.Floor((decimal)((mario->ActionArg - 2) / 10)) * 3;
+                    if (mario->ActionTimer == volly - Math.Min(speed, volly - 4)) {
+                        // alternate
+                        mario->FacingRight = !mario->FacingRight;
 
-                if (mario->ActionTimer < 34) {
-                    if (!doRespawn && mario->Stars > 0) {
-                        if (mario->ActionTimer == 33) {
-                            // alternate
-                            mario->FacingRight = !mario->FacingRight;
-
-                            // Try to drop more stars
-                            mario->SpawnStars(f, entity, 1);
-                            mario->ActionTimer = 0;
-                        }
+                        // Try to drop more stars
+                        mario->SpawnStars(f, entity, 1);
+                        UnityEngine.Debug.Log($"ActionArg [{mario->ActionArg}]");
+                        mario->ActionTimer = 0;
+                        mario->ActionArg++;
                     }
-                } else if ((mario->ActionState & deathUpFlag) == 0) {
+                }
+                
+                if (mario->ActionTimer >= 34 && (mario->ActionState & deathUpFlag) == 0) {
                     // Play the animation as normal
                     if (transform->Position.Y > stage.StageWorldMin.Y) {
                         mario->ActionState |= deathUpFlag;
@@ -844,6 +853,10 @@ namespace Quantum {
             }
             case 2: {
                 f.Events.StartCameraFadeIn(f, entity);
+                if (!doRespawn) {
+                    f.Destroy(entity);
+                    return;
+                }
                 mario->SetPlayerAction(PlayerAction.Respawning, f, mario->ActionArg);
                 return;
             }
@@ -860,11 +873,6 @@ namespace Quantum {
             switch (mario->ActionState) {
             case 0: {
                 if (mario->ActionTimer == 0) {
-                    if (mario->ActionArg == 2) {
-                        f.Destroy(entity);
-                        return;
-                    }
-
                     FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios);
                     transform->Position = spawnpoint;
                     f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
@@ -2499,7 +2507,7 @@ namespace Quantum {
                         IceBlockSystem.Freeze(f, marioEntity);
                     } else {
                         int args = (dropStars ? 1 : 0) + (!projectile->FacingRight ? MarioPlayer.DropStarRight : 0);
-                        mario->SetPlayerAction(PlayerAction.SoftKnockback, f, args, projectileEntity);
+                        mario->SetPlayerAction(PlayerAction.SoftKnockback, f, args, projectileEntity, dropItem: true);
                     }
                     break;
                 }
