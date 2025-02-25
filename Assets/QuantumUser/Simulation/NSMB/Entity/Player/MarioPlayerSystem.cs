@@ -803,14 +803,13 @@ namespace Quantum {
                 
                 if (!doRespawn && mario->Stars > 0) {
                     var volly = 33;
-                    var speed = Math.Floor((decimal)((mario->ActionArg - 2) / 10)) * 3;
+                    var speed = Math.Floor((decimal)((mario->ActionArg - 2) / 5)) * 3;
                     if (mario->ActionTimer == volly - Math.Min(speed, volly - 4)) {
                         // alternate
                         mario->FacingRight = !mario->FacingRight;
 
                         // Try to drop more stars
                         mario->SpawnStars(f, entity, 1);
-                        UnityEngine.Debug.Log($"ActionArg [{mario->ActionArg}]");
                         mario->ActionTimer = 0;
                         mario->ActionArg++;
                     }
