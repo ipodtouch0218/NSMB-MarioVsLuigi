@@ -130,7 +130,7 @@ namespace Quantum {
             return true;
         }
 
-        public PlayerAction SetGroundAction(PhysicsObject* physicsObject, Frame f, PlayerAction? groundAction = null, int actionArg = 0) {
+        public PlayerAction? SetGroundAction(PhysicsObject* physicsObject, Frame f, PlayerAction? groundAction = null, int actionArg = 0) {
             if (physicsObject->IsTouchingGround) {
                 PlayerAction targetAction;
                 if (groundAction == null) {
@@ -144,10 +144,10 @@ namespace Quantum {
                 }
                 return SetPlayerAction(targetAction, f, actionArg);
             }
-            return Action;
+            return null;
         }
 
-        public PlayerAction SetAirAction(PhysicsObject* physicsObject, Frame f, PlayerAction? airAction = null, int actionArg = 0, bool ignCoyote = false) {
+        public PlayerAction? SetAirAction(PhysicsObject* physicsObject, Frame f, PlayerAction? airAction = null, int actionArg = 0, bool ignCoyote = false) {
             if (ignCoyote) {
                 CoyoteTimeFrames = 0;
             }
@@ -165,7 +165,7 @@ namespace Quantum {
                 }
                 return SetPlayerAction(targetAction, f, actionArg);
             }
-            return Action;
+            return null;
         }
 
         public bool HasActionFlags(ActionFlags actionFlags) {

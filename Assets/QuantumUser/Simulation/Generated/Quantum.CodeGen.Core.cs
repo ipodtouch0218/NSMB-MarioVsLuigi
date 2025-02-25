@@ -2104,15 +2104,15 @@ namespace Quantum {
     [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public Int32 CurrActionFlags;
-    [FieldOffset(76)]
-    [ExcludeFromPrototype()]
-    public Int32 StarStealCount;
-    [FieldOffset(35)]
-    [ExcludeFromPrototype()]
-    public PlayerAction StompAction;
     [FieldOffset(144)]
     [ExcludeFromPrototype()]
     public EntityRef ActionObject;
+    [FieldOffset(35)]
+    [ExcludeFromPrototype()]
+    public PlayerAction StompAction;
+    [FieldOffset(76)]
+    [ExcludeFromPrototype()]
+    public Int32 StarStealCount;
     [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
@@ -2272,9 +2272,9 @@ namespace Quantum {
         hash = hash * 31 + ActionState.GetHashCode();
         hash = hash * 31 + ActionArg.GetHashCode();
         hash = hash * 31 + CurrActionFlags.GetHashCode();
-        hash = hash * 31 + StarStealCount.GetHashCode();
-        hash = hash * 31 + (Byte)StompAction;
         hash = hash * 31 + ActionObject.GetHashCode();
+        hash = hash * 31 + (Byte)StompAction;
+        hash = hash * 31 + StarStealCount.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + IsTurnaround.GetHashCode();
         hash = hash * 31 + FastTurnaroundFrames.GetHashCode();

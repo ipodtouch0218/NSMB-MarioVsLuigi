@@ -115,9 +115,11 @@ component MarioPlayer {
 	[ExcludeFromPrototype] int ActionState;
 	[ExcludeFromPrototype] int ActionArg;
 	[ExcludeFromPrototype] int CurrActionFlags;
-	[ExcludeFromPrototype] int StarStealCount;
-	[ExcludeFromPrototype] PlayerAction StompAction;
 	[ExcludeFromPrototype] EntityRef ActionObject;
+
+	// Stomping
+	[ExcludeFromPrototype] PlayerAction StompAction;
+	[ExcludeFromPrototype] int StarStealCount;
 
 	// Walk/Running
     [ExcludeFromPrototype] bool FacingRight;
