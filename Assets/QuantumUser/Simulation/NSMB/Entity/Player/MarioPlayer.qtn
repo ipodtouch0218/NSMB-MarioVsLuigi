@@ -54,6 +54,7 @@ enum PlayerAction : Byte {
 	SpinBlockSpin,
     SpinBlockDrill,
     BlueShellCrouch,
+	BlueShellCrouchAir,
     BlueShellSliding,
     BlueShellJump,
     PropellerSpin,
@@ -68,27 +69,28 @@ enum PlayerAction : Byte {
 }
 
 enum ActionFlags : Int32 {
-    Intangible = 1,
-    BreaksBlocks = 2,
-    IsShelled = 4,
-    Attacking = 8,
-    NoPlayerBounce = 16,
-    NoEnemyBounce = 32,
-    AirAction = 64,
-    WaterAction = 128,
-    AllowBump = 256,
-    StrongAction = 512, // used for things like ground pounds
-	AllowHold = 1024,
-	Cutscene = 2048,
-	CameraChange = 4096,
-	DisableTurnaround = 8192,
-	DisablePushing = 16384,
-	UsesSmallHitbox = 32768,
-	UsesCrouchHitbox = 65536,
-	KillMiniStomp = 131072,
-	StarSpinAction = 262144,
-	IrregularVelocity = 524288,
-	Holding = 1048576,
+    Intangible = 1,				// makes Mario intangible if added
+    BreaksBlocks = 2,			// allows Mario to break blocks
+    IsShelled = 4,				// Blue Shell action
+    Attacking = 8,				// hurts enemies
+    NoPlayerBounce = 16,		// disable bounce off players
+    NoEnemyBounce = 32,			// disable bounce off enemies
+    AirAction = 64,				// if the action is in the air
+    WaterAction = 128,			// if the action is in the water
+    AllowBump = 256,			// allows bumping into other players
+    StrongAction = 512,			// makes the special particles spawn when killing enemies
+	AllowHold = 1024,			// allows Mario to pick up items
+	Cutscene = 2048,			// cutscene-like properties
+	CameraChange = 4096,		// changes the way the camera moves (i.e Propeller Spin)
+	DisableTurnaround = 8192,	// disables turn around by left and right
+	DisablePushing = 16384,		// disables pushing
+	UsesSmallHitbox = 32768,	// use the small hitbox even if Mario's big
+	UsesCrouchHitbox = 65536,	// use the crouch hitbox
+	KillMiniStomp = 131072,		// kills Mini players if above
+	StarSpinAction = 262144,	// makes Mario do the star sommersault
+	IrregularVelocity = 524288, // velocity isn't controlled by the regular left and right inputs
+	Holding = 1048576,			// Mario is holding something in the action
+	OverrideAll = 2097152,		// skip every method only letting the HandleActions method run
 }
 
 component MarioPlayer {

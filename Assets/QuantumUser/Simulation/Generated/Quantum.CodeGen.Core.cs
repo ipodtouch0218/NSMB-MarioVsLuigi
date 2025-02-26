@@ -71,6 +71,7 @@ namespace Quantum {
     StarSpinAction = 262144,
     IrregularVelocity = 524288,
     Holding = 1048576,
+    OverrideAll = 2097152,
   }
   public enum GameState : byte {
     PreGameRoom,
@@ -110,6 +111,7 @@ namespace Quantum {
     SpinBlockSpin,
     SpinBlockDrill,
     BlueShellCrouch,
+    BlueShellCrouchAir,
     BlueShellSliding,
     BlueShellJump,
     PropellerSpin,
