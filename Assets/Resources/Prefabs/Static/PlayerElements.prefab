@@ -9247,9 +9247,8 @@ GameObject:
   - component: {fileID: 4001773746480381555}
   - component: {fileID: 2514710803567660230}
   - component: {fileID: 129225791480229248}
+  - component: {fileID: 1691672296026432118}
   - component: {fileID: 2804282441104696034}
-  - component: {fileID: 7361790315754596193}
-  - component: {fileID: 6479589915706582879}
   m_Layer: 5
   m_Name: StoredItem
   m_TagString: Untagged
@@ -9317,6 +9316,24 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!111 &1691672296026432118
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4064374408395516847}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 25009e65bfed3352f904c177546ac934, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 0f3c6958b5fc3ef8ebe1e2f23c15f131, type: 2}
+  - {fileID: 7400000, guid: 673b15a006f96b576b8b1f1feb624950, type: 2}
+  - {fileID: 7400000, guid: 25009e65bfed3352f904c177546ac934, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!114 &2804282441104696034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9346,54 +9363,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &7361790315754596193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4064374408395516847}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22e5793cd3bc8532fbca6abdd4c81b3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  staticStartedCallback:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 9097301694252427416}
-        m_TargetAssemblyTypeName: UIUpdater, Assembly-CSharp
-        m_MethodName: OnReserveItemStaticStarted
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
---- !u!95 &6479589915706582879
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4064374408395516847}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 6c8adac7a5d598a3d97ee15740f86c8a, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4099086245890618279
 GameObject:
   m_ObjectHideFlags: 0
@@ -14923,7 +14892,7 @@ MonoBehaviour:
   itemColor: {fileID: 2133906945429794286}
   deathFade: {fileID: 4930218725579375668}
   boos: {fileID: 6223832221889303903}
-  reserveAnimator: {fileID: 6479589915706582879}
+  reserveAnimation: {fileID: 1691672296026432118}
   winText: {fileID: 8775046895323857938}
   winTextAnimator: {fileID: 8157540372676150971}
 --- !u!114 &8974932381927139425
@@ -15247,7 +15216,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 89.95
+  m_fontSize: 90
   m_fontSizeBase: 42
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -16867,7 +16836,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &778448273675168382
 CanvasRenderer:

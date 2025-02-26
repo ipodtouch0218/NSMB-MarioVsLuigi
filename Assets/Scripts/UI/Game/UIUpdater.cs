@@ -15,11 +15,6 @@ using UnityEngine.UI;
 namespace NSMB.UI.Game {
     public unsafe class UIUpdater : MonoBehaviour {
 
-        //---Static Variables
-        private static readonly int ParamIn = Animator.StringToHash("in");
-        private static readonly int ParamOut = Animator.StringToHash("out");
-        private static readonly int ParamHasItem = Animator.StringToHash("has-item");
-
         //---Properties
         public EntityRef Target => playerElements.Entity;
 
@@ -31,7 +26,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
         [SerializeField] private GameObject boos;
-        [SerializeField] private Animator reserveAnimator;
+        [SerializeField] private Animation reserveAnimation;
 
         [SerializeField] private TMP_Text winText;
         [SerializeField] private Animator winTextAnimator;
@@ -50,7 +45,7 @@ namespace NSMB.UI.Game {
         private VersusStageData stage;
         private EntityRef previousTarget;
 
-        private Coroutine endGameSequenceCoroutine;
+        private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
         public void OnEnable() {
             MarioPlayerAnimator.MarioPlayerInitialized += OnMarioInitialized;
@@ -173,28 +168,35 @@ namespace NSMB.UI.Game {
 
         private void UpdateStoredItemUI(MarioPlayer* mario, bool playAnimation) {
             PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario->ReserveItem);
-            reserveAnimator.SetBool(ParamHasItem, powerup && powerup.ReserveSprite);
-
-            if (!powerup) {
-                if (playAnimation && previousPowerup != powerup) {
-                    reserveAnimator.SetTrigger(ParamOut);
-                    previousPowerup = powerup;
-                }
+            if (previousPowerup == powerup) {
                 return;
             }
 
-            itemReserve.sprite = powerup.ReserveSprite ? powerup.ReserveSprite : storedItemNull;
-            if (playAnimation && previousPowerup != powerup) {
-                reserveAnimator.SetTrigger(ParamIn);
-                previousPowerup = powerup;
+            // New powerup
+            if (reserveSummonCoroutine != null) {
+                StopCoroutine(reserveSummonCoroutine);
+                reserveSummonCoroutine = null;
             }
+            if (playAnimation) {
+                if (powerup) {
+                    reserveAnimation.Play("reserve-in");
+                    itemReserve.sprite = powerup.ReserveSprite;
+                } else {
+                    reserveAnimation.Play("reserve-out");
+                    reserveSummonCoroutine = StartCoroutine(ReserveSummonCoroutine());
+                }
+            } else {
+                itemReserve.sprite = (powerup && powerup.ReserveSprite) ? powerup.ReserveSprite : storedItemNull;
+                reserveAnimation.Play();
+            }
+            previousPowerup = powerup;
         }
 
-        // The "reserve-static" animation is just for the "No Item" sprite to not do the bopping idling movement.
-        // We gotta wait for the "reserve-summon" animation, which always auto-exits to the static one,
-        // to finish before swapping to the "No Item" sprite.
-        public void OnReserveItemStaticStarted() {
+        private IEnumerator ReserveSummonCoroutine() {
+            yield return new WaitForSeconds(reserveAnimation.GetClip("reserve-out").length);
             itemReserve.sprite = storedItemNull;
+            reserveAnimation.Play();
+            reserveSummonCoroutine = null;
         }
 
         private void OnStartCameraFadeOut(EventStartCameraFadeOut e) {
