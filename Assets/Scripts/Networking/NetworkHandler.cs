@@ -239,10 +239,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         var manager = ReplayListManager.Instance;
         if (manager) {
             var deletions = manager.GetTemporaryReplaysToDelete();
-            foreach (var replay in deletions) {
-                Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.GetDisplayName()}' ({replay.FilePath}) to make room.");
-                File.Delete(replay.FilePath);
-                manager.RemoveReplay(replay);
+            if (deletions != null) {
+                foreach (var replay in deletions) {
+                    Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.GetDisplayName()}' ({replay.FilePath}) to make room.");
+                    File.Delete(replay.FilePath);
+                    manager.RemoveReplay(replay);
+                }
             }
         }
 
@@ -376,7 +378,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
         Runner.Game.AddPlayer(new RuntimePlayer {
             PlayerNickname = Settings.Instance.generalNickname ?? "noname",
-            UserId = default(Guid).ToString(),
+            UserId = Client.UserId,
             UseColoredNickname = Settings.Instance.generalUseNicknameColor,
             Character = (byte) Settings.Instance.generalCharacter,
             Palette = (byte) Settings.Instance.generalPalette,

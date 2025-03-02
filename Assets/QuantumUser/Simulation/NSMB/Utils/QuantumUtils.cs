@@ -207,7 +207,7 @@ public static unsafe class QuantumUtils {
         int? winningTeam = null;
         bool tie = false;
 
-        Span<byte> teamStars = stackalloc byte[10];
+        Span<byte> teamStars = stackalloc byte[Constants.MaxPlayers];
         GetTeamStars(f, teamStars);
 
         for (int i = 0; i < 10; i++) {
@@ -277,7 +277,7 @@ public static unsafe class QuantumUtils {
     }
 
     public static byte GetFirstPlaceStars(Frame f) {
-        Span<byte> teamStars = stackalloc byte[10];
+        Span<byte> teamStars = stackalloc byte[Constants.MaxPlayers];
         GetTeamStars(f, teamStars);
 
         byte max = 0;

@@ -46,6 +46,11 @@ public class VersusStageBaker : MapDataBakerCallback {
         if (!stage.OverrideAutomaticCameraSettings) {
             stage.CameraMinPosition = stage.TilemapWorldPosition + (((Vector2) stage.TileOrigin).ToFPVector2() / 2);
             stage.CameraMaxPosition = stage.CameraMinPosition + (((Vector2) stage.TileDimensions).ToFPVector2() / 2);
+
+            if (stage.IsWrappingLevel) {
+                stage.CameraMinPosition.X = -1000;
+                stage.CameraMaxPosition.X = 1000;
+            }
             // Adjust so we don't see the absolute bottom of the stage.
             stage.CameraMinPosition += FPVector2.Up * FP._1_50;
             LogInfo($"Automatically found camera bounds: min={stage.CameraMinPosition} max={stage.CameraMaxPosition}");
@@ -202,8 +207,9 @@ public class VersusStageBaker : MapDataBakerCallback {
                 List<Vector2> vertices = new();
                 sprite.GetPhysicsShape(i, vertices);
                 data.Shapes[i].Vertices = vertices
-                    .Select(v2 => new FPVector2(FP.FromFloat_UNSAFE(v2.x), FP.FromFloat_UNSAFE(v2.y)))
+                    .Select(v2 => v2.ToFPVector2())
                     .ToArray();
+                FPVector2.MakeCounterClockWise(data.Shapes[i].Vertices);
             }
             return data;
         default:

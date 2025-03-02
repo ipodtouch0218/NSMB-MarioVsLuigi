@@ -402,7 +402,7 @@ public class ReplayListManager : Selectable {
     public int? GetReplaysUntilDeletion(Replay replay) {
         int max = Settings.Instance.generalMaxTempReplays;
         int index = temporaryReplays.IndexOf(r => r == replay);
-        if (max == 0 || !replay.IsTemporary || index == -1) {    
+        if (max <= 0 || !replay.IsTemporary || index == -1) {    
             return null;
         }
 
@@ -410,6 +410,10 @@ public class ReplayListManager : Selectable {
     }
 
     public List<Replay> GetTemporaryReplaysToDelete() {
+        if (Settings.Instance.generalMaxTempReplays <= 0) {
+            return null;
+        }
+
         List<Replay> replaysToDelete = new();
 
         foreach (var replay in temporaryReplays) {

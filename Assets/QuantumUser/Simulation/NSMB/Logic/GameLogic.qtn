@@ -1,4 +1,5 @@
 #pragma max_players 10
+#define MaxPlayers 10
 
 global {
 	GameRules Rules;	
@@ -9,7 +10,7 @@ global {
 	ushort PlayerLoadFrames;
 
 	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
-	array<PlayerInformation>[10] PlayerInfo;
+	array<PlayerInformation>[MaxPlayers] PlayerInfo;
 	byte RealPlayers;
 	byte TotalMarios;
 
