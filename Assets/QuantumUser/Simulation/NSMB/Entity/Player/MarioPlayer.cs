@@ -51,9 +51,9 @@ namespace Quantum {
                 PlayerAction.Wallkick               => ActionFlags.AirAction,
                 PlayerAction.GroundPound            => ActionFlags.AirAction | ActionFlags.DisableTurnaround | ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction | ActionFlags.IrregularVelocity, // the 3 stars flag gets applied later
                 // PlayerAction.MiniGroundPound        => (int) (ActionFlags.AirAction), // has player bounce
-                PlayerAction.SoftKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
-                PlayerAction.NormalKnockback        => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
-                PlayerAction.HardKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround,
+                PlayerAction.SoftKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
+                PlayerAction.NormalKnockback        => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
+                PlayerAction.HardKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
                 PlayerAction.SpinBlockSpin          => ActionFlags.AirAction | ActionFlags.CameraChange,
                 PlayerAction.SpinBlockDrill         => ActionFlags.AirAction | ActionFlags.NoPlayerBounce,
                 PlayerAction.BlueShellCrouch        => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,

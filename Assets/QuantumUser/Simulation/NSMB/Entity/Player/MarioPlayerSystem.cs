@@ -2,8 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using System.Drawing.Drawing2D;
-using UnityEditor.Experimental.GraphView;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -155,6 +153,8 @@ namespace Quantum {
             var entity = filter.Entity;
             var inputs = filter.Inputs;
 
+            mario->SetPlayerAction(PlayerAction.SoftKnockback, f, 3);
+            return;
             if (!inputs.Down.IsDown) {
                 mario->SetPlayerAction(physicsObject->Velocity.X == 0 ? PlayerAction.Idle : PlayerAction.Walk, f);
                 return;
@@ -608,14 +608,55 @@ namespace Quantum {
                 }
             } else if (mario->ActionState == 1) {
                 int getUpTimes = mario->Action switch {
-                    PlayerAction.NormalKnockback => 30,
-                    PlayerAction.HardKnockback => 30,
-                    PlayerAction.SoftKnockback => 60,
+                    PlayerAction.NormalKnockback => 10,
+                    PlayerAction.HardKnockback => 10,
+                    PlayerAction.SoftKnockback => 30,
                     _ => -1,
                 };
 
-                if (!physicsObject->IsTouchingGround && !weak) {
-                    mario->ActionTimer = 0;
+                if (!physicsObject->IsTouchingGround) {
+                    if (!weak) mario->ActionTimer = 0;
+                } else {
+                    FP[] maxArray = physics.WalkMaxVelocity;
+
+                    FP xVel = physicsObject->Velocity.X;
+                    FP xVelAbs = FPMath.Abs(xVel);
+                    int sign = FPMath.SignInt(xVel);
+                    bool uphill = FPMath.Abs(physicsObject->FloorAngle) > physics.SlideMinimumAngle && FPMath.SignInt(physicsObject->FloorAngle) != sign;
+
+                    FP max = maxArray[physics.WalkSpeedStage] += CalculateSlopeMaxSpeedOffset(FPMath.Abs(physicsObject->FloorAngle) * (uphill ? 1 : -1));
+                    FP maxAcceleration = FPMath.Abs(max - xVelAbs) * f.UpdateRate;
+
+                    FP angle = FPMath.Abs(physicsObject->FloorAngle);
+                    FP acc;
+                    int walkStage = mario->GetSpeedStage(physicsObject, physics);
+                    /*if (swimming) {
+                        if (physicsObject->IsTouchingGround) {
+                            acc = mario->CurrentPowerupState == PowerupState.BlueShell ? physics.SwimWalkShellAcceleration[walkStage] : physics.SwimWalkAcceleration[walkStage];
+                        } else {
+                            acc = mario->CurrentPowerupState == PowerupState.BlueShell ? physics.SwimShellAcceleration[walkStage] : physics.SwimAcceleration[walkStage];
+                        }
+                    } else */if (physicsObject->IsOnSlipperyGround) {
+                        acc = physics.WalkIceAcceleration[walkStage];
+                    } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                        acc = physics.WalkMegaAcceleration[walkStage];
+                    } else {
+                        acc = physics.WalkAcceleration[walkStage];
+                    }
+                    FPMath.Clamp(acc, -maxAcceleration, maxAcceleration);
+                    acc = -physics.KnockbackDeceleration;
+
+                    FP newX = xVel + acc * f.DeltaTime * sign;
+                    FP target = (angle > 30 && physicsObject->IsOnSlideableGround) ? FPMath.Sign(physicsObject->FloorAngle) * physics.WalkMaxVelocity[0] : 0;
+                    if ((sign == -1) ^ (newX <= target)) {
+                        newX = target;
+                    }
+
+                    physicsObject->Velocity.X = newX;
+
+                    if (physicsObject->Velocity.X <= 0 && !weak) {
+                        mario->ActionTimer = 0;
+                    }
                 }
 
                 if (mario->ActionTimer >= getUpTimes) {
