@@ -1,13 +1,17 @@
 using Photon.Deterministic;
 using System;
+using System.Drawing.Drawing2D;
+using static Quantum.Core.FrameBase;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
 
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
-        public bool IsWallsliding => WallslideLeft || WallslideRight;
-        public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
+        public bool IsCrouchedInShell => Action == PlayerAction.BlueShellCrouch;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+        public bool IsDead => Action is PlayerAction.Death or PlayerAction.LavaDeath;
+        public const int DropStarRight = 1 << 8;
+        public const int NoStarLoss = -1;
 
         public byte GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
@@ -16,6 +20,206 @@ namespace Quantum {
             } else {
                 return data->RealTeam;
             }
+        }
+
+        public int GetDeathArgs(Frame f) {
+            if (!f.Global->Rules.IsLivesEnabled || Lives > 0) {
+                return 0;
+            } else {
+                return 2;
+            }
+        }
+
+        public ActionFlags GetActionFlags(PlayerAction action) {
+            return action switch {
+                PlayerAction.Idle                   => ActionFlags.AllowBump,
+                PlayerAction.Walk                   => ActionFlags.AllowBump | ActionFlags.AllowHold,
+                PlayerAction.Skidding               => ActionFlags.AllowBump,
+                PlayerAction.Crouch                 => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
+                PlayerAction.CrouchAir              => ActionFlags.AllowBump | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction,
+                PlayerAction.Sliding                => ActionFlags.AllowBump | ActionFlags.Attacking | ActionFlags.IrregularVelocity,
+                // PlayerAction.Bounce                 => 0 all this action does is set to another action
+                PlayerAction.SingleJump             => ActionFlags.AllowBump | ActionFlags.AllowHold | ActionFlags.AirAction,
+                PlayerAction.DoubleJump             => ActionFlags.AllowBump | ActionFlags.AllowHold | ActionFlags.AirAction,
+                PlayerAction.TripleJump             => ActionFlags.AllowBump | ActionFlags.AllowHold |ActionFlags.AirAction,
+                PlayerAction.Freefall               => ActionFlags.AllowBump | ActionFlags.AllowHold | ActionFlags.AirAction,
+                PlayerAction.HoldIdle               => ActionFlags.AllowBump | ActionFlags.Holding,
+                PlayerAction.HoldWalk               => ActionFlags.AllowBump | ActionFlags.Holding,
+                PlayerAction.HoldJump               => ActionFlags.AllowBump | ActionFlags.Holding | ActionFlags.AirAction,
+                PlayerAction.HoldFall               => ActionFlags.AllowBump | ActionFlags.Holding | ActionFlags.AirAction,
+                PlayerAction.WallSlide              => ActionFlags.AirAction,
+                PlayerAction.Wallkick               => ActionFlags.AirAction,
+                PlayerAction.GroundPound            => ActionFlags.AirAction | ActionFlags.DisableTurnaround | ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction | ActionFlags.IrregularVelocity, // the 3 stars flag gets applied later
+                // PlayerAction.MiniGroundPound        => (int) (ActionFlags.AirAction), // has player bounce
+                PlayerAction.SoftKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
+                PlayerAction.NormalKnockback        => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
+                PlayerAction.HardKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
+                PlayerAction.SpinBlockSpin          => ActionFlags.AirAction | ActionFlags.CameraChange,
+                PlayerAction.SpinBlockDrill         => ActionFlags.AirAction | ActionFlags.NoPlayerBounce,
+                PlayerAction.BlueShellCrouch        => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
+                PlayerAction.BlueShellCrouchAir     => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
+                PlayerAction.BlueShellSliding       => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.BreaksBlocks | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.NoPlayerBounce | ActionFlags.IrregularVelocity,
+                PlayerAction.BlueShellJump          => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction | ActionFlags.IrregularVelocity, // the no player bounce based off ActionArg
+                // PlayerAction.BlueShellGroundPound   => (int) (ActionFlags.IsShelled | ActionFlags.AirAction | ActionFlags.NoPlayerBounce),
+                PlayerAction.PropellerSpin          => ActionFlags.AirAction | ActionFlags.CameraChange,
+                // PlayerAction.PropellerFall          => (int) (ActionFlags.AirAction | ActionFlags.Takes1Star | ActionFlags.GivesNormalKnockback),
+                PlayerAction.PropellerDrill         => ActionFlags.AirAction,
+                PlayerAction.MegaMushroom           => ActionFlags.Cutscene | ActionFlags.OverrideAll,
+                PlayerAction.PowerupShoot           => ActionFlags.AllowBump,
+                PlayerAction.Pushing                => ActionFlags.AllowBump,
+                PlayerAction.Death                  => ActionFlags.Cutscene | ActionFlags.Intangible | ActionFlags.OverrideAll,
+                PlayerAction.LavaDeath              => ActionFlags.Cutscene | ActionFlags.Intangible | ActionFlags.OverrideAll,
+                PlayerAction.Respawning             => ActionFlags.Cutscene | ActionFlags.Intangible,
+                PlayerAction.EnteringPipe           => ActionFlags.Cutscene | ActionFlags.Intangible,
+                _                                   => 0 // null
+            };
+        }
+
+        public void DropItem(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* heldItem)) {
+                heldItem->Throw(f, entity, true);
+            }
+        }
+
+        public void ThrowItem(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* heldItem)) {
+                heldItem->Throw(f, entity, false);
+            }
+        }
+
+        public void DiscardItem(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* heldItem)) {
+                heldItem->DropWithoutThrowing(f, entity);
+            }
+        }
+
+        public PlayerAction SetPlayerAction(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default, bool throwItem = false, bool dropItem = false, bool discardItem = false, EntityRef actionObjectB = default) {
+            PrevAction = Action;
+            PreActionInput = default;
+            if (PlayerRef.IsValid && f.GetPlayerInput(PlayerRef) != null) {
+                PreActionInput = *f.GetPlayerInput(PlayerRef);
+            }
+
+            if (throwItem) {
+                ThrowItem(f, actionObjectB);
+            } else if (dropItem) {
+                DropItem(f, actionObjectB);
+            } else if (discardItem) {
+                DiscardItem(f, actionObjectB);
+            }
+
+            Action = playerAction;
+
+            ActionTimer = 0;
+            ActionState = 0;
+            ActionArg = arg;
+            ActionObject = actionObject;
+
+            StarStealCount = NoStarLoss;
+            StompAction = default;
+            SetActionFlags(GetActionFlags(Action));
+
+            UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}] with Arg [{arg}]");
+            return Action;
+        }
+
+        public bool SetPlayerActionOnce(PlayerAction playerAction, Frame f, int arg = 0, EntityRef actionObject = default) {
+            if (Action == playerAction) {
+                return false;
+            }
+            SetPlayerAction(playerAction, f, arg, actionObject);
+            return true;
+        }
+
+        public PlayerAction? SetGroundAction(PhysicsObject* physicsObject, Frame f, PlayerAction? groundAction = null, int actionArg = 0) {
+            if (physicsObject->IsTouchingGround) {
+                PlayerAction targetAction;
+                if (groundAction == null) {
+                    if (HasActionFlags(ActionFlags.Holding)) {
+                        targetAction = physicsObject->Velocity.X != 0 ? PlayerAction.HoldWalk : PlayerAction.HoldIdle;
+                    } else {
+                        targetAction = physicsObject->Velocity.X != 0 ? PlayerAction.Walk : PlayerAction.Idle;
+                    }
+                } else {
+                    targetAction = groundAction.GetValueOrDefault();
+                }
+                return SetPlayerAction(targetAction, f, actionArg);
+            }
+            return null;
+        }
+
+        public PlayerAction? SetAirAction(PhysicsObject* physicsObject, Frame f, PlayerAction? airAction = null, int actionArg = 0, bool ignCoyote = false) {
+            if (ignCoyote) {
+                CoyoteTimeFrames = 0;
+            }
+
+            if (!physicsObject->IsTouchingGround && (CoyoteTimeFrames <= 0)) {
+                PlayerAction targetAction;
+                if (airAction == null) {
+                    if (HasActionFlags(ActionFlags.Holding)) {
+                        targetAction = PlayerAction.HoldFall;
+                    } else {
+                        targetAction = PlayerAction.Freefall;
+                    }
+                } else {
+                    targetAction = airAction.GetValueOrDefault();
+                }
+                return SetPlayerAction(targetAction, f, actionArg);
+            }
+            return null;
+        }
+
+        public bool HasActionFlags(ActionFlags actionFlags) {
+            return (this.CurrActionFlags & (int)actionFlags) != 0;
+        }
+
+        public void AddActionFlags(ActionFlags actionFlags) {
+            this.CurrActionFlags |= (int) actionFlags;
+        }
+
+        public void ClearActionFlags(ActionFlags actionFlags) {
+            this.CurrActionFlags &= ~(int) actionFlags;
+        }
+
+        public void ToggleActionFlags(ActionFlags actionFlags, bool add) {
+            if (!add) {
+                ClearActionFlags(actionFlags);
+            } else {
+                AddActionFlags(actionFlags);
+            }
+        }
+
+        public void SetActionFlags(ActionFlags actionFlags) {
+            this.CurrActionFlags = (int) actionFlags;
+        }
+
+        public void SetStompEvents(PlayerAction victimAction = PlayerAction.NormalKnockback, int starsToDrop = 1) {
+            this.StarStealCount = starsToDrop;
+            this.StompAction = victimAction;
+        }
+
+        public void ClearStompEvents() {
+            this.StarStealCount = NoStarLoss;
+            this.StompAction = default;
+        }
+
+        public bool CheckEntityBounce(Frame f, bool checkPlayer = false) {
+            // invincible players should never bounce
+            if (IsStarmanInvincible) {
+                return false;
+            }
+
+            if (!checkPlayer) {
+                if (HasActionFlags(ActionFlags.NoEnemyBounce)) {
+                    return false;
+                }
+            } else {
+                if (HasActionFlags(ActionFlags.NoPlayerBounce)) {
+                    return false;
+                }
+            }
+            SetPlayerAction(PlayerAction.Bounce, f);
+            return true;
         }
 
         public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
@@ -70,11 +274,9 @@ namespace Quantum {
             }
 
             return (input.Sprint.IsDown || forceHold)
-                && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
-                && !IsInKnockback && KnockbackGetupFrames == 0 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead
-                && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(item) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
-                && !IsGroundpounding && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown)
-                && !(aboveHead && physicsObject->IsUnderwater);
+                && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom
+                && (HasActionFlags(ActionFlags.AllowHold) || HasActionFlags(ActionFlags.Holding)) && (f.Exists(item) || physicsObject->IsTouchingGround)
+                && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown) && !(aboveHead && physicsObject->IsUnderwater);
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario, EntityRef item) {
@@ -84,8 +286,8 @@ namespace Quantum {
         public bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {
             return CurrentPowerupState == PowerupState.MegaMushroom
                 || IsStarmanInvincible
-                || IsInShell
-                || (includeSliding && (IsSliding || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
+                || HasActionFlags(ActionFlags.Attacking)
+                || (includeSliding && (Action == PlayerAction.Sliding || Action == PlayerAction.BlueShellSliding) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
         }
 
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
@@ -97,7 +299,7 @@ namespace Quantum {
                 } else {
                     arr = physicsInfo.SwimMaxVelocity;
                 }
-            } else if ((IsSpinnerFlying || IsPropellerFlying) && CurrentPowerupState != PowerupState.MegaMushroom) {
+            } else if ((Action == PlayerAction.SpinBlockSpin || Action == PlayerAction.PropellerSpin) && CurrentPowerupState != PowerupState.MegaMushroom) {
                 arr = physicsInfo.FlyingMaxVelocity;
             } else {
                 arr = physicsInfo.WalkMaxVelocity;
@@ -149,68 +351,6 @@ namespace Quantum {
             ReserveItem = newItem;
         }
 
-        public void Death(Frame f, EntityRef entity, bool fire, bool stars = true) {
-            if (IsDead) {
-                return;
-            }
-
-            IsDead = true;
-            FireDeath = fire;
-            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
-
-            PreRespawnFrames = 180;
-            RespawnFrames = 78;
-
-            if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
-                SpawnStars(f, entity, 1);
-                DeathAnimationFrames = (Stars > 0) ? (byte) 30 : (byte) 36;
-            } else {
-                if (stars) {
-                    SpawnStars(f, entity, 1);
-                }
-                DeathAnimationFrames = 36;
-            }
-
-            // OnSpinner = null;
-            CurrentPipe = default;
-            IsInShell = false;
-            IsPropellerFlying = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            IsSpinnerFlying = false;
-            IsDrilling = false;
-            IsSliding = false;
-            IsCrouching = false;
-            IsSkidding = false;
-            IsTurnaround = false;
-            IsGroundpounding = false;
-            IsInKnockback = false;
-            WallslideRight = false;
-            WallslideLeft = false;
-            SwimForceJumpTimer = 0;
-            
-            /*
-            IsWaterWalking = false;
-            IsFrozen = false;
-           
-            if (FrozenCube) {
-                Runner.Despawn(FrozenCube.Object);
-            }
-            */
-
-            if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
-                holdable->DropWithoutThrowing(f, HeldEntity);
-            }
-
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            physicsObject->IsFrozen = true;
-            physicsObject->DisableCollision = true;
-            physicsObject->CurrentData = default;
-
-            f.Signals.OnMarioPlayerDied(entity);
-            f.Events.MarioPlayerDied(f, entity, fire);
-        }
-
         public bool Powerdown(Frame f, EntityRef entity, bool ignoreInvincible) {
             if (!ignoreInvincible && !IsDamageable) {
                 return false;
@@ -221,8 +361,8 @@ namespace Quantum {
             switch (CurrentPowerupState) {
             case PowerupState.MiniMushroom:
             case PowerupState.NoPowerup: {
-                Death(f,entity, false);
-                break;
+                SetPlayerAction(PlayerAction.Death, f, GetDeathArgs(f), entity, discardItem: true);
+                return true;
             }
             case PowerupState.Mushroom: {
                 CurrentPowerupState = PowerupState.NoPowerup;
@@ -240,17 +380,8 @@ namespace Quantum {
             }
             }
 
-            IsDrilling &= !IsPropellerFlying;
-            IsPropellerFlying = false;
-            IsInShell = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            UsedPropellerThisJump = false;
-
-            if (!IsDead) {
-                DamageInvincibilityFrames = 2 * 60;
-                f.Events.MarioPlayerTookDamage(f, entity);
-            }
+            DamageInvincibilityFrames = 2 * 60;
+            f.Events.MarioPlayerTookDamage(f, entity);
             return true;
         }
 
@@ -259,18 +390,6 @@ namespace Quantum {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             bool fastStars = amount > 2 && Stars > 2;
             int starDirection = FacingRight ? 1 : 2;
-
-            if (f.Global->Rules.IsLivesEnabled && Lives == 0) {
-                fastStars = true;
-                NoLivesStarDirection = (byte) ((NoLivesStarDirection + 1) % 4);
-                starDirection = NoLivesStarDirection;
-
-                starDirection = starDirection switch {
-                    2 => 1,
-                    1 => 2,
-                    _ => starDirection
-                };
-            }
 
             int droppedStars = 0;
             while (amount > 0) {
@@ -305,158 +424,6 @@ namespace Quantum {
             }
         }
 
-        public void PreRespawn(Frame f, EntityRef entity, VersusStageData stage) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-
-            RespawnFrames = 78;
-
-            if ((f.Global->Rules.IsLivesEnabled && Lives == 0) || Disconnected) {
-                f.Destroy(entity);
-                return;
-            }
-
-            FPVector2 spawnpoint = stage.GetWorldSpawnpointForPlayer(SpawnpointIndex, f.Global->TotalMarios);
-            transform->Position = spawnpoint;
-            f.Unsafe.GetPointer<CameraController>(entity)->Recenter(stage, spawnpoint);
-            
-            IsDead = true;
-            f.Unsafe.GetPointer<Freezable>(entity)->FrozenCubeEntity = EntityRef.None;
-            IsRespawning = true;
-            FacingRight = true;
-            WallslideLeft = false;
-            WallslideRight = false;
-            WallslideEndFrames = 0;
-            WalljumpFrames = 0;
-            IsPropellerFlying = false;
-            UsedPropellerThisJump = false;
-            IsSpinnerFlying = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            JumpState = JumpState.None;
-            PreviousPowerupState = CurrentPowerupState = PowerupState.NoPowerup;
-            //animationController.DisableAllModels();
-            DamageInvincibilityFrames = 0;
-            InvincibilityFrames = 0;
-            MegaMushroomFrames = 0;
-            MegaMushroomStartFrames = 0;
-            MegaMushroomEndFrames = 0;
-            // f.ResolveHashSet(WaterColliders).Clear();
-            IsCrouching = false;
-            IsSliding = false;
-            IsTurnaround = false;
-            IsInKnockback = false;
-            IsGroundpounding = false;
-            IsSkidding = false;
-            IsInShell = false;
-            IsTurnaround = false;
-            SwimForceJumpTimer = 0;
-
-            physicsObject->IsFrozen = true;
-            physicsObject->Velocity = FPVector2.Zero;
-            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
-
-            f.Events.MarioPlayerPreRespawned(f, entity);
-        }
-
-        public void Respawn(Frame f, EntityRef entity) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-
-            IsDead = false;
-            IsRespawning = false;
-            DamageInvincibilityFrames = 120;
-            CoyoteTimeFrames = 0;
-            SwimForceJumpTimer = 0;
-
-            physicsObject->IsFrozen = false;
-            physicsObject->DisableCollision = false;
-
-            f.Events.MarioPlayerRespawned(f, entity);
-        }
-
-        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, bool weak, EntityRef attacker) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            if (physicsObject->IsUnderwater) {
-                weak = false;
-            }
-
-            if (IsInKnockback && ((IsInWeakKnockback && weak) || !IsInWeakKnockback)) {
-                return;
-            }
-
-            var freezable = f.Unsafe.GetPointer<Freezable>(entity);
-            if (DamageInvincibilityFrames > 0 || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
-                return;
-            }
-
-            if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
-                SpawnStars(f, entity, starsToDrop - 1);
-                Powerdown(f, entity, false);
-                return;
-            }
-
-            if (IsInKnockback || IsInWeakKnockback) {
-                starsToDrop = Math.Min(1, starsToDrop);
-            }
-
-            IsInKnockback = true;
-            IsInWeakKnockback = weak;
-            KnockbackWasOriginallyFacingRight = FacingRight;
-            KnockbackTick = f.Number;
-
-            //IsInForwardsKnockback = FacingRight != fromRight;
-            //KnockbackAttacker = attacker;
-
-            // Don't go into walls
-            var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
-
-            if (!weak && PhysicsObjectSystem.Raycast((FrameThreadSafe) f, null, transform->Position + collider->Shape.Centroid, fromRight ? FPVector2.Left : FPVector2.Right, FP._0_33, out _)) {
-                fromRight = !fromRight;
-            }
-
-            physicsObject->Velocity = new FPVector2(
-                (fromRight ? -1 : 1) *
-                    ((starsToDrop + 2) / (FP) 3) *
-                    FP._1_50 *
-                    (CurrentPowerupState == PowerupState.MegaMushroom ? 3 : 1) *
-                    (CurrentPowerupState == PowerupState.MiniMushroom ? FP._1_50 : 1) *
-                    (weak ? FP._0_50 : 1),
-
-                // Don't go upwards if we got hit by a fireball
-                f.Has<Projectile>(attacker) ? 0 : Constants._4_50
-            );
-
-            //IsOnGround = false;
-            //PreviousTickIsOnGround = false;
-            IsInShell = false;
-            IsGroundpounding = false;
-            IsSpinnerFlying = false;
-            IsPropellerFlying = false;
-            PropellerLaunchFrames = 0;
-            PropellerSpinFrames = 0;
-            IsSliding = false;
-            IsDrilling = false;
-            WallslideLeft = WallslideRight = false;
-
-            SpawnStars(f, entity, starsToDrop);
-            //HandleLayerState();
-            f.Events.MarioPlayerReceivedKnockback(f, entity, attacker, weak);
-        }
-
-        public void ResetKnockback(Frame f, EntityRef entity) {
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-            KnockbackGetupFrames = (byte) (IsInWeakKnockback || physicsObject->IsUnderwater ? 0 : 25);
-            DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
-            ////DoEntityBounce = false;
-            IsInKnockback = false;
-            IsInWeakKnockback = false;
-            //IsForwardsKnockback = false;
-            FacingRight = KnockbackWasOriginallyFacingRight;
-            
-            physicsObject->Velocity.X = 0;
-        }
-
         public void EnterPipe(Frame f, EntityRef mario, EntityRef pipe) {
             if (f.Exists(CurrentPipe)
                 || PipeCooldownFrames > 0) {
@@ -475,15 +442,9 @@ namespace Quantum {
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(mario);
             marioTransform->Position.X = pipeTransform->Position.X;
 
-            IsCrouching = false;
-            IsSliding = false;
-            IsPropellerFlying = false;
             UsedPropellerThisJump = false;
             PropellerLaunchFrames = 0;
             PropellerSpinFrames = 0;
-            IsSpinnerFlying = false;
-            IsInShell = false;
-            PipeEntering = true;
 
             if (InvincibilityFrames > 0) {
                 InvincibilityFrames += (ushort) (PipeFrames * 2);

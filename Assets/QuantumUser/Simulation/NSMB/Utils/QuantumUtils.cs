@@ -597,6 +597,18 @@ public static unsafe class QuantumUtils {
 
         return true;
     }
+
+    public static bool Increment(ref byte timer) {
+        return ++timer == 0;
+    }
+
+    public static bool Increment(ref ushort timer) {
+        return ++timer == 0;
+    }
+
+    public static bool Increment(ref int timer) {
+        return ++timer == 0;
+    }
 }
 
 public static class Extensions {

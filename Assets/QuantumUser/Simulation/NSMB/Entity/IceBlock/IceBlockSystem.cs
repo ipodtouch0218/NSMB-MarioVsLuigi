@@ -120,7 +120,7 @@ namespace Quantum {
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
             if (upDot >= PhysicsObjectSystem.GroundMaxAngle) {
                 // Top
-                if (mario->IsGroundpoundActive) {
+                if (mario->HasActionFlags(ActionFlags.StrongAction)) {
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.Groundpounded);
                     return;
                 }
@@ -131,10 +131,11 @@ namespace Quantum {
             } else {
                 // Side
                 bool rightContact = contact.Normal.X > 0;
-                if ((iceBlock->IsSliding && iceBlock->FacingRight == rightContact) || mario->IsInShell) {
+                if ((iceBlock->IsSliding && iceBlock->FacingRight == rightContact) || mario->HasActionFlags(ActionFlags.Attacking)) {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
                     bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->GetTeam(f) != holderMario->GetTeam(f);
-                    mario->DoKnockback(f, marioEntity, contact.Normal.X > 0, dropStars ? 1 : 0, !dropStars, iceBlockEntity);
+                    mario->SetPlayerAction(dropStars ? PlayerAction.NormalKnockback : PlayerAction.SoftKnockback, f,
+                        dropStars ? 1 : 0 + (contact.Normal.X > 0 ? MarioPlayer.DropStarRight : 0), iceBlockEntity);
 
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.HitWall);
                     return;

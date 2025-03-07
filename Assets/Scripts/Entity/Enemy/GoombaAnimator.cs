@@ -69,7 +69,7 @@ public unsafe class GoombaAnimator : QuantumEntityViewComponent {
         }
 
         if (e.IsSpecialKill) {
-            if (e.Frame.Unsafe.TryGetPointer(e.Killer, out MarioPlayer* mario) && mario->IsGroundpoundActive) {
+            if (e.Frame.Unsafe.TryGetPointer(e.Killer, out MarioPlayer* mario) && mario->HasActionFlags(ActionFlags.StrongAction)) {
                 Instantiate(specialKillParticle, transform.position + Vector3.up * 0.2f, Quaternion.identity);
             }
         } else {

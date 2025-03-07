@@ -70,26 +70,26 @@ namespace Quantum {
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
-            bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
+            bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
-                mario->DoEntityBounce |= mario->IsDrilling;
+                mario->CheckEntityBounce(f);
                 return;
             }
 
             if (attackedFromAbove) {
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                    if (mario->IsGroundpounding) {
-                        mario->IsGroundpounding = false;
+                    if (mario->HasActionFlags(ActionFlags.StrongAction)) {
+                        mario->SetPlayerAction(PlayerAction.Freefall, f);
                         goomba->Kill(f, goombaEntity, marioEntity, false);
                     }
-                    mario->DoEntityBounce = true;
+                    mario->CheckEntityBounce(f);
                 } else {
                     goomba->Kill(f, goombaEntity, marioEntity, false);
-                    mario->DoEntityBounce = !mario->IsGroundpounding;
+                    mario->CheckEntityBounce(f);
                 }
-
-                mario->IsDrilling = false;
+                if (mario->Action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
+                else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
 
             } else if (mario->IsCrouchedInShell) {
                 mario->FacingRight = damageDirection.X < 0;

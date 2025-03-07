@@ -31,10 +31,10 @@ namespace Quantum {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(holdable->Holder);
 
-            if (!mario->CanHoldItem(f, holdable->Holder, filter.Entity)) {
+            /*if (!mario->CanHoldItem(f, holdable->Holder, filter.Entity)) {
                 holdable->Throw(f, filter.Entity);
                 return;
-            }
+            }*/
 
             var physicsObject = filter.PhysicsObject;
             physicsObject->Velocity = FPVector2.Zero;

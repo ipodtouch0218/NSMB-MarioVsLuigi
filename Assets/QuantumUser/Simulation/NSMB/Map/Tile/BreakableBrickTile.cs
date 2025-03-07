@@ -27,22 +27,22 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
             if (mario->CurrentPowerupState < PowerupState.Mushroom) {
                 doBreak = direction switch {
                     // Small Mario
-                    InteractionDirection.Down when mario->IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.SmallMarioGroundpound),
-                    InteractionDirection.Down when mario->IsDrilling => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
+                    InteractionDirection.Down when mario->HasActionFlags(ActionFlags.BreaksBlocks) && mario->Action == PlayerAction.GroundPound => BreakingRules.HasFlag(BreakableBy.SmallMarioGroundpound),
+                    InteractionDirection.Down when mario->Action is PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill => BreakingRules.HasFlag(BreakableBy.SmallMarioDrill),
                     InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.SmallMario),
                     _ => false
                 };
             } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 // Mega Mario
                 doBreak = BreakingRules.HasFlag(BreakableBy.MegaMario);
-            } else if (mario->IsInShell) {
+            } else if (mario->HasActionFlags(ActionFlags.BreaksBlocks | ActionFlags.IsShelled)) {
                 // Blue Shell
                 doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
             } else {
                 doBreak = direction switch {
                     // Large Mario
-                    InteractionDirection.Down when mario->IsGroundpoundActive => BreakingRules.HasFlag(BreakableBy.LargeMarioGroundpound),
-                    InteractionDirection.Down when mario->IsDrilling => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
+                    InteractionDirection.Down when mario->HasActionFlags(ActionFlags.BreaksBlocks) && mario->Action == PlayerAction.GroundPound => BreakingRules.HasFlag(BreakableBy.LargeMarioGroundpound),
+                    InteractionDirection.Down when mario->Action is PlayerAction.PropellerDrill or PlayerAction.SpinBlockDrill => BreakingRules.HasFlag(BreakableBy.LargeMarioDrill),
                     InteractionDirection.Up => BreakingRules.HasFlag(BreakableBy.LargeMario),
                     _ => false
                 };

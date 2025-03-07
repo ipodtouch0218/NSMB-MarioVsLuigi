@@ -74,7 +74,7 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            nametag.SetActive(elements.Entity != Entity && !(mario->IsDead && mario->IsRespawning) && f.Global->GameState >= GameState.Playing);
+            nametag.SetActive(elements.Entity != Entity && !(mario->IsDead && mario->Action == PlayerAction.Respawning) && f.Global->GameState >= GameState.Playing);
             if (!nametag.activeSelf) {
                 return;
             }

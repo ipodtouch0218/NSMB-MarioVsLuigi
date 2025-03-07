@@ -225,7 +225,8 @@ namespace Quantum {
 
             if (newState == PowerupState.MegaMushroom) {
                 mario->MegaMushroomStartFrames = 90;
-                mario->IsSliding = false;
+                mario->SetGroundAction(marioPhysicsObject, f);
+                mario->SetAirAction(marioPhysicsObject, f);
                 if (marioPhysicsObject->IsTouchingGround) {
                     mario->JumpState = JumpState.None;
                 }
@@ -244,11 +245,8 @@ namespace Quantum {
             mario->PreviousPowerupState = mario->CurrentPowerupState;
             mario->CurrentPowerupState = newState;
             //mario->powerupFlash = 2;
-            mario->IsPropellerFlying = false;
             mario->UsedPropellerThisJump = false;
-            mario->IsDrilling &= mario->IsSpinnerFlying;
             mario->PropellerLaunchFrames = 0;
-            mario->IsInShell = false;
 
             // Don't give us an extra mushroom
             if (mario->PreviousPowerupState == PowerupState.NoPowerup

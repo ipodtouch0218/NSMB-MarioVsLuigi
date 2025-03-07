@@ -39,7 +39,7 @@ namespace Quantum {
             var camera = filter.Camera;
 
             FP targetSize;
-            if (mario->IsPropellerFlying || mario->IsSpinnerFlying) {
+            if (mario->HasActionFlags(ActionFlags.CameraChange)) {
                 targetSize = 8;
             } else {
                 targetSize = 7;
@@ -55,7 +55,7 @@ namespace Quantum {
             var transform = filter.Transform;
             var physicsObject = filter.PhysicsObject;
 
-            if (!mario->IsDead && !mario->IsRespawning) {
+            if (!mario->IsDead && mario->Action != PlayerAction.Respawning) {
                 camera->LastPlayerPosition = transform->Position;
             }
 
