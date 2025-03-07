@@ -108,6 +108,7 @@ synced event GameStarted {
 
 synced event GameEnded {
 	Frame Frame;
+	bool EndedByHost;
 	int WinningTeam;
 	bool HasWinner;
 }

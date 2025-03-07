@@ -33,7 +33,9 @@ public class ResultsHandler : MonoBehaviour {
     }
 
     private void OnGameEnded(EventGameEnded e) {
-        endingCoroutine = StartCoroutine(RunEndingSequence(e.Frame, delayUntilStart));
+        if (!e.EndedByHost) {
+            endingCoroutine = StartCoroutine(RunEndingSequence(e.Frame, delayUntilStart));
+        }
     }
 
     private IEnumerator RunEndingSequence(Frame f, float delay) {

@@ -375,10 +375,11 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventGameEnded GameEnded(Frame Frame, Int32 WinningTeam, QBoolean HasWinner) {
+      public EventGameEnded GameEnded(Frame Frame, QBoolean EndedByHost, Int32 WinningTeam, QBoolean HasWinner) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventGameEnded>(EventGameEnded.ID);
         ev.Frame = Frame;
+        ev.EndedByHost = EndedByHost;
         ev.WinningTeam = WinningTeam;
         ev.HasWinner = HasWinner;
         _f.AddEvent(ev);
@@ -1527,6 +1528,7 @@ namespace Quantum {
   public unsafe partial class EventGameEnded : EventBase {
     public new const Int32 ID = 31;
     public Frame Frame;
+    public QBoolean EndedByHost;
     public Int32 WinningTeam;
     public QBoolean HasWinner;
     protected EventGameEnded(Int32 id, EventFlags flags) : 
@@ -1547,6 +1549,7 @@ namespace Quantum {
       unchecked {
         var hash = 191;
         hash = hash * 31 + Frame.GetHashCode();
+        hash = hash * 31 + EndedByHost.GetHashCode();
         hash = hash * 31 + WinningTeam.GetHashCode();
         hash = hash * 31 + HasWinner.GetHashCode();
         return hash;

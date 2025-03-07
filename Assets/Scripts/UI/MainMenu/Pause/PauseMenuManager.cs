@@ -225,6 +225,7 @@ namespace NSMB.UI.Pause {
                 }
             }
             Unpause(false);
+            GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
         }
 
         public void ClickConfirmNo() {

@@ -329,9 +329,9 @@ namespace NSMB.UI.Game {
             itemColor.color = color;
         }
 
-        private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger) {
-            // Wait one second before playing the music 
-            yield return new WaitForSecondsRealtime(1);
+        private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger, float delay) {
+            // Wait before playing the music 
+            yield return new WaitForSecondsRealtime(delay);
 
             GlobalController.Instance.sfx.PlayOneShot(resultMusic);
             winTextAnimator.SetTrigger(resultAnimationTrigger);
@@ -376,9 +376,12 @@ namespace NSMB.UI.Game {
             TeamAsset[] allTeams = f.SimulationConfig.Teams;
             string resultText;
             string winner = null;
-            bool local;
+            bool local = false;
 
-            if (hasWinner) {
+            if (e.EndedByHost) {
+                resultText = tm.GetTranslation("ui.result.nocontest");
+                ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.nocontest", color: ChatManager.Red);
+            } else if (hasWinner) {
                 if (teamMode) {
                     // Winning team
                     winner = tm.GetTranslation(allTeams[e.WinningTeam].nameTranslationKey);
@@ -401,13 +404,15 @@ namespace NSMB.UI.Game {
             } else {
                 resultText = tm.GetTranslation("ui.result.draw");
                 ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.draw", color: ChatManager.Red);
-                local = false;
             }
             winText.text = resultText;
 
             SoundEffect resultMusic;
             string resultAnimationTrigger;
-            if (!hasWinner) {
+            if (e.EndedByHost) {
+                resultMusic = SoundEffect.UI_Match_Cancel;
+                resultAnimationTrigger = "startNoContest";
+            } else if (!hasWinner) {
                 resultMusic = SoundEffect.UI_Match_Draw;
                 resultAnimationTrigger = "startNegative";
             } else if (hasWinner && local) {
@@ -418,7 +423,7 @@ namespace NSMB.UI.Game {
                 resultAnimationTrigger = "startNegative";
             }
 
-            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger));
+            endGameSequenceCoroutine = StartCoroutine(EndGameSequence(resultMusic, resultAnimationTrigger, e.EndedByHost ? 0.5f : 1f));
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

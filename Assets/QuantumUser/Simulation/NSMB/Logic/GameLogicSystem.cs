@@ -115,7 +115,7 @@ namespace Quantum {
 
                 PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
                 if (f.GetPlayerCommand(host) is CommandHostEndGame) {
-                    EndGame(f, null);
+                    EndGame(f, true, null);
                 }
                 break;
 
@@ -171,12 +171,12 @@ namespace Quantum {
             if (oneOrNoTeamAlive) {
                 if (aliveTeam == -1) {
                     // It's a draw
-                    EndGame(f, null);
+                    EndGame(f, false, null);
                     return;
                 } else if (f.Global->RealPlayers > 1) {
                     // <team> wins, assuming more than 1 player
                     // so the player doesn't insta-win in a solo game.
-                    EndGame(f, aliveTeam);
+                    EndGame(f, false, aliveTeam);
                     return;
                 }
             }
@@ -186,7 +186,7 @@ namespace Quantum {
             // End Condition: team gets to enough stars
             if (winningTeam != null && stars >= f.Global->Rules.StarsToWin) {
                 // <team> wins
-                EndGame(f, winningTeam.Value);
+                EndGame(f, false, winningTeam.Value);
                 return;
             }
 
@@ -194,20 +194,20 @@ namespace Quantum {
             if (f.Global->Rules.IsTimerEnabled && f.Global->Timer <= 0) {
                 if (f.Global->Rules.DrawOnTimeUp) {
                     // It's a draw
-                    EndGame(f, null);
+                    EndGame(f, false, null);
                     return;
                 }
 
                 // Check if one team is winning
                 if (winningTeam != null) {
                     // <team> wins
-                    EndGame(f, winningTeam.Value);
+                    EndGame(f, false, winningTeam.Value);
                     return;
                 }
             }
         }
 
-        public static void EndGame(Frame f, int? winningTeam) {
+        public static void EndGame(Frame f, bool endedByHost, int? winningTeam) {
             if (f.Global->GameState != GameState.Playing) {
                 return;
             }
@@ -216,7 +216,7 @@ namespace Quantum {
             f.Global->HasWinner = winningTeam.HasValue;
 
             f.Signals.OnGameEnding(winningTeam.GetValueOrDefault(), winningTeam.HasValue);
-            f.Events.GameEnded(f, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
+            f.Events.GameEnded(f, endedByHost, winningTeam.GetValueOrDefault(), winningTeam.HasValue);
 
             var playerDatas = f.Filter<PlayerData>();
             playerDatas.UseCulling = false;
@@ -229,7 +229,7 @@ namespace Quantum {
 
             f.Global->GameState = GameState.Ended;
             f.Events.GameStateChanged(f, GameState.Ended);
-            f.Global->GameStartFrames = (ushort) (21 * f.UpdateRate);
+            f.Global->GameStartFrames = (ushort) ((endedByHost ? 3 + FP._0_50 : 21) * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
         }
 
