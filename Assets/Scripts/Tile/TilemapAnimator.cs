@@ -59,7 +59,7 @@ public class TilemapAnimator : MonoBehaviour {
         TileBase unityTile = tile ? tile.Tile : null;
         Matrix4x4 mat = Matrix4x4.TRS(default, Quaternion.Euler(0, 0, tileInstance.Rotation.AsFloat), new Vector3(tileInstance.Scale.X.AsFloat, tileInstance.Scale.Y.AsFloat, 1));
 
-        Debug.Log($"tile event cancelled at {coords}. Was {tilemap.GetTile(coords)?.name}, changing back to {unityTile}");
+        // Debug.Log($"tile event cancelled at {coords}. Was {tilemap.GetTile(coords)?.name}, changing back to {unityTile}");
 
         tilemap.SetTile(coords, unityTile);
         tilemap.SetTransformMatrix(coords, mat);
@@ -70,7 +70,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     private void OnEventConfirmed(CallbackEventConfirmed e) {
         if (tileEventPositions.TryGetValue(e.EventKey, out Vector3Int coords)) {
-            Debug.Log($"tile event CONFIRMED at {coords}.");
+            // Debug.Log($"tile event CONFIRMED at {coords}.");
         }
         tileEventPositions.Remove(e.EventKey);
     }
@@ -103,11 +103,7 @@ public class TilemapAnimator : MonoBehaviour {
                 audio.Stop();
             }
 
-            sfx.PlayOneShot(
-                e.Frame.Unsafe.TryGetPointer(e.Entity, out MarioPlayer* mario) && mario->CurrentPowerupState == PowerupState.MegaMushroom
-                    ? SoundEffect.Powerup_MegaMushroom_Break_Block
-                    : SoundEffect.World_Block_Break);
-
+            sfx.PlayOneShot(e.BrokenByMega ? SoundEffect.Powerup_MegaMushroom_Break_Block : SoundEffect.World_Block_Break);
             entityBreakBlockSounds[e.Entity] = sfx;
         }
 

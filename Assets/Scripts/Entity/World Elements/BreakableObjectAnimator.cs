@@ -34,7 +34,7 @@ public unsafe class BreakableObjectAnimator : QuantumEntityViewComponent {
             return;
         }
 
-        var pipe = e.Frame.Unsafe.GetPointer<BreakableObject>(e.Entity);
+        var pipe = VerifiedFrame.Unsafe.GetPointer<BreakableObject>(e.Entity);
 
         SimplePhysicsMover particle = Instantiate(breakPrefab, transform.position, transform.rotation);
         //particle.transform.localScale = transform.localScale;

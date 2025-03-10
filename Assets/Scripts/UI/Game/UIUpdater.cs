@@ -362,13 +362,13 @@ namespace NSMB.UI.Game {
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.Starting) {
                 foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
-                    entityTrackIcons[mario] = CreateTrackIcon(e.Frame, mario.EntityRef, mario.transform);
+                    entityTrackIcons[mario] = CreateTrackIcon(e.Game.Frames.Predicted, mario.EntityRef, mario.transform);
                 }
             }
         }
 
         private void OnGameEnded(EventGameEnded e) {
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Verified;
             bool teamMode = f.Global->Rules.TeamsEnabled;
             bool hasWinner = e.HasWinner;
 

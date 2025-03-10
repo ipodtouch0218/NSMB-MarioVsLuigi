@@ -8,31 +8,35 @@ component Enemy {
 	[ExcludeFromPrototype] bool FacingRight;
 }
 
-signal OnEnemyDespawned(entity_ref entity);
-signal OnEnemyRespawned(entity_ref entity);
-signal OnEnemyEnemyCollision(entity_ref a, entity_ref b);
-signal OnEnemyKilledByStageReset(entity_ref entity);
-signal OnEnemyTurnaround(entity_ref entity);
+signal OnEnemyDespawned(EntityRef entity);
+signal OnEnemyRespawned(EntityRef entity);
+signal OnEnemyEnemyCollision(EntityRef a, EntityRef b);
+signal OnEnemyKilledByStageReset(EntityRef entity);
+signal OnEnemyTurnaround(EntityRef entity);
+
+enum KillReason {
+	Normal,
+	Special,
+	Groundpounded,
+	InWall
+}
 
 event EnemyDespawned {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event EnemyKilled {
-	nothashed Frame Frame;
-	entity_ref Enemy;
-	entity_ref Killer;
-	bool IsSpecialKill;
+	EntityRef Enemy;
+	EntityRef Killer;
+	KillReason KillReason;
+	nothashed FPVector2 EnemyCenter;
 }
 
 event PlayComboSound {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	nothashed byte Combo;
 }
 
 event PlayBumpSound {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }

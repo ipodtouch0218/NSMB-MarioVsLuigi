@@ -2,11 +2,11 @@ component BulletBill {
 	FP Speed;
 	FP DespawnRadius;
 	[ExcludeFromPrototype] byte DespawnFrames;
-	[ExcludeFromPrototype] entity_ref Owner;
+	[ExcludeFromPrototype] EntityRef Owner;
 }
 
 component BulletBillLauncher {
-	asset_ref<EntityPrototype> BulletBillPrototype;
+	AssetRef<EntityPrototype> BulletBillPrototype;
 	ushort TimeToShoot;
 	FP MinimumShootRadius;
 	FP MaximumShootRadius;
@@ -15,12 +15,11 @@ component BulletBillLauncher {
 }
 
 event BulletBillHitByProjectile {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event BulletBillLauncherShoot {
-	nothashed Frame Frame;
-	entity_ref Entity;
-	entity_ref NewBulletBill;
+	EntityRef Entity;
+	EntityRef NewBulletBill;
+	bool Right;
 }

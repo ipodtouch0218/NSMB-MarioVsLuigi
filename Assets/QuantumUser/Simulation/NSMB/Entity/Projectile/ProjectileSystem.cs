@@ -71,7 +71,7 @@ namespace Quantum {
 
         public static void Destroy(Frame f, EntityRef entity, ParticleEffect particle) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            f.Events.ProjectileDestroyed(f, entity, particle, transform->Position);
+            f.Events.ProjectileDestroyed(entity, particle, transform->Position);
             f.Destroy(entity);
         }
 

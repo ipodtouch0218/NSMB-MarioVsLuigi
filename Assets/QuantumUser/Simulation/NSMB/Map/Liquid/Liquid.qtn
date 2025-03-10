@@ -5,17 +5,16 @@ component Liquid {
 	int WidthTiles;
 	FP HeightTiles;
 
-	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<entity_ref> SplashedEntities;
-	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<entity_ref> UnderwaterEntities;
+	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<EntityRef> SplashedEntities;
+	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<EntityRef> UnderwaterEntities;
 }
 
 signal OnTryLiquidSplash(EntityRef entity, EntityRef liquid, bool exit, bool* doSplash);
 signal OnEntityEnterExitLiquid(EntityRef entity, EntityRef liquid, bool underwater);
 
 event LiquidSplashed {
-	nothashed Frame Frame;
-	entity_ref Entity;
-	entity_ref Splasher;
+	EntityRef Entity;
+	EntityRef Splasher;
 	nothashed FP Force;
 	nothashed FPVector2 Position;
 	bool Exit;

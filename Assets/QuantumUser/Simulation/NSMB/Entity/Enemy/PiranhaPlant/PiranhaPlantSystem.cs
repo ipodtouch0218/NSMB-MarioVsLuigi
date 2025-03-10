@@ -65,7 +65,7 @@ namespace Quantum {
             var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
-            piranhaPlant->Kill(f, piranhaPlantEntity, iceBlockEntity, true);
+            piranhaPlant->Kill(f, piranhaPlantEntity, iceBlockEntity, KillReason.Special);
         }
 
         public void OnPiranhaPlantProjectileInteraction(Frame f, EntityRef piranhaPlantEntity, EntityRef projectileEntity) {
@@ -75,7 +75,7 @@ namespace Quantum {
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
             case ProjectileEffectType.Fire: {
-                piranhaPlant->Kill(f, piranhaPlantEntity, projectileEntity, true);
+                piranhaPlant->Kill(f, piranhaPlantEntity, projectileEntity, KillReason.Special);
                 break;
             }
             case ProjectileEffectType.Freeze: {
@@ -95,7 +95,7 @@ namespace Quantum {
 
             if (mario->InstakillsEnemies(marioPhysicsObject, false)) {
                 var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
-                piranhaPlant->Kill(f, piranhaPlantEntity, marioEntity, true);
+                piranhaPlant->Kill(f, piranhaPlantEntity, marioEntity, KillReason.Special);
 
             } else if (!mario->IsCrouchedInShell) {
                 mario->Powerdown(f, marioEntity, false);
@@ -113,7 +113,7 @@ namespace Quantum {
 
                 Vector2Int tile = QuantumUtils.WorldToRelativeTile(stage, enemy->Spawnpoint);
                 if (tile.x == tileX && tile.y == tileY) {
-                    piranhaPlant->Kill(f, entity, EntityRef.None, true);
+                    piranhaPlant->Kill(f, entity, EntityRef.None, KillReason.Special);
                 }
             }
         }
@@ -132,7 +132,7 @@ namespace Quantum {
                 }
                 var breakable = f.Unsafe.GetPointer<BreakableObject>(breakableEntity);
                 if (piranhaPlant->Pipe == breakableEntity && newHeight != breakable->OriginalHeight) {
-                    piranhaPlant->Kill(f, piranhaPlantEntity, EntityRef.None, true);
+                    piranhaPlant->Kill(f, piranhaPlantEntity, EntityRef.None, KillReason.Special);
                 }
             }
         }
@@ -141,7 +141,7 @@ namespace Quantum {
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
             if (f.Unsafe.TryGetPointer(iceBlock->Entity, out PiranhaPlant* piranhaPlant)) {
-                piranhaPlant->Kill(f, iceBlock->Entity, brokenIceBlock, true);
+                piranhaPlant->Kill(f, iceBlock->Entity, brokenIceBlock, KillReason.Special);
             }
         }
     }

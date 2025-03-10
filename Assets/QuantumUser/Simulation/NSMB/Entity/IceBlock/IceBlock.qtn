@@ -3,7 +3,7 @@ import enum LiquidType(byte);
 
 component IceBlock {
 	FP SlidingSpeed;
-	[ExcludeFromPrototype] entity_ref Entity;
+	[ExcludeFromPrototype] EntityRef Entity;
 	[ExcludeFromPrototype] FPVector2 Size;
 	[ExcludeFromPrototype] FPVector2 ChildOffset;
 	[ExcludeFromPrototype] bool IsFlying;

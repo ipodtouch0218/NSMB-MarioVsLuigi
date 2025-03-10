@@ -11,11 +11,11 @@ namespace Quantum {
             Owner = owner;
         }
 
-        public void Kill(Frame f, EntityRef entity, EntityRef killerEntity, bool special) {
-            var enemy = f.Unsafe.GetPointer<Enemy>(entity);
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
+        public void Kill(Frame f, EntityRef bulletBillEntity, EntityRef killerEntity, KillReason reason) {
+            var enemy = f.Unsafe.GetPointer<Enemy>(bulletBillEntity);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(bulletBillEntity);
 
-            if (special) {
+            if (reason != KillReason.Normal) {
                 // Spawn 
                 enemy->IsActive = false;
                 physicsObject->IsFrozen = true;
@@ -27,7 +27,7 @@ namespace Quantum {
                 } else {
                     combo = 0;
                 }
-                f.Events.PlayComboSound(f, entity, combo);
+                f.Events.PlayComboSound(bulletBillEntity, combo);
             } else {
                 // Fall off screen
                 physicsObject->DisableCollision = true;
@@ -39,8 +39,11 @@ namespace Quantum {
             }
 
             enemy->IsDead = true;
-            f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = true;
-            f.Events.EnemyKilled(f, entity, killerEntity, special);
+            f.Unsafe.GetPointer<Interactable>(bulletBillEntity)->ColliderDisabled = true;
+
+            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(bulletBillEntity);
+            FPVector2 center = f.Unsafe.GetPointer<Transform2D>(bulletBillEntity)->Position + collider->Shape.Centroid;
+            f.Events.EnemyKilled(bulletBillEntity, killerEntity, reason, center);
         }
     }
 }

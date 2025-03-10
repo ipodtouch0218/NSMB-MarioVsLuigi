@@ -10,7 +10,7 @@ namespace Quantum {
         }
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
             playerData->Ping = PingMs;
-            f.Events.PlayerDataChanged(f, sender);
+            f.Events.PlayerDataChanged(sender);
         }
     }
 }

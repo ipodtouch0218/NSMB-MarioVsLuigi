@@ -11,7 +11,7 @@ namespace Quantum {
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
             playerData->IsInSettings = InSettings;
-            f.Events.PlayerDataChanged(f, sender);
+            f.Events.PlayerDataChanged(sender);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Quantum {
             playerData->IsLoaded = true;
 
             if (!wasLoaded) {
-                f.Events.PlayerLoaded(f, sender);
+                f.Events.PlayerLoaded(sender);
             }
         }
     }

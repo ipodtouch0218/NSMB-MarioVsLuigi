@@ -5,6 +5,5 @@ component Boo {
 }
 
 event BooBecomeActive {
-	nothashed Frame Frame;
 	EntityRef Entity;
 }

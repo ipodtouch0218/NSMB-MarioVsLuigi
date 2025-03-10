@@ -17,7 +17,7 @@ namespace Quantum {
                 return;
             }
             f.Global->GameStartFrames = (ushort) (gameStarting ? 3 * f.UpdateRate : 0);
-            f.Events.StartingCountdownChanged(f, gameStarting);
+            f.Events.StartingCountdownChanged(gameStarting);
         }
     }
 }

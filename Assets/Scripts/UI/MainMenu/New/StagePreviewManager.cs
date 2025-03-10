@@ -41,7 +41,7 @@ public class StagePreviewManager : MonoBehaviour {
     }
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {
-        PreviewStage(e.Frame.Global->Rules.Stage);
+        PreviewStage(e.Game.Frames.Predicted.Global->Rules.Stage);
     }
 
 

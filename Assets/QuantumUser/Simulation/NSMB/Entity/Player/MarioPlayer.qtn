@@ -127,164 +127,148 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte PropellerDrillCooldown;
 	[ExcludeFromPrototype] byte PropellerDrillHoldFrames;
 
-    [ExcludeFromPrototype] entity_ref HeldEntity;
+    [ExcludeFromPrototype] EntityRef HeldEntity;
 	[ExcludeFromPrototype] int HoldStartFrame;
 
-    [ExcludeFromPrototype] entity_ref CurrentPipe;
+    [ExcludeFromPrototype] EntityRef CurrentPipe;
 	[ExcludeFromPrototype] FPVector2 PipeDirection;
 	[ExcludeFromPrototype] bool PipeEntering;
 	[ExcludeFromPrototype] byte PipeFrames;
 	[ExcludeFromPrototype] byte PipeCooldownFrames;
 
-	[ExcludeFromPrototype] entity_ref CurrentSpinner;
+	[ExcludeFromPrototype] EntityRef CurrentSpinner;
 }
 
 signal OnMarioPlayerDied(EntityRef entity);
 signal OnMarioPlayerBecameInvincible(EntityRef entity);
 
 event MarioPlayerJumped {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
+	nothashed PowerupState PowerupState;
 	nothashed JumpState JumpState;
 	nothashed bool WasBounce;
+	nothashed bool IsUnderwater;
 }
 
 event MarioPlayerGroundpoundStarted {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event MarioPlayerGroundpounded {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
+	nothashed PowerupState PowerupState;
 }
 
 event MarioPlayerCrouched {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
+	nothashed PowerupState PowerupState;
 }
 
 synced event MarioPlayerCollectedPowerup {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	nothashed PowerupReserveResult Result;
 	nothashed PowerupAsset Scriptable;
 }
 
 event MarioPlayerUsedReserveItem {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	nothashed bool Success;
 }
 
 event MarioPlayerWalljumped {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	nothashed FPVector2 Position;
 	nothashed bool WasOnRightWall;
+	nothashed FPVector2 HitboxExtents;
 }
 
 event MarioPlayerShotProjectile {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	nothashed Projectile Projectile;
 }
 
 event MarioPlayerUsedPropeller {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event MarioPlayerPropellerSpin {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 synced event MarioPlayerDied {
-	Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	bool IsLava;
 }
 
 event MarioPlayerDeathUp {
-	nothashed Frame Frame;
 	EntityRef Entity;
+	bool FireDeath;
 }
 
 synced event MarioPlayerTookDamage {
-	Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event MarioPlayerPreRespawned {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
+	nothashed FPVector2 Spawnpoint;
 }
 
 event MarioPlayerRespawned {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event MarioPlayerPickedUpObject {
-	nothashed Frame Frame;
-	entity_ref Entity;
-	entity_ref OtherEntity;
+	EntityRef Entity;
+	EntityRef OtherEntity;
+	bool HoldAboveHead;
 }
 
 event MarioPlayerThrewObject {
-	nothashed Frame Frame;
-	entity_ref Entity;
-	entity_ref OtherEntity;
+	EntityRef Entity;
+	EntityRef OtherEntity;
 }
 
 synced event MarioPlayerMegaStart {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event MarioPlayerMegaEnd {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	bool Cancelled;
+	byte EndingFrames;
 }
 
 event MarioPlayerReceivedKnockback {
-	nothashed Frame Frame;
-	entity_ref Entity;
-	entity_ref Attacker;
+	EntityRef Entity;
+	EntityRef Attacker;
 	bool Weak;
+	nothashed FPVector2 AttackerPosition;
 }
 
 event MarioPlayerEnteredPipe {
-	nothashed Frame Frame;
-	entity_ref Entity;
-	entity_ref Pipe;
+	EntityRef Entity;
+	EntityRef Pipe;
 }
 
 event MarioPlayerStoppedSliding {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 	bool IsStationary;
 }
 
 event MarioPlayerUsedSpinner {
-	nothashed Frame Frame;
-	entity_ref Entity;
-	entity_ref Spinner;
+	EntityRef Entity;
+	EntityRef Spinner;
 }
 
 event MarioPlayerStompedByTeammate {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 synced event MarioPlayerDestroyed {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }
 
 event MarioPlayerLandedWithAnimation {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }

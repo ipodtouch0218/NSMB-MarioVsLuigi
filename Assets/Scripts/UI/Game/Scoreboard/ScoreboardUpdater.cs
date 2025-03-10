@@ -219,7 +219,7 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {
-            UpdateTeamHeader(e.Frame);
+            UpdateTeamHeader(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
@@ -231,7 +231,7 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
-            UpdateTeamHeader(e.Frame);
+            UpdateTeamHeader(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
@@ -245,11 +245,11 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {
-            UpdateSpectatorCount(e.Frame);
+            UpdateSpectatorCount(e.Game.Frames.Verified);
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
-            UpdateSpectatorCount(e.Frame);
+            UpdateSpectatorCount(e.Game.Frames.Verified);
         }
 
         private void OnColorblindModeChanged() {

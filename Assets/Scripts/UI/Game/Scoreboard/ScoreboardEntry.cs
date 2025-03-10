@@ -94,7 +94,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 return;
             }
 
-            UpdateEntry(e.Frame);
+            UpdateEntry(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
@@ -102,7 +102,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 return;
             }
 
-            UpdateEntry(e.Frame);
+            UpdateEntry(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {
@@ -110,7 +110,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 return;
             }
 
-            UpdateEntry(e.Frame);
+            UpdateEntry(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
@@ -118,7 +118,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 return;
             }
 
-            UpdateEntry(e.Frame);
+            UpdateEntry(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerDestroyed(EventMarioPlayerDestroyed e) {
@@ -126,7 +126,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 return;
             }
 
-            UpdateEntry(e.Frame);
+            UpdateEntry(e.Game.Frames.Predicted);
         }
 
         private void OnGameResynced(CallbackGameResynced e) {
@@ -134,11 +134,12 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private unsafe void OnPlayerRemoved(EventPlayerRemoved e) {
-            ref PlayerInformation info = ref e.Frame.Global->PlayerInfo[informationIndex];
-            cachedNickname = info.Nickname.ToString().ToValidUsername(e.Frame, info.PlayerRef);
+            Frame f = e.Game.Frames.Verified;
+            ref PlayerInformation info = ref f.Global->PlayerInfo[informationIndex];
+            cachedNickname = info.Nickname.ToString().ToValidUsername(f, info.PlayerRef);
             nicknameMayHaveChanged = true;
 
-            UpdateEntry(e.Frame);
+            UpdateEntry(f);
         }
     }
 }

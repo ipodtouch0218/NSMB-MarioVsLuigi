@@ -174,7 +174,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     }
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {
-        FindValue(e.Frame.Global->Rules);
+        FindValue(e.Game.Frames.Predicted.Global->Rules);
     }
 
     private unsafe void OnGameStarted(CallbackGameStarted e) {

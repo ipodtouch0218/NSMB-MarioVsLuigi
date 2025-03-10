@@ -97,7 +97,8 @@ public unsafe class MarioBrosPlatformAnimator : QuantumEntityViewComponent<Stage
             return;
         }
 
-        Frame f = e.Frame;
+        Frame f = PredictedFrame;
+        // TODO: this can error.
         var qTransform = f.Unsafe.GetPointer<Transform2D>(e.Entity);
         var qCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(e.Entity);
 

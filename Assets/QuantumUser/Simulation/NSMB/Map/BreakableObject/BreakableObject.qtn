@@ -11,7 +11,6 @@ component BreakableObject {
 signal OnBreakableObjectChangedHeight(EntityRef breakable, FP newHeight);
 
 synced event BreakableObjectBroken {
-	nothashed Frame Frame;
 	EntityRef Entity;
 	EntityRef Cause;
 	nothashed FPVector2 LaunchDirection;

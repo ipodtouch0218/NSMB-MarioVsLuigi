@@ -65,7 +65,7 @@ namespace Quantum {
                     launcher->BulletBillCount++;
                     launcher->TimeToShootFrames = launcher->TimeToShoot;
 
-                    f.Events.BulletBillLauncherShoot(f, entity, newBillEntity);
+                    f.Events.BulletBillLauncherShoot(entity, newBillEntity, right);
                 }
             }
 
@@ -123,7 +123,7 @@ namespace Quantum {
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
-                bulletBill->Kill(f, bulletBillEntity, marioEntity, true);
+                bulletBill->Kill(f, bulletBillEntity, marioEntity, groundpounded ? KillReason.Groundpounded : KillReason.Special);
                 mario->DoEntityBounce |= mario->IsDrilling;
                 return;
             }
@@ -132,11 +132,11 @@ namespace Quantum {
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                     if (mario->IsGroundpounding) {
                         mario->IsGroundpounding = false;
-                        bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
+                        bulletBill->Kill(f, bulletBillEntity, marioEntity, KillReason.Normal);
                     }
                     mario->DoEntityBounce = true;
                 } else {
-                    bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
+                    bulletBill->Kill(f, bulletBillEntity, marioEntity, KillReason.Normal);
                     mario->DoEntityBounce = !mario->IsGroundpounding;
                 }
 
@@ -155,7 +155,7 @@ namespace Quantum {
             if (iceBlock->IsSliding
                 && upDot < PhysicsObjectSystem.GroundMaxAngle) {
 
-                bulletBill->Kill(f, bulletBillEntity, iceBlockEntity, true);
+                bulletBill->Kill(f, bulletBillEntity, iceBlockEntity, KillReason.Special);
             }
         }
 
@@ -165,9 +165,9 @@ namespace Quantum {
             if (projectileAsset.Effect == ProjectileEffectType.Freeze) {
                 IceBlockSystem.Freeze(f, bulletBillEntity, true);
             } else if (projectileAsset.Effect == ProjectileEffectType.Fire) {
-                f.Events.BulletBillHitByProjectile(f, bulletBillEntity);
+                f.Events.BulletBillHitByProjectile(bulletBillEntity);
             } else {
-                f.Unsafe.GetPointer<BulletBill>(bulletBillEntity)->Kill(f, bulletBillEntity, projectileEntity, true);
+                f.Unsafe.GetPointer<BulletBill>(bulletBillEntity)->Kill(f, bulletBillEntity, projectileEntity, KillReason.Special);
             }
 
             f.Signals.OnProjectileHitEntity(f, projectileEntity, bulletBillEntity);
@@ -177,7 +177,7 @@ namespace Quantum {
         #region Signals
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out BulletBill* bulletBill)) {
-                bulletBill->Kill(f, entity, bobomb, false);
+                bulletBill->Kill(f, entity, bobomb, KillReason.Special);
             }
         }
 
@@ -190,8 +190,8 @@ namespace Quantum {
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
             if (f.Unsafe.TryGetPointer(iceBlock->Entity, out BulletBill* bulletBill)) {
-                bulletBill->Kill(f, iceBlock->Entity, brokenIceBlock, false);
-                f.Events.PlayComboSound(f, iceBlock->Entity, 0);
+                bulletBill->Kill(f, iceBlock->Entity, brokenIceBlock, KillReason.Special);
+                f.Events.PlayComboSound(iceBlock->Entity, 0);
             }
         }
         #endregion

@@ -52,7 +52,7 @@ namespace Quantum {
             } else {
                 // Become unscared
                 if (boo->UnscaredFrames > 0 && QuantumUtils.Decrement(ref boo->UnscaredFrames)) {
-                    f.Events.BooBecomeActive(f, filter.Entity);
+                    f.Events.BooBecomeActive(filter.Entity);
                 }
             }
 
@@ -123,7 +123,7 @@ namespace Quantum {
 
             if (mario->InstakillsEnemies(marioPhysicsObject, false)) {
                 var boo = f.Unsafe.GetPointer<Boo>(booEntity);
-                boo->Kill(f, booEntity, marioEntity, true);
+                boo->Kill(f, booEntity, marioEntity, KillReason.Special);
             } else {
                 mario->Powerdown(f, marioEntity, false);
             }
@@ -145,7 +145,7 @@ namespace Quantum {
 
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Boo* boo)) {
-                boo->Kill(f, entity, bobomb, true);
+                boo->Kill(f, entity, bobomb, KillReason.Special);
             }
         }
     }

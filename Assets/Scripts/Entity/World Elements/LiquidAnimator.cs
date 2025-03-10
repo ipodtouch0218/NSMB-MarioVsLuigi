@@ -133,7 +133,7 @@ namespace NSMB.Entities.World {
                 return;
             }
 
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Predicted;
             bool light = false;
             if (lightSplashPrefab
                 && f.Unsafe.TryGetPointer(e.Splasher, out MarioPlayer* mario)

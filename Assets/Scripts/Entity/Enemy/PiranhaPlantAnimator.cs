@@ -57,11 +57,6 @@ public unsafe class PiranhaPlantAnimator : QuantumEntityViewComponent {
         sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Death);
         sfx.PlayOneShot(SoundEffect.Enemy_Shell_Kick);
 
-        Frame f = e.Frame;
-        var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(e.Enemy);
-        FPVector2 center = f.Unsafe.GetPointer<Transform2D>(e.Enemy)->Position
-                           + collider->Shape.Centroid + (FPVector2.Up * collider->Shape.Box.Extents.Y);
-
-        Instantiate(Enums.PrefabParticle.Enemy_KillPoof.GetGameObject(), center.ToUnityVector3(), Quaternion.identity);
+        Instantiate(Enums.PrefabParticle.Enemy_KillPoof.GetGameObject(), e.EnemyCenter.ToUnityVector3(), Quaternion.identity);
     }
 }

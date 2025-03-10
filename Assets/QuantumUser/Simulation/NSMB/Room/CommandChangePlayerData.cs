@@ -47,7 +47,7 @@ namespace Quantum {
                 GameLogicSystem.StopCountdown(f);
             }
 
-            f.Events.PlayerDataChanged(f, playerData->PlayerRef);
+            f.Events.PlayerDataChanged(playerData->PlayerRef);
         }
 
         public enum Changes : byte {

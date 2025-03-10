@@ -42,7 +42,7 @@ namespace Quantum {
                 }
             } else if (dot > -PhysicsObjectSystem.GroundMaxAngle) {
                 // Hit the side of a pipe
-                f.Events.BreakableObjectBroken(f, breakableObjectEntity, marioEntity, -effectiveNormal, breakable->CurrentHeight - breakable->MinimumHeight);
+                f.Events.BreakableObjectBroken(breakableObjectEntity, marioEntity, -effectiveNormal, breakable->CurrentHeight - breakable->MinimumHeight);
                 ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->MinimumHeight, true);
                 breakable->IsDestroyed = true;
 

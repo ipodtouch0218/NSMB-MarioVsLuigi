@@ -62,6 +62,12 @@ namespace Quantum {
     DoubleJump,
     TripleJump,
   }
+  public enum KillReason : int {
+    Normal,
+    Special,
+    Groundpounded,
+    InWall,
+  }
   public enum PowerupReserveResult : byte {
     None,
     NoneButPlaySound,
@@ -3714,6 +3720,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Joint), Joint.SIZE);
       typeRegistry.Register(typeof(Joint3D), Joint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.JumpState), 1);
+      typeRegistry.Register(typeof(Quantum.KillReason), 4);
       typeRegistry.Register(typeof(Quantum.Koopa), Quantum.Koopa.SIZE);
       typeRegistry.Register(typeof(LayerMask), LayerMask.SIZE);
       typeRegistry.Register(typeof(Quantum.Liquid), Quantum.Liquid.SIZE);
@@ -3823,6 +3830,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<IceBlockBreakReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InputButtons>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.JumpState>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.KillReason>();
       FramePrinter.EnsurePrimitiveNotStripped<LiquidType>();
       FramePrinter.EnsurePrimitiveNotStripped<ParticleEffect>();
       FramePrinter.EnsurePrimitiveNotStripped<PhysicsFlags>();

@@ -86,7 +86,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Verified;
             ref GameRules rules = ref f.Global->Rules;
 
             if (e.LevelChanged) {

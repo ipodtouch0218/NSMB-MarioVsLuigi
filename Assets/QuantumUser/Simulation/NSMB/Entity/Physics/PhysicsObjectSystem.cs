@@ -218,7 +218,7 @@ namespace Quantum {
             var filter = f.Filter<PhysicsObject>();
             while (filter.NextUnsafe(out EntityRef entity, out PhysicsObject* physicsObject)) {
                 if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
-                    ((Frame) f).Events.PhysicsObjectLanded((Frame) f, entity);
+                    ((Frame) f).Events.PhysicsObjectLanded(entity);
                 }
                 if (!physicsObject->WasBeingCrushed && physicsObject->IsBeingCrushed) {
                     ((Frame) f).Signals.OnEntityCrushed(entity);

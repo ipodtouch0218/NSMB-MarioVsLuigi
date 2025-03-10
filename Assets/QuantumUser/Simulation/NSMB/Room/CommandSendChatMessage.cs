@@ -16,7 +16,7 @@ namespace Quantum {
             }
 
             playerData->LastChatMessage = f.Number;
-            f.Events.PlayerSentChatMessage(f, sender, Message);
+            f.Events.PlayerSentChatMessage(sender, Message);
         }
     }
 }

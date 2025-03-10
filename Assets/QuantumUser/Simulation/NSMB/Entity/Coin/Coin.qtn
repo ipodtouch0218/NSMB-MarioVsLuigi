@@ -12,7 +12,6 @@ component Coin {
 signal OnMarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, bool fromBlock, bool downwards);
 
 synced event MarioPlayerCollectedCoin {
-	Frame Frame;
 	entity_ref Entity;
 	MarioPlayer Mario;
 	byte Coins;
@@ -24,20 +23,17 @@ synced event MarioPlayerCollectedCoin {
 }
 
 event CoinChangedType {
-	nothashed Frame Frame;
 	entity_ref Entity;
 	nothashed Coin Coin;
 }
 
 event CoinChangeCollected {
-	nothashed Frame Frame;
 	entity_ref Entity;
 	nothashed Coin Coin;
 	bool Collected;
 }
 
 event CoinBounced {
-	nothashed Frame Frame;
 	entity_ref Entity;
 	nothashed Coin Coin;
 }

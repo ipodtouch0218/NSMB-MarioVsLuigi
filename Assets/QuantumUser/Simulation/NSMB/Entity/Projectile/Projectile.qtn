@@ -1,7 +1,7 @@
 import enum ParticleEffect(byte);
 
 component Projectile {
-	asset_ref<ProjectileAsset> Asset;
+	AssetRef<ProjectileAsset> Asset;
 	FP Speed;
 
 	[ExcludeFromPrototype] EntityRef Owner;
@@ -14,7 +14,6 @@ component Projectile {
 signal OnProjectileHitEntity(Frame frame, EntityRef projectile, EntityRef hitEntity);
 
 event ProjectileDestroyed {
-	nothashed Frame Frame;
 	EntityRef Entity;
 	ParticleEffect Particle;
 	nothashed FPVector2 Position;

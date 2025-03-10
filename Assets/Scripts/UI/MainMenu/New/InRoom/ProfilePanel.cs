@@ -114,10 +114,12 @@ namespace NSMB.UI.MainMenu.Submenus {
                 return;
             }
 
+            Frame f = e.Game.Frames.Verified;
+
             // Set character button to the correct state
-            PlayerData* data = QuantumUtils.GetPlayerData(e.Frame, e.Player);
+            PlayerData* data = QuantumUtils.GetPlayerData(f, e.Player);
             SetPaletteButtonState(data->Palette);
-            SetCharacterButtonState(e.Frame, data->Character, false);
+            SetCharacterButtonState(f, data->Character, false);
             spectateToggle.SetIsOnWithoutNotify(data->ManualSpectator);
         }
     }

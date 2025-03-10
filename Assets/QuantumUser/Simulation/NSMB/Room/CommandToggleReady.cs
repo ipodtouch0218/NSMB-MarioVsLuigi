@@ -12,7 +12,7 @@ namespace Quantum {
             }
 
             playerData->IsReady = !playerData->IsReady;
-            f.Events.PlayerDataChanged(f, sender);
+            f.Events.PlayerDataChanged(sender);
         }
     }
 }

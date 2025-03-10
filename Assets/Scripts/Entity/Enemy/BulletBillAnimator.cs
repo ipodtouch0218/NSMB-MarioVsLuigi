@@ -92,7 +92,7 @@ public unsafe class BulletBillAnimator : QuantumEntityViewComponent {
             return;
         }
 
-        if (e.IsSpecialKill) {
+        if (e.KillReason == KillReason.Special || e.KillReason == KillReason.Groundpounded) {
             Instantiate(specialKillParticles, transform.position, Quaternion.identity);
         } else {
             // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);

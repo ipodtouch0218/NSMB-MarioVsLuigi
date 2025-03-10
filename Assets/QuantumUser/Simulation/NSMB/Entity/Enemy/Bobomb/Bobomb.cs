@@ -25,24 +25,28 @@ namespace Quantum {
                 Constants._3_50
             );
 
-            f.Events.PlayComboSound(f, entity, 0);
+            f.Events.PlayComboSound(entity, 0);
         }
 
-        public void Kill(Frame f, EntityRef bobombEntity, EntityRef killerEntity, bool special) {
+        public void Kill(Frame f, EntityRef bobombEntity, EntityRef killerEntity, KillReason reason) {
             var enemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(bobombEntity);
             var bobombTransform = f.Unsafe.GetPointer<Transform2D>(bobombEntity);
 
-            // Spawn coin
-            EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
-            var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
-            var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
-            coinTransform->Position = bobombTransform->Position;
-            coinPhysicsObject->Velocity.Y = f.RNG->Next(Constants._4_50, 5);
+            FPVector2 position = bobombTransform->Position;
+
+            if (reason.ShouldSpawnCoin()) {
+                // Spawn coin
+                EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
+                var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
+                var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
+                coinTransform->Position = position;
+                coinPhysicsObject->Velocity.Y = f.RNG->Next(Constants._4_50, 5);
+            }
 
             // Fall off screen
             if (f.Unsafe.TryGetPointer(killerEntity, out Transform2D* killerTransform)) {
-                QuantumUtils.UnwrapWorldLocations(f, bobombTransform->Position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
+                QuantumUtils.UnwrapWorldLocations(f, position, killerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
                 enemy->ChangeFacingRight(f, bobombEntity, ourPos.X > theirPos.X);
             } else {
                 enemy->ChangeFacingRight(f, bobombEntity, false);
@@ -61,7 +65,7 @@ namespace Quantum {
             } else {
                 combo = 0;
             }
-            f.Events.PlayComboSound(f, bobombEntity, combo);
+            f.Events.PlayComboSound(bobombEntity, combo);
 
             enemy->IsDead = true;
 
@@ -74,7 +78,10 @@ namespace Quantum {
             }
 
             f.Unsafe.GetPointer<Interactable>(bobombEntity)->ColliderDisabled = true;
-            f.Events.EnemyKilled(f, bobombEntity, killerEntity, special);
+
+            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(bobombEntity);
+            FPVector2 center = position + collider->Shape.Centroid;
+            f.Events.EnemyKilled(bobombEntity, killerEntity, reason, center);
         }
     }
 }

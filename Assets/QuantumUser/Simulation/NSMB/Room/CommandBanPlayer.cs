@@ -17,7 +17,7 @@ namespace Quantum {
 
             // TODO: Also ban player
 
-            f.Events.PlayerKickedFromRoom(f, Target);
+            f.Events.PlayerKickedFromRoom(Target);
             f.Signals.OnPlayerRemoved(Target);
         }
     }

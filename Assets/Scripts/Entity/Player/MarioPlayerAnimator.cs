@@ -745,8 +745,10 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (e.Frame.Unsafe.TryGetPointer(e.Attacker, out Transform2D* attackerTransform)) {
-                SpawnParticle("Prefabs/Particle/PlayerBounce", attackerTransform->Position.ToUnityVector3());
+            if (e.AttackerPosition != default) {
+                // Technically, does not work if the attacker is at (0,0)
+                // Will probably NEVER happen.
+                SpawnParticle("Prefabs/Particle/PlayerBounce", e.AttackerPosition.ToUnityVector3());
             }
 
             PlaySound(e.Weak ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
@@ -762,8 +764,7 @@ namespace NSMB.Entities.Player {
             }
 
             if (e.Cancelled) {
-                var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-                animator.Play("mega-cancel", 0, 1f - (mario->MegaMushroomEndFrames / 90f));
+                animator.Play("mega-cancel", 0, 1f - (e.EndingFrames / 90f));
             } else {
                 PlaySound(SoundEffect.Powerup_MegaMushroom_End);
             }
@@ -791,19 +792,13 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            Frame f = e.Frame;
-
-            if (!f.Exists(e.OtherEntity)) {
-                return;
-            }
-
             animator.ResetTrigger(ParamFireball);
-            if (f.Unsafe.GetPointer<Holdable>(e.OtherEntity)->HoldAboveHead) {
+            animator.ResetTrigger(ParamThrow);
+            
+            if (e.HoldAboveHead) {
                 animator.Play(ParamHeadPickup);
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);
             }
-
-            animator.ResetTrigger(ParamThrow);
         }
 
         private void OnMarioPlayerStompedByTeammate(EventMarioPlayerStompedByTeammate e) {
@@ -821,7 +816,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var physicsObject = e.Frame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
+            var physicsObject = PredictedFrame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
             if (physicsObject->IsUnderwater && physicsObject->PreviousFrameVelocity.Y < -1) {
                 SpawnParticle(Enums.PrefabParticle.Player_WaterDust.GetGameObject(), transform.position + Vector3.back * 5);
             }
@@ -832,7 +827,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            var mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             if (!mario->IsInShell && (Time.time - lastBumpSound < 0.25f)) {
                 return;
             }
@@ -862,13 +857,13 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var marioTransform = e.Frame.Unsafe.GetPointer<Transform2D>(e.Entity);
-            activeRespawnParticle = SpawnParticle(respawnParticle, marioTransform->Position.ToUnityVector3());
+            activeRespawnParticle = SpawnParticle(respawnParticle, e.Spawnpoint.ToUnityVector3());
             foreach (ParticleSystem particle in activeRespawnParticle.GetComponentsInChildren<ParticleSystem>()) {
                 var main = particle.main;    
                 main.startColor = GlowColor;
             }
-            //PlaySound(SoundEffect.Player_Sound_Respawn);
+
+            // Particle handles the sound effect.
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {
@@ -895,8 +890,7 @@ namespace NSMB.Entities.Player {
 
             animator.SetTrigger("deathup");
 
-            var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            if (mario->FireDeath && !NetworkHandler.IsReplayFastForwarding) {
+            if (e.FireDeath && !NetworkHandler.IsReplayFastForwarding) {
                 PlaySound(SoundEffect.Player_Voice_LavaDeath);
             }
         }
@@ -932,7 +926,7 @@ namespace NSMB.Entities.Player {
             }
 
             animator.SetTrigger("fireball");
-            ProjectileAsset projectile = e.Frame.FindAsset(e.Projectile.Asset);
+            ProjectileAsset projectile = e.Game.Frames.Predicted.FindAsset(e.Projectile.Asset);
             PlaySound(projectile.ShootSound);
         }
 
@@ -942,9 +936,7 @@ namespace NSMB.Entities.Player {
             }
 
             if (!NetworkHandler.IsReplayFastForwarding) {
-                var hitbox = e.Frame.Unsafe.GetPointer<PhysicsCollider2D>(e.Entity);
-
-                Vector3 particleOffset = hitbox->Shape.Box.Extents.ToUnityVector3() + (Vector3.back * 8);
+                Vector3 particleOffset = e.HitboxExtents.ToUnityVector3() + (Vector3.back * 8);
                 Quaternion rot = Quaternion.identity;
                 if (e.WasOnRightWall) {
                     rot = Quaternion.Euler(0, 0, 180);
@@ -967,7 +959,7 @@ namespace NSMB.Entities.Player {
             GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(), Quaternion.identity);
             number.GetComponentInChildren<NumberParticle>().Initialize(
                 Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
-                Utils.Utils.GetPlayerColor(e.Frame, e.Mario.PlayerRef),
+                Utils.Utils.GetPlayerColor(VerifiedFrame, e.Mario.PlayerRef),
                 e.ItemSpawned
             );
 
@@ -1001,7 +993,6 @@ namespace NSMB.Entities.Player {
             }
 
             var powerup = e.Scriptable;
-            var marioTransform = e.Frame.Unsafe.GetPointer<Transform2D>(e.Entity);
 
             switch (e.Result) {
             case PowerupReserveResult.ReserveOldPowerup:
@@ -1018,7 +1009,7 @@ namespace NSMB.Entities.Player {
 
                 if (powerup.State == PowerupState.MegaMushroom) {
                     animator.Play("mega-scale");
-                    Vector3 spawnPosition = marioTransform->Position.ToUnityVector2();
+                    Vector3 spawnPosition = transform.position;
                     spawnPosition.z = -4f;
                     SpawnParticle(Enums.PrefabParticle.Player_MegaMushroom.GetGameObject(), spawnPosition);
                 }
@@ -1037,10 +1028,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            if (!mario->IsInShell) {
-                PlaySound(mario->CurrentPowerupState == PowerupState.BlueShell ? SoundEffect.Powerup_BlueShell_Enter : SoundEffect.Player_Sound_Crouch);
-            }
+            PlaySound(e.PowerupState == PowerupState.BlueShell ? SoundEffect.Powerup_BlueShell_Enter : SoundEffect.Player_Sound_Crouch);
         }
 
         private void OnMarioPlayerGroundpoundStarted(EventMarioPlayerGroundpoundStarted e) {
@@ -1056,14 +1044,11 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            var marioTransform = e.Frame.Unsafe.GetPointer<Transform2D>(e.Entity);
-
             // Groundpound
-            if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+            if (e.PowerupState == PowerupState.MegaMushroom) {
                 PlaySound(SoundEffect.Powerup_MegaMushroom_Groundpound);
 
-                SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform->Position.ToUnityVector3() + Vector3.back * 5);
+                SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), transform.position + (Vector3.back * 5));
                 CameraAnimator.TriggerScreenshake(0.35f);
 
                 if (Utils.Utils.IsMarioLocal(e.Entity)) {
@@ -1072,13 +1057,13 @@ namespace NSMB.Entities.Player {
                 }
 
             } else {
-                SoundEffect soundEffect = mario->CurrentPowerupState switch {
+                SoundEffect soundEffect = e.PowerupState switch {
                     PowerupState.MiniMushroom => SoundEffect.Powerup_MiniMushroom_Groundpound,
                     _ => SoundEffect.Player_Sound_GroundpoundLanding,
                 };
                 PlaySound(soundEffect);
 
-                SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), marioTransform->Position.ToUnityVector3() + Vector3.back * 5);
+                SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), transform.position + (Vector3.back * 5));
 
                 if (Utils.Utils.IsMarioLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f,
@@ -1092,9 +1077,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            var physicsObject = e.Frame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
-            if (physicsObject->IsUnderwater) {
+            if (e.IsUnderwater) {
                 // Paddle
                 if (e.WasBounce) {
                     if (Time.time - lastStompSoundTime > 0.25f) {
@@ -1129,7 +1112,7 @@ namespace NSMB.Entities.Player {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.4f, 0.15f, RumbleManager.RumbleSetting.Low);
                 }
             } else {
-                SoundEffect soundEffect = mario->CurrentPowerupState switch {
+                SoundEffect soundEffect = e.PowerupState switch {
                     PowerupState.MiniMushroom => SoundEffect.Powerup_MiniMushroom_Jump,
                     PowerupState.MegaMushroom => SoundEffect.Powerup_MegaMushroom_Jump,
                     _ => SoundEffect.Player_Sound_Jump,

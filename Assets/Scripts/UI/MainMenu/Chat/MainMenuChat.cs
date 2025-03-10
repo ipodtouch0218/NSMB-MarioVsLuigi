@@ -177,7 +177,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {
-            RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+            Frame f = e.Game.Frames.Verified;
+            RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
             foreach (var chatMessage in chatMessages) {
                 if (chatMessage.data.userId == runtimePlayer.UserId) {
                     // Reassign this chat message

@@ -136,7 +136,7 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            UpdateText(e.Frame);
+            UpdateText(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerCollectedStar(EventMarioPlayerCollectedStar e) {
@@ -144,7 +144,7 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            UpdateText(e.Frame);
+            UpdateText(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerDroppedStar(EventMarioPlayerDroppedStar e) {
@@ -152,7 +152,7 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            UpdateText(e.Frame);
+            UpdateText(e.Game.Frames.Predicted);
         }
 
         private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
@@ -160,7 +160,7 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            UpdateText(e.Frame);
+            UpdateText(e.Game.Frames.Predicted);
         }
 
         private void OnGameResynced(CallbackGameResynced e) {
@@ -168,7 +168,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void OnPlayerRemoved(EventPlayerRemoved e) {
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Verified;
             if (f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
                 UpdateCachedNickname(f, mario);
             }

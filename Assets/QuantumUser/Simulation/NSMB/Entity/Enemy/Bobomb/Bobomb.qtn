@@ -11,15 +11,13 @@ component Bobomb {
 	[ExcludeFromPrototype] ushort CurrentDetonationFrames;
 }
 
-signal OnBobombExplodeEntity(entity_ref bobomb, entity_ref entity);
+signal OnBobombExplodeEntity(EntityRef bobomb, EntityRef entity);
 
 event BobombLit {
-	nothashed Frame Frame;
 	EntityRef Entity;
 	bool Stomped;
 }
 
 event BobombExploded {
-	nothashed Frame Frame;
 	EntityRef Entity;
 }

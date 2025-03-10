@@ -1,5 +1,5 @@
 component Koopa {
-	asset_ref<PowerupAsset> SpawnPowerupWhenStomped;
+	AssetRef<PowerupAsset> SpawnPowerupWhenStomped;
 	bool DontWalkOfLedges;
 	bool IsSpiny;
 	FP Speed;
@@ -16,7 +16,6 @@ component Koopa {
 }
 
 event KoopaKicked {
-	nothashed Frame Frame;
 	EntityRef Entity;
 	bool Groundpounded;
 }

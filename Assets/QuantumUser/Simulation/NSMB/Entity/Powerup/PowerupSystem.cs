@@ -21,6 +21,7 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            var entity = filter.Entity;
             var powerup = filter.Powerup;
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
@@ -38,7 +39,7 @@ namespace Quantum {
                         powerup->ParentMarioPlayer = EntityRef.None;
                         filter.Interactable->ColliderDisabled = false;
                         physicsObject->IsFrozen = false;
-                        f.Events.PowerupBecameActive(f, filter.Entity);
+                        f.Events.PowerupBecameActive(entity);
                     } else {
                         return;
                     }
@@ -52,15 +53,15 @@ namespace Quantum {
                     }
 
                     if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                        if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, filter.Entity)) {
+                        if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, entity)) {
                             // TODO: poof effect.
-                            f.Destroy(filter.Entity);
+                            f.Destroy(entity);
                             return;
                         }
                         powerup->BlockSpawn = false;
                         physicsObject->IsFrozen = false;
                         filter.Interactable->ColliderDisabled = false;
-                        f.Events.PowerupBecameActive(f, filter.Entity);
+                        f.Events.PowerupBecameActive(entity);
                     } else {
                         return;
                     }
@@ -71,7 +72,7 @@ namespace Quantum {
                         powerup->LaunchSpawn = false;
                         physicsObject->DisableCollision = false;
                         filter.Interactable->ColliderDisabled = false;
-                        f.Events.PowerupBecameActive(f, filter.Entity);
+                        f.Events.PowerupBecameActive(entity);
                     }
                 } else {
                     if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
@@ -117,7 +118,7 @@ namespace Quantum {
             }
 
             if (QuantumUtils.Decrement(ref powerup->Lifetime)) {
-                f.Destroy(filter.Entity);
+                f.Destroy(entity);
             }
         }
 
@@ -178,7 +179,7 @@ namespace Quantum {
             PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
 
             f.Destroy(powerupEntity);
-            f.Events.MarioPlayerCollectedPowerup(f, marioEntity, result, newScriptable);
+            f.Events.MarioPlayerCollectedPowerup(marioEntity, result, newScriptable);
         }
 
         public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {

@@ -68,13 +68,8 @@ public unsafe class GoombaAnimator : QuantumEntityViewComponent {
             return;
         }
 
-        if (e.IsSpecialKill) {
-            if (e.Frame.Unsafe.TryGetPointer(e.Killer, out MarioPlayer* mario) && mario->IsGroundpoundActive) {
-                Instantiate(specialKillParticle, transform.position + Vector3.up * 0.2f, Quaternion.identity);
-            }
-        } else {
-            // Play death sound effect
-            // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
+        if (e.KillReason == KillReason.Groundpounded) {
+            Instantiate(specialKillParticle, transform.position + Vector3.up * 0.2f, Quaternion.identity);
         }
     }
 }

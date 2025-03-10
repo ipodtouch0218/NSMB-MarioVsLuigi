@@ -1,5 +1,5 @@
 component EnterablePipe {
-	entity_ref OtherPipe;
+	EntityRef OtherPipe;
 	bool IsEnterable;
 	bool IsCeilingPipe;
 	bool IsMiniOnly;

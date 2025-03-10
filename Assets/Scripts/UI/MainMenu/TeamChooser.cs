@@ -30,7 +30,6 @@ namespace NSMB.UI.MainMenu {
             if (NetworkHandler.Game != null) {
                 OnRulesChanged(new EventRulesChanged {
                     Game = NetworkHandler.Game,
-                    Frame = NetworkHandler.Game.Frames.Predicted,
                     LevelChanged = false,
                     Tick = NetworkHandler.Game.Frames.Predicted.Number,
                 });
@@ -114,7 +113,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Predicted;
             if (f.Global->Rules.TeamsEnabled) {
                 TeamAsset team = f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length];
                 flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
@@ -130,7 +129,7 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            Frame f = e.Frame;
+            Frame f = e.Game.Frames.Predicted;
             var playerData = QuantumUtils.GetPlayerData(f, e.Player);
             selected = playerData->RequestedTeam;
 

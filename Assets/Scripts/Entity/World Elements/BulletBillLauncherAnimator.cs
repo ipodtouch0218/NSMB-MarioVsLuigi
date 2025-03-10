@@ -43,8 +43,7 @@ public class BulletBillLauncherAnimator : BreakableObjectAnimator {
         }
 
         headAnimation.Play();
-        var newBillEnemy = e.Frame.Unsafe.GetPointer<Enemy>(e.NewBulletBill);
-        bulletBillShoot.transform.position = headOrigin.position + (newBillEnemy->FacingRight ? new Vector3(0.25f, 0.25f, 0) : new Vector3(-0.25f, 0.25f, 0));
+        bulletBillShoot.transform.position = headOrigin.position + (e.Right ? new Vector3(0.25f, 0.25f, 0) : new Vector3(-0.25f, 0.25f, 0));
         bulletBillShoot.Play();
     }
 }

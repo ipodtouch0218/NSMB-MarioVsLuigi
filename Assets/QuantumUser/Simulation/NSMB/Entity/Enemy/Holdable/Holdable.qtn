@@ -1,8 +1,8 @@
 component Holdable {
 	bool HoldAboveHead;
 
-	[ExcludeFromPrototype] entity_ref Holder;
-	[ExcludeFromPrototype] entity_ref PreviousHolder;
+	[ExcludeFromPrototype] EntityRef Holder;
+	[ExcludeFromPrototype] EntityRef PreviousHolder;
 	[ExcludeFromPrototype] byte IgnoreOwnerFrames;
 }
 

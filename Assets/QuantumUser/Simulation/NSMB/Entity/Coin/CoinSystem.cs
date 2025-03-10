@@ -11,7 +11,9 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
-            if (f.DestroyPending(filter.Entity)) {
+            var entity = filter.Entity;
+
+            if (f.DestroyPending(entity)) {
                 return;
             }
 
@@ -20,14 +22,18 @@ namespace Quantum {
             QuantumUtils.Decrement(ref coin->UncollectableFrames);
 
             if (!coin->IsFloating) {
+                if (coin->Lifetime == 480) {
+                    // Eject
+                    PhysicsObjectSystem.TryEject((FrameThreadSafe) f, entity, stage);
+                }
                 if (QuantumUtils.Decrement(ref coin->Lifetime)
                     || filter.Transform->Position.Y < stage.StageWorldMin.Y) {
 
-                    f.Destroy(filter.Entity);
+                    f.Destroy(entity);
                     return;
                 }
 
-                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(filter.Entity);
+                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
                 foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
                     if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
                         continue;
@@ -37,7 +43,7 @@ namespace Quantum {
                         physicsObject->Velocity = physicsObject->PreviousFrameVelocity;
                         physicsObject->Velocity.Y *= -Constants._0_66;
                         physicsObject->IsTouchingGround = false;
-                        f.Events.CoinBounced(f, filter.Entity, *coin);
+                        f.Events.CoinBounced(entity, *coin);
                     } else {
                         physicsObject->Velocity.Y = 0;
                     }
@@ -47,7 +53,7 @@ namespace Quantum {
             if (coin->DottedChangeFrames > 0 && QuantumUtils.Decrement(ref coin->DottedChangeFrames)) {
                 // Become a normal coin
                 coin->IsCurrentlyDotted = false;
-                f.Events.CoinChangedType(f, filter.Entity, *coin);
+                f.Events.CoinChangedType(entity, *coin);
             }
         }
 
@@ -60,11 +66,11 @@ namespace Quantum {
 
                 coin->IsCollected = false;
                 interactable->ColliderDisabled = false;
-                f.Events.CoinChangeCollected(f, entity, *coin, false);
+                f.Events.CoinChangeCollected(entity, *coin, false);
 
                 if (coin->IsDotted && (!coin->IsCurrentlyDotted || full)) {
                     coin->IsCurrentlyDotted = true;
-                    f.Events.CoinChangedType(f, entity, *coin);
+                    f.Events.CoinChangedType(entity, *coin);
                 }
             }
         }
@@ -92,7 +98,7 @@ namespace Quantum {
             if (coin->IsFloating) {
                 coin->IsCollected = true;
                 coinInteractable->ColliderDisabled = true;
-                f.Events.CoinChangeCollected(f, coinEntity, *coin, true);
+                f.Events.CoinChangeCollected(coinEntity, *coin, true);
             } else {
                 f.Destroy(coinEntity);
             }
@@ -108,7 +114,7 @@ namespace Quantum {
                 mario->Coins = newCoins;
             }
 
-            f.Events.MarioPlayerCollectedCoin(f, marioEntity, *mario, newCoins, item, worldLocation, fromBlock, downwards);
+            f.Events.MarioPlayerCollectedCoin(marioEntity, *mario, newCoins, item, worldLocation, fromBlock, downwards);
         }
 
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
@@ -128,7 +134,7 @@ namespace Quantum {
 
                 if (coin->IsFloating) {
                     coin->IsCollected = true;
-                    f.Events.CoinChangeCollected(f, entity, *coin, true);
+                    f.Events.CoinChangeCollected(entity, *coin, true);
                 } else {
                     f.Destroy(entity);
                 }
@@ -138,7 +144,7 @@ namespace Quantum {
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Coin* coin)
                 && !coin->IsFloating) {
-                f.Destroy(entity);
+                coin->Lifetime = 0;
             }
         }
     }

@@ -50,7 +50,7 @@ namespace NSMB.UI.Game {
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.Playing) {
-                CheckForSpectatorUI(e.Frame);
+                CheckForSpectatorUI(e.Game.Frames.Predicted);
             }
         }
     }

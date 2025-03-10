@@ -339,7 +339,8 @@ namespace NSMB.UI.MainMenu {
 
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.PreGameRoom) {
-                UpdateText(e.Frame);
+                Frame f = e.Game.Frames.Verified;
+                UpdateText(f);
             }
         }
 
@@ -348,10 +349,11 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            var playerData = QuantumUtils.GetPlayerData(e.Frame, e.Player);
+            Frame f = e.Game.Frames.Verified;
+            var playerData = QuantumUtils.GetPlayerData(f, e.Player);
             readyIcon.SetActive(playerData->IsReady);
             settingsIcon.SetActive(playerData->IsInSettings);
-            handler.GetPlayerEntry(e.Player).UpdateText(e.Frame);
+            handler.GetPlayerEntry(e.Player).UpdateText(f);
         }
 
         public void OnSelect(BaseEventData eventData) {
@@ -371,12 +373,13 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
+            Frame f = e.Game.Frames.Verified;
             RuntimePlayer runtimePlayer;
-            if (!player.IsValid || (runtimePlayer = e.Frame.GetPlayerData(player)) == null) {
+            if (!player.IsValid || (runtimePlayer = f.GetPlayerData(player)) == null) {
                 return;
             }
 
-            cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(e.Frame, player);
+            cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
         }
     }
 }

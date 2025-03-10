@@ -141,7 +141,7 @@ namespace Quantum {
             }
 
             f.Signals.OnMarioPlayerCollectedStar(marioEntity);
-            f.Events.MarioPlayerCollectedStar(f, marioEntity, *mario, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position);
+            f.Events.MarioPlayerCollectedStar(marioEntity, *mario, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position);
             f.Destroy(starEntity);
         }
 

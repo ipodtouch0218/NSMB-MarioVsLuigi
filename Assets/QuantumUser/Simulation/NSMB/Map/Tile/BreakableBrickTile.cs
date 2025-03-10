@@ -21,6 +21,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         bool allowSelfDamage = false;
         playBumpSound = false;
 
+        bool brokenByMega = false;
         EntityRef bumpOwner = default;
         if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
             // Mario interacting with the block
@@ -35,6 +36,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
             } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 // Mega Mario
                 doBreak = BreakingRules.HasFlag(BreakableBy.MegaMario);
+                brokenByMega = true;
             } else if (mario->IsInShell) {
                 // Blue Shell
                 doBreak = BreakingRules.HasFlag(BreakableBy.Shells);
@@ -62,7 +64,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
         if (doBreak) {
             BlockBumpSystem.Bump(f, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition), bumpOwner, allowSelfDamage);
-            f.Events.TileBroken(f, entity, tilePosition.x, tilePosition.y, tileInstance);
+            f.Events.TileBroken(entity, tilePosition.x, tilePosition.y, tileInstance, brokenByMega);
             stage.SetTileRelative(f, tilePosition.x, tilePosition.y, default);
 
         } else if (BumpIfNotBroken && doBump) {

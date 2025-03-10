@@ -1,5 +1,5 @@
 component Powerup {
-	asset_ref<PowerupAsset> Scriptable;
+	AssetRef<PowerupAsset> Scriptable;
 	bool FacingRight;
 	int Lifetime;
 
@@ -37,6 +37,5 @@ enum PowerupReserveResult : Byte {
 }
 
 event PowerupBecameActive {
-	nothashed Frame Frame;
-	entity_ref Entity;
+	EntityRef Entity;
 }

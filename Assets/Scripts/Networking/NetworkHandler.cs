@@ -422,12 +422,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     private void OnPlayerAdded(EventPlayerAdded e) {
-        RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+        Frame f = e.Game.Frames.Predicted;
+        RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
         Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) joined the game.");
     }
 
     private void OnPlayerRemoved(EventPlayerRemoved e) {
-        RuntimePlayer runtimePlayer = e.Frame.GetPlayerData(e.Player);
+        Frame f = e.Game.Frames.Predicted;
+        RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
         Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) left the game.");
     }
 
@@ -452,7 +454,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     byte[] playerteams;
     PlayerRef[] playerrefs;
     private void OnRecordingStarted(EventRecordingStarted e) {
-        RecordReplay(e.Game, e.Frame);
+        RecordReplay(e.Game, e.Game.Frames.Verified);
     }
 
     public unsafe void RecordReplay(QuantumGame game, Frame f) {

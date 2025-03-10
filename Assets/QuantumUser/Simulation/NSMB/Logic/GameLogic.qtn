@@ -29,7 +29,7 @@ struct PlayerInformation {
 }
 
 struct GameRules {
-	asset_ref<Map> Stage;
+	AssetRef<Map> Stage;
 
 	int StarsToWin;
 	int CoinsForPowerup;
@@ -54,65 +54,55 @@ signal OnGameEnding(int winningTeam, bool hasWinner);
 signal OnReturnToRoom();
 
 synced event GameStateChanged {
-	Frame Frame;
 	GameState NewState;
 }
 
 synced event PlayerAdded {
-	Frame Frame;
 	PlayerRef Player;
 }
 
 synced event PlayerRemoved {
-	Frame Frame;
 	PlayerRef Player;
 }
 
 event PlayerDataChanged {
-	nothashed Frame Frame;
 	PlayerRef Player;
 }
 
 event StartingCountdownChanged {
-	nothashed Frame Frame;
 	bool IsGameStarting;
 }
 
 event CountdownTick {
-	nothashed Frame Frame;
 	int SecondsRemaining;
 }
 
 synced event HostChanged {
-	Frame Frame;
 	PlayerRef NewHost;
 }
 
 synced event RulesChanged {
-	Frame Frame;
 	bool LevelChanged;
 }
 
 synced event PlayerLoaded {
-	Frame Frame;
 	PlayerRef Player;
 }
 
 synced event RecordingStarted {
-	Frame Frame;
+
 }
 
 synced event GameStarted {
-	Frame Frame;
+
 }
 
 synced event GameEnded {
-	Frame Frame;
 	bool EndedByHost;
 	int WinningTeam;
 	bool HasWinner;
 }
 
 event StartGameEndFade {
-	nothashed Frame Frame;
+
 }

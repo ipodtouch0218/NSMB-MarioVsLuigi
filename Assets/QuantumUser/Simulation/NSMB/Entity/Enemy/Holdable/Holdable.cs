@@ -7,7 +7,7 @@ namespace Quantum {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             mario->HeldEntity = entity;
             mario->HoldStartFrame = f.Number;
-            f.Events.MarioPlayerPickedUpObject(f, marioEntity, entity);
+            f.Events.MarioPlayerPickedUpObject(marioEntity, entity, HoldAboveHead);
         }
 
         public void DropWithoutThrowing(Frame f, EntityRef entity) {

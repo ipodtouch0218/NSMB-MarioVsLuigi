@@ -43,6 +43,5 @@ signal OnEntityChangeUnderwaterState(EntityRef entity, EntityRef liquid, bool un
 signal OnEntityCrushed(EntityRef entity);
 
 event PhysicsObjectLanded {
-    nothashed Frame Frame;
     EntityRef Entity;
 }
