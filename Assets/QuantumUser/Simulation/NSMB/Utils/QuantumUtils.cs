@@ -308,10 +308,14 @@ public static unsafe class QuantumUtils {
         bool vertical = stage.SpawnVerticalPowerups;
 
         bool canSpawnMega = true;
+        
         var allPlayers = f.Filter<MarioPlayer>();
         allPlayers.UseCulling = false;
-        while (allPlayers.Next(out _, out MarioPlayer otherPlayer)) {
-            if (otherPlayer.CurrentPowerupState == PowerupState.MegaMushroom) {
+        while (allPlayers.NextUnsafe(out _, out MarioPlayer* otherPlayer)) {
+            // Check if another player is actively mega (not growing or shrinking)
+            // If they are growing, we might have desynced. Hopefully, prediction wont be a full 2-3 seconds long...
+            if (otherPlayer->CurrentPowerupState == PowerupState.MegaMushroom
+                && otherPlayer->MegaMushroomStartFrames == 0) {
                 canSpawnMega = false;
                 break;
             }
@@ -333,7 +337,7 @@ public static unsafe class QuantumUtils {
             totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
         }
 
-        FP rand = f.RNG->Next(0, totalChance);
+        FP rand = mario->RNG.Next(0, totalChance);
         foreach (PowerupAsset powerup in f.SimulationConfig.AllPowerups) {
             if (powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                 continue;

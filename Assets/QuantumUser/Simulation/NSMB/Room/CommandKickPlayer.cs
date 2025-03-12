@@ -15,7 +15,7 @@ namespace Quantum {
                 return;
             }
 
-            f.Events.PlayerKickedFromRoom(Target);
+            f.Events.PlayerKickedFromRoom(Target, false);
             f.Signals.OnPlayerRemoved(Target);
         }
     }

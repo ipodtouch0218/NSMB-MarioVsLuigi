@@ -9,6 +9,7 @@ global {
 	ushort GameStartFrames;
 	ushort PlayerLoadFrames;
 
+	[AllocateOnComponentAdded] list<QStringUtf8<40>> BannedPlayerIds;
 	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
 	array<PlayerInformation>[MaxPlayers] PlayerInfo;
 	byte RealPlayers;

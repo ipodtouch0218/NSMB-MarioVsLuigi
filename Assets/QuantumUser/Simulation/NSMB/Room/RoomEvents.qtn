@@ -9,4 +9,5 @@ synced event PlayerSentChatMessage {
 
 synced event PlayerKickedFromRoom {
 	PlayerRef Player;
+	bool Banned;
 }

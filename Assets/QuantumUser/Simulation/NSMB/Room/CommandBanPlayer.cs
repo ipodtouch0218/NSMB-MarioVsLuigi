@@ -15,9 +15,9 @@ namespace Quantum {
                 return;
             }
 
-            // TODO: Also ban player
-
-            f.Events.PlayerKickedFromRoom(Target);
+            RuntimePlayer targetPlayerData = f.GetPlayerData(Target);
+            f.ResolveList(f.Global->BannedPlayerIds).Add(targetPlayerData.UserId);
+            f.Events.PlayerKickedFromRoom(Target, true);
             f.Signals.OnPlayerRemoved(Target);
         }
     }

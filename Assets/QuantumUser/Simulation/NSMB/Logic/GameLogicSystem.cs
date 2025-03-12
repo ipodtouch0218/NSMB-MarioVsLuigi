@@ -21,6 +21,9 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
+            // Tick RNG
+            _ = f.RNG->Next();
+
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
             for (int i = 0; i < f.PlayerCount; i++) {
@@ -239,6 +242,12 @@ namespace Quantum {
 
         public void OnPlayerAdded(Frame f, PlayerRef player, bool firstTime) {
             RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+
+            if (f.ResolveList(f.Global->BannedPlayerIds).Contains(runtimePlayer.UserId)) {
+                // banned user- ignore them.
+                return;
+            }
+
             EntityRef newEntity = f.Create();
             f.Add(newEntity, out PlayerData* newData);
             newData->PlayerRef = player;
@@ -328,9 +337,9 @@ namespace Quantum {
 
                 f.Destroy(entity);
                 playerDatas.Remove(player);
-            }
 
-            f.Events.PlayerRemoved(player);
+                f.Events.PlayerRemoved(player);
+            }
 
             switch (f.Global->GameState) {
             case GameState.PreGameRoom:

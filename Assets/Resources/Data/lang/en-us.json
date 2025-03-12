@@ -47,6 +47,7 @@
   "ui.main.quit": "Quit",
   "ui.main.about": "About",
   "ui.main.extras": "Extras",
+  "ui.main.replays": "Replays",
   "ui.main.bulletin": "Bulletin Board",
   "ui.update.header": "An update is available!",
   "ui.update.prompt": "New version: {newversion} \nYour version: {currentversion}",

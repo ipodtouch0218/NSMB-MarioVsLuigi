@@ -266,8 +266,15 @@ namespace NSMB.UI.MainMenu {
             canvas.EventSystem.SetSelectedGameObject(button.gameObject);
         }
 
-        public void BanPlayer() {
-            // TODO MainMenuManager.Instance.Ban(player);
+        public unsafe void BanPlayer() {
+            QuantumGame game = NetworkHandler.Game;
+            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            if (game.PlayerIsLocal(host)) {
+                int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
+                game.SendCommand(slot, new CommandBanPlayer {
+                    Target = player
+                });
+            }
             HideDropdown(true);
         }
 

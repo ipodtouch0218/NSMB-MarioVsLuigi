@@ -33,6 +33,9 @@ namespace Quantum {
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var mario = filter.MarioPlayer;
             var player = mario->PlayerRef;
+            
+            // Shuffle RNG.
+            _ = mario->RNG.Next();
 
             Input* inputPtr;
             if (player.IsValid && (inputPtr = f.GetPlayerInput(player)) != null) {

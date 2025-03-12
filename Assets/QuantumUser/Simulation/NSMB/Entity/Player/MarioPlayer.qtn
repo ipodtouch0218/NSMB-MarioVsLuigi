@@ -30,14 +30,16 @@ enum JumpState : Byte {
 }
 
 component MarioPlayer {
-    asset_ref<MarioPlayerPhysicsInfo> PhysicsAsset;
-	asset_ref<CharacterAsset> CharacterAsset;
+    AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+	AssetRef<CharacterAsset> CharacterAsset;
+
 	[ExcludeFromPrototype] PlayerRef PlayerRef;
 	[ExcludeFromPrototype] byte SpawnpointIndex;
 
 	[ExcludeFromPrototype] PowerupState CurrentPowerupState;
 	[ExcludeFromPrototype] PowerupState PreviousPowerupState;
-	[ExcludeFromPrototype] asset_ref<PowerupAsset> ReserveItem;
+	[ExcludeFromPrototype] AssetRef<PowerupAsset> ReserveItem;
+	[ExcludeFromPrototype] RNGSession RNG;
 
 	[ExcludeFromPrototype] byte Stars;
 	[ExcludeFromPrototype] byte Coins;

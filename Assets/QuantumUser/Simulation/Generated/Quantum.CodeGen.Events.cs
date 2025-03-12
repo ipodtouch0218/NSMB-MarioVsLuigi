@@ -617,10 +617,11 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventPlayerKickedFromRoom PlayerKickedFromRoom(PlayerRef Player) {
+      public EventPlayerKickedFromRoom PlayerKickedFromRoom(PlayerRef Player, QBoolean Banned) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventPlayerKickedFromRoom>(EventPlayerKickedFromRoom.ID);
         ev.Player = Player;
+        ev.Banned = Banned;
         _f.AddEvent(ev);
         return ev;
       }
@@ -2422,6 +2423,7 @@ namespace Quantum {
   public unsafe partial class EventPlayerKickedFromRoom : EventBase {
     public new const Int32 ID = 68;
     public PlayerRef Player;
+    public QBoolean Banned;
     protected EventPlayerKickedFromRoom(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -2440,6 +2442,7 @@ namespace Quantum {
       unchecked {
         var hash = 409;
         hash = hash * 31 + Player.GetHashCode();
+        hash = hash * 31 + Banned.GetHashCode();
         return hash;
       }
     }

@@ -85,19 +85,22 @@ public class GlobalController : Singleton<GlobalController> {
         int newWindowWidth = Screen.width;
         int newWindowHeight = Screen.height;
 
-        if (windowWidth != newWindowWidth || windowHeight != newWindowHeight) {
-            windowWidth = newWindowWidth;
-            windowHeight = newWindowHeight;
-            ResolutionChanged?.Invoke();
-        }
-
         //todo: this jitters to hell
 #if UNITY_STANDALONE
+        if (UnityEngine.Input.GetKey(KeyCode.LeftShift)) {
+            Debug.Log($"{Screen.fullScreenMode == FullScreenMode.Windowed} && {UnityEngine.Input.GetKey(KeyCode.LeftShift)} && ({windowWidth != newWindowWidth} || {windowHeight != newWindowHeight})");
+        }
         if (Screen.fullScreenMode == FullScreenMode.Windowed && UnityEngine.Input.GetKey(KeyCode.LeftShift) && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
             newWindowHeight = (int) (newWindowWidth * (9f / 16f));
             Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
         }
 #endif
+
+        if (windowWidth != newWindowWidth || windowHeight != newWindowHeight) {
+            windowWidth = newWindowWidth;
+            windowHeight = newWindowHeight;
+            ResolutionChanged?.Invoke();
+        }
 
         if ((int) (Time.unscaledTime + Time.unscaledDeltaTime) > (int) Time.unscaledTime) {
             // Update discord every second
