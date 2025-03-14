@@ -31,7 +31,7 @@ namespace NSMB.UI.MainMenu {
                 playerListEntries.Add(Instantiate(template, template.transform.parent));
             }
 
-            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded, NetworkHandler.FilterOutReplay);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved, NetworkHandler.FilterOutReplay);
@@ -177,8 +177,8 @@ namespace NSMB.UI.MainMenu {
             RemoveAllPlayerEntries();
         }
 
-        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-            PopulatePlayerEntries(e.Frame);
+        private void OnGameStarted(CallbackGameStarted e) {
+            PopulatePlayerEntries(e.Game.Frames.Predicted);
         }
     }
 }

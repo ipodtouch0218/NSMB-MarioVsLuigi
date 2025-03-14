@@ -1,5 +1,5 @@
-#pragma max_players 10
 #define MaxPlayers 10
+#pragma max_players MaxPlayers
 
 global {
 	GameRules Rules;	

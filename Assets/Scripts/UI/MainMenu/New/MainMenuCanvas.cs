@@ -1,7 +1,9 @@
 using NSMB.Extensions;
+using NSMB.UI.MainMenu.Submenus;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -25,7 +27,6 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private MainMenuSubmenu startingSubmenu;
         [SerializeField] private GameObject mainPanel;
         [SerializeField] private AudioSource sfx;
-        [SerializeField] private MainMenuSubmenu goToSubmenuOnError;
         [SerializeField] private ErrorPromptSubmenu errorSubmenu;
 
         [Header("Header")]
@@ -85,6 +86,10 @@ namespace NSMB.UI.MainMenu {
                 HeaderColorChanged?.Invoke(newColor);
             }
             header.SetActive(showHeader);
+        }
+
+        public bool IsSubmenuOpen(MainMenuSubmenu menu) {
+            return submenuStack.Contains(menu);
         }
 
         public void OpenMenu(MainMenuSubmenu menu) {
@@ -187,7 +192,10 @@ namespace NSMB.UI.MainMenu {
             mainPanel.SetActive(showMainPanel);
         }
 
-        private void OnError(string message) {
+        private void OnError(string message, bool disconnect) {
+            if (disconnect) {
+                OpenMenu(allSubmenus.OfType<RoomListSubmenu>().First());
+            }
             errorSubmenu.OpenWithString(message);
         }
     }

@@ -32,7 +32,7 @@ public class VersusStageGizmos : MonoBehaviour {
 
         for (int i = 0; i < 10; i++) {
             Gizmos.color = new Color((float) i / 10, 0, 0, 0.75f);
-            Gizmos.DrawCube(stage.GetWorldSpawnpointForPlayer(i, 10).ToUnityVector3() + Vector3.down * 0.25f, Vector2.one * 0.5f);
+            Gizmos.DrawCube(stage.GetWorldSpawnpointForPlayer(i, 10).ToUnityVector3() + Vector3.up * 0.25f, Vector2.one * 0.5f);
         }
 
         Vector2 cameraDimensions = (stage.CameraMaxPosition - stage.CameraMinPosition).ToUnityVector2();

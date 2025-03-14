@@ -17,7 +17,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     //---Events
     public static event Action<ClientState, ClientState> StateChanged;
-    public static event Action<string> OnError;
+    public static event Action<string, bool> OnError;
 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
@@ -59,6 +59,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         };
         realtimeClient.AddCallbackTarget(this);
 
+        QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
         QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
@@ -402,7 +403,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     private void OnPluginDisconnect(CallbackPluginDisconnect e) {
         Debug.Log($"[Network] Disconnected via server plugin: {e.Reason}");
 
-        OnError?.Invoke(e.Reason);
+        OnError?.Invoke(e.Reason, true);
 
         if (Runner) {
             Runner.Shutdown(ShutdownCause.SimulationStopped);
@@ -531,6 +532,14 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         ReplayFrameCache.Clear();
         ReplayFrameCache.Add(arguments.FrameData);
         Runner = await QuantumRunner.StartGameAsync(arguments);
+    }
+
+    private unsafe void OnGameStarted(CallbackGameStarted e) {
+        Frame f = e.Game.Frames.Verified;
+        if (f.ResolveList(f.Global->BannedPlayerIds).Contains(Client.UserId)) {
+            QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
+            OnError?.Invoke("ui.error.join.banned", true);
+        }
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {

@@ -29,9 +29,10 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public override void Initialize() {
             base.Initialize();
-            NetworkHandler.StateChanged += OnClientStateChanged;
-            QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
             defaultUsernameColor = usernameField.targetGraphic.color;
+
+            NetworkHandler.StateChanged += OnClientStateChanged;
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         }
 
         public void OnEnable() {
@@ -188,8 +189,10 @@ namespace NSMB.UI.MainMenu.Submenus {
             */
         }
 
-        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-            Canvas.OpenMenu(inRoomSubmenu);
+        private void OnPlayerAdded(EventPlayerAdded e) {
+            if (e.Game.PlayerIsLocal(e.Player) && !Canvas.IsSubmenuOpen(inRoomSubmenu)) {
+                Canvas.OpenMenu(inRoomSubmenu);
+            }
         }
 
         private class RegionOption : TMP_Dropdown.OptionData, IComparable {

@@ -10,7 +10,7 @@ public class StagePreviewManager : MonoBehaviour {
 
     public void Start() {
         PreviewRandomStage();
-        QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
+        QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
     }
 
@@ -36,8 +36,10 @@ public class StagePreviewManager : MonoBehaviour {
         return stages[0];
     }
 
-    private unsafe void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-        PreviewStage(e.Game.Frames.Predicted.Global->Rules.Stage);
+    private unsafe void OnPlayerAdded(EventPlayerAdded e) {
+        if (e.Game.PlayerIsLocal(e.Player)) {
+            PreviewStage(e.Game.Frames.Predicted.Global->Rules.Stage);
+        }
     }
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {

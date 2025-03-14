@@ -17,7 +17,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         public override void Initialize() {
             base.Initialize();
-
             QuantumCallback.Subscribe<CallbackLocalPlayerAddConfirmed>(this, OnLocalPlayerAddConfirmed);
         }
 
