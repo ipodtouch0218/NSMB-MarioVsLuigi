@@ -93,6 +93,13 @@ enum ActionFlags : Int32 {
 	OverrideAll = 2097152,		// skip every method only letting the HandleActions method run
 }
 
+enum BreakableFlags : Int32 {
+	Down = 1,
+	Up = 2,
+	Left = 4,
+	Right = 8,
+}
+
 component MarioPlayer {
     asset_ref<MarioPlayerPhysicsInfo> PhysicsAsset;
 	asset_ref<CharacterAsset> CharacterAsset;
@@ -118,6 +125,10 @@ component MarioPlayer {
 	[ExcludeFromPrototype] int ActionArg;
 	[ExcludeFromPrototype] int CurrActionFlags;
 	[ExcludeFromPrototype] EntityRef ActionObject;
+
+	// Breaking Blocks
+	[ExcludeFromPrototype] int CurrBreakableFlags;
+	[ExcludeFromPrototype] PowerupState BreakableLevel;
 
 	// Stomping
 	[ExcludeFromPrototype] PlayerAction StompAction;

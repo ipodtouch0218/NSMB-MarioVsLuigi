@@ -119,6 +119,14 @@ namespace Quantum {
             StompAction = default;
             SetActionFlags(GetActionFlags(Action));
 
+            BreakableLevel = CurrentPowerupState;
+            if (HasActionFlags(ActionFlags.AirAction)) {
+                // assume they can break ceilings
+                SetBreakableFlags(BreakableFlags.Up);
+            } else {
+                CurrBreakableFlags = 0;
+            }
+
             UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}] with Arg [{arg}]");
             return Action;
         }
@@ -170,7 +178,7 @@ namespace Quantum {
         }
 
         public bool HasActionFlags(ActionFlags actionFlags) {
-            return (this.CurrActionFlags & (int)actionFlags) != 0;
+            return (this.CurrActionFlags & (int) actionFlags) != 0;
         }
 
         public void AddActionFlags(ActionFlags actionFlags) {
@@ -191,6 +199,30 @@ namespace Quantum {
 
         public void SetActionFlags(ActionFlags actionFlags) {
             this.CurrActionFlags = (int) actionFlags;
+        }
+
+        public bool HasBreakableFlags(BreakableFlags currBreakableFlags) {
+            return (this.CurrBreakableFlags & (int) currBreakableFlags) != 0;
+        }
+
+        public void AddBreakableFlags(BreakableFlags currBreakableFlags) {
+            this.CurrBreakableFlags |= (int) currBreakableFlags;
+        }
+
+        public void ClearBreakableFlags(BreakableFlags currBreakableFlags) {
+            this.CurrBreakableFlags &= ~(int) currBreakableFlags;
+        }
+
+        public void ToggleBreakableFlags(BreakableFlags currBreakableFlags, bool add) {
+            if (!add) {
+                ClearBreakableFlags(currBreakableFlags);
+            } else {
+                AddBreakableFlags(currBreakableFlags);
+            }
+        }
+
+        public void SetBreakableFlags(BreakableFlags currBreakableFlags) {
+            this.CurrBreakableFlags = (int) currBreakableFlags;
         }
 
         public void SetStompEvents(PlayerAction victimAction = PlayerAction.NormalKnockback, int starsToDrop = 1) {

@@ -120,7 +120,7 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, bulletBillTransform->Position + FPVector2.Up * FP._0_10, marioTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > 0;
-            bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
+            bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction);
             
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
                 bulletBill->Kill(f, bulletBillEntity, marioEntity, true);
@@ -129,20 +129,9 @@ namespace Quantum {
             }
 
             if (attackedFromAbove) {
-                if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                    if (mario->HasActionFlags(ActionFlags.StrongAction)) {
-                        mario->SetPlayerAction(PlayerAction.Freefall, f);
-                        bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
-                    }
-                    mario->CheckEntityBounce(f);
-                } else {
-                    bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
-                    mario->CheckEntityBounce(f);
-                }
-                if (mario->Action == PlayerAction.SpinBlockSpin) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
-                else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
-
-            } else if (!mario->IsCrouchedInShell && mario->IsDamageable) {
+                bulletBill->Kill(f, bulletBillEntity, marioEntity, false);
+                mario->CheckEntityBounce(f);
+            } else if (mario->Action != PlayerAction.BlueShellCrouch && mario->IsDamageable) {
                 mario->Powerdown(f, marioEntity, false);
             }
         }

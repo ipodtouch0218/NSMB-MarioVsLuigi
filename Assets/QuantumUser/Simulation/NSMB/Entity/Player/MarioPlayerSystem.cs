@@ -1388,6 +1388,8 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
                 mario->AddActionFlags(ActionFlags.NoEnemyBounce | ActionFlags.NoPlayerBounce | ActionFlags.StrongAction | ActionFlags.BreaksBlocks);
                 mario->SetStompEvents(PlayerAction.HardKnockback, 3);
+                mario->BreakableLevel = mario->CurrentPowerupState;
+                mario->AddBreakableFlags(BreakableFlags.Down);
                 if (mario->CurrentPowerupState == PowerupState.BlueShell) {
                     mario->AddActionFlags(ActionFlags.IsShelled);
                 }

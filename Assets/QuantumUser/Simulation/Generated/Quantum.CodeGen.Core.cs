@@ -73,6 +73,12 @@ namespace Quantum {
     Holding = 1048576,
     OverrideAll = 2097152,
   }
+  public enum BreakableFlags : int {
+    Down = 1,
+    Up = 2,
+    Left = 4,
+    Right = 8,
+  }
   public enum GameState : byte {
     PreGameRoom,
     WaitingForPlayers,
@@ -2058,16 +2064,16 @@ namespace Quantum {
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
     [FieldOffset(120)]
     public AssetRef<CharacterAsset> CharacterAsset;
-    [FieldOffset(80)]
+    [FieldOffset(84)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
-    [FieldOffset(35)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
-    [FieldOffset(36)]
+    [FieldOffset(37)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
     [FieldOffset(136)]
@@ -2082,7 +2088,7 @@ namespace Quantum {
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public Byte Lives;
-    [FieldOffset(84)]
+    [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public QBoolean Disconnected;
     [FieldOffset(32)]
@@ -2109,16 +2115,22 @@ namespace Quantum {
     [FieldOffset(144)]
     [ExcludeFromPrototype()]
     public EntityRef ActionObject;
+    [FieldOffset(60)]
+    [ExcludeFromPrototype()]
+    public Int32 CurrBreakableFlags;
+    [FieldOffset(35)]
+    [ExcludeFromPrototype()]
+    public PowerupState BreakableLevel;
     [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public PlayerAction StompAction;
-    [FieldOffset(76)]
+    [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public Int32 StarStealCount;
-    [FieldOffset(88)]
+    [FieldOffset(92)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(96)]
+    [FieldOffset(100)]
     [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
     [FieldOffset(6)]
@@ -2127,7 +2139,7 @@ namespace Quantum {
     [FieldOffset(23)]
     [ExcludeFromPrototype()]
     public Byte SlowTurnaroundFrames;
-    [FieldOffset(72)]
+    [FieldOffset(76)]
     [ExcludeFromPrototype()]
     public Int32 LastPushingFrame;
     [FieldOffset(26)]
@@ -2148,7 +2160,7 @@ namespace Quantum {
     [FieldOffset(1)]
     [ExcludeFromPrototype()]
     public Byte CoyoteTimeFrames;
-    [FieldOffset(68)]
+    [FieldOffset(72)]
     [ExcludeFromPrototype()]
     public Int32 LandedFrame;
     [FieldOffset(29)]
@@ -2169,10 +2181,10 @@ namespace Quantum {
     [FieldOffset(27)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
-    [FieldOffset(100)]
+    [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public QBoolean KnockbackWasOriginallyFacingRight;
-    [FieldOffset(64)]
+    [FieldOffset(68)]
     [ExcludeFromPrototype()]
     public Int32 KnockbackTick;
     [FieldOffset(5)]
@@ -2181,7 +2193,7 @@ namespace Quantum {
     [FieldOffset(2)]
     [ExcludeFromPrototype()]
     public Byte CrushDamageInvincibilityFrames;
-    [FieldOffset(92)]
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean IsStuckInBlock;
     [FieldOffset(38)]
@@ -2196,7 +2208,7 @@ namespace Quantum {
     [FieldOffset(13)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
-    [FieldOffset(104)]
+    [FieldOffset(108)]
     [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
     [FieldOffset(17)]
@@ -2217,7 +2229,7 @@ namespace Quantum {
     [FieldOffset(21)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
-    [FieldOffset(112)]
+    [FieldOffset(116)]
     [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(19)]
@@ -2229,7 +2241,7 @@ namespace Quantum {
     [FieldOffset(168)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
-    [FieldOffset(60)]
+    [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
     [FieldOffset(152)]
@@ -2238,7 +2250,7 @@ namespace Quantum {
     [FieldOffset(176)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
-    [FieldOffset(108)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
     [FieldOffset(16)]
@@ -2272,6 +2284,8 @@ namespace Quantum {
         hash = hash * 31 + ActionArg.GetHashCode();
         hash = hash * 31 + CurrActionFlags.GetHashCode();
         hash = hash * 31 + ActionObject.GetHashCode();
+        hash = hash * 31 + CurrBreakableFlags.GetHashCode();
+        hash = hash * 31 + (Byte)BreakableLevel;
         hash = hash * 31 + (Byte)StompAction;
         hash = hash * 31 + StarStealCount.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
@@ -2359,6 +2373,7 @@ namespace Quantum {
         serializer.Stream.Serialize((Byte*)&p->Action);
         serializer.Stream.Serialize((Byte*)&p->PrevAction);
         serializer.Stream.Serialize((Byte*)&p->StompAction);
+        serializer.Stream.Serialize((Byte*)&p->BreakableLevel);
         serializer.Stream.Serialize((Byte*)&p->CurrentPowerupState);
         serializer.Stream.Serialize((Byte*)&p->PreviousPowerupState);
         serializer.Stream.Serialize(&p->InvincibilityFrames);
@@ -2367,6 +2382,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->ActionState);
         serializer.Stream.Serialize(&p->ActionTimer);
         serializer.Stream.Serialize(&p->CurrActionFlags);
+        serializer.Stream.Serialize(&p->CurrBreakableFlags);
         serializer.Stream.Serialize(&p->HoldStartFrame);
         serializer.Stream.Serialize(&p->KnockbackTick);
         serializer.Stream.Serialize(&p->LandedFrame);
@@ -3663,6 +3679,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.BlockBump), Quantum.BlockBump.SIZE);
       typeRegistry.Register(typeof(Quantum.Bobomb), Quantum.Bobomb.SIZE);
       typeRegistry.Register(typeof(Quantum.Boo), Quantum.Boo.SIZE);
+      typeRegistry.Register(typeof(Quantum.BreakableFlags), 4);
       typeRegistry.Register(typeof(Quantum.BreakableObject), Quantum.BreakableObject.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBill), Quantum.BulletBill.SIZE);
       typeRegistry.Register(typeof(Quantum.BulletBillLauncher), Quantum.BulletBillLauncher.SIZE);
@@ -3819,6 +3836,7 @@ namespace Quantum {
     public static void EnsureNotStrippedGen() {
       FramePrinter.EnsureNotStripped();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.ActionFlags>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.BreakableFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<CallbackFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.GameState>();
       FramePrinter.EnsurePrimitiveNotStripped<IceBlockBreakReason>();
