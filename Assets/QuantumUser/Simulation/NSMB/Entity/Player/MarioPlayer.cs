@@ -49,7 +49,7 @@ namespace Quantum {
                 PlayerAction.HoldFall               => ActionFlags.AllowBump | ActionFlags.Holding | ActionFlags.AirAction,
                 PlayerAction.WallSlide              => ActionFlags.AirAction,
                 PlayerAction.Wallkick               => ActionFlags.AirAction,
-                PlayerAction.GroundPound            => ActionFlags.AirAction | ActionFlags.DisableTurnaround | ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction | ActionFlags.IrregularVelocity, // the 3 stars flag gets applied later
+                PlayerAction.GroundPound            => ActionFlags.AirAction | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity, // a few flags are handled by the action
                 // PlayerAction.MiniGroundPound        => (int) (ActionFlags.AirAction), // has player bounce
                 PlayerAction.SoftKnockback          => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
                 PlayerAction.NormalKnockback        => ActionFlags.Intangible | ActionFlags.DisableTurnaround | ActionFlags.IrregularVelocity,
@@ -443,7 +443,6 @@ namespace Quantum {
             marioTransform->Position.X = pipeTransform->Position.X;
 
             UsedPropellerThisJump = false;
-            PropellerLaunchFrames = 0;
             PropellerSpinFrames = 0;
 
             if (InvincibilityFrames > 0) {

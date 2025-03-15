@@ -2061,19 +2061,19 @@ namespace Quantum {
     [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
-    [FieldOffset(25)]
+    [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public Byte SpawnpointIndex;
-    [FieldOffset(36)]
+    [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public PowerupState CurrentPowerupState;
-    [FieldOffset(37)]
+    [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
     [FieldOffset(136)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
-    [FieldOffset(26)]
+    [FieldOffset(25)]
     [ExcludeFromPrototype()]
     public Byte Stars;
     [FieldOffset(0)]
@@ -2085,10 +2085,10 @@ namespace Quantum {
     [FieldOffset(84)]
     [ExcludeFromPrototype()]
     public QBoolean Disconnected;
-    [FieldOffset(33)]
+    [FieldOffset(32)]
     [ExcludeFromPrototype()]
     public PlayerAction Action;
-    [FieldOffset(34)]
+    [FieldOffset(33)]
     [ExcludeFromPrototype()]
     public PlayerAction PrevAction;
     [FieldOffset(192)]
@@ -2109,7 +2109,7 @@ namespace Quantum {
     [FieldOffset(144)]
     [ExcludeFromPrototype()]
     public EntityRef ActionObject;
-    [FieldOffset(35)]
+    [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public PlayerAction StompAction;
     [FieldOffset(76)]
@@ -2124,19 +2124,19 @@ namespace Quantum {
     [FieldOffset(6)]
     [ExcludeFromPrototype()]
     public Byte FastTurnaroundFrames;
-    [FieldOffset(24)]
+    [FieldOffset(23)]
     [ExcludeFromPrototype()]
     public Byte SlowTurnaroundFrames;
     [FieldOffset(72)]
     [ExcludeFromPrototype()]
     public Int32 LastPushingFrame;
-    [FieldOffset(27)]
+    [FieldOffset(26)]
     [ExcludeFromPrototype()]
     public Byte StationaryFrames;
-    [FieldOffset(31)]
+    [FieldOffset(30)]
     [ExcludeFromPrototype()]
     public JumpState JumpState;
-    [FieldOffset(32)]
+    [FieldOffset(31)]
     [ExcludeFromPrototype()]
     public JumpState PreviousJumpState;
     [FieldOffset(11)]
@@ -2151,10 +2151,10 @@ namespace Quantum {
     [FieldOffset(68)]
     [ExcludeFromPrototype()]
     public Int32 LandedFrame;
-    [FieldOffset(30)]
+    [FieldOffset(29)]
     [ExcludeFromPrototype()]
     public Byte WallslideEndFrames;
-    [FieldOffset(29)]
+    [FieldOffset(28)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
     [FieldOffset(9)]
@@ -2166,7 +2166,7 @@ namespace Quantum {
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public Byte GroundpoundStandFrames;
-    [FieldOffset(28)]
+    [FieldOffset(27)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
     [FieldOffset(100)]
@@ -2211,13 +2211,10 @@ namespace Quantum {
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public Byte CurrentVolley;
-    [FieldOffset(23)]
+    [FieldOffset(22)]
     [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
     [FieldOffset(21)]
-    [ExcludeFromPrototype()]
-    public Byte PropellerLaunchFrames;
-    [FieldOffset(22)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
     [FieldOffset(112)]
@@ -2310,7 +2307,6 @@ namespace Quantum {
         hash = hash * 31 + CurrentProjectiles.GetHashCode();
         hash = hash * 31 + CurrentVolley.GetHashCode();
         hash = hash * 31 + ShellSlowdownFrames.GetHashCode();
-        hash = hash * 31 + PropellerLaunchFrames.GetHashCode();
         hash = hash * 31 + PropellerSpinFrames.GetHashCode();
         hash = hash * 31 + UsedPropellerThisJump.GetHashCode();
         hash = hash * 31 + PropellerDrillCooldown.GetHashCode();
@@ -2349,7 +2345,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->ProjectileVolleyFrames);
         serializer.Stream.Serialize(&p->PropellerDrillCooldown);
         serializer.Stream.Serialize(&p->PropellerDrillHoldFrames);
-        serializer.Stream.Serialize(&p->PropellerLaunchFrames);
         serializer.Stream.Serialize(&p->PropellerSpinFrames);
         serializer.Stream.Serialize(&p->ShellSlowdownFrames);
         serializer.Stream.Serialize(&p->SlowTurnaroundFrames);

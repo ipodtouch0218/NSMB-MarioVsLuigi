@@ -382,7 +382,8 @@ namespace NSMB.Entities.Player {
 
             } else if (mario->Action is PlayerAction.SpinBlockSpin or PlayerAction.PropellerSpin or
                 PlayerAction.SpinBlockDrill or PlayerAction.PropellerDrill) {
-                modelRotationTarget *= Quaternion.Euler(0, (-1200 - ((mario->PropellerLaunchFrames / 60f) * 1400)
+                int spin = mario->Action == PlayerAction.PropellerSpin && mario->ActionArg == 0 ? 60 - mario->ActionTimer : 0;
+                modelRotationTarget *= Quaternion.Euler(0, (-1200 - ((spin / 60f) * 1400)
                     - ((mario->Action is PlayerAction.SpinBlockDrill or PlayerAction.PropellerDrill) ? 900 : 0)
                     + (mario->Action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames == 0 && physicsObject->Velocity.Y < 0 ? 700 : 0)) * delta, 0);
                 modelRotateInstantly = true;
@@ -442,7 +443,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamSkidding,         mario->Action == PlayerAction.Skidding);
             animator.SetBool(ParamPropeller,        mario->Action == PlayerAction.PropellerSpin); // little confused on this one, where is IsPropellerFlying used?
             animator.SetBool(ParamPropellerSpin,    mario->Action == PlayerAction.PropellerSpin && mario->PropellerSpinFrames > 0);
-            animator.SetBool(ParamPropellerStart,   mario->Action == PlayerAction.PropellerSpin && mario->PropellerLaunchFrames > 0); // confusing
+            animator.SetBool(ParamPropellerStart,   mario->Action == PlayerAction.PropellerSpin && mario->ActionTimer < 60 && mario->ActionArg == 0);
             animator.SetBool(ParamCrouching,        mario->Action is PlayerAction.Crouch or PlayerAction.CrouchAir);
             animator.SetBool(ParamGroundpound,      mario->Action == PlayerAction.GroundPound);
             animator.SetBool(ParamSliding,          mario->Action == PlayerAction.Sliding);

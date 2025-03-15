@@ -246,7 +246,6 @@ namespace Quantum {
             mario->CurrentPowerupState = newState;
             //mario->powerupFlash = 2;
             mario->UsedPropellerThisJump = false;
-            mario->PropellerLaunchFrames = 0;
 
             // Don't give us an extra mushroom
             if (mario->PreviousPowerupState == PowerupState.NoPowerup
