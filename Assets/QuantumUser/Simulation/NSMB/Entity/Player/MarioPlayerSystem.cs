@@ -302,6 +302,8 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
+
+            int oldStompLevel = mario->StompPowerLevel;
  
             // set the action based off the action right before this
             switch (mario->PrevAction) {
@@ -309,6 +311,7 @@ namespace Quantum {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.SingleJump;
                 JumpHandler(f, ref filter, physics, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
+                mario->StompPowerLevel = oldStompLevel;
                 f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
@@ -316,6 +319,7 @@ namespace Quantum {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.DoubleJump;
                 JumpHandler(f, ref filter, physics, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
+                mario->StompPowerLevel = oldStompLevel;
                 f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
@@ -323,6 +327,7 @@ namespace Quantum {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.TripleJump;
                 JumpHandler(f, ref filter, physics, actionArg: 1, skipJumpCheck: true, checkJumpDown: true);
+                mario->StompPowerLevel = oldStompLevel;
                 f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
@@ -330,11 +335,13 @@ namespace Quantum {
                 mario->PropellerDrillCooldown = 30;
                 physicsObject->Velocity.Y = physics.PropellerLaunchVelocity;
                 mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
+                mario->StompPowerLevel = oldStompLevel;
                 return;
             }
             case PlayerAction.SpinBlockSpin or PlayerAction.SpinBlockDrill: {
                 physicsObject->Velocity.Y = physics.JumpVelocity; // ?
                 mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
+                mario->StompPowerLevel = oldStompLevel;
                 f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
@@ -342,6 +349,7 @@ namespace Quantum {
                 mario->LandedFrame = f.Number;
                 mario->JumpState = JumpState.None;
                 JumpHandler(f, ref filter, physics, PlayerAction.SingleJump, 1, true, true);
+                mario->StompPowerLevel = oldStompLevel;
                 f.Events.MarioPlayerJumped(f, filter.Entity, ConvertJumpState(mario->JumpState), true);
                 return;
             }
@@ -521,13 +529,13 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
 
-            // flags such as ActionFlags.BreaksBlocks are added here
+            // block breaking is added here
             HandleGroundpoundStartAnimation(ref filter, physics);
             HandleGroundpoundBlockCollision(f, ref filter, physics, stage, true);
 
             // a mini groundpound does not have these flags
             if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                mario->ClearActionFlags(ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce | ActionFlags.StrongAction);
+                mario->ClearActionFlags(ActionFlags.NoPlayerBounce | ActionFlags.NoEnemyBounce);
             }
 
             if (physicsObject->IsTouchingGround) {
@@ -698,6 +706,11 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
+
+            mario->StompPowerLevel = 1;
+            mario->BreakableLevel = PowerupState.Mushroom;
+            mario->AddBreakableFlags(BreakableFlags.Down);
+
             if (mario->ActionArg == 2) {
                 mario->AddActionFlags(ActionFlags.NoEnemyBounce | ActionFlags.NoPlayerBounce);
                 mario->SetStompEvents(PlayerAction.SoftKnockback, 1);
@@ -737,7 +750,7 @@ namespace Quantum {
             var inputs = filter.Inputs;
 
             if (mario->ActionArg == 0) {
-                mario->AddActionFlags(ActionFlags.BreaksBlocks);
+                mario->AddActionFlags(ActionFlags.Attacking);
                 BlueShellPhysics(f, ref filter, physics, stage);
             }
 
@@ -812,6 +825,9 @@ namespace Quantum {
                 mario->SetAirAction(physicsObject, f);
                 return;
             }
+
+            mario->BreakableLevel = mario->CurrentPowerupState;
+            mario->AddBreakableFlags(BreakableFlags.Down);
 
             if (inputs.Down.IsDown) {
                 mario->PropellerDrillHoldFrames = 15;
@@ -1356,7 +1372,7 @@ namespace Quantum {
             }
 
             /// * intentional: remove left/right requirement when groundpounding
-            if (ignoreLeftRight && (inputs.Left.IsDown || inputs.Right.IsDown)) {
+            if (!ignoreLeftRight && (inputs.Left.IsDown || inputs.Right.IsDown)) {
                 return false;
             }
             // */
@@ -1386,10 +1402,10 @@ namespace Quantum {
             }
 
             if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
-                mario->AddActionFlags(ActionFlags.NoEnemyBounce | ActionFlags.NoPlayerBounce | ActionFlags.StrongAction | ActionFlags.BreaksBlocks);
+                mario->AddActionFlags(ActionFlags.NoEnemyBounce | ActionFlags.NoPlayerBounce);
                 mario->SetStompEvents(PlayerAction.HardKnockback, 3);
-                mario->BreakableLevel = mario->CurrentPowerupState;
                 mario->AddBreakableFlags(BreakableFlags.Down);
+                mario->StompPowerLevel = mario->CurrentPowerupState == PowerupState.MiniMushroom ? 1 : MarioPlayer.StrongPowerLevel;
                 if (mario->CurrentPowerupState == PowerupState.BlueShell) {
                     mario->AddActionFlags(ActionFlags.IsShelled);
                 }
@@ -1453,7 +1469,7 @@ namespace Quantum {
             continueGroundpound &= interactedAny;
             if (!continueGroundpound && isGroundpound) {
                 // remove these flags
-                mario->ClearActionFlags(ActionFlags.BreaksBlocks | ActionFlags.StrongAction);
+                mario->StompPowerLevel = mario->CurrentPowerupState == PowerupState.MiniMushroom ? 0 : 1;
                 mario->ClearStompEvents();
                 return false;
             }
@@ -2061,10 +2077,6 @@ namespace Quantum {
                     InteractionDirection direction;
                     FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
                     if (upDot > PhysicsObjectSystem.GroundMaxAngle) {
-                        // Ground contact... only allow if groundpounding
-                        if (mario->Action == PlayerAction.GroundPound && mario->HasActionFlags(ActionFlags.BreaksBlocks)) {
-                            continue;
-                        }
                         direction = InteractionDirection.Down;
                     } else if (upDot < -PhysicsObjectSystem.GroundMaxAngle) {
                         direction = InteractionDirection.Up;

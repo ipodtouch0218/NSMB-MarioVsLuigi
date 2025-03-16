@@ -70,27 +70,25 @@ enum PlayerAction : Byte {
 
 enum ActionFlags : Int32 {
     Intangible = 1,				// makes Mario intangible if added
-    BreaksBlocks = 2,			// allows Mario to break blocks
-    IsShelled = 4,				// Blue Shell action
-    Attacking = 8,				// hurts enemies
-    NoPlayerBounce = 16,		// disable bounce off players
-    NoEnemyBounce = 32,			// disable bounce off enemies
-    AirAction = 64,				// if the action is in the air
-    WaterAction = 128,			// if the action is in the water
-    AllowBump = 256,			// allows bumping into other players
-    StrongAction = 512,			// makes the special particles spawn when killing enemies
-	AllowHold = 1024,			// allows Mario to pick up items
-	Cutscene = 2048,			// cutscene-like properties
-	CameraChange = 4096,		// changes the way the camera moves (i.e Propeller Spin)
-	DisableTurnaround = 8192,	// disables turn around by left and right
-	DisablePushing = 16384,		// disables pushing
-	UsesSmallHitbox = 32768,	// use the small hitbox even if Mario's big
-	UsesCrouchHitbox = 65536,	// use the crouch hitbox
-	KillMiniStomp = 131072,		// kills Mini players if above
-	StarSpinAction = 262144,	// makes Mario do the star sommersault
-	IrregularVelocity = 524288, // velocity isn't controlled by the regular left and right inputs
-	Holding = 1048576,			// Mario is holding something in the action
-	OverrideAll = 2097152,		// skip every method only letting the HandleActions method run
+    IsShelled = 2,				// Blue Shell action
+    Attacking = 4,				// hurts enemies
+    NoPlayerBounce = 8,			// disable bounce off players
+    NoEnemyBounce = 16,			// disable bounce off enemies
+    AirAction = 32,				// if the action is in the air
+    WaterAction = 64,			// if the action is in the water
+    AllowBump = 128,			// allows bumping into other players
+	AllowHold = 256,			// allows Mario to pick up items
+	Cutscene = 512,				// cutscene-like properties
+	CameraChange = 1024,		// changes the way the camera moves (i.e Propeller Spin)
+	DisableTurnaround = 2048,	// disables turn around by left and right
+	DisablePushing = 4096,		// disables pushing
+	UsesSmallHitbox = 8192,		// use the small hitbox even if Mario's big
+	UsesCrouchHitbox = 16384,	// use the crouch hitbox
+	KillMiniStomp = 32768,		// kills Mini players if above
+	StarSpinAction = 65536,	// makes Mario do the star sommersault
+	IrregularVelocity = 131072, // velocity isn't controlled by the regular left and right inputs
+	Holding = 262144,			// Mario is holding something in the action
+	OverrideAll = 524288,		// skip every method only letting the HandleActions method run
 }
 
 enum BreakableFlags : Int32 {
@@ -126,9 +124,10 @@ component MarioPlayer {
 	[ExcludeFromPrototype] int CurrActionFlags;
 	[ExcludeFromPrototype] EntityRef ActionObject;
 
-	// Breaking Blocks
+	// Breaking Stuff
 	[ExcludeFromPrototype] int CurrBreakableFlags;
 	[ExcludeFromPrototype] PowerupState BreakableLevel;
+	[ExcludeFromPrototype] int StompPowerLevel;
 
 	// Stomping
 	[ExcludeFromPrototype] PlayerAction StompAction;

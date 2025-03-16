@@ -51,27 +51,25 @@ namespace Quantum {
   
   public enum ActionFlags : int {
     Intangible = 1,
-    BreaksBlocks = 2,
-    IsShelled = 4,
-    Attacking = 8,
-    NoPlayerBounce = 16,
-    NoEnemyBounce = 32,
-    AirAction = 64,
-    WaterAction = 128,
-    AllowBump = 256,
-    StrongAction = 512,
-    AllowHold = 1024,
-    Cutscene = 2048,
-    CameraChange = 4096,
-    DisableTurnaround = 8192,
-    DisablePushing = 16384,
-    UsesSmallHitbox = 32768,
-    UsesCrouchHitbox = 65536,
-    KillMiniStomp = 131072,
-    StarSpinAction = 262144,
-    IrregularVelocity = 524288,
-    Holding = 1048576,
-    OverrideAll = 2097152,
+    IsShelled = 2,
+    Attacking = 4,
+    NoPlayerBounce = 8,
+    NoEnemyBounce = 16,
+    AirAction = 32,
+    WaterAction = 64,
+    AllowBump = 128,
+    AllowHold = 256,
+    Cutscene = 512,
+    CameraChange = 1024,
+    DisableTurnaround = 2048,
+    DisablePushing = 4096,
+    UsesSmallHitbox = 8192,
+    UsesCrouchHitbox = 16384,
+    KillMiniStomp = 32768,
+    StarSpinAction = 65536,
+    IrregularVelocity = 131072,
+    Holding = 262144,
+    OverrideAll = 524288,
   }
   public enum BreakableFlags : int {
     Down = 1,
@@ -2056,15 +2054,15 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 304;
+    public const Int32 SIZE = 312;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(300)]
+    [FieldOffset(308)]
     private fixed Byte _alignment_padding_[4];
-    [FieldOffset(128)]
+    [FieldOffset(136)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
-    [FieldOffset(120)]
+    [FieldOffset(128)]
     public AssetRef<CharacterAsset> CharacterAsset;
-    [FieldOffset(84)]
+    [FieldOffset(88)]
     [ExcludeFromPrototype()]
     public PlayerRef PlayerRef;
     [FieldOffset(24)]
@@ -2076,7 +2074,7 @@ namespace Quantum {
     [FieldOffset(37)]
     [ExcludeFromPrototype()]
     public PowerupState PreviousPowerupState;
-    [FieldOffset(136)]
+    [FieldOffset(144)]
     [ExcludeFromPrototype()]
     public AssetRef<PowerupAsset> ReserveItem;
     [FieldOffset(25)]
@@ -2088,7 +2086,7 @@ namespace Quantum {
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public Byte Lives;
-    [FieldOffset(88)]
+    [FieldOffset(92)]
     [ExcludeFromPrototype()]
     public QBoolean Disconnected;
     [FieldOffset(32)]
@@ -2097,7 +2095,7 @@ namespace Quantum {
     [FieldOffset(33)]
     [ExcludeFromPrototype()]
     public PlayerAction PrevAction;
-    [FieldOffset(192)]
+    [FieldOffset(200)]
     [ExcludeFromPrototype()]
     public Input PreActionInput;
     [FieldOffset(52)]
@@ -2112,7 +2110,7 @@ namespace Quantum {
     [FieldOffset(56)]
     [ExcludeFromPrototype()]
     public Int32 CurrActionFlags;
-    [FieldOffset(144)]
+    [FieldOffset(152)]
     [ExcludeFromPrototype()]
     public EntityRef ActionObject;
     [FieldOffset(60)]
@@ -2121,16 +2119,19 @@ namespace Quantum {
     [FieldOffset(35)]
     [ExcludeFromPrototype()]
     public PowerupState BreakableLevel;
+    [FieldOffset(84)]
+    [ExcludeFromPrototype()]
+    public Int32 StompPowerLevel;
     [FieldOffset(34)]
     [ExcludeFromPrototype()]
     public PlayerAction StompAction;
     [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public Int32 StarStealCount;
-    [FieldOffset(92)]
+    [FieldOffset(96)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(100)]
+    [FieldOffset(104)]
     [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
     [FieldOffset(6)]
@@ -2181,7 +2182,7 @@ namespace Quantum {
     [FieldOffset(27)]
     [ExcludeFromPrototype()]
     public Byte SwimForceJumpTimer;
-    [FieldOffset(104)]
+    [FieldOffset(108)]
     [ExcludeFromPrototype()]
     public QBoolean KnockbackWasOriginallyFacingRight;
     [FieldOffset(68)]
@@ -2193,7 +2194,7 @@ namespace Quantum {
     [FieldOffset(2)]
     [ExcludeFromPrototype()]
     public Byte CrushDamageInvincibilityFrames;
-    [FieldOffset(96)]
+    [FieldOffset(100)]
     [ExcludeFromPrototype()]
     public QBoolean IsStuckInBlock;
     [FieldOffset(38)]
@@ -2208,7 +2209,7 @@ namespace Quantum {
     [FieldOffset(13)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
-    [FieldOffset(108)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
     [FieldOffset(17)]
@@ -2229,7 +2230,7 @@ namespace Quantum {
     [FieldOffset(21)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
-    [FieldOffset(116)]
+    [FieldOffset(120)]
     [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(19)]
@@ -2238,19 +2239,19 @@ namespace Quantum {
     [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public Byte PropellerDrillHoldFrames;
-    [FieldOffset(168)]
+    [FieldOffset(176)]
     [ExcludeFromPrototype()]
     public EntityRef HeldEntity;
     [FieldOffset(64)]
     [ExcludeFromPrototype()]
     public Int32 HoldStartFrame;
-    [FieldOffset(152)]
+    [FieldOffset(160)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentPipe;
-    [FieldOffset(176)]
+    [FieldOffset(184)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
-    [FieldOffset(112)]
+    [FieldOffset(116)]
     [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
     [FieldOffset(16)]
@@ -2259,7 +2260,7 @@ namespace Quantum {
     [FieldOffset(15)]
     [ExcludeFromPrototype()]
     public Byte PipeCooldownFrames;
-    [FieldOffset(160)]
+    [FieldOffset(168)]
     [ExcludeFromPrototype()]
     public EntityRef CurrentSpinner;
     public override Int32 GetHashCode() {
@@ -2286,6 +2287,7 @@ namespace Quantum {
         hash = hash * 31 + ActionObject.GetHashCode();
         hash = hash * 31 + CurrBreakableFlags.GetHashCode();
         hash = hash * 31 + (Byte)BreakableLevel;
+        hash = hash * 31 + StompPowerLevel.GetHashCode();
         hash = hash * 31 + (Byte)StompAction;
         hash = hash * 31 + StarStealCount.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
@@ -2388,6 +2390,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->LandedFrame);
         serializer.Stream.Serialize(&p->LastPushingFrame);
         serializer.Stream.Serialize(&p->StarStealCount);
+        serializer.Stream.Serialize(&p->StompPowerLevel);
         PlayerRef.Serialize(&p->PlayerRef, serializer);
         QBoolean.Serialize(&p->Disconnected, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);

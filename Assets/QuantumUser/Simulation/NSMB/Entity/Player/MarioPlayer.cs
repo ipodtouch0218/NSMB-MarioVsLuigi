@@ -12,6 +12,7 @@ namespace Quantum {
         public bool IsDead => Action is PlayerAction.Death or PlayerAction.LavaDeath;
         public const int DropStarRight = 1 << 8;
         public const int NoStarLoss = -1;
+        public const int StrongPowerLevel = 3;
 
         public byte GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
@@ -58,7 +59,7 @@ namespace Quantum {
                 PlayerAction.SpinBlockDrill         => ActionFlags.AirAction | ActionFlags.NoPlayerBounce,
                 PlayerAction.BlueShellCrouch        => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
                 PlayerAction.BlueShellCrouchAir     => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.IrregularVelocity,
-                PlayerAction.BlueShellSliding       => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.BreaksBlocks | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.NoPlayerBounce | ActionFlags.IrregularVelocity,
+                PlayerAction.BlueShellSliding       => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.Attacking | ActionFlags.AirAction | ActionFlags.NoPlayerBounce | ActionFlags.IrregularVelocity,
                 PlayerAction.BlueShellJump          => ActionFlags.IsShelled | ActionFlags.DisableTurnaround | ActionFlags.UsesCrouchHitbox | ActionFlags.AirAction | ActionFlags.IrregularVelocity, // the no player bounce based off ActionArg
                 // PlayerAction.BlueShellGroundPound   => (int) (ActionFlags.IsShelled | ActionFlags.AirAction | ActionFlags.NoPlayerBounce),
                 PlayerAction.PropellerSpin          => ActionFlags.AirAction | ActionFlags.CameraChange,
@@ -126,6 +127,7 @@ namespace Quantum {
             } else {
                 CurrBreakableFlags = 0;
             }
+            StompPowerLevel = CurrentPowerupState == PowerupState.MiniMushroom ? 0 : 1;
 
             UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}] with Arg [{arg}]");
             return Action;
@@ -250,7 +252,9 @@ namespace Quantum {
                     return false;
                 }
             }
+            int oldStompLevel = StompPowerLevel;
             SetPlayerAction(PlayerAction.Bounce, f);
+            StompPowerLevel = oldStompLevel;
             return true;
         }
 

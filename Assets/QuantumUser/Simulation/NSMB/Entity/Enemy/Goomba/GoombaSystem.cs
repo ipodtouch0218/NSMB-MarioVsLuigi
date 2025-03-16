@@ -70,27 +70,17 @@ namespace Quantum {
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
-            bool groundpounded = attackedFromAbove && mario->HasActionFlags(ActionFlags.StrongAction) && mario->CurrentPowerupState != PowerupState.MiniMushroom;
-            if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
+            bool groundpounded = mario->StompPowerLevel >= MarioPlayer.StrongPowerLevel;
+            if (mario->InstakillsEnemies(marioPhysicsObject, true)) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
-                mario->CheckEntityBounce(f);
                 return;
             }
 
             if (attackedFromAbove) {
-                if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                    if (mario->HasActionFlags(ActionFlags.StrongAction)) {
-                        mario->SetPlayerAction(PlayerAction.Freefall, f);
-                        goomba->Kill(f, goombaEntity, marioEntity, false);
-                    }
-                    mario->CheckEntityBounce(f);
-                } else {
-                    goomba->Kill(f, goombaEntity, marioEntity, false);
-                    mario->CheckEntityBounce(f);
+                if (mario->StompPowerLevel > 1) {
+                    goomba->Kill(f, goombaEntity, marioEntity, groundpounded);
                 }
-                if (mario->Action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
-                else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
-
+                mario->CheckEntityBounce(f);
             } else if (mario->IsCrouchedInShell) {
                 mario->FacingRight = damageDirection.X < 0;
                 marioPhysicsObject->Velocity.X = 0;

@@ -170,18 +170,17 @@ namespace Quantum {
             } else {
                 if (attackedFromAbove) {
                     // Light
-                    bool mini = mario->CurrentPowerupState == PowerupState.MiniMushroom;
-                    if (!mini || mario->HasActionFlags(ActionFlags.StrongAction)) {
-                        Light(f, bobombEntity, bobomb, mini || !mario->HasActionFlags(ActionFlags.StrongAction));
+                    bool strong = mario->StompPowerLevel >= MarioPlayer.StrongPowerLevel;
+                    bool mini = mario->StompPowerLevel < 1;
+                    if (!mini || strong) {
+                        Light(f, bobombEntity, bobomb, mini || !strong);
                     }
 
-                    if (!mini && mario->HasActionFlags(ActionFlags.StrongAction)) {
+                    if (!mini && strong) {
                         bobomb->Kick(f, bobombEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
                     } else {
                         mario->CheckEntityBounce(f);
                     }
-                    if (mario->Action == PlayerAction.SpinBlockDrill) mario->SetPlayerAction(PlayerAction.SpinBlockSpin, f, 1);
-                    else if (mario->Action == PlayerAction.PropellerDrill) mario->SetPlayerAction(PlayerAction.PropellerSpin, f, 1);
 
                 } else if (mario->HasActionFlags(ActionFlags.IsShelled)) {
                     // Bounce off blue shell crouched player
