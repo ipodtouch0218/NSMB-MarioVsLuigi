@@ -170,8 +170,8 @@ namespace Quantum {
             } else {
                 if (attackedFromAbove) {
                     // Light
-                    bool strong = mario->StompPowerLevel >= MarioPlayer.StrongPowerLevel;
-                    bool mini = mario->StompPowerLevel < 1;
+                    bool strong = mario->StompPowerLevel >= StompLevel.Strong;
+                    bool mini = mario->StompPowerLevel < StompLevel.Normal;
                     if (!mini || strong) {
                         Light(f, bobombEntity, bobomb, mini || !strong);
                     }

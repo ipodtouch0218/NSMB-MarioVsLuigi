@@ -303,7 +303,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
 
-            int oldStompLevel = mario->StompPowerLevel;
+            StompLevel oldStompLevel = mario->StompPowerLevel;
  
             // set the action based off the action right before this
             switch (mario->PrevAction) {
@@ -707,7 +707,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             var inputs = filter.Inputs;
 
-            mario->StompPowerLevel = 1;
+            mario->StompPowerLevel = StompLevel.Normal;
             mario->BreakableLevel = PowerupState.Mushroom;
             mario->AddBreakableFlags(BreakableFlags.Down);
 
@@ -1403,9 +1403,9 @@ namespace Quantum {
 
             if (QuantumUtils.Decrement(ref mario->GroundpoundStartFrames)) {
                 mario->AddActionFlags(ActionFlags.NoEnemyBounce | ActionFlags.NoPlayerBounce);
-                mario->SetStompEvents(PlayerAction.HardKnockback, 3);
                 mario->AddBreakableFlags(BreakableFlags.Down);
-                mario->StompPowerLevel = mario->CurrentPowerupState == PowerupState.MiniMushroom ? 1 : MarioPlayer.StrongPowerLevel;
+                mario->SetStompEvents(PlayerAction.HardKnockback, 3);
+                mario->SetStompLevel(StompLevel.Strong, StompLevel.Normal);
                 if (mario->CurrentPowerupState == PowerupState.BlueShell) {
                     mario->AddActionFlags(ActionFlags.IsShelled);
                 }
@@ -1469,7 +1469,7 @@ namespace Quantum {
             continueGroundpound &= interactedAny;
             if (!continueGroundpound && isGroundpound) {
                 // remove these flags
-                mario->StompPowerLevel = mario->CurrentPowerupState == PowerupState.MiniMushroom ? 0 : 1;
+                mario->SetStompLevel();
                 mario->ClearStompEvents();
                 return false;
             }
@@ -1819,10 +1819,6 @@ namespace Quantum {
                 mario->PreviousJumpState = mario->JumpState;
             }
 
-            bool doJump =
-                (mario->JumpBufferFrames > 0 && (physicsObject->IsTouchingGround || mario->CoyoteTimeFrames > 0)) 
-                || (!physicsObject->IsUnderwater && mario->SwimForceJumpTimer == 10);
-
             QuantumUtils.Decrement(ref mario->SwimForceJumpTimer);
             QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
@@ -1842,7 +1838,7 @@ namespace Quantum {
             FP gravity;
 
             // Slow-rise check
-            bool swimming = physicsObject->IsUnderwater;
+            bool swimming = mario->HasActionFlags(ActionFlags.WaterAction);
             if (swimming && f.Exists(mario->HeldEntity)) {
                 gravity = 0;
             } else if (!swimming && (mario->Action is PlayerAction.SpinBlockSpin or PlayerAction.PropellerSpin)) {
@@ -1879,22 +1875,12 @@ namespace Quantum {
             FP terminalVelocity;
 
             if (mario->Action is PlayerAction.Death or PlayerAction.LavaDeath) {
-                bool isUnderwater = false;
-                if (physicsObject->IsUnderwater) {
-                    var contacts = f.ResolveHashSet(physicsObject->LiquidContacts);
-                    foreach (var contact in contacts) {
-                        if (f.Unsafe.GetPointer<Liquid>(contact)->LiquidType == LiquidType.Water) {
-                            isUnderwater = true;
-                            break;
-                        }
-                    }
-                }
-                if (isUnderwater) {
+                if (mario->HasActionFlags(ActionFlags.WaterAction)) {
                     terminalVelocity = -Constants.OnePixelPerFrame;
                 } else {
                     terminalVelocity = -8;
                 }
-            } else if (physicsObject->IsUnderwater) {
+            } else if (mario->HasActionFlags(ActionFlags.WaterAction) || physicsObject->IsUnderwater &! mario->HasActionFlags(ActionFlags.IgnoreWater)) {
                 terminalVelocity = inputs.Jump.IsDown ? physics.SwimTerminalVelocityButtonHeld : physics.SwimTerminalVelocity;
                 physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y, physics.SwimMaxVerticalVelocity);
             } else if (mario->Action == PlayerAction.SpinBlockSpin) {
@@ -1978,27 +1964,6 @@ namespace Quantum {
                 }
             }
         }
-
-        /*public void HandleKnockback(Frame f, ref Filter filter) {
-            using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleKnockback");
-            var entity = filter.Entity;
-            var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
-
-            if (mario->Action >= PlayerAction.SoftKnockback || mario->Action <= PlayerAction.HardKnockback) {
-                bool swimming = physicsObject->IsUnderwater;
-                int framesInKnockback = f.Number - mario->KnockbackTick;
-                if (mario->DoEntityBounce
-                    || (swimming && framesInKnockback > 90)
-                    || (!swimming && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) < FP._0_33 && framesInKnockback > 30)
-                    || (!swimming && physicsObject->IsTouchingGround && framesInKnockback > 120)
-                    || (!swimming && mario->Action == PlayerAction.SoftKnockback && framesInKnockback > 30)) {
-
-                    mario->ResetKnockback(f, entity);
-                    return;
-                }
-            }
-        }*/
 
         private bool HandleMegaMushroom(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleMegaMushroom");

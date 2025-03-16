@@ -70,14 +70,14 @@ namespace Quantum {
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > FP._0_25;
 
-            bool groundpounded = mario->StompPowerLevel >= MarioPlayer.StrongPowerLevel;
+            bool groundpounded = mario->StompPowerLevel >= StompLevel.Strong;
             if (mario->InstakillsEnemies(marioPhysicsObject, true)) {
                 goomba->Kill(f, goombaEntity, marioEntity, true);
                 return;
             }
 
             if (attackedFromAbove) {
-                if (mario->StompPowerLevel > 1) {
+                if (mario->StompPowerLevel > StompLevel.Normal) {
                     goomba->Kill(f, goombaEntity, marioEntity, groundpounded);
                 }
                 mario->CheckEntityBounce(f);

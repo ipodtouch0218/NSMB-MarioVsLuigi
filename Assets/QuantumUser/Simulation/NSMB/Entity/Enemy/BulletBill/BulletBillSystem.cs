@@ -120,7 +120,7 @@ namespace Quantum {
             QuantumUtils.UnwrapWorldLocations(f, bulletBillTransform->Position + FPVector2.Up * FP._0_10, marioTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
             FPVector2 damageDirection = (theirPos - ourPos).Normalized;
             bool attackedFromAbove = FPVector2.Dot(damageDirection, FPVector2.Up) > 0;
-            bool groundpounded = mario->StompPowerLevel >= MarioPlayer.StrongPowerLevel;
+            bool groundpounded = mario->StompPowerLevel >= StompLevel.Strong;
             
             if (mario->InstakillsEnemies(marioPhysicsObject, true)) {
                 bulletBill->Kill(f, bulletBillEntity, marioEntity, true);

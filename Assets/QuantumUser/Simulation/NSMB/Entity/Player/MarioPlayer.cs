@@ -12,7 +12,6 @@ namespace Quantum {
         public bool IsDead => Action is PlayerAction.Death or PlayerAction.LavaDeath;
         public const int DropStarRight = 1 << 8;
         public const int NoStarLoss = -1;
-        public const int StrongPowerLevel = 3;
 
         public byte GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
@@ -116,8 +115,8 @@ namespace Quantum {
             ActionArg = arg;
             ActionObject = actionObject;
 
-            StarStealCount = NoStarLoss;
-            StompAction = default;
+            ClearStompEvents();
+            SetStompLevel();
             SetActionFlags(GetActionFlags(Action));
 
             BreakableLevel = CurrentPowerupState;
@@ -127,7 +126,6 @@ namespace Quantum {
             } else {
                 CurrBreakableFlags = 0;
             }
-            StompPowerLevel = CurrentPowerupState == PowerupState.MiniMushroom ? 0 : 1;
 
             UnityEngine.Debug.Log($"[Player] Set action to [{Enum.GetName(typeof(PlayerAction), playerAction)}] with Arg [{arg}]");
             return Action;
@@ -237,6 +235,11 @@ namespace Quantum {
             this.StompAction = default;
         }
 
+        public StompLevel SetStompLevel(StompLevel level = StompLevel.Normal, StompLevel miniLevel = StompLevel.NoDamage) {
+            StompPowerLevel = CurrentPowerupState == PowerupState.MiniMushroom ? miniLevel : level;
+            return level;
+        }
+
         public bool CheckEntityBounce(Frame f, bool checkPlayer = false) {
             // invincible players should never bounce
             if (IsStarmanInvincible) {
@@ -252,9 +255,9 @@ namespace Quantum {
                     return false;
                 }
             }
-            int oldStompLevel = StompPowerLevel;
+            StompLevel oldStompLevel = StompPowerLevel;
             SetPlayerAction(PlayerAction.Bounce, f);
-            StompPowerLevel = oldStompLevel;
+            SetStompLevel(oldStompLevel);
             return true;
         }
 
@@ -279,7 +282,7 @@ namespace Quantum {
                 );
             } else {
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
-                if (marioPhysicsObject->IsUnderwater) {
+                if (HasActionFlags(ActionFlags.WaterAction)) {
                     return new FPVector2(
                         (FacingRight ? 1 : -1) * (CurrentPowerupState >= PowerupState.Mushroom ? Constants._0_40 : FP._0_33),
                         (CurrentPowerupState >= PowerupState.Mushroom ? Constants._0_09 : FP._0_04) + holdableYOffset
@@ -312,7 +315,7 @@ namespace Quantum {
             return (input.Sprint.IsDown || forceHold)
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom
                 && (HasActionFlags(ActionFlags.AllowHold) || HasActionFlags(ActionFlags.Holding)) && (f.Exists(item) || physicsObject->IsTouchingGround)
-                && !(!f.Exists(item) && physicsObject->IsUnderwater && input.Jump.IsDown) && !(aboveHead && physicsObject->IsUnderwater);
+                && !(!f.Exists(item) && HasActionFlags(ActionFlags.WaterAction) && input.Jump.IsDown) && !(aboveHead && HasActionFlags(ActionFlags.WaterAction));
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario, EntityRef item) {
@@ -329,7 +332,7 @@ namespace Quantum {
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP xVel = FPMath.Abs(physicsObject->Velocity.X) - FP._0_01;
             FP[] arr;
-            if (physicsObject->IsUnderwater) {
+            if (HasActionFlags(ActionFlags.WaterAction)) {
                 if (physicsObject->IsTouchingGround) {
                     arr = CurrentPowerupState == PowerupState.BlueShell ? physicsInfo.SwimWalkShellMaxVelocity : physicsInfo.SwimWalkMaxVelocity;
                 } else {
@@ -351,7 +354,7 @@ namespace Quantum {
 
         public int GetGravityStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP yVel = physicsObject->Velocity.Y;
-            FP[] maxArray = physicsObject->IsUnderwater ? physicsInfo.GravitySwimmingVelocity : (CurrentPowerupState == PowerupState.MegaMushroom ? physicsInfo.GravityMegaVelocity : (CurrentPowerupState == PowerupState.MiniMushroom ? physicsInfo.GravityMiniVelocity : physicsInfo.GravityVelocity));
+            FP[] maxArray = HasActionFlags(ActionFlags.WaterAction) ? physicsInfo.GravitySwimmingVelocity : (CurrentPowerupState == PowerupState.MegaMushroom ? physicsInfo.GravityMegaVelocity : (CurrentPowerupState == PowerupState.MiniMushroom ? physicsInfo.GravityMiniVelocity : physicsInfo.GravityVelocity));
             for (int i = 0; i < maxArray.Length; i++) {
                 if (yVel >= maxArray[i]) {
                     return i;

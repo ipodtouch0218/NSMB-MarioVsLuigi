@@ -233,7 +233,7 @@ namespace Quantum {
                 return;
             }
 
-            bool groundpounded = attackedFromAbove && mario->StompPowerLevel >= MarioPlayer.StrongPowerLevel;
+            bool groundpounded = attackedFromAbove && mario->StompPowerLevel >= StompLevel.Strong;
             if (isSpiny) {
                 // Do damage
                 if (mario->HasActionFlags(ActionFlags.IsShelled)) {

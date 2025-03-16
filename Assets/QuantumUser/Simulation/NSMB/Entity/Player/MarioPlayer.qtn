@@ -66,6 +66,8 @@ enum PlayerAction : Byte {
 	LavaDeath,
 	Respawning,
 	EnteringPipe,
+	Swimming,
+	WaterKnockback,
 }
 
 enum ActionFlags : Int32 {
@@ -85,17 +87,24 @@ enum ActionFlags : Int32 {
 	UsesSmallHitbox = 8192,		// use the small hitbox even if Mario's big
 	UsesCrouchHitbox = 16384,	// use the crouch hitbox
 	KillMiniStomp = 32768,		// kills Mini players if above
-	StarSpinAction = 65536,	// makes Mario do the star sommersault
+	StarSpinAction = 65536,		// makes Mario do the star sommersault
 	IrregularVelocity = 131072, // velocity isn't controlled by the regular left and right inputs
 	Holding = 262144,			// Mario is holding something in the action
 	OverrideAll = 524288,		// skip every method only letting the HandleActions method run
+	IgnoreWater = 1048576,		// do not set Mario's action to Swimming
 }
 
-enum BreakableFlags : Int32 {
+enum BreakableFlags : Byte {
 	Down = 1,
 	Up = 2,
 	Left = 4,
 	Right = 8,
+}
+
+enum StompLevel : Byte {
+	NoDamage,
+	Normal,
+	Strong
 }
 
 component MarioPlayer {
@@ -127,7 +136,7 @@ component MarioPlayer {
 	// Breaking Stuff
 	[ExcludeFromPrototype] int CurrBreakableFlags;
 	[ExcludeFromPrototype] PowerupState BreakableLevel;
-	[ExcludeFromPrototype] int StompPowerLevel;
+	[ExcludeFromPrototype] StompLevel StompPowerLevel;
 
 	// Stomping
 	[ExcludeFromPrototype] PlayerAction StompAction;
