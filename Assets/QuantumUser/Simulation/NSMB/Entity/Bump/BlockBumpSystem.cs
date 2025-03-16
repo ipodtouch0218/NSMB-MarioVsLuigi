@@ -70,7 +70,8 @@ namespace Quantum {
                     if (powerupScriptable.State == PowerupState.MegaMushroom) {
                         origin.Y += (tile.BumpSize.Y / 2) - FP._0_50;
 
-                        powerup->Initialize(f, newPowerup, 90, 
+                        powerup->Initialize(f, newPowerup, 90,
+                            PowerupSpawnReason.PowerupBlock,
                             origin + FPVector2.Up * FP._0_50, 
                             origin + FPVector2.Up * FP._0_50, 
                             false);
@@ -82,6 +83,7 @@ namespace Quantum {
                         }
 
                         powerup->Initialize(f, newPowerup, (byte) (launch ? 20 : 60),
+                            PowerupSpawnReason.PowerupBlock,
                             origin, 
                             origin + (blockBump->IsDownwards ? new FPVector2(0, -FP._0_50) : new FPVector2(0, FP._0_50)), 
                             launch);

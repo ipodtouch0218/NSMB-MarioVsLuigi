@@ -6,6 +6,7 @@ component Powerup {
 	FPVector2 AnimationCurveOrigin;
 	FP AnimationCurveTimer;
 
+	[ExcludeFromPrototype] PowerupSpawnReason SpawnReason;
 	[ExcludeFromPrototype] bool BlockSpawn;
 	[ExcludeFromPrototype] bool LaunchSpawn;
 	[ExcludeFromPrototype] FPVector2 BlockSpawnOrigin;
@@ -27,6 +28,13 @@ enum PowerupState : Byte {
     BlueShell,
 	HammerSuit,
     MegaMushroom
+}
+
+enum PowerupSpawnReason : Byte {
+	PowerupBlock,
+	Coins,
+	BlueKoopa,
+	Other
 }
 
 enum PowerupReserveResult : Byte {

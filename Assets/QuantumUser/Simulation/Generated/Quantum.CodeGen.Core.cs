@@ -74,6 +74,12 @@ namespace Quantum {
     ReserveOldPowerup,
     ReserveNewPowerup,
   }
+  public enum PowerupSpawnReason : byte {
+    PowerupBlock,
+    Coins,
+    BlueKoopa,
+    Other,
+  }
   public enum PowerupState : byte {
     NoPowerup,
     MiniMushroom,
@@ -2757,6 +2763,9 @@ namespace Quantum {
     public FPVector2 AnimationCurveOrigin;
     [FieldOffset(40)]
     public FP AnimationCurveTimer;
+    [FieldOffset(3)]
+    [ExcludeFromPrototype()]
+    public PowerupSpawnReason SpawnReason;
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public QBoolean BlockSpawn;
@@ -2789,6 +2798,7 @@ namespace Quantum {
         hash = hash * 31 + Lifetime.GetHashCode();
         hash = hash * 31 + AnimationCurveOrigin.GetHashCode();
         hash = hash * 31 + AnimationCurveTimer.GetHashCode();
+        hash = hash * 31 + (Byte)SpawnReason;
         hash = hash * 31 + BlockSpawn.GetHashCode();
         hash = hash * 31 + LaunchSpawn.GetHashCode();
         hash = hash * 31 + BlockSpawnOrigin.GetHashCode();
@@ -2805,6 +2815,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->BlockSpawnAnimationLength);
         serializer.Stream.Serialize(&p->IgnorePlayerFrames);
         serializer.Stream.Serialize(&p->SpawnAnimationFrames);
+        serializer.Stream.Serialize((Byte*)&p->SpawnReason);
         serializer.Stream.Serialize(&p->Lifetime);
         QBoolean.Serialize(&p->BlockSpawn, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
@@ -3841,6 +3852,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(PlayerRef), PlayerRef.SIZE);
       typeRegistry.Register(typeof(Quantum.Powerup), Quantum.Powerup.SIZE);
       typeRegistry.Register(typeof(Quantum.PowerupReserveResult), 1);
+      typeRegistry.Register(typeof(Quantum.PowerupSpawnReason), 1);
       typeRegistry.Register(typeof(Quantum.PowerupState), 1);
       typeRegistry.Register(typeof(Quantum.Projectile), Quantum.Projectile.SIZE);
       typeRegistry.Register(typeof(Ptr), Ptr.SIZE);
@@ -3916,6 +3928,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<ParticleEffect>();
       FramePrinter.EnsurePrimitiveNotStripped<PhysicsFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupReserveResult>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupSpawnReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.PowerupState>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString16>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString48>();

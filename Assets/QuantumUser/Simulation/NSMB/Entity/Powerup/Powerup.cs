@@ -3,7 +3,8 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe partial struct Powerup {
 
-        public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength) {
+        public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength, PowerupSpawnReason spawnReason) {
+            SpawnReason = spawnReason;
             SpawnAnimationFrames = spawnAnimationLength;
             Lifetime += spawnAnimationLength;
 
@@ -11,8 +12,8 @@ namespace Quantum {
             f.Unsafe.GetPointer<Interactable>(thisEntity)->ColliderDisabled = true;
         }
 
-        public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength, FPVector2 spawnOrigin, FPVector2 spawnDestination, bool launch = false) {
-            Initialize(f, thisEntity, spawnAnimationLength);
+        public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength, PowerupSpawnReason spawnReason, FPVector2 spawnOrigin, FPVector2 spawnDestination, bool launch = false) {
+            Initialize(f, thisEntity, spawnAnimationLength, spawnReason);
 
             LaunchSpawn = launch;
             BlockSpawn = !launch;
@@ -32,7 +33,7 @@ namespace Quantum {
         }
 
         public void ParentToPlayer(Frame f, EntityRef thisEntity, EntityRef playerToFollow) {
-            Initialize(f, thisEntity, 60);
+            Initialize(f, thisEntity, 60, PowerupSpawnReason.Coins);
             ParentMarioPlayer = playerToFollow;
 
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(playerToFollow);

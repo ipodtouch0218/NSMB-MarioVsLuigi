@@ -10,7 +10,8 @@ public unsafe class PowerupAnimator : QuantumEntityViewComponent {
     [SerializeField] private Animation childAnimation;
     [SerializeField] private float blinkingRate = 4, scaleRate = 0.1333f, scaleSize = 0.3f;
     [SerializeField] private AudioSource sfx;
-
+    [SerializeField] private ParticleSystem koopaSpawnParticles;
+    
     //---Private
     private int originalSortingOrder;
     private bool inSpawnAnimation;
@@ -33,13 +34,16 @@ public unsafe class PowerupAnimator : QuantumEntityViewComponent {
         var powerup = f.Unsafe.GetPointer<Powerup>(EntityRef);
         var scriptable = QuantumUnityDB.GetGlobalAsset(powerup->Scriptable);
 
-        if (powerup->ParentMarioPlayer.IsValid) {
+        if (powerup->SpawnReason == PowerupSpawnReason.BlueKoopa && koopaSpawnParticles) {
+            koopaSpawnParticles.Play();
+        }
+
+        if (f.Exists(powerup->ParentMarioPlayer)) {
             // Following mario
             sRenderer.sortingOrder = 15;
             if (childAnimator) {
                 childAnimator.enabled = false;
             }
-
         } else if (powerup->BlockSpawn) {
             // Block spawn
             sRenderer.sortingOrder = -1000;

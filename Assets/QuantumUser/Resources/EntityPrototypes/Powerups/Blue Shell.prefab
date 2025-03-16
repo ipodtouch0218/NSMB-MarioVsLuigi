@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &34781978719586527
 Transform:
@@ -4939,6 +4939,11 @@ PrefabInstance:
       propertyPath: childAnimator
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 9121724411283337017, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: koopaSpawnParticles
+      value: 
+      objectReference: {fileID: 1414043243210303755}
     m_RemovedComponents:
     - {fileID: 3981535449506474497, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}
     - {fileID: 3726716108760662804, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}

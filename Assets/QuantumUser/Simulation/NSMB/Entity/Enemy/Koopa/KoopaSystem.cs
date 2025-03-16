@@ -283,7 +283,7 @@ namespace Quantum {
                         var powerupPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newPowerup);
 
                         powerupTransform->Position = koopaTransform->Position;
-                        powerup->Initialize(f, newPowerup, 15);
+                        powerup->Initialize(f, newPowerup, 15, PowerupSpawnReason.BlueKoopa);
                         powerupPhysicsObject->DisableCollision = false;
 
                         koopaEnemy->IsActive = false;
