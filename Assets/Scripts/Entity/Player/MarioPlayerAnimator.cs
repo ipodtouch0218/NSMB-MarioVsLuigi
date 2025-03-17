@@ -346,7 +346,7 @@ namespace NSMB.Entities.Player {
 
             if (mario->Action is PlayerAction.SoftKnockback or PlayerAction.NormalKnockback or PlayerAction.HardKnockback || freezable->IsFrozen(f)) {
                 bool right = mario->FacingRight;
-                if (mario->Action is PlayerAction.NormalKnockback or PlayerAction.HardKnockback && (physicsObject->IsUnderwater || mario->Action == PlayerAction.SoftKnockback)) { // ?
+                if (mario->Action is PlayerAction.NormalKnockback or PlayerAction.HardKnockback && (mario->HasActionFlags(ActionFlags.WaterAction) || mario->Action == PlayerAction.SoftKnockback)) { // ?
                     right = mario->KnockbackWasOriginallyFacingRight;
                 }
                 modelRotationTarget = Quaternion.Euler(0, right ? 110 : 250, 0);
@@ -462,7 +462,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamMega,             mario->CurrentPowerupState == PowerupState.MegaMushroom);
             animator.SetBool(ParamInShell,          mario->HasActionFlags(ActionFlags.IsShelled));
             animator.SetBool(ParamTurnaround,       mario->IsTurnaround);
-            animator.SetBool(ParamSwimming,         physicsObject->IsUnderwater && mario->HasActionFlags(ActionFlags.WaterAction) && !freezable->IsFrozen(f));
+            animator.SetBool(ParamSwimming,         mario->HasActionFlags(ActionFlags.WaterAction) && !freezable->IsFrozen(f));
             animator.SetBool(ParamAHeld,            inputs.Jump.IsDown);
             animator.SetBool(ParamFireballKnockback,mario->Action == PlayerAction.SoftKnockback);
             animator.SetBool(ParamFireDeath,        mario->Action == PlayerAction.LavaDeath);
@@ -590,7 +590,7 @@ namespace NSMB.Entities.Player {
 
             float newZ = -4;
             if (mario->IsDead) {
-                if (physicsObject->IsUnderwater) {
+                if (mario->HasActionFlags(ActionFlags.WaterAction)) {
                     newZ = -2;
                 } else {
                     newZ = -6;
@@ -1101,7 +1101,7 @@ namespace NSMB.Entities.Player {
 
             var mario = e.Frame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
             var physicsObject = e.Frame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
-            if (physicsObject->IsUnderwater) {
+            if (mario->HasActionFlags(ActionFlags.WaterAction)) {
                 // Paddle
                 if (e.WasBounce) {
                     if (Time.time - lastStompSoundTime > 0.25f) {

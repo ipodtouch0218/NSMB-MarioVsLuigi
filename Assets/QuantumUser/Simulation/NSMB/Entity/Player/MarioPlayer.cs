@@ -30,7 +30,7 @@ namespace Quantum {
             }
         }
 
-        public ActionFlags GetActionFlags(PlayerAction action) {
+        public static ActionFlags GetActionFlags(PlayerAction action) {
             return action switch {
                 PlayerAction.Idle                   => ActionFlags.AllowBump,
                 PlayerAction.Walk                   => ActionFlags.AllowBump | ActionFlags.AllowHold,
@@ -71,6 +71,8 @@ namespace Quantum {
                 PlayerAction.LavaDeath              => ActionFlags.Cutscene | ActionFlags.Intangible | ActionFlags.OverrideAll,
                 PlayerAction.Respawning             => ActionFlags.Cutscene | ActionFlags.Intangible,
                 PlayerAction.EnteringPipe           => ActionFlags.Cutscene | ActionFlags.Intangible,
+                PlayerAction.Swimming               => ActionFlags.WaterAction,
+                PlayerAction.WaterKnockback         => ActionFlags.WaterAction,
                 _                                   => 0 // null
             };
         }
@@ -171,6 +173,23 @@ namespace Quantum {
                     }
                 } else {
                     targetAction = airAction.GetValueOrDefault();
+                }
+                return SetPlayerAction(targetAction, f, actionArg);
+            }
+            return null;
+        }
+
+        public PlayerAction? SetWaterAction(PhysicsObject* physicsObject, Frame f, PlayerAction? waterAction = null, int actionArg = 0) {
+            if (physicsObject->IsUnderwater) {
+                PlayerAction targetAction;
+                if (waterAction == null) {
+                    if (HasActionFlags(ActionFlags.Holding)) {
+                        targetAction = PlayerAction.WaterHolding;
+                    } else {
+                        targetAction = PlayerAction.Swimming;
+                    }
+                } else {
+                    targetAction = waterAction.GetValueOrDefault();
                 }
                 return SetPlayerAction(targetAction, f, actionArg);
             }

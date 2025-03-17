@@ -129,6 +129,9 @@ namespace Quantum {
     Respawning,
     EnteringPipe,
     Swimming,
+    WaterIdle,
+    WaterWalk,
+    WaterHolding,
     WaterKnockback,
   }
   public enum PowerupReserveResult : byte {
