@@ -31,37 +31,11 @@ public class UpdateChecker {
             JObject data = JObject.Parse(json);
 
             string tag = data.Value<string>("tag_name");
-            if (tag.StartsWith("v")) {
-                tag = tag[1..];
-            }
+            SemanticVersion remoteVersion = SemanticVersion.Parse(tag);
+            SemanticVersion localVersion = SemanticVersion.Parse(Application.version);
 
-            string[] splitTag = tag.Split(".");
-
-            string ver = Application.version;
-            if (ver.StartsWith("v")) {
-                ver = ver[1..];
-            }
-
-            string[] splitVer = Application.version.Split(".");
-
-            Debug.Log($"[Updater] Local version: {Application.version} / Remote version: {tag}");
-
-            // Check if we're a higher version
-            bool upToDate = true;
-            for (int i = 0; i < 4; i++) {
-                int.TryParse(splitTag[i], out int remote);
-                int.TryParse(splitVer[i], out int local);
-
-                if (local > remote) {
-                    break;
-                }
-                if (local == remote) {
-                    continue;
-                }
-
-                upToDate = false;
-                break;
-            }
+            bool upToDate = localVersion >= remoteVersion;
+            Debug.Log($"[Updater] Local version: {localVersion} / Remote version: {remoteVersion}. Up to date: {upToDate}");
 
             callback(upToDate, tag);
         } catch { }

@@ -1,4 +1,3 @@
-#pragma maxplayers 10
 #define _1_18 1.18
 #define _0_85 0.85
 #define WeirdSlopeConstant -0.0304687 
@@ -30,7 +29,7 @@ enum JumpState : Byte {
 }
 
 component MarioPlayer {
-    AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
+	AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
 	AssetRef<CharacterAsset> CharacterAsset;
 
 	[ExcludeFromPrototype] PlayerRef PlayerRef;

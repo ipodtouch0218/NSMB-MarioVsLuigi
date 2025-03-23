@@ -42,7 +42,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             LayoutRebuilder.ForceRebuildLayoutImmediate(sideMenu);
         }
 
-        public void OnDestroy() {
+        public override void OnDestroy() {
             NetworkHandler.StateChanged -= OnClientStateChanged;
         }
 

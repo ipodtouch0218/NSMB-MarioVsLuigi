@@ -45,8 +45,9 @@ namespace NSMB.UI.MainMenu.Submenus {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
-        public void OnDestroy() {
+        public override void OnDestroy() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            chat.OnDestroy();
         }
 
         public override bool TryGoBack(out bool playSound) {

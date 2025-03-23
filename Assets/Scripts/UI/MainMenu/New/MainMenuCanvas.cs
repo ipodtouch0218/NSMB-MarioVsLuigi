@@ -1,6 +1,7 @@
 using NSMB.Extensions;
 using NSMB.UI.MainMenu.Submenus;
 using NSMB.UI.MainMenu.Submenus.Prompts;
+using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,12 @@ namespace NSMB.UI.MainMenu {
 
             NetworkHandler.OnError += OnError;
             OpenMenu(startingSubmenu);
+        }
+
+        public void OnDestroy() {
+            foreach (var menu in allSubmenus) {
+                menu.OnDestroy();
+            }
         }
 
         public void UpdateHeader() {

@@ -102,6 +102,12 @@ namespace NSMB.UI.MainMenu.Submenus {
             Settings.Controls.UI.Previous.performed -= OnPreviousPerformed;
         }
 
+        public override void OnDestroy() {
+            foreach (var panel in allPanels) {
+                panel.OnDestroy();
+            }
+        }
+
         public override bool TryGoBack(out bool playSound) {
             bool allowGoBack = true;
             playSound = true;

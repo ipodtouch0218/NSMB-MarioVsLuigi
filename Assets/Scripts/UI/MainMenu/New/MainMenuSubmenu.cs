@@ -39,6 +39,10 @@ namespace NSMB.UI.MainMenu {
             OnInitialize?.Invoke();
         }
 
+        public virtual void OnDestroy() {
+
+        }
+
         public virtual void Show(bool first) {
             gameObject.SetActive(true);
             Canvas.EventSystem.SetSelectedGameObject(first ? DefaultSelection : savedSelection);

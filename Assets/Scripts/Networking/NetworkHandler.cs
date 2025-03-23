@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using static BinaryReplayFile;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -132,6 +133,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         Instance.lastRegion = region;
         Client.AuthValues = await AuthenticationHandler.Authenticate();
 
+        if (Client == null) {
+            return false;
+        }
+
         if (Client.AuthValues == null) {
             StateChanged?.Invoke(ClientState.ConnectingToMasterServer, ClientState.Disconnected);
             return false;
@@ -150,7 +155,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         try {
             await Client.ConnectUsingSettingsAsync(new AppSettings {
                 AppIdQuantum = "6b4b72d0-57c3-4991-96c1-f3f36f9548e5",
-                AppVersion = Application.version[0..(Application.version.LastIndexOf('.') - 1)],
+                AppVersion = SemanticVersion.Parse(Application.version).ToStringNoPatch(),
                 EnableLobbyStatistics = true,
                 AuthMode = AuthModeOption.Auth,
                 FixedRegion = region,
@@ -260,18 +265,29 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         string replayFolder = Path.Combine(ReplayListManager.ReplayDirectory, "temp");
         Directory.CreateDirectory(replayFolder);
 
-        byte[] stars = new byte[10];
+        // Find end-game data
         Frame f = game.Frames.Verified;
+
+        int players = f.Global->RealPlayers;
+        ReplayPlayerInformation[] playerInformation = new ReplayPlayerInformation[players];
+
         for (int i = 0; i < players; i++) {
+            ref PlayerInformation inGamePlayerInformation = ref f.Global->PlayerInfo[i];
+            playerInformation[i].Username = inGamePlayerInformation.Nickname;
+            playerInformation[i].Character = inGamePlayerInformation.Character;
+            playerInformation[i].Team = inGamePlayerInformation.Team;
+            playerInformation[i].PlayerRef = inGamePlayerInformation.PlayerRef;
+
             var filter = f.Filter<MarioPlayer>();
+            filter.UseCulling = false;
             while (filter.NextUnsafe(out _, out MarioPlayer* mario)) {
-                if (mario->PlayerRef != playerrefs[i]) {
+                if (mario->PlayerRef != playerInformation[i].PlayerRef) {
                     continue;
                 }
 
                 // Found him :)
                 if (mario->Lives > 0 || !f.Global->Rules.IsLivesEnabled) {
-                    stars[i] = mario->Stars;
+                    playerInformation[i].FinalStarCount = mario->Stars;
                 }
                 break;
             }
@@ -291,7 +307,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             }
         } while (outputStream == null);
 
-        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, players, playernames, playerteams, stars, winner);
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, playerInformation, winner);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
         outputStream.Dispose();
 
@@ -308,9 +324,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             Game.RecordInputStream.Dispose();
             Game.RecordInputStream = null;
         }
-        playernames = null;
-        playerteams = null;
-        playerrefs = null;
     }
 
     private unsafe void UpdateRealtimeProperties() {
@@ -450,10 +463,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     int initialFrame;
     byte[] initialFrameData;
-    byte players;
-    string[] playernames;
-    byte[] playerteams;
-    PlayerRef[] playerrefs;
+
     private void OnRecordingStarted(EventRecordingStarted e) {
         RecordReplay(e.Game, e.Game.Frames.Verified);
     }
@@ -466,29 +476,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         game.StartRecordingInput(f.Number);
         initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
         initialFrame = f.Number;
-
-        players = f.Global->RealPlayers;
-        playernames = new string[10];
-        playerrefs = new PlayerRef[10];
-        playerteams = new byte[10];
-
-        int count = 0;
-        for (PlayerRef player = 0; count < players && player < f.PlayerCount; player++) {
-            var playerData = QuantumUtils.GetPlayerData(f, player);
-            if (playerData == null || playerData->IsSpectator) {
-                continue;
-            }
-
-            RuntimePlayer runtimePlayer = f.GetPlayerData(player);
-            if (runtimePlayer == null) {
-                continue;
-            }
-
-            playernames[count] = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
-            playerrefs[count] = player;
-            playerteams[count] = playerData->RealTeam;
-            count++;
-        }
 
         Debug.Log("[Replay] Started recording a new replay.");
     }

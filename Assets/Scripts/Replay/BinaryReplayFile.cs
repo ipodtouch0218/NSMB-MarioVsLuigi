@@ -11,8 +11,7 @@ using UnityEngine;
 public class BinaryReplayFile {
 
     //---Helpers
-    public static readonly string[] Versions = { "Invalid", "v1.8.0.0" };
-    public const int CurrentVersion = 1;
+    private static SemanticVersion? CachedCurrentVersion;
     private static int MagicHeaderLength => Encoding.ASCII.GetByteCount(MagicHeader);
     private static readonly byte[] HeaderBuffer = new byte[MagicHeaderLength];
 
@@ -21,26 +20,23 @@ public class BinaryReplayFile {
 
     // Header
     private const string MagicHeader = "MvLO-RP";
-    public byte Version;
+    public SemanticVersion Version;
     public long UnixTimestamp;
     public int InitialFrameNumber;
     public int ReplayLengthInFrames;
     public string CustomName = "";
-    public bool IsCompatible => Version == CurrentVersion;
+    public bool IsCompatible => Version.Equals(GetCurrentVersion(), ignorePatch: true); // Major.Minor.Patch -> patch is for backwards compatible hotfixes.
 
     // Rules
     public GameRulesPrototype Rules;
 
     // Player information
-    public byte Players;
+    public ReplayPlayerInformation[] PlayerInformation = Array.Empty<ReplayPlayerInformation>();
     public sbyte WinningTeam = -1;
-    public byte[] PlayerStars = new byte[10];
-    public byte[] PlayerTeams = new byte[10];
-    public string[] PlayerNames = new string[10];
 
     // Variable length
     public byte[] CompressedRuntimeConfigData;
-    public byte[] CompressedDeterministicConfigData;
+    public byte[] CompressedDeterministicConfigData;    
     public byte[] CompressedInitialFrameData;
     public byte[] CompressedInputData;
 
@@ -51,29 +47,25 @@ public class BinaryReplayFile {
 
     public long WriteToStream(Stream output) {
         using BinaryWriter writer = new(output, Encoding.ASCII);
+        BinaryFormatter formatter = new();
 
         // Write header stuffs
         writer.Write(Encoding.ASCII.GetBytes(MagicHeader)); // Write the *bytes* to avoid wasteful \0 termination
-        writer.Write(Version);
+        Version.Serialize(writer);
         writer.Write(UnixTimestamp);
         writer.Write(InitialFrameNumber);
         writer.Write(ReplayLengthInFrames);
         writer.Write(CustomName);
 
         // Rules
-        BinaryFormatter formatter = new();
         formatter.Serialize(output, Rules);
 
         // Players
-        writer.Write(Players);
-        writer.Write(WinningTeam);
-
-        // TODO: change to Information struct ?
-        for (int i = 0; i < Players; i++) {
-            writer.Write(PlayerNames[i]);
-            writer.Write(PlayerStars[i]);
-            writer.Write(PlayerTeams[i]);
+        writer.Write((byte) PlayerInformation.Length);
+        for (int i = 0; i < PlayerInformation.Length; i++) {
+            PlayerInformation[i].Serialize(writer);
         }
+        writer.Write(WinningTeam);
 
         // Write variable-length data lengths
         writer.Write(CompressedRuntimeConfigData.Length);
@@ -102,13 +94,14 @@ public class BinaryReplayFile {
 
     public string GetDefaultName() {
         TranslationManager tm = GlobalController.Instance.translationManager;
+        int playerCount = PlayerInformation.Length;
 
         if (QuantumUnityDB.TryGetGlobalAsset(Rules.Stage, out Map map)
             && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
             // We can find the map they're talking about
-            return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname", "playercount", Players.ToString(), "map", tm.GetTranslation(stage.TranslationKey));
+            return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname", "playercount", playerCount.ToString(), "map", tm.GetTranslation(stage.TranslationKey));
         } else {
-            return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname.invalidmap", "playercount", Players.ToString());
+            return tm.GetTranslationWithReplacements("ui.extras.replays.defaultname.invalidmap", "playercount", playerCount.ToString());
         }
     }
 
@@ -123,6 +116,7 @@ public class BinaryReplayFile {
 
     public static bool TryLoadFromFile(Stream input, out BinaryReplayFile result) {
         using BinaryReader reader = new(input, Encoding.ASCII);
+        BinaryFormatter formatter = new();
 
         result = new();
         result.FileSize = reader.BaseStream.Length;
@@ -135,24 +129,21 @@ public class BinaryReplayFile {
             }
 
             // Header is good!
-            result.Version = reader.ReadByte();
+            result.Version = SemanticVersion.Deserialize(reader);
             result.UnixTimestamp = reader.ReadInt64();
             result.InitialFrameNumber = reader.ReadInt32();
             result.ReplayLengthInFrames = reader.ReadInt32();
             result.CustomName = reader.ReadString();
 
             // Rules
-            BinaryFormatter formatter = new();
             result.Rules = (GameRulesPrototype) formatter.Deserialize(input);
 
             // Players
-            result.Players = reader.ReadByte();
-            result.WinningTeam = reader.ReadSByte();
-            for (int i = 0; i < result.Players; i++) {
-                result.PlayerNames[i] = reader.ReadString();
-                result.PlayerStars[i] = reader.ReadByte();
-                result.PlayerTeams[i] = reader.ReadByte();
+            result.PlayerInformation = new ReplayPlayerInformation[reader.ReadByte()];
+            for (int i = 0; i < result.PlayerInformation.Length; i++) {
+                result.PlayerInformation[i] = ReplayPlayerInformation.Deserialize(reader);
             }
+            result.WinningTeam = reader.ReadSByte();
 
             // Read variable-length data.
             int runtimeConfigSize = reader.ReadInt32();
@@ -173,9 +164,9 @@ public class BinaryReplayFile {
         }
     }
 
-    public static unsafe BinaryReplayFile FromReplayData(QuantumReplayFile replay, GameRules rules, byte players, string[] playernames, byte[] playerteams, byte[] playerstars, sbyte winnerIndex) {
+    public static unsafe BinaryReplayFile FromReplayData(QuantumReplayFile replay, GameRules rules, ReplayPlayerInformation[] playerInformation, sbyte winnerIndex) {
         BinaryReplayFile result = new() {
-            Version = CurrentVersion,
+            Version = GetCurrentVersion(),
             UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
             InitialFrameNumber = replay.InitialTick,
             ReplayLengthInFrames = replay.LastTick - replay.InitialTick,
@@ -190,10 +181,7 @@ public class BinaryReplayFile {
                 TeamsEnabled = rules.TeamsEnabled,
             },
 
-            Players = players,
-            PlayerNames = playernames,
-            PlayerTeams = playerteams,
-            PlayerStars = playerstars,
+            PlayerInformation = playerInformation,
             WinningTeam = winnerIndex,
 
             CompressedDeterministicConfigData = ByteUtils.GZipCompressBytes(DeterministicSessionConfig.ToByteArray(replay.DeterministicConfig)),
@@ -203,5 +191,39 @@ public class BinaryReplayFile {
         };
 
         return result;
+    }
+
+    private static SemanticVersion GetCurrentVersion() {
+        if (!CachedCurrentVersion.HasValue) {
+            CachedCurrentVersion = SemanticVersion.Parse(Application.version);
+        }
+
+        return CachedCurrentVersion.Value;
+    }
+
+    public struct ReplayPlayerInformation {
+        public string Username;
+        public byte FinalStarCount;
+        public byte Team;
+        public byte Character;
+        public PlayerRef PlayerRef;
+
+        public void Serialize(BinaryWriter writer) {
+            writer.Write(Username);
+            writer.Write(FinalStarCount);
+            writer.Write(Team);
+            writer.Write(Character);
+            writer.Write(PlayerRef);
+        }
+
+        public static ReplayPlayerInformation Deserialize(BinaryReader reader) {
+            return new ReplayPlayerInformation {
+                Username = reader.ReadString(),
+                FinalStarCount = reader.ReadByte(),
+                Team = reader.ReadByte(),
+                Character = reader.ReadByte(),
+                PlayerRef = reader.ReadInt32(),
+            };
+        }
     }
 }

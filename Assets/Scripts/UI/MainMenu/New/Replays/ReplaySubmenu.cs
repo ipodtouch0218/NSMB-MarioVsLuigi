@@ -20,7 +20,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public override void Initialize() {
             base.Initialize();
-            replayList.FindReplays();
+            // replayList.FindReplays();
         }
 
         public override void Show(bool first) {

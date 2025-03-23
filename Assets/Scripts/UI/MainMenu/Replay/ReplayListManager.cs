@@ -14,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static BinaryReplayFile;
 
 public class ReplayListManager : Selectable {
 
@@ -121,13 +122,14 @@ public class ReplayListManager : Selectable {
         // Playerlist
         StringBuilder builder = new();
         BinaryReplayFile file = replay.ReplayFile;
-        for (int i = 0; i < file.Players; i++) {
+        for (int i = 0; i < file.PlayerInformation.Length; i++) {
+            ref ReplayPlayerInformation info = ref file.PlayerInformation[i];
+
             // Color and width
             builder.Append("<width=85%>");
-            int teamIndex = file.PlayerTeams[i];
             if (file.Rules.TeamsEnabled) {
                 var allTeams = GlobalController.Instance.config.Teams;
-                TeamAsset team = allTeams[teamIndex % allTeams.Length];
+                TeamAsset team = allTeams[info.Team % allTeams.Length];
                 builder.Append("<nobr>");
                 builder.Append("<color=#").Append(Utils.ColorToHex(team.color, false)).Append(">").Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
             } else {
@@ -136,14 +138,14 @@ public class ReplayListManager : Selectable {
             }
 
             // Username
-            builder.Append(file.PlayerNames[i]);
+            builder.Append(info.Username);
             builder.Append("</nobr>");
 
             // Stars
             builder.Append("<width=100%><pos=90%><sprite name=room_stars>");
             builder.Append("<line-height=0><align=right><br>");
-            builder.Append(teamIndex == file.WinningTeam ? "<color=yellow>" : "<color=white>");
-            builder.Append(file.PlayerStars[i]);
+            builder.Append(info.Team == file.WinningTeam ? "<color=yellow>" : "<color=white>");
+            builder.Append(info.FinalStarCount);
 
             // Fix formatting
             builder.AppendLine("<align=left><line-height=100%>");

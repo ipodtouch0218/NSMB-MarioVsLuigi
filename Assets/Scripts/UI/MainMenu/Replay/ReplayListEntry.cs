@@ -166,13 +166,7 @@ public class ReplayListEntry : MonoBehaviour {
         dateText.text = DateTime.UnixEpoch.AddSeconds(replayFile.UnixTimestamp).ToLocalTime().ToString();
         
         if (!replayFile.IsCompatible) {
-            if (replayFile.Version >= BinaryReplayFile.Versions.Length) {
-                // Newer version
-                warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible.future");
-            } else {
-                // Older version
-                warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", BinaryReplayFile.Versions[replayFile.Version]);
-            }
+            warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", replayFile.Version.ToString());
             warningText.color = criticalColor;
             foreach (var button in compatibleButtons) {
                 button.interactable = false;

@@ -11,13 +11,11 @@ namespace Quantum {
             while (filtered.Next(&filterStruct)) {
                 if (stage == null) {
                     stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-                    BeforeUpdate(f, stage);
                 }
                 Update(f, ref filterStruct, stage);
             }
         }
 
         public abstract void Update(Frame f, ref T filter, VersusStageData stage);
-        public virtual void BeforeUpdate(Frame f, VersusStageData stage) { }
     }
 }

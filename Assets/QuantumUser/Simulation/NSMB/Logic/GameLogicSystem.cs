@@ -23,7 +23,7 @@ namespace Quantum {
         public override void Update(Frame f) {
             // Tick RNG
             _ = f.RNG->Next();
-
+            
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
             for (int i = 0; i < f.PlayerCount; i++) {

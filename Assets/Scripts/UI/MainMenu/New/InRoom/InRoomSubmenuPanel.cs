@@ -19,6 +19,8 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public virtual void Initialize() { }
 
+        public virtual void OnDestroy() { } 
+
         public virtual void Select(bool setDefault) {
             foreach (var hide in hideWhenNotSelected) {
                 hide.SetActive(true);
