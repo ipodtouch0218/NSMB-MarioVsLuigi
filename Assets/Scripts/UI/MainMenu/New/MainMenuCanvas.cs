@@ -65,6 +65,14 @@ namespace NSMB.UI.MainMenu {
             foreach (var menu in allSubmenus) {
                 menu.OnDestroy();
             }
+            NetworkHandler.OnError -= OnError;
+        }
+
+        public void Update() {
+            // Fallback: select the default object if we somehow aren't selecting anything.
+            if (!eventSystem.currentSelectedGameObject && SubmenuStack.Count > 0) {
+                eventSystem.SetSelectedGameObject(SubmenuStack[^1].DefaultSelection);
+            }
         }
 
         public void UpdateHeader() {
@@ -100,23 +108,33 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OpenMenu(MainMenuSubmenu menu) {
+            OpenMenu(menu, menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
+        }
+
+        public void OpenMenu(MainMenuSubmenu menu, SoundEffect? sound) {
+            bool first = true;
             if (submenuStack.Contains(menu)) {
                 // Close menus on top of this menu
                 while (submenuStack[^1] != menu) {
                     GoBack(true);
                 }
+                first = false;
             }
 
             if (submenuStack.Count > 0) {
                 submenuStack[^1].Hide(menu.IsOverlay ? SubmenuHideReason.Overlayed : SubmenuHideReason.Background);
-                PlaySound(menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
+                if (sound.HasValue) {
+                    PlaySound(sound.Value);
+                }
             }
 
-            submenuStack.Add(menu);
-            menu.Show(true);
+            if (first) {
+                submenuStack.Add(menu);
+            }
+
+            menu.Show(first);
             UpdateHeader();
             ShowHideMainPanel();
-            
         }
 
         public void CloseSubmenuAndChildren(MainMenuSubmenu menu) {

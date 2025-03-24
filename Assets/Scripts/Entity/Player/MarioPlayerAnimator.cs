@@ -208,7 +208,7 @@ namespace NSMB.Entities.Player {
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
 
-            if (f.Global->GameState >= GameState.Ended && !forceUpdate) {
+            if (VerifiedFrame.Global->GameState >= GameState.Ended && !forceUpdate) {
                 animator.speed = 0;
                 models.SetActive(!mario->IsRespawning);
                 SetParticleEmission(drillParticle, false);

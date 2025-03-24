@@ -37,7 +37,7 @@ public class MenuGameStateHandler : MonoBehaviour {
 
     private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
         if (e.Game.PlayerIsLocal(e.Player)) {
-            NetworkHandler.Runner.Shutdown(ShutdownCause.SessionError);
+            NetworkHandler.Runner.Shutdown(ShutdownCause.Ok);
         }
     }
 }

@@ -1,3 +1,4 @@
+using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.Utils;
 using Photon.Realtime;
 using Quantum;
@@ -20,18 +21,21 @@ namespace NSMB.UI.MainMenu.Submenus {
         [SerializeField] private TMP_InputField usernameField;
         [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms;
         [SerializeField] private MainMenuSubmenu inRoomSubmenu;
+        [SerializeField] private ErrorPromptSubmenu errorSubmenu;
         [SerializeField] private RectTransform sideMenu;
         [SerializeField] private Color invalidUsernameColor;
 
         //---Private Variables
         private Color defaultUsernameColor;
         private bool overlayed;
-
+        private bool kickedFromPreviousGame, bannedFromPreviousGame;
+    
         public override void Initialize() {
             base.Initialize();
             defaultUsernameColor = usernameField.targetGraphic.color;
 
             NetworkHandler.StateChanged += OnClientStateChanged;
+            QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         }
 
@@ -62,6 +66,15 @@ namespace NSMB.UI.MainMenu.Submenus {
                 Settings.Instance.generalNickname = "Player" + UnityEngine.Random.Range(1000, 10000);
             }
             usernameField.text = Settings.Instance.generalNickname;
+
+            if (kickedFromPreviousGame) {
+                errorSubmenu.OpenWithString("ui.error.kicked");
+            } else if (bannedFromPreviousGame) {
+                errorSubmenu.OpenWithString("ui.error.banned");
+            }
+
+            kickedFromPreviousGame = false;
+            bannedFromPreviousGame = false;
         }
 
         public override void Hide(SubmenuHideReason hideReason) {
@@ -192,6 +205,13 @@ namespace NSMB.UI.MainMenu.Submenus {
         private void OnPlayerAdded(EventPlayerAdded e) {
             if (e.Game.PlayerIsLocal(e.Player) && !Canvas.IsSubmenuOpen(inRoomSubmenu)) {
                 Canvas.OpenMenu(inRoomSubmenu);
+            }
+        }
+
+        private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
+            if (e.Game.PlayerIsLocal(e.Player)) {
+                kickedFromPreviousGame = !e.Banned;
+                bannedFromPreviousGame = e.Banned;
             }
         }
 

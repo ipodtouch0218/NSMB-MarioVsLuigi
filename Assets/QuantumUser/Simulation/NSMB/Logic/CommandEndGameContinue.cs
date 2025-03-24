@@ -7,21 +7,16 @@ namespace Quantum {
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
-            int minFrames = 4 * f.UpdateRate;
+            int minFrames = 31;
             if (f.Global->GameState != GameState.Ended
                 || playerData->VotedToContinue || playerData->IsSpectator
                 || f.Global->GameStartFrames <= minFrames) {
                 return;
             }
 
-            int remainingRealPlayers = 0;
-            for (int i = 0; i < f.Global->RealPlayers; i++) {
-                if (!f.Global->PlayerInfo[i].Disconnected) {
-                    remainingRealPlayers++;
-                }
-            }
+            int players = f.ComponentCount<PlayerData>();
 
-            f.Global->GameStartFrames = (ushort) FPMath.Max(f.Global->GameStartFrames - ((10 * f.UpdateRate) / FPMath.Max(1, remainingRealPlayers)), minFrames);
+            f.Global->GameStartFrames = (ushort) FPMath.Max(f.Global->GameStartFrames - ((15 * f.UpdateRate) / FPMath.Max(1, players)), minFrames);
             playerData->VotedToContinue = true;
         }
     }

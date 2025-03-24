@@ -389,20 +389,30 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         };
 
         IsReplay = false;
-        Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
-        Runner.Game.AddPlayer(new RuntimePlayer {
-            PlayerNickname = Settings.Instance.generalNickname ?? "noname",
-            UserId = Client.UserId,
-            UseColoredNickname = Settings.Instance.generalUseNicknameColor,
-            Character = (byte) Settings.Instance.generalCharacter,
-            Palette = (byte) Settings.Instance.generalPalette,
-        });
+        try {
+            Runner = await QuantumRunner.StartGameAsync(sessionRunnerArguments);
+            Runner.Game.AddPlayer(new RuntimePlayer {
+                PlayerNickname = Settings.Instance.generalNickname ?? "noname",
+                UserId = Client.UserId,
+                UseColoredNickname = Settings.Instance.generalUseNicknameColor,
+                Character = (byte) Settings.Instance.generalCharacter,
+                Palette = (byte) Settings.Instance.generalPalette,
+            });
+        } catch { }
 
         ChatManager.Instance.mutedPlayers.Clear();
         GlobalController.Instance.connecting.SetActive(false);
     }
 
-    public void OnJoinRoomFailed(short returnCode, string message) { }
+    public void OnJoinRoomFailed(short returnCode, string message) {
+        Debug.Log($"[Network] Failed to join room: ({returnCode}) {message}");
+
+        if (!RealtimeErrorCodes.TryGetValue(returnCode, out string errorTranslationKey)) {
+            errorTranslationKey = $"{message} ({returnCode})";
+        }
+
+        OnError?.Invoke(errorTranslationKey, true);
+    }
 
     public void OnJoinRandomFailed(short returnCode, string message) { }
 

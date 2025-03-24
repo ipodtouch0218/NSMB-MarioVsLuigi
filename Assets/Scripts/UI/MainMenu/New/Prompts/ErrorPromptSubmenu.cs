@@ -22,6 +22,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void OpenWithString(string str) {
             TranslationManager tm = GlobalController.Instance.translationManager;
             errorText.text = tm.GetTranslation(str);
+            Canvas.OpenMenu(this, SoundEffect.UI_Error);
         }
     }
 }
