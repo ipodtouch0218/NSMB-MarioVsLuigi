@@ -203,7 +203,7 @@ public class ReplayListManager : Selectable {
             }
 
             using FileStream inputStream = new FileStream(file, FileMode.Open);
-            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile)) {
+            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile) == ReplayParseResult.Success) {
                 Replay newReplay = new Replay {
                     FilePath = file,
                     ReplayFile = replayFile,
@@ -256,24 +256,24 @@ public class ReplayListManager : Selectable {
         string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
 
         foreach (var filepath in selected) {
-            try {
-                using FileStream stream = new FileStream(filepath, FileMode.Open);
-                if (BinaryReplayFile.TryLoadFromFile(stream, out BinaryReplayFile parsedReplay)) {
-                    // Move into the replays folder
-                    string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.UnixTimestamp + ".mvlreplay");
-                    File.Copy(filepath, newPath, false);
+            using FileStream stream = new FileStream(filepath, FileMode.Open);
+            ReplayParseResult parseResult = BinaryReplayFile.TryLoadFromFile(stream, out BinaryReplayFile parsedReplay);
 
-                    Replay newReplay = new Replay {
-                        FilePath = filepath,
-                        ReplayFile = parsedReplay,
-                        ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
-                    };
-                    newReplay.ListEntry.Initialize(this, newReplay);
-                    replays.Add(newReplay);
-                    newReplay.ListEntry.UpdateText();
-                }
-            } catch {
-                Debug.Log($"[Replay] Failed to import replay file at '{filepath}'");
+            if (parseResult == ReplayParseResult.Success) {
+                // Move into the replays folder
+                string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.UnixTimestamp + ".mvlreplay");
+                File.Copy(filepath, newPath, false);
+
+                Replay newReplay = new Replay {
+                    FilePath = filepath,
+                    ReplayFile = parsedReplay,
+                    ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
+                };
+                newReplay.ListEntry.Initialize(this, newReplay);
+                replays.Add(newReplay);
+                newReplay.ListEntry.UpdateText();
+            } else {
+                Debug.LogWarning($"[Replay] Failed to parse {filepath} as a replay: {parseResult}");
             }
         }
     }

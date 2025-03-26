@@ -94217,7 +94217,7 @@ MonoBehaviour:
   backHoldTime: 1
   defaultSelection: {fileID: 176932785}
   useHeaderColor: 1
-  headerColor: {r: 1, g: 0.25882354, b: 0.41568628, a: 1}
+  headerColor: {r: 1, g: 0.5803922, b: 0.5723521, a: 1}
 --- !u!1 &2077391918
 GameObject:
   m_ObjectHideFlags: 0

@@ -31,8 +31,8 @@ public class UpdateChecker {
             JObject data = JObject.Parse(json);
 
             string tag = data.Value<string>("tag_name");
-            SemanticVersion remoteVersion = SemanticVersion.Parse(tag);
-            SemanticVersion localVersion = SemanticVersion.Parse(Application.version);
+            GameVersion remoteVersion = GameVersion.Parse(tag);
+            GameVersion localVersion = GameVersion.Parse(Application.version);
 
             bool upToDate = localVersion >= remoteVersion;
             Debug.Log($"[Updater] Local version: {localVersion} / Remote version: {remoteVersion}. Up to date: {upToDate}");

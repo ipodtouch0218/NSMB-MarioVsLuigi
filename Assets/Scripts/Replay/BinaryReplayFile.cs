@@ -8,24 +8,24 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
 
-public class BinaryReplayFile {
+public unsafe class BinaryReplayFile {
 
     //---Helpers
-    private static SemanticVersion? CachedCurrentVersion;
+    private static GameVersion? CachedCurrentVersion;
     private static int MagicHeaderLength => Encoding.ASCII.GetByteCount(MagicHeader);
-    private static readonly byte[] HeaderBuffer = new byte[MagicHeaderLength];
+    private static readonly byte[] MagicBuffer = new byte[MagicHeaderLength];
 
     // Metadata
     public long FileSize { get; private set; }
 
     // Header
     private const string MagicHeader = "MvLO-RP";
-    public SemanticVersion Version;
+    public GameVersion Version;
     public long UnixTimestamp;
     public int InitialFrameNumber;
     public int ReplayLengthInFrames;
     public string CustomName = "";
-    public bool IsCompatible => Version.Equals(GetCurrentVersion(), ignorePatch: true); // Major.Minor.Patch -> patch is for backwards compatible hotfixes.
+    public bool IsCompatible => Version.EqualsIgnoreHotfix(GetCurrentVersion()); // Major.Minor.Patch.Hotfix -> hotfix is for backwards compatible fixes.
 
     // Rules
     public GameRulesPrototype Rules;
@@ -49,8 +49,8 @@ public class BinaryReplayFile {
         using BinaryWriter writer = new(output, Encoding.ASCII);
         BinaryFormatter formatter = new();
 
-        // Write header stuffs
         writer.Write(Encoding.ASCII.GetBytes(MagicHeader)); // Write the *bytes* to avoid wasteful \0 termination
+
         Version.Serialize(writer);
         writer.Write(UnixTimestamp);
         writer.Write(InitialFrameNumber);
@@ -114,7 +114,13 @@ public class BinaryReplayFile {
         return null;
     }
 
-    public static bool TryLoadFromFile(Stream input, out BinaryReplayFile result) {
+    public enum ReplayParseResult {
+        NotReplayFile,
+        ParseFailure,
+        Success
+    }
+
+    public static ReplayParseResult TryLoadFromFile(Stream input, out BinaryReplayFile result) {
         using BinaryReader reader = new(input, Encoding.ASCII);
         BinaryFormatter formatter = new();
 
@@ -122,14 +128,14 @@ public class BinaryReplayFile {
         result.FileSize = reader.BaseStream.Length;
 
         try {
-            reader.Read(HeaderBuffer);
-            string readString = Encoding.ASCII.GetString(HeaderBuffer);
+            reader.Read(MagicBuffer);
+            string readString = Encoding.ASCII.GetString(MagicBuffer);
             if (readString != MagicHeader) {
-                throw new FormatException($"Error parsing replay file: Incorrect header! Got {readString}, expected {MagicHeader}!");
+                return ReplayParseResult.NotReplayFile;
             }
 
             // Header is good!
-            result.Version = SemanticVersion.Deserialize(reader);
+            result.Version = GameVersion.Deserialize(reader);
             result.UnixTimestamp = reader.ReadInt64();
             result.InitialFrameNumber = reader.ReadInt32();
             result.ReplayLengthInFrames = reader.ReadInt32();
@@ -156,11 +162,11 @@ public class BinaryReplayFile {
             result.CompressedInitialFrameData = reader.ReadBytes(initialFrameSize);
             result.CompressedInputData = reader.ReadBytes(inputDataSize);
 
-            return true;
+            return ReplayParseResult.Success;
         } catch /* (Exception e) */ {
             // Debug.LogWarning("Failed to parse replay: " + e);
             // result = null;
-            return false;
+            return ReplayParseResult.ParseFailure;
         }
     }
 
@@ -193,9 +199,9 @@ public class BinaryReplayFile {
         return result;
     }
 
-    private static SemanticVersion GetCurrentVersion() {
+    private static GameVersion GetCurrentVersion() {
         if (!CachedCurrentVersion.HasValue) {
-            CachedCurrentVersion = SemanticVersion.Parse(Application.version);
+            CachedCurrentVersion = GameVersion.Parse(Application.version);
         }
 
         return CachedCurrentVersion.Value;
