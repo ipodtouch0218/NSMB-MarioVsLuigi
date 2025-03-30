@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 [ExecuteAlways, RequireComponent(typeof(RectTransform))]
 public class ScaleWithParent : MonoBehaviour {
@@ -32,6 +31,15 @@ public class ScaleWithParent : MonoBehaviour {
     }
 
     public void Update() {
+        
+        // I can't get this shit to work... it SHOULD only
+        // get called when the parent changes, but...
+        // just fucking run every frame, i don't give a shit
+        // at this point.
+        OnRectTransformDimensionsChange();
+
+
+        /*
         if (Screen.width != width || Screen.height != height) {
             OnRectTransformDimensionsChange();
             width = Screen.width;
@@ -41,11 +49,13 @@ public class ScaleWithParent : MonoBehaviour {
         Transform tf = transform;
         do {
             if (tf.hasChanged) {
+                Debug.Log("tf has changed; " + tf.name);
                 OnRectTransformDimensionsChange();
                 tf.hasChanged = false;
                 break;
             }
         } while (tf = tf.parent);
+        */
     }
 
     public void OnTransformParentChanged() {

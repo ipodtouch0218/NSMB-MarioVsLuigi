@@ -15893,6 +15893,7 @@ GameObject:
   - component: {fileID: 4506347848550621655}
   - component: {fileID: 9067110928999375944}
   - component: {fileID: 6841901076153067735}
+  - component: {fileID: 7634937552315031300}
   - component: {fileID: 5858149666679547523}
   m_Layer: 0
   m_Name: GlobalController
@@ -16219,6 +16220,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0698a7e52086b6a439d448874dcfc1bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7634937552315031300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4938254683282774592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 404c66bb5f2ef634db9e9b50f14185d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadzone: 0.35
 --- !u!81 &5858149666679547523
 AudioListener:
   m_ObjectHideFlags: 0
@@ -22558,7 +22572,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 397e9690a7e44584288fd2f25a47a772, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSelectedObject: {fileID: 0}
   optionTemplate: {fileID: 3664883044377654223}
   header: {fileID: 5343328489416306754}
   backText: {fileID: 412976368393474945}
@@ -27119,7 +27132,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.4
+  m_fontSize: 21.55
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

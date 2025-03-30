@@ -17,6 +17,9 @@ public class ResultsMenu : QuantumSceneViewComponent {
 
     [SerializeField] private Color labelSelectedColor = Color.white, labelDeselectedColor = Color.gray, countdownCloseColor = Color.red;
 
+    //---Properties
+    private bool CanSaveReplay => !NetworkHandler.IsReplay && NetworkHandler.SavedRecordingPath != null;
+
     //---Private Variables
     private int cursor;
     private int previousCountdownTime;
@@ -107,12 +110,12 @@ public class ResultsMenu : QuantumSceneViewComponent {
 
     public void Deselect(int index) {
         TranslationManager tm = GlobalController.Instance.translationManager;
-        switch (cursor) {
+        switch (index) {
         case 0:
             labels[0].text = tm.GetTranslation(votedToContinue ? "ui.game.results.votedtocontinue" : "ui.pause.continue");
             break;
         case 1:
-            labels[1].text = tm.GetTranslation((NetworkHandler.IsReplay || NetworkHandler.SavedRecordingPath != null) ? "ui.game.results.savereplay" : "ui.game.results.replayunavailable");
+            labels[1].text = tm.GetTranslation(CanSaveReplay ? "ui.game.results.savereplay" : "ui.game.results.replayunavailable");
             break;
         case 2:
             exitPrompt = false;
@@ -129,9 +132,11 @@ public class ResultsMenu : QuantumSceneViewComponent {
     }
 
     public void Click(int index) {
+        Deselect(cursor);
         Select(index);
+        cursor = index;
 
-        switch (cursor) {
+        switch (index) {
         case 0:
             if (!votedToContinue) {
                 foreach (int slot in Game.GetLocalPlayerSlots()) {
@@ -143,9 +148,13 @@ public class ResultsMenu : QuantumSceneViewComponent {
             }
             break;
         case 1:
-            saveReplay = !saveReplay;
-            checkmark.enabled = saveReplay;
-            sfx.PlayOneShot(SoundEffect.UI_Decide);
+            if (CanSaveReplay) {
+                saveReplay = !saveReplay;
+                checkmark.enabled = saveReplay;
+                sfx.PlayOneShot(SoundEffect.UI_Decide);
+            } else {
+                sfx.PlayOneShot(SoundEffect.UI_Error);
+            }
             break;
         case 2:
             if (exitPrompt) {

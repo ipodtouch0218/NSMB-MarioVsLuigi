@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 namespace NSMB.UI.Prompts {
 
-    public class CompositeRebindPrompt : UIPrompt {
+    public class CompositeRebindPrompt : MonoBehaviour {
 
         //---Serialized Variables
         [SerializeField] private RebindCompositeOption optionTemplate;
