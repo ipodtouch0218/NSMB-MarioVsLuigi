@@ -2208,7 +2208,6 @@ namespace Quantum {
             var filter = f.Filter<MarioPlayer>();
             filter.UseCulling = false;
             while (filter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
-                mario->Lives = (byte) f.Global->Rules.Lives;
                 mario->PreRespawn(f, entity, stage);
             }
         }

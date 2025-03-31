@@ -61,8 +61,8 @@ public unsafe class CameraAnimator : ResizingCamera {
         var cameraControllerPrevious = fp.Unsafe.GetPointer<CameraController>(Target);
 
         // Resize from game
-        float orthoSize = Mathf.Lerp(cameraControllerPrevious->OrthographicSize.AsFloat, cameraControllerCurrent->OrthographicSize.AsFloat, game.InterpolationFactor);
-        ClampCameraAspectRatio(orthoSize * 0.5f);
+        float targetOrthoSize = Mathf.Lerp(cameraControllerPrevious->OrthographicSize.AsFloat, cameraControllerCurrent->OrthographicSize.AsFloat, game.InterpolationFactor);
+        ClampCameraAspectRatio(targetOrthoSize * 0.5f);
 
         FPVector2 origin = cameraControllerPrevious->CurrentPosition;
         FPVector2 target = cameraControllerCurrent->CurrentPosition;
@@ -90,21 +90,27 @@ public unsafe class CameraAnimator : ResizingCamera {
         };
 
         // Offset to always put the player in the center for extremely long aspect ratios
+        float screenAspect = ourCamera.aspect;
+        float orthoSize = ourCamera.orthographicSize;
+        if (Mathf.Abs((16f / 9f) - screenAspect) < 0.05f) {
+            screenAspect = 16f / 9f;
+        }
+
         Vector2 cameraFocus = Vector2.Lerp(targetTransformPrevious->Position.ToUnityVector2(), targetTransformCurrent->Position.ToUnityVector2(), game.InterpolationFactor);
         cameraFocus.y += playerHeight * 0.5f;
 
         if (!targetMario->IsDead || targetMario->IsRespawning) {
-            float cameraHalfHeight = ourCamera.orthographicSize - (playerHeight * 0.5f) - 0.25f;
+            float cameraHalfHeight = orthoSize - (playerHeight * 0.5f) - 0.25f;
             newPosition.y = Mathf.Clamp(newPosition.y, cameraFocus.y - cameraHalfHeight, cameraFocus.y + cameraHalfHeight);
         }
 
         // Clamp
-        float cameraMinX = stage.CameraMinPosition.X.AsFloat + (ourCamera.orthographicSize * ourCamera.aspect);
-        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat - (ourCamera.orthographicSize * ourCamera.aspect);
+        float cameraMinX = stage.CameraMinPosition.X.AsFloat + (orthoSize * screenAspect);
+        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat - (orthoSize * screenAspect);
         newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
 
-        float cameraMinY = stage.CameraMinPosition.Y.AsFloat + ourCamera.orthographicSize;
-        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + Mathf.Max(7, ourCamera.orthographicSize * 2), stage.CameraMaxPosition.Y.AsFloat) - ourCamera.orthographicSize;
+        float cameraMinY = stage.CameraMinPosition.Y.AsFloat + orthoSize;
+        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + Mathf.Max(7, orthoSize * 2), stage.CameraMaxPosition.Y.AsFloat) - orthoSize;
         newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
 
         // Screenshake (ignores clamping)

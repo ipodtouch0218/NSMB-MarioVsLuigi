@@ -20,6 +20,9 @@ public class ResizingCamera : MonoBehaviour {
 
     protected void ClampCameraAspectRatio(float target = 14f/4f) {
         float aspect = ourCamera.aspect;
+        if (Mathf.Abs((16f / 9f) - aspect) < 0.05f) {
+            aspect = 16f / 9f;
+        }
 
         // https://forum.unity.com/threads/how-to-calculate-horizontal-field-of-view.16114/#post-2961964
         double aspectReciprocals = 1d / aspect;

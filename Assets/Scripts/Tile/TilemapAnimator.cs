@@ -86,7 +86,7 @@ public class TilemapAnimator : MonoBehaviour {
         tilemap.SetTransformMatrix(coords, mat);
         tilemap.RefreshTile(coords);
         
-        tileEventPositions[(EventKey) e] = coords;
+        tileEventPositions[e] = coords;
     }
 
     private unsafe void OnTileBroken(EventTileBroken e) {

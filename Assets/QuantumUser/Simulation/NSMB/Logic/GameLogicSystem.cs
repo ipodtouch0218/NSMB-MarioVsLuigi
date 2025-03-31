@@ -388,6 +388,7 @@ namespace Quantum {
                 EntityRef newPlayer = f.Create(character.Prototype);
                 var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);
                 mario->PlayerRef = data->PlayerRef;
+                mario->Lives = (byte) f.Global->Rules.Lives;
                 data->RealTeam = (byte) (f.Global->Rules.TeamsEnabled ? data->RequestedTeam : teamCount++);
 
                 var newTransform = f.Unsafe.GetPointer<Transform2D>(newPlayer);

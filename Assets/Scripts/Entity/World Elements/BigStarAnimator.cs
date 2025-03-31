@@ -56,8 +56,12 @@ public class BigStarAnimator : QuantumEntityViewComponent {
 
     public unsafe override void OnUpdateView() {
         Frame f = PredictedFrame;
-        if (!f.Exists(EntityRef)
-            || f.Global->GameState >= GameState.Ended) {
+        if (f.Global->GameState >= GameState.Ended) {
+            return;
+        }
+        
+        if (!f.Exists(EntityRef)) {
+            sRenderer.enabled = false;
             return;
         }
 
@@ -67,6 +71,7 @@ public class BigStarAnimator : QuantumEntityViewComponent {
             pulseEffectCounter += Time.deltaTime;
             float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
             graphicTransform.localScale = Vector3.one * 3f + new Vector3(sin, sin, 0);
+            sRenderer.enabled = true;
         } else if (!stationary) {
             graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
             float timeRemaining = star->Lifetime / 60f;
