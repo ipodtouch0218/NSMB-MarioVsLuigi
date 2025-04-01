@@ -1,5 +1,5 @@
 using Photon.Deterministic;
-using Quantum.Collections;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -16,6 +16,7 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            /*
             var platform = filter.Platform;
             if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
                 platform->Velocity = physicsObject->Velocity;
@@ -32,8 +33,79 @@ namespace Quantum {
 
             MoveVertically(f, ref filter, queryList, ref queryIndex, stage);
             MoveHorizontally(f, ref filter, queryList, ref queryIndex, stage);
+            */
+
+            TryMove(f, ref filter, stage);
         }
 
+        private void TryMove(Frame f, ref Filter filter, VersusStageData stage) {
+            TryMoveShape(f, ref filter, stage, &filter.Collider->Shape);
+
+            var platform = filter.Platform;
+            if (!platform->IgnoreMovement) {
+                filter.Transform->Position += platform->Velocity * f.DeltaTime;
+            }
+        }
+
+        private void TryMoveShape(Frame f, ref Filter filter, VersusStageData stage, Shape2D* shape) {
+            if (shape->Type == Shape2DType.Compound) {
+                shape->Compound.GetShapes(f, out Shape2D* subshapes, out int subshapeCount);
+                for (int i = 0; i < subshapeCount; i++) {
+                    TryMoveShape(f, ref filter, stage, subshapes + i);
+                }
+                return;
+            }
+            
+            var entity = filter.Entity;
+            FPVector2 velocity = filter.Platform->Velocity * f.DeltaTime;
+            FPVector2 shapecastOrigin = filter.Transform->Position + (-velocity * PhysicsObjectSystem.RaycastSkin);
+
+            var hits = f.Physics2D.ShapeCastAll(shapecastOrigin,
+                0,
+                shape,
+                velocity * (1 + PhysicsObjectSystem.RaycastSkin),
+                ~f.Context.ExcludeEntityAndPlayerMask,
+                QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo | QueryOptions.DetectOverlapsAtCastOrigin);
+
+            for (int i = 0; i < hits.Count; i++) {
+                var hit = hits[i];
+                
+                if (hit.Entity == entity) {
+                    continue;
+                }
+                if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* physicsObject)) {
+                    continue;
+                }
+                if (physicsObject->DisableCollision) {
+                    continue;
+                }
+
+                var hitShape = hit.GetShape(f);
+                
+                if (hitShape->Type == Shape2DType.Edge) {
+                    // Semisolid logic
+                    if (FPVector2.Dot(physicsObject->Velocity, velocity) < 0) {
+                        continue;
+                    }
+                }
+
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                var moveDistance = velocity * (1 - hit.CastDistanceNormalized);
+                //moveDistance -= FPVector2.Normalize(moveDistance) * PhysicsObjectSystem.RaycastSkin;
+
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveDistance / f.DeltaTime, hit.Entity, stage, contacts, out bool tempHit1);
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveDistance / f.DeltaTime, hit.Entity, stage, contacts, out bool tempHit2);
+                bool hitObject = tempHit1 || tempHit2;
+
+                if (hitObject && shape->Type != Shape2DType.Edge) {
+                    // Crushed
+                    physicsObject->IsBeingCrushed = true;
+                    Debug.Log(hit.Entity + " _ " + physicsObject->IsBeingCrushed);
+                }
+            }
+        }
+
+#if false
         private void MoveVertically(Frame f, ref Filter filter, QList<PhysicsQueryRef> queryList, ref int queryIndex, VersusStageData stage) {
             var platform = filter.Platform;
             var transform = filter.Transform;
@@ -235,5 +307,6 @@ namespace Quantum {
                 });
             }
         }
+#endif
     }
 }

@@ -165,7 +165,7 @@ namespace Quantum {
                     bobombHoldable->Pickup(f, bobombEntity, marioEntity);
                 } else {
                     // Kicked by player
-                    bobomb->Kick(f, bobombEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
+                    bobomb->Kick(f, bobombEntity, marioEntity, FPMath.Abs(marioPhysicsObject->Velocity.X) / 3);
                 }
             } else {
                 if (attackedFromAbove) {
@@ -176,7 +176,7 @@ namespace Quantum {
                     }
 
                     if (!mini && mario->IsGroundpoundActive) {
-                        bobomb->Kick(f, bobombEntity, marioEntity, marioPhysicsObject->Velocity.X / 3);
+                        bobomb->Kick(f, bobombEntity, marioEntity, FPMath.Abs(marioPhysicsObject->Velocity.X) / 3);
                     } else {
                         mario->DoEntityBounce = true;
                         mario->IsGroundpounding = false;

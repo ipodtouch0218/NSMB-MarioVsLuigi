@@ -39,7 +39,7 @@ MonoBehaviour:
     X:
       RawValue: -1966080
     Y:
-      RawValue: 0
+      RawValue: -16384
   SpawnpointArea:
     X:
       RawValue: 91750

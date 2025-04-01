@@ -62,7 +62,9 @@ public unsafe class VersusStageData : AssetObject {
             FPMath.Cos(comp) * (totalPlayers > 2 ? scale * SpawnpointArea.Y: 0)
         );
 
-        return Spawnpoint + offset;
+        FPVector2 result = Spawnpoint + offset;
+        result.Y -= FP._0_50;
+        return result;
     }
 
     public StageTileInstance GetTileRelative(Frame f, int x, int y) {

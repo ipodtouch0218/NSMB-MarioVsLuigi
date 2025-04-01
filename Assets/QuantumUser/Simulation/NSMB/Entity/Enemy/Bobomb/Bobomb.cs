@@ -15,13 +15,19 @@ namespace Quantum {
         }
 
         public void Kick(Frame f, EntityRef entity, EntityRef initiator, FP speed) {
+            var enemy = f.Unsafe.GetPointer<Enemy>(entity);
+            var initiatorTransform = f.Unsafe.GetPointer<Transform2D>(initiator);
+            var bobombTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+            
+            enemy->FacingRight = QuantumUtils.WrappedDirectionSign(f, bobombTransform->Position, initiatorTransform->Position) > 0;
+
             var holdable = f.Unsafe.GetPointer<Holdable>(entity);
             holdable->PreviousHolder = initiator;
             holdable->IgnoreOwnerFrames = 15;
 
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             physicsObject->Velocity = new(
-                Constants._4_50 + speed,
+                (Constants._4_50 + speed) * (enemy->FacingRight ? 1 : -1),
                 Constants._3_50
             );
 

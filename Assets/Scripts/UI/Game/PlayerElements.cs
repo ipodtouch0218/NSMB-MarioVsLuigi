@@ -120,6 +120,10 @@ namespace NSMB.UI.Game {
         }
 
         public unsafe void UpdateSpectateUI() {
+            if (!spectating) {
+                return;
+            }
+
             Frame f = PredictedFrame;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(spectatingEntity);
 

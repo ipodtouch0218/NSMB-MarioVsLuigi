@@ -39,12 +39,12 @@ MonoBehaviour:
     X:
       RawValue: 327680
     Y:
-      RawValue: -49152
+      RawValue: -16384
   SpawnpointArea:
     X:
       RawValue: 91750
     Y:
-      RawValue: 36700
+      RawValue: 52429
   OverrideAutomaticCameraSettings: 1
   CameraMinPosition:
     X:

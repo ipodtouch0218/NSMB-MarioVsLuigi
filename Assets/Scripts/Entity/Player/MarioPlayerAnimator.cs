@@ -857,7 +857,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            activeRespawnParticle = SpawnParticle(respawnParticle, e.Spawnpoint.ToUnityVector3());
+            activeRespawnParticle = SpawnParticle(respawnParticle, e.Spawnpoint.ToUnityVector3() + (Vector3.up * 0.25f));
             foreach (ParticleSystem particle in activeRespawnParticle.GetComponentsInChildren<ParticleSystem>()) {
                 var main = particle.main;    
                 main.startColor = GlowColor;

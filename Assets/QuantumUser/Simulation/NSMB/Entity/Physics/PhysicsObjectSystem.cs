@@ -145,7 +145,7 @@ namespace Quantum {
 
                 QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
 
-                CeilingCrusherCheck(fts, ref filter, stage, contacts);
+                HandleCeilingCrushers(fts, ref filter, stage, contacts);
 
                 MoveWithPlatform(fts, ref filter, contacts);
                 for (int i = 0; i < contacts.Count; i++) {
@@ -171,8 +171,8 @@ namespace Quantum {
                 effectiveVelocity += physicsObject->ParentVelocity;
 
                 FPVector2 previousPosition = transform->Position;
-                effectiveVelocity = MoveVertically(fts, effectiveVelocity, entity, stage, contacts);
-                effectiveVelocity = MoveHorizontally(fts, effectiveVelocity, entity, stage, contacts);
+                effectiveVelocity = MoveVertically(fts, effectiveVelocity, entity, stage, contacts, out _);
+                effectiveVelocity = MoveHorizontally(fts, effectiveVelocity, entity, stage, contacts, out _);
                 ResolveContacts((FrameThreadSafe) f, stage, physicsObject, contacts);
 
                 if (!physicsObject->DisableCollision && /* canSnap && */ physicsObject->WasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y && !physicsObject->IsTouchingGround) {
@@ -180,10 +180,10 @@ namespace Quantum {
                     FPVector2 previousVelocity = effectiveVelocity;
                     FPVector2 testVelocity = effectiveVelocity;
                     testVelocity.Y = -FP._0_25 * f.UpdateRate;
-                    effectiveVelocity = MoveVertically(fts, testVelocity, entity, stage, contacts);
+                    effectiveVelocity = MoveVertically(fts, testVelocity, entity, stage, contacts, out bool snapped);
                     ResolveContacts(fts, stage, physicsObject, contacts);
 
-                    if (!physicsObject->IsTouchingGround) {
+                    if (!snapped) {
                         transform->Position.Y = previousPosition.Y;
                         effectiveVelocity = previousVelocity;
                         effectiveVelocity.Y = 0;
@@ -195,7 +195,7 @@ namespace Quantum {
                 physicsObject->Velocity.X = effectiveVelocity.X / velocityModifier.X;
                 physicsObject->Velocity.Y = effectiveVelocity.Y / velocityModifier.Y;
 
-                CeilingCrusherCheck(fts, ref filter, stage, contacts);
+                HandleCeilingCrushers(fts, ref filter, stage, contacts);
 
 #if DEBUG
                 foreach (var contact in contacts) {
@@ -226,29 +226,23 @@ namespace Quantum {
             }
         }
 
-        private void CeilingCrusherCheck(FrameThreadSafe f, ref Filter filter, VersusStageData stage, QList<PhysicsContact> contacts) {
+        private void HandleCeilingCrushers(FrameThreadSafe f, ref Filter filter, VersusStageData stage, QList<PhysicsContact> contacts) {
             var physicsObject = filter.PhysicsObject;
-            if (!physicsObject->IsTouchingGround || physicsObject->DisableCollision) {
+            if (physicsObject->DisableCollision || !physicsObject->IsBeingCrushed) {
                 return;
             }
-            var entity = filter.Entity;
             var transform = filter.Transform;
-
-            // Check for ceiling crushers
-            var collider = f.GetPointer<PhysicsCollider2D>(entity);
+            var collider = f.GetPointer<PhysicsCollider2D>(filter.Entity);
             Shape2D shape = collider->Shape;
-            physicsObject->IsBeingCrushed = BoxInGround(f, transform->Position, shape, stage: stage, entity: filter.Entity, includeCeilingCrushers: true);
 
-            if (physicsObject->IsBeingCrushed) {
-                // Snap to ground.
-                foreach (var contact in contacts) {
-                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < GroundMaxAngle) {
-                        continue;
-                    }
-
-                    transform->Position.Y = contact.Position.Y + shape.Box.Extents.Y - shape.Centroid.Y + Skin;
-                    break;
+            // Snap to ground.
+            foreach (var contact in contacts) {
+                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < GroundMaxAngle) {
+                    continue;
                 }
+
+                transform->Position.Y = contact.Position.Y + shape.Box.Extents.Y - shape.Centroid.Y + Skin;
+                break;
             }
         }
 
@@ -284,12 +278,13 @@ namespace Quantum {
             physicsObject->ParentVelocity = maxVelocity ?? FPVector2.Zero;
         }
 
-        public static FPVector2 MoveVertically(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = default) {
+        public static FPVector2 MoveVertically(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
             var physicsObject = f.GetPointer<PhysicsObject>(entity);
             var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
 
             FP velocityY = velocity.Y * f.DeltaTime;
             if (velocityY == 0) {
+                hitObject = false;
                 return velocity;
             }
 
@@ -479,6 +474,7 @@ namespace Quantum {
                     // Only care about the Y aspect to not slide up/down hills via gravity
                     FPVector2 newVelocity = velocity;
                     newVelocity.Y = Project(newVelocity.Normalized * remainingVelocity, newDirection).Y;
+                    hitObject = true;
                     return newVelocity;
                 }
             }
@@ -486,15 +482,17 @@ namespace Quantum {
             // Good to move
             transform->Position += directionVector * FPMath.Abs(velocityY);
             physicsObject->FloorAngle = 0;
+            hitObject = false;
             return velocity;
         }
 
-        public static FPVector2 MoveHorizontally(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts = null) {
+        public static FPVector2 MoveHorizontally(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
             var physicsObject = f.GetPointer<PhysicsObject>(entity);
             var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
 
             FP velocityX = velocity.X * f.DeltaTime;
             if (velocityX == 0) {
+                hitObject = false;
                 return velocity;
             }
 
@@ -684,12 +682,14 @@ namespace Quantum {
                     if (FPMath.Abs(FPVector2.Dot(newDirection, FPVector2.Right)) > GroundMaxAngle) {
                         newVelocity.X = velocityX / f.DeltaTime;
                     }
+                    hitObject = true;
                     return newVelocity;
                 }
             }
 
             // Good to move
             transform->Position += directionVector * FPMath.Abs(velocityX);
+            hitObject = false;
             return velocity;
         }
 

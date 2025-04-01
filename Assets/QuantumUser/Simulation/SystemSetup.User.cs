@@ -17,6 +17,7 @@ namespace Quantum {
 
             systems.Add(
                 new StartDisabledSystemGroup("gameplay",
+                    new PrePhysicsObjectSystem(),
                     new InteractionPhysicsQuerySystem(),
                     new GenericMoverSystem(),
                     new SpinnerSystem(),
@@ -46,9 +47,9 @@ namespace Quantum {
                     new LiquidSystem(),
                     new BreakableObjectSystem(),
                     new MarioBrosPlatformSystem(),
-                    new EnterablePipeSystem(),
+                    new EnterablePipeSystem()
 
-                    new BetterPhysicsObjectSystem()
+                    // new BetterPhysicsObjectSystem()
                 )
             );
         }
