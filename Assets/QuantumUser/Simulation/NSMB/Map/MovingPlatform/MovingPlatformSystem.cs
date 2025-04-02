@@ -100,7 +100,6 @@ namespace Quantum {
                 if (hitObject && shape->Type != Shape2DType.Edge) {
                     // Crushed
                     physicsObject->IsBeingCrushed = true;
-                    Debug.Log(hit.Entity + " _ " + physicsObject->IsBeingCrushed);
                 }
             }
         }

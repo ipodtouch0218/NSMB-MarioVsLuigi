@@ -693,9 +693,15 @@ namespace Quantum {
             return velocity;
         }
 
+        private void ResetContacts(ref PhysicsObjectData data) {
+            data.FloorAngle = 0;
+            // Reset all but IsBeingCrushed
+            data.Flags &= PhysicsFlags.IsBeingCrushed;
+        }
+
         private void ResolveContacts(FrameThreadSafe f, VersusStageData stage, PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
 
-            physicsObject->CurrentData = default;
+            ResetContacts(ref physicsObject->CurrentData);
 
             foreach (var contact in contacts) {
                 FP horizontalDot = FPVector2.Dot(contact.Normal, FPVector2.Right);

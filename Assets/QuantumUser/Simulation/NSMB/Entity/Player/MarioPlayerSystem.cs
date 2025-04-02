@@ -1638,9 +1638,7 @@ namespace Quantum {
             var transform = filter.Transform;
             Shape2D shape = filter.PhysicsCollider->Shape;
 
-            Debug.Log(physicsObject->IsBeingCrushed);
             if (physicsObject->IsBeingCrushed) {
-                Debug.Log(filter.Entity + " a");
                 // In a ceiling crusher
                 if (mario->CrushDamageInvincibilityFrames == 0) {
                     mario->CrushDamageInvincibilityFrames = 30;
