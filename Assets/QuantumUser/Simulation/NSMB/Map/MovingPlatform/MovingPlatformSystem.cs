@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -59,11 +58,12 @@ namespace Quantum {
             var entity = filter.Entity;
             FPVector2 velocity = filter.Platform->Velocity * f.DeltaTime;
             FPVector2 shapecastOrigin = filter.Transform->Position + (-velocity * PhysicsObjectSystem.RaycastSkin);
+            FPVector2 moveVelocity = velocity * (2 + PhysicsObjectSystem.RaycastSkin);
 
             var hits = f.Physics2D.ShapeCastAll(shapecastOrigin,
                 0,
                 shape,
-                velocity * (1 + PhysicsObjectSystem.RaycastSkin),
+                moveVelocity,
                 ~f.Context.ExcludeEntityAndPlayerMask,
                 QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo | QueryOptions.DetectOverlapsAtCastOrigin);
 
@@ -81,7 +81,6 @@ namespace Quantum {
                 }
 
                 var hitShape = hit.GetShape(f);
-                
                 if (hitShape->Type == Shape2DType.Edge) {
                     // Semisolid logic
                     if (FPVector2.Dot(physicsObject->Velocity, velocity) < 0) {
@@ -90,7 +89,8 @@ namespace Quantum {
                 }
 
                 var contacts = f.ResolveList(physicsObject->Contacts);
-                var moveDistance = velocity * (1 - hit.CastDistanceNormalized);
+                var moveDistance = moveVelocity * (1 - hit.CastDistanceNormalized);
+
                 //moveDistance -= FPVector2.Normalize(moveDistance) * PhysicsObjectSystem.RaycastSkin;
 
                 PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveDistance / f.DeltaTime, hit.Entity, stage, contacts, out bool tempHit1);
