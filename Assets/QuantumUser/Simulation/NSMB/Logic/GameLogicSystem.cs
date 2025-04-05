@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
@@ -56,9 +57,11 @@ namespace Quantum {
                 }
                 break;
             case GameState.WaitingForPlayers:
-                var playerDataFilter = f.Filter<PlayerData>();
                 int validPlayers = 0;
                 int loadedPlayers = 0;
+
+                var playerDataFilter = f.Filter<PlayerData>();
+                playerDataFilter.UseCulling = false;
                 while (playerDataFilter.NextUnsafe(out _, out PlayerData* data)) {
                     if (!f.RuntimeConfig.IsRealGame) {
                         data->IsLoaded = true;
@@ -67,9 +70,9 @@ namespace Quantum {
 
                     if (!data->IsSpectator) {
                         validPlayers++;
-                    }
-                    if (data->IsLoaded) {
-                        loadedPlayers++;
+                        if (data->IsLoaded) {
+                            loadedPlayers++;
+                        }
                     }
                 }
                 f.Global->RealPlayers = (byte) validPlayers;
@@ -82,8 +85,8 @@ namespace Quantum {
                     // Progress to next stage.
                     f.Global->RealPlayers = (byte) loadedPlayers;
                     f.Global->GameState = GameState.Starting;
-                    f.Global->GameStartFrames = 6 * 60;
-                    f.Global->Timer = f.Global->Rules.TimerSeconds * 60;
+                    f.Global->GameStartFrames = (ushort) (6 * f.UpdateRate);
+                    f.Global->Timer = f.Global->Rules.TimerSeconds * f.UpdateRate;
 
                     f.Signals.OnLoadingComplete();
                     f.Events.GameStateChanged(GameState.Starting);

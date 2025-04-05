@@ -352,15 +352,16 @@ namespace NSMB.UI.MainMenu {
         }
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
+            Frame f = e.Game.Frames.Predicted;
+            handler.GetPlayerEntry(player).UpdateText(f);
+
             if (e.Player != player) {
                 return;
             }
 
-            Frame f = e.Game.Frames.Verified;
-            var playerData = QuantumUtils.GetPlayerData(f, e.Player);
+            var playerData = QuantumUtils.GetPlayerData(f, player);
             readyIcon.SetActive(playerData->IsReady);
             settingsIcon.SetActive(playerData->IsInSettings);
-            handler.GetPlayerEntry(e.Player).UpdateText(f);
         }
 
         public void OnSelect(BaseEventData eventData) {

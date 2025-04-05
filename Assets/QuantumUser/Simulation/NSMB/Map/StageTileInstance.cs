@@ -28,7 +28,9 @@ namespace Quantum {
             }
 
             if (stageTile is TileInteractionRelocator tir) {
-                f.TryFindAsset(stage.GetTileRelative((Frame) f, tir.RelocateTo.x, tir.RelocateTo.y).Tile, out stageTile);
+                if (!f.TryFindAsset(stage.GetTileRelative((Frame) f, tir.RelocateTo.x, tir.RelocateTo.y).Tile, out stageTile)) {
+                    return;
+                }
             }
 
             if (stageTile == null || stageTile.CollisionData.Shapes == null) {

@@ -325,7 +325,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
             bool isHost = e.Game.PlayerIsLocal(QuantumUtils.GetHostPlayer(f, out _));
 
             if (isHost) {

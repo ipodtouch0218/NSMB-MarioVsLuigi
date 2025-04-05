@@ -7,9 +7,9 @@ namespace Quantum {
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
-            int minFrames = 31;
+            int minFrames = (f.UpdateRate / 2) + 1;
             if (f.Global->GameState != GameState.Ended
-                || playerData->VotedToContinue || playerData->IsSpectator
+                || playerData->VotedToContinue
                 || f.Global->GameStartFrames <= minFrames) {
                 return;
             }

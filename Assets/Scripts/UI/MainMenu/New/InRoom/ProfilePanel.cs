@@ -114,7 +114,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 return;
             }
 
-            Frame f = e.Game.Frames.Verified;
+            Frame f = e.Game.Frames.Predicted;
 
             // Set character button to the correct state
             PlayerData* data = QuantumUtils.GetPlayerData(f, e.Player);

@@ -854,6 +854,13 @@ namespace Quantum {
                 return;
             }
 
+            var liquidContacts = f.ResolveHashSet(physicsObject->LiquidContacts);
+            foreach (var contact in liquidContacts) {
+                if (f.Unsafe.TryGetPointer(contact, out Liquid* liquid) && liquid->LiquidType == LiquidType.Water) {
+                    return;
+                }
+            }
+
             /// * intentional: remove left/right requirement when groundpounding
             if (!mario->IsPropellerFlying && !mario->IsSpinnerFlying && (inputs.Left.IsDown || inputs.Right.IsDown)) {
                 return;
