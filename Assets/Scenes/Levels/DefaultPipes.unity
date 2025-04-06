@@ -4258,6 +4258,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BreakablePipe (21)
       objectReference: {fileID: 0}
+    - target: {fileID: 2668281350895519371, guid: 63263ccdbb1edfc4a9696176d24e7692,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2857987242245735359, guid: 63263ccdbb1edfc4a9696176d24e7692,
         type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.Y.RawValue

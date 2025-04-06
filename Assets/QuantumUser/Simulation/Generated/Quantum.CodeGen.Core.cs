@@ -91,6 +91,10 @@ namespace Quantum {
     HammerSuit,
     MegaMushroom,
   }
+  public enum StageTileFlags : byte {
+    MirrorX = 1,
+    MirrorY = 2,
+  }
   [System.FlagsAttribute()]
   public enum InputButtons : int {
     Up = 1 << 0,
@@ -961,28 +965,28 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct StageTileInstance {
-    public const Int32 SIZE = 32;
+    public const Int32 SIZE = 16;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(0)]
-    public AssetRef<StageTile> Tile;
     [FieldOffset(8)]
-    public FP Rotation;
-    [FieldOffset(16)]
-    public FPVector2 Scale;
+    public AssetRef<StageTile> Tile;
+    [FieldOffset(2)]
+    public UInt16 Rotation;
+    [FieldOffset(0)]
+    public StageTileFlags Flags;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 18131;
         hash = hash * 31 + Tile.GetHashCode();
         hash = hash * 31 + Rotation.GetHashCode();
-        hash = hash * 31 + Scale.GetHashCode();
+        hash = hash * 31 + (Byte)Flags;
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (StageTileInstance*)ptr;
+        serializer.Stream.Serialize((Byte*)&p->Flags);
+        serializer.Stream.Serialize(&p->Rotation);
         AssetRef.Serialize(&p->Tile, serializer);
-        FP.Serialize(&p->Rotation, serializer);
-        FPVector2.Serialize(&p->Scale, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1256,7 +1260,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BlockBump : Quantum.IComponent {
-    public const Int32 SIZE = 96;
+    public const Int32 SIZE = 80;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public Byte Lifetime;
@@ -3868,6 +3872,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.Spinner), Quantum.Spinner.SIZE);
       typeRegistry.Register(typeof(SpringJoint), SpringJoint.SIZE);
       typeRegistry.Register(typeof(SpringJoint3D), SpringJoint3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.StageTileFlags), 1);
       typeRegistry.Register(typeof(Quantum.StageTileInstance), Quantum.StageTileInstance.SIZE);
       typeRegistry.Register(typeof(Transform2D), Transform2D.SIZE);
       typeRegistry.Register(typeof(Transform2DVertical), Transform2DVertical.SIZE);
@@ -3934,6 +3939,7 @@ namespace Quantum {
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QString48>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.QStringUtf8_40>();
       FramePrinter.EnsurePrimitiveNotStripped<QueryOptions>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.StageTileFlags>();
     }
   }
 }

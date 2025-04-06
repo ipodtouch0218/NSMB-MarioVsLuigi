@@ -68,13 +68,11 @@ public unsafe class VersusStageData : AssetObject {
     }
 
     public StageTileInstance GetTileRelative(Frame f, int x, int y) {
-        int index = x + y * TileDimensions.x;
-        StageTileInstance[] stageLayout = f.StageTiles;
-        if (index < 0 || index >= stageLayout.Length) {
+        if (x < 0 || y < 0 || x >= TileDimensions.x || y >= TileDimensions.y) {
             return default;
         }
 
-        return stageLayout[index];
+        return f.StageTiles[x + y * TileDimensions.x];
     }
 
     public StageTileInstance GetTileRelative(Frame f, Quantum.Vector2Int tile) {

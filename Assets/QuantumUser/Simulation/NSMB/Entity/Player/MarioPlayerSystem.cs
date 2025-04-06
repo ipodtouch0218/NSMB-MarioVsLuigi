@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using UnityEditor.Search;
 using UnityEngine;
 using static IInteractableTile;
 
@@ -1418,18 +1419,17 @@ namespace Quantum {
                 }
 
                 var hitboxShape = filter.PhysicsCollider->Shape;
-                FP hitboxCenter = filter.Transform->Position.Y + hitboxShape.Centroid.Y + FP._0_10;
+                FP hitboxCenter = filter.Transform->Position.Y + hitboxShape.Centroid.Y + FP._0_25;
                 FP distanceToSurface = maxSurface - hitboxCenter;
 
-                if (distanceToSurface > 0) {
-                    FP original = physicsObject->Velocity.Y;
-                    if (physicsObject->IsTouchingGround && physicsObject->Velocity.Y < 0) {
-                        physicsObject->Velocity.Y = 1;
-                    }
-                    physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (physics.SwimAcceleration[^1] * FPMath.Clamp01(distanceToSurface * (1 - FPMath.Clamp01(physicsObject->Velocity.Y / physics.SwimJumpVelocity)))), physics.SwimJumpVelocity);
-                    physicsObject->IsTouchingGround = false;
-                    physicsObject->WasTouchingGround = false;
+                FP original = physicsObject->Velocity.Y;
+                if (physicsObject->IsTouchingGround && physicsObject->Velocity.Y < 0) {
+                    physicsObject->Velocity.Y = 1;
                 }
+
+                physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (physics.SwimAcceleration[^1] * FPMath.Min(distanceToSurface * (1 - FPMath.Clamp01(physicsObject->Velocity.Y / physics.SwimJumpVelocity)), 1)), physics.SwimJumpVelocity);
+                physicsObject->IsTouchingGround = false;
+                physicsObject->WasTouchingGround = false;
             }
 
             mario->WallslideLeft = false;
@@ -1871,8 +1871,6 @@ namespace Quantum {
             }
 
             StageTileInstance result = new StageTileInstance {
-                Rotation = 0,
-                Scale = FPVector2.One,
                 Tile = invisibleBlock->Tile,
             };
             f.Signals.OnMarioPlayerCollectedCoin(marioEntity, mario, transform->Position, true, false);

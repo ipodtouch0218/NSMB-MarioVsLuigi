@@ -795,13 +795,13 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.StageTileInstance))]
   public unsafe partial class StageTileInstancePrototype : StructPrototype {
     public AssetRef<StageTile> Tile;
-    public FP Rotation;
-    public FPVector2 Scale;
+    public UInt16 Rotation;
+    public Quantum.QEnum8<StageTileFlags> Flags;
     partial void MaterializeUser(Frame frame, ref Quantum.StageTileInstance result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.StageTileInstance result, in PrototypeMaterializationContext context = default) {
         result.Tile = this.Tile;
         result.Rotation = this.Rotation;
-        result.Scale = this.Scale;
+        result.Flags = this.Flags;
         MaterializeUser(frame, ref result, in context);
     }
   }

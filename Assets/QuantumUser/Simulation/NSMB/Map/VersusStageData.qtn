@@ -1,7 +1,12 @@
 struct StageTileInstance {
     AssetRef<StageTile> Tile;
-    FP Rotation;
-    FPVector2 Scale;
+    ushort Rotation;
+    StageTileFlags Flags;
+}
+
+enum StageTileFlags : Byte {
+    MirrorX = 1,
+    MirrorY = 2
 }
 
 global {

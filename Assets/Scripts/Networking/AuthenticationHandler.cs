@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using NSMB.UI.MainMenu;
 using Newtonsoft.Json;
 using JetBrains.Annotations;
+using NSMB.Translation;
 
 public class AuthenticationHandler {
 
@@ -50,19 +51,28 @@ public class AuthenticationHandler {
         while (result.EndsWith('"')) {
             result = result[..^1];
         }
-         
+
+        if (webRequest.responseCode >= 500) {
+            // Auth server down?
+            NetworkHandler.ThrowError("ui.error.authentication", false);
+            IsAuthenticating = false;
+            return null;
+        }
+
         if (webRequest.responseCode >= 300) {
-            BanMessage ban = JsonConvert.DeserializeObject<BanMessage>(result);
-            if (ban != null) {
-                /* TODO
-                string reason = string.IsNullOrWhiteSpace(ban.Message) ? GlobalController.Instance.translationManager.GetTranslation("ui.error.noreason") : ban.Message;
-                string template = ban.Expiration.HasValue ? "ui.error.gamebanned.temporary" : "ui.error.gamebanned.permanent";
-                MainMenuManager.Instance.OpenErrorBox(template,
-                    "banreason", reason, 
-                    "banid", ban.Id.ToString(), 
-                    "expiration", ban.Expiration.HasValue ? DateTimeOffset.FromUnixTimeSeconds(ban.Expiration.Value).LocalDateTime.ToString() : "");
-                */
-            }
+            try {
+                BanMessage ban = JsonConvert.DeserializeObject<BanMessage>(result);
+                if (ban != null) {
+                    string reason = string.IsNullOrWhiteSpace(ban.Message) ? GlobalController.Instance.translationManager.GetTranslation("ui.error.noreason") : ban.Message;
+                    string template = ban.Expiration.HasValue ? "ui.error.gamebanned.temporary" : "ui.error.gamebanned.permanent";
+
+                    string msg = GlobalController.Instance.translationManager.GetTranslationWithReplacements(template,
+                        "banreason", reason,
+                        "banid", ban.Id.ToString(),
+                        "expiration", ban.Expiration.HasValue ? DateTimeOffset.FromUnixTimeSeconds(ban.Expiration.Value).LocalDateTime.ToString() : "");
+                    NetworkHandler.ThrowError(msg, true);
+                }
+            } catch { }
             IsAuthenticating = false;
             return null;
         }

@@ -49,7 +49,7 @@ namespace Quantum {
 
                 for (int point = 0; point < shapePointCount; point++) {
                     int index = point;
-                    if (Scale.X < 0 ^ Scale.Y < 0) {
+                    if (Flags.HasFlag(StageTileFlags.MirrorX) ^ Flags.HasFlag(StageTileFlags.MirrorY)) {
                         // Flipping produced counter-clockwise points;
                         // Invert order for proper normals
 
@@ -58,9 +58,16 @@ namespace Quantum {
                     
                     FPVector2 p = stageTile.CollisionData.Shapes[shapeIndex].Vertices[index];
                     // Scale
-                    p = FPVector2.Scale(p, Scale) / 2;
+                    FPVector2 scale = FPVector2.One;
+                    if (Flags.HasFlag(StageTileFlags.MirrorX)) {
+                        scale.X *= -1;
+                    }
+                    if (Flags.HasFlag(StageTileFlags.MirrorY)) {
+                        scale.Y *= -1;
+                    }
+                    p = FPVector2.Scale(p, scale) / 2;
                     // Rotate
-                    p = RotateAroundOrigin(p, Rotation);
+                    p = RotateAroundOrigin(p, Rotation / ((FP) ushort.MaxValue / 360));
                     // Translate
                     p += worldPos.Value;
 
@@ -78,7 +85,7 @@ namespace Quantum {
         }
 
         public bool Equals(StageTileInstance other) {
-            return Tile == other.Tile && Rotation == other.Rotation && Scale == other.Scale;
+            return Tile == other.Tile && Flags == other.Flags;
         }
     }
 }

@@ -48,6 +48,11 @@ namespace Quantum {
         }
 
         private void TryMoveShape(Frame f, ref Filter filter, VersusStageData stage, Shape2D* shape) {
+            FPVector2 velocity = filter.Platform->Velocity * f.DeltaTime;
+            if (velocity == FPVector2.Zero) {
+                return;
+            }
+
             if (shape->Type == Shape2DType.Compound) {
                 shape->Compound.GetShapes(f, out Shape2D* subshapes, out int subshapeCount);
                 for (int i = 0; i < subshapeCount; i++) {
@@ -57,7 +62,6 @@ namespace Quantum {
             }
             
             var entity = filter.Entity;
-            FPVector2 velocity = filter.Platform->Velocity * f.DeltaTime;
             FPVector2 shapecastOrigin = filter.Transform->Position /*+ (-velocity * PhysicsObjectSystem.RaycastSkin)*/;
             FPVector2 moveVelocity = velocity * (1 + PhysicsObjectSystem.RaycastSkin);
 
@@ -91,7 +95,6 @@ namespace Quantum {
 
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 var moveDistance = moveVelocity * (1 - hit.CastDistanceNormalized);
-                Debug.Log($"{moveDistance} - ({moveDistance.Magnitude}) -> {velocity}");
 
                 //moveDistance -= FPVector2.Normalize(moveDistance) * PhysicsObjectSystem.RaycastSkin;
 

@@ -411,7 +411,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             errorTranslationKey = $"{message} ({returnCode})";
         }
 
-        OnError?.Invoke(errorTranslationKey, true);
+        ThrowError(errorTranslationKey, true);
+    }
+
+    public static void ThrowError(string key, bool network) {
+        OnError?.Invoke(key, network);
     }
 
     public void OnJoinRandomFailed(short returnCode, string message) { }
@@ -426,7 +430,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     private void OnPluginDisconnect(CallbackPluginDisconnect e) {
         Debug.Log($"[Network] Disconnected via server plugin: {e.Reason}");
 
-        OnError?.Invoke(e.Reason, true);
+        ThrowError(e.Reason, true);
 
         if (Runner) {
             Runner.Shutdown(ShutdownCause.SimulationStopped);
@@ -535,7 +539,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         Frame f = e.Game.Frames.Verified;
         if (f.ResolveList(f.Global->BannedPlayerIds).Contains(Client.UserId)) {
             QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
-            OnError?.Invoke("ui.error.join.banned", true);
+            ThrowError("ui.error.join.banned", true);
         }
     }
 

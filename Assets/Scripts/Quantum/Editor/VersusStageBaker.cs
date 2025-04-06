@@ -110,10 +110,17 @@ public class VersusStageBaker : MapDataBakerCallback {
     }
 
     private StageTileInstance GetStageTileInstance(TileBase tile, Matrix4x4 mat) {
+        StageTileFlags flags = default;
+        if (mat.lossyScale.x < 0) {
+            flags |= StageTileFlags.MirrorX;
+        }
+        if (mat.lossyScale.y < 0) {
+            flags |= StageTileFlags.MirrorY;
+        }
         return new StageTileInstance {
             Tile = GetStageTile(tile),
-            Rotation = FP.FromFloat_UNSAFE(mat.rotation.eulerAngles.z),
-            Scale = mat.lossyScale.ToFPVector2()
+            Rotation = (ushort) ((Mathf.Repeat(mat.rotation.eulerAngles.z, 360) / 360) * ushort.MaxValue),
+            Flags = flags,
         };
     }
 

@@ -104,8 +104,6 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 
         stage.SetTileRelative(f, tilePosition.x, tilePosition.y, new StageTileInstance {
             Tile = f.SimulationConfig.InvisibleSolidTile,
-            Rotation = 0,
-            Scale = FPVector2.One,
         });
     }
 

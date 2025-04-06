@@ -17353,6 +17353,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: MiniPipeR
       objectReference: {fileID: 0}
+    - target: {fileID: 9177859486925039916, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
