@@ -23,6 +23,7 @@ public class ReplayListManager : Selectable {
 
     //---Properties
     public ReplayListEntry Selected { get; private set; }
+    public List<Replay> Replays => replays;
 
     //---Serialized Variables
     [SerializeField] private MainMenuCanvas canvas;
@@ -179,6 +180,9 @@ public class ReplayListManager : Selectable {
         }
         if (replay.ListEntry) {
             Destroy(replay.ListEntry.gameObject);
+            if (replays.Count == 0) {
+                noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
+            }
         }
         replays.Remove(replay);
     }
@@ -272,6 +276,8 @@ public class ReplayListManager : Selectable {
                 newReplay.ListEntry.Initialize(this, newReplay);
                 replays.Add(newReplay);
                 newReplay.ListEntry.UpdateText();
+
+                noReplaysText.text = "";
             } else {
                 Debug.LogWarning($"[Replay] Failed to parse {filepath} as a replay: {parseResult}");
             }

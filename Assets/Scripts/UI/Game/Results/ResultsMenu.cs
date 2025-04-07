@@ -1,6 +1,7 @@
 using NSMB.Extensions;
 using NSMB.Translation;
 using Quantum;
+using System.Collections;
 using System.IO;
 using TMPro;
 using UnityEngine;
@@ -27,6 +28,7 @@ public class ResultsMenu : QuantumSceneViewComponent {
     private bool votedToContinue;
     private bool saveReplay;
     private bool exitPrompt;
+    private Coroutine noReplaysCoroutine;
 
     public void OnValidate() {
         this.SetIfNull(ref sfx);
@@ -35,11 +37,14 @@ public class ResultsMenu : QuantumSceneViewComponent {
     public override void OnEnable() {
         base.OnEnable();
         cursor = 0;
+        Settings.Controls.UI.Enable();
         Settings.Controls.UI.Navigate.performed += OnNavigate;
         Settings.Controls.UI.Navigate.canceled += OnNavigate;
         Settings.Controls.UI.Submit.performed += OnSubmit;
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
         RefreshAll();
+
+        checkmark.enabled = checkbox.enabled = countdown.enabled = !NetworkHandler.IsReplay;
     }
 
     public override void OnDisable() {
@@ -63,19 +68,21 @@ public class ResultsMenu : QuantumSceneViewComponent {
     }
 
     public override unsafe void OnUpdateView() {
-        int currentCountdownTime = PredictedFrame.Global->GameStartFrames / PredictedFrame.UpdateRate;
+        if (!NetworkHandler.IsReplay) {
+            int currentCountdownTime = PredictedFrame.Global->GameStartFrames / PredictedFrame.UpdateRate;
 
-        if (currentCountdownTime != previousCountdownTime) {
-            countdown.text = "<sprite name=room_timer>" + currentCountdownTime.ToString();
-            countdown.color = currentCountdownTime <= 3 ? countdownCloseColor : Color.white; 
-            previousCountdownTime = currentCountdownTime;
+            if (currentCountdownTime != previousCountdownTime) {
+                countdown.text = "<sprite name=room_timer>" + currentCountdownTime.ToString();
+                countdown.color = currentCountdownTime <= 3 ? countdownCloseColor : Color.white;
+                previousCountdownTime = currentCountdownTime;
+            }
         }
     }
     
     private void OnNavigate(InputAction.CallbackContext context) {
         Vector2 input = context.ReadValue<Vector2>();
 
-        if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || previousCountdownTime == 0) {
+        if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !NetworkHandler.IsReplay)) {
             inputted = false;
             return;
         }
@@ -89,7 +96,7 @@ public class ResultsMenu : QuantumSceneViewComponent {
     }
 
     private void OnSubmit(InputAction.CallbackContext context) {
-        if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || previousCountdownTime == 0) {
+        if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !NetworkHandler.IsReplay)) {
             return;
         }
 
@@ -97,10 +104,14 @@ public class ResultsMenu : QuantumSceneViewComponent {
     }
 
     public void IncrementOption(int adjustment) {
-        int newCursor = cursor + adjustment;
-        if (newCursor < 0 || newCursor > labels.Length - 1) {
-            return;
-        }
+        int newCursor = cursor;
+
+        do {
+            newCursor += adjustment;
+            if (newCursor < 0 || newCursor > labels.Length - 1) {
+                return;
+            }
+        } while (!labels[newCursor].isActiveAndEnabled);
 
         Deselect(cursor);
         Select(newCursor);
@@ -110,12 +121,23 @@ public class ResultsMenu : QuantumSceneViewComponent {
 
     public void Deselect(int index) {
         TranslationManager tm = GlobalController.Instance.translationManager;
+        string text;
         switch (index) {
         case 0:
-            labels[0].text = tm.GetTranslation(votedToContinue ? "ui.game.results.votedtocontinue" : "ui.pause.continue");
+            if (NetworkHandler.IsReplay) {
+                text = tm.GetTranslation("ui.game.results.nextreplay");
+            } else {
+                text = tm.GetTranslation(votedToContinue ? "ui.game.results.votedtocontinue" : "ui.pause.continue");
+            }
+            labels[0].text = text;
             break;
         case 1:
-            labels[1].text = tm.GetTranslation(CanSaveReplay ? "ui.game.results.savereplay" : "ui.game.results.replayunavailable");
+            if (NetworkHandler.IsReplay) {
+                text = tm.GetTranslation("ui.game.results.restartreplay");
+            } else {
+                text = tm.GetTranslation(CanSaveReplay ? "ui.game.results.savereplay" : "ui.game.results.replayunavailable"); ;
+            }
+            labels[1].text = text;
             break;
         case 2:
             exitPrompt = false;
@@ -132,28 +154,53 @@ public class ResultsMenu : QuantumSceneViewComponent {
     }
 
     public void Click(int index) {
-        Deselect(cursor);
-        Select(index);
-        cursor = index;
+        if (cursor != index) {
+            Deselect(cursor);
+            Select(index);
+            cursor = index;
+        }
 
         switch (index) {
         case 0:
-            if (!votedToContinue) {
-                foreach (int slot in Game.GetLocalPlayerSlots()) {
-                    Game.SendCommand(slot, new CommandEndGameContinue());
+            if (NetworkHandler.IsReplay) {
+                ReplayListManager replayManager = ReplayListManager.Instance;
+                int replayIndex = replayManager.Replays.IndexOf(rle => rle.ReplayFile == NetworkHandler.CurrentReplay);
+
+                BinaryReplayFile newReplay = replayManager.Replays[(replayIndex + 1) % replayManager.Replays.Count].ReplayFile;
+                if (replayIndex + 1 >= replayManager.Replays.Count || newReplay == NetworkHandler.CurrentReplay) {
+                    labels[0].text = "» " + GlobalController.Instance.translationManager.GetTranslation("ui.game.results.nextreplay.nomore");
+                    sfx.PlayOneShot(SoundEffect.UI_Error);
+                    if (noReplaysCoroutine != null) {
+                        StopCoroutine(noReplaysCoroutine);
+                    }
+                    noReplaysCoroutine = StartCoroutine(ResetTextAfterTime(0, 0.5f));
+                } else {
+                    NetworkHandler.StartReplay(newReplay);
                 }
-                sfx.PlayOneShot(SoundEffect.UI_Decide);
-                votedToContinue = true;
-                Select(0);
+            } else {
+                // Vote to continue
+                if (!votedToContinue) {
+                    foreach (int slot in Game.GetLocalPlayerSlots()) {
+                        Game.SendCommand(slot, new CommandEndGameContinue());
+                    }
+                    sfx.PlayOneShot(SoundEffect.UI_Decide);
+                    votedToContinue = true;
+                    Select(0);
+                }
             }
             break;
         case 1:
-            if (CanSaveReplay) {
-                saveReplay = !saveReplay;
-                checkmark.enabled = saveReplay;
+            if (NetworkHandler.IsReplay) {
+                FindObjectOfType<ReplayUI>().Reset();
                 sfx.PlayOneShot(SoundEffect.UI_Decide);
             } else {
-                sfx.PlayOneShot(SoundEffect.UI_Error);
+                if (CanSaveReplay) {
+                    saveReplay = !saveReplay;
+                    checkmark.enabled = saveReplay;
+                    sfx.PlayOneShot(SoundEffect.UI_Decide);
+                } else {
+                    sfx.PlayOneShot(SoundEffect.UI_Error);
+                }
             }
             break;
         case 2:
@@ -166,6 +213,16 @@ public class ResultsMenu : QuantumSceneViewComponent {
             sfx.PlayOneShot(SoundEffect.UI_Decide);
             break;
         }
+    }
+
+    IEnumerator ResetTextAfterTime(int index, float seconds) {
+        yield return new WaitForSecondsRealtime(seconds);
+        if (cursor == index) {
+            Select(index);
+        } else {
+            Deselect(index);
+        }
+        noReplaysCoroutine = null;
     }
 
     private void OnLanguageChanged(TranslationManager tm) {

@@ -36,6 +36,10 @@ public class ReplayUI : QuantumSceneViewComponent {
         this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
     }
 
+    public void Start() {
+        QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+    }
+
     public override void OnActivate(Frame f) {
         replayUI.SetActive(NetworkHandler.IsReplay);
         if (!NetworkHandler.IsReplay) {
@@ -257,6 +261,30 @@ public class ReplayUI : QuantumSceneViewComponent {
             Time.timeScale = 8;
             simulationTargetTrackArrow.position = trackArrow.position;
             simulationTargetTrackArrow.gameObject.SetActive(true);
+        }
+    }
+
+    public void Reset() {
+        QuantumRunner runner = NetworkHandler.Runner;
+        var session = runner.Session;
+
+        // It's a private method. Because of course it is.
+        NetworkHandler.IsReplayFastForwarding = true;
+        var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
+        resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[0], NetworkHandler.ReplayStart, true });
+        NetworkHandler.IsReplayFastForwarding = false;
+
+        // Fix accumulated time applying
+        if (session.AccumulatedTime > 0) {
+            var simulator = session.GetType().GetField("_simulator", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(session);
+            var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
+            adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
+        }
+    }
+
+    private unsafe void OnGameResynced(CallbackGameResynced e) {
+        if (NetworkHandler.IsReplay && e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
+            FindObjectOfType<LoopingMusicPlayer>().Stop();
         }
     }
 

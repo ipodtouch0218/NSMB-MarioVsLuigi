@@ -14,7 +14,7 @@ public class ResultsHandler : MonoBehaviour {
     [SerializeField] private RectTransform header, ui;
     [SerializeField] private CanvasGroup fadeGroup; 
     [SerializeField] private LoopingMusicData musicData;
-    [SerializeField] private float delayUntilStart = 5.5f, delayPerEntry = 0.05f;
+    [SerializeField] private float delayUntilStart = 5.5f, delayPerEntry = 0.05f, replayDelayUntilStart = 3f;
 
     //---Private Variables
     private Coroutine endingCoroutine, moveUiCoroutine, moveHeaderCoroutine, fadeCoroutine;
@@ -33,8 +33,8 @@ public class ResultsHandler : MonoBehaviour {
     }
 
     private void OnGameEnded(EventGameEnded e) {
-        if (!e.EndedByHost) {
-            endingCoroutine = StartCoroutine(RunEndingSequence(e.Game.Frames.Predicted, delayUntilStart));
+        if (!e.EndedByHost || NetworkHandler.IsReplay) {
+            endingCoroutine = StartCoroutine(RunEndingSequence(e.Game.Frames.Predicted, NetworkHandler.IsReplay ? replayDelayUntilStart : delayUntilStart));
         }
     }
 
