@@ -1897,7 +1897,7 @@ TextureImporter:
         width: 17
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1905,6 +1905,48 @@ TextureImporter:
       bones: []
       spriteID: e7f02c22006eede4a9bbf5326f0602a5
       internalID: 380926162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: room_camera
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 228
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1fc1e1ad0e706f24892c18440cdb379f
+      internalID: -1332971411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: room_layers
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 228
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c772226960fb2734ebc014526095e0e2
+      internalID: -1043678390
       vertices: []
       indices: 
       edges: []
@@ -1963,10 +2005,12 @@ TextureImporter:
       l_button: 1433395218
       player_muted: 1560846788
       r_button: 907324317
+      room_camera: -1332971411
       room_coins: 1534273505
       room_create: 1496232669
       room_customlevel: -971827560
       room_host: -9005941153719796207
+      room_layers: -1043678390
       room_lives: 1261997413
       room_powerups: 268930356
       room_private: -1683070159

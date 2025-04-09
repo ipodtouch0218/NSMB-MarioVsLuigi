@@ -108,7 +108,7 @@ public class ResultsMenu : QuantumSceneViewComponent {
 
         do {
             newCursor += adjustment;
-            if (newCursor < 0 || newCursor > labels.Length - 1) {
+            if (newCursor < 0 || newCursor >= labels.Length) {
                 return;
             }
         } while (!labels[newCursor].isActiveAndEnabled);

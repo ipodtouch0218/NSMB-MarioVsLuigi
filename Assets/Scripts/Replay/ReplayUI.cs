@@ -2,8 +2,10 @@
 using NSMB.UI.Game;
 using NSMB.Utils;
 using Quantum;
+using System.Collections;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,6 +23,7 @@ public class ReplayUI : QuantumSceneViewComponent {
     [SerializeField] private float minTrackX = -180, maxTrackX = 180;
     [SerializeField] private TMP_Text replayTimecode;
     [SerializeField] private TMP_Text replayPauseButton;
+    [SerializeField] private CanvasGroup replayCanvasGroup;
 
     [SerializeField] private InputActionReference mousePositionAction;
 
@@ -38,6 +41,7 @@ public class ReplayUI : QuantumSceneViewComponent {
 
     public void Start() {
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
     }
 
     public override void OnActivate(Frame f) {
@@ -47,6 +51,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             return;
         }
 
+        replayCanvasGroup.interactable = true;
         replayLength = Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate);
         trackArrowText.gameObject.SetActive(false);
         Settings.Controls.UI.Pause.performed += OnPause;
@@ -106,6 +111,10 @@ public class ReplayUI : QuantumSceneViewComponent {
         Vector4 newPadding = trackBufferMask.padding;
         newPadding.z = Mathf.Max((1f - bufferPercentage) * width + 8, 16);
         trackBufferMask.padding = newPadding;
+
+        if (draggingArrow && !replayCanvasGroup.interactable) {
+            StopArrowDrag();
+        }
 
         float percentage;
         if (draggingArrow) {
@@ -204,6 +213,23 @@ public class ReplayUI : QuantumSceneViewComponent {
         }
     }
 
+    public void FrameAdvance() {
+        replayPaused = true;
+        Time.timeScale = 0;
+        replayPauseButton.text = "►";
+
+        StartCoroutine(FrameAdvanceCoroutine());
+    }
+
+    private IEnumerator FrameAdvanceCoroutine() {
+        Frame f = NetworkHandler.Game.Frames.Predicted;
+        Time.timeScale = 1;
+        Time.captureDeltaTime = f.DeltaTime.AsFloat;
+        yield return null;
+        Time.timeScale = 0;
+        Time.captureDeltaTime = 0;
+    }
+
     public void ReplayChangeSpeed(Slider slider) {
         float[] speeds = { 0.25f, 0.5f, 1f, 2f, 4f };
         replaySpeed = speeds[Mathf.RoundToInt(slider.value)];
@@ -214,16 +240,22 @@ public class ReplayUI : QuantumSceneViewComponent {
     }
 
     public void StartArrowDrag() {
-        draggingArrow = true;
-        trackArrowText.gameObject.SetActive(true);
+        if (replayCanvasGroup.interactable) {
+            draggingArrow = true;
+            trackArrowText.gameObject.SetActive(true);
+        }
     }
 
     public void StopArrowDrag() {
-        QuantumRunner runner = NetworkHandler.Runner;
-        Frame f = runner.Game.Frames.Predicted;
-
         draggingArrow = false;
         trackArrowText.gameObject.SetActive(false);
+
+        if (!replayCanvasGroup.interactable) {
+            return;
+        }
+
+        QuantumRunner runner = NetworkHandler.Runner;
+        Frame f = runner.Game.Frames.Predicted;
 
         float newX = Mathf.Clamp(trackArrow.localPosition.x, minTrackX, maxTrackX);
         float percentage = (newX - minTrackX) / (maxTrackX - minTrackX);
@@ -283,8 +315,17 @@ public class ReplayUI : QuantumSceneViewComponent {
     }
 
     private unsafe void OnGameResynced(CallbackGameResynced e) {
-        if (NetworkHandler.IsReplay && e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
-            FindObjectOfType<LoopingMusicPlayer>().Stop();
+        if (NetworkHandler.IsReplay) {
+            replayCanvasGroup.interactable = true;
+            if (e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
+                FindObjectOfType<LoopingMusicPlayer>().Stop();
+            }
+        }
+    }
+
+    private void OnGameEnded(EventGameEnded e) {
+        if (NetworkHandler.IsReplay) {
+            replayCanvasGroup.interactable = false;
         }
     }
 
