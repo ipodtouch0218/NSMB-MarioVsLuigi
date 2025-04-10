@@ -5,7 +5,6 @@ using Quantum;
 using System.Collections;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -24,8 +23,9 @@ public class ReplayUI : QuantumSceneViewComponent {
     [SerializeField] private TMP_Text replayTimecode;
     [SerializeField] private TMP_Text replayPauseButton;
     [SerializeField] private CanvasGroup replayCanvasGroup;
-
     [SerializeField] private InputActionReference mousePositionAction;
+
+    [SerializeField] private GameObject tabBlocker;
 
     //---Private Variables
     private float replaySpeed = 1;
@@ -34,6 +34,7 @@ public class ReplayUI : QuantumSceneViewComponent {
     private bool draggingArrow;
     private string replayLength;
     private StringBuilder builder = new();
+    private ReplayUITab activeTab;
 
     public void OnValidate() {
         this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
@@ -66,7 +67,8 @@ public class ReplayUI : QuantumSceneViewComponent {
     public void Update() {
         if (NetworkHandler.IsReplayFastForwarding) {
             float update = Time.deltaTime;
-            Frame f = NetworkHandler.Game.Frames.Predicted;
+            var runner = NetworkHandler.Runner;
+            Frame f = runner.Game.Frames.Predicted;
             float maxDelta = (fastForwardDestinationTick - f.Number) * f.DeltaTime.AsFloat;
 
             bool done = update >= maxDelta;
@@ -74,7 +76,7 @@ public class ReplayUI : QuantumSceneViewComponent {
                 update = maxDelta;
             }
 
-            NetworkHandler.Runner.Session.Update(update);
+            runner.Session.Update(update);
 
             if (done) {
                 FinishFastForward();
@@ -82,7 +84,7 @@ public class ReplayUI : QuantumSceneViewComponent {
         }
     }
 
-    private void FinishFastForward() {
+    private unsafe void FinishFastForward() {
         NetworkHandler.IsReplayFastForwarding = false;
         simulatingCanvas.SetActive(false);
         fastForwardDestinationTick = 0;
@@ -90,6 +92,10 @@ public class ReplayUI : QuantumSceneViewComponent {
         Time.timeScale = replayPaused ? 0 : replaySpeed;
         NetworkHandler.Runner.IsSessionUpdateDisabled = false;
         simulationTargetTrackArrow.gameObject.SetActive(false);
+
+        if (NetworkHandler.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
+            FindObjectOfType<LoopingMusicPlayer>().Stop();
+        }
     }
 
     public override void OnUpdateView() {
@@ -130,6 +136,23 @@ public class ReplayUI : QuantumSceneViewComponent {
         }
 
         trackArrow.localPosition = new Vector3(percentage * (maxTrackX - minTrackX) + minTrackX, 0, 0);
+    }
+
+    public void OpenTab(ReplayUITab tab) {
+        CloseTab();
+        activeTab = tab;
+        tab.gameObject.SetActive(true);
+        tabBlocker.SetActive(true);
+    }
+
+    public void CloseTab() {
+        if (!activeTab) {
+            return;
+        }
+
+        activeTab.gameObject.SetActive(false);
+        activeTab = null;
+        tabBlocker.SetActive(false);
     }
 
     public bool ToggleReplayControls() {
@@ -317,8 +340,10 @@ public class ReplayUI : QuantumSceneViewComponent {
     private unsafe void OnGameResynced(CallbackGameResynced e) {
         if (NetworkHandler.IsReplay) {
             replayCanvasGroup.interactable = true;
-            if (e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
-                FindObjectOfType<LoopingMusicPlayer>().Stop();
+            if (NetworkHandler.IsReplayFastForwarding) {
+                if (e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
+                    FindObjectOfType<LoopingMusicPlayer>().Stop();
+                }
             }
         }
     }
@@ -326,6 +351,8 @@ public class ReplayUI : QuantumSceneViewComponent {
     private void OnGameEnded(EventGameEnded e) {
         if (NetworkHandler.IsReplay) {
             replayCanvasGroup.interactable = false;
+            FinishFastForward();
+            CloseTab();
         }
     }
 

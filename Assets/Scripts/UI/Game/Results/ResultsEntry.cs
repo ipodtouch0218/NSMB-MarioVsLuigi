@@ -51,8 +51,7 @@ public class ResultsEntry : MonoBehaviour {
             leftHalf.color = rightHalf.color = unrankedColor;
         }
 
-
-        StartCoroutine(ResultsHandler.MoveObjectToTarget(childTransform, offscreenStartPosition, 0, slideInTimeSeconds, delay));
+        StartCoroutine(ResultsHandler.MoveObjectToTarget(childTransform, -1.25f, 0, slideInTimeSeconds, delay));
     }
 
     public void Update() {

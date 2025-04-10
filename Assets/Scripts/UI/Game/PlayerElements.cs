@@ -136,8 +136,8 @@ namespace NSMB.UI.Game {
 
         public void StartSpectating() {
             spectating = true;
+            spectationUI.SetActive(!NetworkHandler.IsReplay);
             if (!NetworkHandler.IsReplay) {
-                spectationUI.SetActive(true);
                 if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
                     GlobalController.Instance.loadingCanvas.EndLoading(NetworkHandler.Game);
                 }

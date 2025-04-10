@@ -5,11 +5,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ResultsHandler : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private GameObject parent;
+    [SerializeField] private Canvas parentCanvas;
     [SerializeField] private ResultsEntry[] entries;
     [SerializeField] private RectTransform header, ui;
     [SerializeField] private CanvasGroup fadeGroup; 
@@ -18,6 +20,10 @@ public class ResultsHandler : MonoBehaviour {
 
     //---Private Variables
     private Coroutine endingCoroutine, moveUiCoroutine, moveHeaderCoroutine, fadeCoroutine;
+
+    public void OnValidate() {
+        this.SetIfNull(ref parentCanvas, UnityExtensions.GetComponentType.Parent);
+    }
 
     public unsafe void Start() {
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
@@ -44,9 +50,11 @@ public class ResultsHandler : MonoBehaviour {
         parent.SetActive(true);
         FindObjectOfType<LoopingMusicPlayer>().Play(musicData);
         InitializeResultsEntries(f);
-        moveHeaderCoroutine = StartCoroutine(MoveObjectToTarget(header, -500, 0, 1/3f));
-        moveUiCoroutine = StartCoroutine(MoveObjectToTarget(ui, 500, 0, 1/3f));
+        moveHeaderCoroutine = StartCoroutine(MoveObjectToTarget(header, -1.25f, 0, 1/3f));
+        moveUiCoroutine = StartCoroutine(MoveObjectToTarget(ui, 1.25f, 0, 1/3f));
         fadeCoroutine = StartCoroutine(OtherUIFade());
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) header.parent);
     }
 
     public unsafe void InitializeResultsEntries(Frame f) {
@@ -107,15 +115,15 @@ public class ResultsHandler : MonoBehaviour {
     }
 
     public static IEnumerator MoveObjectToTarget(RectTransform obj, float start, float end, float moveTime, float delay = 0) {
-        obj.SetAnchoredPositionX(start);
-        if (delay > 0) {
-            yield return new WaitForSeconds(delay);
+        while ((delay -= Time.deltaTime) > 0) {
+            obj.SetAnchoredPositionX(start * obj.rect.size.x);
+            yield return null;
         }
 
         float timer = moveTime;
         while (timer > 0) {
             timer -= Time.deltaTime;
-            obj.SetAnchoredPositionX(Mathf.Lerp(end, start, timer / moveTime));
+            obj.SetAnchoredPositionX(Mathf.Lerp(end, start, timer / moveTime) * obj.rect.size.x);
             yield return null;
         }
     }

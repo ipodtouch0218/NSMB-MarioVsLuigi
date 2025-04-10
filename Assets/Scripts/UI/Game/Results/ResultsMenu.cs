@@ -10,11 +10,13 @@ using UnityEngine.UI;
 
 public class ResultsMenu : QuantumSceneViewComponent {
 
+    //---Properties
+    private AudioSource sfx => GlobalController.Instance.sfx;
+    
     //---Serialized Variables
     [SerializeField] private TMP_Text[] labels;
     [SerializeField] private TMP_Text countdown;
     [SerializeField] private Image checkbox, checkmark;
-    [SerializeField] private AudioSource sfx;
 
     [SerializeField] private Color labelSelectedColor = Color.white, labelDeselectedColor = Color.gray, countdownCloseColor = Color.red;
 
@@ -29,10 +31,6 @@ public class ResultsMenu : QuantumSceneViewComponent {
     private bool saveReplay;
     private bool exitPrompt;
     private Coroutine noReplaysCoroutine;
-
-    public void OnValidate() {
-        this.SetIfNull(ref sfx);
-    }
 
     public override void OnEnable() {
         base.OnEnable();

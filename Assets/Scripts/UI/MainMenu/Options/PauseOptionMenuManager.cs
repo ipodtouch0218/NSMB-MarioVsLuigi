@@ -225,7 +225,8 @@ namespace NSMB.UI.Pause.Options {
 
         private void OnNavigate(InputAction.CallbackContext context) {
 
-            if (context.canceled || context.ReadValue<Vector2>() == Vector2.zero) {
+            Vector2 direction = context.ReadValue<Vector2>();
+            if (context.canceled || direction.magnitude < 0.1f) {
                 inputted = false;
                 return;
             }
@@ -238,7 +239,6 @@ namespace NSMB.UI.Pause.Options {
                 return;
             }
 
-            Vector2 direction = context.ReadValue<Vector2>();
             direction = direction.normalized;
             float u = Vector2.Dot(direction, Vector2.up);
             float d = Vector2.Dot(direction, Vector2.down);
