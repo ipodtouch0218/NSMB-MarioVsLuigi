@@ -49,7 +49,7 @@ public class ResultsHandler : MonoBehaviour {
 
         parent.SetActive(true);
         FindObjectOfType<LoopingMusicPlayer>().Play(musicData);
-        InitializeResultsEntries(f);
+        InitializeResultsEntries(f, 0);
         moveHeaderCoroutine = StartCoroutine(MoveObjectToTarget(header, -1.25f, 0, 1/3f));
         moveUiCoroutine = StartCoroutine(MoveObjectToTarget(ui, 1.25f, 0, 1/3f));
         fadeCoroutine = StartCoroutine(OtherUIFade());
@@ -57,7 +57,7 @@ public class ResultsHandler : MonoBehaviour {
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) header.parent);
     }
 
-    public unsafe void InitializeResultsEntries(Frame f) {
+    public unsafe void InitializeResultsEntries(Frame f, float additionalDelay) {
         // Generate scores
         Dictionary<int, int> teamRankings = null;
         if (f.Global->HasWinner) {
@@ -95,13 +95,13 @@ public class ResultsHandler : MonoBehaviour {
         }
         foreach (var info in infos.OrderByDescending(x => x.GetStarCount(f))) {
             int rank = teamRankings != null ? teamRankings[info.Team] : -1;
-            entries[initializeCount].Initialize(f, info, rank, initializeCount * delayPerEntry, info.GetStarCount(f));
+            entries[initializeCount].Initialize(f, info, rank, (initializeCount * delayPerEntry) + additionalDelay, info.GetStarCount(f));
             initializeCount++;
         }
 
         // Initialize remaining scores
         for (int i = initializeCount; i < entries.Length; i++) {
-            entries[i].Initialize(f, null, -1, i * delayPerEntry);
+            entries[i].Initialize(f, null, -1, (i * delayPerEntry) + additionalDelay);
         }
     }
 

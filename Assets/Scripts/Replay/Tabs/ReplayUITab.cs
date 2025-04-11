@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class ReplayUITab : Selectable {
 
     //---Serialized Variables
-    [SerializeField] private ReplayUI parent;
+    [SerializeField] protected ReplayUI parent;
     [SerializeField] protected List<TMP_Text> selectables;
     [SerializeField] private bool horizontalMovement;
     [SerializeField] public GameObject defaultSelection, selectOnClose;
@@ -39,6 +39,7 @@ public class ReplayUITab : Selectable {
         Settings.Controls.UI.Cancel.performed += OnCancel;
         GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_WindowOpen);
         IncrementOption(0);
+        EventSystem.current.SetSelectedGameObject(gameObject);
     }
 
     protected override void OnDisable() {
@@ -89,12 +90,16 @@ public class ReplayUITab : Selectable {
         if (newPos < 0 && newPos >= selectables.Count) {
             return;
         }
-        
+
+        SelectItem(newPos);
+    }
+
+    public void SelectItem(int index) {
         for (int i = 0; i < selectables.Count; i++) {
             selectables[i].color = deselectedColor;
         }
-        selectables[newPos].color = selectedColor;
-        cursor = newPos;
+        selectables[index].color = selectedColor;
+        cursor = index;
     }
 
     private void OnSubmit(InputAction.CallbackContext context) {

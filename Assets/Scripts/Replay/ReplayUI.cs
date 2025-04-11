@@ -27,6 +27,9 @@ public class ReplayUI : QuantumSceneViewComponent {
 
     [SerializeField] private GameObject tabBlocker;
 
+    //---Properties
+    public float ReplaySpeed => replaySpeed;
+
     //---Private Variables
     private float replaySpeed = 1;
     private int fastForwardDestinationTick, previousTimestampSeconds;
@@ -253,9 +256,9 @@ public class ReplayUI : QuantumSceneViewComponent {
         Time.captureDeltaTime = 0;
     }
 
-    public void ReplayChangeSpeed(Slider slider) {
+    public void ChangeReplaySpeed(int index) {
         float[] speeds = { 0.25f, 0.5f, 1f, 2f, 4f };
-        replaySpeed = speeds[Mathf.RoundToInt(slider.value)];
+        replaySpeed = speeds[index];
 
         if (!replayPaused) {
             Time.timeScale = replaySpeed;
@@ -344,6 +347,8 @@ public class ReplayUI : QuantumSceneViewComponent {
                 if (e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
                     FindObjectOfType<LoopingMusicPlayer>().Stop();
                 }
+            } else {
+                Time.timeScale = replaySpeed;
             }
         }
     }
@@ -352,6 +357,8 @@ public class ReplayUI : QuantumSceneViewComponent {
         if (NetworkHandler.IsReplay) {
             replayCanvasGroup.interactable = false;
             FinishFastForward();
+            replayPaused = false;
+            Time.timeScale = 1;
             CloseTab();
         }
     }

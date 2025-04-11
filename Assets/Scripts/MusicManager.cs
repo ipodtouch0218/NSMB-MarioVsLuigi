@@ -70,7 +70,7 @@ public class MusicManager : MonoBehaviour {
 
         int playersWithOneLife = 0;
         while (allPlayers.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
-            if (rules.IsLivesEnabled && mario->Lives == 0) {
+            if (rules.IsLivesEnabled && mario->Lives == 0) { 
                 continue;
             }
             if (rules.IsLivesEnabled && mario->Lives == 1) {

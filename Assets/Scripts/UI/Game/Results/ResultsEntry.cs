@@ -13,7 +13,7 @@ public class ResultsEntry : MonoBehaviour {
     [SerializeField] private RectTransform childTransform;
     [SerializeField] private GameObject fullSlot, emptySlot;
     [SerializeField] private Color firstPlaceColor, secondPlaceColor, thirdPlaceColor, unrankedColor;
-    [SerializeField] private float offscreenStartPosition = -500, slideInTimeSeconds = 0.1f;
+    [SerializeField] private float slideInTimeSeconds = 0.1f;
 
     //---Private Variables
     private string nicknameColor;
