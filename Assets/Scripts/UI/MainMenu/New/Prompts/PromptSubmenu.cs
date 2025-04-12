@@ -5,7 +5,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class PromptSubmenu : MainMenuSubmenu {
 
         //---Serialized Variables
-        [SerializeField] private GameObject backButton;
+        [SerializeField] protected GameObject backButton;
 
         public override bool TryGoBack(out bool playSound) {
             if (backButton && EventSystem.current.currentSelectedGameObject != backButton) {

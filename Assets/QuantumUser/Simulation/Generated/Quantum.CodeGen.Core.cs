@@ -709,6 +709,28 @@ namespace Quantum {
     }
   }
   [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct BannedPlayerInfo {
+    public const Int32 SIZE = 88;
+    public const Int32 ALIGNMENT = 4;
+    [FieldOffset(40)]
+    public QString48 Nickname;
+    [FieldOffset(0)]
+    public QStringUtf8_40 UserId;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 13763;
+        hash = hash * 31 + Nickname.GetHashCode();
+        hash = hash * 31 + UserId.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (BannedPlayerInfo*)ptr;
+        Quantum.QStringUtf8_40.Serialize(&p->UserId, serializer);
+        Quantum.QString48.Serialize(&p->Nickname, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct BetterPhysicsContact {
     public const Int32 SIZE = 80;
     public const Int32 ALIGNMENT = 8;
@@ -1060,9 +1082,6 @@ namespace Quantum {
     public UInt16 GameStartFrames;
     [FieldOffset(1648)]
     public UInt16 PlayerLoadFrames;
-    [FieldOffset(1676)]
-    [AllocateOnComponentAdded()]
-    public QListPtr<QStringUtf8_40> BannedPlayerIds;
     [FieldOffset(1672)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
@@ -1077,6 +1096,9 @@ namespace Quantum {
     public Int32 WinningTeam;
     [FieldOffset(1668)]
     public QBoolean HasWinner;
+    [FieldOffset(1676)]
+    [AllocateOnComponentAdded()]
+    public QListPtr<BannedPlayerInfo> BannedPlayerIds;
     [FieldOffset(1696)]
     public FP Timer;
     public FixedArray<Input> input {
@@ -1114,24 +1136,24 @@ namespace Quantum {
         hash = hash * 31 + TotalGamesPlayed.GetHashCode();
         hash = hash * 31 + GameStartFrames.GetHashCode();
         hash = hash * 31 + PlayerLoadFrames.GetHashCode();
-        hash = hash * 31 + BannedPlayerIds.GetHashCode();
         hash = hash * 31 + PlayerDatas.GetHashCode();
         hash = hash * 31 + HashCodeUtils.GetArrayHashCode(PlayerInfo);
         hash = hash * 31 + RealPlayers.GetHashCode();
         hash = hash * 31 + TotalMarios.GetHashCode();
         hash = hash * 31 + WinningTeam.GetHashCode();
         hash = hash * 31 + HasWinner.GetHashCode();
+        hash = hash * 31 + BannedPlayerIds.GetHashCode();
         hash = hash * 31 + Timer.GetHashCode();
         return hash;
       }
     }
     partial void ClearPointersPartial(FrameBase f, EntityRef entity) {
-      BannedPlayerIds = default;
       PlayerDatas = default;
+      BannedPlayerIds = default;
     }
     partial void AllocatePointersPartial(FrameBase f, EntityRef entity) {
-      f.TryAllocateList(ref BannedPlayerIds);
       f.TryAllocateDictionary(ref PlayerDatas);
+      f.TryAllocateList(ref BannedPlayerIds);
     }
     static partial void SerializeCodeGen(void* ptr, FrameSerializer serializer) {
         var p = (_globals_*)ptr;
@@ -1159,7 +1181,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->WinningTeam);
         QBoolean.Serialize(&p->HasWinner, serializer);
         QDictionary.Serialize(&p->PlayerDatas, serializer, Statics.SerializePlayerRef, Statics.SerializeEntityRef);
-        QList.Serialize(&p->BannedPlayerIds, serializer, Statics.SerializeQStringUtf8_40);
+        QList.Serialize(&p->BannedPlayerIds, serializer, Statics.SerializeBannedPlayerInfo);
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);
         EntityRef.Serialize(&p->MainBigStar, serializer);
         FP.Serialize(&p->Timer, serializer);
@@ -3734,7 +3756,7 @@ namespace Quantum {
     public static FrameSerializer.Delegate SerializeEntityRef;
     public static FrameSerializer.Delegate SerializePhysicsQueryRef;
     public static FrameSerializer.Delegate SerializePhysicsContact;
-    public static FrameSerializer.Delegate SerializeQStringUtf8_40;
+    public static FrameSerializer.Delegate SerializeBannedPlayerInfo;
     public static FrameSerializer.Delegate SerializePlayerRef;
     public static FrameSerializer.Delegate SerializePlayerInformation;
     public static FrameSerializer.Delegate SerializeInput;
@@ -3743,7 +3765,7 @@ namespace Quantum {
       SerializeEntityRef = EntityRef.Serialize;
       SerializePhysicsQueryRef = PhysicsQueryRef.Serialize;
       SerializePhysicsContact = Quantum.PhysicsContact.Serialize;
-      SerializeQStringUtf8_40 = Quantum.QStringUtf8_40.Serialize;
+      SerializeBannedPlayerInfo = Quantum.BannedPlayerInfo.Serialize;
       SerializePlayerRef = PlayerRef.Serialize;
       SerializePlayerInformation = Quantum.PlayerInformation.Serialize;
       SerializeInput = Quantum.Input.Serialize;
@@ -3751,6 +3773,7 @@ namespace Quantum {
     static partial void RegisterSimulationTypesGen(TypeRegistry typeRegistry) {
       typeRegistry.Register(typeof(AssetGuid), AssetGuid.SIZE);
       typeRegistry.Register(typeof(AssetRef), AssetRef.SIZE);
+      typeRegistry.Register(typeof(Quantum.BannedPlayerInfo), Quantum.BannedPlayerInfo.SIZE);
       typeRegistry.Register(typeof(Quantum.BetterPhysicsContact), Quantum.BetterPhysicsContact.SIZE);
       typeRegistry.Register(typeof(Quantum.BetterPhysicsObject), Quantum.BetterPhysicsObject.SIZE);
       typeRegistry.Register(typeof(Quantum.BigStar), Quantum.BigStar.SIZE);

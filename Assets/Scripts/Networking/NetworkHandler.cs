@@ -538,9 +538,13 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private unsafe void OnGameStarted(CallbackGameStarted e) {
         Frame f = e.Game.Frames.Verified;
-        if (f.ResolveList(f.Global->BannedPlayerIds).Contains(Client.UserId)) {
-            QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
-            ThrowError("ui.error.join.banned", true);
+        var bans = f.ResolveList(f.Global->BannedPlayerIds);
+        foreach (var ban in bans) {
+            if (ban.UserId == Client.UserId) {
+                QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
+                ThrowError("ui.error.join.banned", true);
+                return;
+            }
         }
     }
 

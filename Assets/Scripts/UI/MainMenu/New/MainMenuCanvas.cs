@@ -1,7 +1,6 @@
 using NSMB.Extensions;
 using NSMB.UI.MainMenu.Submenus;
 using NSMB.UI.MainMenu.Submenus.Prompts;
-using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;

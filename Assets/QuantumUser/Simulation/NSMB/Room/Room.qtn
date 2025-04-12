@@ -1,0 +1,26 @@
+global {
+	[AllocateOnComponentAdded] list<BannedPlayerInfo> BannedPlayerIds;
+}
+
+struct BannedPlayerInfo {
+	QString<48> Nickname;
+	QStringUtf8<40> UserId;
+}
+
+event PlayerStartedTyping {
+	PlayerRef Player;
+}
+
+synced event PlayerSentChatMessage {
+	PlayerRef Player;
+	String Message;
+}
+
+synced event PlayerKickedFromRoom {
+	PlayerRef Player;
+	bool Banned;
+}
+
+synced event PlayerUnbanned {
+	BannedPlayerInfo PlayerInfo;
+}
