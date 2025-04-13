@@ -40,6 +40,7 @@ public class ChatManager : MonoBehaviour {
         QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved, NetworkHandler.FilterOutReplay);
         QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged, NetworkHandler.FilterOutReplay);
         QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom, NetworkHandler.FilterOutReplay);
+        QuantumEvent.Subscribe<EventPlayerUnbanned>(this, OnPlayerUnbanned, NetworkHandler.FilterOutReplay);
     }
 
     public void AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
@@ -124,6 +125,11 @@ public class ChatManager : MonoBehaviour {
         Frame f = e.Game.Frames.Predicted;
         RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
         AddSystemMessage(e.Banned ? "ui.inroom.chat.player.banned" : "ui.inroom.chat.player.kicked", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(f, e.Player));
+    }
+
+    private void OnPlayerUnbanned(EventPlayerUnbanned e) {
+        Frame f = e.Game.Frames.Predicted;
+        AddSystemMessage("ui.inroom.chat.player.unbanned", Blue, "playername", e.PlayerInfo.Nickname.ToString().ToValidUsername(f, default));
     }
 
     private void OnHostChanged(EventHostChanged e) {

@@ -249,7 +249,7 @@
   "ui.inroom.chat.player.kicked": "{playername} was kicked from the room by the host",
   "ui.inroom.chat.player.promoted": "Promoted {playername} to be the host",
   "ui.inroom.chat.player.banned": "{playername} was banned from the room by the host",
-  "ui.inroom.chat.player.unbanned": "Successfully unbanned {playername}",
+  "ui.inroom.chat.player.unbanned": "{playername} was unbanned from the room by the host",
   "ui.inroom.chat.hostreminder": "You are the room's host! Click on a player's username to moderate your room.",
   "ui.inroom.chat.command": "Chat commands have been removed. Click on a player's username to moderate your room instead!",
   "ui.inroom.chat.server.map": "Map set to: {map}",

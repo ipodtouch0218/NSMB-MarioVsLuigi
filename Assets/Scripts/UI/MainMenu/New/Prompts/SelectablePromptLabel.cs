@@ -14,7 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [SerializeField] private List<GameObject> selectionTargets;
 
         [SerializeField] private bool changeText = true;
-        [SerializeField] private string translationKey;
+        [SerializeField] public string translationKey;
         [SerializeField] private bool twoSided;
 
         //---Private Variables

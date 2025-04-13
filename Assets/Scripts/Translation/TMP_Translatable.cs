@@ -8,7 +8,7 @@ namespace NSMB.Translation {
     public class TMP_Translatable : MonoBehaviour {
 
         //---Serialized Variables
-        [SerializeField] private string key;
+        [SerializeField] public string key;
         [SerializeField] private TMP_Text text;
 
         //---Private Variables
@@ -24,11 +24,15 @@ namespace NSMB.Translation {
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
-            OnLanguageChanged(GlobalController.Instance.translationManager);
+            Run();
         }
 
         public void OnDisable() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
+
+        public void Run() {
+            OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

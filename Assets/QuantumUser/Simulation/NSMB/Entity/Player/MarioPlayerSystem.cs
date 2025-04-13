@@ -2375,6 +2375,9 @@ namespace Quantum {
                 return;
             }
 
+            mario->IsPropellerFlying = false;
+            mario->IsSpinnerFlying = false;
+            mario->IsDrilling = false;
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
                 mario->HeldEntity = EntityRef.None;
                 holdable->Holder = EntityRef.None;

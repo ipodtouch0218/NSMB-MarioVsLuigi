@@ -19,10 +19,12 @@ public class ReplayUITab : Selectable {
     //---Private Variables
     private int cursor;
 
+#if UNITY_EDITOR
     protected override void OnValidate() {
         base.OnValidate();
         this.SetIfNull(ref parent, UnityExtensions.GetComponentType.Parent);
     }
+#endif
 
     protected override void OnEnable() {
         base.OnEnable();

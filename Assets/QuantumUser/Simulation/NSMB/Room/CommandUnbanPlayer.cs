@@ -7,18 +7,20 @@ namespace Quantum {
 
         public override void Serialize(BitStream stream) {
             stream.Serialize(ref TargetUserId);
-
         }
+
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
             if (f.Global->GameState != GameState.PreGameRoom || !playerData->IsRoomHost) {
                 return;
             }
 
-            /*
-            RuntimePlayer targetPlayerData = f.GetPlayerData(Target);
-            f.ResolveList(f.Global->BannedPlayerIds).Add(targetPlayerData.UserId);
-            f.Events.PlayerKickedFromRoom(Target, true);
-            */
+            var bans = f.ResolveList(f.Global->BannedPlayerIds);
+            for (int i = bans.Count - 1; i >= 0; i--) {
+                if (bans[i].UserId == TargetUserId) {
+                    f.Events.PlayerUnbanned(bans[i]);
+                    bans.RemoveAtUnordered(i);
+                }
+            }
         }
     }
 }

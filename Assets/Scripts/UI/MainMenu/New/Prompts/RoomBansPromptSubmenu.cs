@@ -1,7 +1,9 @@
+using NSMB.Extensions;
 using Quantum;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
@@ -24,7 +26,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public unsafe void PopulateBanList() {
-            foreach (var entry in entries) {
+            int selectedIndex = -1;
+            for (int i = 0; i < entries.Count; i++) {
+                var entry = entries[i];
+                if (EventSystem.current.currentSelectedGameObject == entry.GameObject) {
+                    selectedIndex = i;
+                }
                 Destroy(entry.GameObject);
             }
             entries.Clear();
@@ -35,9 +42,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 var ban = bans.GetPointer(i);
 
                 GameObject newInstance = Instantiate(template, template.transform.parent);
-                TMP_Text label = newInstance.transform.GetChild(0).GetComponent<TMP_Text>();
-                label.text = ban->Nickname;
+                SelectablePromptLabel label = newInstance.transform.GetChild(0).GetComponent<SelectablePromptLabel>();
+                label.translationKey = ban->Nickname;
+                label.UpdateLabel();
                 Button newButton = newInstance.GetComponentInChildren<Button>();
+
+                int i2 = i;
+                newButton.onClick.AddListener(() => UnbanViaIndex(i2));
 
                 if (i > 0) {
                     Button previousButton = entries[i - 1].GameObject.GetComponentInChildren<Button>();
@@ -59,11 +70,22 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 });
             }
 
+            Button backButtonBtn = backButton.GetComponent<Button>();
+            var backNav = backButtonBtn.navigation;
             if (entries.Count > 0) {
                 Button lastButton = entries[^1].GameObject.GetComponentInChildren<Button>();
                 var lastNav = lastButton.navigation;
                 lastNav.selectOnDown = backButton.GetComponentInChildren<Button>();
                 lastButton.navigation = lastNav;
+
+                backNav.selectOnUp = lastButton;
+            } else {
+                backNav.selectOnUp = null;
+            }
+            backButtonBtn.navigation = backNav;
+
+            if (entries.Count > 0 && selectedIndex != -1) {
+                EventSystem.current.SetSelectedGameObject(entries[Mathf.Clamp(selectedIndex, 0, entries.Count - 1)].GameObject);
             }
 
             noBansText.gameObject.SetActive(entries.Count == 0);
@@ -82,9 +104,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 TargetUserId = entry.UserId,
             });
 
-            Destroy(entry.GameObject);
-            entries.RemoveAt(index);
-            noBansText.gameObject.SetActive(entries.Count == 0);
+            GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
+            PopulateBanList();
         }
 
 

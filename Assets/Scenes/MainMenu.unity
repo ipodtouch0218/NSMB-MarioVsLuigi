@@ -3938,7 +3938,7 @@ MonoBehaviour:
   useHeaderColor: 0
   headerColor: {r: 0, g: 0, b: 0, a: 0}
   backButton: {fileID: 1434670614}
-  template: {fileID: 0}
+  template: {fileID: 1872477661}
   noBansText: {fileID: 1874038644}
 --- !u!1 &119496800
 GameObject:
@@ -6569,20 +6569,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.RoomSettingsPromptSubmenu,
-          Assembly-CSharp
-        m_MethodName: RoomIdClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!222 &237243929
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -15360,7 +15347,7 @@ GameObject:
   - component: {fileID: 480278821}
   - component: {fileID: 480278824}
   - component: {fileID: 480278823}
-  - component: {fileID: 480278822}
+  - component: {fileID: 480278825}
   m_Layer: 16
   m_Name: Label
   m_TagString: Untagged
@@ -15387,25 +15374,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &480278822
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 480278820}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b26211ad09d035f42b32b2cdd412679a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventSystem: {fileID: 566761500}
-  label: {fileID: 480278823}
-  selectionTargets:
-  - {fileID: 237243926}
-  changeText: 1
-  translationKey: ui.inroom.settings.room.bans
-  twoSided: 0
 --- !u!114 &480278823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15504,6 +15472,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 480278820}
   m_CullTransparentMesh: 1
+--- !u!114 &480278825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 480278820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b26211ad09d035f42b32b2cdd412679a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventSystem: {fileID: 566761500}
+  label: {fileID: 480278823}
+  selectionTargets:
+  - {fileID: 237243926}
+  changeText: 1
+  translationKey: 
+  twoSided: 0
 --- !u!1 &481095080
 GameObject:
   m_ObjectHideFlags: 0
@@ -27198,6 +27185,7 @@ GameObject:
   - component: {fileID: 764089376}
   - component: {fileID: 764089379}
   - component: {fileID: 764089378}
+  - component: {fileID: 764089380}
   m_Layer: 16
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -27322,6 +27310,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 764089375}
   m_CullTransparentMesh: 1
+--- !u!114 &764089380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764089375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.inroom.settings.room.bans.remove
+  text: {fileID: 764089378}
 --- !u!1 &768727995
 GameObject:
   m_ObjectHideFlags: 0
@@ -40939,8 +40941,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 791989381}
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.82825863
+  m_Value: 0
+  m_Size: 0.82819504
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -75303,7 +75305,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -22.600006}
-  m_SizeDelta: {x: 376.3108, y: 0}
+  m_SizeDelta: {x: 376.42233, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
