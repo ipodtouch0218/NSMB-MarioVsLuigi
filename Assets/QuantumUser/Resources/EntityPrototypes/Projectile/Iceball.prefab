@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 5152219214808162071}
   - component: {fileID: 4699996320109001571}
   - component: {fileID: 4325935567163801675}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Iceball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -335,6 +335,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sRenderer: {fileID: 6983710913193508245}
+  animator: {fileID: 0}
+  legacySpriteAnimator: {fileID: 7118529404408818850}
   sameTeamColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
   differentTeamColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &6313951447176480054
@@ -348,7 +350,7 @@ GameObject:
   - component: {fileID: 2272710620091358615}
   - component: {fileID: 6983710913193508245}
   - component: {fileID: 7118529404408818850}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: IceGraphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -444,6 +446,7 @@ MonoBehaviour:
   - {fileID: 750297706712597742, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   - {fileID: -8127487528002223245, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
   - {fileID: -3915765450054648673, guid: eddf8ec042b3e614e925d846a27642df, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 6983710913193508245}
   image: {fileID: 0}
 --- !u!1 &6817442949190414024
@@ -455,7 +458,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6102423714800591244}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -491,7 +494,7 @@ GameObject:
   - component: {fileID: 2963240724454673592}
   - component: {fileID: 8753930268045016890}
   - component: {fileID: 6505870195547170246}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: IceTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5364,6 +5367,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CoinSparkles
+      objectReference: {fileID: 0}
+    - target: {fileID: 6203692344828610460, guid: 34b8762c3868b5d43b40a69badde238a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 19
       objectReference: {fileID: 0}
     - target: {fileID: 6441094937726390934, guid: 34b8762c3868b5d43b40a69badde238a,
         type: 3}

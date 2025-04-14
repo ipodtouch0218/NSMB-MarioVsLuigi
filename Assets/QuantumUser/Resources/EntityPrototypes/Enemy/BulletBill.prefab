@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4914380577473150768}
   - component: {fileID: 1566471443926189886}
   - component: {fileID: 5870185156035057517}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4850,7 +4850,7 @@ GameObject:
   - component: {fileID: 464766525613347646}
   - component: {fileID: 4540435544182297773}
   - component: {fileID: 5184426367989315057}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4982,6 +4982,7 @@ MonoBehaviour:
   - {fileID: 3957211391672382866, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
   - {fileID: -519060384786953374, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
   - {fileID: -3085684383362731524, guid: 6a8295a206a133847aa7c4b37eaa0337, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 4540435544182297773}
   image: {fileID: 0}
 --- !u!1 &2627485830306083579
@@ -5005,7 +5006,7 @@ GameObject:
   - component: {fileID: 9160283603330728788}
   - component: {fileID: -9012748332886022531}
   - component: {fileID: 4061144589790746280}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: BulletBill
   m_TagString: Untagged
   m_Icon: {fileID: 0}

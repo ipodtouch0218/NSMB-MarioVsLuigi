@@ -14,6 +14,7 @@ public unsafe class CameraAnimator : ResizingCamera {
 
     //---Properties
     public EntityRef Target => playerElements.Entity;
+    public CameraMode Mode { get; set; } = CameraMode.FollowPlayer;
 
     //---Serialized Variables
     [SerializeField] private PlayerElements playerElements;
@@ -42,18 +43,34 @@ public unsafe class CameraAnimator : ResizingCamera {
     }
 
     public override void Update() {
-        // Do nothing.
+        // Do nothing, let OnUpdateView handle it.
     }
 
     public void OnUpdateView(CallbackUpdateView e) {
+
+        switch (Mode) {
+        case CameraMode.FollowPlayer:
+            UpdateCameraFollowPlayerMode(e);
+            break;
+        case CameraMode.Freecam:
+            UpdateCameraFreecamMode(e);
+            break;
+        }
+
+        secondaryPositioners.RemoveAll(scp => !scp);
+        secondaryPositioners.ForEach(scp => scp.UpdatePosition());
+
+        if (BackgroundLoop.Instance) {
+            BackgroundLoop.Instance.Reposition(ourCamera);
+        }
+    }
+
+    private void UpdateCameraFollowPlayerMode(CallbackUpdateView e) {
         QuantumGame game = e.Game;
         Frame f = game.Frames.Predicted;
         Frame fp = game.Frames.PredictedPrevious;
 
         if (!Target.IsValid || !f.Exists(Target) || !fp.Exists(Target)) {
-            if (BackgroundLoop.Instance) {
-                BackgroundLoop.Instance.Reposition(ourCamera);
-            }
             return;
         }
 
@@ -119,12 +136,10 @@ public unsafe class CameraAnimator : ResizingCamera {
         }
 
         ourCamera.transform.position = newPosition;
-        secondaryPositioners.RemoveAll(scp => !scp);
-        secondaryPositioners.ForEach(scp => scp.UpdatePosition());
+    }
 
-        if (BackgroundLoop.Instance) {
-            BackgroundLoop.Instance.Reposition(ourCamera);
-        }
+    private void UpdateCameraFreecamMode(CallbackUpdateView e) {
+
     }
 
     private void OnScreenshakeCallback(float screenshake) {
@@ -135,5 +150,9 @@ public unsafe class CameraAnimator : ResizingCamera {
 
             screenshakeTimer += screenshake;
         }
+    }
+
+    public enum CameraMode {
+        FollowPlayer, Freecam
     }
 }

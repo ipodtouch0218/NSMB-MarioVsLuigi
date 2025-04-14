@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4448616224636714055}
   - component: {fileID: 6417112947153219436}
   - component: {fileID: 4216477983537697777}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: WaterDust
   m_TagString: Untagged
   m_Icon: {fileID: 0}

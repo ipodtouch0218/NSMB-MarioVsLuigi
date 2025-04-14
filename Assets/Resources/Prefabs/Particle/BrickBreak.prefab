@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5859651690888885883}
   - component: {fileID: 6006421557060995789}
   - component: {fileID: 3617870472148960368}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: BrickBreak
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5004,4 +5004,3 @@ MonoBehaviour:
   soundOrigin: {fileID: 5041573631698971161}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2723776556589032404}
   - component: {fileID: 780408594289012747}
   - component: {fileID: 1274404448203276789}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4899,7 +4899,7 @@ GameObject:
   - component: {fileID: 8333740177941989665}
   - component: {fileID: 6139133043033739357}
   - component: {fileID: 3073745935495318737}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: BlueExplosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9787,7 +9787,7 @@ GameObject:
   - component: {fileID: 977447961826148930}
   - component: {fileID: 3052775064796588965}
   - component: {fileID: 5618990364568478680}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14693,7 +14693,7 @@ GameObject:
   - component: {fileID: 2352593340322610859}
   - component: {fileID: 1921091685061104845}
   - component: {fileID: 2128343623190041987}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19580,7 +19580,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8531896136659669628}
   - component: {fileID: 3153095635963405949}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: EnemyHardKick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19631,7 +19631,7 @@ GameObject:
   - component: {fileID: 9066580507850747406}
   - component: {fileID: 9066580507850747404}
   - component: {fileID: 9066580507850747405}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Stars
   m_TagString: Untagged
   m_Icon: {fileID: 0}

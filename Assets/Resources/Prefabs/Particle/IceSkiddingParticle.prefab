@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2437713122180973618}
   - component: {fileID: 4521925750696175202}
   - component: {fileID: 1459428735827537501}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Wooshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4841,7 +4841,7 @@ GameObject:
   - component: {fileID: 2433924041625306854}
   - component: {fileID: 5736391937106539089}
   - component: {fileID: 7940060003326263959}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Sparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9675,7 +9675,7 @@ GameObject:
   - component: {fileID: 1498854185915811176}
   - component: {fileID: 9136434103236884902}
   - component: {fileID: 870712723850675062}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: IceSkiddingParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14642,4 +14642,3 @@ MonoBehaviour:
   soundOrigin: {fileID: 754380605149502712}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0

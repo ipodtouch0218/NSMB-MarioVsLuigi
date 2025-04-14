@@ -1442,7 +1442,7 @@ MonoBehaviour:
               RawValue: 0
             UserTag: 1
             IsSetFromSourceCollider: 0
-        Layer: 8
+        Layer: 20
         IsTrigger: 0
         PhysicsMaterial:
           Id:

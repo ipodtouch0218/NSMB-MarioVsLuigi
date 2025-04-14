@@ -171,7 +171,7 @@ namespace NSMB.UI.Pause {
                 return;
             }
 
-            if (GlobalController.Instance.optionsManager.gameObject.activeSelf) {
+            if (GlobalController.Instance.optionsManager.gameObject.activeSelf || playerElements.ReplayUi.TabOpen) {
                 return;
             }
 

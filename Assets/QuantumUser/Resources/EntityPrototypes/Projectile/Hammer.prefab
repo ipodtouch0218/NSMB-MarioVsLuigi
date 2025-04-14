@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 5816618518376565689}
   - component: {fileID: -9113168347366101870}
   - component: {fileID: -5850122481703649106}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Hammer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -364,7 +364,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6102423714800591244}
   - component: {fileID: 9025442341733772760}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -421,7 +421,7 @@ GameObject:
   - component: {fileID: 3437905331129197368}
   - component: {fileID: 5329144335610595165}
   - component: {fileID: 9162743564300288012}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: HammerSpriteGraphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -558,7 +558,7 @@ GameObject:
   - component: {fileID: 5082207059470328561}
   - component: {fileID: 5202007457111186492}
   - component: {fileID: 2887448907472742947}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5449,8 +5449,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b5d73eb4473d1c54683911fb44031e91,
         type: 3}
+      propertyPath: m_Layer
+      value: 19
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b5d73eb4473d1c54683911fb44031e91,
+        type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164078558771037576, guid: b5d73eb4473d1c54683911fb44031e91,
+        type: 3}
+      propertyPath: m_Layer
+      value: 19
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

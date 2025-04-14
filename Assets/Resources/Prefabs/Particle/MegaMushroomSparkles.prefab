@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1112932331959547725}
   - component: {fileID: 2735028173329477612}
   - component: {fileID: 2059777663677175449}
-  m_Layer: 6
+  m_Layer: 17
   m_Name: MegaMushroomSparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}

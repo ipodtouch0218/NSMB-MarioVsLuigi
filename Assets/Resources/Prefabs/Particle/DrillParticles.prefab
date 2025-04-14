@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7636536272958848137}
   - component: {fileID: 2288529350662871608}
   - component: {fileID: 502723795878498370}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4899,7 +4899,7 @@ GameObject:
   - component: {fileID: 6595995385592519657}
   - component: {fileID: 5647425341035870921}
   - component: {fileID: 3860419527084914323}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Rings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9791,7 +9791,7 @@ GameObject:
   - component: {fileID: 8410937341537386978}
   - component: {fileID: 2403749385367476491}
   - component: {fileID: 3832526926453192857}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: DrillParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14760,7 +14760,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 5155523784996638670}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!1 &8493105865608791888
 GameObject:
   m_ObjectHideFlags: 0
@@ -14772,7 +14771,7 @@ GameObject:
   - component: {fileID: 1841894268877603111}
   - component: {fileID: 3717041430707198169}
   - component: {fileID: 2924277904509074766}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Woosh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

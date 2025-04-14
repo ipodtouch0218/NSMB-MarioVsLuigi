@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5837454655164076623}
   - component: {fileID: -2813270327434964485}
   - component: {fileID: 6714667219562485223}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: BulletBillLauncher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,10 +125,10 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 0
     CallbackFlags:
-      Value: 4095
+      Value: 0
   PhysicsBody:
     IsEnabled: 0
     Config2D: 116
@@ -296,7 +296,7 @@ GameObject:
   m_Component:
   - component: {fileID: 599600988802498468}
   - component: {fileID: 5535595080187867665}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -382,7 +382,7 @@ GameObject:
   - component: {fileID: 1544552339192739484}
   - component: {fileID: 5933736536034044470}
   - component: {fileID: 6571764976568214655}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -481,7 +481,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5162465030239809677}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: HeadOrigin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -512,10 +512,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1068660991916741857}
     m_Modifications:
+    - target: {fileID: 2554205168198831069, guid: 17ea5a6a8b49f5f4c8ab5398155cb2dd,
+        type: 3}
+      propertyPath: m_Layer
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3723752893050173268, guid: 17ea5a6a8b49f5f4c8ab5398155cb2dd,
+        type: 3}
+      propertyPath: m_Layer
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4471391655463703650, guid: 17ea5a6a8b49f5f4c8ab5398155cb2dd,
+        type: 3}
+      propertyPath: m_Layer
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 4639301973597389099, guid: 17ea5a6a8b49f5f4c8ab5398155cb2dd,
         type: 3}
       propertyPath: m_Name
       value: BulletBillShoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 4639301973597389099, guid: 17ea5a6a8b49f5f4c8ab5398155cb2dd,
+        type: 3}
+      propertyPath: m_Layer
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5338778651932590486, guid: 17ea5a6a8b49f5f4c8ab5398155cb2dd,
         type: 3}

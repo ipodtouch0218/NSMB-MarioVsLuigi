@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4956502219089369304}
   - component: {fileID: 6802069033892577108}
   - component: {fileID: 6546114060539198613}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4902,7 +4902,7 @@ GameObject:
   - component: {fileID: 7670899683599330417}
   - component: {fileID: 2128556804426530209}
   - component: {fileID: 8568363983463915492}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: IceballBreak
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9822,7 +9822,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 6037585406543101043}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!199 &2128556804426530209
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -9921,7 +9920,7 @@ GameObject:
   - component: {fileID: 3351478219206725305}
   - component: {fileID: 5963950412576339779}
   - component: {fileID: 9200757005530226101}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 317770117208862231}
   - component: {fileID: 1450510929900931296}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 3633822440498878527}
   - component: {fileID: 5260750400409825475}
   - component: {fileID: 8809138527817545200}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: BreakablePipe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,7 +207,7 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 0
     CallbackFlags:
       Value: 0

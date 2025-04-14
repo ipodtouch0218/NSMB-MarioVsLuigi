@@ -152,16 +152,6 @@ PrefabInstance:
       propertyPath: Prototype.Spawnpoint.Y.RawValue
       value: 32768
       objectReference: {fileID: 0}
-    - target: {fileID: 2072787540995169967, guid: 1ce5864bde999014a92015b065520add,
-        type: 3}
-      propertyPath: frame
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5669064217863857783, guid: 1ce5864bde999014a92015b065520add,
-        type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7523289063499453450, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
       propertyPath: m_Name
@@ -222,12 +212,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7821411591339125535, guid: 1ce5864bde999014a92015b065520add,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -2665958366948368982, guid: b455056ca00f84e48a8040f94ae8170d,
-        type: 3}
     - target: {fileID: 8059900885248764230, guid: 1ce5864bde999014a92015b065520add,
         type: 3}
       propertyPath: Flags
@@ -716,7 +700,7 @@ GameObject:
   - component: {fileID: 407379217}
   - component: {fileID: 407379219}
   - component: {fileID: 407379220}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: BigClouds
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -846,7 +830,7 @@ GameObject:
   - component: {fileID: 643464986}
   - component: {fileID: 643464985}
   - component: {fileID: 643464987}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Ground
   m_TagString: MainTilemap
   m_Icon: {fileID: 0}
@@ -1090,8 +1074,8 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 4
-      m_TileMatrixIndex: 0
+      m_TileSpriteIndex: 8
+      m_TileMatrixIndex: 1
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
@@ -1680,7 +1664,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 4
+      m_TileSpriteIndex: 8
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1690,7 +1674,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 6
+      m_TileSpriteIndex: 10
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -2280,8 +2264,8 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 7
-      m_TileMatrixIndex: 0
+      m_TileSpriteIndex: 10
+      m_TileMatrixIndex: 1
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
@@ -3182,28 +3166,28 @@ Tilemap:
   - m_RefCount: 4
     m_Data: {fileID: 3313547660045521459, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
-  - m_RefCount: 52
+  - m_RefCount: 50
     m_Data: {fileID: -4988122654707678320, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
   - m_RefCount: 12
     m_Data: {fileID: -4118142165262079471, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
-  - m_RefCount: 25
+  - m_RefCount: 24
     m_Data: {fileID: -3128345703424356310, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
-  - m_RefCount: 23
+  - m_RefCount: 22
     m_Data: {fileID: 1979728170566909823, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
-  - m_RefCount: 8
+  - m_RefCount: 10
     m_Data: {fileID: 863867184008000231, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
   - m_RefCount: 8
     m_Data: {fileID: 1979116087514208989, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
-  - m_RefCount: 4
+  - m_RefCount: 6
     m_Data: {fileID: 7932916211814125238, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
       type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 168
+  - m_RefCount: 166
     m_Data:
       e00: 1
       e01: 0
@@ -3221,7 +3205,7 @@ Tilemap:
       e31: 0
       e32: 0
       e33: 1
-  - m_RefCount: 14
+  - m_RefCount: 16
     m_Data:
       e00: -1
       e01: 0
@@ -3799,7 +3783,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1227227469}
   - component: {fileID: 1227227468}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3998,7 +3982,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1542081886}
   - component: {fileID: 1542081887}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: Backgrounds
   m_TagString: Backgrounds
   m_Icon: {fileID: 0}
@@ -4049,7 +4033,7 @@ GameObject:
   - component: {fileID: 1550383124}
   - component: {fileID: 1550383126}
   - component: {fileID: 1550383127}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: SmallClouds
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4403,7 +4387,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1831778354}
   - component: {fileID: 1831778353}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4805,7 +4789,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1959336206}
   - component: {fileID: 1959336205}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5477,8 +5461,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 4834808755216373431}
   - {fileID: 1532757892}
-  - {fileID: 1542081886}
   - {fileID: 1227227469}
+  - {fileID: 1542081886}
   - {fileID: 1674679211}
   - {fileID: 1761972580}
   - {fileID: 4425110964215584584}

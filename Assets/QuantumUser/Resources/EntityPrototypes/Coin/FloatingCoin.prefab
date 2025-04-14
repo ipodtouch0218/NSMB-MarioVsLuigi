@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 388009723025345444}
   - component: {fileID: 6153461050534851498}
   - component: {fileID: 1541163589079276198}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +158,7 @@ GameObject:
   - component: {fileID: 2115189598253090278}
   - component: {fileID: -4892106406039443480}
   - component: {fileID: 8774640590014395009}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: FloatingCoin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -582,6 +582,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CoinSparkles
+      objectReference: {fileID: 0}
+    - target: {fileID: 6203692344828610460, guid: 34b8762c3868b5d43b40a69badde238a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 6441094937726390934, guid: 34b8762c3868b5d43b40a69badde238a,
         type: 3}

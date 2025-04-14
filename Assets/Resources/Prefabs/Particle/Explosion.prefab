@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 988838030771060770}
   - component: {fileID: 7443426293781153942}
   - component: {fileID: 8033128487764959016}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Explosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -159,7 +159,7 @@ GameObject:
   - component: {fileID: 8537730553377813587}
   - component: {fileID: 148785419623682100}
   - component: {fileID: 1324750644265368642}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5056,7 +5056,7 @@ GameObject:
   - component: {fileID: 5084081865605441338}
   - component: {fileID: 1352333779600495850}
   - component: {fileID: 7075152631378974109}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Leftover Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9944,7 +9944,7 @@ GameObject:
   - component: {fileID: 144356845019780489}
   - component: {fileID: 3725653256252583919}
   - component: {fileID: 3164965471670656826}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14832,7 +14832,7 @@ GameObject:
   - component: {fileID: 1739618621685944833}
   - component: {fileID: 543736633145878815}
   - component: {fileID: 8968689072248276068}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19720,7 +19720,7 @@ GameObject:
   - component: {fileID: 3264608892472132961}
   - component: {fileID: 8198089925137876252}
   - component: {fileID: 6655221429026641735}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}

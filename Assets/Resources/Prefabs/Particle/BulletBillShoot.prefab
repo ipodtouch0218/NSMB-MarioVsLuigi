@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2485018965003175790}
   - component: {fileID: 3187635977286377457}
   - component: {fileID: 1562452402079740674}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4917,7 +4917,7 @@ GameObject:
   - component: {fileID: 6021781713850879691}
   - component: {fileID: 4152281680975225408}
   - component: {fileID: 4032974320553390308}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9805,7 +9805,7 @@ GameObject:
   - component: {fileID: 5283545621776311732}
   - component: {fileID: 3912246659667880308}
   - component: {fileID: 4134117786777249059}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14693,7 +14693,7 @@ GameObject:
   - component: {fileID: 5338778651932590486}
   - component: {fileID: 5036876403938927493}
   - component: {fileID: 7072490542433878876}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: BulletBillShoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 2210952625023297629}
   - component: {fileID: 3093743753026942761}
   - component: {fileID: 3901402401622306172}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Mushroom
   m_TagString: Powerup
   m_Icon: {fileID: 0}
@@ -61,6 +61,7 @@ MonoBehaviour:
   scaleRate: 0.1333
   scaleSize: 0.3
   sfx: {fileID: 4207910641862185911}
+  koopaSpawnParticles: {fileID: 0}
 --- !u!114 &6673749068647908742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,7 +149,7 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 9
     CallbackFlags:
       Value: 4095
@@ -371,6 +372,8 @@ MonoBehaviour:
       Value: 1
     IsWaterSolid:
       Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &1256801405142820976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -441,8 +444,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0
@@ -476,7 +477,7 @@ GameObject:
   - component: {fileID: 2479772350441087688}
   - component: {fileID: 1145319354374527610}
   - component: {fileID: 4473616532155397182}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}

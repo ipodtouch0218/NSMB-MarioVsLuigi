@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7871383497797880675}
   - component: {fileID: 8457851836967887307}
   - component: {fileID: 1758923742581242375}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: MarioBrosPlatform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,68 +123,7 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 4
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 196608
-        Y:
-          RawValue: 10240
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: -10240
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    ScaledShape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 0
     CallbackFlags:
       Value: 0
@@ -320,7 +259,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90795a33ed129444bb14668420459390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 7871383497797880675}
   sRenderer: {fileID: 4048133831610917976}
   samplesPerTile: 16
   bumpWidthPoints: 1
@@ -336,7 +274,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2705733514373397080}
   - component: {fileID: 4048133831610917976}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}

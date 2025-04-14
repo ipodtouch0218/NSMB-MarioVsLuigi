@@ -402,7 +402,7 @@ GameObject:
   m_Component:
   - component: {fileID: 133657843}
   - component: {fileID: 133657842}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -632,7 +632,7 @@ GameObject:
   m_Component:
   - component: {fileID: 402974983}
   - component: {fileID: 402974984}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: Backgrounds
   m_TagString: Backgrounds
   m_Icon: {fileID: 0}
@@ -836,7 +836,7 @@ GameObject:
   - component: {fileID: 531789394}
   - component: {fileID: 531789396}
   - component: {fileID: 531789395}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Godrays
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -935,7 +935,7 @@ GameObject:
   - component: {fileID: 618044466}
   - component: {fileID: 618044468}
   - component: {fileID: 618044467}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Godrays Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1034,7 +1034,7 @@ GameObject:
   - component: {fileID: 682279887}
   - component: {fileID: 682279888}
   - component: {fileID: 682279889}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Middleground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2015,7 +2015,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1128498886}
   - component: {fileID: 1128498887}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2445,7 +2445,7 @@ GameObject:
   - component: {fileID: 1531711657}
   - component: {fileID: 1531711659}
   - component: {fileID: 1531711658}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Dark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4233,7 +4233,7 @@ GameObject:
   - component: {fileID: 1816989173}
   - component: {fileID: 1816989172}
   - component: {fileID: 1816989174}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Ground
   m_TagString: MainTilemap
   m_Icon: {fileID: 0}
@@ -8531,7 +8531,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1902688426}
   - component: {fileID: 1902688427}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8737,7 +8737,7 @@ GameObject:
   - component: {fileID: 2022846295}
   - component: {fileID: 2022846297}
   - component: {fileID: 2022846296}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12990,8 +12990,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 781762829}
   - {fileID: 121915677}
-  - {fileID: 402974983}
   - {fileID: 133657843}
+  - {fileID: 402974983}
   - {fileID: 1292545025}
   - {fileID: 859204837}
   - {fileID: 2097970934}

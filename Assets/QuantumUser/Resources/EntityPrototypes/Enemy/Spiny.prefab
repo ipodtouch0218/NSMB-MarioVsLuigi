@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 3436560665117882628}
   - component: {fileID: 6612678236420697831}
   - component: {fileID: -2455541069636724775}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Spiny
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -578,7 +578,7 @@ GameObject:
   - component: {fileID: 7237572828892493257}
   - component: {fileID: 5045576353537437192}
   - component: {fileID: 1376368638781678059}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6129504704901067234}
   - component: {fileID: -9213054407736008163}
   - component: {fileID: -2330482680041870623}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Respawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 2955742676981792723}
   - component: {fileID: 8313763211968700695}
   - component: {fileID: 5412334486319678067}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: stars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5004,7 +5004,7 @@ GameObject:
   - component: {fileID: 798530764527165389}
   - component: {fileID: 874216209889198278}
   - component: {fileID: 7653967124022579032}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: RespawnParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

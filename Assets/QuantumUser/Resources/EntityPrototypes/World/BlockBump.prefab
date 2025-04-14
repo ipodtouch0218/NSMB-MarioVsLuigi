@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 2456925674553834749}
   - component: {fileID: -3568204047339294810}
   - component: {fileID: -5113133810989481609}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: BlockBump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,8 +126,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
-    Layer: 8
+    LayerSource: 1
+    Layer: 0
     CallbackFlags:
       Value: 0
   PhysicsBody:
@@ -417,7 +417,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 5347700891599547490}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!114 &-3568204047339294810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -439,13 +438,9 @@ MonoBehaviour:
       Tile:
         Id:
           Value: 0
-      Rotation:
-        RawValue: 0
-      Scale:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
+      Rotation: 0
+      Flags:
+        Value: 0
     Powerup:
       Id:
         Value: 0
@@ -462,8 +457,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

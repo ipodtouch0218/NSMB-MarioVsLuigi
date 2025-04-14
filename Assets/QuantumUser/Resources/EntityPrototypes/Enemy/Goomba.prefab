@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3591845850498963736}
   - component: {fileID: 7821411591339125535}
   - component: {fileID: 2072787540995169967}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 4848679844973023050}
   - component: {fileID: -2967928457836996957}
   - component: {fileID: 2934046834125206836}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Goomba
   m_TagString: Untagged
   m_Icon: {fileID: 0}

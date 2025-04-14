@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1819625159246992548}
   - component: {fileID: 9188833939589568991}
   - component: {fileID: 597996973523047501}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Wooshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4845,7 +4845,7 @@ GameObject:
   - component: {fileID: 3043955022219344892}
   - component: {fileID: 8708531807875116866}
   - component: {fileID: 4834474784862403382}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: WaterSkiddingParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9810,4 +9810,3 @@ MonoBehaviour:
   soundOrigin: {fileID: 2047133884692133370}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0

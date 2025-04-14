@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2018796604398268700}
   - component: {fileID: 2018796604398268701}
   - component: {fileID: 2018796604398268702}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: SandFootstep
   m_TagString: Untagged
   m_Icon: {fileID: 0}

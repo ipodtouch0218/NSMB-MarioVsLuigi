@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 4429105053950663285}
   - component: {fileID: -6652070002619640731}
   - component: {fileID: 9168676210325572332}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Boo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -373,7 +373,7 @@ GameObject:
   - component: {fileID: 4326104160039452375}
   - component: {fileID: 3241501505551194881}
   - component: {fileID: 3432254750485393025}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: BounceOffset
   m_TagString: Untagged
   m_Icon: {fileID: 0}

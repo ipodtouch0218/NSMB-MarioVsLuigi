@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2942793993665947634}
   - component: {fileID: 3060121057263043570}
   - component: {fileID: 8371659256944361981}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Sparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4861,7 +4861,7 @@ GameObject:
   - component: {fileID: 5279632371919351669}
   - component: {fileID: 5501024112843099950}
   - component: {fileID: 2599661224704062266}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: BigStar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4971,10 +4971,10 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 9
     CallbackFlags:
-      Value: 448
+      Value: 0
   PhysicsBody:
     IsEnabled: 0
     Config2D: 116
@@ -5446,7 +5446,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8519953457714558423}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5480,7 +5480,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7308630834410186342}
   - component: {fileID: 3409460790137144535}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

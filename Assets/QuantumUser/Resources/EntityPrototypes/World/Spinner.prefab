@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4414814671149789817}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7245697392584499111}
   - component: {fileID: 2379644510384985744}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 990444944486247083}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: platform_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 549879886592098528}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -196,7 +196,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3206220589763810860}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: ring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ GameObject:
   - component: {fileID: 1930001598682921039}
   - component: {fileID: 4917209735065614385}
   - component: {fileID: 7931773572498726739}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Spinner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,7 +344,7 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 0
     CallbackFlags:
       Value: 0
@@ -573,7 +573,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 7020551328166419880}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!1 &7886301467451270129
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,7 +582,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8641861451224738235}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Armature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -621,7 +620,7 @@ GameObject:
   - component: {fileID: 1314304527043845973}
   - component: {fileID: 7415217367350898022}
   - component: {fileID: 965637652487541285}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: spring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -732,7 +731,7 @@ MonoBehaviour:
       IsPersistent: 1
       CompoundShapes: []
     LayerSource: 0
-    Layer: 0
+    Layer: 20
     CallbackFlags:
       Value: 4095
   PhysicsBody:
@@ -896,8 +895,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

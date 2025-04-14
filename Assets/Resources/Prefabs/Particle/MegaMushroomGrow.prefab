@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1027938210060589434}
   - component: {fileID: 1027938210060589432}
   - component: {fileID: 1027938210060589433}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Rings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4899,7 +4899,7 @@ GameObject:
   - component: {fileID: 1027938211055538159}
   - component: {fileID: 1027938211055538157}
   - component: {fileID: 1027938211055538158}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Stars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9785,7 +9785,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1027938211648583551}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Mover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9820,7 +9820,7 @@ GameObject:
   - component: {fileID: 1027938211771126355}
   - component: {fileID: -5076542876201361600}
   - component: {fileID: 7263807594913351691}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: MegaMushroomGrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

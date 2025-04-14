@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8231289528425871317}
   - component: {fileID: 7558042822839980312}
   - component: {fileID: 2138876113641640070}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -254,7 +254,7 @@ GameObject:
   - component: {fileID: -805149708868906492}
   - component: {fileID: 8366835173838899577}
   - component: {fileID: 9027180685943835176}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: PiranhaPlant
   m_TagString: Untagged
   m_Icon: {fileID: 0}

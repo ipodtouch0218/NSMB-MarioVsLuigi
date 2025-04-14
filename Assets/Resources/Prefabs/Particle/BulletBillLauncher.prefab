@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4610713870707772705}
   - component: {fileID: 1154580734366823496}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 6090458509712813838}
   - component: {fileID: -1843595439736670929}
   - component: {fileID: 5957365481354593459}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: BulletBillLauncher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,4 +250,3 @@ MonoBehaviour:
   soundOrigin: {fileID: 6460915104767337924}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3955483781748331973}
   - component: {fileID: 3332745724366257714}
   - component: {fileID: 1155036517483620352}
-  m_Layer: 12
+  m_Layer: 20
   m_Name: WrappingPlatform
   m_TagString: platform
   m_Icon: {fileID: 0}
@@ -177,123 +177,8 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    ScaledShape2D:
-      ShapeType: 16
-      PolygonCollider:
-        Id:
-          Value: 0
-      CircleRadius:
-        RawValue: 0
-      CapsuleSize:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      EdgeExtent:
-        RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-      RotationOffset:
-        RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes:
-      - ShapeType: 8
-        PolygonCollider:
-          Id:
-            Value: 0
-        CircleRadius:
-          RawValue: 0
-        CapsuleSize:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        EdgeExtent:
-          RawValue: 65536
-        BoxExtents:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        PositionOffset:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 32768
-        RotationOffset:
-          RawValue: 0
-        UserTag: 0
-        IsSetFromSourceCollider: 0
-      - ShapeType: 8
-        PolygonCollider:
-          Id:
-            Value: 0
-        CircleRadius:
-          RawValue: 0
-        CapsuleSize:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        EdgeExtent:
-          RawValue: 65536
-        BoxExtents:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        PositionOffset:
-          X:
-            RawValue: -1048576
-          Y:
-            RawValue: 32768
-        RotationOffset:
-          RawValue: 0
-        UserTag: 0
-        IsSetFromSourceCollider: 0
-    ScaledShape3D:
-      ShapeType: 0
-      SphereRadius:
-        RawValue: 0
-      CapsuleRadius:
-        RawValue: 0
-      CapsuleHeight:
-        RawValue: 0
-      PositionOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      BoxExtents:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      RotationOffset:
-        X:
-          RawValue: 0
-        Y:
-          RawValue: 0
-        Z:
-          RawValue: 0
-      UserTag: 0
-      IsPersistent: 1
-      CompoundShapes: []
-    LayerSource: 0
-    Layer: 12
+    LayerSource: 1
+    Layer: 0
     CallbackFlags:
       Value: 0
   PhysicsBody:
@@ -377,6 +262,8 @@ MonoBehaviour:
         RawValue: 0
       Y:
         RawValue: 0
+    IgnoreMovement:
+      Value: 0
 --- !u!114 &3332745724366257714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,7 +322,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4813915802632404675}
-  m_Layer: 12
+  m_Layer: 20
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -469,7 +356,7 @@ GameObject:
   m_Component:
   - component: {fileID: 815103074287610376}
   - component: {fileID: 652202278414242431}
-  m_Layer: 12
+  m_Layer: 20
   m_Name: Platform (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -554,7 +441,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3646922749939168605}
   - component: {fileID: 3918695714886919987}
-  m_Layer: 12
+  m_Layer: 20
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}

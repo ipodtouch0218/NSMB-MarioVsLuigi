@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4677531960176377289}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: CoinNumber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 234383116846618720}
   - component: {fileID: 1320995819476395061}
   - component: {fileID: 2637418064421435260}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Graphic
   m_TagString: Untagged
   m_Icon: {fileID: 0}

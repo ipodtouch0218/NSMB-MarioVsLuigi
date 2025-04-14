@@ -1,111 +1,44 @@
 using NSMB.Extensions;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
-public class ReplayUITab : Selectable {
+public class ReplayUITab : MonoBehaviour {
+
+    public virtual GameObject DefaultSelection => defaultSelection;
 
     //---Serialized Variables
     [SerializeField] protected ReplayUI parent;
-    [SerializeField] protected List<TMP_Text> selectables;
-    [SerializeField] private bool horizontalMovement;
+    [SerializeField] protected List<GameObject> selectables;
     [SerializeField] public GameObject defaultSelection, selectOnClose;
+    [SerializeField] protected Color enabledColor = Color.white, disabledColor = Color.gray;
 
-    [SerializeField] private Color deselectedColor = Color.gray, selectedColor = Color.white;
-
-    //---Private Variables
-    private int cursor;
-
-#if UNITY_EDITOR
-    protected override void OnValidate() {
-        base.OnValidate();
+    public void OnValidate() {
         this.SetIfNull(ref parent, UnityExtensions.GetComponentType.Parent);
     }
-#endif
 
-    protected override void OnEnable() {
-        base.OnEnable();
-
+    public virtual void OnEnable() {
 #if UNITY_EDITOR
-        if (Application.isEditor) {
+        if (!Application.isPlaying) {
             return;
         }
 #endif
 
-        cursor = 0;
-
-        Settings.Controls.UI.Submit.performed += OnSubmit;
         Settings.Controls.UI.Cancel.performed += OnCancel;
+        EventSystem.current.SetSelectedGameObject(DefaultSelection);
         GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_WindowOpen);
-        IncrementOption(0);
-        EventSystem.current.SetSelectedGameObject(gameObject);
     }
 
-    protected override void OnDisable() {
-        base.OnDisable();
-
+    public virtual void OnDisable() {
 #if UNITY_EDITOR
-        if (Application.isEditor) {
+        if (!Application.isPlaying) {
             return;
         }
 #endif
 
-        Settings.Controls.UI.Submit.performed -= OnSubmit;
         Settings.Controls.UI.Cancel.performed -= OnCancel;
         GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_WindowClose);
-    }
-
-    public override void OnMove(AxisEventData eventData) {
-        switch (eventData.moveDir) {
-        case MoveDirection.Left:
-            if (!horizontalMovement) {
-                break;
-            }
-            IncrementOption(-1);
-            break;
-        case MoveDirection.Right:
-            if (!horizontalMovement) {
-                break;
-            }
-            IncrementOption(1);
-            break;
-        case MoveDirection.Up:
-            if (horizontalMovement) {
-                break;
-            }
-            IncrementOption(-1);
-            break;
-        case MoveDirection.Down:
-            if (horizontalMovement) {
-                break;
-            }
-            IncrementOption(1);
-            break;
-        }
-    }
-
-    public void IncrementOption(int value) {
-        int newPos = cursor + value;
-        if (newPos < 0 && newPos >= selectables.Count) {
-            return;
-        }
-
-        SelectItem(newPos);
-    }
-
-    public void SelectItem(int index) {
-        for (int i = 0; i < selectables.Count; i++) {
-            selectables[i].color = deselectedColor;
-        }
-        selectables[index].color = selectedColor;
-        cursor = index;
-    }
-
-    private void OnSubmit(InputAction.CallbackContext context) {
-        
     }
 
     private void OnCancel(InputAction.CallbackContext context) {

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6441094937726390934}
   - component: {fileID: 1821550530333385025}
   - component: {fileID: 8084874191887672275}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: CoinSparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}

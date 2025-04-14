@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 68141974}
   - component: {fileID: 68141973}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1167,7 +1167,7 @@ GameObject:
   m_Component:
   - component: {fileID: 763815595}
   - component: {fileID: 763815596}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1252,7 +1252,7 @@ GameObject:
   - component: {fileID: 861513080}
   - component: {fileID: 861513082}
   - component: {fileID: 861513081}
-  m_Layer: 4
+  m_Layer: 21
   m_Name: Clouds 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2207,7 +2207,7 @@ GameObject:
   - component: {fileID: 1328772357}
   - component: {fileID: 1328772356}
   - component: {fileID: 1328772358}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Ground
   m_TagString: MainTilemap
   m_Icon: {fileID: 0}
@@ -11429,7 +11429,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1457634497}
   - component: {fileID: 1457634498}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: Backgrounds
   m_TagString: Backgrounds
   m_Icon: {fileID: 0}
@@ -11598,7 +11598,7 @@ GameObject:
   - component: {fileID: 1555709834}
   - component: {fileID: 1555709836}
   - component: {fileID: 1555709835}
-  m_Layer: 11
+  m_Layer: 20
   m_Name: Tilemap_DarkBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12242,7 +12242,7 @@ GameObject:
   - component: {fileID: 1758446272}
   - component: {fileID: 1758446271}
   - component: {fileID: 1758446273}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12534,7 +12534,7 @@ GameObject:
   - component: {fileID: 1865717359}
   - component: {fileID: 1865717361}
   - component: {fileID: 1865717360}
-  m_Layer: 4
+  m_Layer: 21
   m_Name: Clouds 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12637,7 +12637,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1880257358}
   - component: {fileID: 1880257357}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Door :)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13101,8 +13101,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 363713084}
   - {fileID: 1546349546}
-  - {fileID: 1457634497}
   - {fileID: 68141974}
+  - {fileID: 1457634497}
   - {fileID: 921256176}
   - {fileID: 527788659}
   - {fileID: 171571677}

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6257058125082474392}
   - component: {fileID: 5790814903443358490}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Sprite Mask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,9 +98,9 @@ GameObject:
   - component: {fileID: 3150085164645429832}
   - component: {fileID: 5377348487338848431}
   - component: {fileID: 2586611310233273419}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Water
-  m_TagString: water
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -316,7 +316,7 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 0
     CallbackFlags:
       Value: 4095

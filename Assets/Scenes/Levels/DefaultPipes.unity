@@ -702,7 +702,7 @@ GameObject:
   m_Component:
   - component: {fileID: 167560906}
   - component: {fileID: 167560907}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: Backgrounds
   m_TagString: Backgrounds
   m_Icon: {fileID: 0}
@@ -1096,9 +1096,7 @@ GameObject:
   m_Component:
   - component: {fileID: 255438755}
   - component: {fileID: 255438754}
-  - component: {fileID: 255438757}
-  - component: {fileID: 255438756}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1133,76 +1131,6 @@ Transform:
   - {fileID: 1890770086}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!66 &255438756
-CompositeCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 255438753}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_GeometryType: 0
-  m_GenerationType: 0
-  m_EdgeRadius: 0
-  m_ColliderPaths: []
-  m_CompositePaths:
-    m_Paths: []
-  m_VertexDistance: 0.0005
-  m_OffsetDistance: 0
-  m_UseDelaunayMesh: 0
-  m_CompositeGameObject: {fileID: 255438753}
---- !u!50 &255438757
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 255438753}
-  m_BodyType: 2
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!1001 &271742325
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6150,7 +6078,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1277131673}
   - component: {fileID: 1277131672}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7443,7 +7371,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1500230911}
   - component: {fileID: 1500230912}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9323,7 +9251,7 @@ GameObject:
   - component: {fileID: 1890770091}
   - component: {fileID: 1890770090}
   - component: {fileID: 1890770092}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Ground
   m_TagString: MainTilemap
   m_Icon: {fileID: 0}
@@ -13121,8 +13049,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 941320096}
   - {fileID: 8587725864420799970}
-  - {fileID: 167560906}
   - {fileID: 255438755}
+  - {fileID: 167560906}
   - {fileID: 1044624147}
   - {fileID: 2069188964}
   - {fileID: 2110129131}

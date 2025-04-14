@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6441858778381477698}
   - component: {fileID: 4854378239597354105}
   - component: {fileID: 8735478572021304808}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +128,7 @@ GameObject:
   - component: {fileID: -7630330329796668258}
   - component: {fileID: -740791522673204871}
   - component: {fileID: 3614990866440943241}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Bobomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}

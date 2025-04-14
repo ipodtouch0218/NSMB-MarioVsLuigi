@@ -7,9 +7,7 @@ public class CameraReplayUITab : ReplayUITab {
     //---Serialized Variables
     [SerializeField] private TMP_Text template;
 
-    protected override unsafe void Start() {
-        base.Start();
-
+    public unsafe void Start() {
         template.gameObject.SetActive(false);
         Frame f = NetworkHandler.Game.Frames.Predicted;
         for (int i = 0; i < f.Global->RealPlayers; i++) {
@@ -18,7 +16,7 @@ public class CameraReplayUITab : ReplayUITab {
             TMP_Text newLabel = Instantiate(template, transform);
             newLabel.text = playerInfo.Nickname.ToString();
             newLabel.gameObject.SetActive(true);
-            selectables.Add(newLabel);
+            selectables.Add(newLabel.gameObject);
         }
     }
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8088900794427276647}
   - component: {fileID: 8133877121043965814}
   - component: {fileID: 3696720750550087088}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 6785230435006475844}
   - component: {fileID: 5706729172118545942}
   - component: {fileID: -5171311978343019671}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Koopa
   m_TagString: Untagged
   m_Icon: {fileID: 0}

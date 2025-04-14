@@ -454,7 +454,7 @@ MonoBehaviour:
               RawValue: 0
             UserTag: 0
             IsSetFromSourceCollider: 0
-        Layer: 12
+        Layer: 0
         IsTrigger: 0
         PhysicsMaterial:
           Id:
@@ -654,7 +654,7 @@ MonoBehaviour:
               RawValue: 0
             UserTag: 0
             IsSetFromSourceCollider: 0
-        Layer: 12
+        Layer: 0
         IsTrigger: 0
         PhysicsMaterial:
           Id:
@@ -778,7 +778,7 @@ MonoBehaviour:
               RawValue: 0
             UserTag: 0
             IsSetFromSourceCollider: 0
-        Layer: 12
+        Layer: 0
         IsTrigger: 0
         PhysicsMaterial:
           Id:

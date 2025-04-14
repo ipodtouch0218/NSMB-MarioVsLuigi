@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4355208377236206565}
   - component: {fileID: 4355208377236206567}
   - component: {fileID: 4355208377236206564}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,7 +116,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4355208377719065581}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: CoinFromBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}

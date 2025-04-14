@@ -253,7 +253,7 @@ GameObject:
   m_Component:
   - component: {fileID: 61731049}
   - component: {fileID: 61731050}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: Backgrounds
   m_TagString: Backgrounds
   m_Icon: {fileID: 0}
@@ -301,7 +301,7 @@ GameObject:
   m_Component:
   - component: {fileID: 133657843}
   - component: {fileID: 133657842}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +378,7 @@ GameObject:
   m_Component:
   - component: {fileID: 200514979}
   - component: {fileID: 200514980}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1138,7 +1138,7 @@ GameObject:
   - component: {fileID: 763173035}
   - component: {fileID: 763173040}
   - component: {fileID: 763173039}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3427,7 +3427,7 @@ GameObject:
   m_Component:
   - component: {fileID: 852669703}
   - component: {fileID: 852669704}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4215,7 +4215,7 @@ GameObject:
   - component: {fileID: 1816989173}
   - component: {fileID: 1816989172}
   - component: {fileID: 1816989174}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Ground
   m_TagString: MainTilemap
   m_Icon: {fileID: 0}
@@ -7759,8 +7759,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 932282399}
   - {fileID: 311633201}
-  - {fileID: 61731049}
   - {fileID: 133657843}
+  - {fileID: 61731049}
   - {fileID: 859204837}
   - {fileID: 1979826735}
   - {fileID: 1292545025}

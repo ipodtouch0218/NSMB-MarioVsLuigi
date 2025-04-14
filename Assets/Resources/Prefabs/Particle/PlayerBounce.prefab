@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3458674367600516711}
   - component: {fileID: 2939313980652028268}
   - component: {fileID: 5679892313265753842}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: bomf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4898,7 +4898,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6572656997369707539}
   - component: {fileID: 8213225902792355912}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: PlayerBounce
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4946,7 +4946,7 @@ GameObject:
   - component: {fileID: 1004220464651386489}
   - component: {fileID: 6308196086130794685}
   - component: {fileID: 8067957899892179929}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: stars
   m_TagString: Untagged
   m_Icon: {fileID: 0}

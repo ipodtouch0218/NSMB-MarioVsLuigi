@@ -285,7 +285,7 @@ MonoBehaviour:
           UserTag: 0
           IsPersistent: 1
           CompoundShapes: []
-        Layer: 0
+        Layer: 20
         IsTrigger: 0
         PhysicsMaterial:
           Id:
@@ -608,7 +608,7 @@ MonoBehaviour:
       type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         CallbackFlags:
-          Value: 4095
+          Value: 0
     - rid: 1129043281737416707
       type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -682,7 +682,7 @@ MonoBehaviour:
       type: {class: PhysicsCallbacks2DPrototype, ns: Quantum.Prototypes, asm: Quantum.Engine}
       data:
         CallbackFlags:
-          Value: 4095
+          Value: 0
     - rid: 1649462287150350339
       type: {class: BreakableObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

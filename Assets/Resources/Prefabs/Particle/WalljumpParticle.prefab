@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1486272506777507864}
   - component: {fileID: 4897914159205296236}
   - component: {fileID: 2961368411967462914}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Shock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4899,7 +4899,7 @@ GameObject:
   - component: {fileID: 4064858922911726349}
   - component: {fileID: 2335436463266234778}
   - component: {fileID: 458440055502656920}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9787,7 +9787,7 @@ GameObject:
   - component: {fileID: 7945709583383104836}
   - component: {fileID: 5314325645590327256}
   - component: {fileID: 7963187872016023572}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14674,7 +14674,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9100450100766208475}
   - component: {fileID: 5117557483162219350}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: WalljumpParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -260,7 +260,7 @@ GameObject:
   m_Component:
   - component: {fileID: 61731049}
   - component: {fileID: 61731050}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: Backgrounds
   m_TagString: Backgrounds
   m_Icon: {fileID: 0}
@@ -477,7 +477,7 @@ GameObject:
   m_Component:
   - component: {fileID: 133657843}
   - component: {fileID: 133657842}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1524,7 +1524,7 @@ GameObject:
   m_Component:
   - component: {fileID: 420344210}
   - component: {fileID: 420344211}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Blue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2924,7 +2924,7 @@ GameObject:
   m_Component:
   - component: {fileID: 852669703}
   - component: {fileID: 852669704}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Red
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3652,7 +3652,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1080608883}
   - component: {fileID: 1080608884}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: RightOfBlueBonus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3977,7 +3977,7 @@ GameObject:
   - component: {fileID: 1307731840}
   - component: {fileID: 1307731842}
   - component: {fileID: 1307731841}
-  m_Layer: 11
+  m_Layer: 20
   m_Name: Tilemap_Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4664,7 +4664,7 @@ GameObject:
   - component: {fileID: 1417493316}
   - component: {fileID: 1417493318}
   - component: {fileID: 1417493317}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Clouds
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5775,7 +5775,7 @@ GameObject:
   - component: {fileID: 1816989173}
   - component: {fileID: 1816989172}
   - component: {fileID: 1816989174}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11588,7 +11588,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1937306560}
   - component: {fileID: 1937306561}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: RightOfRedBonus
   m_TagString: Untagged
   m_Icon: {fileID: 0}

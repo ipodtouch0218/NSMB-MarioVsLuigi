@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3623737869823869219}
   - component: {fileID: 7801312018231950201}
   - component: {fileID: 7982852102018805714}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: BigSplash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4900,7 +4900,7 @@ GameObject:
   - component: {fileID: 7027243595425865096}
   - component: {fileID: 973512419996953564}
   - component: {fileID: 1573413261906505513}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: LavaSplash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5051,7 +5051,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 5604144073064567413}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!1 &7629435363909363196
 GameObject:
   m_ObjectHideFlags: 0
@@ -5063,7 +5062,7 @@ GameObject:
   - component: {fileID: 6211359847198501620}
   - component: {fileID: 5799851895166437479}
   - component: {fileID: 1643532689794251745}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: LittleSplash
   m_TagString: Untagged
   m_Icon: {fileID: 0}

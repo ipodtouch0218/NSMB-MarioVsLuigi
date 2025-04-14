@@ -189,7 +189,7 @@ public class ResultsMenu : QuantumSceneViewComponent {
             break;
         case 1:
             if (NetworkHandler.IsReplay) {
-                FindObjectOfType<ReplayUI>().Reset();
+                FindObjectOfType<ReplayUI>().ResetReplay();
                 sfx.PlayOneShot(SoundEffect.UI_Decide);
             } else {
                 if (CanSaveReplay) {

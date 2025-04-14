@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4738668675967758046}
   - component: {fileID: 3923556902564110569}
   - component: {fileID: 5860934111420931759}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Sparkles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4845,7 +4845,7 @@ GameObject:
   - component: {fileID: 6139600130300242844}
   - component: {fileID: 1837613836439086063}
   - component: {fileID: 2874948174173172042}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: IceWalkingParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9810,4 +9810,3 @@ MonoBehaviour:
   soundOrigin: {fileID: 2840416365155994570}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0

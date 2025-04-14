@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4805165230231647432}
   - component: {fileID: 8187154022884452268}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: KillPoof
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 8058731046653160176}
   - component: {fileID: 7659063052492811772}
   - component: {fileID: 1280648013693142455}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4947,7 +4947,7 @@ GameObject:
   - component: {fileID: 3860352727414713748}
   - component: {fileID: 7913146974233148288}
   - component: {fileID: 8538714270874773301}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9835,7 +9835,7 @@ GameObject:
   - component: {fileID: 2402651179507992548}
   - component: {fileID: 6160947964116832518}
   - component: {fileID: 2190012036166420504}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Dots
   m_TagString: Untagged
   m_Icon: {fileID: 0}

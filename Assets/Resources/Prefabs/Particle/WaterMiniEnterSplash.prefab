@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 149241691573597058}
   - component: {fileID: 3402094591697207163}
   - component: {fileID: 2113883940188870197}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Mist
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4926,7 +4926,7 @@ GameObject:
   - component: {fileID: 6043517108869605988}
   - component: {fileID: 844401449848844687}
   - component: {fileID: 3926234756722306324}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: BigWave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9841,7 +9841,7 @@ GameObject:
   - component: {fileID: 8648471937121699966}
   - component: {fileID: 9069806084415378598}
   - component: {fileID: 2867586912459344549}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: SmallWave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14757,7 +14757,7 @@ GameObject:
   - component: {fileID: 5680656179849727251}
   - component: {fileID: 8856350405573363111}
   - component: {fileID: 4167307850227689685}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: WaterMiniEnterSplash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14897,7 +14897,6 @@ MonoBehaviour:
   soundOrigin: {fileID: 4120514959126284088}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0
 --- !u!114 &4167307850227689685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14922,7 +14921,7 @@ GameObject:
   - component: {fileID: 4893701721966112895}
   - component: {fileID: 9163431765510144459}
   - component: {fileID: 466215993341075009}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: LeftRightThingys
   m_TagString: Untagged
   m_Icon: {fileID: 0}

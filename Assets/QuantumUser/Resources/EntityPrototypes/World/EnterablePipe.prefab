@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4064725579428214608}
   - component: {fileID: 758687465262641939}
   - component: {fileID: 2333072886424663942}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: EnterablePipe
   m_TagString: Untagged
   m_Icon: {fileID: 0}

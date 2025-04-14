@@ -17,7 +17,7 @@ PrefabInstance:
     - target: {fileID: 4966771921777507886, guid: 838c4efa2a70fd44d9414efed832ea97,
         type: 3}
       propertyPath: m_Name
-      value: RedPipe Variant
+      value: RedPipe
       objectReference: {fileID: 0}
     - target: {fileID: 6460915104767337924, guid: 838c4efa2a70fd44d9414efed832ea97,
         type: 3}

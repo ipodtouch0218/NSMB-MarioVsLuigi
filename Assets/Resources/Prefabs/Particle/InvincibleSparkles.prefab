@@ -81,7 +81,7 @@ PrefabInstance:
     - target: {fileID: 8469385762470922254, guid: da75331a116cd3b4f8a6cebc1fb26d88,
         type: 3}
       propertyPath: m_Name
-      value: InvincibleSparkles Variant
+      value: InvincibleSparkles
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

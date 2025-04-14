@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 122509331735454064}
   - component: {fileID: 122509331735454066}
   - component: {fileID: 122509331735454067}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Mist
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4926,7 +4926,7 @@ GameObject:
   - component: {fileID: 122509332418927731}
   - component: {fileID: 122509332418927741}
   - component: {fileID: 122509332418927730}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: LeftRightThingys
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9833,7 +9833,7 @@ GameObject:
   - component: {fileID: 4930366427946256054}
   - component: {fileID: 5567072061921847436}
   - component: {fileID: -1058581093654445895}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: WaterExitSplash
   m_TagString: Untagged
   m_Icon: {fileID: 0}

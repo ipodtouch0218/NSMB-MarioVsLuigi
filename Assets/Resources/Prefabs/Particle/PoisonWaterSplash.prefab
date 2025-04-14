@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5915462787734291376}
   - component: {fileID: 2954749760962805410}
   - component: {fileID: 6313531122763606821}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: PoisonWaterSplash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5027,4 +5027,3 @@ MonoBehaviour:
   soundOrigin: {fileID: 5915462787734291390}
   soundRange: 12
   maxPanning: 0.8
-  useDistanceToCamera: 0

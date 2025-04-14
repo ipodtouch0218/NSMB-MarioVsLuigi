@@ -20,9 +20,9 @@ GameObject:
   - component: {fileID: 5466463427177246889}
   - component: {fileID: 3123853808942919971}
   - component: {fileID: -1116452901013867628}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: IceBlock
-  m_TagString: frozencube
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -130,10 +130,10 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 0
     CallbackFlags:
-      Value: 4095
+      Value: 0
   PhysicsBody:
     IsEnabled: 0
     Config2D: 116
@@ -488,7 +488,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3560772426833456990}
   - component: {fileID: 5772244049117569476}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}

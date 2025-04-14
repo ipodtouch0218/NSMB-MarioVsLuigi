@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 819605915704597882}
   - component: {fileID: 5475970293224446293}
   - component: {fileID: 5475970293224446294}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,6 +140,7 @@ MonoBehaviour:
   - {fileID: -404099666, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 1339308990, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
   - {fileID: 2093605636, guid: 752c51ce7499177419a33a6cddc8de5c, type: 3}
+  useUnscaledDelta: 0
   sRenderer: {fileID: 5475970293224446295}
   image: {fileID: 0}
 --- !u!1 &5334425534174023786
@@ -161,7 +162,7 @@ GameObject:
   - component: {fileID: 8611491811130374641}
   - component: {fileID: 7282818765540506302}
   - component: {fileID: -1053788941134108228}
-  m_Layer: 9
+  m_Layer: 19
   m_Name: Propeller Mushroom
   m_TagString: Powerup
   m_Icon: {fileID: 0}
@@ -203,6 +204,7 @@ MonoBehaviour:
   scaleRate: 0.1333
   scaleSize: 0.3
   sfx: {fileID: -6891361109405082350}
+  koopaSpawnParticles: {fileID: 0}
 --- !u!114 &3377063373533538626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -290,7 +292,7 @@ MonoBehaviour:
       UserTag: 0
       IsPersistent: 1
       CompoundShapes: []
-    LayerSource: 0
+    LayerSource: 1
     Layer: 9
     CallbackFlags:
       Value: 4095
@@ -570,6 +572,8 @@ MonoBehaviour:
       Value: 0
     IsWaterSolid:
       Value: 0
+    BreakMegaObjects:
+      Value: 0
 --- !u!114 &7282818765540506302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,8 +587,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    DisableCulling:
-      Value: 0
     Offset:
       X:
         RawValue: 0

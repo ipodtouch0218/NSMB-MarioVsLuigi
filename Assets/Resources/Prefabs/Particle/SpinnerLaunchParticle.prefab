@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4336672085366385589}
   - component: {fileID: 4419860583866652914}
   - component: {fileID: 5897590490064661184}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: SpinnerLaunchParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4914,7 +4914,7 @@ GameObject:
   - component: {fileID: 3731339686017408447}
   - component: {fileID: 658685360338502977}
   - component: {fileID: 1805887219863201056}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
