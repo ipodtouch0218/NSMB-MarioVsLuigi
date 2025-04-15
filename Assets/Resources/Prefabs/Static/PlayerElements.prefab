@@ -13121,6 +13121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Updater: {fileID: 0}
   UseFindUpdater: 1
+  playerElements: {fileID: 0}
   labels:
   - {fileID: 5769053198963143860}
   - {fileID: 6758143619385143274}
@@ -16596,6 +16597,7 @@ MonoBehaviour:
   replayCanvasGroup: {fileID: 1568216966726193077}
   mousePositionAction: {fileID: -957078602764158190, guid: d29805f34fe91da4e94010a38823fab7,
     type: 3}
+  defaultSelection: {fileID: 8921975485660676511}
   tabBlocker: {fileID: 5945620774666629189}
 --- !u!225 &322794829254065858
 CanvasGroup:

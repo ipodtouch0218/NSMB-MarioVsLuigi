@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.Sound;
 using NSMB.UI.Game;
 using Photon.Deterministic;
 using Quantum;

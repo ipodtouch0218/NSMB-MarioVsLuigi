@@ -8,7 +8,9 @@ public class ScaleWithParent : MonoBehaviour {
 
     //---Private Variables
     private DrivenRectTransformTracker tracker;
+#if BROKEN_VERSION
     private int width, height;
+#endif
 
 #if UNITY_EDITOR
     public void OnValidate() {
@@ -30,16 +32,8 @@ public class ScaleWithParent : MonoBehaviour {
         tracker.Clear();
     }
 
-    public void Update() {
-        
-        // I can't get this shit to work... it SHOULD only
-        // get called when the parent changes, but...
-        // just fucking run every frame, i don't give a shit
-        // at this point.
-        OnRectTransformDimensionsChange();
-
-
-        /*
+#if BROKEN_VERSION
+    public void LateUpdate() {
         if (Screen.width != width || Screen.height != height) {
             OnRectTransformDimensionsChange();
             width = Screen.width;
@@ -55,12 +49,20 @@ public class ScaleWithParent : MonoBehaviour {
                 break;
             }
         } while (tf = tf.parent);
-        */
     }
 
     public void OnTransformParentChanged() {
         OnRectTransformDimensionsChange();
     }
+#else
+    public void LateUpdate() {
+        // I can't get this shit to work... it SHOULD only
+        // get called when the parent changes, but...
+        // just fucking run every frame, i don't give a shit
+        // at this point.
+        OnRectTransformDimensionsChange();
+    }
+#endif
 
     public void OnRectTransformDimensionsChange() {
         RectTransform rt = (RectTransform) transform;

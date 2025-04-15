@@ -28,10 +28,16 @@ public class RumbleManager : MonoBehaviour {
     }
 
     public void RumbleForSeconds(float bassStrength, float trebleStrength, float duration, RumbleSetting setting) {
-        if (setting == RumbleSetting.None || setting > Settings.Instance.controlsRumble) return;
-        if (strengthMultiplier <= 0 || pad == null) return;
+        if (setting == RumbleSetting.None || setting > Settings.Instance.controlsRumble) {
+            return;
+        }
+        if (strengthMultiplier <= 0 || pad == null) {
+            return;
+        }
 
-        if (currentlyRumbling != null) StopCoroutine(currentlyRumbling);
+        if (currentlyRumbling != null) {
+            StopCoroutine(currentlyRumbling);
+        }
         currentlyRumbling = StartCoroutine(Rumble(bassStrength, trebleStrength, duration));
     }
 

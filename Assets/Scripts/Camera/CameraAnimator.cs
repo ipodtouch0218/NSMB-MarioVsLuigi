@@ -1,3 +1,4 @@
+using NSMB.Background;
 using NSMB.Extensions;
 using NSMB.UI.Game;
 using Photon.Deterministic;

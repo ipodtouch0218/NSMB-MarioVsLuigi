@@ -1,4 +1,5 @@
 ﻿using NSMB.Extensions;
+using NSMB.Sound;
 using NSMB.UI.Game;
 using NSMB.Utils;
 using Quantum;
@@ -7,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -24,6 +26,7 @@ public class ReplayUI : QuantumSceneViewComponent {
     [SerializeField] private TMP_Text replayPauseButton;
     [SerializeField] private CanvasGroup replayCanvasGroup;
     [SerializeField] private InputActionReference mousePositionAction;
+    [SerializeField] private GameObject defaultSelection;
 
     [SerializeField] private GameObject tabBlocker;
 
@@ -86,6 +89,11 @@ public class ReplayUI : QuantumSceneViewComponent {
             if (done) {
                 FinishFastForward();
             }
+        }
+
+        GameObject current = EventSystem.current.currentSelectedGameObject;
+        if (!current || !current.activeInHierarchy) {
+            EventSystem.current.SetSelectedGameObject(defaultSelection);
         }
     }
 
