@@ -70,6 +70,8 @@ public unsafe class CameraAnimator : ResizingCamera {
         if (BackgroundLoop.Instance) {
             BackgroundLoop.Instance.Reposition(ourCamera);
         }
+
+        previousPointer = ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>());
     }
 
     private void UpdateCameraFollowPlayerMode(CallbackUpdateView e) {
@@ -146,24 +148,21 @@ public unsafe class CameraAnimator : ResizingCamera {
     }
 
     private void UpdateCameraFreecamMode(CallbackUpdateView e) {
-        Debug.Log(Settings.Controls.UI.Point.ReadValue<Vector2>());
-
         bool ignoreKeyboard = playerElements.PauseMenu.IsPaused || playerElements.ReplayUi.IsOpen;
 
         // Movement
         Vector2 movement = Vector2.zero;
         if (!ignoreKeyboard) {
-            movement += Settings.Controls.Player.Movement.ReadValue<Vector2>();
+            movement += Settings.Controls.Player.Movement.ReadValue<Vector2>() * (Time.unscaledDeltaTime * moveSpeed * ourCamera.orthographicSize);
         }
-        Vector2 pointer = Settings.Controls.UI.Point.ReadValue<Vector2>();
+        Vector2 pointer = ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>());
         bool lmb = Settings.Controls.UI.Click.ReadValue<float>() >= 0.5f;
         if (lmb) {
             // TODO THIS DOESNT WORK
-            movement += (previousPointer - pointer) / (ourCamera.orthographicSize * 8);
+            movement += (previousPointer - pointer) * new Vector2(ourCamera.orthographicSize * ourCamera.aspect * 2, ourCamera.orthographicSize * 2);
         }
-        previousPointer = pointer;
 
-        Vector3 newPosition = ourCamera.transform.position + (Vector3) (movement * (Time.unscaledDeltaTime * moveSpeed * ourCamera.orthographicSize));
+        Vector3 newPosition = ourCamera.transform.position + (Vector3) (movement);
         newPosition = QuantumUtils.WrapWorld(stage, newPosition.ToFPVector2(), out _).ToUnityVector3();
         newPosition.z = -10;
 
