@@ -9,5 +9,6 @@ public class ReplayListButton : MonoBehaviour, ISelectHandler {
 
     public void OnSelect(BaseEventData eventData) {
         handler.UpdateInformation(entry.Replay);
+        handler.Selected = entry;
     }
 }

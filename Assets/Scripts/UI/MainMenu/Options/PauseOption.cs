@@ -51,21 +51,29 @@ namespace NSMB.UI.Pause.Options {
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
+            UpdateLabel();
+        }
+
+        public void UpdateLabel() {
+            if (!label) {
+                return;
+            }
+
             if (IsSelected) {
-                Selected();
+                label.text = "» " + GetTranslatedString();
             } else {
-                Deselected();
+                label.text = GetTranslatedString();
             }
         }
 
         public virtual void Selected() {
-            label.text = "» " + GetTranslatedString();
             IsSelected = true;
+            UpdateLabel();
         }
 
         public virtual void Deselected() {
-            label.text = GetTranslatedString();
             IsSelected = false;
+            UpdateLabel();
         }
 
         public virtual void OnClick() { }

@@ -25,6 +25,7 @@ namespace NSMB.UI.MainMenu {
         public PlayerRef player;
         public float typingCounter;
         public Button button;
+        public Image lockImage;
         [NonSerialized] public int joinTick = int.MaxValue;
 
         //---Serialized Variables
@@ -116,6 +117,7 @@ namespace NSMB.UI.MainMenu {
             userId = default;
             joinTick = int.MaxValue;
             playerExistsGameObject.SetActive(false);
+            constantNicknameColor = true;
             dropdownOptions.SetActive(false);
         }
 

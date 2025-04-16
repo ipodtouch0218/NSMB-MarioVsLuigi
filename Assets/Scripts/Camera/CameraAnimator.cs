@@ -6,6 +6,7 @@ using Quantum;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public unsafe class CameraAnimator : ResizingCamera {
 
@@ -20,10 +21,13 @@ public unsafe class CameraAnimator : ResizingCamera {
     //---Serialized Variables
     [SerializeField] private PlayerElements playerElements;
     [SerializeField] private List<SecondaryCameraPositioner> secondaryPositioners;
+    [SerializeField] private float zoomSpeed = 3, moveSpeed = 2;
+    [SerializeField] private AudioSource zoomSfx;
 
     //---Private Variables
     private VersusStageData stage;
     private float screenshakeTimer;
+    private Vector2 previousPointer;
 
     public override void OnValidate() {
         base.OnValidate();
@@ -36,10 +40,12 @@ public unsafe class CameraAnimator : ResizingCamera {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
 
+        Settings.Controls.Replay.Reset.performed += Reset;
         OnScreenshake += OnScreenshakeCallback;
     }
 
     public void OnDestroy() {
+        Settings.Controls.Replay.Reset.performed -= Reset;
         OnScreenshake -= OnScreenshakeCallback;
     }
 
@@ -140,7 +146,91 @@ public unsafe class CameraAnimator : ResizingCamera {
     }
 
     private void UpdateCameraFreecamMode(CallbackUpdateView e) {
+        Debug.Log(Settings.Controls.UI.Point.ReadValue<Vector2>());
 
+        bool ignoreKeyboard = playerElements.PauseMenu.IsPaused || playerElements.ReplayUi.IsOpen;
+
+        // Movement
+        Vector2 movement = Vector2.zero;
+        if (!ignoreKeyboard) {
+            movement += Settings.Controls.Player.Movement.ReadValue<Vector2>();
+        }
+        Vector2 pointer = Settings.Controls.UI.Point.ReadValue<Vector2>();
+        bool lmb = Settings.Controls.UI.Click.ReadValue<float>() >= 0.5f;
+        if (lmb) {
+            // TODO THIS DOESNT WORK
+            movement += (previousPointer - pointer) / (ourCamera.orthographicSize * 8);
+        }
+        previousPointer = pointer;
+
+        Vector3 newPosition = ourCamera.transform.position + (Vector3) (movement * (Time.unscaledDeltaTime * moveSpeed * ourCamera.orthographicSize));
+        newPosition = QuantumUtils.WrapWorld(stage, newPosition.ToFPVector2(), out _).ToUnityVector3();
+        newPosition.z = -10;
+
+        // Screenshake
+        if ((screenshakeTimer -= Time.unscaledDeltaTime) > 0) {
+            newPosition += new Vector3((UnityEngine.Random.value - 0.5f) * screenshakeTimer, (UnityEngine.Random.value - 0.5f) * screenshakeTimer);
+        }
+
+        ourCamera.transform.position = newPosition;
+
+        // Zoom
+        float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y / -12f;
+
+        if (!ignoreKeyboard) {
+            int zoomIn = Settings.Controls.Replay.ZoomIn.ReadValue<float>() >= 0.5f ? 1 : 0;
+            int zoomOut = Settings.Controls.Replay.ZoomOut.ReadValue<float>() >= 0.5f ? 1 : 0;
+            zoomAmount += (zoomIn - zoomOut);
+        }
+
+        if (zoomAmount != 0) {
+            float newOrthoScale = ourCamera.orthographicSize + (zoomAmount * zoomSpeed * Time.unscaledDeltaTime);
+            float max = stage.TileDimensions.x * 0.25f / ourCamera.aspect;
+            newOrthoScale = Mathf.Clamp(newOrthoScale, 0.5f, max);
+            ourCamera.orthographicSize = newOrthoScale;
+
+            if (newOrthoScale > 0.5f && newOrthoScale < max) {
+                if (!zoomSfx.isPlaying) {
+                    zoomSfx.Play();
+                    zoomSfx.loop = true;
+                } else {
+                    zoomSfx.loop = true;
+                }
+            } else {
+                zoomSfx.loop = false;
+            }
+        } else {
+            zoomSfx.loop = false;
+        }
+    }
+
+    private void Reset(InputAction.CallbackContext context) {
+        if (Mode != CameraMode.Freecam) {
+            return;
+        }
+
+        ourCamera.orthographicSize = 3.5f;
+        Vector3 newPosition = stage.Spawnpoint.ToUnityVector2();
+        newPosition.z = -10;
+
+        float screenAspect = ourCamera.aspect;
+        float orthoSize = ourCamera.orthographicSize;
+        if (Mathf.Abs((16f / 9f) - screenAspect) < 0.05f) {
+            screenAspect = 16f / 9f;
+        }
+
+        // Clamp
+        float cameraMinX = stage.CameraMinPosition.X.AsFloat + (orthoSize * screenAspect);
+        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat - (orthoSize * screenAspect);
+        newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
+
+        float cameraMinY = stage.CameraMinPosition.Y.AsFloat + orthoSize;
+        float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + Mathf.Max(7, orthoSize * 2), stage.CameraMaxPosition.Y.AsFloat) - orthoSize;
+        newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
+
+        ourCamera.transform.position = newPosition;
+
+        GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Back);
     }
 
     private void OnScreenshakeCallback(float screenshake) {

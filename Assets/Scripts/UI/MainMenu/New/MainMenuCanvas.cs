@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using NSMB.Translation;
 using NSMB.UI.MainMenu.Submenus;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using System;
@@ -57,6 +58,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             NetworkHandler.OnError += OnError;
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OpenMenu(startingSubmenu);
         }
 
@@ -65,6 +67,7 @@ namespace NSMB.UI.MainMenu {
                 menu.OnDestroy();
             }
             NetworkHandler.OnError -= OnError;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         public void Update() {
@@ -221,6 +224,10 @@ namespace NSMB.UI.MainMenu {
                 OpenMenu(allSubmenus.OfType<RoomListSubmenu>().First());
             }
             errorSubmenu.OpenWithString(message);
+        }
+
+        private void OnLanguageChanged(TranslationManager tm) {
+            UpdateHeader();
         }
     }
 

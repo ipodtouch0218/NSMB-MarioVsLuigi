@@ -2,6 +2,7 @@
 using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.Game.Scoreboard;
+using NSMB.UI.Pause;
 using NSMB.Utils;
 using Quantum;
 using System.Collections.Generic;
@@ -16,12 +17,13 @@ namespace NSMB.UI.Game {
         public static HashSet<PlayerElements> AllPlayerElements = new();
 
         //---Properties
-        public PlayerRef Player => player;
-        public EntityRef Entity => spectating ? spectatingEntity : entity;
+        public PlayerRef Player { get; private set; }
+        public EntityRef Entity { get; set; }
         public Camera ScrollCamera => scrollCamera;
         public Camera Camera => ourCamera;
         public CameraAnimator CameraAnimator => cameraAnimator;
         public ReplayUI ReplayUi => replayUi;
+        public PauseMenuManager PauseMenu => pauseMenu;
         public bool IsSpectating => spectating;
 
         //---Serialized Variables
@@ -31,6 +33,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private InputCollector inputCollector;
         [SerializeField] private ScoreboardUpdater scoreboardUpdater;
         [SerializeField] private ReplayUI replayUi;
+        [SerializeField] private PauseMenuManager pauseMenu;
 
         [SerializeField] public GameObject spectationUI;
         [SerializeField] private TMP_Text spectatingText;
@@ -38,12 +41,8 @@ namespace NSMB.UI.Game {
         [SerializeField] public GameObject nametagCanvas;
 
         //---Private Variables
-        private PlayerRef player;
-        private EntityRef entity;
-
         private bool initialized;
         private bool spectating;
-        private EntityRef spectatingEntity;
         private Vector2 previousNavigate;
 
         public void OnValidate() {
@@ -78,8 +77,8 @@ namespace NSMB.UI.Game {
         }
 
         public void Initialize(QuantumGame game, Frame f, EntityRef entity, PlayerRef player) {
-            this.player = player;
-            this.entity = entity;
+            Player = player;
+            Entity = entity;
 
             Camera.transform.SetParent(null);
             Camera.transform.localScale = Vector3.one;
@@ -108,14 +107,14 @@ namespace NSMB.UI.Game {
             }
 
             Frame f = PredictedFrame;
-            if (!spectating && !f.Exists(entity) && f.Global->GameState >= GameState.Starting) {
-                // Spectating
-                StartSpectating();
-            }
-
-            if (spectating && !f.Exists(spectatingEntity)) {
-                // Find a new player to spectate
-                SpectateNextPlayer();
+            if (!f.Exists(Entity) && f.Global->GameState >= GameState.Starting) {
+                if (spectating) {
+                    // Find a new player to spectate
+                    SpectateNextPlayer();
+                } else {
+                    // Spectating
+                    StartSpectating();
+                }
             }
         }
 
@@ -125,7 +124,7 @@ namespace NSMB.UI.Game {
             }
 
             Frame f = PredictedFrame;
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(spectatingEntity);
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(Entity);
 
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
             string username = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
@@ -171,8 +170,8 @@ namespace NSMB.UI.Game {
             marios.Sort((a, b) => {
                 return a.Index - b.Index;
             });
-            int currentIndex = marios.IndexOf(spectatingEntity);
-            spectatingEntity = marios[(currentIndex + 1) % marioCount];
+            int currentIndex = marios.IndexOf(Entity);
+            Entity = marios[(currentIndex + 1) % marioCount];
             UpdateSpectateUI();
         }
 
@@ -201,8 +200,8 @@ namespace NSMB.UI.Game {
             marios.Sort((a, b) => {
                 return a.Index - b.Index;
             });
-            int currentIndex = marios.IndexOf(spectatingEntity);
-            spectatingEntity = marios[(currentIndex - 1 + marioCount) % marioCount];
+            int currentIndex = marios.IndexOf(Entity);
+            Entity = marios[(currentIndex - 1 + marioCount) % marioCount];
             UpdateSpectateUI();
         }
 
@@ -233,7 +232,7 @@ namespace NSMB.UI.Game {
 
                 EntityRef newTarget = scoreboardUpdater.EntityAtPosition(index);
                 if (newTarget != EntityRef.None) {
-                    spectatingEntity = newTarget;
+                    Entity = newTarget;
                     UpdateSpectateUI();
                 }
             }

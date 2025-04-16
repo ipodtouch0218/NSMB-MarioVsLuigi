@@ -12,6 +12,9 @@ namespace NSMB.UI.Pause {
 
     public class PauseMenuManager : MonoBehaviour {
 
+        //---Properties
+        public bool IsPaused => isPaused;
+
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private InputCollector inputCollector;

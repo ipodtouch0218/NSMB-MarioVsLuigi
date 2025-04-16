@@ -22,7 +22,7 @@ public class ReplayListManager : Selectable {
     public static string ReplayDirectory => Path.Combine(Application.persistentDataPath, "replays");
 
     //---Properties
-    public ReplayListEntry Selected { get; private set; }
+    public ReplayListEntry Selected { get; set; }
     public List<Replay> Replays => replays;
 
     //---Serialized Variables
@@ -36,6 +36,7 @@ public class ReplayListManager : Selectable {
     [SerializeField] private SpriteChangingToggle ascendingToggle;
     [SerializeField] private TMP_InputField searchField;
     [SerializeField] private TMP_Text replayInformation;
+    [SerializeField] private GameObject importButton;
 
     //---Private Variables
     private readonly List<Replay> replays = new();
@@ -237,7 +238,13 @@ public class ReplayListManager : Selectable {
 
         ReplayListEntry firstReplay = GetFirstReplayEntry();
         if (gameObject.activeInHierarchy) {
-            Select(firstReplay ? firstReplay.Replay : null);
+            Select(null);
+            if (firstReplay) {
+                Selected = firstReplay;
+                EventSystem.current.SetSelectedGameObject(firstReplay.button.gameObject);
+            } else {
+                EventSystem.current.SetSelectedGameObject(importButton);
+            }
         }
     }
 

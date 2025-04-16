@@ -119,6 +119,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -236,7 +249,7 @@ TextureImporter:
         width: 14
         height: 19
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 5, y: 8, z: 8, w: 10}
       outline: []
       physicsShape: []
@@ -244,6 +257,27 @@ TextureImporter:
       bones: []
       spriteID: 35cc758cf1f80d24eb8749465a8996f4
       internalID: 537862683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerribbons_5
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 6
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1883cb4c3c8f74f40a24003b7e865d72
+      internalID: -18656199
       vertices: []
       indices: 
       edges: []
@@ -264,6 +298,7 @@ TextureImporter:
       playerribbons_2: 6740235
       playerribbons_3: 95362073
       playerribbons_4: 537862683
+      playerribbons_5: -18656199
       playerribbons_p1: -1881540139
       playerribbons_p10: -2128627715
       playerribbons_p2: -1773238144

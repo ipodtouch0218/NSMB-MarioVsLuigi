@@ -9,7 +9,6 @@ namespace NSMB.Background {
 
         //---Static Variables
         public static BackgroundLoop Instance { get; private set; }
-        private static readonly Vector2 ScreenBounds = new(8.5f, 5f);
 
         //---Misc Variables
         private GameObject[] children;
@@ -67,13 +66,13 @@ namespace NSMB.Background {
                     obj.transform.position = newPosition;
                 }
 
-                RepositionChildObjects(cameraTransform, obj);
+                RepositionChildObjects(camera, obj);
             }
         }
 
         private void LoadChildObjects(GameObject obj) {
             float objectWidth = halfWidths[Array.IndexOf(children, obj)] * 2f;
-            int childsNeeded = (int) Mathf.Ceil(ScreenBounds.x * 2f / objectWidth);
+            int childsNeeded = (int) Mathf.Ceil(ViewContext.Stage.TileDimensions.x * 0.5f / objectWidth);
             GameObject clone = Instantiate(obj);
             for (int i = 0; i <= childsNeeded; i++) {
                 GameObject c = Instantiate(clone);
@@ -90,7 +89,7 @@ namespace NSMB.Background {
             }
         }
 
-        private void RepositionChildObjects(Transform camera, GameObject obj) {
+        private void RepositionChildObjects(Camera camera, GameObject obj) {
             if (!obj) {
                 return;
             }
@@ -100,13 +99,13 @@ namespace NSMB.Background {
                 GameObject firstChild = parent.GetChild(0).gameObject;
                 GameObject lastChild = parent.GetChild(parent.childCount - 1).gameObject;
                 float halfObjectWidth = halfWidths[Array.IndexOf(children, obj)];
-                while (camera.position.x + ScreenBounds.x > lastChild.transform.position.x + halfObjectWidth) {
+                while (camera.transform.position.x + (ViewContext.Stage.TileDimensions.x * 0.25f) > lastChild.transform.position.x + halfObjectWidth) {
                     firstChild.transform.SetAsLastSibling();
                     firstChild.transform.position = new Vector3(lastChild.transform.position.x + halfObjectWidth * 2, lastChild.transform.position.y, lastChild.transform.position.z);
                     firstChild = parent.GetChild(0).gameObject;
                     lastChild = parent.GetChild(parent.childCount - 1).gameObject;
                 }
-                while (camera.position.x - ScreenBounds.x < firstChild.transform.position.x - halfObjectWidth) {
+                while (camera.transform.position.x - (ViewContext.Stage.TileDimensions.x * 0.25f) < firstChild.transform.position.x - halfObjectWidth) {
                     lastChild.transform.SetAsFirstSibling();
                     lastChild.transform.position = new Vector3(firstChild.transform.position.x - halfObjectWidth * 2, firstChild.transform.position.y, firstChild.transform.position.z);
                     firstChild = parent.GetChild(0).gameObject;

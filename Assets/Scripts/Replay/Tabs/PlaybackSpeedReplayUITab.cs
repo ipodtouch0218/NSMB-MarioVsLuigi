@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using System;
 using TMPro;
 using UnityEngine;
@@ -18,6 +19,7 @@ public class PlaybackSpeedReplayUITab : ReplayUITab {
     public void ChangePlaybackSpeedViaIndex(int index) {
         parent.ChangeReplaySpeed(index);
         EventSystem.current.SetSelectedGameObject(speedButtons[index]);
+        GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
         ApplyColor();
     }
 

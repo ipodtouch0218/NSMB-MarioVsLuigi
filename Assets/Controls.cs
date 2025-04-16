@@ -1126,6 +1126,173 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             ]
         },
         {
+            ""name"": ""Replay"",
+            ""id"": ""4365e579-6b9c-4c55-abb1-d58712778760"",
+            ""actions"": [
+                {
+                    ""name"": ""ZoomIn"",
+                    ""type"": ""Button"",
+                    ""id"": ""7810083b-d8d7-4e63-ac60-48fcc1dc9661"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ZoomOut"",
+                    ""type"": ""Button"",
+                    ""id"": ""cdc58d81-35bc-4a66-9fbf-d1664fcc9314"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Reset"",
+                    ""type"": ""Button"",
+                    ""id"": ""cf516245-0513-4e76-938f-92d82eed6140"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""42e1bed2-17fa-46a9-b5c8-a45fcef341c6"",
+                    ""path"": ""<Keyboard>/equals"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""ZoomIn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""256c34d5-2b41-4d82-99bb-af3f3d63b7ac"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""ZoomIn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1c553b19-48a6-44cb-8ee5-62ab87ec22a8"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ZoomIn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""39f11d2a-5298-416e-96fd-b5a579fd8e7c"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ZoomIn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c0245661-1c5d-4e7b-835f-a462d6ddba59"",
+                    ""path"": ""<Keyboard>/minus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""ZoomOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2f5470fb-9b47-4f9b-9138-ee1f1e10c3c0"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""ZoomOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""535dcf62-0d82-47f0-ad68-2c5de22b83ee"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ZoomOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""15f9045d-4df3-451f-ab05-077293379ff1"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ZoomOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9bc6d286-0165-4480-94ca-6db40e532d70"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Reset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""68d02fef-5708-4e90-b630-d3c62a2ba3f7"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Reset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""72e6181e-040a-4d4a-9357-85537265e592"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Reset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4a54e279-51a3-46c3-ab5b-b25ffb849baf"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Reset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
             ""name"": ""Debug"",
             ""id"": ""a9644b88-61e9-43f4-b83d-f87aff12c2de"",
             ""actions"": [
@@ -1297,6 +1464,11 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_UI_ScrollWheel = m_UI.FindAction("!ScrollWheel", throwIfNotFound: true);
         m_UI_MiddleClick = m_UI.FindAction("!MiddleClick", throwIfNotFound: true);
         m_UI_RightClick = m_UI.FindAction("!RightClick", throwIfNotFound: true);
+        // Replay
+        m_Replay = asset.FindActionMap("Replay", throwIfNotFound: true);
+        m_Replay_ZoomIn = m_Replay.FindAction("ZoomIn", throwIfNotFound: true);
+        m_Replay_ZoomOut = m_Replay.FindAction("ZoomOut", throwIfNotFound: true);
+        m_Replay_Reset = m_Replay.FindAction("Reset", throwIfNotFound: true);
         // Debug
         m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
         m_Debug_FPSMonitor = m_Debug.FindAction("FPS Monitor", throwIfNotFound: true);
@@ -1579,6 +1751,68 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     }
     public UIActions @UI => new UIActions(this);
 
+    // Replay
+    private readonly InputActionMap m_Replay;
+    private List<IReplayActions> m_ReplayActionsCallbackInterfaces = new List<IReplayActions>();
+    private readonly InputAction m_Replay_ZoomIn;
+    private readonly InputAction m_Replay_ZoomOut;
+    private readonly InputAction m_Replay_Reset;
+    public struct ReplayActions
+    {
+        private @Controls m_Wrapper;
+        public ReplayActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ZoomIn => m_Wrapper.m_Replay_ZoomIn;
+        public InputAction @ZoomOut => m_Wrapper.m_Replay_ZoomOut;
+        public InputAction @Reset => m_Wrapper.m_Replay_Reset;
+        public InputActionMap Get() { return m_Wrapper.m_Replay; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(ReplayActions set) { return set.Get(); }
+        public void AddCallbacks(IReplayActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ReplayActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ReplayActionsCallbackInterfaces.Add(instance);
+            @ZoomIn.started += instance.OnZoomIn;
+            @ZoomIn.performed += instance.OnZoomIn;
+            @ZoomIn.canceled += instance.OnZoomIn;
+            @ZoomOut.started += instance.OnZoomOut;
+            @ZoomOut.performed += instance.OnZoomOut;
+            @ZoomOut.canceled += instance.OnZoomOut;
+            @Reset.started += instance.OnReset;
+            @Reset.performed += instance.OnReset;
+            @Reset.canceled += instance.OnReset;
+        }
+
+        private void UnregisterCallbacks(IReplayActions instance)
+        {
+            @ZoomIn.started -= instance.OnZoomIn;
+            @ZoomIn.performed -= instance.OnZoomIn;
+            @ZoomIn.canceled -= instance.OnZoomIn;
+            @ZoomOut.started -= instance.OnZoomOut;
+            @ZoomOut.performed -= instance.OnZoomOut;
+            @ZoomOut.canceled -= instance.OnZoomOut;
+            @Reset.started -= instance.OnReset;
+            @Reset.performed -= instance.OnReset;
+            @Reset.canceled -= instance.OnReset;
+        }
+
+        public void RemoveCallbacks(IReplayActions instance)
+        {
+            if (m_Wrapper.m_ReplayActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IReplayActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ReplayActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ReplayActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public ReplayActions @Replay => new ReplayActions(this);
+
     // Debug
     private readonly InputActionMap m_Debug;
     private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
@@ -1673,6 +1907,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnScrollWheel(InputAction.CallbackContext context);
         void OnMiddleClick(InputAction.CallbackContext context);
         void OnRightClick(InputAction.CallbackContext context);
+    }
+    public interface IReplayActions
+    {
+        void OnZoomIn(InputAction.CallbackContext context);
+        void OnZoomOut(InputAction.CallbackContext context);
+        void OnReset(InputAction.CallbackContext context);
     }
     public interface IDebugActions
     {

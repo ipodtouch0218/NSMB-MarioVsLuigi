@@ -14,6 +14,8 @@ using UnityEngine.UI;
 
 public class ReplayUI : QuantumSceneViewComponent {
 
+    public bool IsOpen => replayUI.activeSelf;
+
     //---Serialized Variables
     [SerializeField] public PlayerElements playerElements;
 
