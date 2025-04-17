@@ -64,7 +64,8 @@ namespace NSMB.UI.MainMenu {
 
             Close(false);
 
-            TeamAsset teamScriptable = game.Configurations.Simulation.Teams[selected];
+            Frame f = game.Frames.Predicted;
+            TeamAsset teamScriptable = f.FindAsset(game.Configurations.Simulation.Teams[selected]);
             flag.sprite = Settings.Instance.GraphicsColorblind ? teamScriptable.spriteColorblind : teamScriptable.spriteNormal;
             canvas.PlayConfirmSound();
             canvas.EventSystem.SetSelectedGameObject(button.gameObject);
@@ -75,8 +76,8 @@ namespace NSMB.UI.MainMenu {
             Frame f = game.Frames.Predicted;
             var playerData = QuantumUtils.GetPlayerData(f, game.GetLocalPlayers()[0]);
 
-            TeamAsset[] teams = f.SimulationConfig.Teams;
-            int selected = Mathf.Clamp(playerData->RequestedTeam, 0, teams.Length);
+            int selected = Mathf.Clamp(playerData->RequestedTeam, 0, f.SimulationConfig.Teams.Length);
+
             blockerInstance = Instantiate(blockerTemplate, canvas.transform);
             blockerInstance.SetActive(true);
             content.SetActive(true);
@@ -107,15 +108,15 @@ namespace NSMB.UI.MainMenu {
 
             Frame f = game.Frames.Predicted;
             if (f.Global->Rules.TeamsEnabled) {
-                TeamAsset[] teams = f.SimulationConfig.Teams;
-                flag.sprite = Settings.Instance.GraphicsColorblind ? teams[selected].spriteColorblind : teams[selected].spriteNormal;
+                TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[selected]);
+                flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
             }
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
             Frame f = e.Game.Frames.Predicted;
             if (f.Global->Rules.TeamsEnabled) {
-                TeamAsset team = f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length];
+                TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length]);
                 flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
                 button.interactable = true;
             } else {
@@ -134,7 +135,7 @@ namespace NSMB.UI.MainMenu {
             selected = playerData->RequestedTeam;
 
             if (f.Global->Rules.TeamsEnabled) {
-                TeamAsset team = f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length];
+                TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[selected % f.SimulationConfig.Teams.Length]);
                 flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
             }
         }

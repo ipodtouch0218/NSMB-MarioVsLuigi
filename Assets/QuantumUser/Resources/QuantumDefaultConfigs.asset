@@ -200,55 +200,95 @@ MonoBehaviour:
   HeapPageShift: 15
   HeapPageCount: 256
   HeapExtraCount: 0
-  InvisibleSolidTile: {fileID: 11400000, guid: af92f900a1bff3d459eaf5b25d41a4ac, type: 2}
+  InvisibleSolidTile:
+    Id:
+      Value: 282924479522535788
   AllPowerups:
-  - {fileID: 11400000, guid: e76c0ec90859dff49866293da2354232, type: 2}
-  - {fileID: 11400000, guid: ad249570d3ae629428779f2a5f287379, type: 2}
-  - {fileID: 11400000, guid: 96d0e671b1aa9184889fe00ea87ee1cf, type: 2}
-  - {fileID: 11400000, guid: f7c732f643070ec48bd813f077972b86, type: 2}
-  - {fileID: 11400000, guid: 348238c0b7671f944aaa8b9d272994f5, type: 2}
-  - {fileID: 11400000, guid: a79a59f03b5eabb41aabf2f6476ce154, type: 2}
-  - {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
-  - {fileID: 11400000, guid: 66847e430712048408ec06255e8732aa, type: 2}
-  - {fileID: 11400000, guid: 937b975636292004d99a857288a07edc, type: 2}
-  - {fileID: 11400000, guid: 5a6d8e27fecb6774b9c9fccdd163c3a8, type: 2}
+  - Id:
+      Value: 390055422968795145
+  - Id:
+      Value: 296548766860541996
+  - Id:
+      Value: 279725308049324760
+  - Id:
+      Value: 271390802845879304
+  - Id:
+      Value: 378514462062875007
+  - Id:
+      Value: 269903407669338010
+  - Id:
+      Value: 328877894917160747
+  - Id:
+      Value: 372382251364764784
+  - Id:
+      Value: 402398838204577684
+  - Id:
+      Value: 421291512996345105
   AllStages:
-  - {fileID: 11400000, guid: f06333ca273567e4aa69ecffa0ec4aa5, type: 2}
-  - {fileID: 11400000, guid: 49ae08f98b45cab4eba5f78b2b8e5e79, type: 2}
-  - {fileID: 11400000, guid: e2f52cfc3ee50884ba9f5b260e822fd0, type: 2}
-  - {fileID: 11400000, guid: 16a25243d0bc6ca4aa2e9f6bdce2863f, type: 2}
-  - {fileID: 11400000, guid: e4239af6b597ce04d87c6ecd1628779e, type: 2}
-  - {fileID: 11400000, guid: 44e13c15080ad0c4eb6de49738be371f, type: 2}
-  - {fileID: 11400000, guid: a6f9d7537b419f745a2b9468827d1da8, type: 2}
-  - {fileID: 11400000, guid: bd5808d9e85ad8b4592ca36eaff24b8f, type: 2}
-  - {fileID: 11400000, guid: 38b485d0cebae0645a9d3fac32e38653, type: 2}
-  - {fileID: 11400000, guid: 2725d860a5f0d8f48a6b40fa4d04ae1a, type: 2}
-  - {fileID: 11400000, guid: b18d332df84e64f4ba8cd55a576ce872, type: 2}
-  - {fileID: 11400000, guid: 540a3bf6243f1c94cb307db79d724474, type: 2}
-  FallbackPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
+  - Id:
+      Value: 438935048561577377
+  - Id:
+      Value: 422133218138107384
+  - Id:
+      Value: 472204063534919154
+  - Id:
+      Value: 329327285755650127
+  - Id:
+      Value: 372220640476305493
+  - Id:
+      Value: 365460248894597713
+  - Id:
+      Value: 420358832928607506
+  - Id:
+      Value: 328495164863943948
+  - Id:
+      Value: 269186410886596865
+  - Id:
+      Value: 280769179842433036
+  - Id:
+      Value: 372234066173501830
+  - Id:
+      Value: 503647763446439242
+  FallbackPowerup:
+    Id:
+      Value: 390055422968795145
   CharacterDatas:
-  - {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
-  - {fileID: 11400000, guid: 20241e3c68674eb4dbb58f063d01cfd2, type: 2}
+  - Id:
+      Value: 532063855470386108
+  - Id:
+      Value: 485289843648077326
   Teams:
-  - {fileID: 11400000, guid: bcf92b1630ab5c343bf5fa73ad79fc89, type: 2}
-  - {fileID: 11400000, guid: 7bf34ce9b8de8f940a7d54b75f404511, type: 2}
-  - {fileID: 11400000, guid: e33c0d39bc8139e47b46c512e5bfdca3, type: 2}
-  - {fileID: 11400000, guid: 437c1b4891fe12346ba9d84056d0a671, type: 2}
-  - {fileID: 11400000, guid: 8ce2d81bba3ca02408b028c0fb6fed8f, type: 2}
-  FireballPrototype: {fileID: 3097001405596171208, guid: ec7f94c7576907a44b50eb692bdf439d,
-    type: 3}
-  IceballPrototype: {fileID: 3097001405596171208, guid: f34a1c8377d923742858185e987aa0c6,
-    type: 3}
-  HammerPrototype: {fileID: 3097001405596171208, guid: 6cd84404656b38b47a3096f0080b0063,
-    type: 3}
-  BigStarPrototype: {fileID: 3097001405596171208, guid: f4614a9d678f440429280d54866b33cc,
-    type: 3}
-  BlockBumpPrototype: {fileID: 3097001405596171208, guid: bccc5bdeb7a9b96419ace83dcddd92e6,
-    type: 3}
-  LooseCoinPrototype: {fileID: 3097001405596171208, guid: 5ad0ca873a0bce64fba5692545b6c450,
-    type: 3}
-  IceBlockPrototype: {fileID: 3097001405596171208, guid: c71bb37b419b1164e96d12c17c294c79,
-    type: 3}
+  - Id:
+      Value: 382742106279861433
+  - Id:
+      Value: 423273233552518485
+  - Id:
+      Value: 434877241313458872
+  - Id:
+      Value: 413209515111157446
+  - Id:
+      Value: 466583187519537156
+  FireballPrototype:
+    Id:
+      Value: 1460912212237464861
+  IceballPrototype:
+    Id:
+      Value: 1531419298539715423
+  HammerPrototype:
+    Id:
+      Value: 1406353302584805307
+  BigStarPrototype:
+    Id:
+      Value: 1295981493910502871
+  BlockBumpPrototype:
+    Id:
+      Value: 1308320651839637093
+  LooseCoinPrototype:
+    Id:
+      Value: 1464681621458001613
+  IceBlockPrototype:
+    Id:
+      Value: 1386525317044462577
   DefaultRules:
     Stage:
       Id:

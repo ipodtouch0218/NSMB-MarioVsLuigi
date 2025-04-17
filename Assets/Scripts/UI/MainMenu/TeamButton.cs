@@ -1,6 +1,5 @@
 using Quantum;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TeamButton : MonoBehaviour {
@@ -17,8 +16,8 @@ public class TeamButton : MonoBehaviour {
         Frame f = game.Frames.Predicted;
         var playerData = QuantumUtils.GetPlayerData(f, game.GetLocalPlayers()[0]);
 
-        TeamAsset[] teams = f.SimulationConfig.Teams;
-        flag.sprite = Settings.Instance.GraphicsColorblind ? teams[index].spriteColorblind : teams[index].spriteNormal;
+        TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[index]);
+        flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
     }
 
     public void OnDisable() {
@@ -27,7 +26,9 @@ public class TeamButton : MonoBehaviour {
 
     private unsafe void OnColorblindModeChanged() {
         QuantumGame game = QuantumRunner.DefaultGame;
-        TeamAsset[] teams = game.Configurations.Simulation.Teams;
-        flag.sprite = Settings.Instance.GraphicsColorblind ? teams[index].spriteColorblind : teams[index].spriteNormal;
+
+        Frame f = game.Frames.Predicted;
+        TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[index]);
+        flag.sprite = Settings.Instance.GraphicsColorblind ? team.spriteColorblind : team.spriteNormal;
     }
 }

@@ -158,11 +158,13 @@ namespace NSMB.UI.MainMenu {
             }
 
             int characterIndex = playerData->Character;
-            characterIndex %= GlobalController.Instance.config.CharacterDatas.Length;
-            builder.Append(GlobalController.Instance.config.CharacterDatas[characterIndex].UiString);
+            var allCharacters = f.SimulationConfig.CharacterDatas;
+            characterIndex %= allCharacters.Length;
+            CharacterAsset character = f.FindAsset(allCharacters[characterIndex]);
+            builder.Append(character.UiString);
 
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
-                TeamAsset team = f.SimulationConfig.Teams[playerData->RequestedTeam];
+                TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[playerData->RequestedTeam]);
                 builder.Append(team.textSpriteColorblindBig);
             }
 

@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -1417,15 +1418,14 @@ namespace Quantum {
                 }
 
                 var hitboxShape = filter.PhysicsCollider->Shape;
-                FP hitboxCenter = filter.Transform->Position.Y + hitboxShape.Centroid.Y + FP._0_25;
+                FP hitboxCenter = filter.Transform->Position.Y + hitboxShape.Centroid.Y + FP._0_10;
                 FP distanceToSurface = maxSurface - hitboxCenter;
 
-                FP original = physicsObject->Velocity.Y;
-                if (physicsObject->IsTouchingGround && physicsObject->Velocity.Y < 0) {
-                    physicsObject->Velocity.Y = 1;
+                FP desiredVelocity = FPMath.Min(distanceToSurface, physics.SwimJumpVelocity);
+                if (desiredVelocity > 0) {
+                    physicsObject->Velocity.Y = QuantumUtils.MoveTowards(physicsObject->Velocity.Y, desiredVelocity, physics.SwimAcceleration[^1] * f.DeltaTime * 10);
                 }
 
-                physicsObject->Velocity.Y = FPMath.Min(physicsObject->Velocity.Y + (physics.SwimAcceleration[^1] * FPMath.Min(distanceToSurface * (1 - FPMath.Clamp01(physicsObject->Velocity.Y / physics.SwimJumpVelocity)), 1)), physics.SwimJumpVelocity);
                 physicsObject->IsTouchingGround = false;
                 physicsObject->WasTouchingGround = false;
             }

@@ -38,6 +38,15 @@ public class ReplayListEntry : MonoBehaviour {
     }
 
     public void OnDisable() {
+        // Deselect
+        dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 48);
+        Canvas.ForceUpdateCanvases();
+        manager.layout.SetLayoutVertical();
+        selected = false;
+        if (manager.Selected == this) {
+            manager.Selected = null;
+        }
+
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 

@@ -90,8 +90,8 @@ namespace NSMB.UI.MainMenu.Submenus {
                 characterButtonLogos[index].color = enabledCharacterButtonLogoColor;
             }
 
-            SimulationConfig config = f.SimulationConfig;
-            CharacterAsset characterAsset = config.CharacterDatas[Mathf.Clamp(index, 0, config.CharacterDatas.Length)];
+            var allCharacters = f.SimulationConfig.CharacterDatas;
+            CharacterAsset characterAsset = f.FindAsset(allCharacters[Mathf.Clamp(index, 0, allCharacters.Length)]);
             paletteChooser.ChangeCharacter(characterAsset);
 
             if (changed) {

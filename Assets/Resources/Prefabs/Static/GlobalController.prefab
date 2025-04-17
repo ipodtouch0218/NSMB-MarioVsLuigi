@@ -17653,13 +17653,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d58278364962a4aae36829243ad8de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioListener: {fileID: 0}
   audioSource: {fileID: 2604880723276919109}
   mario: {fileID: 2335449052012428788}
   animator: {fileID: 3179808912045039180}
   loadingGroup: {fileID: 6581389812410081186}
   readyGroup: {fileID: 7245564593415694122}
   readyBackground: {fileID: 2647977579914163713}
+  readyImage: {fileID: 7011901351358917837}
   defaultCharacterAsset: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330,
     type: 2}
 --- !u!223 &1480544161717833697
@@ -22602,7 +22602,6 @@ GameObject:
   - component: {fileID: 6450710254286479958}
   - component: {fileID: 2650131378314215579}
   - component: {fileID: 7011901351358917837}
-  - component: {fileID: 4813587129388766951}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -22668,19 +22667,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4813587129388766951
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6908400449635736115}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbeccd0bed4d67e4f8ad1c997834fd47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  image: {fileID: 7011901351358917837}
 --- !u!1 &6918180412125412589
 GameObject:
   m_ObjectHideFlags: 0
@@ -27117,7 +27103,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.9
+  m_fontSize: 21.45
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

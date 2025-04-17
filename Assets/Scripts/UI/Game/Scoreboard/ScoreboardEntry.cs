@@ -71,7 +71,7 @@ namespace NSMB.UI.Game.Scoreboard {
             backgroundColor.a = 0.5f;
             background.color = backgroundColor;
 
-            var character = f.SimulationConfig.CharacterDatas[info.Character];
+            CharacterAsset character = f.FindAsset(f.SimulationConfig.CharacterDatas[info.Character]);
             int stars = 0;
             int lives = 0;
             if (f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {

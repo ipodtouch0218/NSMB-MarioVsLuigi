@@ -322,7 +322,8 @@ public static unsafe class QuantumUtils {
         }
 
         FP totalChance = 0;
-        foreach (PowerupAsset powerup in f.SimulationConfig.AllPowerups) {
+        foreach (AssetRef<PowerupAsset> powerupAsset in f.SimulationConfig.AllPowerups) {
+            PowerupAsset powerup = f.FindAsset(powerupAsset);
             if (powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                 continue;
             }
@@ -338,7 +339,8 @@ public static unsafe class QuantumUtils {
         }
 
         FP rand = mario->RNG.Next(0, totalChance);
-        foreach (PowerupAsset powerup in f.SimulationConfig.AllPowerups) {
+        foreach (AssetRef<PowerupAsset> powerupAsset in f.SimulationConfig.AllPowerups) {
+            PowerupAsset powerup = f.FindAsset(powerupAsset);
             if (powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
                 continue;
             }
@@ -359,7 +361,7 @@ public static unsafe class QuantumUtils {
             rand -= chance;
         }
 
-        return f.SimulationConfig.FallbackPowerup;
+        return f.FindAsset(f.SimulationConfig.FallbackPowerup);
     }
 
     public static FP WrappedDistance(Frame f, FPVector2 a, FPVector2 b) {
@@ -515,8 +517,9 @@ public static unsafe class QuantumUtils {
     }
 
     public static PowerupAsset FindPowerupAsset(Frame f, PowerupState state) {
-        foreach (var powerup in f.SimulationConfig.AllPowerups) {
-            if (powerup.State == state) {
+        foreach (var powerupAsset in f.SimulationConfig.AllPowerups) {
+            if (f.TryFindAsset(powerupAsset, out PowerupAsset powerup)
+                && powerup.State == state) {
                 return powerup;
             }
         }

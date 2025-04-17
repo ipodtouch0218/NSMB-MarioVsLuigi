@@ -13,13 +13,12 @@ namespace NSMB.Loading {
         public static event Action<bool> OnLoadingEnded;
 
         //---Serialized Variables
-        [SerializeField] private AudioListener audioListener;
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private MarioLoader mario;
 
         [SerializeField] private Animator animator;
         [SerializeField] private CanvasGroup loadingGroup, readyGroup;
-        [SerializeField] private Image readyBackground;
+        [SerializeField] private Image readyBackground, readyImage;
 
         [SerializeField] private CharacterAsset defaultCharacterAsset;
 
@@ -58,10 +57,11 @@ namespace NSMB.Loading {
                 }
 
                 var characters = f.SimulationConfig.CharacterDatas;
-                character = characters[characterIndex % characters.Length];
+                character = f.FindAsset(characters[characterIndex % characters.Length]);
             }
 
             mario.Initialize(character);
+            readyImage.sprite = character.ReadySprite;
 
             readyGroup.gameObject.SetActive(false);
             gameObject.SetActive(true);

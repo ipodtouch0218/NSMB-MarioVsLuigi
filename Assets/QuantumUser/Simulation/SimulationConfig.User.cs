@@ -1,15 +1,15 @@
 ﻿namespace Quantum {
     public partial class SimulationConfig : AssetObject {
 
-        public StageTile InvisibleSolidTile;
+        public AssetRef<StageTile> InvisibleSolidTile;
 
-        public PowerupAsset[] AllPowerups;
-        public Map[] AllStages;
-        public PowerupAsset FallbackPowerup;
-        public CharacterAsset[] CharacterDatas;
-        public TeamAsset[] Teams;
+        public AssetRef<PowerupAsset>[] AllPowerups;
+        public AssetRef<Map>[] AllStages;
+        public AssetRef<PowerupAsset >FallbackPowerup;
+        public AssetRef<CharacterAsset>[] CharacterDatas;
+        public AssetRef<TeamAsset>[] Teams;
 
-        public EntityPrototype FireballPrototype, IceballPrototype, HammerPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype;
+        public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, HammerPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype;
 
         public GameRules DefaultRules;
     }

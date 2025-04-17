@@ -19,6 +19,7 @@ namespace NSMB.UI.Game {
         //---Properties
         public PlayerRef Player { get; private set; }
         public EntityRef Entity { get; set; }
+        public Canvas Canvas => canvas;
         public Camera ScrollCamera => scrollCamera;
         public Camera Camera => ourCamera;
         public CameraAnimator CameraAnimator => cameraAnimator;
@@ -27,6 +28,7 @@ namespace NSMB.UI.Game {
         public bool IsSpectating => spectating;
 
         //---Serialized Variables
+        [SerializeField] private Canvas canvas;
         [SerializeField] private UIUpdater uiUpdater;
         [SerializeField] private CameraAnimator cameraAnimator;
         [SerializeField] private Camera ourCamera, scrollCamera;
@@ -107,7 +109,7 @@ namespace NSMB.UI.Game {
             }
 
             Frame f = PredictedFrame;
-            if (!f.Exists(Entity) && f.Global->GameState >= GameState.Starting) {
+            if (!f.Exists(Entity) && f.Global->GameState >= GameState.Starting && CameraAnimator.Mode == CameraAnimator.CameraMode.FollowPlayer) {
                 if (spectating) {
                     // Find a new player to spectate
                     SpectateNextPlayer();
@@ -221,8 +223,8 @@ namespace NSMB.UI.Game {
             }
         }
 
-        private void SpectatePlayerIndex(InputAction.CallbackContext context) {
-            if (!spectating) {
+        private unsafe void SpectatePlayerIndex(InputAction.CallbackContext context) {
+            if (!spectating || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
                 return;
             }
 
@@ -233,6 +235,7 @@ namespace NSMB.UI.Game {
                 EntityRef newTarget = scoreboardUpdater.EntityAtPosition(index);
                 if (newTarget != EntityRef.None) {
                     Entity = newTarget;
+                    CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
                     UpdateSpectateUI();
                 }
             }

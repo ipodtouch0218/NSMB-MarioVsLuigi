@@ -65,9 +65,14 @@ MonoBehaviour:
   SpawnBigPowerups: 0
   SpawnVerticalPowerups: 1
   MainMusic:
-  - {fileID: 11400000, guid: de3421d71a764934fac9d25358c6b33e, type: 2}
-  InvincibleMusic: {fileID: 11400000, guid: 628804e165b231243abe39caa050a76c, type: 2}
-  MegaMushroomMusic: {fileID: 11400000, guid: d2c80d3a80e82cb4b988278210db3bb9, type: 2}
+  - Id:
+      Value: 386992444490795070
+  InvincibleMusic:
+    Id:
+      Value: 289056355789154037
+  MegaMushroomMusic:
+    Id:
+      Value: 451321131049702687
   TileData:
   - Tile:
       Id:

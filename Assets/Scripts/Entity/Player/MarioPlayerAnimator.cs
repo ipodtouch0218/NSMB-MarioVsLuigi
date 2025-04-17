@@ -99,7 +99,7 @@ namespace NSMB.Entities.Player {
 
         //---Properties
         public Color GlowColor { get; private set; }
-
+        
         //---Private Variables
         private Enums.PlayerEyeState eyeState;
         private float propellerVelocity;

@@ -161,7 +161,7 @@ public unsafe class BinaryReplayFile {
             result.CompressedDeterministicConfigData = reader.ReadBytes(deterministicConfigSize);
             result.CompressedInitialFrameData = reader.ReadBytes(initialFrameSize);
             result.CompressedInputData = reader.ReadBytes(inputDataSize);
-
+            
             return ReplayParseResult.Success;
         } catch /* (Exception e) */ {
             // Debug.LogWarning("Failed to parse replay: " + e);
@@ -191,7 +191,7 @@ public unsafe class BinaryReplayFile {
             WinningTeam = winnerIndex,
 
             CompressedDeterministicConfigData = ByteUtils.GZipCompressBytes(DeterministicSessionConfig.ToByteArray(replay.DeterministicConfig)),
-            CompressedRuntimeConfigData = ByteUtils.GZipCompressBytes(replay.RuntimeConfigData.Decode()),
+            CompressedRuntimeConfigData = replay.RuntimeConfigData.Decode(),
             CompressedInitialFrameData = ByteUtils.GZipCompressBytes(replay.InitialFrameData),
             CompressedInputData = ByteUtils.GZipCompressBytes(replay.InputHistoryDeltaCompressed.Decode()),
         };

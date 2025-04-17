@@ -22,8 +22,12 @@ MonoBehaviour:
   DiscordStageImage: 
   Icon: {fileID: 0}
   OverrideAutomaticTilemapSettings: 0
-  TileDimensions: {x: 64, y: 8}
-  TileOrigin: {x: -32, y: -13}
+  TileDimensions:
+    x: 64
+    y: 8
+  TileOrigin:
+    x: -32
+    y: -13
   TilemapWorldPosition:
     X:
       RawValue: 0
@@ -52,5136 +56,2586 @@ MonoBehaviour:
       RawValue: 65536000
     Y:
       RawValue: 0
-  UIColor: {r: 0.1009914, g: 0.7490195, b: 0.7153557, a: 1}
+  UIColor:
+    R: 24
+    G: 178
+    B: 170
+    A: 255
   HidePlayersOnMinimap: 0
   SpawnBigPowerups: 1
   SpawnVerticalPowerups: 1
   MainMusic:
-  - {fileID: 11400000, guid: 853814253b9d46741895bfc7bc7b2972, type: 2}
-  - {fileID: 11400000, guid: 9eb9732611977644eb2ab4a290238ad6, type: 2}
-  InvincibleMusic: {fileID: 11400000, guid: 628804e165b231243abe39caa050a76c, type: 2}
-  MegaMushroomMusic: {fileID: 11400000, guid: d2c80d3a80e82cb4b988278210db3bb9, type: 2}
+  - Id:
+      Value: 369157696319829885
+  - Id:
+      Value: 386427822095829515
+  InvincibleMusic:
+    Id:
+      Value: 289056355789154037
+  MegaMushroomMusic:
+    Id:
+      Value: 451321131049702687
   TileData:
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 316078177911819842
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 410364468200401995
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 408526691487012230
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 277814980061746330
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 295905944913037735
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 356299494617327315
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 316772755534135393
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 373358573290158056
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 477152350521436451
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 437727040945182437
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 269459891710323174
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 499615834365212176
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 401240891722271635
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 310033910154760287
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 391805232253762952
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 294152138064844365
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 373758687312585997
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 384394092941292678
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 269596760890592717
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 333838487589470934
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 459037349675743235
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 345122475084360428
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 435864969586615061
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 360674356114225412
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 509911214507972585
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 398906383005469878
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 274867781412919138
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 401866519066162552
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 495981064839832924
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 389724106935902655
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 466100481571561108
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 435165707651861562
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation:
-      RawValue: -3
-    Scale:
-      X:
-        RawValue: -65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 453546792495425668
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 371739775300527686
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 362633902293829697
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 477683130632991220
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 362633902293829697
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 342476424856818660
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 362633902293829697
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   - Tile:
       Id:
         Value: 0
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
+    Rotation: 0
+    Flags: 0
   BigStarSpawnpoints:
   - X:
       RawValue: -720895

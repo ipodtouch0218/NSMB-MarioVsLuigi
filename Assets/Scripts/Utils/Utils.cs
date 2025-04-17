@@ -201,7 +201,7 @@ namespace NSMB.Utils {
                 return spectatorColor;
             }
 
-            Color color = teams[team].color;
+            Color color = f.FindAsset(teams[team]).color;
             Color.RGBToHSV(color, out float hue, out float saturation, out float value);
             return Color.HSVToRGB(hue, saturation * s, value * v);
         }

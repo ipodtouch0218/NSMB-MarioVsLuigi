@@ -94,6 +94,7 @@ namespace NSMB.UI.Game {
             RectTransform parentTransform = (RectTransform) transform.parent;
             transform.localPosition = (cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * 2) - Vector3.one;
             transform.localPosition = transform.localPosition.Multiply(parentTransform.rect.size / 2);
+            transform.localScale = Vector3.one * (3.5f / cam.orthographicSize);
 
             if (!constantNicknameColor) {
                 text.color = Utils.Utils.SampleNicknameColor(nicknameColor, out _);
@@ -109,7 +110,7 @@ namespace NSMB.UI.Game {
             stringBuilder.Clear();
 
             if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind) {
-                TeamAsset team = f.SimulationConfig.Teams[mario->GetTeam(f)];
+                TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[mario->GetTeam(f)]);
                 stringBuilder.Append(team.textSpriteColorblindBig);
             }
             stringBuilder.AppendLine(cachedNickname);

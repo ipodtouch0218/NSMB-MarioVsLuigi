@@ -140,7 +140,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 return;
             }
 
-            TeamAsset[] teamAssets = f.SimulationConfig.Teams;
+            AssetRef<TeamAsset>[] teamAssets = f.SimulationConfig.Teams;
             StringBuilder result = new();
 
             byte[] teamStars = new byte[10];
@@ -153,7 +153,8 @@ namespace NSMB.UI.Game.Scoreboard {
                 }
 
                 byte stars = teamStars[i];
-                result.Append(Settings.Instance.GraphicsColorblind ? teamAssets[i].textSpriteColorblind : teamAssets[i].textSpriteNormal);
+                TeamAsset team = f.FindAsset(teamAssets[i]);
+                result.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
                 result.Append(Utils.Utils.GetSymbolString("x" + stars));
             }
 

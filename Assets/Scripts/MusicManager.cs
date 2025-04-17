@@ -104,11 +104,11 @@ namespace NSMB.Sound {
             }
 
             if (mega) {
-                musicPlayer.Play(stage.MegaMushroomMusic);
+                musicPlayer.Play(f.FindAsset(stage.MegaMushroomMusic));
             } else if (invincible) {
-                musicPlayer.Play(stage.InvincibleMusic);
+                musicPlayer.Play(f.FindAsset(stage.InvincibleMusic));
             } else {
-                musicPlayer.Play(stage.MainMusic[f.Global->TotalGamesPlayed % stage.MainMusic.Length]);
+                musicPlayer.Play(f.FindAsset(stage.MainMusic[f.Global->TotalGamesPlayed % stage.MainMusic.Length]));
             }
 
             musicPlayer.FastMusic = speedup;

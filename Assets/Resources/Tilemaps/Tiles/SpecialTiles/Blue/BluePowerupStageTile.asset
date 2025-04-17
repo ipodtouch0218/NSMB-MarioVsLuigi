@@ -44,16 +44,25 @@ MonoBehaviour:
   ParticleColor: {r: 0.29411766, g: 0.6901961, b: 0.8627451, a: 1}
   BreakingRules: 320
   BumpIfNotBroken: 0
+  BumpSize:
+    X:
+      RawValue: 32768
+    Y:
+      RawValue: 32768
+  BumpOffset:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 0
   resultTile:
     Tile:
       Id:
         Value: 407138680637916208
-    Rotation:
-      RawValue: 0
-    Scale:
-      X:
-        RawValue: 65536
-      Y:
-        RawValue: 65536
-  smallPowerup: {fileID: 11400000, guid: 96aa97e77f3b7fe4999fbc85e8b34323, type: 2}
-  largePowerup: {fileID: 11400000, guid: 96d0e671b1aa9184889fe00ea87ee1cf, type: 2}
+    Rotation: 0
+    Flags: 0
+  smallPowerup:
+    Id:
+      Value: 390055422968795145
+  largePowerup:
+    Id:
+      Value: 296548766860541996

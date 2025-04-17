@@ -388,7 +388,7 @@ namespace Quantum {
                 }
 
                 int characterIndex = FPMath.Clamp(data->Character, 0, config.CharacterDatas.Length - 1);
-                CharacterAsset character = config.CharacterDatas[characterIndex];
+                CharacterAsset character = f.FindAsset(config.CharacterDatas[characterIndex]);
 
                 EntityRef newPlayer = f.Create(character.Prototype);
                 var mario = f.Unsafe.GetPointer<MarioPlayer>(newPlayer);

@@ -131,7 +131,7 @@ public class ReplayListManager : Selectable {
             builder.Append("<width=85%>");
             if (file.Rules.TeamsEnabled) {
                 var allTeams = GlobalController.Instance.config.Teams;
-                TeamAsset team = allTeams[info.Team % allTeams.Length];
+                TeamAsset team = QuantumUnityDB.GetGlobalAsset(allTeams[info.Team % allTeams.Length]);
                 builder.Append("<nobr>");
                 builder.Append("<color=#").Append(Utils.ColorToHex(team.color, false)).Append(">").Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
             } else {

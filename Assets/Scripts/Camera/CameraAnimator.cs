@@ -5,8 +5,11 @@ using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public unsafe class CameraAnimator : ResizingCamera {
 
@@ -28,10 +31,13 @@ public unsafe class CameraAnimator : ResizingCamera {
     private VersusStageData stage;
     private float screenshakeTimer;
     private Vector2 previousPointer;
+    private bool clickHeld, freecamMouseDragging;
 
     public override void OnValidate() {
         base.OnValidate();
-        GetComponentsInChildren(secondaryPositioners);
+        if (secondaryPositioners.Count == 0) {
+            GetComponentsInChildren(secondaryPositioners);
+        }
         this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
     }
 
@@ -71,7 +77,11 @@ public unsafe class CameraAnimator : ResizingCamera {
             BackgroundLoop.Instance.Reposition(ourCamera);
         }
 
-        previousPointer = ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>());
+        bool lmb = Settings.Controls.UI.Click.ReadValue<float>() >= 0.5f || Settings.Controls.UI.RightClick.ReadValue<float>() >= 0.5f;
+        bool mmb = Settings.Controls.UI.MiddleClick.ReadValue<float>() >= 0.5f;
+        if (lmb || !mmb) {
+            previousPointer = ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>());
+        }
     }
 
     private void UpdateCameraFollowPlayerMode(CallbackUpdateView e) {
@@ -148,6 +158,10 @@ public unsafe class CameraAnimator : ResizingCamera {
     }
 
     private void UpdateCameraFreecamMode(CallbackUpdateView e) {
+        if (e.Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
+            return;
+        }
+
         bool ignoreKeyboard = playerElements.PauseMenu.IsPaused || playerElements.ReplayUi.IsOpen;
 
         // Movement
@@ -155,13 +169,38 @@ public unsafe class CameraAnimator : ResizingCamera {
         if (!ignoreKeyboard) {
             movement += Settings.Controls.Player.Movement.ReadValue<Vector2>() * (Time.unscaledDeltaTime * moveSpeed * ourCamera.orthographicSize);
         }
-        Vector2 pointer = ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>());
-        bool lmb = Settings.Controls.UI.Click.ReadValue<float>() >= 0.5f;
-        if (lmb) {
-            // TODO THIS DOESNT WORK
-            movement += (previousPointer - pointer) * new Vector2(ourCamera.orthographicSize * ourCamera.aspect * 2, ourCamera.orthographicSize * 2);
+        Vector2 pointerScreen = Settings.Controls.UI.Point.ReadValue<Vector2>();
+        Vector2 pointer = ourCamera.ScreenToViewportPoint(pointerScreen);
+
+        bool lmb = Settings.Controls.UI.Click.ReadValue<float>() >= 0.5f || Settings.Controls.UI.RightClick.ReadValue<float>() >= 0.5f;
+        bool mmb = Settings.Controls.UI.MiddleClick.ReadValue<float>() >= 0.5f;
+        if (lmb || mmb) {
+            if (!clickHeld) {
+                // Make sure we're not over an object.
+                List<RaycastResult> results = new();
+                playerElements.Canvas.GetComponent<GraphicRaycaster>().Raycast(new PointerEventData(EventSystem.current) {
+                    position = pointerScreen
+                }, results);
+                freecamMouseDragging = (results.Count == 0);
+                clickHeld = true;
+            }
+        } else {
+            clickHeld = false;
+            freecamMouseDragging = false;
         }
 
+        if (freecamMouseDragging) {
+            if (lmb) {
+                if (Vector2.Distance(pointer, previousPointer) < 0.2f) {
+                    movement += (previousPointer - pointer) * new Vector2(ourCamera.orthographicSize * ourCamera.aspect * 2, ourCamera.orthographicSize * 2);
+                }
+                freecamMouseDragging = true;
+            } else if (mmb) {
+                movement += (pointer - previousPointer) * new Vector2(ourCamera.orthographicSize * ourCamera.aspect * 2, ourCamera.orthographicSize * 2) * (Time.deltaTime * 6);
+                freecamMouseDragging = true;
+            }
+        }
+        
         Vector3 newPosition = ourCamera.transform.position + (Vector3) (movement);
         newPosition = QuantumUtils.WrapWorld(stage, newPosition.ToFPVector2(), out _).ToUnityVector3();
         newPosition.z = -10;
@@ -175,11 +214,12 @@ public unsafe class CameraAnimator : ResizingCamera {
 
         // Zoom
         float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y / -12f;
+        Vector3? worldPosBefore = (zoomAmount != 0) ? ourCamera.ViewportToWorldPoint(pointer) : null;
 
         if (!ignoreKeyboard) {
             int zoomIn = Settings.Controls.Replay.ZoomIn.ReadValue<float>() >= 0.5f ? 1 : 0;
             int zoomOut = Settings.Controls.Replay.ZoomOut.ReadValue<float>() >= 0.5f ? 1 : 0;
-            zoomAmount += (zoomIn - zoomOut);
+            zoomAmount += (zoomOut - zoomIn);
         }
 
         if (zoomAmount != 0) {
@@ -198,9 +238,27 @@ public unsafe class CameraAnimator : ResizingCamera {
             } else {
                 zoomSfx.loop = false;
             }
+
+            if (worldPosBefore != null) {
+                Vector3 worldPosAfter = ourCamera.ViewportToWorldPoint(pointer);
+                newPosition += (Vector3) (worldPosBefore - worldPosAfter);
+            }
         } else {
             zoomSfx.loop = false;
         }
+
+        // Clamp
+        float orthoSize = ourCamera.orthographicSize;
+        float screenAspect = ourCamera.aspect;
+        float cameraMinX = stage.CameraMinPosition.X.AsFloat - (orthoSize * screenAspect);
+        float cameraMaxX = stage.CameraMaxPosition.X.AsFloat + (orthoSize * screenAspect);
+        newPosition.x = Mathf.Clamp(newPosition.x, cameraMinX, cameraMaxX);
+
+        float cameraMinY = stage.CameraMinPosition.Y.AsFloat - orthoSize;
+        float cameraMaxY = cameraMinY + Mathf.Max(7, stage.CameraMaxPosition.Y.AsFloat - stage.CameraMinPosition.Y.AsFloat) + (orthoSize * 2);
+        newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
+
+        ourCamera.transform.position = newPosition;
     }
 
     private void Reset(InputAction.CallbackContext context) {
