@@ -29,6 +29,7 @@ public unsafe class BobombAnimator : QuantumEntityViewComponent {
         QuantumEvent.Subscribe<EventBobombLit>(this, OnBobombLit, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventEntityBlockBumped>(this, OnEntityBlockBumped, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
 
         sRenderer.GetPropertyBlock(mpb = new());
     }
@@ -88,6 +89,10 @@ public unsafe class BobombAnimator : QuantumEntityViewComponent {
         } else {
             transform.rotation = Quaternion.identity;
         }
+    }
+
+    private void OnGameEnded(EventGameEnded e) {
+        sfx.Stop();
     }
 
     private void OnPlayComboSound(EventPlayComboSound e) {
