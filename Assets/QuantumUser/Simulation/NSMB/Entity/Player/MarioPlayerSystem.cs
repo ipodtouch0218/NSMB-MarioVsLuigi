@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -969,6 +968,9 @@ namespace Quantum {
             continueGroundpound &= interactedAny;
             mario->IsGroundpoundActive &= continueGroundpound;
 
+            if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                physicsObject->Velocity.Y = physics.TerminalVelocityGroundpound;
+            }
             if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
                 mario->IsGroundpounding = false;
                 mario->IsSliding = true;

@@ -67,7 +67,7 @@ Material:
     - Points: 256
     - PointsPerTile: 4
     - TextureIndex: 7
-    - WaveHeight: 0.3
+    - WaveHeight: 0.2
     - WaveSpeed: 1.2
     - WaveWidth: 1
     - WidthTiles: 30

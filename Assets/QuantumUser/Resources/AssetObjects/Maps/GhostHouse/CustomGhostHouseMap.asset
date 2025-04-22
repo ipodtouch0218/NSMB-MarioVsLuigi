@@ -639,7 +639,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 720896
+            RawValue: 737280
           Y:
             RawValue: 229376
         Rotation:
@@ -948,7 +948,7 @@ MonoBehaviour:
       data:
         Position:
           X:
-            RawValue: 753664
+            RawValue: 770048
           Y:
             RawValue: 229376
         Rotation:

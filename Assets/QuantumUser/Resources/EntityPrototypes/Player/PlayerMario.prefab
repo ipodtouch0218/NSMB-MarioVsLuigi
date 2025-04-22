@@ -8234,11 +8234,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3961968685019454519, guid: 93d9711d25974674a8196b3204b10e6a,
+        type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 7a2f311b131107240b42522a7f67d5c2, type: 3}
     - target: {fileID: 5505468501837578399, guid: 93d9711d25974674a8196b3204b10e6a,
         type: 3}
       propertyPath: m_Layer
       value: 17
       objectReference: {fileID: 0}
+    - target: {fileID: 8708531807875116866, guid: 93d9711d25974674a8196b3204b10e6a,
+        type: 3}
+      propertyPath: currentAudio
+      value: 
+      objectReference: {fileID: 11400000, guid: 3056fcf4413f58c45bfb03a25185d076,
+        type: 2}
     - target: {fileID: 9161589328116201173, guid: 93d9711d25974674a8196b3204b10e6a,
         type: 3}
       propertyPath: m_Name

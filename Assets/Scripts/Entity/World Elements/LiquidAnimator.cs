@@ -72,7 +72,7 @@ namespace NSMB.Entities.World {
             heightTex.SetPixels32(colors);
             heightTex.Apply();
 
-            spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.5f);
+            spriteRenderer.size = new(widthTiles * 0.5f, heightTiles * 0.5f + 0.6f);
             if (mask) {
                 mask.transform.localScale = new(widthTiles * mask.sprite.pixelsPerUnit / 32f, (heightTiles - 0.5f) * mask.sprite.pixelsPerUnit / 32f, 1f);
             }
