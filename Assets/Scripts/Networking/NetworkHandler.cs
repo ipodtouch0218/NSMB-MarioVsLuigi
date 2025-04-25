@@ -12,8 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Text.RegularExpressions;
-using static BinaryReplayFile;
-using static ReplayListManager;
+using Quantum.Prototypes;
+using static BinaryReplayHeader;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -36,8 +36,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay => CurrentReplay != null;
-    public static int ReplayStart => CurrentReplay?.InitialFrameNumber ?? -1;
-    public static int ReplayLength => CurrentReplay?.ReplayLengthInFrames ?? -1;
+    public static int ReplayStart => CurrentReplay?.Header.InitialFrameNumber ?? -1;
+    public static int ReplayLength => CurrentReplay?.Header.ReplayLengthInFrames ?? -1;
     public static int ReplayEnd => ReplayStart + ReplayLength;
     public static bool IsReplayFastForwarding { get; set; }
     public static string SavedRecordingPath { get; set; }
@@ -309,7 +309,27 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             }
         } while (outputStream == null);
 
-        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, f.Global->Rules, playerInformation, winner);
+        ref GameRules rules = ref f.Global->Rules;
+        BinaryReplayHeader header = new() {
+            Version = BinaryReplayHeader.GetCurrentVersion(),
+            UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
+            InitialFrameNumber = jsonReplay.InitialTick,
+            ReplayLengthInFrames = jsonReplay.LastTick - jsonReplay.InitialTick,
+
+            Rules = new GameRulesPrototype {
+                Stage = rules.Stage,
+                StarsToWin = rules.StarsToWin,
+                CoinsForPowerup = rules.CoinsForPowerup,
+                Lives = rules.Lives,
+                TimerSeconds = rules.TimerSeconds,
+                CustomPowerupsEnabled = rules.CustomPowerupsEnabled,
+                TeamsEnabled = rules.TeamsEnabled,
+            },
+            PlayerInformation = playerInformation,
+            WinningTeam = winner,
+        };
+
+        BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, header);
         long writtenBytes = binaryReplay.WriteToStream(outputStream);
         outputStream.Dispose();
 

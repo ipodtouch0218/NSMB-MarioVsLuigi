@@ -1,12 +1,14 @@
 using NSMB.Extensions;
+using NSMB.Sound;
 using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
 
-public class SfxManager : QuantumSceneViewComponent {
+public unsafe class SfxManager : QuantumSceneViewComponent {
 
     //---Serialized Variables
     [SerializeField] private AudioSource sfx;
+    [SerializeField] private LoopingMusicPlayer musicPlayer;
 
     //---Private Variables
     private bool playedHurryUp;
@@ -19,9 +21,10 @@ public class SfxManager : QuantumSceneViewComponent {
     public void Start() {
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned, NetworkHandler.FilterOutReplayFastForward);
     }
 
-    public override unsafe void OnUpdateView() {
+    public override void OnUpdateView() {
         if (NetworkHandler.IsReplayFastForwarding) {
             return;
         }
@@ -48,7 +51,7 @@ public class SfxManager : QuantumSceneViewComponent {
         }
     }
 
-    private unsafe void OnGameResynced(CallbackGameResynced e) {
+    private void OnGameResynced(CallbackGameResynced e) {
         Frame f = PredictedFrame;
         if (f.Global->Rules.IsTimerEnabled && f.Global->Timer < 60) {
             playedHurryUp = true;
@@ -56,7 +59,16 @@ public class SfxManager : QuantumSceneViewComponent {
         previousTimer = 0;
     }
 
-    private unsafe void OnTimerExpired(EventTimerExpired e) {
+    private void OnTimerExpired(EventTimerExpired e) {
         sfx.PlayOneShot(SoundEffect.UI_Countdown_1);
+    }
+
+    private void OnMarioPlayerPreRespawned(EventMarioPlayerPreRespawned e) {
+        Frame f = PredictedFrame;
+        var mario = f.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+
+        if (Game.PlayerIsLocal(mario->PlayerRef) && !musicPlayer.IsPlaying) {
+            sfx.PlayOneShot(SoundEffect.UI_StartGame);
+        }
     }
 }

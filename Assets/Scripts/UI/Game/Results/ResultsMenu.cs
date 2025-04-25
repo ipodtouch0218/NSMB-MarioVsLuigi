@@ -165,10 +165,10 @@ namespace NSMB.UI.Game.Results {
             case 0:
                 if (NetworkHandler.IsReplay) {
                     ReplayListManager replayManager = ReplayListManager.Instance;
-                    int replayIndex = replayManager.Replays.IndexOf(rle => rle.ReplayFile == NetworkHandler.CurrentReplay);
+                    int replayIndex = replayManager.Replays.IndexOf(rle => rle.ReplayFile == NetworkHandler.CurrentReplay.Header);
 
-                    BinaryReplayFile newReplay = replayManager.Replays[(replayIndex + 1) % replayManager.Replays.Count].ReplayFile;
-                    if (replayIndex + 1 >= replayManager.Replays.Count || newReplay == NetworkHandler.CurrentReplay) {
+                    var newReplay = replayManager.Replays[(replayIndex + 1) % replayManager.Replays.Count];
+                    if (replayIndex + 1 >= replayManager.Replays.Count || newReplay.ReplayFile == NetworkHandler.CurrentReplay.Header) {
                         labels[0].text = "» " + GlobalController.Instance.translationManager.GetTranslation("ui.game.results.nextreplay.nomore");
                         sfx.PlayOneShot(SoundEffect.UI_Error);
                         if (noReplaysCoroutine != null) {
@@ -176,7 +176,10 @@ namespace NSMB.UI.Game.Results {
                         }
                         noReplaysCoroutine = StartCoroutine(ResetTextAfterTime(0, 0.5f));
                     } else {
-                        NetworkHandler.StartReplay(newReplay);
+                        using FileStream input = new(newReplay.FilePath, FileMode.Open);
+                        if (BinaryReplayFile.TryLoadFromFile(input, out BinaryReplayFile fullReplay) == BinaryReplayFile.ReplayParseResult.Success) {
+                            NetworkHandler.StartReplay(fullReplay);
+                        }
                     }
                 } else {
                     // Vote to continue

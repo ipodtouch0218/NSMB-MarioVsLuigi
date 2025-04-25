@@ -98,6 +98,12 @@ namespace Quantum {
                     f.Events.GameStateChanged(GameState.Playing);
                     f.Global->StartFrame = f.Number;
 
+                    var playerDatas = f.Filter<PlayerData>();
+                    while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+                        data->IsLoaded = false;
+                        data->IsReady = false;
+                    }
+
                 } else if (f.Global->GameStartFrames == 79) {
                     f.Events.RecordingStarted();
 

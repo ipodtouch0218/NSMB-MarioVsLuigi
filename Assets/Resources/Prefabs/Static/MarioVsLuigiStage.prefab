@@ -109,8 +109,8 @@ Transform:
   - {fileID: 6560545802608712613}
   - {fileID: 843148949445353326}
   - {fileID: 4940414689882256244}
-  - {fileID: 3980477004298403645}
   - {fileID: 3912374818038313351}
+  - {fileID: 3980477004298403645}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1922647946039554095
@@ -526,7 +526,7 @@ GameObject:
   - component: {fileID: 390882757022401945}
   - component: {fileID: 280813357432322288}
   m_Layer: 0
-  m_Name: Sfx
+  m_Name: SfxManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -659,6 +659,7 @@ MonoBehaviour:
   Updater: {fileID: 2550855901662361809}
   UseFindUpdater: 0
   sfx: {fileID: 390882757022401945}
+  musicPlayer: {fileID: 539312975697019843}
 --- !u!1 &8835350829400233188
 GameObject:
   m_ObjectHideFlags: 0

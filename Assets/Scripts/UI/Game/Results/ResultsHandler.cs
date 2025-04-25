@@ -14,7 +14,7 @@ namespace NSMB.UI.Game.Results {
         //---Serialized Variables
         [SerializeField] private GameObject parent;
         [SerializeField] private Canvas parentCanvas;
-        [SerializeField] private ResultsEntry[] entries;
+        [SerializeField] private ResultsEntry template;
         [SerializeField] private RectTransform header, ui;
         [SerializeField] private CanvasGroup fadeGroup;
         [SerializeField] private LoopingMusicData musicData;
@@ -22,12 +22,20 @@ namespace NSMB.UI.Game.Results {
 
         //---Private Variables
         private Coroutine endingCoroutine, moveUiCoroutine, moveHeaderCoroutine, fadeCoroutine;
+        private readonly List<ResultsEntry> entries = new();
 
         public void OnValidate() {
             this.SetIfNull(ref parentCanvas, UnityExtensions.GetComponentType.Parent);
         }
 
         public unsafe void Start() {
+            for (int i = 0; i < Constants.MaxPlayers; i++) {
+                ResultsEntry newEntry = Instantiate(template, template.transform.parent);
+                newEntry.gameObject.SetActive(true);
+                entries.Add(newEntry);
+            }
+            template.gameObject.SetActive(false);
+
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             parent.SetActive(false);
@@ -102,7 +110,7 @@ namespace NSMB.UI.Game.Results {
             }
 
             // Initialize remaining scores
-            for (int i = initializeCount; i < entries.Length; i++) {
+            for (int i = initializeCount; i < entries.Count; i++) {
                 entries[i].Initialize(f, null, -1, (i * delayPerEntry) + additionalDelay);
             }
         }

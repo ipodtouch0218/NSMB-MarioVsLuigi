@@ -18,6 +18,7 @@ namespace Quantum {
 
             f.Global->GameStartFrames = (ushort) FPMath.Max(f.Global->GameStartFrames - ((15 * f.UpdateRate) / FPMath.Max(1, players)), minFrames);
             playerData->VotedToContinue = true;
+            f.Events.PlayerDataChanged(sender);
         }
     }
 }

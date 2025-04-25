@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using NSMB.Translation;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
@@ -8,6 +9,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static BinaryReplayFile;
 
 public class ReplayListEntry : MonoBehaviour {
 
@@ -140,7 +142,14 @@ public class ReplayListEntry : MonoBehaviour {
     }
 
     public void OnWatchClick() {
-        NetworkHandler.StartReplay(Replay.ReplayFile);
+        using FileStream replayFileStream = new(Replay.FilePath, FileMode.Open);
+        ReplayParseResult parseResult = BinaryReplayFile.TryLoadFromFile(replayFileStream, out BinaryReplayFile replayFile);
+
+        if (parseResult == ReplayParseResult.Success) {
+            NetworkHandler.StartReplay(replayFile);
+        } else {
+            GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
+        }
     }
 
     public void OnRenameClick() {
@@ -169,7 +178,7 @@ public class ReplayListEntry : MonoBehaviour {
         }
 
         TranslationManager tm = GlobalController.Instance.translationManager;
-        BinaryReplayFile replayFile = Replay.ReplayFile;
+        BinaryReplayHeader replayFile = Replay.ReplayFile;
 
         nameText.text = replayFile.GetDisplayName();
         dateText.text = DateTime.UnixEpoch.AddSeconds(replayFile.UnixTimestamp).ToLocalTime().ToString();

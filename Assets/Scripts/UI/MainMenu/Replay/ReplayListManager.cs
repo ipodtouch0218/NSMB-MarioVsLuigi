@@ -10,11 +10,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static BinaryReplayFile;
+using static BinaryReplayHeader;
 
 public class ReplayListManager : Selectable {
 
@@ -123,7 +125,7 @@ public class ReplayListManager : Selectable {
         // TODO: possibly parse from initial frame instead of storing as separate members
         // Playerlist
         StringBuilder builder = new();
-        BinaryReplayFile file = replay.ReplayFile;
+        BinaryReplayHeader file = replay.ReplayFile;
         for (int i = 0; i < file.PlayerInformation.Length; i++) {
             ref ReplayPlayerInformation info = ref file.PlayerInformation[i];
 
@@ -160,16 +162,17 @@ public class ReplayListManager : Selectable {
         string on = tm.GetTranslation("ui.generic.on");
 
         builder.Append("<align=center><color=white>");
-        builder.Append("<sprite name=room_stars> ").Append(file.Rules.StarsToWin).Append("    ");
-        builder.Append("<sprite name=room_coins> ").Append(file.Rules.CoinsForPowerup).Append("    ");
-        builder.Append("<sprite name=room_lives> ").Append(file.Rules.Lives > 0 ? file.Rules.Lives : off).Append("    ");
-        builder.Append("<sprite name=room_timer> ").Append(file.Rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(file.Rules.TimerSeconds) : off).Append("    ");
-        builder.Append("<sprite name=room_powerups>").Append(file.Rules.CustomPowerupsEnabled ? on : off).Append("    ");
-        builder.Append("<sprite name=room_teams>").AppendLine(file.Rules.TeamsEnabled ? on : off);
+        var rules = file.Rules;
+        builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
+        builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
+        builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
+        builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append("    ");
+        builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
+        builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
 
         // Add date
         builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(file.UnixTimestamp).ToLocalTime().ToString()).Append(" - ");
-        builder.Append(Utils.SecondsToMinuteSeconds(file.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(file.FileSize));
+        builder.Append(Utils.SecondsToMinuteSeconds(file.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(replay.FileSize));
 
         replayInformation.text = builder.ToString();
         replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Left;
@@ -202,22 +205,24 @@ public class ReplayListManager : Selectable {
         Directory.CreateDirectory(Path.Combine(ReplayDirectory, "saved"));
 
         string[] files = Directory.GetFiles(Path.Combine(ReplayDirectory), "*.mvlreplay", SearchOption.AllDirectories);
-        foreach (var file in files) {
-            if (!File.Exists(file)) {
+        foreach (var filepath in files) {
+            if (!File.Exists(filepath)) {
                 continue;
             }
 
-            using FileStream inputStream = new FileStream(file, FileMode.Open);
-            if (BinaryReplayFile.TryLoadFromFile(inputStream, out BinaryReplayFile replayFile) == ReplayParseResult.Success) {
+            using FileStream inputStream = new FileStream(filepath, FileMode.Open);
+            long filesize = inputStream.Length;
+            if (BinaryReplayHeader.TryLoadFromFile(inputStream, out BinaryReplayHeader replayHeader) == ReplayParseResult.Success) {
                 Replay newReplay = new Replay {
-                    FilePath = file,
-                    ReplayFile = replayFile,
-                    ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
+                    FilePath = filepath,
+                    FileSize = filesize,
+                    ReplayFile = replayHeader,
+                    ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent),
                 };
                 newReplay.ListEntry.Initialize(this, newReplay);
                 replays.Add(newReplay);
 
-                if (file.StartsWith(tempPath)) {
+                if (newReplay.FilePath.StartsWith(Path.Combine(ReplayDirectory, "temp"))) {
                     // Is temporary
                     temporaryReplays.Add(newReplay);
                 }
@@ -268,7 +273,8 @@ public class ReplayListManager : Selectable {
 
         foreach (var filepath in selected) {
             using FileStream stream = new FileStream(filepath, FileMode.Open);
-            ReplayParseResult parseResult = BinaryReplayFile.TryLoadFromFile(stream, out BinaryReplayFile parsedReplay);
+            long filesize = stream.Length;
+            ReplayParseResult parseResult = BinaryReplayHeader.TryLoadFromFile(stream, out BinaryReplayHeader parsedReplay);
 
             if (parseResult == ReplayParseResult.Success) {
                 // Move into the replays folder
@@ -277,6 +283,7 @@ public class ReplayListManager : Selectable {
 
                 Replay newReplay = new Replay {
                     FilePath = filepath,
+                    FileSize = filesize,
                     ReplayFile = parsedReplay,
                     ListEntry = Instantiate(replayTemplate, replayTemplate.transform.parent)
                 };
@@ -442,8 +449,9 @@ public class ReplayListManager : Selectable {
 
     public class Replay {
         public string FilePath;
-        public BinaryReplayFile ReplayFile;
+        public BinaryReplayHeader ReplayFile;
         public ReplayListEntry ListEntry;
+        public long FileSize;
         public bool IsTemporary => FilePath.StartsWith(Path.Combine(ReplayDirectory, "temp"));
         public bool IsFavorited => FilePath.StartsWith(Path.Combine(ReplayDirectory, "favorite"));
     }

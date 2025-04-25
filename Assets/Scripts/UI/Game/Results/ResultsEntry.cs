@@ -13,12 +13,18 @@ namespace NSMB.UI.Game.Results {
         [SerializeField] private TMP_Text usernameText, starCountText;
         [SerializeField] private RectTransform childTransform;
         [SerializeField] private GameObject fullSlot, emptySlot;
+        [SerializeField] private GameObject readyCheckmark;
         [SerializeField] private Color firstPlaceColor, secondPlaceColor, thirdPlaceColor, unrankedColor;
         [SerializeField] private float slideInTimeSeconds = 0.1f;
 
         //---Private Variables
         private string nicknameColor;
+        private PlayerRef player;
         private bool constantNicknameColor;
+
+        public void Start() {
+            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
+        }
 
         public unsafe void Initialize(Frame f, in PlayerInformation? info, int ranking, float delay, int stars = -1) {
             bool occupied = info.HasValue;
@@ -26,7 +32,7 @@ namespace NSMB.UI.Game.Results {
             emptySlot.SetActive(!occupied);
 
             if (occupied) {
-                PlayerRef player = info.Value.PlayerRef;
+                player = info.Value.PlayerRef;
 
                 usernameText.text = info.Value.Nickname.ToString().ToValidUsername(f, player);
                 nicknameColor = info.Value.NicknameColor.ToString();
@@ -47,9 +53,14 @@ namespace NSMB.UI.Game.Results {
                 }
 
                 leftHalf.color = Utils.Utils.GetPlayerColor(f, player, s: 0.7f, considerDisqualifications: false);
+                
+                var playerData = QuantumUtils.GetPlayerData(f, player);
+                readyCheckmark.SetActive(playerData->VotedToContinue);
             } else {
+                player = PlayerRef.None;
                 constantNicknameColor = true;
                 leftHalf.color = rightHalf.color = unrankedColor;
+                readyCheckmark.SetActive(false);
             }
 
             StartCoroutine(ResultsHandler.MoveObjectToTarget(childTransform, -1.25f, 0, slideInTimeSeconds, delay));
@@ -59,6 +70,15 @@ namespace NSMB.UI.Game.Results {
             if (!constantNicknameColor) {
                 usernameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
             }
+        }
+
+        private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
+            if (e.Player != player) {
+                return;
+            }
+
+            var playerData = QuantumUtils.GetPlayerData(e.Game.Frames.Predicted, player);
+            readyCheckmark.SetActive(playerData->VotedToContinue);
         }
     }
 }
