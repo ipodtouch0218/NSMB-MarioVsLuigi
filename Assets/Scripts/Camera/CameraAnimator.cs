@@ -5,7 +5,6 @@ using Photon.Deterministic;
 using Quantum;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -222,13 +221,13 @@ public unsafe class CameraAnimator : ResizingCamera {
             zoomAmount += (zoomOut - zoomIn);
         }
 
+        float maxOrthoSize = stage.TileDimensions.x * 0.25f / ourCamera.aspect;
         if (zoomAmount != 0) {
-            float newOrthoScale = ourCamera.orthographicSize + (zoomAmount * zoomSpeed * Time.unscaledDeltaTime);
-            float max = stage.TileDimensions.x * 0.25f / ourCamera.aspect;
-            newOrthoScale = Mathf.Clamp(newOrthoScale, 0.5f, max);
-            ourCamera.orthographicSize = newOrthoScale;
+            float newOrthoSize = ourCamera.orthographicSize + (zoomAmount * zoomSpeed * Time.unscaledDeltaTime);
+            newOrthoSize = Mathf.Clamp(newOrthoSize, 0.5f, maxOrthoSize);
+            ourCamera.orthographicSize = newOrthoSize;
 
-            if (newOrthoScale > 0.5f && newOrthoScale < max) {
+            if (newOrthoSize > 0.5f && newOrthoSize < maxOrthoSize) {
                 if (!zoomSfx.isPlaying) {
                     zoomSfx.Play();
                     zoomSfx.loop = true;
@@ -248,6 +247,10 @@ public unsafe class CameraAnimator : ResizingCamera {
         }
 
         // Clamp
+        // Ortho size
+        ourCamera.orthographicSize = Mathf.Clamp(ourCamera.orthographicSize, 0.5f, maxOrthoSize);
+
+        // Position
         float orthoSize = ourCamera.orthographicSize;
         float screenAspect = ourCamera.aspect;
         float cameraMinX = stage.CameraMinPosition.X.AsFloat - (orthoSize * screenAspect);
@@ -259,6 +262,9 @@ public unsafe class CameraAnimator : ResizingCamera {
         newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
 
         ourCamera.transform.position = newPosition;
+    }
+
+    private void ClampFreecam() {
     }
 
     private void Reset(InputAction.CallbackContext context) {

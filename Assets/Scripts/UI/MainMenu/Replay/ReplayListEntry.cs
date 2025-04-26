@@ -1,4 +1,4 @@
-using NSMB.Extensions;
+using NSMB.Replay;
 using NSMB.Translation;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
@@ -9,12 +9,15 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static BinaryReplayFile;
 
 public class ReplayListEntry : MonoBehaviour {
 
     //---Properties
-    public ReplayListManager.Replay Replay { get; private set; }
+    public BinaryReplayFile ReplayFile { get; private set; }
+    public bool IsTemporary => ReplayFile.FilePath.StartsWith(Path.Combine(ReplayListManager.ReplayDirectory, "temp"));
+    public bool IsFavorited => ReplayFile.FilePath.StartsWith(Path.Combine(ReplayListManager.ReplayDirectory, "favorite"));
+    private bool Selected => manager.Selected == this;
+    public bool IsOpen { get; private set; }
 
     //---Serialized Variables
     [SerializeField] private MainMenuCanvas canvas;
@@ -31,7 +34,6 @@ public class ReplayListEntry : MonoBehaviour {
 
     //---Private Variables
     private ReplayListManager manager;
-    private bool selected;
     private Coroutine showHideButtonsCoroutine;
 
     public void OnEnable() {
@@ -40,21 +42,12 @@ public class ReplayListEntry : MonoBehaviour {
     }
 
     public void OnDisable() {
-        // Deselect
-        dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 48);
-        // Canvas.ForceUpdateCanvases();
-        manager.layout.SetLayoutVertical();
-        selected = false;
-        if (manager.Selected == this) {
-            manager.Selected = null;
-        }
-
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
-    public void Initialize(ReplayListManager ourManager, ReplayListManager.Replay ourReplay) {
+    public void Initialize(ReplayListManager ourManager, BinaryReplayFile ourReplay) {
         manager = ourManager;
-        Replay = ourReplay;
+        ReplayFile = ourReplay;
         gameObject.SetActive(true);
     }
 
@@ -73,33 +66,38 @@ public class ReplayListEntry : MonoBehaviour {
     }
 
     public void HideButtons() {
-        if (!selected) {
+        if (!Selected) {
             return;
         }
-        if (showHideButtonsCoroutine != null) {
-            StopCoroutine(showHideButtonsCoroutine);
+        if (IsOpen) {
+            if (showHideButtonsCoroutine != null) {
+                StopCoroutine(showHideButtonsCoroutine);
+            }
+            showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, 0.1f));
         }
-        selected = false;
-        showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, 0.1f));
         canvasGroup.interactable = false;
+        button.interactable = true;
+        IsOpen = false;
     }
 
     public void OnClick() {
-        if (selected) {
-            return;
-        }
-        manager.Select(Replay);
+        manager.Select(this, true);
     }
 
-    public void OnSelect() {
-        if (showHideButtonsCoroutine != null) {
-            StopCoroutine(showHideButtonsCoroutine);
+    public void OnSelect(bool open) {
+        if (open) {
+            if (showHideButtonsCoroutine != null) {
+                StopCoroutine(showHideButtonsCoroutine);
+            }
+            showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0.1f));
+            canvasGroup.interactable = true;
+            button.interactable = false;
+            canvas.PlayCursorSound();
+            canvas.EventSystem.SetSelectedGameObject(defaultSelection);
+        } else {
+            HideButtons();
         }
-        showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0.1f));
-        selected = true;
-        canvasGroup.interactable = true;
-        canvas.PlayCursorSound();
-        canvas.EventSystem.SetSelectedGameObject(defaultSelection);
+        IsOpen = open;
     }
 
     private IEnumerator SmoothResize(float target, float time) {
@@ -121,13 +119,13 @@ public class ReplayListEntry : MonoBehaviour {
 
     public void OnFavoriteClicked() {
         string destination = ReplayListManager.ReplayDirectory;
-        string path = Replay.FilePath[destination.Length..];
+        string path = ReplayFile.FilePath[destination.Length..];
         int nextSlash = path.IndexOf(Path.DirectorySeparatorChar, 1);
         if (nextSlash != -1) {
             path = path[(nextSlash + 1)..];
         }
 
-        if (Replay.IsTemporary || Replay.IsFavorited) {
+        if (IsTemporary || IsFavorited) {
             // Save / Unfavorite
             destination = Path.Combine(destination, "saved", path);
         } else {
@@ -135,62 +133,55 @@ public class ReplayListEntry : MonoBehaviour {
             destination = Path.Combine(destination, "favorite", path);
         }
 
-        File.Move(Replay.FilePath, destination);
-        Replay.FilePath = destination;
+        File.Move(ReplayFile.FilePath, destination);
+        ReplayFile.FilePath = destination;
         UpdateText();
         canvas.PlayConfirmSound();
     }
 
     public void OnWatchClick() {
-        using FileStream replayFileStream = new(Replay.FilePath, FileMode.Open);
-        ReplayParseResult parseResult = BinaryReplayFile.TryLoadFromFile(replayFileStream, out BinaryReplayFile replayFile);
-
-        if (parseResult == ReplayParseResult.Success) {
-            NetworkHandler.StartReplay(replayFile);
-        } else {
-            GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
-        }
+        NetworkHandler.StartReplay(ReplayFile);
     }
 
     public void OnRenameClick() {
-        manager.StartRename(Replay);
+        manager.StartRename(this);
     }
 
     public void OnExportClick() {
         TranslationManager tm = GlobalController.Instance.translationManager;
-        StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, Replay.ReplayFile.GetDisplayName(), "mvlreplay", (file) => {
+        StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, ReplayFile.Header.GetDisplayName(), "mvlreplay", (file) => {
             if (string.IsNullOrWhiteSpace(file)) {
                 return;
             }
 
             using FileStream stream = new(file, FileMode.OpenOrCreate);
-            Replay.ReplayFile.WriteToStream(stream);
+            ReplayFile.WriteToStream(stream);
         });
     }
 
     public void OnDeleteClick() {
-        manager.StartDeletion(Replay);
+        manager.StartDeletion(this);
     }
 
     public void UpdateText() {
-        if (Replay == null) {
+        if (ReplayFile == null) {
             return;
         }
 
         TranslationManager tm = GlobalController.Instance.translationManager;
-        BinaryReplayHeader replayFile = Replay.ReplayFile;
+        BinaryReplayHeader header = ReplayFile.Header;
 
-        nameText.text = replayFile.GetDisplayName();
-        dateText.text = DateTime.UnixEpoch.AddSeconds(replayFile.UnixTimestamp).ToLocalTime().ToString();
+        nameText.text = header.GetDisplayName();
+        dateText.text = DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp).ToLocalTime().ToString();
         
-        if (!replayFile.IsCompatible) {
-            warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", replayFile.Version.ToString());
+        if (!header.IsCompatible) {
+            warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToString());
             warningText.color = criticalColor;
             foreach (var button in compatibleButtons) {
                 button.interactable = false;
             }
-        } else if (Replay.IsTemporary) {
-            int? deletion = manager.GetReplaysUntilDeletion(Replay);
+        } else if (IsTemporary) {
+            int? deletion = manager.GetReplaysUntilDeletion(this);
             if (deletion.HasValue && deletion == 1) {
                 warningText.text = tm.GetTranslation("ui.extras.replays.temporary.next");
                 warningText.color = criticalColor;
@@ -201,21 +192,21 @@ public class ReplayListEntry : MonoBehaviour {
                 warningText.text = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
                 warningText.color = warningColor;
             }
-        } else if (Replay.IsFavorited) {
+        } else if (IsFavorited) {
             warningText.text = tm.GetTranslation("ui.extras.replays.favorited");
             warningText.color = favoriteColor;
         } else {
             warningText.text = "";
         }
 
-        mapImage.sprite = replayFile.GetMapSprite();
+        mapImage.sprite = header.GetMapSprite();
         if (!mapImage.sprite) {
             mapImage.sprite = defaultMapSprite;
         }
 
-        if (Replay.IsTemporary) {
+        if (IsTemporary) {
             favoriteButtonText.text = tm.GetTranslation("ui.extras.replays.actions.save");
-        } else if (Replay.IsFavorited) {
+        } else if (IsFavorited) {
             favoriteButtonText.text = tm.GetTranslation("ui.extras.replays.actions.unfavorite");
         } else {
             favoriteButtonText.text = tm.GetTranslation("ui.extras.replays.actions.favorite");

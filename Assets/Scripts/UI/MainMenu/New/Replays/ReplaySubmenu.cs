@@ -13,15 +13,10 @@ namespace NSMB.UI.MainMenu.Submenus {
                 return base.DefaultSelection;
             }
         }
-        public override float BackHoldTime => replayList.Selected ? 0 : 1;
+        public override float BackHoldTime => replayList.Selected && replayList.Selected.IsOpen ? 0 : 1;
 
         //---Serialized Variables
         [SerializeField] private ReplayListManager replayList;
-
-        public override void Initialize() {
-            base.Initialize();
-            // replayList.FindReplays();
-        }
 
         public override void Show(bool first) {
             base.Show(first);
@@ -31,10 +26,19 @@ namespace NSMB.UI.MainMenu.Submenus {
             }
         }
 
+        public override void Hide(SubmenuHideReason hideReason) {
+            base.Hide(hideReason);
+
+            if (hideReason == SubmenuHideReason.Closed) {
+                // Dispose
+                replayList.Close();
+            }
+        }
+
         public override bool TryGoBack(out bool playSound) {
             ReplayListEntry selected = replayList.Selected;
-            if (selected) {
-                replayList.Select(null);
+            if (selected && selected.IsOpen) {
+                selected.HideButtons();
                 Canvas.EventSystem.SetSelectedGameObject(selected.button.gameObject);
                 playSound = true;
                 return false;

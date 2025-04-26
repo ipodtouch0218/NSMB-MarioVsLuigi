@@ -1,7 +1,7 @@
+using System;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using static ReplayListManager;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class ReplayRenamePromptSubmenu : PromptSubmenu {
@@ -12,10 +12,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [SerializeField] private TMP_Text defaultValue;
 
         //---Private Variables
-        private Replay target;
+        private ReplayListEntry target;
         private bool success;
 
-        public void Open(Replay replay) {
+        public void Open(ReplayListEntry replay) {
             target = replay;
             Canvas.OpenMenu(this);
         }
@@ -23,8 +23,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public override void Show(bool first) {
             base.Show(first);
             success = false;
-            inputField.text = target.ReplayFile.GetDisplayName(false);
-            defaultValue.text = target.ReplayFile.GetDefaultName();
+            inputField.text = target.ReplayFile.Header.GetDisplayName(false);
+            defaultValue.text = target.ReplayFile.Header.GetDefaultName();
         }
 
         public override bool TryGoBack(out bool playSound) {
@@ -42,13 +42,19 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 inputField.text = null;
             }
 
-            if (inputField.text != target.ReplayFile.GetDisplayName()) {
+            if (inputField.text != target.ReplayFile.Header.GetDisplayName()) {
                 // Confirm + no change = no change. Do this because translations matter.
-                target.ReplayFile.CustomName = inputField.text;
+                target.ReplayFile.Header.CustomName = inputField.text;
 
-                using FileStream file = new FileStream(target.FilePath, FileMode.OpenOrCreate);
-                target.ReplayFile.WriteToStream(file);
-                target.ListEntry.UpdateText();
+                try {
+                    target.ReplayFile.LoadAllIfNeeded();
+                    using FileStream file = new FileStream(target.ReplayFile.FilePath, FileMode.OpenOrCreate);
+                    file.SetLength(0);
+                    target.ReplayFile.WriteToStream(file);
+                } catch (Exception e) {
+                    Debug.LogWarning("Failed to save renamed replay: " + e);
+                }
+                target.UpdateText();
             }
 
             target = null;

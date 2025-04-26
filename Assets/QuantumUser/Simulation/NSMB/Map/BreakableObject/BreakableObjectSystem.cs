@@ -6,6 +6,7 @@ namespace Quantum {
         public override void OnInit(Frame f) {
             f.Context.Interactions.Register<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioHitboxInteraction);
             f.Context.Interactions.Register<MarioPlayer, BreakableObject>(f, OnBreakableObjectMarioPlatformInteraction);
+            f.Context.RegisterPreContactCallback(f, OnMarioBreakableObjectPreContact);
         }
 
         private static bool TryInteraction(Frame f, EntityRef marioEntity, EntityRef breakableObjectEntity, PhysicsContact? contact = null) {
@@ -36,7 +37,8 @@ namespace Quantum {
             if (dot > PhysicsObjectSystem.GroundMaxAngle) {
                 // Hit the top of a pipe
                 // Shrink by 1, if we can.
-                if (breakable->IsStompable && breakable->CurrentHeight >= breakable->MinimumHeight + 1 && mario->JumpState != JumpState.None && (breakable->CurrentHeight - 1 > 0)) {
+                var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
+                if (breakable->IsStompable && breakable->CurrentHeight >= breakable->MinimumHeight + 1 && !marioPhysicsObject->WasTouchingGround && (breakable->CurrentHeight - 1 > 0)) {
                     ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->CurrentHeight - 1, null);
                     mario->JumpState = JumpState.None;
                 }
@@ -46,6 +48,7 @@ namespace Quantum {
                 ChangeHeight(f, breakableObjectEntity, breakable, breakableCollider, breakable->MinimumHeight, true);
                 breakable->IsDestroyed = true;
 
+                /*
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
                 FPVector2 velocity = marioPhysicsObject->PreviousFrameVelocity;
                 
@@ -55,6 +58,7 @@ namespace Quantum {
                     PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), marioEntity, f.FindAsset<VersusStageData>(f.Map.UserAsset), default, out _);
                     marioPhysicsObject->Velocity.X = velocity.X;
                 }
+                */
                 return true;
             }
 
@@ -82,6 +86,12 @@ namespace Quantum {
 
         private static void OnBreakableObjectMarioPlatformInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
             TryInteraction(f, breakableObjectEntity, marioEntity, contact);
+        }
+
+        private static void OnMarioBreakableObjectPreContact(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContacts) {
+            if (f.Has<MarioPlayer>(entity) && f.Has<BreakableObject>(contact.Entity)) {
+                keepContacts = !TryInteraction(f, entity, contact.Entity, contact);
+            }
         }
         #endregion
 

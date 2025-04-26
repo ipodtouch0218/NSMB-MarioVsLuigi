@@ -97,6 +97,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             var game = NetworkHandler.Game;
             PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
             if (!game.PlayerIsLocal(host)) {
+                GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
                 return;
             }
             int slot = game.GetLocalPlayerSlots().IndexOf(host);

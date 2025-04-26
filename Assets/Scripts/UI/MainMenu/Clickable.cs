@@ -4,9 +4,10 @@ using UnityEngine.EventSystems;
 
 public class Clickable : MonoBehaviour, IPointerDownHandler, IPointerExitHandler, IPointerUpHandler {
 
+    //---Public Variables
     public UnityEvent OnClick;
-    public bool Interactable = true, RepeatOnHold = false;
-
+    public bool Interactable = true, RepeatOnHold = false, OnRelease = false;
+    
     //---Private Variables
     private bool held;
     private float holdTime;
@@ -26,7 +27,7 @@ public class Clickable : MonoBehaviour, IPointerDownHandler, IPointerExitHandler
     }
 
     public void OnPointerDown(PointerEventData eventData) {
-        if (Interactable) {
+        if (Interactable && !OnRelease) {
             OnClick?.Invoke();
             held = true;
             holdTime = 0; 
@@ -38,6 +39,9 @@ public class Clickable : MonoBehaviour, IPointerDownHandler, IPointerExitHandler
     }
 
     public void OnPointerUp(PointerEventData eventData) {
+        if (Interactable && OnRelease) {
+            OnClick?.Invoke();
+        }
         held = false;
     }
 }

@@ -33,7 +33,7 @@ public class SecondaryCameraPositioner : MonoBehaviour {
         }
 
         float camX = mainCamera.transform.position.x;
-        bool enable = Mathf.Abs(camX - stage.StageWorldMin.X.AsFloat) < (mainCamera.orthographicSize * 2) || Mathf.Abs(camX - stage.StageWorldMax.X.AsFloat) < (mainCamera.orthographicSize * 2);
+        bool enable = Mathf.Abs(camX - stage.StageWorldMin.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect) || Mathf.Abs(camX - stage.StageWorldMax.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect);
 
         ourCamera.enabled = enable;
         ourCamera.orthographicSize = mainCamera.orthographicSize;

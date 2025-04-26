@@ -7674,7 +7674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: ui.extras.replays.simulating.cancel
+  key: ui.replay.simulating.cancel
   text: {fileID: 5603717140372557678}
 --- !u!1 &3882850512464174579
 GameObject:
@@ -14135,7 +14135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: ui.extras.replays.simulating
+  key: ui.replay.simulating
   text: {fileID: 7248586625861505041}
 --- !u!1 &6527823767786401461
 GameObject:

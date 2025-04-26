@@ -1,6 +1,7 @@
 ﻿using NSMB.Extensions;
 using NSMB.Sound;
 using NSMB.UI.Game;
+using NSMB.UI.Pause;
 using NSMB.Utils;
 using Quantum;
 using System.Collections;
@@ -176,6 +177,7 @@ public class ReplayUI : QuantumSceneViewComponent {
         activeTab.gameObject.SetActive(false);
         activeTab = null;
         tabBlocker.SetActive(false);
+        PauseMenuManager.UnpauseTime = Time.unscaledTime;
     }
 
     public bool ToggleReplayControls() {

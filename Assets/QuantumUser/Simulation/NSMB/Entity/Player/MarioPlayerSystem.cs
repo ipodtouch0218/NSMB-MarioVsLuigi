@@ -968,9 +968,6 @@ namespace Quantum {
             continueGroundpound &= interactedAny;
             mario->IsGroundpoundActive &= continueGroundpound;
 
-            if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
-                physicsObject->Velocity.Y = physics.TerminalVelocityGroundpound;
-            }
             if (!mario->IsGroundpoundActive && physicsObject->IsOnSlideableGround && !mario->IsInShell && FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle) {
                 mario->IsGroundpounding = false;
                 mario->IsSliding = true;
@@ -1179,8 +1176,11 @@ namespace Quantum {
                         physicsObject->Velocity.X = physicsObject->PreviousFrameVelocity.X;
                         FP leftoverVelocity = (FPMath.Abs(physicsObject->Velocity.X) - (contact.Distance * f.UpdateRate)) * (physicsObject->Velocity.X > 0 ? 1 : -1);
                         PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, new FPVector2(leftoverVelocity, 0), entity, stage, contacts, out _);
-                    } else if (direction == InteractionDirection.Up) {
+                    } else if (direction == InteractionDirection.Up || (direction == InteractionDirection.Down && mario->IsGroundpoundActive)) {
                         physicsObject->Velocity.Y = physicsObject->PreviousFrameVelocity.Y;
+                        physicsObject->HoverFrames = 0;
+                        physicsObject->IsTouchingGround = false;
+                        physicsObject->WasTouchingGround = false;
                         FP leftoverVelocity = (FPMath.Abs(physicsObject->Velocity.Y) - (contact.Distance * f.UpdateRate)) * (physicsObject->Velocity.Y > 0 ? 1 : -1);
                         PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, new FPVector2(0, leftoverVelocity), entity, stage, contacts, out _);
                     }
@@ -1204,7 +1204,6 @@ namespace Quantum {
             }
             if (mario->MegaMushroomEndFrames > 0 && QuantumUtils.Decrement(ref mario->MegaMushroomEndFrames) && mario->MegaMushroomStationaryEnd) {
                 // Ended after premature shrink, allow to move.
-
                 mario->DamageInvincibilityFrames = 2 * 60;
                 physicsObject->Velocity = FPVector2.Zero;
                 physicsObject->IsFrozen = false;
@@ -1588,8 +1587,8 @@ namespace Quantum {
 
             FPVector2 iceBlockSize = collider->Shape.Box.Extents;
             FP newHeight;
-            bool crouchHitbox = mario->CurrentPowerupState >= PowerupState.Mushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
-            bool smallHitbox = (mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->IsGroundpounding;
+            bool crouchHitbox = mario->CurrentPowerupState >= PowerupState.Mushroom && mario->CurrentPowerupState != PowerupState.MegaMushroom && !f.Exists(mario->CurrentPipe) && ((mario->IsCrouching && !mario->IsGroundpounding) || mario->IsInShell || mario->IsSliding);
+            bool smallHitbox = mario->CurrentPowerupState != PowerupState.MegaMushroom && ((mario->IsStarmanInvincible && !physicsObject->IsTouchingGround && !crouchHitbox && !mario->IsSliding && !mario->IsSpinnerFlying && !mario->IsPropellerFlying) || mario->IsGroundpounding);
             if (mario->CurrentPowerupState <= PowerupState.MiniMushroom || smallHitbox) {
                 newHeight = physics.SmallHitboxHeight;
                 if (smallHitbox) {
@@ -1619,15 +1618,15 @@ namespace Quantum {
             } else if (mario->MegaMushroomFrames > 0) {
                 megaPercentage = 1;
             }
-            newExtents *= FPMath.Lerp(1, Constants._3_50, megaPercentage);
+            newExtents *= FPMath.Lerp(1, Constants._3_50 + FP._0_25, megaPercentage);
 
             collider->Shape.Box.Extents = newExtents;
             collider->Shape.Centroid = FPVector2.Up * newExtents.Y;
-            collider->IsTrigger = mario->IsDead;
+            // collider->IsTrigger = mario->IsDead;
 
             filter.Freezable->IceBlockSize = iceBlockSize * Constants._2_50;
-            filter.Freezable->IceBlockSize.Y += FP._0_10;
-            filter.Freezable->IceBlockSize.X += FP._0_10;
+            filter.Freezable->IceBlockSize.Y += FP._0_10 + FP._0_05;
+            filter.Freezable->IceBlockSize.X += FP._0_10 + FP._0_05;
         }
 
         private bool HandleStuckInBlock(Frame f, ref Filter filter, VersusStageData stage) {
@@ -1674,7 +1673,7 @@ namespace Quantum {
             mario->IsSpinnerFlying = false;
             physicsObject->IsTouchingGround = false;
 
-            if (!wasStuckLastTick) {
+            if (!wasStuckLastTick || (f.Number + filter.Entity.Index) % 4 == 0) {
                 // Code for mario to instantly teleport to the closest free position when he gets stuck
                 if (PhysicsObjectSystem.TryEject((FrameThreadSafe) f, filter.Entity, stage)) {
                     mario->IsStuckInBlock = false;

@@ -37,7 +37,7 @@ public class VolumeWithDistance : MonoBehaviour {
         float minDistance = float.MaxValue;
         FP xDifference = 0;
         foreach (var pe in PlayerElements.AllPlayerElements) {
-            float distance = QuantumUtils.WrappedDistance(stage, pe.Camera.transform.position.ToFPVector2(), soundOrigin.position.ToFPVector2(), out FP tempXDifference).AsFloat;
+            float distance = QuantumUtils.WrappedDistance(stage, pe.Camera.transform.position.ToFPVector2(), soundOrigin.position.ToFPVector2(), out FP tempXDifference).AsFloat * Mathf.Min(1, (3.5f / pe.Camera.orthographicSize));
             if (distance < minDistance) {
                 minDistance = distance;
                 xDifference = tempXDifference;

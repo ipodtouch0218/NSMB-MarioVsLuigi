@@ -342,6 +342,8 @@ namespace Quantum {
                 Span<FPVector2> vertexBuffer = stackalloc FPVector2[128];
                 Span<int> shapeVertexCountBuffer = stackalloc int[16];
                 Span<PhysicsContact> contactBuffer = stackalloc PhysicsContact[32];
+                Span<PhysicsContact> removedContacts = stackalloc PhysicsContact[64];
+                int removedContactCount = 0;
 
                 for (FP y = start; (direction > 0 ? (y <= end) : (y >= end)); y += direction / 2) {
 
@@ -421,9 +423,6 @@ namespace Quantum {
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;
 
-                    Span<PhysicsContact> removedContacts = stackalloc PhysicsContact[32];
-                    int removedContactCount = 0;
-
                     for (int i = 0; i < potentialContactCount; i++) {
                         var contact = potentialContacts[i];
                         bool earlyContinue = false;
@@ -444,7 +443,7 @@ namespace Quantum {
                         
                         bool keepContact = true;
                         foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
-                            callback?.Invoke(f, stage, entity, contact, ref keepContact);
+                            callback?.Invoke((Frame) f, stage, entity, contact, ref keepContact);
                         }
                         
                         if (keepContact) {
@@ -550,6 +549,8 @@ namespace Quantum {
                 Span<FPVector2> vertexBuffer = stackalloc FPVector2[128];
                 Span<int> shapeVertexCountBuffer = stackalloc int[16];
                 Span<PhysicsContact> contactBuffer = stackalloc PhysicsContact[32];
+                Span<PhysicsContact> removedContacts = stackalloc PhysicsContact[64];
+                int removedContactCount = 0;
 
                 for (FP x = start; (direction > 0 ? (x <= end) : (x >= end)); x += direction / 2) {
                     
@@ -629,9 +630,6 @@ namespace Quantum {
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;
 
-                    Span<PhysicsContact> removedContacts = stackalloc PhysicsContact[32];
-                    int removedContactCount = 0;
-
                     for (int i = 0; i < potentialContactCount; i++) {
                         var contact = potentialContacts[i];
                         bool earlyContinue = false;
@@ -652,7 +650,7 @@ namespace Quantum {
 
                         bool keepContact = true;
                         foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
-                            callback?.Invoke(f, stage, entity, contact, ref keepContact);
+                            callback?.Invoke((Frame) f, stage, entity, contact, ref keepContact);
                         }
 
                         if (keepContact) {

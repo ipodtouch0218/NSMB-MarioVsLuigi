@@ -11,10 +11,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [SerializeField] private TMP_Text text;
 
         //---Private Variables
-        private Replay target;
+        private ReplayListEntry target;
         private bool success;
 
-        public void Open(Replay replay) {
+        public void Open(ReplayListEntry replay) {
             target = replay;
             Canvas.OpenMenu(this);
         }
@@ -23,7 +23,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             base.Show(first);
             success = false;
             text.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.extras.replays.delete.text", 
-                "replayname", target.ReplayFile.GetDisplayName());
+                "replayname", target.ReplayFile.Header.GetDisplayName());
         }
 
         public override bool TryGoBack(out bool playSound) {
@@ -37,7 +37,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void ClickConfirm() {
-            File.Delete(target.FilePath);
+            try {
+                File.Delete(target.ReplayFile.FilePath);
+            } catch { }
             manager.RemoveReplay(target);
             target = null;
             success = true;

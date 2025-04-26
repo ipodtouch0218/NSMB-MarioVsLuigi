@@ -8,7 +8,6 @@ public class ReplayListButton : MonoBehaviour, ISelectHandler {
     [SerializeField] private ReplayListManager handler;
 
     public void OnSelect(BaseEventData eventData) {
-        handler.UpdateInformation(entry.Replay);
-        handler.Selected = entry;
+        handler.Select(entry, false);
     }
 }

@@ -13,6 +13,7 @@ namespace NSMB.UI.Pause {
     public class PauseMenuManager : MonoBehaviour {
 
         //---Properties
+        public static float UnpauseTime { get; set; }
         public bool IsPaused => isPaused;
 
         //---Serialized Variables
@@ -29,7 +30,6 @@ namespace NSMB.UI.Pause {
 
         //---Private Variables
         private bool isPaused;
-
         private bool inputted;
         private int selected;
         private bool skipSound;
@@ -40,7 +40,6 @@ namespace NSMB.UI.Pause {
         private bool isInConfirmationForQuitting;
         private string originalNoText, originalYesText;
 
-        private float unpauseTime;
 
         public void OnValidate() {
             this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
@@ -60,7 +59,7 @@ namespace NSMB.UI.Pause {
         }
 
         private unsafe void OnPause(InputAction.CallbackContext context) {
-            if (isPaused || unpauseTime == Time.unscaledTime || NetworkHandler.IsReplayFastForwarding) {
+            if (isPaused || UnpauseTime == Time.unscaledTime || NetworkHandler.IsReplayFastForwarding) {
                 return;
             }
 
@@ -113,7 +112,7 @@ namespace NSMB.UI.Pause {
             if (playSound) {
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Pause);
             }
-            unpauseTime = Time.unscaledTime;
+            UnpauseTime = Time.unscaledTime;
         }
 
         public void OnNavigate(InputAction.CallbackContext context) {

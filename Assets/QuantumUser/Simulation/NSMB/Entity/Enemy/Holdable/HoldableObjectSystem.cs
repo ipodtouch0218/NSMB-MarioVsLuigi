@@ -51,9 +51,9 @@ namespace Quantum {
             }
         }
 
-        public void OnPreContactCallback(FrameThreadSafe f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContact) {
+        public void OnPreContactCallback(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContact) {
             if (contact.Entity != EntityRef.None
-                && f.TryGetPointer(contact.Entity, out Holdable* holdable)
+                && f.Unsafe.TryGetPointer(contact.Entity, out Holdable* holdable)
                 && (entity == holdable->Holder || (entity == holdable->PreviousHolder && holdable->IgnoreOwnerFrames > 0))) {
 
                 keepContact = false;

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using System.Text.RegularExpressions;
 using Quantum.Prototypes;
-using static BinaryReplayHeader;
+using NSMB.Replay;
 
 public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, IConnectionCallbacks {
 
@@ -249,8 +249,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             var deletions = manager.GetTemporaryReplaysToDelete();
             if (deletions != null) {
                 foreach (var replay in deletions) {
-                    Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.GetDisplayName()}' ({replay.FilePath}) to make room.");
-                    File.Delete(replay.FilePath);
+                    Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.Header.GetDisplayName()}' ({replay.ReplayFile.FilePath}) to make room.");
+                    File.Delete(replay.ReplayFile.FilePath);
                     manager.RemoveReplay(replay);
                 }
             }
@@ -523,6 +523,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
         if (Runner && Runner.IsRunning) {
             await Runner.ShutdownAsync();
+        }
+        if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
+            return;
         }
 
         CurrentReplay = replay;

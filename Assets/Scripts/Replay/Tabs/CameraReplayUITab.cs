@@ -13,7 +13,20 @@ namespace NSMB.UI.Game.Replay {
         //---Serialized Variables
         [SerializeField] private GameObject template;
 
-        public unsafe void Start() {
+        //---Private Variables
+        private bool initialized;
+        
+        public override void OnEnable() {
+            if (!initialized) {
+                Initialize();
+                initialized = true;
+                defaultSelection = selectables[1];
+            }
+
+            base.OnEnable();
+        }
+
+        public unsafe void Initialize() {
             template.SetActive(false);
             Frame f = NetworkHandler.Game.Frames.Predicted;
 
@@ -74,6 +87,7 @@ namespace NSMB.UI.Game.Replay {
                 }
             }
 
+            defaultSelection = selectables[index + 1];
             ApplyColor(false);
         }
 
