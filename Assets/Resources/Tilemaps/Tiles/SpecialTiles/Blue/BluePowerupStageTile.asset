@@ -18,24 +18,8 @@ MonoBehaviour:
       Value: 300455806277301968
   Tile: {fileID: 11400000, guid: 7833a44a5c5ede241bf057e9e7ecc82f, type: 2}
   CollisionData:
-    Shapes:
-    - Vertices:
-      - X:
-          RawValue: -32768
-        Y:
-          RawValue: 32768
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: 32768
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: -32768
-      - X:
-          RawValue: -32768
-        Y:
-          RawValue: -32768
+    IsFullTile: 1
+    Shapes: []
   IsSlipperyGround: 0
   IsSlideableGround: 0
   IsPolygon: 1

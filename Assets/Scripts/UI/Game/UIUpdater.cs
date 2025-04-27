@@ -43,6 +43,7 @@ namespace NSMB.UI.Game {
         private PowerupAsset previousPowerup;
         private VersusStageData stage;
         private EntityRef previousTarget;
+        private bool previousMarioExists;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -120,17 +121,22 @@ namespace NSMB.UI.Game {
             Frame f = game.Frames.Predicted;
             //UpdateTrackIcons(f);
 
-            if (!f.Exists(Target) || !f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
-                UpdateElementVisibility(f, false);
+            bool marioExists = f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario);
+            if (Target != previousTarget || marioExists != previousMarioExists) {
+                UpdateElementVisibility(f, marioExists);
+            }
+
+            if (!marioExists) {
+                previousMarioExists = false;
                 return;
             }
 
-            UpdateElementVisibility(f, true);
             UpdateStoredItemUI(mario, previousTarget == Target);
             UpdateTextUI(f, mario);
             ApplyUIColor(f, mario);
 
             previousTarget = Target;
+            previousMarioExists = true;
         }
 
         private void OnMarioInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
@@ -185,7 +191,7 @@ namespace NSMB.UI.Game {
         private void UpdateElementVisibility(Frame f, bool marioExists) {
             teamsParent.SetActive(marioExists && f.Global->Rules.TeamsEnabled);
             starsParent.SetActive(marioExists);
-            livesParent.SetActive(marioExists);
+            livesParent.SetActive(marioExists && f.Global->Rules.IsLivesEnabled);
             coinsParent.SetActive(marioExists);
             timerParent.SetActive(f.Global->Rules.IsTimerEnabled);
             reserveItemBox.SetActive(marioExists);
@@ -238,7 +244,8 @@ namespace NSMB.UI.Game {
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
 
-            if (rules.TeamsEnabled) {
+            // TEAMS
+            if (teamsEnabled) {
                 byte teamIndex = mario->GetTeam(f);
                 int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
                 if (cachedTeamStars != teamStars) {
@@ -246,10 +253,9 @@ namespace NSMB.UI.Game {
                     TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
                     uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + "/" + starRequirement);
                 }
-            } else {
-                teamsParent.SetActive(false);
             }
 
+            // STARS
             if (mario->Stars != cachedStars) {
                 cachedStars = mario->Stars;
                 string starString = "Sx" + cachedStars;
@@ -259,20 +265,22 @@ namespace NSMB.UI.Game {
 
                 uiStars.text = Utils.Utils.GetSymbolString(starString);
             }
+
+            // COINS
             if (mario->Coins != cachedCoins) {
                 cachedCoins = mario->Coins;
                 uiCoins.text = Utils.Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
             }
 
+            // LIVES
             if (livesEnabled) {
                 if (mario->Lives != cachedLives) {
                     cachedLives = mario->Lives;
                     uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.Utils.GetSymbolString("x" + cachedLives);
                 }
-            } else {
-                livesParent.SetActive(false);
             }
 
+            // TIMER
             if (timerEnabled) {
                 float timeRemaining = f.Global->Timer.AsFloat;
                 int secondsRemaining = Mathf.Max(Mathf.CeilToInt(timeRemaining), 0);
@@ -282,8 +290,6 @@ namespace NSMB.UI.Game {
                     uiCountdown.text = Utils.Utils.GetSymbolString("Tx" + Utils.Utils.SecondsToMinuteSeconds(secondsRemaining));
                     timerParent.SetActive(true);
                 }
-            } else {
-                timerParent.SetActive(false);
             }
         }
 

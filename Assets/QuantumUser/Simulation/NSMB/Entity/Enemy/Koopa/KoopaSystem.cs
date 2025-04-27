@@ -82,11 +82,11 @@ namespace Quantum {
                         }
 
                         // Floor tiles.
-                        var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                        var tileInstance = stage.GetTileRelative(f, contact.Tile);
                         StageTile tile = f.FindAsset(tileInstance.Tile);
                         if (tile is IInteractableTile it) {
                             it.Interact(f, filter.Entity, right ? InteractionDirection.Right : InteractionDirection.Left,
-                                new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
+                                contact.Tile, tileInstance, out bool tempPlayBumpSound);
                         }
                     }
 

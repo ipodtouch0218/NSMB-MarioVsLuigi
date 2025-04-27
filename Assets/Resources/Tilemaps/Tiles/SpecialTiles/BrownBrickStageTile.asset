@@ -18,26 +18,23 @@ MonoBehaviour:
       Value: 362633902293829697
   Tile: {fileID: 11400000, guid: 5b752973dc1c0dc42a34828d1f33c6fd, type: 2}
   CollisionData:
-    Shapes:
-    - Vertices:
-      - X:
-          RawValue: -32768
-        Y:
-          RawValue: 32768
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: 32768
-      - X:
-          RawValue: 32768
-        Y:
-          RawValue: -32768
-      - X:
-          RawValue: -32768
-        Y:
-          RawValue: -32768
+    IsFullTile: 1
+    Shapes: []
   IsSlipperyGround: 0
   IsSlideableGround: 0
+  IsPolygon: 1
+  FootstepSound: 31
+  FootstepParticle: 0
   ParticleColor: {r: 0.84705883, g: 0.627451, b: 0.15686275, a: 1}
   BreakingRules: 508
   BumpIfNotBroken: 1
+  BumpSize:
+    X:
+      RawValue: 32768
+    Y:
+      RawValue: 32768
+  BumpOffset:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 0

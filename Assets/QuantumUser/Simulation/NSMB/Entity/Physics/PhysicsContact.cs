@@ -1,19 +1,19 @@
 using System;
 
 namespace Quantum {
-    public partial struct PhysicsContact : IEquatable<PhysicsContact> {
+    public unsafe partial struct PhysicsContact : IEquatable<PhysicsContact> {
+
         public override bool Equals(object obj) {
-            if (obj is not PhysicsContact other) {
-                return false;
+            if (obj is PhysicsContact other) {
+                // Custom equals- fixes phantom hits
+                return Equals(other);
             }
 
-            // Custom equals- fixes phantom hits
-            return Equals(obj);
+            return false;            
         }
 
         public bool Equals(PhysicsContact other) {
-            return TileX == other.TileX
-                && TileY == other.TileY
+            return Tile == other.Tile
                 && Entity == other.Entity
                 && Frame == other.Frame;
         }

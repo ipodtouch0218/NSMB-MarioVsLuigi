@@ -95,7 +95,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             BanEntry entry = entries[index];
 
             var game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (!game.PlayerIsLocal(host)) {
                 GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
                 return;

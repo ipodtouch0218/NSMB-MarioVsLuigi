@@ -483,6 +483,7 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Interactable))]
   public unsafe partial class InteractablePrototype : ComponentPrototype<Quantum.Interactable> {
+    public QBoolean IsPassive;
     public QBoolean ColliderDisabled;
     partial void MaterializeUser(Frame frame, ref Quantum.Interactable result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
@@ -491,6 +492,7 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.Interactable result, in PrototypeMaterializationContext context = default) {
+        result.IsPassive = this.IsPassive;
         result.ColliderDisabled = this.ColliderDisabled;
         MaterializeUser(frame, ref result, in context);
     }
@@ -614,16 +616,14 @@ namespace Quantum.Prototypes {
     public FPVector2 Normal;
     public FP Distance;
     public Int32 Frame;
-    public Int32 TileX;
-    public Int32 TileY;
+    public Quantum.Prototypes.Vector2IntPrototype Tile;
     public MapEntityId Entity;
     public void Materialize(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context = default) {
         result.Position = this.Position;
         result.Normal = this.Normal;
         result.Distance = this.Distance;
         result.Frame = this.Frame;
-        result.TileX = this.TileX;
-        result.TileY = this.TileY;
+        this.Tile.Materialize(frame, ref result.Tile, in context);
         PrototypeValidator.FindMapEntity(this.Entity, in context, out result.Entity);
     }
   }

@@ -22,6 +22,7 @@ namespace Quantum {
 
             playerData->IsRoomHost = false;
             newHostPlayerData->IsRoomHost = true;
+            f.Global->Host = NewHost;
             f.Events.HostChanged(NewHost);
         }
     }

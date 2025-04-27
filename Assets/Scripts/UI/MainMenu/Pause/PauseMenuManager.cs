@@ -82,7 +82,7 @@ namespace NSMB.UI.Pause {
             skipSound = true;
 
             QuantumGame game = QuantumRunner.DefaultGame;
-            isHost = game == null || game.PlayerIsLocal(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _));
+            isHost = game == null || game.PlayerIsLocal(game.Frames.Predicted.Global->Host);
             options[1].text.fontSharedMaterial = isHost || NetworkHandler.IsReplay ? enabledMaterial : disabledMaterial;
             SelectOption(0);
 
@@ -218,7 +218,7 @@ namespace NSMB.UI.Pause {
             } else {
                 QuantumGame game = NetworkHandler.Game;
                 Frame f = game.Frames.Predicted;
-                PlayerRef hostPlayer = QuantumUtils.GetHostPlayer(f, out _);
+                PlayerRef hostPlayer = f.Global->Host;
 
                 int index = game.GetLocalPlayers().IndexOf(hostPlayer);
                 if (index != -1) {

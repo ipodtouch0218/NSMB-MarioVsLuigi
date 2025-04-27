@@ -11527,7 +11527,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8475244344260817380}
   - component: {fileID: 1958874176922941125}
-  m_Layer: 5
+  m_Layer: 18
   m_Name: Parent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17019,7 +17019,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1310746913248571851}
   - component: {fileID: 4860955359390765288}
-  m_Layer: 5
+  m_Layer: 18
   m_Name: NametagCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18282,7 +18282,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7254413228168120027}
   - component: {fileID: 5954223862243588252}
-  m_Layer: 5
+  m_Layer: 18
   m_Name: PlayerNametagTemplate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18337,7 +18337,7 @@ GameObject:
   - component: {fileID: 3817364912648868397}
   - component: {fileID: 2232885366247696238}
   - component: {fileID: 7190874099432899339}
-  m_Layer: 5
+  m_Layer: 18
   m_Name: username
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18688,7 +18688,7 @@ GameObject:
   - component: {fileID: 2356769047064259312}
   - component: {fileID: 2363587619986607430}
   - component: {fileID: 7171030738423974364}
-  m_Layer: 5
+  m_Layer: 18
   m_Name: arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

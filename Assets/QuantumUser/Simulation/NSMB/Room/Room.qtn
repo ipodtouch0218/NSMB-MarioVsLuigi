@@ -1,4 +1,6 @@
 global {
+	PlayerRef Host;
+	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
 	[AllocateOnComponentAdded] list<BannedPlayerInfo> BannedPlayerIds;
 }
 

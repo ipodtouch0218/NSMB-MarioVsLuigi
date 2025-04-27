@@ -38,7 +38,7 @@ public class ToggleChangeableRule : ChangeableRule {
         }
 
         QuantumGame game = NetworkHandler.Game;
-        int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _))];
+        int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
         game.SendCommand(slot, cmd);
     }
 

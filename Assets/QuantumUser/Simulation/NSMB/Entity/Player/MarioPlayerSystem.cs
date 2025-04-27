@@ -949,11 +949,11 @@ namespace Quantum {
                     continueGroundpound &= ice;
                     interactedAny |= ice;
                 } else {
-                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    var tileInstance = stage.GetTileRelative(f, contact.Tile);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
                         continueGroundpound &= it.Interact(f, filter.Entity, InteractionDirection.Down,
-                            new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
+                            contact.Tile, tileInstance, out bool tempPlayBumpSound);
                         interactedAny = true;
 
                         playBumpSound &= (playBumpSound ?? true) & tempPlayBumpSound;
@@ -1026,17 +1026,22 @@ namespace Quantum {
                 QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
                 FPVector2? maxVector = null;
                 foreach (var contact in contacts) {
+                    if (f.Exists(contact.Entity)) {
+                        continue;
+                    }
+
                     FP dot = FPVector2.Dot(contact.Normal, FPVector2.Right);
                     if (FPMath.Abs(dot) < FP._0_75) {
                         continue;
                     }
 
                     // Wall tiles.
-                    var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    Vector2Int tileCoords = contact.Tile;
+                    var tileInstance = stage.GetTileRelative(f, tileCoords);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
                         it.Interact(f, filter.Entity, dot > 0 ? InteractionDirection.Right : InteractionDirection.Left,
-                            new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
+                            tileCoords, tileInstance, out bool tempPlayBumpSound);
                     }
 
                     FPVector2 vector = contact.Normal * (contact.Distance + FP._0_05);
@@ -1088,7 +1093,7 @@ namespace Quantum {
                     physicsObject->IsFrozen = false;
 
                     Span<PhysicsObjectSystem.LocationTilePair> tiles = stackalloc PhysicsObjectSystem.LocationTilePair[64];
-                    int overlappingTiles = PhysicsObjectSystem.GetTilesOverlappingHitbox((FrameThreadSafe) f, transform->Position, collider->Shape, tiles, stage);
+                    int overlappingTiles = PhysicsObjectSystem.GetTilesOverlappingHitbox(f, transform->Position, collider->Shape, tiles, stage);
 
                     for (int i = 0; i < overlappingTiles; i++) {
                         StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);
@@ -1122,15 +1127,15 @@ namespace Quantum {
                     if (mario->JumpState != JumpState.None) {
                         // Break ground
                         foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                            if (FPVector2.Dot(contact.Normal, FPVector2.Up) < FP._0_33 * 2) {
+                            if (f.Exists(contact.Entity) || FPVector2.Dot(contact.Normal, FPVector2.Up) < FP._0_33 * 2) {
                                 continue;
                             }
 
-                            StageTileInstance tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                            StageTileInstance tileInstance = stage.GetTileRelative(f, contact.Tile);
                             StageTile tile = f.FindAsset(tileInstance.Tile);
 
                             if (tile is IInteractableTile it) {
-                                it.Interact(f, filter.Entity, InteractionDirection.Down, new Vector2Int(contact.TileX, contact.TileY), tileInstance, out _);
+                                it.Interact(f, filter.Entity, InteractionDirection.Down, contact.Tile, tileInstance, out _);
                             }
                         }
                     }
@@ -1141,7 +1146,7 @@ namespace Quantum {
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 foreach (var contact in contacts) {
                     // Try to break this tile as mega mario...
-                    if (contact.TileX == -1 || contact.TileY == -1) {
+                    if (f.Exists(contact.Entity)) {
                         continue;
                     }
 
@@ -1161,13 +1166,13 @@ namespace Quantum {
                         direction = InteractionDirection.Left;
                     }
 
-                    StageTileInstance tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTileInstance tileInstance = stage.GetTileRelative(f, contact.Tile);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is not IInteractableTile it) {
                         continue;
                     }
 
-                    if (!it.Interact(f, entity, direction, new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool _)) {
+                    if (!it.Interact(f, entity, direction, contact.Tile, tileInstance, out bool _)) {
                         continue;
                     }
 
@@ -1705,13 +1710,13 @@ namespace Quantum {
                 }
 
                 // Ceiling tiles.
-                var tileInstance = stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                var tileInstance = stage.GetTileRelative(f, contact.Tile);
                 StageTile tile = f.FindAsset(tileInstance.Tile);
                 if (tile == null) {
                     playBumpSound = false;
                 } else if (tile is IInteractableTile it) {
                     it.Interact(f, filter.Entity, InteractionDirection.Up,
-                        new Vector2Int(contact.TileX, contact.TileY), tileInstance, out bool tempPlayBumpSound);
+                        contact.Tile, tileInstance, out bool tempPlayBumpSound);
 
                     playBumpSound = (playBumpSound ?? true) & tempPlayBumpSound;
                 }
@@ -2346,7 +2351,7 @@ namespace Quantum {
                 }
 
                 Span<PhysicsObjectSystem.LocationTilePair> tiles = stackalloc PhysicsObjectSystem.LocationTilePair[64];
-                int overlappingTiles = PhysicsObjectSystem.GetTilesOverlappingHitbox((FrameThreadSafe) f, transform->Position, physicsCollider->Shape, tiles, stage);
+                int overlappingTiles = PhysicsObjectSystem.GetTilesOverlappingHitbox(f, transform->Position, physicsCollider->Shape, tiles, stage);
 
                 for (int i = 0; i < overlappingTiles; i++) {
                     StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);

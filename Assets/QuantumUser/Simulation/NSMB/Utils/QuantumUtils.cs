@@ -57,21 +57,6 @@ public static unsafe class QuantumUtils {
         return data;
     }
 
-    public static unsafe PlayerRef GetHostPlayer(Frame f, out PlayerData* data) {
-        var filter = f.Filter<PlayerData>();
-        filter.UseCulling = false;
-        while (filter.NextUnsafe(out _, out PlayerData* playerData)) {
-            if (playerData->IsRoomHost) {
-                data = playerData;
-                return playerData->PlayerRef;
-            }
-        }
-
-        data = null;
-        return PlayerRef.None;
-    }
-
-
     public static SoundEffect GetComboSoundEffect(int combo) {
         return ComboSounds[FPMath.Clamp(combo, 0, ComboSounds.Length - 1)];
     }

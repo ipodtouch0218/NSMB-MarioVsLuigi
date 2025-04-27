@@ -20,7 +20,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             get {
                 const int rngSeed = 2035767;
                 Frame f = NetworkHandler.Runner.Game.Frames.Predicted;
-                PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+                PlayerRef host = f.Global->Host;
                 RuntimePlayer playerData = f.GetPlayerData(host);
                 string hostname;
 
@@ -38,7 +38,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         public unsafe override string Header {
             get {
                 Frame f = NetworkHandler.Runner.Game.Frames.Predicted;
-                PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+                PlayerRef host = f.Global->Host;
                 RuntimePlayer playerData = f.GetPlayerData(host);
                 string hostname;
 
@@ -166,7 +166,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         //---Helpers
         private unsafe void UpdateStartButton(QuantumGame game, Frame f, int? seconds = null) {
             TranslationManager tm = GlobalController.Instance.translationManager;
-            bool isHost = game.PlayerIsLocal(QuantumUtils.GetHostPlayer(f, out _));
+            bool isHost = game.PlayerIsLocal(f.Global->Host);
             seconds ??= f.Global->GameStartFrames / 60;
 
             if (seconds <= 0) {
@@ -217,7 +217,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         public unsafe void OnStartGameButtonClicked() {
             QuantumGame game = NetworkHandler.Runner.Game;
             Frame f = game.Frames.Predicted;
-            PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+            PlayerRef host = f.Global->Host;
 
             if (game.PlayerIsLocal(host)) {
                 // Start (or cancel) the game countdown
@@ -304,7 +304,7 @@ namespace NSMB.UI.MainMenu.Submenus {
             Frame f = e.Game.Frames.Predicted;
             UpdateStartButton(e.Game, f, e.IsGameStarting ? 3 : -1);
 
-            bool isHost = e.Game.PlayerIsLocal(QuantumUtils.GetHostPlayer(f, out _));
+            bool isHost = e.Game.PlayerIsLocal(f.Global->Host);
             
             if (isHost
                 || (f.Number - lastCountdownStartFrame) > (f.UpdateRate * 3)
@@ -326,7 +326,7 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         private unsafe void OnPlayerDataChanged(EventPlayerDataChanged e) {
             Frame f = e.Game.Frames.Predicted;
-            bool isHost = e.Game.PlayerIsLocal(QuantumUtils.GetHostPlayer(f, out _));
+            bool isHost = e.Game.PlayerIsLocal(f.Global->Host);
 
             if (isHost) {
                 startGameButton.interactable = QuantumUtils.IsGameStartable(f);

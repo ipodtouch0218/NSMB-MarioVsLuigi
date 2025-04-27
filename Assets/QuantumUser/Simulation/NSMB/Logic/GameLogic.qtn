@@ -9,7 +9,6 @@ global {
 	ushort GameStartFrames;
 	ushort PlayerLoadFrames;
 
-	[AllocateOnComponentAdded] dictionary<PlayerRef, EntityRef> PlayerDatas;
 	array<PlayerInformation>[MaxPlayers] PlayerInfo;
 	byte RealPlayers;
 	byte TotalMarios;

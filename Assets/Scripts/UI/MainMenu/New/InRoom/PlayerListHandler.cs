@@ -77,7 +77,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             if (!GetPlayerEntry(player)) {
-                PlayerListEntry newEntry = GetUnusedPlayerEntry();
+                PlayerListEntry newEntry = GetPlayerEntry(PlayerRef.None);
                 newEntry.SetPlayer(f, player);
                 UpdateAllPlayerEntries(f);
 
@@ -109,11 +109,12 @@ namespace NSMB.UI.MainMenu {
         }
 
         public PlayerListEntry GetPlayerEntry(PlayerRef player) {
-            return playerListEntries.FirstOrDefault(ple => ple.player == player);
-        }
-
-        public PlayerListEntry GetUnusedPlayerEntry() {
-            return playerListEntries.FirstOrDefault(ple => ple.player == PlayerRef.None);
+            foreach (var ple in playerListEntries) {
+                if (ple.player == player) {
+                    return ple;
+                }
+            }
+            return null;
         }
 
         public PlayerListEntry GetPlayerEntryAtIndex(int index) {

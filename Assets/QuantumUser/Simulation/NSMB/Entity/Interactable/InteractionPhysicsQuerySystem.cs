@@ -6,8 +6,12 @@ namespace Quantum {
             var interactable = filter.Interactable;
             var shape = filter.Collider->Shape;
 
+            if (interactable->ColliderDisabled || interactable->IsPassive) {
+                return;
+            }
+
             Transform2D transformCopy = *filter.Transform;
-            
+
             interactable->OverlapQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
 
             FP center = transformCopy.Position.X + shape.Centroid.X;
@@ -20,6 +24,8 @@ namespace Quantum {
                 // Right edge
                 transformCopy.Position.X -= stage.TileDimensions.x * FP._0_50;
                 interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
+            } else {
+                interactable->OverlapLevelSeamQueryRef = PhysicsQueryRef.None;
             }
         }
     }

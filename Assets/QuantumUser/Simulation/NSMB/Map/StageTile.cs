@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum;
 using System;
+using System.Linq;
 
 public class StageTile : AssetObject {
 
@@ -13,12 +14,23 @@ public class StageTile : AssetObject {
     public ParticleEffect FootstepParticle = ParticleEffect.None;
 
     [Serializable]
-    public struct TileCollisionData {
+    public struct TileCollisionData : IEquatable<TileCollisionData> {
+        public bool IsFullTile;
         public TileShape[] Shapes;
 
         [Serializable]
-        public struct TileShape {
+        public struct TileShape : IEquatable<TileShape> {
             public FPVector2[] Vertices;
+
+            public bool Equals(TileShape other) {
+                // Uses linq... whatever.
+                return Vertices.SequenceEqual(other.Vertices);
+            }
+        }
+
+        public bool Equals(TileCollisionData other) {
+            return IsFullTile == other.IsFullTile
+                && Shapes.SequenceEqual(other.Shapes);
         }
     }
 }

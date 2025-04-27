@@ -8,10 +8,17 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEditor;
-
+using JimmysUnityUtilities;
 
 [assembly: QuantumMapBakeAssembly]
 public class VersusStageBaker : MapDataBakerCallback {
+
+    private static FPVector2[] GridCoords = new FPVector2[] {
+        new(FP._0_50, FP._0_50),
+        new(FP._0_50, -FP._0_50),
+        new(-FP._0_50, -FP._0_50),
+        new(-FP._0_50, FP._0_50),
+    };
 
     private QuantumMapData data;
 
@@ -19,6 +26,22 @@ public class VersusStageBaker : MapDataBakerCallback {
     }
 
     public override void OnBake(QuantumMapData data) {
+        int changed = 0;
+        foreach (var stageTile in FindAssetsByType<StageTile>()) {
+            var shapes = stageTile.CollisionData.Shapes;
+            if (shapes.Length != 1) {
+                continue;
+            }
+
+            if (shapes[0].Vertices.ContainsAll(GridCoords)) {
+                changed++;
+                stageTile.CollisionData = Grid;
+                EditorUtility.SetDirty(stageTile);
+            }
+        }
+        if (changed != 0) {
+            LogInfo($"{changed} StageTile(s) had a custom physics shape which was just a full grid. Migrated those custom shapes to 'IsFullTile' automatically. This should only appear once.");
+        }
 
         this.data = data;
         var stage = QuantumUnityDB.GetGlobalAssetEditorInstance<VersusStageData>(data.Asset.UserAsset);
@@ -187,20 +210,10 @@ public class VersusStageBaker : MapDataBakerCallback {
     }
 
     private static readonly StageTile.TileCollisionData Grid = new() {
-        Shapes = new[] {
-            new StageTile.TileCollisionData.TileShape {
-                Vertices = new FPVector2[] {
-                    new(FP._0_50, FP._0_50),
-                    new(FP._0_50, -FP._0_50),
-                    new(-FP._0_50, -FP._0_50),
-                    new(-FP._0_50, FP._0_50)
-                }
-            }
-        }
+        IsFullTile = true,
     };
 
-    private static StageTile.TileCollisionData GetTileCollisionData(Tile.ColliderType collider, Sprite sprite) {
-
+    private static StageTile.TileCollisionData GetTileCollisionData(Tile.ColliderType collider, Sprite sprite) { 
         switch (collider) {
         case Tile.ColliderType.Grid:
             // Single full-tile square.
@@ -235,6 +248,17 @@ public class VersusStageBaker : MapDataBakerCallback {
         Debug.LogWarning($"[VersusStageBaker] Unable to bake scene \"{data.Asset.ScenePath}\": {message}", focus);
     }
 
+    // https://discussions.unity.com/t/getting-all-assets-of-the-specified-type/75031/5
+    private static IEnumerable<T> FindAssetsByType<T>() where T : UnityEngine.Object {
+        var guids = AssetDatabase.FindAssets($"t:{typeof(T)}");
+        foreach (var t in guids) {
+            var assetPath = AssetDatabase.GUIDToAssetPath(t);
+            var asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+            if (asset != null) {
+                yield return asset;
+            }
+        }
+    }
 
     private class TileBaseSorter : IComparer<TileBase> {
         public int Compare(TileBase x, TileBase y) {
@@ -249,5 +273,4 @@ public class VersusStageBaker : MapDataBakerCallback {
             return x.name.CompareTo(y.name);
         }
     }
-
 }

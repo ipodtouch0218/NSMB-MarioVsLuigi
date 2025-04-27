@@ -543,6 +543,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
+    IsPassive:
+      Value: 1
     ColliderDisabled:
       Value: 0
 --- !u!114 &8774640590014395009

@@ -54,7 +54,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         }
 
         QuantumGame game = NetworkHandler.Game;
-        PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+        PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
             canvas.PlaySound(SoundEffect.UI_Error);
             return;
@@ -87,7 +87,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
 
     public unsafe void OnPointerClick(PointerEventData eventData) {
         QuantumGame game = NetworkHandler.Game;
-        PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+        PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
             canvas.PlaySound(SoundEffect.UI_Error);
             return;
@@ -111,7 +111,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
 
     public unsafe void IncreaseValue() {
         QuantumGame game = NetworkHandler.Game;
-        PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+        PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
             canvas.PlaySound(SoundEffect.UI_Error);
             return;
@@ -123,7 +123,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
 
     public unsafe void DecreaseValue() {
         QuantumGame game = NetworkHandler.Game;
-        PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+        PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
             canvas.PlaySound(SoundEffect.UI_Error);
             return;

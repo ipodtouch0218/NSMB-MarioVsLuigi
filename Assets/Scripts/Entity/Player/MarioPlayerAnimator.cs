@@ -695,7 +695,7 @@ namespace NSMB.Entities.Player {
                         footstepSoundEffect = SoundEffect.Player_Walk_Water;
                     }
                 } else {
-                    StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, contact.TileX, contact.TileY);
+                    StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, contact.Tile);
                     if (f.TryFindAsset(tileInstance.Tile, out StageTile tile)) {
                         if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
                             footstepSoundEffect = tile.FootstepSound;

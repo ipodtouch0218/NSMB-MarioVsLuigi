@@ -9,15 +9,16 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            VersusStageData stage = null;
 
             if (!f.Exists(f.Global->MainBigStar) && QuantumUtils.Decrement(ref f.Global->BigStarSpawnTimer)) {
+                stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 HandleSpawningNewStar(f, stage);
             }
 
             var allStars = f.Filter<BigStar>();
             while (allStars.NextUnsafe(out EntityRef entity, out BigStar* bigStar)) {
-                HandleStar(f, stage, entity, bigStar);
+                HandleStar(f, ref stage, entity, bigStar);
             }
         }
 
@@ -72,12 +73,15 @@ namespace Quantum {
             }
         }
 
-        private void HandleStar(Frame f, VersusStageData stage, EntityRef entity, BigStar* bigStar) {
+        private void HandleStar(Frame f, ref VersusStageData stage, EntityRef entity, BigStar* bigStar) {
             if (bigStar->IsStationary) {
                 return;
             }
 
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            if (stage == null) {
+                stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            }
 
             if (QuantumUtils.Decrement(ref bigStar->Lifetime) || (transform->Position.Y < stage.StageWorldMin.Y && bigStar->UncollectableFrames == 0)) {
                 f.Destroy(entity);

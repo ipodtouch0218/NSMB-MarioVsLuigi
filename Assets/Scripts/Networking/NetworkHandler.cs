@@ -350,7 +350,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private unsafe void UpdateRealtimeProperties() {
         Frame f = Game.Frames.Predicted;
-        PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
+        PlayerRef host = f.Global->Host;
         if (!Game.PlayerIsLocal(host)) {
             return;
         }

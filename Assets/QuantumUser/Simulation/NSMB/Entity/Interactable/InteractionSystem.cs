@@ -3,8 +3,6 @@ using Quantum.Physics2D;
 using Quantum.Profiling;
 using Quantum.Task;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 namespace Quantum {
 
@@ -129,6 +127,7 @@ namespace Quantum {
                 var entity = filter.Entity;
 
                 if (interactable->ColliderDisabled
+                    || interactable->IsPassive
                     || (f.Unsafe.TryGetPointer(entity, out Enemy* enemy) && enemy->IsDead)
                     || (f.Unsafe.TryGetPointer(entity, out Freezable* freezable) && f.Exists(freezable->FrozenCubeEntity))) {
                     continue;

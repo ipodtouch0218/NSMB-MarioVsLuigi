@@ -49,7 +49,6 @@ public class VersusStageGizmos : MonoBehaviour {
 
         for (int x = 0; x < stage.TileDimensions.x; x++) {
             for (int y = 0; y < stage.TileDimensions.y; y++) {
-                Gizmos.color = Color.green;
                 if (stage.TileData.Length <= (x + y * stage.TileDimensions.x)) {
                     break;
                 }
@@ -66,18 +65,30 @@ public class VersusStageGizmos : MonoBehaviour {
                 }
 
                 if (stageTile) {
-                    tile.GetWorldPolygons((FrameThreadSafe) null, stage, stageTile, VertexBuffer, ShapeVertexCountBuffer, worldPos);
+                    if (stageTile.CollisionData.IsFullTile) {
+                        Gizmos.color = Color.red;
+                        Vector3 worldPosUnity = worldPos.ToUnityVector3();
+                        Gizmos.DrawLineStrip(new Vector3[] {
+                            worldPosUnity + new Vector3(-0.25f,  0.25f),
+                            worldPosUnity + new Vector3( 0.25f,  0.25f),
+                            worldPosUnity + new Vector3( 0.25f, -0.25f),
+                            worldPosUnity + new Vector3(-0.25f, -0.25f)
+                        }, true);
+                    } else {
+                        Gizmos.color = Color.green;
+                        tile.GetWorldPolygons((FrameThreadSafe) null, stage, stageTile, VertexBuffer, ShapeVertexCountBuffer, worldPos);
 
-                    int shapeIndex = 0;
-                    int vertexIndex = 0;
-                    int shapeVertexCount;
-                    while ((shapeVertexCount = ShapeVertexCountBuffer[shapeIndex++]) > 0) {
-                        for (int i = 0; i < shapeVertexCount; i++) {
-                            UnityVertexBuffer[i] = VertexBuffer[vertexIndex + i].ToUnityVector3();
+                        int shapeIndex = 0;
+                        int vertexIndex = 0;
+                        int shapeVertexCount;
+                        while ((shapeVertexCount = ShapeVertexCountBuffer[shapeIndex++]) > 0) {
+                            for (int i = 0; i < shapeVertexCount; i++) {
+                                UnityVertexBuffer[i] = VertexBuffer[vertexIndex + i].ToUnityVector3();
+                            }
+
+                            Gizmos.DrawLineStrip(UnityVertexBuffer.AsSpan(0, shapeVertexCount), stageTile.IsPolygon);
+                            vertexIndex += shapeVertexCount;
                         }
-
-                        Gizmos.DrawLineStrip(UnityVertexBuffer.AsSpan(0, shapeVertexCount), stageTile.IsPolygon);
-                        vertexIndex += shapeVertexCount;
                     }
                 }
 

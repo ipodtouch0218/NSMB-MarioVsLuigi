@@ -269,7 +269,7 @@ namespace NSMB.Utils {
                     byte.Parse(color[3..5], System.Globalization.NumberStyles.HexNumber),
                     byte.Parse(color[5..7], System.Globalization.NumberStyles.HexNumber),
                     255);
-            } else if (color.Equals("rainbow", StringComparison.InvariantCultureIgnoreCase)) {
+            } else if (color == "rainbow".AsSpan()) {
                 constant = false;
                 return GetRainbowColor();
             } else {

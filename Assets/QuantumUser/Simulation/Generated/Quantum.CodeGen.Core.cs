@@ -887,15 +887,13 @@ namespace Quantum {
     public FPVector2 Position;
     [FieldOffset(32)]
     public FPVector2 Normal;
-    [FieldOffset(24)]
+    [FieldOffset(16)]
     public FP Distance;
     [FieldOffset(0)]
     public Int32 Frame;
-    [FieldOffset(4)]
-    public Int32 TileX;
+    [FieldOffset(24)]
+    public Vector2Int Tile;
     [FieldOffset(8)]
-    public Int32 TileY;
-    [FieldOffset(16)]
     public EntityRef Entity;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -904,8 +902,7 @@ namespace Quantum {
         hash = hash * 31 + Normal.GetHashCode();
         hash = hash * 31 + Distance.GetHashCode();
         hash = hash * 31 + Frame.GetHashCode();
-        hash = hash * 31 + TileX.GetHashCode();
-        hash = hash * 31 + TileY.GetHashCode();
+        hash = hash * 31 + Tile.GetHashCode();
         hash = hash * 31 + Entity.GetHashCode();
         return hash;
       }
@@ -913,10 +910,9 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (PhysicsContact*)ptr;
         serializer.Stream.Serialize(&p->Frame);
-        serializer.Stream.Serialize(&p->TileX);
-        serializer.Stream.Serialize(&p->TileY);
         EntityRef.Serialize(&p->Entity, serializer);
         FP.Serialize(&p->Distance, serializer);
+        Quantum.Vector2Int.Serialize(&p->Tile, serializer);
         FPVector2.Serialize(&p->Normal, serializer);
         FPVector2.Serialize(&p->Position, serializer);
     }
@@ -1035,7 +1031,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2544;
+    public const Int32 SIZE = 2552;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -1064,13 +1060,13 @@ namespace Quantum {
     public BitSet10 PlayerLastConnectionState;
     [FieldOffset(1644)]
     public UInt16 BigStarSpawnTimer;
-    [FieldOffset(1688)]
+    [FieldOffset(1696)]
     public EntityRef MainBigStar;
-    [FieldOffset(1680)]
+    [FieldOffset(1688)]
     public BitSet64 UsedStarSpawns;
     [FieldOffset(1660)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1704)]
+    [FieldOffset(1712)]
     public GameRules Rules;
     [FieldOffset(1642)]
     public GameState GameState;
@@ -1082,10 +1078,7 @@ namespace Quantum {
     public UInt16 GameStartFrames;
     [FieldOffset(1648)]
     public UInt16 PlayerLoadFrames;
-    [FieldOffset(1672)]
-    [AllocateOnComponentAdded()]
-    public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1744)]
+    [FieldOffset(1752)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[800];
     [FieldOffset(1640)]
@@ -1094,12 +1087,17 @@ namespace Quantum {
     public Byte TotalMarios;
     [FieldOffset(1664)]
     public Int32 WinningTeam;
-    [FieldOffset(1668)]
+    [FieldOffset(1672)]
     public QBoolean HasWinner;
+    [FieldOffset(1668)]
+    public PlayerRef Host;
     [FieldOffset(1676)]
     [AllocateOnComponentAdded()]
+    public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
+    [FieldOffset(1680)]
+    [AllocateOnComponentAdded()]
     public QListPtr<BannedPlayerInfo> BannedPlayerIds;
-    [FieldOffset(1696)]
+    [FieldOffset(1704)]
     public FP Timer;
     public FixedArray<Input> input {
       get {
@@ -1136,12 +1134,13 @@ namespace Quantum {
         hash = hash * 31 + TotalGamesPlayed.GetHashCode();
         hash = hash * 31 + GameStartFrames.GetHashCode();
         hash = hash * 31 + PlayerLoadFrames.GetHashCode();
-        hash = hash * 31 + PlayerDatas.GetHashCode();
         hash = hash * 31 + HashCodeUtils.GetArrayHashCode(PlayerInfo);
         hash = hash * 31 + RealPlayers.GetHashCode();
         hash = hash * 31 + TotalMarios.GetHashCode();
         hash = hash * 31 + WinningTeam.GetHashCode();
         hash = hash * 31 + HasWinner.GetHashCode();
+        hash = hash * 31 + Host.GetHashCode();
+        hash = hash * 31 + PlayerDatas.GetHashCode();
         hash = hash * 31 + BannedPlayerIds.GetHashCode();
         hash = hash * 31 + Timer.GetHashCode();
         return hash;
@@ -1179,6 +1178,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->TotalGamesPlayed);
         serializer.Stream.Serialize(&p->UsedStarSpawnCount);
         serializer.Stream.Serialize(&p->WinningTeam);
+        PlayerRef.Serialize(&p->Host, serializer);
         QBoolean.Serialize(&p->HasWinner, serializer);
         QDictionary.Serialize(&p->PlayerDatas, serializer, Statics.SerializePlayerRef, Statics.SerializeEntityRef);
         QList.Serialize(&p->BannedPlayerIds, serializer, Statics.SerializeBannedPlayerInfo);
@@ -1907,6 +1907,8 @@ namespace Quantum {
   public unsafe partial struct Interactable : Quantum.IComponent {
     public const Int32 SIZE = 24;
     public const Int32 ALIGNMENT = 8;
+    [FieldOffset(4)]
+    public QBoolean IsPassive;
     [FieldOffset(0)]
     public QBoolean ColliderDisabled;
     [FieldOffset(16)]
@@ -1918,6 +1920,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 2039;
+        hash = hash * 31 + IsPassive.GetHashCode();
         hash = hash * 31 + ColliderDisabled.GetHashCode();
         hash = hash * 31 + OverlapQueryRef.GetHashCode();
         hash = hash * 31 + OverlapLevelSeamQueryRef.GetHashCode();
@@ -1927,6 +1930,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Interactable*)ptr;
         QBoolean.Serialize(&p->ColliderDisabled, serializer);
+        QBoolean.Serialize(&p->IsPassive, serializer);
         PhysicsQueryRef.Serialize(&p->OverlapLevelSeamQueryRef, serializer);
         PhysicsQueryRef.Serialize(&p->OverlapQueryRef, serializer);
     }

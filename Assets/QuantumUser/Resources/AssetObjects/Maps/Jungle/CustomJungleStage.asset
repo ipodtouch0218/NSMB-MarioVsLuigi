@@ -254,6 +254,8 @@ MonoBehaviour:
     - rid: 415489980106801157
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 432452981359640576
@@ -330,6 +332,8 @@ MonoBehaviour:
     - rid: 432452981359640581
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 1189759297370718208
@@ -398,6 +402,8 @@ MonoBehaviour:
     - rid: 1189759297370718212
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 1844143589785862144
@@ -474,6 +480,8 @@ MonoBehaviour:
     - rid: 1844143589785862149
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 1911905205062991872
@@ -550,6 +558,8 @@ MonoBehaviour:
     - rid: 1911905205062991877
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 1928036496636379136
@@ -626,6 +636,8 @@ MonoBehaviour:
     - rid: 1928036496636379141
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 1987491028835237888
@@ -726,6 +738,8 @@ MonoBehaviour:
     - rid: 1987491028835237894
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 0
         ColliderDisabled:
           Value: 0
     - rid: 1987491028835237895
@@ -860,6 +874,8 @@ MonoBehaviour:
     - rid: 2646313237942894600
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 0
         ColliderDisabled:
           Value: 0
     - rid: 2646313237942894601
@@ -976,6 +992,8 @@ MonoBehaviour:
     - rid: 3288229553830363140
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 3804419343601631232
@@ -1081,6 +1099,8 @@ MonoBehaviour:
     - rid: 3804419343601631239
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 0
         ColliderDisabled:
           Value: 0
     - rid: 3804419343601631240
@@ -1181,6 +1201,8 @@ MonoBehaviour:
     - rid: 5447016561468506117
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 5631465667162013696
@@ -1257,6 +1279,8 @@ MonoBehaviour:
     - rid: 5631465667162013701
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 6135919321358008320
@@ -1333,6 +1357,8 @@ MonoBehaviour:
     - rid: 6135919321358008325
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 6165230615579852800
@@ -1409,6 +1435,8 @@ MonoBehaviour:
     - rid: 6165230615579852805
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 6993034417413292032
@@ -1485,6 +1513,8 @@ MonoBehaviour:
     - rid: 6993034417413292037
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 1
         ColliderDisabled:
           Value: 0
     - rid: 8298140632090673152
@@ -1594,6 +1624,8 @@ MonoBehaviour:
     - rid: 8298140632090673160
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
+        IsPassive:
+          Value: 0
         ColliderDisabled:
           Value: 0
     - rid: 8298140632090673161

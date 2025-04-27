@@ -48,7 +48,6 @@ namespace Quantum {
                     if (ac.IsSet(key.Item1)
                         && bc.IsSet(key.Item2)) {
 
-                        Log.Debug($"found hitbox interaction between {a} and {b} - {i}");
                         return new PendingInteraction {
                             EntityA = a,
                             EntityB = b,
@@ -58,7 +57,6 @@ namespace Quantum {
                     } else if (ac.IsSet(key.Item2)
                         && bc.IsSet(key.Item1)) {
 
-                        Log.Debug($"found hitbox interaction between {b} and {a} - {i}");
                         return new PendingInteraction {
                             EntityA = b,
                             EntityB = a,
@@ -68,7 +66,6 @@ namespace Quantum {
                     }
                 }
 
-                Log.Debug($"found no hitbox interaction between {a} and {b}");
                 return None;
             }
 
@@ -78,7 +75,6 @@ namespace Quantum {
                     if (ac.IsSet(key.Item1)
                         && bc.IsSet(key.Item2)) {
 
-                        Log.Debug($"found platform interaction between {a} and {b} - {i}");
                         return new PendingInteraction {
                             EntityA = a,
                             EntityB = b,
@@ -89,7 +85,6 @@ namespace Quantum {
                     } else if (ac.IsSet(key.Item2)
                         && bc.IsSet(key.Item1)) {
 
-                        Log.Debug($"found platform interaction between {b} and {a} - {i}");
                         return new PendingInteraction {
                             EntityA = b,
                             EntityB = a,
@@ -100,7 +95,6 @@ namespace Quantum {
                     }
                 }
 
-                Log.Debug($"found no platform interaction between {a} and {b}");
                 return None;
             }
 

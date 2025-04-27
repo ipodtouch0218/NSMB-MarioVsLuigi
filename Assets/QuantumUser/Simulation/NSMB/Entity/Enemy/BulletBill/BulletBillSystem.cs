@@ -12,7 +12,7 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            VersusStageData stage = null;
 
             var launchers = f.Filter<BulletBillLauncher, BreakableObject, PhysicsCollider2D, Transform2D>();
             while (launchers.NextUnsafe(out EntityRef entity, out BulletBillLauncher* launcher, out BreakableObject* breakable, out PhysicsCollider2D* collider, out Transform2D* transform)) {
@@ -29,6 +29,9 @@ namespace Quantum {
                 FP smallestDistance = FP.UseableMax;
                 bool tooClose = false;
                 while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
+                    if (stage == null) {
+                        stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                    }
                     QuantumUtils.WrappedDistance(stage, spawnpoint, marioTransform->Position, out FP distance);
                     FP abs = FPMath.Abs(distance);
 

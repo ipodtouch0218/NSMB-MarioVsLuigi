@@ -44,7 +44,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public unsafe void PrivateToggleChanged() {
             Room currentRoom = NetworkHandler.Client.CurrentRoom;
             QuantumGame game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (!game.PlayerIsLocal(host)) {
                 Canvas.PlaySound(SoundEffect.UI_Error);
                 privateToggle.isOn = !currentRoom.IsVisible;
@@ -58,7 +58,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public unsafe void MaxPlayerSliderChanged() {
             Room currentRoom = NetworkHandler.Client.CurrentRoom;
             QuantumGame game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (!game.PlayerIsLocal(host)) {
                 // Canvas.PlaySound(SoundEffect.UI_Error);
                 maxPlayerSlider.SetValueWithoutNotify(currentRoom.MaxPlayers);
@@ -82,7 +82,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public unsafe void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged) {
             Room currentRoom = NetworkHandler.Client.CurrentRoom;
             QuantumGame game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (!game.PlayerIsLocal(host)) {
                 maxPlayerSlider.SetValueWithoutNotify(currentRoom.MaxPlayers);
                 privateToggle.SetIsOnWithoutNotify(!currentRoom.IsVisible);

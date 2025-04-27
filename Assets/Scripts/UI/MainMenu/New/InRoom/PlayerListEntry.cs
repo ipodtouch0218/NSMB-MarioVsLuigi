@@ -272,7 +272,7 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void BanPlayer() {
             QuantumGame game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (game.PlayerIsLocal(host)) {
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
                 game.SendCommand(slot, new CommandBanPlayer {
@@ -284,7 +284,7 @@ namespace NSMB.UI.MainMenu {
 
         public unsafe void KickPlayer() {
             QuantumGame game = NetworkHandler.Game;
-            PlayerRef host = QuantumUtils.GetHostPlayer(game.Frames.Predicted, out _);
+            PlayerRef host = game.Frames.Predicted.Global->Host;
             if (game.PlayerIsLocal(host)) {
                 int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(host)];
                 game.SendCommand(slot, new CommandKickPlayer {

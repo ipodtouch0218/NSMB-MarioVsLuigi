@@ -124,8 +124,7 @@ namespace Quantum {
                     }
                 }
 
-                PlayerRef host = QuantumUtils.GetHostPlayer(f, out _);
-                if (f.GetPlayerCommand(host) is CommandHostEndGame) {
+                if (f.GetPlayerCommand(f.Global->Host) is CommandHostEndGame) {
                     EndGame(f, true, null);
                 }
                 break;
@@ -295,6 +294,7 @@ namespace Quantum {
             if (playerDatas.Count == 0) {
                 // First player is host
                 newData->IsRoomHost = true;
+                f.Global->Host = player;
                 f.Events.HostChanged(player);
             }
 
@@ -340,6 +340,7 @@ namespace Quantum {
 
                     if (youngestPlayer != null) {
                         youngestPlayer->IsRoomHost = true;
+                        f.Global->Host = youngestPlayer->PlayerRef;
                         f.Events.HostChanged(youngestPlayer->PlayerRef);
                     }
 
