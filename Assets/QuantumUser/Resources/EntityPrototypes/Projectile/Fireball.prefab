@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 5432761528888521127}
   - component: {fileID: 5816618518376565689}
   - component: {fileID: -9113168347366101870}
+  - component: {fileID: -8971064262029751978}
   m_Layer: 19
   m_Name: Fireball
   m_TagString: Untagged
@@ -339,6 +340,20 @@ MonoBehaviour:
   legacySpriteAnimator: {fileID: 9162743564300288012}
   sameTeamColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
   differentTeamColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &-8971064262029751978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6307920351473437675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb55c9faeb7d9444db037aeb19b9b790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    _empty_prototype_dummy_field_: 0
 --- !u!1 &6817442949190414024
 GameObject:
   m_ObjectHideFlags: 0

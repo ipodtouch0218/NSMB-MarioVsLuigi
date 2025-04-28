@@ -14,7 +14,7 @@ namespace Quantum {
             if (data == null) {
                 return 0;
             } else {
-                return data->RealTeam;
+                return (byte) (data->RealTeam % Constants.MaxPlayers);
             }
         }
 

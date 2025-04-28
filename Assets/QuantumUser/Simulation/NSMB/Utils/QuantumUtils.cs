@@ -195,7 +195,7 @@ public static unsafe class QuantumUtils {
         Span<byte> teamStars = stackalloc byte[Constants.MaxPlayers];
         GetTeamStars(f, teamStars);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < Constants.MaxPlayers; i++) {
             byte stars = teamStars[i];
             if (winningTeam == null) {
                 winningTeam = i;

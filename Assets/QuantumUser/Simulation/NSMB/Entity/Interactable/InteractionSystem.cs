@@ -19,6 +19,7 @@ namespace Quantum {
             public EntityRef Entity;
             public Transform2D* Transform;
             public Interactable* Interactable;
+            public InteractionInitiator* Initiator;
             public PhysicsCollider2D* Collider;
         }
 
@@ -124,10 +125,10 @@ namespace Quantum {
             Filter filter = default;
             while (entityFilter.Next(&filter)) {
                 var interactable = filter.Interactable;
+                var initiator = filter.Initiator;
                 var entity = filter.Entity;
 
                 if (interactable->ColliderDisabled
-                    || interactable->IsPassive
                     || (f.Unsafe.TryGetPointer(entity, out Enemy* enemy) && enemy->IsDead)
                     || (f.Unsafe.TryGetPointer(entity, out Freezable* freezable) && f.Exists(freezable->FrozenCubeEntity))) {
                     continue;
@@ -137,12 +138,12 @@ namespace Quantum {
                 var transform = filter.Transform;
 
                 // Collide with hitboxes
-                if (f.Physics2D.TryGetQueryHits(interactable->OverlapQueryRef, out HitCollection hits)) {
+                if (f.Physics2D.TryGetQueryHits(initiator->OverlapQueryRef, out HitCollection hits)) {
                     for (int i = 0; i < hits.Count; i++) {
                         TryCollideWithEntity(fts, entity, hits[i].Entity);
                     }
                 }
-                if (f.Physics2D.TryGetQueryHits(interactable->OverlapLevelSeamQueryRef, out hits)) {
+                if (f.Physics2D.TryGetQueryHits(initiator->OverlapLevelSeamQueryRef, out hits)) {
                     for (int i = 0; i < hits.Count; i++) {
                         TryCollideWithEntity(fts, entity, hits[i].Entity);
                     }

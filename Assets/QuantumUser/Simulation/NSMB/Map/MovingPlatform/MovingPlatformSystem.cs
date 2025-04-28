@@ -10,9 +10,11 @@ namespace Quantum {
             public MovingPlatform* Platform;
             public PhysicsCollider2D* Collider;
         }
+        private ComponentGetter<PhysicsObjectSystem.Filter> PhysicsObjectSystemFilterGetter;
 
         public override void OnInit(Frame f) {
             f.Context.ExcludeEntityAndPlayerMask = ~f.Layers.GetLayerMask("Entity", "Player");
+            PhysicsObjectSystemFilterGetter = f.Unsafe.ComponentGetter<PhysicsObjectSystem.Filter>();
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -59,9 +61,10 @@ namespace Quantum {
                 if (hit.Entity == entity) {
                     continue;
                 }
-                if (!f.Unsafe.TryGetPointer(hit.Entity, out PhysicsObject* physicsObject)) {
+                if (!PhysicsObjectSystemFilterGetter.TryGet(f, hit.Entity, out var physicsSystemFilter)) {
                     continue;
                 }
+                var physicsObject = physicsSystemFilter.PhysicsObject;
                 if (physicsObject->DisableCollision) {
                     continue;
                 }
@@ -78,9 +81,8 @@ namespace Quantum {
                 var moveDistance = -hit.Normal * (moveVelocity.Magnitude * (1 - hit.CastDistanceNormalized)) * f.UpdateRate;
 
                 //moveDistance -= FPVector2.Normalize(moveDistance) * PhysicsObjectSystem.RaycastSkin;
-
-                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveDistance, hit.Entity, stage, contacts, out bool tempHit1);
-                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveDistance, hit.Entity, stage, contacts, out bool tempHit2);
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveDistance, ref physicsSystemFilter, stage, contacts, out bool tempHit1);
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveDistance, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
                 bool hitObject = tempHit1 || tempHit2;
 
                 if (hitObject && shape->Type != Shape2DType.Edge) {

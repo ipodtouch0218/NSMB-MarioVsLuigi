@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public unsafe class CloudAnimator : QuantumEntityViewComponent {
+public unsafe class CloudAnimator : QuantumEntityViewComponent<StageContext> {
 
     //---Static Variables
     private static readonly int ParamDisplacementMap = Shader.PropertyToID("DisplacementMap");
@@ -99,7 +99,7 @@ public unsafe class CloudAnimator : QuantumEntityViewComponent {
             if (!contact.Exit) {
                 FPVector2 currentPosition = f.Unsafe.GetPointer<Transform2D>(contact.Entity)->Position;
                 FPVector2 previousPosition = fp.Unsafe.GetPointer<Transform2D>(contact.Entity)->Position;
-                lerpedPosition = QuantumUtils.WrappedLerp(f, previousPosition, currentPosition, FP.FromFloat_UNSAFE(Game.InterpolationFactor));
+                lerpedPosition = QuantumUtils.WrappedLerp(ViewContext.Stage, previousPosition, currentPosition, FP.FromFloat_UNSAFE(Game.InterpolationFactor));
             }
 
             int point = contact.Point(lerpedPosition.ToUnityVector3(), this);

@@ -1905,32 +1905,42 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Interactable : Quantum.IComponent {
-    public const Int32 SIZE = 24;
-    public const Int32 ALIGNMENT = 8;
-    [FieldOffset(4)]
-    public QBoolean IsPassive;
+    public const Int32 SIZE = 4;
+    public const Int32 ALIGNMENT = 4;
     [FieldOffset(0)]
     public QBoolean ColliderDisabled;
-    [FieldOffset(16)]
-    [ExcludeFromPrototype()]
-    public PhysicsQueryRef OverlapQueryRef;
-    [FieldOffset(8)]
-    [ExcludeFromPrototype()]
-    public PhysicsQueryRef OverlapLevelSeamQueryRef;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 2039;
-        hash = hash * 31 + IsPassive.GetHashCode();
         hash = hash * 31 + ColliderDisabled.GetHashCode();
-        hash = hash * 31 + OverlapQueryRef.GetHashCode();
-        hash = hash * 31 + OverlapLevelSeamQueryRef.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Interactable*)ptr;
         QBoolean.Serialize(&p->ColliderDisabled, serializer);
-        QBoolean.Serialize(&p->IsPassive, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct InteractionInitiator : Quantum.IComponent {
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public PhysicsQueryRef OverlapQueryRef;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public PhysicsQueryRef OverlapLevelSeamQueryRef;
+    public override Int32 GetHashCode() {
+      unchecked { 
+        var hash = 6067;
+        hash = hash * 31 + OverlapQueryRef.GetHashCode();
+        hash = hash * 31 + OverlapLevelSeamQueryRef.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (InteractionInitiator*)ptr;
         PhysicsQueryRef.Serialize(&p->OverlapLevelSeamQueryRef, serializer);
         PhysicsQueryRef.Serialize(&p->OverlapQueryRef, serializer);
     }
@@ -3422,6 +3432,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.IceBlock>();
       BuildSignalsArrayOnComponentAdded<Quantum.Interactable>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Interactable>();
+      BuildSignalsArrayOnComponentAdded<Quantum.InteractionInitiator>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.InteractionInitiator>();
       BuildSignalsArrayOnComponentAdded<Quantum.InvisibleBlock>();
       BuildSignalsArrayOnComponentRemoved<Quantum.InvisibleBlock>();
       BuildSignalsArrayOnComponentAdded<Quantum.Koopa>();
@@ -3838,6 +3850,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.Input), Quantum.Input.SIZE);
       typeRegistry.Register(typeof(Quantum.InputButtons), 4);
       typeRegistry.Register(typeof(Quantum.Interactable), Quantum.Interactable.SIZE);
+      typeRegistry.Register(typeof(Quantum.InteractionInitiator), Quantum.InteractionInitiator.SIZE);
       typeRegistry.Register(typeof(Quantum.InvisibleBlock), Quantum.InvisibleBlock.SIZE);
       typeRegistry.Register(typeof(Joint), Joint.SIZE);
       typeRegistry.Register(typeof(Joint3D), Joint3D.SIZE);
@@ -3910,7 +3923,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen() {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 33)
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 34)
         .AddBuiltInComponents()
         .Add<Quantum.BetterPhysicsObject>(Quantum.BetterPhysicsObject.Serialize, Quantum.BetterPhysicsObject.OnAdded, Quantum.BetterPhysicsObject.OnRemoved, ComponentFlags.None)
         .Add<Quantum.BigStar>(Quantum.BigStar.Serialize, null, null, ComponentFlags.None)
@@ -3932,6 +3945,7 @@ namespace Quantum {
         .Add<Quantum.Holdable>(Quantum.Holdable.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.IceBlock>(Quantum.IceBlock.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Interactable>(Quantum.Interactable.Serialize, null, null, ComponentFlags.None)
+        .Add<Quantum.InteractionInitiator>(Quantum.InteractionInitiator.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.InvisibleBlock>(Quantum.InvisibleBlock.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Koopa>(Quantum.Koopa.Serialize, null, null, ComponentFlags.None)
         .Add<Quantum.Liquid>(Quantum.Liquid.Serialize, Quantum.Liquid.OnAdded, Quantum.Liquid.OnRemoved, ComponentFlags.None)

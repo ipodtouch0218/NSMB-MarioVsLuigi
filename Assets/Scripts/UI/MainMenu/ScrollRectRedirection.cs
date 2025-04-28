@@ -5,6 +5,10 @@ using UnityEngine.UI;
 // https://answers.unity.com/questions/1564463/how-do-i-have-clickable-buttons-in-a-scroll-rect.html
 public class ScrollRectRedirection : MonoBehaviour {
 
+    //---Serialized Variables
+    [SerializeField] private bool scrollOnly;
+
+    //---Private Variables
     private GameObject rect;
     private bool passingEvent = false;
 
@@ -13,20 +17,23 @@ public class ScrollRectRedirection : MonoBehaviour {
 
         EventTrigger trigger = GetComponent<EventTrigger>();
 
-        EventTrigger.Entry entry = new();
-        entry.eventID = EventTriggerType.BeginDrag;
-        entry.callback.AddListener((data) => { OnBeginDrag((PointerEventData) data); });
-        trigger.triggers.Add(entry);
+        EventTrigger.Entry entry;
+        if (!scrollOnly) {
+            entry = new();
+            entry.eventID = EventTriggerType.BeginDrag;
+            entry.callback.AddListener((data) => { OnBeginDrag((PointerEventData) data); });
+            trigger.triggers.Add(entry);
 
-        entry = new();
-        entry.eventID = EventTriggerType.Drag;
-        entry.callback.AddListener((data) => { OnDrag((PointerEventData) data); });
-        trigger.triggers.Add(entry);
+            entry = new();
+            entry.eventID = EventTriggerType.Drag;
+            entry.callback.AddListener((data) => { OnDrag((PointerEventData) data); });
+            trigger.triggers.Add(entry);
 
-        entry = new();
-        entry.eventID = EventTriggerType.EndDrag;
-        entry.callback.AddListener((data) => { OnEndDrag((PointerEventData) data); });
-        trigger.triggers.Add(entry);
+            entry = new();
+            entry.eventID = EventTriggerType.EndDrag;
+            entry.callback.AddListener((data) => { OnEndDrag((PointerEventData) data); });
+            trigger.triggers.Add(entry);
+        }
 
         entry = new();
         entry.eventID = EventTriggerType.Scroll;
@@ -41,8 +48,9 @@ public class ScrollRectRedirection : MonoBehaviour {
     }
 
     public void OnDrag(PointerEventData pointerEventData) {
-        if (passingEvent)
+        if (passingEvent) {
             ExecuteEvents.Execute(rect, pointerEventData, ExecuteEvents.dragHandler);
+        }
     }
 
     public void OnEndDrag(PointerEventData pointerEventData) {

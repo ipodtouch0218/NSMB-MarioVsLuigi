@@ -221,6 +221,7 @@ namespace NSMB.UI.Game {
                 // Right
                 SpectateNextPlayer();
             }
+            previousNavigate = newPosition;
         }
 
         private unsafe void SpectatePlayerIndex(InputAction.CallbackContext context) {

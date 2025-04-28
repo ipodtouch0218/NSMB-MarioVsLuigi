@@ -170,8 +170,8 @@ namespace Quantum {
                 effectiveVelocity += physicsObject->ParentVelocity;
 
                 FPVector2 previousPosition = transform->Position;
-                effectiveVelocity = MoveVertically(fts, effectiveVelocity, entity, stage, contacts, out _);
-                effectiveVelocity = MoveHorizontally(fts, effectiveVelocity, entity, stage, contacts, out _);
+                effectiveVelocity = MoveVertically(fts, effectiveVelocity, ref filter, stage, contacts, out _);
+                effectiveVelocity = MoveHorizontally(fts, effectiveVelocity, ref filter, stage, contacts, out _);
                 ResolveContacts(fts, stage, physicsObject, contacts);
 
                 if (!physicsObject->DisableCollision && !physicsObject->IsTouchingGround && physicsObject->WasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y) {
@@ -179,7 +179,7 @@ namespace Quantum {
                     FPVector2 previousVelocity = effectiveVelocity;
                     FPVector2 testVelocity = effectiveVelocity;
                     testVelocity.Y = -FP._0_25 * f.UpdateRate;
-                    effectiveVelocity = MoveVertically(fts, testVelocity, entity, stage, contacts, out bool snapped);
+                    effectiveVelocity = MoveVertically(fts, testVelocity, ref filter, stage, contacts, out bool snapped);
                     ResolveContacts(fts, stage, physicsObject, contacts);
 
                     if (!snapped) {
@@ -279,8 +279,8 @@ namespace Quantum {
             physicsObject->ParentVelocity = maxVelocity ?? FPVector2.Zero;
         }
 
-        public static FPVector2 MoveVertically(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
-            var physicsObject = f.GetPointer<PhysicsObject>(entity);
+        public static FPVector2 MoveVertically(FrameThreadSafe f, FPVector2 velocity, ref Filter filter, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
+            var physicsObject = filter.PhysicsObject;
             var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
 
             FP velocityY = velocity.Y * f.DeltaTime;
@@ -289,7 +289,7 @@ namespace Quantum {
                 return velocity;
             }
 
-            var transform = f.GetPointer<Transform2D>(entity);
+            var transform = filter.Transform;
 
             FPVector2 directionVector = velocityY > 0 ? FPVector2.Up : FPVector2.Down;
 
@@ -298,14 +298,14 @@ namespace Quantum {
                     contacts = f.ResolveList(physicsObject->Contacts);
                 }
 
-                var collider = f.GetPointer<PhysicsCollider2D>(entity);
+                var collider = filter.Collider;
                 Shape2D shape = collider->Shape;
 
                 FPVector2 position = transform->Position;
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(0, velocityY) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 int closerEdge;
@@ -326,7 +326,7 @@ namespace Quantum {
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
 
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -461,7 +461,7 @@ namespace Quantum {
                         
                         bool keepContact = true;
                         foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
-                            callback?.Invoke((Frame) f, stage, entity, contact, ref keepContact);
+                            callback?.Invoke((Frame) f, stage, filter.Entity, contact, ref keepContact);
                         }
                         
                         if (keepContact) {
@@ -503,8 +503,8 @@ namespace Quantum {
             return velocity;
         }
 
-        public static FPVector2 MoveHorizontally(FrameThreadSafe f, FPVector2 velocity, EntityRef entity, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
-            var physicsObject = f.GetPointer<PhysicsObject>(entity);
+        public static FPVector2 MoveHorizontally(FrameThreadSafe f, FPVector2 velocity, ref Filter filter, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
+            var physicsObject = filter.PhysicsObject;
             var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
 
             FP velocityX = velocity.X * f.DeltaTime;
@@ -517,19 +517,19 @@ namespace Quantum {
                 contacts = f.ResolveList(physicsObject->Contacts);
             }
 
-            var transform = f.GetPointer<Transform2D>(entity);
+            var transform = filter.Transform;
 
             FPVector2 directionVector = velocityX > 0 ? FPVector2.Right : FPVector2.Left;
 
             if (!physicsObject->DisableCollision) {
-                var collider = f.GetPointer<PhysicsCollider2D>(entity);
+                var collider = filter.Collider;
                 Shape2D shape = collider->Shape;
                 
                 FPVector2 position = transform->Position;
                 FPVector2 raycastOrigin = position - (directionVector * RaycastSkin);
                 FPVector2 raycastTranslation = new FPVector2(velocityX, 0) + (directionVector * (RaycastSkin * 2 + Skin));
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
 
                 FP center = transform->Position.X + shape.Centroid.X;
                 int closerEdge;
@@ -550,7 +550,7 @@ namespace Quantum {
                     FPVector2 wrappedRaycastOrigin = raycastOrigin;
                     wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
 
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo);
+                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
                     for (int i = 0; i < wrappedHits.Count; i++) {
                         physicsHits.Add(wrappedHits[i], f.Context);
                     }
@@ -684,7 +684,7 @@ namespace Quantum {
 
                         bool keepContact = true;
                         foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
-                            callback?.Invoke((Frame) f, stage, entity, contact, ref keepContact);
+                            callback?.Invoke((Frame) f, stage, filter.Entity, contact, ref keepContact);
                         }
 
                         if (keepContact) {

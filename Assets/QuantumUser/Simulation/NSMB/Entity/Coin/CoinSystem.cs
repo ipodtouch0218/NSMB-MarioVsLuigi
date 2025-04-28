@@ -3,7 +3,10 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe class CoinSystem : SystemMainThreadFilterStage<CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin,
         ISignalOnEntityBumped, ISignalOnEntityCrushed {
-        
+
+        private static readonly FP BounceThreshold = FP._1_50;
+        private static readonly FP BounceStrength = Constants._0_66;
+
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -18,7 +21,6 @@ namespace Quantum {
             }
 
             var coin = filter.Coin;
-
             QuantumUtils.Decrement(ref coin->UncollectableFrames);
 
             if (!coin->IsFloating) {
@@ -39,9 +41,9 @@ namespace Quantum {
                         continue;
                     }
 
-                    if (physicsObject->PreviousFrameVelocity.Y < -FP._1_50) {
+                    if (physicsObject->PreviousFrameVelocity.Y < -BounceThreshold) {
                         physicsObject->Velocity = physicsObject->PreviousFrameVelocity;
-                        physicsObject->Velocity.Y *= -Constants._0_66;
+                        physicsObject->Velocity.Y *= -BounceStrength;
                         physicsObject->IsTouchingGround = false;
                         f.Events.CoinBounced(entity, *coin);
                     } else {

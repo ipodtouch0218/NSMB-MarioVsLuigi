@@ -1,6 +1,8 @@
 component Interactable {
-	bool IsPassive;
 	bool ColliderDisabled;
+}
+
+component InteractionInitiator {
 	[ExcludeFromPrototype] PhysicsQueryRef OverlapQueryRef;
 	[ExcludeFromPrototype] PhysicsQueryRef OverlapLevelSeamQueryRef;
 }

@@ -45,12 +45,12 @@ public unsafe class CameraAnimator : ResizingCamera {
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
 
-        Settings.Controls.Replay.Reset.performed += Reset;
+        Settings.Controls.Replay.Reset.performed += OnReset;
         OnScreenshake += OnScreenshakeCallback;
     }
 
     public void OnDestroy() {
-        Settings.Controls.Replay.Reset.performed -= Reset;
+        Settings.Controls.Replay.Reset.performed -= OnReset;
         OnScreenshake -= OnScreenshakeCallback;
     }
 
@@ -264,10 +264,7 @@ public unsafe class CameraAnimator : ResizingCamera {
         ourCamera.transform.position = newPosition;
     }
 
-    private void ClampFreecam() {
-    }
-
-    private void Reset(InputAction.CallbackContext context) {
+    private void OnReset(InputAction.CallbackContext context) {
         if (Mode != CameraMode.Freecam) {
             return;
         }

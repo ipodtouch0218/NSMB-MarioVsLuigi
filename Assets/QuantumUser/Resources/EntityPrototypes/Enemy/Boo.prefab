@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 4429105053950663285}
   - component: {fileID: -6652070002619640731}
   - component: {fileID: 9168676210325572332}
+  - component: {fileID: 8808035629059796204}
   m_Layer: 19
   m_Name: Boo
   m_TagString: Untagged
@@ -360,6 +361,20 @@ MonoBehaviour:
         RawValue: 0
     BroadRadius:
       RawValue: 32768
+--- !u!114 &8808035629059796204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3813481168314615756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb55c9faeb7d9444db037aeb19b9b790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    _empty_prototype_dummy_field_: 0
 --- !u!1 &7589329121707926406
 GameObject:
   m_ObjectHideFlags: 0

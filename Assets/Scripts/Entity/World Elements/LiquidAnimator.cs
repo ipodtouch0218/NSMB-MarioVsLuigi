@@ -85,6 +85,10 @@ namespace NSMB.Entities.World {
         }
 
         public void Update() {
+            if (!initialized) {
+                return;
+            }
+
             animTimer += animationSpeed * Time.deltaTime;
             animTimer %= 8;
 
