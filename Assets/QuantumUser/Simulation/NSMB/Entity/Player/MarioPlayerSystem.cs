@@ -98,13 +98,13 @@ namespace Quantum {
 
         public void HandleWalkingRunning(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWalkingRunning");
-            ref var inputs = ref filter.Inputs;
             var mario = filter.MarioPlayer;
-            var physicsObject = filter.PhysicsObject;
 
             if (!QuantumUtils.Decrement(ref mario->WalljumpFrames)) {
                 return;
             }
+
+            var physicsObject = filter.PhysicsObject;
 
             if (mario->GroundpoundStandFrames > 0) {
                 if (!physicsObject->IsTouchingGround) {
@@ -125,6 +125,7 @@ namespace Quantum {
                 mario->IsSkidding = false;
             }
 
+            ref var inputs = ref filter.Inputs;
             bool run = (inputs.Sprint.IsDown || mario->CurrentPowerupState == PowerupState.MegaMushroom || mario->IsPropellerFlying) && !mario->IsSpinnerFlying;
             int maxStage;
             if (swimming) {
@@ -483,7 +484,6 @@ namespace Quantum {
 
         public void HandleGravity(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGravity");
-            ref var inputs = ref filter.Inputs;
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -507,8 +507,11 @@ namespace Quantum {
                 bool mega = mario->CurrentPowerupState == PowerupState.MegaMushroom;
                 bool mini = mario->CurrentPowerupState == PowerupState.MiniMushroom;
 
+
                 FP[] accArr = swimming ? physics.GravitySwimmingAcceleration : (mega ? physics.GravityMegaAcceleration : (mini ? physics.GravityMiniAcceleration : physics.GravityAcceleration));
                 FP acc = accArr[stage];
+
+                ref var inputs = ref filter.Inputs;
                 if (stage == 0 && !(inputs.Jump.IsDown || swimming || (!swimming && mario->SwimForceJumpTimer > 0))) {
                     acc = accArr[^1];
                 }
@@ -526,7 +529,6 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            FP maxWalkSpeed = physics.WalkMaxVelocity[physics.WalkSpeedStage];
             FP terminalVelocity;
 
             if (mario->IsDead) {
@@ -551,6 +553,9 @@ namespace Quantum {
             } else if (mario->IsSpinnerFlying) {
                 terminalVelocity = mario->IsDrilling ? physics.TerminalVelocityDrilling : physics.TerminalVelocityFlying;
             } else if (mario->IsPropellerFlying) {
+
+                FP maxWalkSpeed = physics.WalkMaxVelocity[physics.WalkSpeedStage];
+
                 if (mario->IsDrilling) {
                     terminalVelocity = physics.TerminalVelocityDrilling;
                     physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -maxWalkSpeed * FP._0_25, maxWalkSpeed * FP._0_25);
@@ -581,13 +586,14 @@ namespace Quantum {
         public void HandleWallslide(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWallslide");
             var mario = filter.MarioPlayer;
-            ref var inputs = ref filter.Inputs;
             var physicsObject = filter.PhysicsObject;
 
             if (mario->IsInShell || mario->IsGroundpounding || mario->IsCrouching || mario->IsDrilling 
                 || mario->IsSpinnerFlying || mario->IsInKnockback || physicsObject->IsUnderwater) {
                 return;
             }
+
+            ref var inputs = ref filter.Inputs;
 
             FPVector2 currentWallDirection;
             if (mario->WallslideLeft) {
@@ -679,7 +685,6 @@ namespace Quantum {
         private static readonly FPVector2 WallslideLowerHeightOffset = new(0, FP._0_20);
         private void HandleWallslideStopChecks(ref Filter filter, FPVector2 wallDirection) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleWallslideStopChecks");
-            ref var inputs = ref filter.Inputs;
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -692,6 +697,8 @@ namespace Quantum {
                 mario->WallslideEndFrames = 0;
                 return;
             }
+
+            ref var inputs = ref filter.Inputs;
 
             if ((wallDirection == FPVector2.Left && (!inputs.Left.IsDown || !physicsObject->IsTouchingLeftWall)) || (wallDirection == FPVector2.Right && (!inputs.Right.IsDown || !physicsObject->IsTouchingRightWall))) {
                 if (mario->WallslideEndFrames == 0) {
@@ -706,7 +713,6 @@ namespace Quantum {
 
         public void HandleFacingDirection(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleFacingDirection");
-            ref var inputs = ref filter.Inputs;
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -716,6 +722,7 @@ namespace Quantum {
                 return;
             }
 
+            ref var inputs = ref filter.Inputs;
             bool rightOrLeft = (inputs.Right.IsDown ^ inputs.Left.IsDown);
 
             if (mario->WalljumpFrames > 0) {
