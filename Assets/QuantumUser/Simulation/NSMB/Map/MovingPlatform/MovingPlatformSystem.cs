@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -53,7 +52,7 @@ namespace Quantum {
                 shape,
                 moveVelocity,
                 ~f.Context.ExcludeEntityAndPlayerMask,
-                QueryOptions.HitAll | QueryOptions.ComputeDetailedInfo | QueryOptions.DetectOverlapsAtCastOrigin);
+                QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo | QueryOptions.DetectOverlapsAtCastOrigin);
 
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits[i];
@@ -69,20 +68,25 @@ namespace Quantum {
                     continue;
                 }
 
-                var hitShape = hit.GetShape(f);
-                if (hitShape->Type == Shape2DType.Edge) {
+                if (shape->Type == Shape2DType.Edge) {
                     // Semisolid logic
                     if (FPVector2.Dot(physicsObject->Velocity, velocity) < 0) {
                         continue;
                     }
                 }
 
-                var contacts = f.ResolveList(physicsObject->Contacts);
-                var moveDistance = -hit.Normal * (moveVelocity.Magnitude * (1 - hit.CastDistanceNormalized)) * f.UpdateRate;
+                FP moveDistance = moveVelocity.Magnitude * (1 - hit.CastDistanceNormalized);
+                var overlapHits = f.Physics2D.CheckOverlap(shape, filter.Transform, &hit);
+                if (overlapHits.Count > 0) {
+                    // overlap!
+                    var overlapHit = overlapHits[0];
+                    moveDistance += overlapHit.OverlapPenetration;
+                }
+                FPVector2 moveVector = -hit.Normal * (moveDistance * f.UpdateRate);
 
-                //moveDistance -= FPVector2.Normalize(moveDistance) * PhysicsObjectSystem.RaycastSkin;
-                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveDistance, ref physicsSystemFilter, stage, contacts, out bool tempHit1);
-                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveDistance, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
+                var contacts = f.ResolveList(physicsObject->Contacts);
+                PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit1);
+                PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
                 bool hitObject = tempHit1 || tempHit2;
 
                 if (hitObject && shape->Type != Shape2DType.Edge) {

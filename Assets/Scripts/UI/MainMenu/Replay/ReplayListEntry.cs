@@ -154,8 +154,10 @@ public class ReplayListEntry : MonoBehaviour {
                 return;
             }
 
-            using FileStream stream = new(file, FileMode.OpenOrCreate);
-            ReplayFile.WriteToStream(stream);
+            if (ReplayFile.LoadAllIfNeeded() == ReplayParseResult.Success) {
+                using FileStream stream = new(file, FileMode.OpenOrCreate);
+                ReplayFile.WriteToStream(stream);
+            }
         });
     }
 

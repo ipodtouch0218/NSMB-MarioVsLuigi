@@ -1,6 +1,7 @@
 using NSMB.Extensions;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using Quantum;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,7 +24,15 @@ namespace NSMB.UI.Game.Replay {
                 defaultSelection = selectables[1];
             }
 
+            ApplyColor(true);
             base.OnEnable();
+            parent.playerElements.OnCameraFocusChanged += OnCameraFocusChanged;
+        }
+
+        public override void OnDisable() {
+            base.OnDisable();
+
+            parent.playerElements.OnCameraFocusChanged -= OnCameraFocusChanged;
         }
 
         public unsafe void Initialize() {
@@ -71,6 +80,7 @@ namespace NSMB.UI.Game.Replay {
                 // Freecam
                 parent.playerElements.CameraAnimator.Mode = CameraAnimator.CameraMode.Freecam;
                 parent.playerElements.Entity = EntityRef.None;
+                parent.playerElements.UpdateSpectateUI();
                 GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
             } else {
                 // Player index
@@ -81,6 +91,7 @@ namespace NSMB.UI.Game.Replay {
                 if (f.Exists(marioEntity)) {
                     parent.playerElements.CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
                     parent.playerElements.Entity = marioEntity;
+                    parent.playerElements.UpdateSpectateUI();
                     GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Decide);
                 } else {
                     GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
@@ -88,7 +99,6 @@ namespace NSMB.UI.Game.Replay {
             }
 
             defaultSelection = selectables[index + 1];
-            ApplyColor(false);
         }
 
         private unsafe EntityRef FindMario(Frame f, PlayerRef player) {
@@ -126,6 +136,11 @@ namespace NSMB.UI.Game.Replay {
             if (changeSelection && selectedIndex >= 0 && selectedIndex < selectables.Count) {
                 EventSystem.current.SetSelectedGameObject(selectables[selectedIndex]);
             }
+            defaultSelection = selectables[selectedIndex];
+        }
+
+        private void OnCameraFocusChanged() {
+            ApplyColor(true);
         }
     }
 }

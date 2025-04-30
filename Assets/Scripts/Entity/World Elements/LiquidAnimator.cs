@@ -12,6 +12,7 @@ namespace NSMB.Entities.World {
         [SerializeField] private float tension = 40, kconstant = 1.5f, damping = 0.92f, splashVelocity = 50f, animationSpeed = 1f, minimumSplashStrength = 2f;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private QuantumEntityView entity;
+        [SerializeField] private ParticleSystem bubbles;
 
         //---Private Variables
         private Texture2D heightTex;
@@ -40,9 +41,9 @@ namespace NSMB.Entities.World {
         public void Start() {
             if (entity == null) {
                 Initialize(Mathf.RoundToInt(spriteRenderer.size.x * 2), Mathf.RoundToInt(spriteRenderer.size.y * 2) - 1);
-            } 
-
-            QuantumEvent.Subscribe<EventLiquidSplashed>(this, OnLiquidSplashed, NetworkHandler.FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
+            } else {
+                QuantumEvent.Subscribe<EventLiquidSplashed>(this, OnLiquidSplashed, NetworkHandler.FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
+            }
         }
 
         public void Initialize(QuantumGame game) {
@@ -82,6 +83,14 @@ namespace NSMB.Entities.World {
             properties.SetFloat("WidthTiles", widthTiles);
             properties.SetFloat("Height", heightTiles);
             spriteRenderer.SetPropertyBlock(properties);
+
+            if (bubbles) {
+                var emission = bubbles.emission;
+                emission.rateOverTime = widthTiles / 4;
+
+                var shape = bubbles.shape;
+                shape.radius = widthTiles / 4;
+            }
         }
 
         public void Update() {

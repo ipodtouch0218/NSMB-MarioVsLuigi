@@ -5,6 +5,7 @@ using NSMB.UI.Game.Scoreboard;
 using NSMB.UI.Pause;
 using NSMB.Utils;
 using Quantum;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace NSMB.UI.Game {
     public class PlayerElements : QuantumSceneViewComponent {
 
         public static HashSet<PlayerElements> AllPlayerElements = new();
+        public event Action OnCameraFocusChanged;
 
         //---Properties
         public PlayerRef Player { get; private set; }
@@ -126,13 +128,15 @@ namespace NSMB.UI.Game {
             }
 
             Frame f = PredictedFrame;
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(Entity);
+            if (f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
+                RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
+                string username = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
 
-            RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-            string username = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
+                TranslationManager tm = GlobalController.Instance.translationManager;
+                spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
+            }
 
-            TranslationManager tm = GlobalController.Instance.translationManager;
-            spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
+            OnCameraFocusChanged?.Invoke();
         }
 
         public void StartSpectating() {
@@ -235,8 +239,8 @@ namespace NSMB.UI.Game {
 
                 EntityRef newTarget = scoreboardUpdater.EntityAtPosition(index);
                 if (newTarget != EntityRef.None) {
-                    Entity = newTarget;
                     CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
+                    Entity = newTarget;
                     UpdateSpectateUI();
                 }
             }

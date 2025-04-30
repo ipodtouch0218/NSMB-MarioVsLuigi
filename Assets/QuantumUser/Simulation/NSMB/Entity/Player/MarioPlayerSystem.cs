@@ -1711,6 +1711,8 @@ namespace Quantum {
             if (!wasStuckLastTick || (f.Number + filter.Entity.Index) % 4 == 0) {
                 // Code for mario to instantly teleport to the closest free position when he gets stuck
                 if (PhysicsObjectSystem.TryEject((FrameThreadSafe) f, filter.Entity, stage)) {
+                    physicsObject->DisableCollision = false;
+                    physicsObject->Velocity = FPVector2.Zero;
                     mario->IsStuckInBlock = false;
                     return false;
                 }

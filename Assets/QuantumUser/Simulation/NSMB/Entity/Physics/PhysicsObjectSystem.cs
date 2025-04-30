@@ -307,30 +307,32 @@ namespace Quantum {
                 FPVector2 raycastTranslation = new FPVector2(0, velocityY) + (directionVector * (RaycastSkin * 2 + Skin));
 
                 var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo);
 
-                FP center = transform->Position.X + shape.Centroid.X;
-                int closerEdge;
-                FP bounds;
-                if (center > (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
-                    // Right edge
-                    closerEdge = 1;
-                    bounds = stage.StageWorldMax.X;
-                } else {
-                    // Left edge
-                    closerEdge = -1;
-                    bounds = stage.StageWorldMin.X;
-                }
+                if (stage.IsWrappingLevel) {
+                    FP center = transform->Position.X + shape.Centroid.X;
+                    int closerEdge;
+                    FP bounds;
+                    if (center > (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
+                        // Right edge
+                        closerEdge = 1;
+                        bounds = stage.StageWorldMax.X;
+                    } else {
+                        // Left edge
+                        closerEdge = -1;
+                        bounds = stage.StageWorldMin.X;
+                    }
 
-                FP hitboxPosClosestEdge = center + shape.Box.Extents.X * closerEdge;
-                if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
-                    // Close enough- check over the level seam.
-                    FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                    wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
+                    FP hitboxPosClosestEdge = center + shape.Box.Extents.X * closerEdge;
+                    if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
+                        // Close enough- check over the level seam.
+                        FPVector2 wrappedRaycastOrigin = raycastOrigin;
+                        wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
 
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
-                    for (int i = 0; i < wrappedHits.Count; i++) {
-                        physicsHits.Add(wrappedHits[i], f.Context);
+                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo);
+                        for (int i = 0; i < wrappedHits.Count; i++) {
+                            physicsHits.Add(wrappedHits[i], f.Context);
+                        }
                     }
                 }
 
@@ -532,30 +534,32 @@ namespace Quantum {
 
                 var mask = ((Frame) f).Context.ExcludeEntityAndPlayerMask;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo);
 
-                FP center = transform->Position.X + shape.Centroid.X;
-                int closerEdge;
-                FP bounds;
-                if (center > (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
-                    // Right edge
-                    closerEdge = 1;
-                    bounds = stage.StageWorldMax.X;
-                } else {
-                    // Left edge
-                    closerEdge = -1;
-                    bounds = stage.StageWorldMin.X;
-                }
+                if (stage.IsWrappingLevel) {
+                    FP center = transform->Position.X + shape.Centroid.X;
+                    int closerEdge;
+                    FP bounds;
+                    if (center > (stage.StageWorldMin.X + stage.StageWorldMax.X) / 2) {
+                        // Right edge
+                        closerEdge = 1;
+                        bounds = stage.StageWorldMax.X;
+                    } else {
+                        // Left edge
+                        closerEdge = -1;
+                        bounds = stage.StageWorldMin.X;
+                    }
 
-                FP hitboxPosClosestEdge = center + shape.Box.Extents.X * closerEdge;
-                if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
-                    // Close enough- check over the level seam.
-                    FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                    wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
+                    FP hitboxPosClosestEdge = center + shape.Box.Extents.X * closerEdge;
+                    if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
+                        // Close enough- check over the level seam.
+                        FPVector2 wrappedRaycastOrigin = raycastOrigin;
+                        wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
 
-                    var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.ComputeDetailedInfo);
-                    for (int i = 0; i < wrappedHits.Count; i++) {
-                        physicsHits.Add(wrappedHits[i], f.Context);
+                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo);
+                        for (int i = 0; i < wrappedHits.Count; i++) {
+                            physicsHits.Add(wrappedHits[i], f.Context);
+                        }
                     }
                 }
 

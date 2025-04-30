@@ -55,18 +55,20 @@ namespace Quantum {
                 Transform2D transformCopy = *filter.Transform;
                 interactable->OverlapQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
 
-                FP center = transformCopy.Position.X + shape.Centroid.X;
-                if (center - shape.Box.Extents.X <= min) {
-                    // Left edge
-                    transformCopy.Position.X += offset;
-                    interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
+                if (stage.IsWrappingLevel) {
+                    FP center = transformCopy.Position.X + shape.Centroid.X;
+                    if (center - shape.Box.Extents.X <= min) {
+                        // Left edge
+                        transformCopy.Position.X += offset;
+                        interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
 
-                } else if (center + shape.Box.Extents.X >= max) {
-                    // Right edge
-                    transformCopy.Position.X -= offset;
-                    interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
-                } else {
-                    interactable->OverlapLevelSeamQueryRef = PhysicsQueryRef.None;
+                    } else if (center + shape.Box.Extents.X >= max) {
+                        // Right edge
+                        transformCopy.Position.X -= offset;
+                        interactable->OverlapLevelSeamQueryRef = f.Physics2D.AddOverlapShapeQuery(transformCopy, shape);
+                    } else {
+                        interactable->OverlapLevelSeamQueryRef = PhysicsQueryRef.None;
+                    }
                 }
             }
         }

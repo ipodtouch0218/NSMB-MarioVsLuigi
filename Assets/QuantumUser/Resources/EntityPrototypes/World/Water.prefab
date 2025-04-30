@@ -429,7 +429,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 16, y: 1.6}
+  m_Size: {x: 16, y: 1.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -464,6 +464,7 @@ MonoBehaviour:
   minimumSplashStrength: 5
   spriteRenderer: {fileID: 1060841653561283886}
   entity: {fileID: 5377348487338848431}
+  bubbles: {fileID: 0}
 --- !u!114 &3150085164645429832
 MonoBehaviour:
   m_ObjectHideFlags: 0
