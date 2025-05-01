@@ -10,7 +10,7 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter) {
-            if (f.Global->GameState != GameState.Playing) {
+            if (f.Global->GameState is not (GameState.Starting or GameState.Playing)) {
                 return;
             }
 

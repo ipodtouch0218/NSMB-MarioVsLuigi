@@ -3,7 +3,6 @@ using Quantum;
 using Quantum.Prototypes;
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
 
@@ -33,8 +32,7 @@ namespace NSMB.Replay {
 
         internal long WriteToStream(Stream output) {
             using BinaryWriter writer = new(output, Encoding.ASCII, true);
-            BinaryFormatter formatter = new();
-
+            
             writer.Write(Encoding.ASCII.GetBytes(MagicHeader)); // Write the *bytes* to avoid wasteful \0 termination
 
             Version.Serialize(writer);
@@ -44,7 +42,7 @@ namespace NSMB.Replay {
             writer.Write(CustomName);
 
             // Rules
-            formatter.Serialize(output, Rules);
+            writer.Write(JsonUtility.ToJson(Rules));
 
             // Players
             writer.Write((byte) PlayerInformation.Length);
@@ -58,7 +56,6 @@ namespace NSMB.Replay {
 
         internal static ReplayParseResult TryLoadFromFile(Stream input, out BinaryReplayHeader result) {
             using BinaryReader reader = new(input, Encoding.ASCII, true);
-            BinaryFormatter formatter = new();
             
             result = new();
 
@@ -77,7 +74,10 @@ namespace NSMB.Replay {
                 result.CustomName = reader.ReadString();
 
                 // Rules
-                result.Rules = (GameRulesPrototype) formatter.Deserialize(input);
+                result.Rules = JsonUtility.FromJson<GameRulesPrototype>(reader.ReadString());
+                if (result.Rules == null) {
+                    return ReplayParseResult.ParseFailure;
+                }
 
                 // Players
                 result.PlayerInformation = new ReplayPlayerInformation[reader.ReadByte()];

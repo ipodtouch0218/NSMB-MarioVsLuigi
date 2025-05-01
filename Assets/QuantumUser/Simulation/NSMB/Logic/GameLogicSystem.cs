@@ -96,7 +96,6 @@ namespace Quantum {
                     // Now playing
                     f.Global->GameState = GameState.Playing;
                     f.Events.GameStateChanged(GameState.Playing);
-                    f.Global->StartFrame = f.Number;
 
                     var playerDatas = f.Filter<PlayerData>();
                     while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
@@ -109,6 +108,7 @@ namespace Quantum {
 
                 } if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
+                    f.Global->StartFrame = f.Number;
                     f.SystemEnable<StartDisabledSystemGroup>();
                     f.Signals.OnGameStarting();
                     f.Events.GameStarted();

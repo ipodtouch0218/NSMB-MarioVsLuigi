@@ -2,19 +2,14 @@ using Quantum;
 using System;
 using UnityEngine;
 
-public class ProjectileParticles : MonoBehaviour {
+public class MiscParticles : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private ParticlePair[] particles;
     
     public void Start() {
         QuantumEvent.Subscribe<EventProjectileDestroyed>(this, OnProjectileDestroyed, NetworkHandler.FilterOutReplayFastForward);
-    }
-
-    private void OnProjectileDestroyed(EventProjectileDestroyed e) {
-        if (TryGetParticlePair(e.Particle, out ParticlePair pp)) {
-            Instantiate(pp.prefab, e.Position.ToUnityVector3() + pp.offset, Quaternion.identity);
-        }
+        QuantumEvent.Subscribe<EventCollectableDespawned>(this, OnCollectableDespawned, NetworkHandler.FilterOutReplayFastForward);
     }
 
     private bool TryGetParticlePair(ParticleEffect particleEffect, out ParticlePair particlePair) {
@@ -26,6 +21,18 @@ public class ProjectileParticles : MonoBehaviour {
         }
         particlePair = null;
         return false;
+    }
+
+    private void OnProjectileDestroyed(EventProjectileDestroyed e) {
+        if (TryGetParticlePair(e.Particle, out ParticlePair pp)) {
+            Instantiate(pp.prefab, e.Position.ToUnityVector3() + pp.offset, Quaternion.identity);
+        }
+    }
+
+    private void OnCollectableDespawned(EventCollectableDespawned e) {
+        if (!e.Collected && TryGetParticlePair(ParticleEffect.Puff, out ParticlePair pp)) {
+            Instantiate(pp.prefab, e.Position.ToUnityVector3() + pp.offset, Quaternion.identity);
+        }
     }
 
     [Serializable]

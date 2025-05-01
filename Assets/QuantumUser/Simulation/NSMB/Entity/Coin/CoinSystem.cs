@@ -31,6 +31,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref coin->Lifetime)
                     || filter.Transform->Position.Y < stage.StageWorldMin.Y) {
 
+                    f.Events.CollectableDespawned(entity, filter.Transform->Position, false);
                     f.Destroy(entity);
                     return;
                 }
@@ -102,6 +103,7 @@ namespace Quantum {
                 coinInteractable->ColliderDisabled = true;
                 f.Events.CoinChangeCollected(coinEntity, *coin, true);
             } else {
+                f.Events.CollectableDespawned(coinEntity, coinTransform->Position, true);
                 f.Destroy(coinEntity);
             }
         }
@@ -144,8 +146,7 @@ namespace Quantum {
         }
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
-            if (f.Unsafe.TryGetPointer(entity, out Coin* coin)
-                && !coin->IsFloating) {
+            if (f.Unsafe.TryGetPointer(entity, out Coin* coin) && !coin->IsFloating) {
                 coin->Lifetime = 0;
             }
         }

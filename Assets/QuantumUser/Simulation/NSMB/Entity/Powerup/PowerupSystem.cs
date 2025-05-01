@@ -54,7 +54,7 @@ namespace Quantum {
 
                     if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
                         if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, entity)) {
-                            // TODO: poof effect.
+                            f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                             f.Destroy(entity);
                             return;
                         }
@@ -118,6 +118,7 @@ namespace Quantum {
             }
 
             if (QuantumUtils.Decrement(ref powerup->Lifetime)) {
+                f.Events.CollectableDespawned(entity, transform->Position, false);
                 f.Destroy(entity);
             }
         }
@@ -178,8 +179,9 @@ namespace Quantum {
             // Change the player's powerup state
             PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
 
-            f.Destroy(powerupEntity);
             f.Events.MarioPlayerCollectedPowerup(marioEntity, result, newScriptable);
+            f.Events.CollectableDespawned(powerupEntity, f.Unsafe.GetPointer<Transform2D>(powerupEntity)->Position, true);
+            f.Destroy(powerupEntity);
         }
 
         public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {
@@ -284,6 +286,8 @@ namespace Quantum {
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
                 && powerup->SpawnAnimationFrames <= 0) {
+
+                f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                 f.Destroy(entity);
             }
         }

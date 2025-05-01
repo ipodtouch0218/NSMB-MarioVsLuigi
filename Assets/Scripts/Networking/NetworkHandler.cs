@@ -541,7 +541,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         var deterministicConfig = DeterministicSessionConfig.FromByteArray(replay.DecompressedDeterministicConfigData);
         var inputStream = new Photon.Deterministic.BitStream(replay.DecompressedInputData);
         var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);
-
+        
         // Disable checksums- they murder performance.
         deterministicConfig.ChecksumInterval = 0;
 
