@@ -149,7 +149,7 @@ public class ReplayUI : QuantumSceneViewComponent {
         float percentage;
         if (draggingArrow) {
             Vector2 mousePositionPixels = mousePositionAction.action.ReadValue<Vector2>();
-            Vector2 mousePositionTrack = trackArrow.transform.parent.InverseTransformPoint(mousePositionPixels);
+            Vector2 mousePositionTrack = trackArrow.transform.parent.InverseTransformPoint(playerElements.Camera.ScreenToWorldPoint(mousePositionPixels));
             
             float newX = Mathf.Clamp(mousePositionTrack.x, minTrackX, maxTrackX);
             percentage = (newX - minTrackX) / (maxTrackX - minTrackX);

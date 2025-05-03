@@ -105,7 +105,7 @@ namespace Quantum {
 
                 } else if (f.Global->GameStartFrames == 79) {
                     f.Events.RecordingStarted();
-
+                    
                 } if (f.Global->GameStartFrames == 78) {
                     // Respawn all players and enable systems
                     f.Global->StartFrame = f.Number;

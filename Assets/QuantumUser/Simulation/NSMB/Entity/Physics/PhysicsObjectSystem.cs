@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
@@ -1055,14 +1056,14 @@ namespace Quantum {
             var extents = shape.Box.Extents;
 
             FPVector2 origin = position + shape.Centroid;
-            FPVector2 boxMin = origin - extents;
-            FPVector2 boxMax = origin + extents;
+            FPVector2 boxMin = origin - extents + new FPVector2(Skin, Skin);
+            FPVector2 boxMax = origin + extents - new FPVector2(Skin, Skin);
 
             Span<FPVector2> boxCorners = stackalloc FPVector2[4];
-            boxCorners[0] = new(origin.X - extents.X, origin.Y + extents.Y);
-            boxCorners[1] = boxMax;
-            boxCorners[2] = new(origin.X + extents.X, origin.Y - extents.Y);
-            boxCorners[3] = boxMin;
+            boxCorners[0] = new(boxMin.X, boxMax.Y);
+            boxCorners[1] = new(boxMax.X, boxMax.Y);
+            boxCorners[2] = new(boxMax.X, boxMin.Y);
+            boxCorners[3] = new(boxMin.X, boxMin.Y);
 
             Span<FPVector2> vertexBuffer = stackalloc FPVector2[128];
             Span<int> shapeVertexCountBuffer = stackalloc int[16];

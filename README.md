@@ -115,6 +115,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Snick, It's Him.
 * Thebababois369
 * Tombuntu
+* Windows10V
 * vlco_o
 
 ### QA Testing:

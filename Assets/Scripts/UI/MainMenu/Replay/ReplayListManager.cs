@@ -252,12 +252,12 @@ public class ReplayListManager : Selectable {
                     Select(newReplayEntry, false);
                     StartCoroutine(SelectAtEndOfFrame());
                 }
+            }
 
-                // Max three per frame.
-                if (stopwatch.ElapsedMilliseconds > 10) {
-                    yield return null;
-                    stopwatch.Restart();
-                }
+            // Max 10ms per frame.
+            if (stopwatch.ElapsedMilliseconds > 10) {
+                yield return null;
+                stopwatch.Restart();
             }
         }
 

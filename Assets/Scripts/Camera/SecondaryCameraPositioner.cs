@@ -8,6 +8,7 @@ public class SecondaryCameraPositioner : MonoBehaviour {
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Camera ourCamera;
     [SerializeField] private UnityEngine.LayerMask alwaysIgnoreMask;
+    [SerializeField] private bool copyPropertiesOnly;
 
     //---Private Variables
     private bool destroyed;
@@ -22,27 +23,30 @@ public class SecondaryCameraPositioner : MonoBehaviour {
     }
 
     public void UpdatePosition() {
-        if (!stage || destroyed) {
-            return;
+        if (!copyPropertiesOnly) {
+            if (!stage || destroyed) {
+                return;
+            }
+
+            if (!stage.IsWrappingLevel) {
+                Destroy(gameObject);
+                destroyed = true;
+                return;
+            }
+
+            float camX = mainCamera.transform.position.x;
+            bool enable = Mathf.Abs(camX - stage.StageWorldMin.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect) || Mathf.Abs(camX - stage.StageWorldMax.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect);
+
+            ourCamera.enabled = enable;
+
+            if (enable) {
+                float middle = stage.StageWorldMin.X.AsFloat + stage.TileDimensions.x * 0.25f;
+                bool rightHalf = mainCamera.transform.position.x > middle;
+                transform.localPosition = new(stage.TileDimensions.x * (rightHalf ? -1 : 1) * 0.5f, 0, 0);
+            }
         }
 
-        if (!stage.IsWrappingLevel) {
-            Destroy(gameObject);
-            destroyed = true;
-            return;
-        }
-
-        float camX = mainCamera.transform.position.x;
-        bool enable = Mathf.Abs(camX - stage.StageWorldMin.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect) || Mathf.Abs(camX - stage.StageWorldMax.X.AsFloat) < (mainCamera.orthographicSize * mainCamera.aspect);
-
-        ourCamera.enabled = enable;
         ourCamera.orthographicSize = mainCamera.orthographicSize;
         ourCamera.cullingMask = mainCamera.cullingMask & ~alwaysIgnoreMask;
-
-        if (enable) {
-            float middle = stage.StageWorldMin.X.AsFloat + stage.TileDimensions.x * 0.25f;
-            bool rightHalf = mainCamera.transform.position.x > middle;
-            transform.localPosition = new(stage.TileDimensions.x * (rightHalf ? -1 : 1) * 0.5f, 0, 0);
-        }
     }
 }

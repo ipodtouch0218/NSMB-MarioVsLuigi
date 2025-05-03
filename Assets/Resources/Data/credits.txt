@@ -65,6 +65,7 @@ Shadow_Walker13
 Snick, It's Him.
 Thebababois369
 Tombuntu
+Windows10V
 vlco_o
 
 <color=yellow>{ui.about.credits.qa}</color>

@@ -73,7 +73,7 @@ public class ReplayListEntry : MonoBehaviour {
             if (showHideButtonsCoroutine != null) {
                 StopCoroutine(showHideButtonsCoroutine);
             }
-            showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, 0.1f));
+            showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, /*0.1f*/ 0));
         }
         canvasGroup.interactable = false;
         button.interactable = true;
@@ -89,7 +89,7 @@ public class ReplayListEntry : MonoBehaviour {
             if (showHideButtonsCoroutine != null) {
                 StopCoroutine(showHideButtonsCoroutine);
             }
-            showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0.1f));
+            showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, /*0.1f*/ 0));
             canvasGroup.interactable = true;
             button.interactable = false;
             canvas.PlayCursorSound();

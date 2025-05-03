@@ -1698,6 +1698,7 @@ namespace Quantum {
                 return false;
             }
 
+            UnityEngine.Debug.Log("stuck in block");
             bool wasStuckLastTick = mario->IsStuckInBlock;
 
             mario->IsStuckInBlock = true;

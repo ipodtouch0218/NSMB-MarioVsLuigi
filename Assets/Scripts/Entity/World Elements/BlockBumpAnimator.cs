@@ -46,7 +46,7 @@ public unsafe class BlockBumpAnimator : QuantumEntityViewComponent {
         float bumpScale = 0.35f;
         float bumpDuration = 0.25f;
 
-        float remainingTime = blockBump->Lifetime / 60f;
+        float remainingTime = (blockBump->Lifetime - Game.InterpolationFactor) / 60f;
         float size = Mathf.Sin((remainingTime / bumpDuration) * Mathf.PI) * bumpScale * 0.5f;
 
         transform.localScale = new(0.5f + size, 0.5f + size, 1);

@@ -157,11 +157,12 @@ public unsafe class CameraAnimator : ResizingCamera {
     }
 
     private void UpdateCameraFreecamMode(CallbackUpdateView e) {
-        if (e.Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
+        if (e.Game.Frames.Predicted.Global->GameState >= GameState.Ended
+            || playerElements.PauseMenu.IsPaused) {
             return;
         }
 
-        bool ignoreKeyboard = playerElements.PauseMenu.IsPaused || playerElements.ReplayUi.IsOpen;
+        bool ignoreKeyboard = playerElements.ReplayUi.IsOpen;
 
         // Movement
         Vector2 movement = Vector2.zero;

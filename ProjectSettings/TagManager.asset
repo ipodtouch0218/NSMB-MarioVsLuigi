@@ -47,7 +47,7 @@ TagManager:
   - RenderLayerObject
   - RenderLayerMap
   - RenderLayerBackground
-  - 
+  - RenderLayerPlayerUI
   - 
   - 
   - 

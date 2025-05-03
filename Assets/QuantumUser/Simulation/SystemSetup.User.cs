@@ -1,5 +1,6 @@
 ﻿using Quantum.Core;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Quantum {
     public static partial class DeterministicSystemSetup {
