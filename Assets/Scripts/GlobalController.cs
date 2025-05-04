@@ -8,6 +8,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
+using UnityEngine.Profiling;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
@@ -90,6 +91,21 @@ public class GlobalController : Singleton<GlobalController> {
         if (Screen.fullScreenMode == FullScreenMode.Windowed && UnityEngine.Input.GetKey(KeyCode.LeftShift) && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
             newWindowHeight = (int) (newWindowWidth * (9f / 16f));
             Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
+        }
+
+        if (Debug.isDebugBuild) {
+            if (UnityEngine.Input.GetKeyDown(KeyCode.F9)) {
+                if (Profiler.enabled) {
+                    Profiler.enabled = false;
+                    PlaySound(SoundEffect.Player_Sound_Powerdown);
+                } else {
+                    Profiler.maxUsedMemory = 256 * 1024 * 1024;
+                    Profiler.logFile = "profile-" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    Profiler.enableBinaryLog = true;
+                    Profiler.enabled = true;
+                    PlaySound(SoundEffect.Player_Sound_PowerupCollect);
+                }
+            }
         }
 #endif
 

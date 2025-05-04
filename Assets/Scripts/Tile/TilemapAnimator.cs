@@ -1,11 +1,10 @@
 using NSMB.Extensions;
 using Quantum;
 using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TilemapAnimator : MonoBehaviour {
+public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
 
     //---Serialized Variables
     [SerializeField] private Tilemap tilemap;
@@ -14,11 +13,14 @@ public class TilemapAnimator : MonoBehaviour {
     //---Private Variables
     private readonly Dictionary<EntityRef, AudioSource> entityBreakBlockSounds = new();
     private readonly Dictionary<EventKey, Vector3Int> tileEventPositions = new();
-    private VersusStageData stage;
-
 
     public void OnValidate() {
         this.SetIfNull(ref tilemap);
+    }
+
+    public override void OnEnable() {
+        UseFindUpdater = true;
+        base.OnEnable();
     }
 
     public void Start() {
@@ -29,7 +31,6 @@ public class TilemapAnimator : MonoBehaviour {
         QuantumCallback.Subscribe<CallbackEventCanceled>(this, OnEventCanceled);
         QuantumCallback.Subscribe<CallbackEventConfirmed>(this, OnEventConfirmed);
 
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         if (QuantumRunner.DefaultGame != null) {
             RefreshMap(QuantumRunner.DefaultGame.Frames.Verified);
         }
@@ -53,7 +54,7 @@ public class TilemapAnimator : MonoBehaviour {
         // This is a tile change event.
         // Refer back to the simulation
         Frame f = e.Game.Frames.Predicted;
-        StageTileInstance tileInstance = stage.GetTileRelative(f, coords.x, coords.y);
+        StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, coords.x, coords.y);
 
         var tile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);
         TileBase unityTile = tile ? tile.Tile : null;
@@ -99,7 +100,7 @@ public class TilemapAnimator : MonoBehaviour {
 
     private unsafe void OnTileBroken(EventTileBroken e) {
         ParticleSystem particle = Instantiate(tileBreakParticleSystem,
-            QuantumUtils.RelativeTileToWorld(stage, new Quantum.Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
+            QuantumUtils.RelativeTileToWorld(ViewContext.Stage, new Quantum.Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
 
         if (QuantumUnityDB.GetGlobalAsset(e.Tile.Tile) is BreakableBrickTile bbt) {
             var main = particle.main;
@@ -119,6 +120,7 @@ public class TilemapAnimator : MonoBehaviour {
     }
     
     private void RefreshMap(Frame f) {
+        VersusStageData stage = ViewContext.Stage;
         if (f == null
             || f.StageTiles == null 
             || f.StageTiles.Length != stage.TileDimensions.x * stage.TileDimensions.y) {

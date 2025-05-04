@@ -146,6 +146,7 @@ MonoBehaviour:
     - rid: 6128927690125737993
     - rid: 6128927690125737994
     - rid: 6128927690125737995
+    - rid: 6128927690125737996
   - Components:
     - rid: 2112854041804406784
     - rid: 2112854041804406785
@@ -159,6 +160,7 @@ MonoBehaviour:
     - rid: 2112854041804406793
     - rid: 2112854041804406794
     - rid: 2112854041804406795
+    - rid: 2112854041804406796
   - Components:
     - rid: 7689850815606947840
     - rid: 7689850815606947841
@@ -169,6 +171,7 @@ MonoBehaviour:
     - rid: 7689850815606947846
     - rid: 7689850815606947847
     - rid: 7689850815606947848
+    - rid: 7689850815606947849
   SerializedTriangleDataUncompressedSize: 8
   references:
     version: 2
@@ -283,6 +286,10 @@ MonoBehaviour:
         ColliderDisabled:
           Value: 0
     - rid: 2112854041804406793
+      type: {class: InteractionInitiatorPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
+    - rid: 2112854041804406794
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         SpawnPowerupWhenStomped:
@@ -306,7 +313,7 @@ MonoBehaviour:
             RawValue: 39322
           Y:
             RawValue: 65536
-    - rid: 2112854041804406794
+    - rid: 2112854041804406795
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Gravity:
@@ -326,7 +333,7 @@ MonoBehaviour:
           Value: 0
         BreakMegaObjects:
           Value: 0
-    - rid: 2112854041804406795
+    - rid: 2112854041804406796
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
@@ -896,6 +903,10 @@ MonoBehaviour:
         ColliderDisabled:
           Value: 0
     - rid: 6128927690125737993
+      type: {class: InteractionInitiatorPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
+    - rid: 6128927690125737994
       type: {class: KoopaPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         SpawnPowerupWhenStomped:
@@ -919,7 +930,7 @@ MonoBehaviour:
             RawValue: 39322
           Y:
             RawValue: 65536
-    - rid: 6128927690125737994
+    - rid: 6128927690125737995
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Gravity:
@@ -939,7 +950,7 @@ MonoBehaviour:
           Value: 0
         BreakMegaObjects:
           Value: 0
-    - rid: 6128927690125737995
+    - rid: 6128927690125737996
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0
@@ -1408,6 +1419,10 @@ MonoBehaviour:
         ColliderDisabled:
           Value: 0
     - rid: 7689850815606947847
+      type: {class: InteractionInitiatorPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
+      data:
+        _empty_prototype_dummy_field_: 0
+    - rid: 7689850815606947848
       type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Gravity:
@@ -1427,7 +1442,7 @@ MonoBehaviour:
           Value: 0
         BreakMegaObjects:
           Value: 0
-    - rid: 7689850815606947848
+    - rid: 7689850815606947849
       type: {class: WrappingObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         _empty_prototype_dummy_field_: 0

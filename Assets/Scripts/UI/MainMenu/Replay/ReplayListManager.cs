@@ -209,6 +209,7 @@ public class ReplayListManager : Selectable {
         }
         replays.Clear();
         temporaryReplays.Clear();
+        hiddenReplaysText.gameObject.SetActive(false);
 
         string tempPath = Path.Combine(ReplayDirectory, "temp");
         Directory.CreateDirectory(tempPath);

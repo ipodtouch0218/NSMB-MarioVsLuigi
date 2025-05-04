@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -1686,12 +1683,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -6175656340737754197
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 6367339836166448312
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1818,12 +1815,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 8378108777348871862
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -1075243939552166759
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1950,12 +1947,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 7224248269006976714
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -9018368106086833996
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2732,12 +2729,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 597171190669668077, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 1172053303110669260
       objectReference: {fileID: 0}
     - target: {fileID: 597171190669668077, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 1194962293093866675
       objectReference: {fileID: 0}
     - target: {fileID: 1900118007787000339, guid: 28a7f3ea2c44a564d906449744561724,
@@ -2812,12 +2809,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3486165437591023350, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 3765508049229964439
       objectReference: {fileID: 0}
     - target: {fileID: 3486165437591023350, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -8521006016811817595
       objectReference: {fileID: 0}
     - target: {fileID: 4162546976232202784, guid: 28a7f3ea2c44a564d906449744561724,
@@ -2837,27 +2834,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[0]
+      propertyPath: 'NetworkedBehaviours.Array.data[0]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[1]
+      propertyPath: 'NetworkedBehaviours.Array.data[1]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[2]
+      propertyPath: 'NetworkedBehaviours.Array.data[2]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 2255176288507368458
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 3145246320407674541
       objectReference: {fileID: 0}
     - target: {fileID: 6254190274066690703, guid: 28a7f3ea2c44a564d906449744561724,
@@ -3201,12 +3198,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 597171190669668077, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -8121974348959618980
       objectReference: {fileID: 0}
     - target: {fileID: 597171190669668077, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -1920083624723706996
       objectReference: {fileID: 0}
     - target: {fileID: 1900118007787000339, guid: 28a7f3ea2c44a564d906449744561724,
@@ -3281,12 +3278,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3486165437591023350, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -1565930251644836207
       objectReference: {fileID: 0}
     - target: {fileID: 3486165437591023350, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 6276242257839415441
       objectReference: {fileID: 0}
     - target: {fileID: 4162546976232202784, guid: 28a7f3ea2c44a564d906449744561724,
@@ -3306,27 +3303,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[0]
+      propertyPath: 'NetworkedBehaviours.Array.data[0]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[1]
+      propertyPath: 'NetworkedBehaviours.Array.data[1]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[2]
+      propertyPath: 'NetworkedBehaviours.Array.data[2]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -2069939616957388110
       objectReference: {fileID: 0}
     - target: {fileID: 5412312900953502766, guid: 28a7f3ea2c44a564d906449744561724,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -3120804737518776684
       objectReference: {fileID: 0}
     - target: {fileID: 8006284552651083082, guid: 28a7f3ea2c44a564d906449744561724,
@@ -3496,12 +3493,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -2932271444650380924
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 5094788069169895093
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -3790,367 +3787,367 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[0]
+      propertyPath: 'MapEntityReferences.Array.data[0]'
       value: 
       objectReference: {fileID: 1809458997}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[1]
+      propertyPath: 'MapEntityReferences.Array.data[1]'
       value: 
       objectReference: {fileID: 1729401767}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[2]
+      propertyPath: 'MapEntityReferences.Array.data[2]'
       value: 
       objectReference: {fileID: 365299250}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[3]
+      propertyPath: 'MapEntityReferences.Array.data[3]'
       value: 
       objectReference: {fileID: 1043697614}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[4]
+      propertyPath: 'MapEntityReferences.Array.data[4]'
       value: 
       objectReference: {fileID: 1299022529}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[5]
+      propertyPath: 'MapEntityReferences.Array.data[5]'
       value: 
       objectReference: {fileID: 831890588}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[6]
+      propertyPath: 'MapEntityReferences.Array.data[6]'
       value: 
       objectReference: {fileID: 1213457254}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[7]
+      propertyPath: 'MapEntityReferences.Array.data[7]'
       value: 
       objectReference: {fileID: 1360417020}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[8]
+      propertyPath: 'MapEntityReferences.Array.data[8]'
       value: 
       objectReference: {fileID: 354838374}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[9]
+      propertyPath: 'MapEntityReferences.Array.data[9]'
       value: 
       objectReference: {fileID: 1779665031}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[10]
+      propertyPath: 'MapEntityReferences.Array.data[10]'
       value: 
       objectReference: {fileID: 397271345}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[11]
+      propertyPath: 'MapEntityReferences.Array.data[11]'
       value: 
       objectReference: {fileID: 1356470354}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[12]
+      propertyPath: 'MapEntityReferences.Array.data[12]'
       value: 
       objectReference: {fileID: 1725973758}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[13]
+      propertyPath: 'MapEntityReferences.Array.data[13]'
       value: 
       objectReference: {fileID: 698823886}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[14]
+      propertyPath: 'MapEntityReferences.Array.data[14]'
       value: 
       objectReference: {fileID: 669327384}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[15]
+      propertyPath: 'MapEntityReferences.Array.data[15]'
       value: 
       objectReference: {fileID: 1421100426}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[16]
+      propertyPath: 'MapEntityReferences.Array.data[16]'
       value: 
       objectReference: {fileID: 1755887394}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[17]
+      propertyPath: 'MapEntityReferences.Array.data[17]'
       value: 
       objectReference: {fileID: 19909822}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[18]
+      propertyPath: 'MapEntityReferences.Array.data[18]'
       value: 
       objectReference: {fileID: 1027131003}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[19]
+      propertyPath: 'MapEntityReferences.Array.data[19]'
       value: 
       objectReference: {fileID: 1030877294}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[20]
+      propertyPath: 'MapEntityReferences.Array.data[20]'
       value: 
       objectReference: {fileID: 1102913340}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[21]
+      propertyPath: 'MapEntityReferences.Array.data[21]'
       value: 
       objectReference: {fileID: 524300848}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[22]
+      propertyPath: 'MapEntityReferences.Array.data[22]'
       value: 
       objectReference: {fileID: 842494886}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[23]
+      propertyPath: 'MapEntityReferences.Array.data[23]'
       value: 
       objectReference: {fileID: 479184547}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[24]
+      propertyPath: 'MapEntityReferences.Array.data[24]'
       value: 
       objectReference: {fileID: 1931351591}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[25]
+      propertyPath: 'MapEntityReferences.Array.data[25]'
       value: 
       objectReference: {fileID: 1889303071}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[26]
+      propertyPath: 'MapEntityReferences.Array.data[26]'
       value: 
       objectReference: {fileID: 1604470252}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[27]
+      propertyPath: 'MapEntityReferences.Array.data[27]'
       value: 
       objectReference: {fileID: 679292963}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[28]
+      propertyPath: 'MapEntityReferences.Array.data[28]'
       value: 
       objectReference: {fileID: 1738600964}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[29]
+      propertyPath: 'MapEntityReferences.Array.data[29]'
       value: 
       objectReference: {fileID: 1735290783}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[30]
+      propertyPath: 'MapEntityReferences.Array.data[30]'
       value: 
       objectReference: {fileID: 686577150}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[31]
+      propertyPath: 'MapEntityReferences.Array.data[31]'
       value: 
       objectReference: {fileID: 515240558}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[32]
+      propertyPath: 'MapEntityReferences.Array.data[32]'
       value: 
       objectReference: {fileID: 1902501714}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[33]
+      propertyPath: 'MapEntityReferences.Array.data[33]'
       value: 
       objectReference: {fileID: 1684951439}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[34]
+      propertyPath: 'MapEntityReferences.Array.data[34]'
       value: 
       objectReference: {fileID: 1710337710}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[35]
+      propertyPath: 'MapEntityReferences.Array.data[35]'
       value: 
       objectReference: {fileID: 1493021571}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[36]
+      propertyPath: 'MapEntityReferences.Array.data[36]'
       value: 
       objectReference: {fileID: 1702050366}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[37]
+      propertyPath: 'MapEntityReferences.Array.data[37]'
       value: 
       objectReference: {fileID: 622117712}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[38]
+      propertyPath: 'MapEntityReferences.Array.data[38]'
       value: 
       objectReference: {fileID: 1660409598}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[39]
+      propertyPath: 'MapEntityReferences.Array.data[39]'
       value: 
       objectReference: {fileID: 1053996144}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[40]
+      propertyPath: 'MapEntityReferences.Array.data[40]'
       value: 
       objectReference: {fileID: 318569193}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[41]
+      propertyPath: 'MapEntityReferences.Array.data[41]'
       value: 
       objectReference: {fileID: 205537554}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[42]
+      propertyPath: 'MapEntityReferences.Array.data[42]'
       value: 
       objectReference: {fileID: 1381835463}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[43]
+      propertyPath: 'MapEntityReferences.Array.data[43]'
       value: 
       objectReference: {fileID: 610703814}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[44]
+      propertyPath: 'MapEntityReferences.Array.data[44]'
       value: 
       objectReference: {fileID: 158209497}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[45]
+      propertyPath: 'MapEntityReferences.Array.data[45]'
       value: 
       objectReference: {fileID: 335040569}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[46]
+      propertyPath: 'MapEntityReferences.Array.data[46]'
       value: 
       objectReference: {fileID: 1187839031}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[47]
+      propertyPath: 'MapEntityReferences.Array.data[47]'
       value: 
       objectReference: {fileID: 1398151416}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[48]
+      propertyPath: 'MapEntityReferences.Array.data[48]'
       value: 
       objectReference: {fileID: 1356082624}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[49]
+      propertyPath: 'MapEntityReferences.Array.data[49]'
       value: 
       objectReference: {fileID: 128571817}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[50]
+      propertyPath: 'MapEntityReferences.Array.data[50]'
       value: 
       objectReference: {fileID: 271742326}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[51]
+      propertyPath: 'MapEntityReferences.Array.data[51]'
       value: 
       objectReference: {fileID: 1347548840}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[52]
+      propertyPath: 'MapEntityReferences.Array.data[52]'
       value: 
       objectReference: {fileID: 2061190617}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[53]
+      propertyPath: 'MapEntityReferences.Array.data[53]'
       value: 
       objectReference: {fileID: 1153779928}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[54]
+      propertyPath: 'MapEntityReferences.Array.data[54]'
       value: 
       objectReference: {fileID: 2073072070}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[55]
+      propertyPath: 'MapEntityReferences.Array.data[55]'
       value: 
       objectReference: {fileID: 1269247087}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[56]
+      propertyPath: 'MapEntityReferences.Array.data[56]'
       value: 
       objectReference: {fileID: 1145512912}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[57]
+      propertyPath: 'MapEntityReferences.Array.data[57]'
       value: 
       objectReference: {fileID: 1119757369}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[58]
+      propertyPath: 'MapEntityReferences.Array.data[58]'
       value: 
       objectReference: {fileID: 38871456}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[59]
+      propertyPath: 'MapEntityReferences.Array.data[59]'
       value: 
       objectReference: {fileID: 2121858170}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[60]
+      propertyPath: 'MapEntityReferences.Array.data[60]'
       value: 
       objectReference: {fileID: 958289986}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[61]
+      propertyPath: 'MapEntityReferences.Array.data[61]'
       value: 
       objectReference: {fileID: 192999501}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[62]
+      propertyPath: 'MapEntityReferences.Array.data[62]'
       value: 
       objectReference: {fileID: 1140080878}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[63]
+      propertyPath: 'MapEntityReferences.Array.data[63]'
       value: 
       objectReference: {fileID: 1979777552}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[64]
+      propertyPath: 'MapEntityReferences.Array.data[64]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[65]
+      propertyPath: 'MapEntityReferences.Array.data[65]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[66]
+      propertyPath: 'MapEntityReferences.Array.data[66]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[67]
+      propertyPath: 'MapEntityReferences.Array.data[67]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[68]
+      propertyPath: 'MapEntityReferences.Array.data[68]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[69]
+      propertyPath: 'MapEntityReferences.Array.data[69]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[70]
+      propertyPath: 'MapEntityReferences.Array.data[70]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[71]
+      propertyPath: 'MapEntityReferences.Array.data[71]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
-      propertyPath: MapEntityReferences.Array.data[72]
+      propertyPath: 'MapEntityReferences.Array.data[72]'
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -4158,6 +4155,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}
+--- !u!114 &941320097 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2550855901662361809, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+    type: 3}
+  m_PrefabInstance: {fileID: 941320096}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c533cfed317c8854c9d8c177029943ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &958289985
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4649,12 +4658,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 5568688845446480590
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 1842922023873488271
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -5891,12 +5900,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 3838626886160233630
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 2722032461972509336
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -6102,6 +6111,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -6253,12 +6265,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -6969090721853495946
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 3872134744252800409
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -6677,12 +6689,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -6968191951868159594
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -2960939085916817243
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -6809,12 +6821,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -1636814025311695328
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 5624019962287477677
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -7410,6 +7422,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -8284,12 +8299,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 8089810597184224683
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -6416064409052456017
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -8416,12 +8431,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -7687710371386232677
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 5239857270667067317
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -8940,12 +8955,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: 6864923517963088084
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: -2150770037802973289
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -9072,12 +9087,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[0]'
       value: -9201219132026662844
       objectReference: {fileID: 0}
     - target: {fileID: 8712797713821691440, guid: 946c21a210ac3094bba96c7e4190a452,
         type: 3}
-      propertyPath: NetworkGuid.RawGuidValue.Array.data[1]
+      propertyPath: 'NetworkGuid.RawGuidValue.Array.data[1]'
       value: 7348234623364237483
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -9290,6 +9305,9 @@ TilemapRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -11864,6 +11882,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452690fbcbac2c84793b5dc35da00380, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 941320097}
+  UseFindUpdater: 0
   tilemap: {fileID: 1890770091}
   tileBreakParticleSystem: {fileID: 4829880438140776504, guid: e1e481681ce723d41ba61becae047562,
     type: 3}
@@ -12974,9 +12994,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4290463620482482720}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 11
   m_Type: 1
-  m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1.1
   m_Range: 10
@@ -13026,8 +13045,12 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!4 &8587725864420799970
 Transform:
   m_ObjectHideFlags: 0

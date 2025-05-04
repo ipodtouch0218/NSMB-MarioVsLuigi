@@ -58,7 +58,7 @@ namespace NSMB.UI.Game.Results {
             yield return new WaitForSeconds(delay);
 
             parent.SetActive(true);
-            FindObjectOfType<LoopingMusicPlayer>().Play(musicData);
+            FindFirstObjectByType<LoopingMusicPlayer>().Play(musicData);
             InitializeResultsEntries(f, 0);
             moveHeaderCoroutine = StartCoroutine(MoveObjectToTarget(header, -1.25f, 0, 1/3f));
             moveUiCoroutine = StartCoroutine(MoveObjectToTarget(ui, 1.25f, 0, 1/3f));

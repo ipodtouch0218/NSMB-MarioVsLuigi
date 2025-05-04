@@ -11,7 +11,7 @@ public class TextSubmitValidator : TMP_InputValidator {
         if (ch == '\n' || ch == '\xB') {
             // Submit
             if (!chat) {
-                chat = FindObjectOfType<MainMenuChat>();
+                chat = FindFirstObjectByType<MainMenuChat>();
                 if (!chat) {
                     return '\0';
                 }

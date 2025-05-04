@@ -73,7 +73,7 @@ public class ProjectileAnimator : QuantumEntityViewComponent {
         }
 
         foreach (var playerElement in PlayerElements.AllPlayerElements) {
-            if (playerElement.Camera == camera || playerElement.ScrollCamera == camera) {
+            if (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera) {
                 // This camera.
                 if (!PredictedFrame.Unsafe.TryGetPointer(playerElement.Entity, out MarioPlayer* cameraMario)) {
                     return false;

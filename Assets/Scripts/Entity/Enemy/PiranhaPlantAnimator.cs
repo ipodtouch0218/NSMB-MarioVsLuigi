@@ -46,7 +46,9 @@ public unsafe class PiranhaPlantAnimator : QuantumEntityViewComponent {
     }
 
     public void PlayChompSound() {
-        sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Chomp);
+        if (!NetworkHandler.IsReplayFastForwarding) {
+            sfx.PlayOneShot(SoundEffect.Enemy_PiranhaPlant_Chomp);
+        }
     }
 
     private void OnEnemyKilled(EventEnemyKilled e) {

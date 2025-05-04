@@ -13,7 +13,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace NSMB.UI.Game {
-    public unsafe class UIUpdater : MonoBehaviour {
+    public unsafe class UIUpdater : QuantumSceneViewComponent<StageContext> {
 
         //---Properties
         public EntityRef Target => playerElements.Entity;
@@ -41,13 +41,13 @@ namespace NSMB.UI.Game {
         //private TeamManager teamManager;
         private int cachedCoins = -1, cachedTeamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1;
         private PowerupAsset previousPowerup;
-        private VersusStageData stage;
         private EntityRef previousTarget;
         private bool previousMarioExists;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
-        public void OnEnable() {
+        public override void OnEnable() {
+            base.OnEnable();
             MarioPlayerAnimator.MarioPlayerInitialized += OnMarioInitialized;
             MarioPlayerAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
             BigStarAnimator.BigStarInitialized += OnBigStarInitialized;
@@ -57,7 +57,8 @@ namespace NSMB.UI.Game {
             OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
-        public void OnDisable() {
+        public override void OnDisable() {
+            base.OnDisable();
             MarioPlayerAnimator.MarioPlayerInitialized -= OnMarioInitialized;
             MarioPlayerAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
             BigStarAnimator.BigStarInitialized -= OnBigStarInitialized;
@@ -87,11 +88,11 @@ namespace NSMB.UI.Game {
             backgrounds.Add(coinsParent.GetComponentInChildren<Image>());
             backgrounds.Add(livesParent.GetComponentInChildren<Image>());
             backgrounds.Add(timerParent.GetComponentInChildren<Image>());
-
-            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
         }
 
         public void Start() {
+            VersusStageData stage = ViewContext.Stage;
+
             PlayerTrackIcon.HideAllPlayerIcons = stage.HidePlayersOnMinimap;
             boos.SetActive(stage.HidePlayersOnMinimap);
             StartCoroutine(UpdatePingTextCoroutine());
@@ -301,7 +302,7 @@ namespace NSMB.UI.Game {
                 icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
             }
 
-            icon.Initialize(playerElements, entity, target, stage);
+            icon.Initialize(playerElements, entity, target, ViewContext.Stage);
             icon.gameObject.SetActive(true);
             return icon;
         }
@@ -325,7 +326,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->GetTeam(f), 0.8f, 1f) : stage.UIColor.AsColor;
+            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->GetTeam(f), 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;

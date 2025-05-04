@@ -175,7 +175,7 @@ namespace NSMB.Entities.Player {
             GlowColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
 
             if (Game.PlayerIsLocal(mario->PlayerRef)) {
-                MasterCanvas masterCanvas = FindObjectOfType<MasterCanvas>();
+                MasterCanvas masterCanvas = FindFirstObjectByType<MasterCanvas>();
                 PlayerElements elements = Instantiate(masterCanvas.playerElementsPrefab, masterCanvas.transform);
                 elements.Initialize(Game, f, EntityRef, mario->PlayerRef);
             }
@@ -571,16 +571,12 @@ namespace NSMB.Entities.Player {
                 animator.runtimeAnimatorController = large ? character.LargeOverrides : character.SmallOverrides;
 
                 // Push back state 
-                animator.Update(0);
+                animator.Rebind();
 
                 foreach (int i in layers) {
                     animator.Play(layerInfo[i].fullPathHash, i, layerInfo[i].normalizedTime);
-                    animator.Update(0);
                 }
-
-                animator.Update(0);
             }
-
 
             float newZ = -4;
             if (mario->IsDead) {
@@ -621,7 +617,7 @@ namespace NSMB.Entities.Player {
 
         private bool IsCameraFocus(Camera camera) {
             foreach (var playerElement in PlayerElements.AllPlayerElements) {
-                if (EntityRef == playerElement.Entity && (playerElement.Camera == camera || playerElement.ScrollCamera == camera)) {
+                if (EntityRef == playerElement.Entity && (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera)) {
                     return true;
                 }
             }

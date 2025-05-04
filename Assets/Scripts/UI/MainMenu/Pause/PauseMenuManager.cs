@@ -34,6 +34,7 @@ namespace NSMB.UI.Pause {
         private int selected;
         private bool skipSound;
         private bool isHost;
+        private float pauseTime;
 
         private bool isInConfirmation;
         private bool isInConfirmationYesSelected;
@@ -96,6 +97,7 @@ namespace NSMB.UI.Pause {
             if (playSound) {
                 GlobalController.Instance.PlaySound(SoundEffect.UI_Pause);
             }
+            pauseTime = Time.unscaledTime;
         }
 
         public void Unpause(bool playSound) {
@@ -169,7 +171,7 @@ namespace NSMB.UI.Pause {
         }
 
         public void OnCancel(InputAction.CallbackContext context) {
-            if (!isPaused) {
+            if (!isPaused || pauseTime == Time.unscaledTime) {
                 return;
             }
 

@@ -11,11 +11,11 @@ PrefabInstance:
     - target: {fileID: 1060841653561283886, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_Size.y
-      value: 1.5
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 1060841653561283886, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 5ea3a4b035481cf4aa3b3a922760ee9c, type: 2}
     - target: {fileID: 2728533984175912727, guid: 9d1829544a867764ea85ac4428593208,

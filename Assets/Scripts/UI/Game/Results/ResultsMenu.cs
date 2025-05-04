@@ -192,7 +192,7 @@ namespace NSMB.UI.Game.Results {
                 break;
             case 1:
                 if (NetworkHandler.IsReplay) {
-                    FindObjectOfType<ReplayUI>().ResetReplay();
+                    FindFirstObjectByType<ReplayUI>().ResetReplay();
                     sfx.PlayOneShot(SoundEffect.UI_Decide);
                 } else {
                     if (CanSaveReplay) {

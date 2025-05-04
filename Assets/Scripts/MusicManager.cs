@@ -5,13 +5,10 @@ using Quantum;
 using UnityEngine;
 
 namespace NSMB.Sound {
-    public class MusicManager : MonoBehaviour {
+    public class MusicManager : QuantumSceneViewComponent<StageContext> {
 
         //---Serialized Variables
         [SerializeField] private LoopingMusicPlayer musicPlayer;
-
-        //---Private Variables
-        private VersusStageData stage;
 
         public void OnValidate() {
             this.SetIfNull(ref musicPlayer);
@@ -24,7 +21,6 @@ namespace NSMB.Sound {
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
 
-            stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
             LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
 
             QuantumGame game = NetworkHandler.Game;
@@ -103,6 +99,7 @@ namespace NSMB.Sound {
                 speedup |= (f.Global->RealPlayers <= 2 && playersWithOneLife > 0) || (playersWithOneLife >= f.Global->RealPlayers);
             }
 
+            VersusStageData stage = ViewContext.Stage;
             if (mega) {
                 musicPlayer.Play(f.FindAsset(stage.MegaMushroomMusic));
             } else if (invincible) {

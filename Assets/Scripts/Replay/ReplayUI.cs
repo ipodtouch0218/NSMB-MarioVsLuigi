@@ -118,7 +118,7 @@ public class ReplayUI : QuantumSceneViewComponent {
         simulationTargetTrackArrow.gameObject.SetActive(false);
 
         if (NetworkHandler.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
-            FindObjectOfType<LoopingMusicPlayer>().Stop();
+            FindFirstObjectByType<LoopingMusicPlayer>().Stop();
         }
     }
 
@@ -371,7 +371,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             replayCanvasGroup.interactable = true;
             if (NetworkHandler.IsReplayFastForwarding) {
                 if (e.Game.Frames.Predicted.Global->GameState != GameState.Playing) {
-                    FindObjectOfType<LoopingMusicPlayer>().Stop();
+                    FindFirstObjectByType<LoopingMusicPlayer>().Stop();
                 }
             } else {
                 Time.timeScale = replaySpeed;

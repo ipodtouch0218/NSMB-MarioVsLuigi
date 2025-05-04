@@ -2,7 +2,7 @@ using NSMB.Extensions;
 using Quantum;
 using UnityEngine;
 
-public class SecondaryCameraPositioner : MonoBehaviour {
+public class SecondaryCameraPositioner : QuantumSceneViewComponent<StageContext> {
 
     //---Serialized Variables
     [SerializeField] private Camera mainCamera;
@@ -12,21 +12,18 @@ public class SecondaryCameraPositioner : MonoBehaviour {
 
     //---Private Variables
     private bool destroyed;
-    private VersusStageData stage;
 
     public void OnValidate() {
         this.SetIfNull(ref ourCamera);
     }
 
-    public void Start() {
-        stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindObjectOfType<QuantumMapData>().Asset.UserAsset);
-    }
-
     public void UpdatePosition() {
         if (!copyPropertiesOnly) {
-            if (!stage || destroyed) {
+            if (destroyed) {
                 return;
             }
+
+            VersusStageData stage = ViewContext.Stage;
 
             if (!stage.IsWrappingLevel) {
                 Destroy(gameObject);

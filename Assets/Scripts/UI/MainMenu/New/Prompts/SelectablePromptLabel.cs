@@ -24,12 +24,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void OnValidate() {
             this.SetIfNull(ref label);
             if (!eventSystem) {
-                eventSystem = FindObjectOfType<EventSystem>(true);
+                eventSystem = FindFirstObjectByType<EventSystem>(FindObjectsInactive.Include);
             }
         }
 
         public void OnEnable() {
-            eventSystem = FindObjectOfType<EventSystem>();
+            eventSystem = FindFirstObjectByType<EventSystem>();
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
 
             originalText ??= label.text;

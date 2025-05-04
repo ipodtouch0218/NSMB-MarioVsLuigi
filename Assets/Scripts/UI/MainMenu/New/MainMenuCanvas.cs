@@ -45,6 +45,10 @@ namespace NSMB.UI.MainMenu {
             this.SetIfNull(ref sfx);
         }
 
+        public void OnEnable() {
+            Settings.Controls.UI.Enable();
+        }
+
         public void Awake() {
             Instance = this;
             defaultHeaderColor = headerImage.color;

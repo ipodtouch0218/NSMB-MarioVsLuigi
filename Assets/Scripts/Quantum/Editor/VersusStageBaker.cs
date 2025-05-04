@@ -50,7 +50,7 @@ public class VersusStageBaker : MapDataBakerCallback {
             return;
         }
 
-        GameObject tilemapGo = GameObject.FindObjectOfType<TilemapAnimator>().gameObject;
+        GameObject tilemapGo = GameObject.FindFirstObjectByType<TilemapAnimator>().gameObject;
         if (!tilemapGo || !tilemapGo.TryGetComponent(out Tilemap tilemap)) {
             LogError("Could not find a main tilemap (one that has a TilemapAnimator component!)");
             return;

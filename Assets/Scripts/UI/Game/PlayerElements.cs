@@ -22,8 +22,9 @@ namespace NSMB.UI.Game {
         public PlayerRef Player { get; private set; }
         public EntityRef Entity { get; set; }
         public Canvas Canvas => canvas;
-        public Camera ScrollCamera => scrollCamera;
         public Camera Camera => ourCamera;
+        public Camera ScrollCamera => scrollCamera;
+        public Camera UICamera => uiCamera;
         public CameraAnimator CameraAnimator => cameraAnimator;
         public ReplayUI ReplayUi => replayUi;
         public PauseMenuManager PauseMenu => pauseMenu;
@@ -33,7 +34,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private Canvas canvas;
         [SerializeField] private UIUpdater uiUpdater;
         [SerializeField] private CameraAnimator cameraAnimator;
-        [SerializeField] private Camera ourCamera, scrollCamera;
+        [SerializeField] private Camera ourCamera, scrollCamera, uiCamera;
         [SerializeField] private InputCollector inputCollector;
         [SerializeField] private ScoreboardUpdater scoreboardUpdater;
         [SerializeField] private ReplayUI replayUi;
