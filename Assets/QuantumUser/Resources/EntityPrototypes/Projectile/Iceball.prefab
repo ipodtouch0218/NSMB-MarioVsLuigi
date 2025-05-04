@@ -83,14 +83,14 @@ MonoBehaviour:
         RawValue: 0
       BoxExtents:
         X:
-          RawValue: 9011
+          RawValue: 8192
         Y:
-          RawValue: 9011
+          RawValue: 8192
       PositionOffset:
         X:
-          RawValue: 0
+          RawValue: 1024
         Y:
-          RawValue: 9011
+          RawValue: 10240
       RotationOffset:
         RawValue: 0
       UserTag: 0
@@ -382,7 +382,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6102423714800591244}
@@ -404,6 +404,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -525,7 +528,7 @@ Transform:
   m_GameObject: {fileID: 8566834211625758416}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.1375, z: 0}
+  m_LocalPosition: {x: 0, y: 0.171875, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5286,6 +5289,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5357,6 +5363,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1821550530333385025, guid: 34b8762c3868b5d43b40a69badde238a,
         type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 0.34375
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821550530333385025, guid: 34b8762c3868b5d43b40a69badde238a,
+        type: 3}
+      propertyPath: ShapeModule.m_Scale.y
+      value: 0.34375
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821550530333385025, guid: 34b8762c3868b5d43b40a69badde238a,
+        type: 3}
       propertyPath: InitialModule.startLifetime.scalar
       value: 0.45
       objectReference: {fileID: 0}
@@ -5396,7 +5412,7 @@ PrefabInstance:
     - target: {fileID: 6441094937726390934, guid: 34b8762c3868b5d43b40a69badde238a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.137
+      value: 0.171875
       objectReference: {fileID: 0}
     - target: {fileID: 6441094937726390934, guid: 34b8762c3868b5d43b40a69badde238a,
         type: 3}

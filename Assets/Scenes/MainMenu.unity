@@ -23989,7 +23989,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 2, y: 0, z: 2, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -25582,7 +25582,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &702961850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25603,7 +25603,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1881540139, guid: 5acb953430fbbd7498dfda1a8cc356a9, type: 3}
+  m_Sprite: {fileID: -1709532258, guid: 5acb953430fbbd7498dfda1a8cc356a9, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -44398,7 +44398,7 @@ MonoBehaviour:
   inRoomSubmenu: {fileID: 252585805}
   errorSubmenu: {fileID: 1105073577}
   sideMenu: {fileID: 1942095559}
-  invalidUsernameColor: {r: 1, g: 0, b: 0, a: 0.2}
+  invalidUsernameColor: {r: 1, g: 0, b: 0, a: 0.23529412}
 --- !u!1 &1283632603
 GameObject:
   m_ObjectHideFlags: 0
@@ -94381,8 +94381,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4290032820
-  m_fontColor: {r: 0.7075472, g: 0.7075472, b: 0.7075472, a: 1}
+    rgba: 4285953654
+  m_fontColor: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

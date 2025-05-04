@@ -1,4 +1,6 @@
 using Photon.Deterministic;
+using Quantum.Collections;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -21,7 +23,8 @@ namespace Quantum {
         }
 
         private void TryMove(Frame f, ref Filter filter, VersusStageData stage) {
-            TryMoveShape(f, ref filter, stage, &filter.Collider->Shape);
+            var queries = f.ResolveList(filter.Platform->Queries);
+            TryMoveShape(f, ref filter, stage, queries, &filter.Collider->Shape, 0);
 
             var platform = filter.Platform;
             if (!platform->IgnoreMovement) {
@@ -29,30 +32,24 @@ namespace Quantum {
             }
         }
 
-        private void TryMoveShape(Frame f, ref Filter filter, VersusStageData stage, Shape2D* shape) {
+        private void TryMoveShape(Frame f, ref Filter filter, VersusStageData stage, QList<PhysicsQueryRef> queries, Shape2D* shape, int index) {
             FPVector2 velocity = filter.Platform->Velocity * f.DeltaTime;
+            /*
             if (velocity == FPVector2.Zero) {
                 return;
             }
+            */
 
             if (shape->Type == Shape2DType.Compound) {
                 shape->Compound.GetShapes(f, out Shape2D* subshapes, out int subshapeCount);
                 for (int i = 0; i < subshapeCount; i++) {
-                    TryMoveShape(f, ref filter, stage, subshapes + i);
+                    TryMoveShape(f, ref filter, stage, queries, subshapes + i, i + index);
                 }
                 return;
             }
             
             var entity = filter.Entity;
-            FPVector2 shapecastOrigin = filter.Transform->Position /*+ (-velocity * PhysicsObjectSystem.RaycastSkin)*/;
-            FPVector2 moveVelocity = velocity * (1 + PhysicsObjectSystem.RaycastSkin);
-
-            var hits = f.Physics2D.ShapeCastAll(shapecastOrigin,
-                0,
-                shape,
-                moveVelocity,
-                ~f.Context.ExcludeEntityAndPlayerMask,
-                QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo | QueryOptions.DetectOverlapsAtCastOrigin);
+            var hits = f.Physics2D.GetQueryHits(queries[index]);
 
             for (int i = 0; i < hits.Count; i++) {
                 var hit = hits[i];
@@ -75,21 +72,32 @@ namespace Quantum {
                     }
                 }
 
-                FP moveDistance = moveVelocity.Magnitude * (1 - hit.CastDistanceNormalized);
-                var overlapHits = f.Physics2D.CheckOverlap(shape, filter.Transform, &hit);
-                if (overlapHits.Count > 0) {
-                    // overlap!
-                    var overlapHit = overlapHits[0];
-                    moveDistance += overlapHit.OverlapPenetration;
+                PhysicsContact newContact = new PhysicsContact {
+                    Position = hit.Point,
+                    Normal = -hit.Normal,
+                    Distance = velocity.Magnitude * hit.CastDistanceNormalized,
+                    Entity = entity,
+                    Frame = f.Number,
+                    Tile = new(-1, -1)
+                };
+                bool keepContact = true;
+                foreach (var callback in f.Context.PreContactCallbacks) {
+                    callback?.Invoke(f, stage, hit.Entity, newContact, ref keepContact);
                 }
+
+                if (!keepContact) {
+                    continue;
+                }
+
+                FP moveDistance = hit.OverlapPenetration;
                 FPVector2 moveVector = -hit.Normal * (moveDistance * f.UpdateRate);
 
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit1);
                 PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
-                bool hitObject = tempHit1 || tempHit2;
+                contacts.Add(newContact);
 
-                if (hitObject && shape->Type != Shape2DType.Edge) {
+                if ((tempHit1 || tempHit2) && shape->Type != Shape2DType.Edge) {
                     // Crushed
                     physicsObject->IsBeingCrushed = true;
                 }

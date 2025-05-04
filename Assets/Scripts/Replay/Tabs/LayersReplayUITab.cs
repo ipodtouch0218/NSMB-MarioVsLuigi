@@ -1,4 +1,5 @@
 using NSMB.Extensions;
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class LayersReplayUITab : ReplayUITab {
     private Camera OurCamera => parent.playerElements.Camera;
 
     //---Serialized Variables
-    [SerializeField] private LayerMask[] layersPerButton;
+    [SerializeField] private ReplayRenderLayer[] layersPerButton;
 
     public override void OnEnable() {
         base.OnEnable();
@@ -19,8 +20,8 @@ public class LayersReplayUITab : ReplayUITab {
     }
 
     public void ToggleLayer(int index) {
-        LayerMask mask = layersPerButton[index];
-        if (IsLayerMaskEnabled(mask)) {
+        ReplayRenderLayer mask = layersPerButton[index];
+        if (IsLayerMaskEnabled(mask.CameraLayerMask)) {
             DisableLayers(mask);
         } else {
             EnableLayers(mask);
@@ -30,20 +31,33 @@ public class LayersReplayUITab : ReplayUITab {
     }
 
     public void ApplyColor(int index) {
-        LayerMask mask = layersPerButton[index];
+        LayerMask mask = layersPerButton[index].CameraLayerMask;
         TMP_Text text = selectables[index].GetComponentInChildren<TMP_Text>();
 
         text.color = IsLayerMaskEnabled(mask) ? enabledColor : disabledColor;
     }
 
-    public void EnableLayers(LayerMask mask) {
-        OurCamera.cullingMask = OurCamera.cullingMask | mask;
+    public void EnableLayers(ReplayRenderLayer mask) {
+        OurCamera.cullingMask = OurCamera.cullingMask | mask.CameraLayerMask;
+        foreach (var b in mask.ObjectsToDisable) {
+            b.enabled = true;
+        }
     }
 
-    public void DisableLayers(LayerMask mask) {
-        OurCamera.cullingMask = OurCamera.cullingMask & ~mask;
+    public void DisableLayers(ReplayRenderLayer mask) {
+        OurCamera.cullingMask = OurCamera.cullingMask & ~mask.CameraLayerMask;
+        foreach (var b in mask.ObjectsToDisable) {
+            b.enabled = false;
+        }
     }
+    
     private bool IsLayerMaskEnabled(LayerMask mask) {
         return (OurCamera.cullingMask & mask) != 0;
+    }
+
+    [Serializable]
+    public class ReplayRenderLayer {
+        public LayerMask CameraLayerMask;
+        public Behaviour[] ObjectsToDisable;
     }
 }

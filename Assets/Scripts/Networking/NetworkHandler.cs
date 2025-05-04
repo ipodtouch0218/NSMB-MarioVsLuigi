@@ -72,6 +72,8 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+
+        CurrentReplay = null;
     }
 
     public void Update() {

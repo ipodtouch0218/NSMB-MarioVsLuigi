@@ -19,7 +19,7 @@ MonoBehaviour:
   Effect: 0
   Bounce: 1
   Speed:
-    RawValue: 409600
+    RawValue: 425984
   BounceStrength:
     RawValue: 442368
   Gravity:
@@ -33,5 +33,5 @@ MonoBehaviour:
   InheritShooterVelocity: 0
   HasCollision: 1
   DoesntEffectBlueShell: 1
-  BlueShellSlowdownFrames: 0
   DestroyParticleEffect: 5
+  ShootSound: 44
