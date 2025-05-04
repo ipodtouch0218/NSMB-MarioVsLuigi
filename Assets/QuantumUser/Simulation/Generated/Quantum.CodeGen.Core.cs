@@ -2525,13 +2525,15 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MovingPlatform : Quantum.IComponent {
-    public const Int32 SIZE = 24;
+    public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(8)]
+    [FieldOffset(16)]
     public FPVector2 Velocity;
-    [FieldOffset(0)]
-    public QBoolean IgnoreMovement;
     [FieldOffset(4)]
+    public QBoolean IgnoreMovement;
+    [FieldOffset(0)]
+    public QBoolean CanCrushEntities;
+    [FieldOffset(8)]
     [ExcludeFromPrototype()]
     [AllocateOnComponentAdded()]
     [FreeOnComponentRemoved()]
@@ -2541,6 +2543,7 @@ namespace Quantum {
         var hash = 19727;
         hash = hash * 31 + Velocity.GetHashCode();
         hash = hash * 31 + IgnoreMovement.GetHashCode();
+        hash = hash * 31 + CanCrushEntities.GetHashCode();
         hash = hash * 31 + Queries.GetHashCode();
         return hash;
       }
@@ -2561,6 +2564,7 @@ namespace Quantum {
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (MovingPlatform*)ptr;
+        QBoolean.Serialize(&p->CanCrushEntities, serializer);
         QBoolean.Serialize(&p->IgnoreMovement, serializer);
         QList.Serialize(&p->Queries, serializer, Statics.SerializePhysicsQueryRef);
         FPVector2.Serialize(&p->Velocity, serializer);

@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using UnityEngine;
 
 namespace Quantum {
     public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
@@ -97,7 +96,7 @@ namespace Quantum {
                 PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
                 contacts.Add(newContact);
 
-                if ((tempHit1 || tempHit2) && shape->Type != Shape2DType.Edge) {
+                if (filter.Platform->CanCrushEntities && (tempHit1 || tempHit2) && shape->Type != Shape2DType.Edge) {
                     // Crushed
                     physicsObject->IsBeingCrushed = true;
                 }
