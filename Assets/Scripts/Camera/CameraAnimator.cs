@@ -297,7 +297,8 @@ public unsafe class CameraAnimator : ResizingCamera {
     private void OnScreenshakeCallback(float screenshake) {
         Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
-        if (!f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
+        if (!f.Exists(Target)
+            || !f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
             || physicsObject->IsTouchingGround) {
 
             screenshakeTimer += screenshake;

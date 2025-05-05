@@ -37,7 +37,12 @@ namespace Quantum {
             }
 
             var physicsObject = filter.PhysicsObject;
-            physicsObject->Velocity = FPVector2.Zero;
+
+            FPVector2 newVel = FPVector2.Zero;
+            if (f.Unsafe.TryGetPointer(holdable->Holder, out PhysicsObject* holderPhysicsObject)) {
+                newVel = holderPhysicsObject->Velocity + holderPhysicsObject->ParentVelocity;
+            }
+            physicsObject->Velocity = newVel;
             physicsObject->WasTouchingGround = false;
             physicsObject->IsTouchingGround = false;
 

@@ -64,9 +64,10 @@ namespace Quantum {
                     continue;
                 }
 
+                bool movingAway = FPVector2.Dot(physicsObject->Velocity, velocity.Normalized) < 0;
                 if (shape->Type == Shape2DType.Edge) {
                     // Semisolid logic
-                    if (FPVector2.Dot(physicsObject->Velocity, velocity) < 0) {
+                    if (movingAway) {
                         continue;
                     }
                 }
@@ -94,7 +95,10 @@ namespace Quantum {
                 var contacts = f.ResolveList(physicsObject->Contacts);
                 PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit1);
                 PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
-                contacts.Add(newContact);
+
+                if (!movingAway) {
+                    contacts.Add(newContact);
+                }
 
                 if (filter.Platform->CanCrushEntities && (tempHit1 || tempHit2) && shape->Type != Shape2DType.Edge) {
                     // Crushed

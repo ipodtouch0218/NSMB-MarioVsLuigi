@@ -677,34 +677,37 @@ namespace NSMB.Entities.Player {
                 PlaySound(SoundEffect.Powerup_PropellerMushroom_Kick);
                 return;
             }
+            if (FPMath.Abs(physicsObject->Velocity.X) < physics.WalkMaxVelocity[physics.WalkSpeedStage]) {
+                return;
+            }
 
             SoundEffect footstepSoundEffect = SoundEffect.Player_Walk_Grass;
             ParticleEffect footstepParticleEffect = ParticleEffect.None;
 
-            foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
-                    continue;
-                }
-
-                if (f.Exists(contact.Entity)) {
-                    if (f.Has<Liquid>(contact.Entity) && mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsWaterSolid) {
-                        footstepSoundEffect = SoundEffect.Player_Walk_Water;
+            if (f.ResolveHashSet(physicsObject->LiquidContacts).Count > 0) {
+                footstepSoundEffect = SoundEffect.Player_Walk_Water;
+            } else {
+                foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+                        continue;
                     }
-                } else {
-                    StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, contact.Tile);
-                    if (f.TryFindAsset(tileInstance.Tile, out StageTile tile)) {
-                        if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
-                            footstepSoundEffect = tile.FootstepSound;
+
+                    if (f.Exists(contact.Entity)) {
+                        if (f.Has<Liquid>(contact.Entity) && mario->CurrentPowerupState == PowerupState.MiniMushroom && physicsObject->IsWaterSolid) {
+                            footstepSoundEffect = SoundEffect.Player_Walk_Water;
                         }
-                        if (tile.FootstepParticle != ParticleEffect.None) {
-                            footstepParticleEffect = tile.FootstepParticle;
+                    } else {
+                        StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, contact.Tile);
+                        if (f.TryFindAsset(tileInstance.Tile, out StageTile tile)) {
+                            if (tile.FootstepSound != SoundEffect.Player_Walk_Grass) {
+                                footstepSoundEffect = tile.FootstepSound;
+                            }
+                            if (tile.FootstepParticle != ParticleEffect.None) {
+                                footstepParticleEffect = tile.FootstepParticle;
+                            }
                         }
                     }
                 }
-            } 
-
-            if (FPMath.Abs(physicsObject->Velocity.X) < physics.WalkMaxVelocity[physics.WalkSpeedStage]) {
-                return;
             }
 
             PlaySound(footstepSoundEffect,
