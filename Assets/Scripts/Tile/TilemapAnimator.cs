@@ -12,7 +12,9 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
 
     //---Private Variables
     private readonly Dictionary<EntityRef, AudioSource> entityBreakBlockSounds = new();
-    private readonly Dictionary<EventKey, Vector3Int> tileEventPositions = new();
+
+    private readonly Dictionary<EventKey, Vector3Int> tilePositionData = new();
+    private readonly Dictionary<Vector3Int, List<TileChangeData>> tileUndoData = new();
 
     public void OnValidate() {
         this.SetIfNull(ref tilemap);
@@ -44,40 +46,36 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
     }
 
     private void OnEventCanceled(CallbackEventCanceled e) {
-        EventKey id = e.EventKey;
+        EventKey key = e.EventKey;
 
-        if (!tileEventPositions.TryGetValue(id, out Vector3Int coords)) {
+        if (!tilePositionData.TryGetValue(key, out Vector3Int coords)) {
             return;
         }
 
+        var undoData = tileUndoData[coords];
+        if (undoData.Count == 1) {
+            // This is a cancelled tile change event.
+            tilemap.SetTile(coords, undoData[0].tile);
+            tilemap.SetTransformMatrix(coords, undoData[0].transform);
+            tilemap.RefreshTile(coords);
+        }
 
-        // This is a tile change event.
-        // Refer back to the simulation
-        Frame f = e.Game.Frames.Predicted;
-        StageTileInstance tileInstance = ViewContext.Stage.GetTileRelative(f, coords.x, coords.y);
+        if (undoData.Count > 0) {
+            undoData.RemoveAt(0);
+        }
 
-        var tile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);
-        TileBase unityTile = tile ? tile.Tile : null;
-        Vector2 scale = new Vector2 {
-            x = tileInstance.Flags.HasFlag(StageTileFlags.MirrorX) ? -1 : 1,
-            y = tileInstance.Flags.HasFlag(StageTileFlags.MirrorY) ? -1 : 1,
-        };
-        Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, tileInstance.Rotation / (float) (ushort.MaxValue / 360f)), scale);
-
-        // Debug.Log($"tile event cancelled at {coords}. Was {tilemap.GetTile(coords)?.name}, changing back to {unityTile}");
-
-        tilemap.SetTile(coords, unityTile);
-        tilemap.SetTransformMatrix(coords, mat);
-        tilemap.RefreshTile(coords);
-
-        tileEventPositions.Remove(id);
+        tilePositionData.Remove(key);
     }
 
     private void OnEventConfirmed(CallbackEventConfirmed e) {
-        if (tileEventPositions.TryGetValue(e.EventKey, out Vector3Int coords)) {
-            // Debug.Log($"tile event CONFIRMED at {coords}.");
+        if (tilePositionData.TryGetValue(e.EventKey, out Vector3Int coords)) {
+            if (tileUndoData.TryGetValue(coords, out List<TileChangeData> undoData)) {
+                if (undoData.Count > 0) {
+                    undoData.RemoveAt(0);
+                }
+            }
         }
-        tileEventPositions.Remove(e.EventKey);
+        tilePositionData.Remove(e.EventKey);
     }
 
     private void OnTileChanged(EventTileChanged e) {
@@ -91,11 +89,21 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
         TileBase unityTile = tile ? tile.Tile : null;
         Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, e.NewTile.Rotation / (float) (ushort.MaxValue / 360f)), scale);
 
+        tilePositionData[e] = coords;
+        
+        if (!tileUndoData.TryGetValue(coords, out var list)) {
+            tileUndoData[coords] = list = new();
+        }
+        list.Add(new TileChangeData {
+            position = coords,
+            tile = tilemap.GetTile(coords),
+            transform = tilemap.GetTransformMatrix(coords),
+        });
+
         tilemap.SetTile(coords, unityTile);
         tilemap.SetTransformMatrix(coords, mat);
         tilemap.RefreshTile(coords);
         
-        tileEventPositions[e] = coords;
     }
 
     private unsafe void OnTileBroken(EventTileBroken e) {
@@ -148,10 +156,5 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
         }
 
         tilemap.RefreshAllTiles();
-    }
-
-    public struct TileEventData {
-        public EventKey Id;
-        public TileChangeData ChangeData;
     }
 }

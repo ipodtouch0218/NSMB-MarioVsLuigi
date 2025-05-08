@@ -76,7 +76,7 @@ namespace NSMB.UI.Game.Scoreboard {
             int lives = 0;
             if (f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
                 stars = mario->Stars;
-                lives = mario->Lives;
+                lives = mario->Disconnected ? 0 : mario->Lives;
             }
 
             StringBuilder scoreBuilder = new();

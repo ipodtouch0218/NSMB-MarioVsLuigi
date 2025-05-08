@@ -10,7 +10,7 @@ namespace Quantum {
                     continue;
                 }
                 
-                if (mario->Lives == 0 && f.Global->Rules.IsLivesEnabled) {
+                if (mario->Disconnected || (mario->Lives == 0 && f.Global->Rules.IsLivesEnabled)) {
                     return -1;
                 }
 

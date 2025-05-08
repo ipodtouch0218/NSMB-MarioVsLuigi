@@ -12,15 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: PauseFont
   m_EditorClassIdentifier: 
-  hashCode: -1141810335
-  material: {fileID: 3023213983796840565}
-  materialHashCode: 1345332257
   m_Version: 1.1.0
-  m_SourceFontFileGUID: 89d07c8cf60619240a2f96f984ad6836
-  m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 89d07c8cf60619240a2f96f984ad6836,
-    type: 3}
-  m_SourceFontFile: {fileID: 0}
-  m_AtlasPopulationMode: 0
   m_FaceInfo:
     m_FaceIndex: 0
     m_FamilyName: 'DS Font: New Super Mario Bros.'
@@ -43,6 +35,31 @@ MonoBehaviour:
     m_StrikethroughOffset: 3.2
     m_StrikethroughThickness: 0.64746094
     m_TabWidth: 4
+  m_Material: {fileID: 3023213983796840565}
+  m_SourceFontFileGUID: 89d07c8cf60619240a2f96f984ad6836
+  m_CreationSettings:
+    sourceFontFileName: 
+    sourceFontFileGUID: 89d07c8cf60619240a2f96f984ad6836
+    faceIndex: 0
+    pointSizeSamplingMode: 1
+    pointSize: 13
+    padding: 10
+    paddingMode: 0
+    packingMode: 4
+    atlasWidth: 512
+    atlasHeight: 512
+    characterSetSelectionMode: 6
+    characterSequence: 20-7E,AB,BB,DC,DF-EB,F1-F6,F9-FC,103,105,107,119,142,15A-15B,17A,17C,218-21B,386,388-38A,38C,38E-38F,391-3A1,3A3-3CE,2018-2019,201C-201D,C4,D6
+    referencedFontAssetGUID: 38e8769007229044bb229d69f8cbae74
+    referencedTextAssetGUID: 
+    fontStyle: 0
+    fontStyleModifier: 0
+    renderMode: 4165
+    includeFontFeatures: 0
+  m_SourceFontFile: {fileID: 0}
+  m_SourceFontFilePath: 
+  m_AtlasPopulationMode: 0
+  InternalDynamicOS: 0
   m_GlyphTable:
   - m_Index: 3
     m_Metrics:
@@ -3941,7 +3958,12 @@ MonoBehaviour:
   - {fileID: 1121832174306494010}
   m_AtlasTextureIndex: 0
   m_IsMultiAtlasTexturesEnabled: 0
+  m_GetFontFeatures: 1
   m_ClearDynamicDataOnBuild: 0
+  m_AtlasWidth: 512
+  m_AtlasHeight: 512
+  m_AtlasPadding: 10
+  m_AtlasRenderMode: 4165
   m_UsedGlyphRects:
   - m_X: 0
     m_Y: 0
@@ -4984,61 +5006,18 @@ MonoBehaviour:
     m_Y: 384
     m_Width: 357
     m_Height: 127
-  m_fontInfo:
-    Name: 
-    PointSize: 0
-    Scale: 0
-    CharacterCount: 0
-    LineHeight: 0
-    Baseline: 0
-    Ascender: 0
-    CapHeight: 0
-    Descender: 0
-    CenterLine: 0
-    SuperscriptOffset: 0
-    SubscriptOffset: 0
-    SubSize: 0
-    Underline: 0
-    UnderlineThickness: 0
-    strikethrough: 0
-    strikethroughThickness: 0
-    TabWidth: 0
-    Padding: 0
-    AtlasWidth: 0
-    AtlasHeight: 0
-  atlas: {fileID: 0}
-  m_AtlasWidth: 512
-  m_AtlasHeight: 512
-  m_AtlasPadding: 10
-  m_AtlasRenderMode: 4165
-  m_glyphInfoList: []
-  m_KerningTable:
-    kerningPairs: []
   m_FontFeatureTable:
+    m_MultipleSubstitutionRecords: []
+    m_LigatureSubstitutionRecords: []
     m_GlyphPairAdjustmentRecords: []
-  fallbackFontAssets: []
+    m_MarkToBaseAdjustmentRecords: []
+    m_MarkToMarkAdjustmentRecords: []
+  m_ShouldReimportFontFeatures: 0
   m_FallbackFontAssetTable:
   - {fileID: 11400000, guid: af342a83ccfafe74b930ff5a647468ec, type: 2}
   - {fileID: 11400000, guid: 0e9b87a2073636640a0b8ee46b859419, type: 2}
   - {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
   - {fileID: 11400000, guid: 1b91bb22255a3064aa9af1f263580e06, type: 2}
-  m_CreationSettings:
-    sourceFontFileName: 
-    sourceFontFileGUID: 89d07c8cf60619240a2f96f984ad6836
-    pointSizeSamplingMode: 1
-    pointSize: 13
-    padding: 10
-    packingMode: 4
-    atlasWidth: 512
-    atlasHeight: 512
-    characterSetSelectionMode: 6
-    characterSequence: 20-7E,AB,BB,DC,DF-EB,F1-F6,F9-FC,103,105,107,119,142,15A-15B,17A,17C,218-21B,386,388-38A,38C,38E-38F,391-3A1,3A3-3CE,2018-2019,201C-201D,C4,D6
-    referencedFontAssetGUID: 38e8769007229044bb229d69f8cbae74
-    referencedTextAssetGUID: 
-    fontStyle: 0
-    fontStyleModifier: 0
-    renderMode: 4165
-    includeFontFeatures: 0
   m_FontWeightTable:
   - regularTypeface: {fileID: 0}
     italicTypeface: {fileID: 0}
@@ -5067,6 +5046,33 @@ MonoBehaviour:
   boldSpacing: 7
   italicStyle: 35
   tabSize: 10
+  m_fontInfo:
+    Name: 
+    PointSize: 0
+    Scale: 0
+    CharacterCount: 0
+    LineHeight: 0
+    Baseline: 0
+    Ascender: 0
+    CapHeight: 0
+    Descender: 0
+    CenterLine: 0
+    SuperscriptOffset: 0
+    SubscriptOffset: 0
+    SubSize: 0
+    Underline: 0
+    UnderlineThickness: 0
+    strikethrough: 0
+    strikethroughThickness: 0
+    TabWidth: 0
+    Padding: 0
+    AtlasWidth: 0
+    AtlasHeight: 0
+  m_glyphInfoList: []
+  m_KerningTable:
+    kerningPairs: []
+  fallbackFontAssets: []
+  atlas: {fileID: 0}
 --- !u!28 &1121832174306494010
 Texture2D:
   m_ObjectHideFlags: 0
@@ -5077,10 +5083,8 @@ Texture2D:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 2
+  serializedVersion: 3
   m_Width: 512
   m_Height: 512
   m_CompleteImageSize: 262144
@@ -5226,5 +5230,6 @@ Material:
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
-    - _UnderlayColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _UnderlayColor: {r: 0.3584906, g: 0.3584906, b: 0.3584906, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

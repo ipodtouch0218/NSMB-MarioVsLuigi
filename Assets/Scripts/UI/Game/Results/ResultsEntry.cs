@@ -55,7 +55,7 @@ namespace NSMB.UI.Game.Results {
                 leftHalf.color = Utils.Utils.GetPlayerColor(f, player, s: 0.7f, considerDisqualifications: false);
                 
                 var playerData = QuantumUtils.GetPlayerData(f, player);
-                readyCheckmark.SetActive(playerData->VotedToContinue);
+                readyCheckmark.SetActive(playerData != null && playerData->VotedToContinue);
             } else {
                 player = PlayerRef.None;
                 constantNicknameColor = true;

@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -109,6 +110,14 @@ namespace NSMB.UI.Game.Scoreboard {
                 var mario1 = f.Unsafe.GetPointer<MarioPlayer>(se1.Target);
                 var mario2 = f.Unsafe.GetPointer<MarioPlayer>(se2.Target);
 
+                if (mario1->Disconnected ^ mario2->Disconnected) {
+                    if (mario1->Disconnected) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+
                 if (f.Global->Rules.IsLivesEnabled && ((mario1->Lives == 0) ^ (mario2->Lives == 0))) {
                     return mario2->Lives - mario1->Lives;
                 }
@@ -143,7 +152,7 @@ namespace NSMB.UI.Game.Scoreboard {
             AssetRef<TeamAsset>[] teamAssets = f.SimulationConfig.Teams;
             StringBuilder result = new();
 
-            byte[] teamStars = new byte[10];
+            Span<short> teamStars = stackalloc short[10];
             QuantumUtils.GetTeamStars(f, teamStars);
             int aliveTeams = QuantumUtils.GetValidTeams(f);
             for (int i = 0; i < 10; i++) {
@@ -152,7 +161,10 @@ namespace NSMB.UI.Game.Scoreboard {
                     continue;
                 }
 
-                byte stars = teamStars[i];
+                short stars = teamStars[i];
+                if (stars < 0) {
+                    stars = 0;
+                }
                 TeamAsset team = f.FindAsset(teamAssets[i]);
                 result.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
                 result.Append(Utils.Utils.GetSymbolString("x" + stars));
