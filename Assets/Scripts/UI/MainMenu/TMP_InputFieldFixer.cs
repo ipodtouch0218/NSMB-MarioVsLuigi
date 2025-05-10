@@ -1,3 +1,4 @@
+using NSMB.UI.MainMenu;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,6 +24,11 @@ public class TMP_InputFieldFixer : MonoBehaviour {
     }
 
     public void OnNavigate(InputAction.CallbackContext context) {
+        var osk = FindFirstObjectByType<OnScreenKeyboard>();
+        if (osk.IsOpen) {
+            return;
+        }
+
         Vector2 vec = context.ReadValue<Vector2>();
         float y = vec.y;
         EventSystem system = EventSystem.current;

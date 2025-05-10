@@ -109,6 +109,10 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnCancel(InputAction.CallbackContext context) {
+            if (FindFirstObjectByType<OnScreenKeyboard>().IsOpen) {
+                return;
+            }
+
             GameObject currentObject = EventSystem.current.currentSelectedGameObject;
             TMP_InputField inputField;
             bool isInsideTextbox = currentObject && (inputField = currentObject.GetComponentInParent<TMP_InputField>()) && inputField.isFocused;

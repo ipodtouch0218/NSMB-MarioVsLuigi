@@ -230,9 +230,10 @@ namespace NSMB.Entities.Player {
             HandleMiscStates(f, mario, physicsObject, freezable);
             HandleAnimations(f, mario, physicsObject, freezable);
 
+            Input* inputPointer = f.GetPlayerInput(mario->PlayerRef);
             Input inputs = default;
-            if (mario->PlayerRef.IsValid) {
-                inputs = *f.GetPlayerInput(mario->PlayerRef);
+            if (inputPointer != null) {
+                inputs = *inputPointer;
             }
 
             SetFacingDirection(f, mario, physicsObject);

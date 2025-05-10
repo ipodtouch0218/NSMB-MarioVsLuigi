@@ -1,7 +1,5 @@
 using NSMB.Extensions;
 using NSMB.Sound;
-using Photon.Deterministic;
-using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
 

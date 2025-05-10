@@ -39,7 +39,7 @@ namespace NSMB.Entities.World {
         }
 
         public void Start() {
-            if (entity == null) {
+            if (!entity) {
                 Initialize(Mathf.RoundToInt(spriteRenderer.size.x * 2), Mathf.RoundToInt(spriteRenderer.size.y * 2) - 1);
             } else {
                 QuantumEvent.Subscribe<EventLiquidSplashed>(this, OnLiquidSplashed, NetworkHandler.FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
@@ -49,7 +49,6 @@ namespace NSMB.Entities.World {
         public void Initialize(QuantumGame game) {
             var liquid = game.Frames.Predicted.Unsafe.GetPointer<Liquid>(entity.EntityRef);
             Initialize(liquid->WidthTiles, liquid->HeightTiles);
-            initialized = true;
         }
 
         public void Initialize(int width, FP height) {
@@ -91,6 +90,8 @@ namespace NSMB.Entities.World {
                 var shape = bubbles.shape;
                 shape.radius = widthTiles / 4;
             }
+
+            initialized = true;
         }
 
         public void Update() {

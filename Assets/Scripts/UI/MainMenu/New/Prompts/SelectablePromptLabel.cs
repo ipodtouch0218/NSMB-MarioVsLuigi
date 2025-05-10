@@ -14,6 +14,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [SerializeField] private List<GameObject> selectionTargets;
 
         [SerializeField] private bool changeText = true;
+        [SerializeField] private bool changeColor = false;
+        [SerializeField] private Color selectedColor = Color.white, deselectedColor = Color.gray;
         [SerializeField] public string translationKey;
         [SerializeField] private bool twoSided;
 
@@ -77,6 +79,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 }
             } else {
                 label.enabled = selected;
+            }
+
+            if (changeColor) {
+                label.color = selected ? selectedColor : deselectedColor;
             }
         }
 
