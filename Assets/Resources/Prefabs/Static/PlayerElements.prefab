@@ -1224,6 +1224,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 400419880642093963}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: 
   twoSided: 1
 --- !u!1 &440535431886847922
@@ -1527,6 +1530,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 470897679798852990}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: 
   twoSided: 0
 --- !u!1 &564414153271995411
@@ -5025,6 +5031,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 2468733903918188036}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: ui.replay.layers.background
   twoSided: 0
 --- !u!1 &2588039045631236596
@@ -5688,6 +5697,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 3108889034822232353}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: ui.replay.layers.particles
   twoSided: 0
 --- !u!1 &3113546542893504435
@@ -6039,6 +6051,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 3130508048941850389}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: ui.replay.layers.players
   twoSided: 0
 --- !u!1 &3133112584527815275
@@ -6662,6 +6677,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 3486679906661299477}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: 
   twoSided: 1
 --- !u!1 &3498427608672430107
@@ -6775,6 +6793,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 3498427608672430107}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: ui.replay.layers.map
   twoSided: 0
 --- !u!1 &3520428600282681386
@@ -7457,6 +7478,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 3806222705200510728}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: 
   twoSided: 1
 --- !u!1 &3852353069017394316
@@ -7570,6 +7594,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 3852353069017394316}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: ui.replay.layers.objects
   twoSided: 0
 --- !u!1 &3855309235006747163
@@ -9896,7 +9923,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Updater: {fileID: 0}
   UseFindUpdater: 1
-  playerElements: {fileID: 0}
+  playerElements: {fileID: 2058053739306675502}
   labels:
   - {fileID: 5769053198963143860}
   - {fileID: 6758143619385143274}
@@ -13855,6 +13882,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 6377310892822376955}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: 
   twoSided: 1
 --- !u!1 &6394529396616111786
@@ -16122,6 +16152,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 7176976963226778852}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: 
   twoSided: 1
 --- !u!1 &7308284107686574044
@@ -18143,6 +18176,9 @@ MonoBehaviour:
   selectionTargets:
   - {fileID: 8289844034373394967}
   changeText: 1
+  changeColor: 0
+  selectedColor: {r: 1, g: 1, b: 1, a: 1}
+  deselectedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   translationKey: ui.replay.camera.freecam
   twoSided: 0
 --- !u!1 &8344728137295609835

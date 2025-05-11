@@ -142,7 +142,7 @@ namespace NSMB.UI.Game.Results {
                 break;
             case 2:
                 exitPrompt = false;
-                labels[2].text = tm.GetTranslation("ui.pause.quit");
+                labels[2].text = tm.GetTranslation("ui.game.results.quittomainmenu");
                 break;
             }
             labels[index].color = labelDeselectedColor;
@@ -209,7 +209,7 @@ namespace NSMB.UI.Game.Results {
                     NetworkHandler.Runner.Shutdown();
                 } else {
                     exitPrompt = true;
-                    labels[2].text = "» " + GlobalController.Instance.translationManager.GetTranslation(exitPrompt ? "ui.generic.confirmation" : "ui.pause.quit");
+                    labels[2].text = "» " + GlobalController.Instance.translationManager.GetTranslation(exitPrompt ? "ui.generic.confirmation" : "ui.game.results.quittomainmenu");
                 }
                 sfx.PlayOneShot(SoundEffect.UI_Decide);
                 break;

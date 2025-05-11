@@ -272,6 +272,7 @@
   "ui.game.results.nextreplay": "Next replay",
   "ui.game.results.nextreplay.nomore": "No more replays!",
   "ui.game.results.restartreplay": "Restart current replay",
+  "ui.game.results.quittomainmenu": "Quit to main menu",
   "ui.pause.continue": "Continue",
   "ui.pause.returntoroom": "Return to room",
   "ui.pause.replay.show": "Show replay controls",
