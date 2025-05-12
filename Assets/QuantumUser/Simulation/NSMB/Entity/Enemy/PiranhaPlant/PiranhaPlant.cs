@@ -10,7 +10,6 @@ namespace Quantum {
 
         public void Kill(Frame f, EntityRef piranhaPlantEntity, EntityRef killerEntity, KillReason reason) {
             var enemy = f.Unsafe.GetPointer<Enemy>(piranhaPlantEntity);
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(piranhaPlantEntity);
 
             FPVector2 position = f.Unsafe.GetPointer<Transform2D>(piranhaPlantEntity)->Position;
 

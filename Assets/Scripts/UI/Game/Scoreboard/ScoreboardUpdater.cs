@@ -153,7 +153,7 @@ namespace NSMB.UI.Game.Scoreboard {
             StringBuilder result = new();
 
             Span<short> teamStars = stackalloc short[10];
-            QuantumUtils.GetTeamStars(f, teamStars);
+            QuantumUtils.GetAllTeamsStars(f, teamStars);
             int aliveTeams = QuantumUtils.GetValidTeams(f);
             for (int i = 0; i < 10; i++) {
                 if ((aliveTeams & (1 << i)) == 0) {

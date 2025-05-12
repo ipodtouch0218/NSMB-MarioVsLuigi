@@ -230,10 +230,12 @@ namespace NSMB.Entities.Player {
             HandleMiscStates(f, mario, physicsObject, freezable);
             HandleAnimations(f, mario, physicsObject, freezable);
 
-            Input* inputPointer = f.GetPlayerInput(mario->PlayerRef);
             Input inputs = default;
-            if (inputPointer != null) {
-                inputs = *inputPointer;
+            if (mario->PlayerRef.IsValid) {
+                Input* inputPointer = f.GetPlayerInput(mario->PlayerRef);
+                if (inputPointer != null) {
+                    inputs = *inputPointer;
+                }
             }
 
             SetFacingDirection(f, mario, physicsObject);
@@ -448,10 +450,10 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamDrill, mario->IsDrilling);
             animator.SetBool(ParamDoubleJump, mario->JumpState == JumpState.DoubleJump);
             animator.SetBool(ParamTripleJump, mario->JumpState == JumpState.TripleJump);
-            animator.SetBool(ParamHolding, mario->HeldEntity.IsValid);
+            animator.SetBool(ParamHolding, f.Exists(mario->HeldEntity));
             animator.SetBool(ParamHeadCarry, heldObject != null && heldObject->HoldAboveHead);
             animator.SetBool(ParamCarryStart, heldObject != null && heldObject->HoldAboveHead && (f.Number - mario->HoldStartFrame) < 27);
-            animator.SetBool(ParamPipe, mario->CurrentPipe.IsValid);
+            animator.SetBool(ParamPipe, f.Exists(mario->CurrentPipe));
             animator.SetBool(ParamBlueShell, mario->CurrentPowerupState == PowerupState.BlueShell);
             animator.SetBool(ParamMini, mario->CurrentPowerupState == PowerupState.MiniMushroom);
             animator.SetBool(ParamMega, mario->CurrentPowerupState == PowerupState.MegaMushroom);
@@ -463,7 +465,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamFireDeath, mario->FireDeath);
             animator.SetBool(ParamPushing, mario->LastPushingFrame + 5 >= f.Number);
             animator.SetBool(ParamFrozen, freezable->IsFrozen(f));
-            //animator.SetBool(ParamKnockforwards, mario->IsInForwardsKnockback);
+            animator.SetBool(ParamKnockforwards, mario->KnockForwards);
 
             float animatedVelocity = Mathf.Abs(physicsObject->Velocity.X.AsFloat);
             if (mario->IsStuckInBlock) {
@@ -526,7 +528,7 @@ namespace NSMB.Entities.Player {
                 _ => 0
             };
             materialBlock.SetFloat(ParamPowerupState, ps);
-            materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead ? Enums.PlayerEyeState.Death : eyeState));
+            materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead || mario->IsInKnockback ? Enums.PlayerEyeState.Death : eyeState));
             materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x);
 
             Vector3 giantMultiply = Vector3.one;
@@ -752,10 +754,19 @@ namespace NSMB.Entities.Player {
                 SpawnParticle("Prefabs/Particle/PlayerBounce", e.AttackerPosition.ToUnityVector3());
             }
 
-            PlaySound(e.Weak ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+            KnockbackStrength strength = e.Strength;
+            PlaySound(strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
 
             if (Utils.Utils.IsMarioLocal(e.Entity)) {
-                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, e.Weak ? 0.3f : 0.5f, RumbleManager.RumbleSetting.Low);
+                float rumbleStrength = strength switch {
+                    KnockbackStrength.Groundpound => 0.9f,
+                    KnockbackStrength.Normal => 0.5f,
+                    KnockbackStrength.FireballBump => 0.25f,
+                    KnockbackStrength.CollisionBump => 0.4f,
+                    _ => 0,
+                };
+
+                GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.6f, rumbleStrength, RumbleManager.RumbleSetting.Low);
             }
         }
 

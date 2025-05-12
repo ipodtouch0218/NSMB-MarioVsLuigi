@@ -143,7 +143,6 @@ MonoBehaviour:
     - rid: 692988744814297094
     - rid: 692988744814297095
     - rid: 692988744814297096
-    - rid: 692988744814297097
   - Components:
     - rid: 4642328894244913152
     - rid: 4642328894244913153
@@ -154,7 +153,6 @@ MonoBehaviour:
     - rid: 4642328894244913158
     - rid: 4642328894244913159
     - rid: 4642328894244913160
-    - rid: 4642328894244913161
   - Components:
     - rid: 7089375187459637248
     - rid: 7089375187459637249
@@ -886,26 +884,6 @@ MonoBehaviour:
       data:
         _empty_prototype_dummy_field_: 0
     - rid: 692988744814297096
-      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Gravity:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        TerminalVelocity:
-          RawValue: 0
-        IsFrozen:
-          Value: 1
-        DisableCollision:
-          Value: 0
-        SlowInLiquids:
-          Value: 0
-        IsWaterSolid:
-          Value: 0
-        BreakMegaObjects:
-          Value: 0
-    - rid: 692988744814297097
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Pipe:
@@ -3003,26 +2981,6 @@ MonoBehaviour:
       data:
         _empty_prototype_dummy_field_: 0
     - rid: 4642328894244913160
-      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Gravity:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        TerminalVelocity:
-          RawValue: 0
-        IsFrozen:
-          Value: 1
-        DisableCollision:
-          Value: 0
-        SlowInLiquids:
-          Value: 0
-        IsWaterSolid:
-          Value: 0
-        BreakMegaObjects:
-          Value: 0
-    - rid: 4642328894244913161
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Pipe:

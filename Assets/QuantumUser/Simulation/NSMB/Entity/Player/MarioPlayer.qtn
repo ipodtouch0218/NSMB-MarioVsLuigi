@@ -70,6 +70,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte CoyoteTimeFrames;
 	[ExcludeFromPrototype] int LandedFrame;
 	[ExcludeFromPrototype] bool DoEntityBounce;
+	[ExcludeFromPrototype] byte ForceJumpTimer;
 
 	// Wallslide
 	[ExcludeFromPrototype] bool WallslideLeft;
@@ -84,12 +85,9 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte GroundpoundCooldownFrames;
 	[ExcludeFromPrototype] byte GroundpoundStandFrames;
 
-	// Swimming
-	[ExcludeFromPrototype] byte SwimForceJumpTimer;
-
 	// Knockback
-    [ExcludeFromPrototype] bool IsInKnockback;
-	[ExcludeFromPrototype] bool IsInWeakKnockback;
+    [ExcludeFromPrototype] KnockbackStrength CurrentKnockback;
+	[ExcludeFromPrototype] bool KnockForwards;
 	[ExcludeFromPrototype] bool KnockbackWasOriginallyFacingRight;
 	[ExcludeFromPrototype] int KnockbackTick;
 	[ExcludeFromPrototype] byte DamageInvincibilityFrames;
@@ -138,6 +136,14 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte PipeCooldownFrames;
 
 	[ExcludeFromPrototype] EntityRef CurrentSpinner;
+}
+
+enum KnockbackStrength : Byte {
+	None,
+	FireballBump,
+	CollisionBump,
+	Normal,
+	Groundpound,
 }
 
 signal OnMarioPlayerDied(EntityRef entity);
@@ -243,7 +249,7 @@ event MarioPlayerMegaEnd {
 event MarioPlayerReceivedKnockback {
 	EntityRef Entity;
 	EntityRef Attacker;
-	bool Weak;
+	KnockbackStrength Strength;
 	nothashed FPVector2 AttackerPosition;
 }
 

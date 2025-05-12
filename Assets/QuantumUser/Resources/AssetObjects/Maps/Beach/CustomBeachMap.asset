@@ -731,6 +731,8 @@ MonoBehaviour:
             RawValue: 0
         IgnoreMovement:
           Value: 0
+        CanCrushEntities:
+          Value: 0
     - rid: 4728321284188930054
       type: {class: SpinnerPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

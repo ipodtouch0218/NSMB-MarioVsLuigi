@@ -25,7 +25,7 @@ public class TMP_InputFieldFixer : MonoBehaviour {
 
     public void OnNavigate(InputAction.CallbackContext context) {
         var osk = FindFirstObjectByType<OnScreenKeyboard>();
-        if (osk.IsOpen) {
+        if (osk && osk.IsOpen) {
             return;
         }
 

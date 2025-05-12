@@ -247,12 +247,13 @@ namespace NSMB.UI.Game {
 
             // TEAMS
             if (teamsEnabled) {
-                byte teamIndex = mario->GetTeam(f);
-                int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
-                if (cachedTeamStars != teamStars) {
-                    cachedTeamStars = teamStars;
-                    TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
-                    uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + "/" + starRequirement);
+                if (mario->GetTeam(f) is byte teamIndex) {
+                    int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
+                    if (cachedTeamStars != teamStars) {
+                        cachedTeamStars = teamStars;
+                        TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
+                        uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + "/" + starRequirement);
+                    }
                 }
             }
 
@@ -326,7 +327,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = f.Global->Rules.TeamsEnabled ? Utils.Utils.GetTeamColor(f, mario->GetTeam(f), 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
+            Color color = (f.Global->Rules.TeamsEnabled && mario->GetTeam(f) is byte team) ? Utils.Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;
@@ -389,7 +390,8 @@ namespace NSMB.UI.Game {
             } else if (hasWinner) {
                 if (teamMode) {
                     // Winning team
-                    winner = tm.GetTranslation(f.FindAsset(f.SimulationConfig.Teams[e.WinningTeam]).nameTranslationKey);
+                    var teams = f.SimulationConfig.Teams;
+                    winner = tm.GetTranslation(f.FindAsset(teams[e.WinningTeam % teams.Length]).nameTranslationKey);
                     resultText = tm.GetTranslationWithReplacements("ui.result.teamwin", "team", winner);
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.ended.team", color: ChatManager.Red, "team", winner);
                 } else {

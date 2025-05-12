@@ -93,7 +93,7 @@ public class GlobalController : Singleton<GlobalController> {
             Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
         }
 
-        if (Debug.isDebugBuild) {
+        //if (Debug.isDebugBuild) {
             if (UnityEngine.Input.GetKeyDown(KeyCode.F9)) {
                 if (Profiler.enabled) {
                     Profiler.enabled = false;
@@ -106,6 +106,10 @@ public class GlobalController : Singleton<GlobalController> {
                     PlaySound(SoundEffect.Player_Sound_PowerupCollect);
                 }
             }
+        //}
+
+        if (UnityEngine.Input.GetKeyDown(KeyCode.F6)) {
+            System.Diagnostics.Process.Start(Application.consoleLogPath);
         }
 #endif
 
@@ -174,7 +178,7 @@ public class GlobalController : Singleton<GlobalController> {
         float fadeRate = currentVolume * 2f;
 
         while (currentVolume > 0f) {
-            currentVolume -= fadeRate * Time.deltaTime;
+            currentVolume -= fadeRate * Time.fixedDeltaTime;
             mixer.SetFloat(key, ToLogScale(currentVolume));
             yield return null;
         }

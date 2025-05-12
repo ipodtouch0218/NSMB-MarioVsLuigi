@@ -73,7 +73,7 @@ namespace NSMB.UI.Game.Results {
             Dictionary<int, int> teamRankings = null;
             if (f.Global->HasWinner) {
                 Span<short> teamScores = stackalloc short[10];
-                QuantumUtils.GetTeamStars(f, teamScores);
+                QuantumUtils.GetAllTeamsStars(f, teamScores);
 
                 Dictionary<int, int> teamScoresDict = new();
                 for (int i = 0; i < teamScores.Length; i++) {

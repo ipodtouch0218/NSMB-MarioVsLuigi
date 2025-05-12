@@ -162,7 +162,6 @@ MonoBehaviour:
     - rid: 1987491028835237894
     - rid: 1987491028835237895
     - rid: 1987491028835237896
-    - rid: 1987491028835237897
   - Components:
     - rid: 1189759297370718208
     - rid: 1189759297370718209
@@ -737,26 +736,6 @@ MonoBehaviour:
       data:
         _empty_prototype_dummy_field_: 0
     - rid: 1987491028835237896
-      type: {class: PhysicsObjectPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
-      data:
-        Gravity:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        TerminalVelocity:
-          RawValue: 0
-        IsFrozen:
-          Value: 1
-        DisableCollision:
-          Value: 0
-        SlowInLiquids:
-          Value: 0
-        IsWaterSolid:
-          Value: 0
-        BreakMegaObjects:
-          Value: 0
-    - rid: 1987491028835237897
       type: {class: PiranhaPlantPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
         Pipe:

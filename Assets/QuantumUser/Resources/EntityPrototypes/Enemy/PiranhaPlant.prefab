@@ -53,6 +53,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -90,7 +93,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 0
 --- !u!95 &863355600414429673
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -104,6 +107,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -138,6 +142,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -249,7 +254,6 @@ GameObject:
   - component: {fileID: 228394594773550846}
   - component: {fileID: 4162546976232202784}
   - component: {fileID: 8006284552651083082}
-  - component: {fileID: 3502500067357238800}
   - component: {fileID: 1515450150619802232}
   - component: {fileID: -805149708868906492}
   - component: {fileID: 8366835173838899577}
@@ -498,36 +502,6 @@ MonoBehaviour:
     IgnorePlayerWhenRespawning:
       Value: 1
     DisableRespawning:
-      Value: 0
---- !u!114 &3502500067357238800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6254190274066690703}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 385320c580a374c44b3da48163df570b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prototype:
-    Gravity:
-      X:
-        RawValue: 0
-      Y:
-        RawValue: 0
-    TerminalVelocity:
-      RawValue: 0
-    IsFrozen:
-      Value: 1
-    DisableCollision:
-      Value: 0
-    SlowInLiquids:
-      Value: 0
-    IsWaterSolid:
-      Value: 0
-    BreakMegaObjects:
       Value: 0
 --- !u!114 &1515450150619802232
 MonoBehaviour:

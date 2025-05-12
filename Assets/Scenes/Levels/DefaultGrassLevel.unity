@@ -240,6 +240,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 57921653}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &57921655 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3919163699763193810, guid: 1ce5864bde999014a92015b065520add,
+    type: 3}
+  m_PrefabInstance: {fileID: 57921653}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &152647184
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -370,6 +382,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 152647184}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &152647186 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3919163699763193810, guid: 1ce5864bde999014a92015b065520add,
+    type: 3}
+  m_PrefabInstance: {fileID: 152647184}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &195012561
 GameObject:
   m_ObjectHideFlags: 0
@@ -3510,18 +3534,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 773708809}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &788889563 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3919163699763193810, guid: 1ce5864bde999014a92015b065520add,
-    type: 3}
-  m_PrefabInstance: {fileID: 152647184}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &956522486
 GameObject:
   m_ObjectHideFlags: 0
@@ -4261,7 +4273,7 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1568107873}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1568107882 stripped
+--- !u!114 &1568107875 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3919163699763193810, guid: 1ce5864bde999014a92015b065520add,
     type: 3}
@@ -4310,18 +4322,6 @@ Transform:
   - {fileID: 1961246880}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1690478898 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3919163699763193810, guid: 1ce5864bde999014a92015b065520add,
-    type: 3}
-  m_PrefabInstance: {fileID: 57921653}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b14052113b8414abfdb2effb52d984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1693744772
 GameObject:
   m_ObjectHideFlags: 0
@@ -4781,7 +4781,7 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1952974819}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1952974829 stripped
+--- !u!114 &1952974821 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3939497445895134035, guid: 4f50cb5e806289d43bf820de1f1347bb,
     type: 3}
@@ -5276,22 +5276,22 @@ PrefabInstance:
         type: 3}
       propertyPath: 'MapEntityReferences.Array.data[6]'
       value: 
-      objectReference: {fileID: 1952974829}
+      objectReference: {fileID: 1952974821}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: 'MapEntityReferences.Array.data[7]'
       value: 
-      objectReference: {fileID: 1568107882}
+      objectReference: {fileID: 1568107875}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: 'MapEntityReferences.Array.data[8]'
       value: 
-      objectReference: {fileID: 788889563}
+      objectReference: {fileID: 152647186}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: 'MapEntityReferences.Array.data[9]'
       value: 
-      objectReference: {fileID: 1690478898}
+      objectReference: {fileID: 57921655}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: 'MapEntityReferences.Array.data[10]'

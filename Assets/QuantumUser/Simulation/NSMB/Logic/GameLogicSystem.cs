@@ -170,8 +170,8 @@ namespace Quantum {
                     continue;
                 }
 
-                if (aliveTeam == -1) {
-                    aliveTeam = mario->GetTeam(f);
+                if (aliveTeam == -1 && mario->GetTeam(f) is byte team) {
+                    aliveTeam = team;
                 } else {
                     oneOrNoTeamAlive = false;
                     break;

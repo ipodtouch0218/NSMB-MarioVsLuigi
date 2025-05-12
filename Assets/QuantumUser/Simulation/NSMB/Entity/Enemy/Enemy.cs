@@ -6,15 +6,17 @@ namespace Quantum {
 
         public void Respawn(Frame f, EntityRef entity) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
 
             IsActive = true;
             IsDead = false;
             FacingRight = false;
             transform->Teleport(f, Spawnpoint);
-            physicsObject->IsFrozen = false;
-            physicsObject->Velocity = FPVector2.Zero;
-            physicsObject->DisableCollision = false;
+
+            if (f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
+                physicsObject->IsFrozen = false;
+                physicsObject->Velocity = FPVector2.Zero;
+                physicsObject->DisableCollision = false;
+            }
         }
 
         public void ChangeFacingRight(Frame f, EntityRef entity, bool newFacingRight) {

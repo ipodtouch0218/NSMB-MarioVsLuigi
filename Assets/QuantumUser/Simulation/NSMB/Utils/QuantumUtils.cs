@@ -193,7 +193,7 @@ public static unsafe class QuantumUtils {
         bool tie = false;
 
         Span<short> teamStars = stackalloc short[Constants.MaxPlayers];
-        GetTeamStars(f, teamStars);
+        GetAllTeamsStars(f, teamStars);
 
         for (int i = 0; i < Constants.MaxPlayers; i++) {
             short stars = teamStars[i];
@@ -231,7 +231,7 @@ public static unsafe class QuantumUtils {
         return result;
     }
 
-    public static void GetTeamStars(Frame f, Span<short> teamStars) {
+    public static void GetAllTeamsStars(Frame f, Span<short> teamStars) {
         var allPlayers = f.Filter<MarioPlayer>();
         allPlayers.UseCulling = false;
 
@@ -243,8 +243,10 @@ public static unsafe class QuantumUtils {
             if (mario->Disconnected || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
                 continue;
             }
+            if (mario->GetTeam(f) is not byte team) {
+                continue;
+            }
 
-            byte team = mario->GetTeam(f);
             if (teamStars[team] == -1) {
                 teamStars[team] = 0;
             }
@@ -253,6 +255,13 @@ public static unsafe class QuantumUtils {
                 teamStars[team] += mario->Stars;
             }
         }
+    }
+
+    public static int? GetTeamStars(Frame f, byte? nullableTeam) {
+        if (nullableTeam is not byte team) {
+            return null;
+        }
+        return GetTeamStars(f, team);
     }
 
     public static int GetTeamStars(Frame f, byte team) {
@@ -273,7 +282,7 @@ public static unsafe class QuantumUtils {
 
     public static short GetFirstPlaceStars(Frame f) {
         Span<short> teamStars = stackalloc short[Constants.MaxPlayers];
-        GetTeamStars(f, teamStars);
+        GetAllTeamsStars(f, teamStars);
 
         short max = 0;
         foreach (short stars in teamStars) {
@@ -291,7 +300,7 @@ public static unsafe class QuantumUtils {
 
         // "Losing" variable based on ln(x+1), x being the # of stars we're behind
 
-        int ourStars = GetTeamStars(f, mario->GetTeam(f));
+        int ourStars = GetTeamStars(f, mario->GetTeam(f)) ?? 0;
         int leaderStars = GetFirstPlaceStars(f);
 
         var rules = f.Global->Rules;
