@@ -246,13 +246,6 @@ event MarioPlayerMegaEnd {
 	byte EndingFrames;
 }
 
-event MarioPlayerReceivedKnockback {
-	EntityRef Entity;
-	EntityRef Attacker;
-	KnockbackStrength Strength;
-	nothashed FPVector2 AttackerPosition;
-}
-
 event MarioPlayerEnteredPipe {
 	EntityRef Entity;
 	EntityRef Pipe;
@@ -278,4 +271,11 @@ synced event MarioPlayerDestroyed {
 
 event MarioPlayerLandedWithAnimation {
 	EntityRef Entity;
+}
+
+event PlayKnockbackEffect {
+	EntityRef Entity;
+	EntityRef Attacker;
+	KnockbackStrength Strength;
+	nothashed FPVector2 AttackerPosition;
 }

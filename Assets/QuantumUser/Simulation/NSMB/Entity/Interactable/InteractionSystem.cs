@@ -2,6 +2,7 @@ using Quantum.Collections;
 using Quantum.Physics2D;
 using Quantum.Profiling;
 using Quantum.Task;
+using System;
 using System.Collections.Generic;
 
 namespace Quantum {
@@ -52,9 +53,10 @@ namespace Quantum {
                         EntityB = entityB,
                     };
                     
-                    if (!alreadyInteracted.Add(pair)) {
+                    if (alreadyInteracted.Contains(pair)) {
                         continue;
                     }
+                    alreadyInteracted.Add(pair);
                 }
 
                 {
@@ -230,12 +232,17 @@ namespace Quantum {
             }
         }
 
-        public struct EntityRefPair : IEqualityComparer<EntityRefPair> {
+        public struct EntityRefPair : IEquatable<EntityRefPair>, IEqualityComparer<EntityRefPair> {
 
             public EntityRef EntityA, EntityB;
 
+
+            public bool Equals(EntityRefPair other) {
+                return (EntityA == other.EntityA && EntityB == other.EntityB) || (EntityA == other.EntityB && EntityB == other.EntityA);
+            }
+
             public bool Equals(EntityRefPair x, EntityRefPair y) {
-                return (x.EntityA == y.EntityA && x.EntityB == y.EntityB) || (x.EntityA == y.EntityB && x.EntityB == y.EntityA);
+                return x.Equals(y);
             }
 
             public int GetHashCode(EntityRefPair obj) {

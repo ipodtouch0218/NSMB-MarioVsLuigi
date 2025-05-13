@@ -376,29 +376,29 @@ namespace Quantum {
             f.Events.MarioPlayerRespawned(entity);
         }
 
-        public void DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, KnockbackStrength strength, EntityRef attacker, bool bypassDamageInvincibility = false) {
+        public bool DoKnockback(Frame f, EntityRef entity, bool fromRight, int starsToDrop, KnockbackStrength strength, EntityRef attacker, bool bypassDamageInvincibility = false) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             if (physicsObject->IsUnderwater) {
                 strength = KnockbackStrength.Normal;
             }
 
             if (CurrentKnockback == strength) {
-                return;
+                return false;
             }
 
             var freezable = f.Unsafe.GetPointer<Freezable>(entity);
             if ((!bypassDamageInvincibility && DamageInvincibilityFrames > 0) || f.Exists(CurrentPipe) || (freezable->IsFrozen(f) && freezable->FrozenCubeEntity != attacker) || IsDead || MegaMushroomStartFrames > 0 || MegaMushroomEndFrames > 0) {
-                return;
+                return false;
             }
 
             if (IsInKnockback) {
                 ResetKnockback(f, entity);
             }
 
-            if (CurrentPowerupState == PowerupState.MiniMushroom && starsToDrop > 1) {
+            if (CurrentPowerupState == PowerupState.MiniMushroom && strength >= KnockbackStrength.Groundpound) {
                 SpawnStars(f, entity, starsToDrop - 1);
                 Powerdown(f, entity, false);
-                return;
+                return true;
             }
 
             if (IsInKnockback || IsInWeakKnockback) {
@@ -446,18 +446,13 @@ namespace Quantum {
             WallslideLeft = WallslideRight = false;
 
             SpawnStars(f, entity, starsToDrop);
-            //HandleLayerState();
-            FPVector2 attackerPosition = default;
-            if (f.Unsafe.TryGetPointer(attacker, out Transform2D* attackerTransform)) {
-                attackerPosition = attackerTransform->Position;
-            }
-            f.Events.MarioPlayerReceivedKnockback(entity, attacker, strength, attackerPosition);
+            return true;
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
             KnockbackGetupFrames = (byte) (IsInWeakKnockback || physicsObject->IsUnderwater ? 0 : 25);
-            DamageInvincibilityFrames = (byte) (60 + KnockbackGetupFrames);
+            DamageInvincibilityFrames = (byte) (90 + KnockbackGetupFrames);
             ////DoEntityBounce = false;
             CurrentKnockback = KnockbackStrength.None;
             //IsForwardsKnockback = false;
