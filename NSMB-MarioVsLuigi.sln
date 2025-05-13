@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quantum.Unity.Editor", "Quantum.Unity.Editor.csproj", "{020D0BD2-C724-14B5-8BD3-28900955C067}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quantum.Menu", "Quantum.Menu.csproj", "{E2682653-7FB6-1939-25CB-BB4B9CFCFB24}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{5118849E-C7BE-5C3A-3D56-282521D64AF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tayx.Graphy", "Tayx.Graphy.csproj", "{DB65BF5A-741F-6341-7634-EDB881064FD9}"
@@ -22,8 +20,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tayx.Graphy.Editor", "Tayx.Graphy.Editor.csproj", "{5B2CC4E0-AB11-0711-B76F-F86BA30995A7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FancyTextRendering", "FancyTextRendering.csproj", "{7AE5AA4C-626F-F308-F912-1E49D1F5AD6E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quantum.Menu.Editor", "Quantum.Menu.Editor.csproj", "{9AE66419-95AB-E25E-2293-5D62175506E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quantum.Unity.Editor.CodeGen", "Quantum.Unity.Editor.CodeGen.csproj", "{808256CA-96A5-4A36-1CB3-6EDA81750842}"
 EndProject
@@ -57,10 +53,6 @@ Global
 		{020D0BD2-C724-14B5-8BD3-28900955C067}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{020D0BD2-C724-14B5-8BD3-28900955C067}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{020D0BD2-C724-14B5-8BD3-28900955C067}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2682653-7FB6-1939-25CB-BB4B9CFCFB24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2682653-7FB6-1939-25CB-BB4B9CFCFB24}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2682653-7FB6-1939-25CB-BB4B9CFCFB24}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2682653-7FB6-1939-25CB-BB4B9CFCFB24}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5118849E-C7BE-5C3A-3D56-282521D64AF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5118849E-C7BE-5C3A-3D56-282521D64AF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5118849E-C7BE-5C3A-3D56-282521D64AF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,10 +69,6 @@ Global
 		{7AE5AA4C-626F-F308-F912-1E49D1F5AD6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AE5AA4C-626F-F308-F912-1E49D1F5AD6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AE5AA4C-626F-F308-F912-1E49D1F5AD6E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AE66419-95AB-E25E-2293-5D62175506E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AE66419-95AB-E25E-2293-5D62175506E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AE66419-95AB-E25E-2293-5D62175506E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AE66419-95AB-E25E-2293-5D62175506E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{808256CA-96A5-4A36-1CB3-6EDA81750842}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{808256CA-96A5-4A36-1CB3-6EDA81750842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{808256CA-96A5-4A36-1CB3-6EDA81750842}.Release|Any CPU.ActiveCfg = Release|Any CPU

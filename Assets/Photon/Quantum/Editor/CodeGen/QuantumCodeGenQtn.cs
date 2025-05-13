@@ -68,9 +68,6 @@ namespace Quantum.Editor {
       var outputFolder = QuantumCodeGenSettings.CodeGenQtnFolderPath;
       var unityOutputFolder = QuantumCodeGenSettings.CodeGenUnityRuntimeFolderPath;
       
-      // since this might log from a different thread, make sure editor log is initialized properly
-      QuantumEditorLog.EnsureInitialized();
-      
       IEnumerable<GeneratorOutputFile> outputFiles;
       try {
         outputFiles = Generator.Generate(qtnFiles, options ?? QuantumCodeGenSettings.Options, warning => {

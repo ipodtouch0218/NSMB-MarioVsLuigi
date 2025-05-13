@@ -27,7 +27,9 @@ namespace Quantum {
     /// <summary>
     /// The callback to notify the MultiClientRunner class of pressing exit.
     /// </summary>
-    public Action<QuantumMultiClientPlayer> DetroyPlayerCallback { get; set; }
+    public Action<QuantumMultiClientPlayer> DestroyPlayerCallback { get; set; }
+    [Obsolete("Use DestroyPlayerCallback")]
+    public Action<QuantumMultiClientPlayer> DetroyPlayerCallback { get { return DestroyPlayerCallback; } set { DestroyPlayerCallback = value; } }
     /// <summary>
     /// The local player slot this player uses. Only used when AddAsLocalPlayers is enabled.
     /// </summary>
@@ -176,7 +178,7 @@ namespace Quantum {
     }
 
     private void OnQuitPressed() {
-      DetroyPlayerCallback?.Invoke(this);
+      DestroyPlayerCallback?.Invoke(this);
     }
   }
 }

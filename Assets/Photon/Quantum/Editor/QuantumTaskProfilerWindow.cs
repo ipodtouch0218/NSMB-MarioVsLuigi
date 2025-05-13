@@ -81,6 +81,7 @@ namespace Quantum.Editor {
 
     [MenuItem("Window/Quantum/Task Profiler")]
     [MenuItem("Tools/Quantum/Window/Task Profiler", false, (int)QuantumEditorMenuPriority.Window + 15)]
+    [MenuItem("Tools/Quantum/Profilers/Open Task Profiler", false, (int)QuantumEditorMenuPriority.Profilers + 15)]
     public static void ShowWindow() {
       GetWindow(typeof(QuantumTaskProfilerWindow));
     }
@@ -487,7 +488,28 @@ namespace Quantum.Editor {
         using (new GUILayout.HorizontalScope()) {
           _isRecording = GUILayout.Toggle(_isRecording, "Record", EditorStyles.toolbarButton);
 
-          _selectedSourceIndex = EditorGUILayout.Popup(_selectedSourceIndex, _sources.Select(x => x.label).ToArray(), EditorStyles.toolbarPopup, GUILayout.MaxWidth(60));
+          var selectedSource = _selectedSourceIndex < 0 || _selectedSourceIndex >= _sources.Count ? null : _sources[_selectedSourceIndex];
+
+          var dropdownRect = EditorGUILayout.GetControlRect(false, 16, EditorStyles.toolbarPopup, GUILayout.MaxWidth(60));
+          if (EditorGUI.DropdownButton(dropdownRect, selectedSource?.label ?? new GUIContent("<NONE>"), FocusType.Keyboard, EditorStyles.toolbarPopup)) {
+            var menu = new GenericMenu();
+
+            for (int i = 0; i < _sources.Count; ++i) {
+              if (i == 2) {
+                menu.AddSeparator(string.Empty);
+              }
+              var source = _sources[i];
+              menu.AddItem(source.label, i == _selectedSourceIndex, obj => {
+                _selectedSourceIndex = (int)obj;
+              }, i);
+            }
+            
+#if !QUANTUM_ENABLE_REMOTE_PROFILER
+            menu.AddSeparator(string.Empty);
+            menu.AddDisabledItem(new GUIContent("Define QUANTUM_ENABLE_REMOTE_PROFILER to enable Player profiling"));
+#endif
+            menu.DropDown(dropdownRect);
+          }
 
           if (GUILayout.Button("New Window", EditorStyles.toolbarButton)) {
             CreateInstance<QuantumTaskProfilerWindow>().Show();
@@ -831,10 +853,12 @@ namespace Quantum.Editor {
           }
 
           QuantumEditorLog.Log($"Attaching to a local runner {runner}");
-          var info = new QuantumProfilingClientInfo(runner.Id, runner.Session.SessionConfig, runner.Session.PlatformInfo);
+          var info = new QuantumProfilingClientInfo(runner.Session.SessionConfig, runner.Session.PlatformInfo);
           info.ProfilerId = "Editor";
 
-          ((QuantumGame)runner.DeterministicGame).ProfilerSampleGenerated += (data) => OnProfilerSample(info, data);
+          QuantumCallback.Subscribe(this, (CallbackTaskProfilerReportGenerated callback) => OnProfilerSample(info, callback.Report),
+            filter: g => _isRecording && g == runner.Session.Game);
+          
           _tracedRunners.Add(new WeakReference<SessionRunner>(runner));
         Next:;
         }

@@ -44,16 +44,19 @@ namespace Quantum {
     List<IQuantumViewComponent> _viewComponents = new List<IQuantumViewComponent>();
     Queue<IQuantumViewComponent> _viewComponentsToAdd = new Queue<IQuantumViewComponent>();
     Queue<IQuantumViewComponent> _viewComponentsToRemove = new Queue<IQuantumViewComponent>();
+    HashSet<IQuantumViewComponent> _viewComponentZombies = new HashSet<IQuantumViewComponent>();
     // the view context for this entity view update
     Dictionary<Type, IQuantumViewContext> _viewContexts;
     // the pool that can optionally be used to create entity views
     IQuantumEntityViewPool _entityViewPool;
+    // the class that can optionally be used to filter which entity views should be spawned at all
+    IQuantumEntityViewCulling _entityViewCulling;
 
 
     /// <summary>
     /// Provides access to MapData when deriving from this class for example.
     /// </summary>
-    protected QuantumMapData MapData => _mapData;
+    public QuantumMapData MapData => _mapData;
     /// <summary>
     /// Provides access to the active entities. 
     /// </summary>
@@ -84,6 +87,19 @@ namespace Quantum {
       set {
         Assert.Always(_entityViewPool == null, "Cannot change the pool once it was set once.");
         _entityViewPool = value;
+      }
+    }
+    
+    /// <summary>
+    /// Get or set the EntityViewCulling. If not set, the EntityViewUpdater will use the first found culling class in the hierarchy.
+    /// </summary>
+    public IQuantumEntityViewCulling Culling {
+      get {
+        return _entityViewCulling;
+      }
+      set {
+        Assert.Always(_entityViewCulling == null, "Cannot change the culler once it was set once.");
+        _entityViewCulling = value;
       }
     }
     /// <summary>
@@ -126,16 +142,24 @@ namespace Quantum {
     /// <summary>
     /// Set the current observed game.
     /// </summary>
-    public void SetCurrentGame(QuantumGame game) {
+    /// <param name="game">The game to observe.</param>
+    /// <param name="updateGizmoContext">Register this EntityViewUpdate with the game gizmos.</param>
+    public void SetCurrentGame(QuantumGame game, bool updateGizmoContext = true) {
       var gameChanged = _observedGame != null;
 
       _observedGame = game;
 
-      if (gameChanged) {
+#if UNITY_EDITOR
+      if (updateGizmoContext) {
+        QuantumGameGizmos.RegisterEntityViewUpdater(this);
+      }
+#endif
 
+      if (gameChanged) {
         for (int i = 0; i < _viewComponents.Count; i++) {
           _viewComponents[i].GameChanged(_observedGame);
         }
+
         foreach (var view in _activeViews) {
           view.Value.GameChanged(_observedGame);
         }
@@ -153,6 +177,7 @@ namespace Quantum {
       QuantumCallback.Subscribe(this, (CallbackUnitySceneLoadBegin c) => OnObservedGameDestroyed(c.Game, false), game => game == _observedGame);
 
       Pool ??= GetComponent<IQuantumEntityViewPool>();
+      Culling ??= GetComponent<IQuantumEntityViewCulling>();
 
       LoadViewContexts();
 
@@ -193,8 +218,8 @@ namespace Quantum {
       LoadViewContexts();
       if (viewComponent.IsInitialized == false) {
         viewComponent.Initialize(_viewContexts);
-        _viewComponentsToAdd.Enqueue(viewComponent);
       }
+      _viewComponentsToAdd.Enqueue(viewComponent);
     }
 
     /// <summary>
@@ -203,6 +228,13 @@ namespace Quantum {
     /// </summary>
     /// <param name="viewComponent">View component instance to remove</param>
     public void RemoveViewComponent(IQuantumViewComponent viewComponent) {
+      if (viewComponent.IsActive == false) {
+        // Defer `Deactivate` to later for components that have not been activated yet.
+        // Do not add them to the remove list, as they will never really be added to the active list.
+        _viewComponentZombies.Add(viewComponent);
+        return;
+      }
+
       viewComponent.Deactivate();
       _viewComponentsToRemove.Enqueue(viewComponent);
     }
@@ -216,6 +248,10 @@ namespace Quantum {
 
     private void OnObservedGameDestroyed(QuantumGame game, bool destroyed) {
       Debug.Assert(_observedGame == game);
+
+#if UNITY_EDITOR
+      QuantumGameGizmos.UnregisterEntityViewUpdater(this);
+#endif
 
       if (destroyed) {
         for (int i=0; i< _viewComponents.Count; i++) {
@@ -253,6 +289,14 @@ namespace Quantum {
         while (_viewComponentsToAdd.Count > 0) {
           var vc = _viewComponentsToAdd.Dequeue();
           vc.Activate(verifiedFrame, game, null);
+
+          // Zombies are components that were deactivated before getting activated in this loop.
+          // For consistency we call Deactivate afterwards here instead of during RemoveViewComponent() and never add it to the active list.
+          if (_viewComponentZombies.Remove(vc)) {
+            vc.Deactivate();
+            continue;
+          }
+
           _viewComponents.Add(vc);
         }
         
@@ -260,7 +304,7 @@ namespace Quantum {
 
         // Update view components
         for (int i = 0; i < _viewComponents.Count; i++) {
-          if (_viewComponents[i].IsActive) {
+          if (_viewComponents[i].IsActiveAndEnabled) {
             _viewComponents[i].UpdateView();
           }
         }
@@ -286,7 +330,7 @@ namespace Quantum {
         var useErrorCorrection = game.Session.IsPredicted && game.Session.IsInterpolatable && _teleport == false;
 
         // Go through all verified entities and create new view instances for new entities.
-        // Checks information (CreateBehaviour) on each EntityView if it should be created/destroyed during Verified or Prediceted frames.
+        // Checks information (CreateBehaviour) on each EntityView if it should be created/destroyed during Verified or Predicted frames.
         SyncViews(game, game.Frames.Verified, QuantumEntityViewBindBehaviour.Verified);
 
         // Go through all entities in the current predicted frame (predicted == verified only during lockstep).
@@ -339,7 +383,7 @@ namespace Quantum {
     private void LateUpdate() {
       if (ObservedGame != null) {
         for (int i = 0; i < _viewComponents.Count; i++) {
-          if (_viewComponents[i].IsActive) {
+          if (_viewComponents[i].IsActiveAndEnabled) {
             _viewComponents[i].LateUpdateView();
           }
         }
@@ -353,18 +397,26 @@ namespace Quantum {
       while (_viewComponentsToRemove.Count > 0) { 
         _viewComponents.Remove(_viewComponentsToRemove.Dequeue());
       }
+
+      _viewComponentZombies.Clear();
     }
 
     private void SyncViews(QuantumGame game, Frame frame, QuantumEntityViewBindBehaviour createBehaviour) {
       // update prefabs
-      foreach (var (entity, view) in frame.GetComponentIterator<View>()) {
-        CreateViewIfNeeded(game, game.Frames.Predicted, entity, view, createBehaviour);
+      if (Culling != null) {
+        foreach (var (entity, view) in Culling.DynamicEntityIterator(game, frame, createBehaviour)) {
+          CreateViewIfNeeded(game, frame, entity, view, createBehaviour);
+        }
+      } else {
+        foreach (var (entity, view) in frame.GetComponentIterator<View>()) {
+          CreateViewIfNeeded(game, frame, entity, view, createBehaviour);
+        }
       }
 
       // update map entities
       if (_mapData) {
-        var currentMap = _mapData.Asset.Guid;
-        if (currentMap == frame.MapAssetRef.Id) {
+        var currentMap = _mapData.AssetRef;
+        if (currentMap == frame.MapAssetRef) {
           BindMapEntities(game, frame, createBehaviour);
         } else if (frame.Map is DynamicMap dynamicMap && dynamicMap.SourceMap.Id == currentMap) {
           BindMapEntities(game, frame, createBehaviour);
@@ -375,28 +427,39 @@ namespace Quantum {
     }
 
     private void BindMapEntities(QuantumGame game, Frame frame, QuantumEntityViewBindBehaviour createBehaviour) {
-      foreach (var (entity, mapEntityLink) in frame.GetComponentIterator<MapEntityLink>()) {
-        BindMapEntityIfNeeded(game, game.Frames.Predicted, entity, mapEntityLink, createBehaviour);
+      if (Culling != null) {
+        foreach (var (entity, mapEntityLink) in Culling.MapEntityIterator(game, frame, createBehaviour)) {
+          BindMapEntityIfNeeded(game, frame, entity, mapEntityLink, createBehaviour);
+        }
+      } else {
+        foreach (var (entity, mapEntityLink) in frame.GetComponentIterator<MapEntityLink>()) {
+          BindMapEntityIfNeeded(game, frame, entity, mapEntityLink, createBehaviour);
+        }
       }
     }
 
-    void CreateViewIfNeeded(QuantumGame game, Frame f, EntityRef handle, View view, QuantumEntityViewBindBehaviour createBehaviour) {
-      var instance = default(QuantumEntityView);
-      var entityView = f.FindAsset<EntityView>(view.Current.Id);
+    void CreateViewIfNeeded(QuantumGame game, Frame frame, EntityRef handle, View view, QuantumEntityViewBindBehaviour createBehaviour) {
+      var entityView = frame.FindAsset<EntityView>(view.Current.Id);
 
-      if (_activeViews.TryGetValue(handle, out instance)) {
-        if (instance.BindBehaviour == createBehaviour) {
+      if (_activeViews.TryGetValue(handle, out var instance)) {
+        var bindBehaviour = instance.BindBehaviour;
+
+        if ((entityView != null) && (entityView.Guid != instance.AssetGuid)) {
+          // If the guid is not identical, try to get the bind behaviour from the prefab instead of the instance (slow, but fixes issues with entity hijacking).
+          TryGetBindBehaviourFromPrefab(entityView, out bindBehaviour, instance.BindBehaviour);
+        }
+
+        if (bindBehaviour == createBehaviour) {
           if (entityView == null) {
-            // Quantum.View has been revoked for this entity
+            // Quantum.View has been revoked for this entity.
             DestroyEntityView(game, handle);
           } else {
-            var currentGuid = entityView.Guid;
-            if (instance.AssetGuid == currentGuid) {
+            if (entityView.Guid == instance.AssetGuid) {
               _activeEntities.Add(handle);
             } else {
               // The Guid changed, recreate the view instance for this entity.
               DestroyEntityView(game, handle);
-              if (CreateView(game, f, handle, entityView, createBehaviour) != null) {
+              if (CreateView(game, frame, handle, entityView, createBehaviour) != null) {
                 _activeEntities.Add(handle);
               }
             }
@@ -404,15 +467,14 @@ namespace Quantum {
         }
       } else if (entityView != null) {
         // Create a new view instance for this entity.
-        if (CreateView(game, f, handle, entityView, createBehaviour) != null) {
+        if (CreateView(game, frame, handle, entityView, createBehaviour) != null) {
           _activeEntities.Add(handle);
         }
       }
     }
 
-    private void BindMapEntityIfNeeded(QuantumGame game, Frame f, EntityRef handle, MapEntityLink mapEntity, QuantumEntityViewBindBehaviour createBehaviour) {
-      var instance = default(QuantumEntityView);
-      if (_activeViews.TryGetValue(handle, out instance)) {
+    private void BindMapEntityIfNeeded(QuantumGame game, Frame frame, EntityRef handle, MapEntityLink mapEntity, QuantumEntityViewBindBehaviour createBehaviour) {
+      if (_activeViews.TryGetValue(handle, out var instance)) {
         if (instance.AssetGuid.IsValid) {
           // this can happen if a scene prototype has the View property set to an asset
         } else {
@@ -421,31 +483,45 @@ namespace Quantum {
           }
         }
       } else {
-        if (BindMapEntity(game, f, handle, mapEntity, createBehaviour) != null) {
+        if (BindMapEntity(game, frame, handle, mapEntity, createBehaviour) != null) {
           _activeEntities.Add(handle);
         }
       }
     }
 
-    QuantumEntityView CreateView(QuantumGame game, Frame f, EntityRef handle, EntityView view, QuantumEntityViewBindBehaviour createBehaviour) {
+    private bool TryGetBindBehaviourFromPrefab(EntityView view, out QuantumEntityViewBindBehaviour result, QuantumEntityViewBindBehaviour defaultBehaviour = QuantumEntityViewBindBehaviour.Verified) {
+      result = defaultBehaviour;
       if (view == null) {
-        return null;
+        return false;
       }
 
       if (view.Prefab == null) {
         LoadMissingPrefab(view);
         if (view.Prefab == null) {
-          return null;
+          return false;
         }
       }
 
-      // TODO: badfix
-      var viewComp = view.Prefab.GetComponent<QuantumEntityView>();
-      if (viewComp.BindBehaviour != createBehaviour)
+      if (view.Prefab.TryGetComponent<QuantumEntityView>(out var viewComp) == false) {
+        return false;
+      }
+
+      result = viewComp.BindBehaviour;
+      return true;
+    }
+
+    QuantumEntityView CreateView(QuantumGame game, Frame frame, EntityRef handle, EntityView view, QuantumEntityViewBindBehaviour createBehaviour) {
+      if (TryGetBindBehaviourFromPrefab(view, out var bindBehaviour) == false) {
         return null;
+      }
+
+      // TODO: bad fix, because it will cause issues with Entity hijacking
+      if (bindBehaviour != createBehaviour) {
+        return null;
+      }
 
       QuantumEntityView instance;
-      if (TryGetTransform(f, handle, out Vector3 position, out Quaternion rotation)) {
+      if (TryGetTransform(frame, handle, out Vector3 position, out Quaternion rotation)) {
         instance = CreateEntityViewInstance(view, position, rotation);
       } else {
         instance = CreateEntityViewInstance(view);
@@ -456,13 +532,13 @@ namespace Quantum {
       }
 
       instance.AssetGuid = view.Guid;
-      OnEntityViewInstantiated(game, f, instance, handle);
+      OnEntityViewInstantiated(game, frame, instance, handle);
 
       // return instance
       return instance;
     }
 
-    QuantumEntityView BindMapEntity(QuantumGame game, Frame f, EntityRef handle, MapEntityLink mapEntity, QuantumEntityViewBindBehaviour createBehaviour) {
+    QuantumEntityView BindMapEntity(QuantumGame game, Frame frame, EntityRef handle, MapEntityLink mapEntity, QuantumEntityViewBindBehaviour createBehaviour) {
       Debug.Assert(_mapData);
 
       if (_mapData.MapEntityReferences.Count <= mapEntity.Index) {
@@ -483,18 +559,18 @@ namespace Quantum {
         DestroyEntityView(game, instance.EntityRef);
       }
 
-      if (TryGetTransform(f, handle, out Vector3 position, out Quaternion rotation)) {
+      if (TryGetTransform(frame, handle, out Vector3 position, out Quaternion rotation)) {
         ActivateMapEntityInstance(instance, position, rotation);
       } else {
         ActivateMapEntityInstance(instance);
       }
 
       instance.AssetGuid = new AssetGuid();
-      OnEntityViewInstantiated(game, f, instance, handle);
+      OnEntityViewInstantiated(game, frame, instance, handle);
       return instance;
     }
 
-    private void OnEntityViewInstantiated(QuantumGame game, Frame f, QuantumEntityView instance, EntityRef handle) {
+    private void OnEntityViewInstantiated(QuantumGame game, Frame frame, QuantumEntityView instance, EntityRef handle) {
       if ((instance.ViewFlags & QuantumEntityViewFlags.DisableEntityRefNaming) == 0) {
         instance.gameObject.name = handle.ToString();
       }
@@ -504,7 +580,7 @@ namespace Quantum {
       // add to lookup
       _activeViews.Add(handle, instance);
 
-      instance.Activate(game, f, Context, this);
+      instance.Activate(game, frame, Context, this);
       instance.OnEntityInstantiated.Invoke(game);
     }
 
@@ -525,15 +601,23 @@ namespace Quantum {
     /// <param name="game">The game reference the entity belongs to.</param>
     /// <param name="view">The entity view object.</param>
     protected virtual void DestroyEntityView(QuantumGame game, QuantumEntityView view) {
-      Debug.Assert(view != null);
+      if ((object)view == null) {
+        Debug.LogError("Invalid entity view GameObject.");
+        return;
+      }
+
       view.OnEntityDestroyed.Invoke(game);
 
-      if (!view.ManualDisposal) {
-        view.Deactivate();
-        if (view.AssetGuid.IsValid) {
-          DestroyEntityViewInstance(view);
+      if (view.ManualDisposal == false) {
+        if (view == null) {
+          Debug.LogWarning($"Quantum Entity View {view?.EntityRef} was already destroyed");
         } else {
-          DisableMapEntityInstance(view);
+          view.Deactivate();
+          if (view.AssetGuid.IsValid) {
+            DestroyEntityViewInstance(view);
+          } else {
+            DisableMapEntityInstance(view);
+          }
         }
       }
     }
@@ -545,6 +629,7 @@ namespace Quantum {
       _viewComponents.Clear();
       _viewComponentsToAdd.Clear();
       _viewComponentsToRemove.Clear();
+      _viewComponentZombies.Clear();
 
       foreach (var kvp in _activeViews) {
         if (kvp.Value && kvp.Value.gameObject) {
@@ -626,14 +711,14 @@ namespace Quantum {
     protected virtual void LoadMissingPrefab(Quantum.EntityView viewAsset) {
     }
 
-    private static bool TryGetTransform(Frame f, EntityRef handle, out Vector3 position, out Quaternion rotation) {
-      if (f.Has<Transform2D>(handle)) {
-        var transform2D = f.Unsafe.GetPointer<Transform2D>(handle);
+    private static bool TryGetTransform(Frame frame, EntityRef handle, out Vector3 position, out Quaternion rotation) {
+      if (frame.Has<Transform2D>(handle)) {
+        var transform2D = frame.Unsafe.GetPointer<Transform2D>(handle);
         position = transform2D->Position.ToUnityVector3();
         rotation = transform2D->Rotation.ToUnityQuaternion();
         return true;
-      } else if (f.Has<Transform3D>(handle)) {
-        var transform3D = f.Unsafe.GetPointer<Transform3D>(handle);
+      } else if (frame.Has<Transform3D>(handle)) {
+        var transform3D = frame.Unsafe.GetPointer<Transform3D>(handle);
         position = transform3D->Position.ToUnityVector3();
         rotation = transform3D->Rotation.ToUnityQuaternion();
         return true;

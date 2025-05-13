@@ -9,8 +9,11 @@
             The base class for a hierarchy of systems.
             </summary>
         </member>
-        <member name="P:Quantum.SystemGroup.ChildSystems">
-            <inheritdoc cref="P:Quantum.SystemBase.ChildSystems"/>
+        <member name="M:Quantum.SystemGroup.#ctor(Quantum.SystemBase[])">
+            <summary>
+            Create a new system group.
+            </summary>
+            <param name="children">The child systems.</param>
         </member>
         <member name="M:Quantum.SystemGroup.#ctor(System.String,Quantum.SystemBase[])">
             <summary>
@@ -21,17 +24,8 @@
         </member>
         <member name="M:Quantum.SystemGroup.Schedule(Quantum.Frame,Quantum.Task.TaskHandle)">
             <summary>
-            Add the child systems the the task hierarchy.
+            Nothing to schedule, this is only a container for children.
             </summary>
-            <param name="f">The referenced frame.</param>
-            <param name="taskHandle">The initial task handle.</param>
-            <returns>The final task graph.</returns>
-        </member>
-        <member name="M:Quantum.SystemGroup.OnEnabled(Quantum.Frame)">
-            <inheritdoc cref="M:Quantum.SystemBase.OnEnabled(Quantum.Frame)"/>
-        </member>
-        <member name="M:Quantum.SystemGroup.OnDisabled(Quantum.Frame)">
-            <inheritdoc cref="M:Quantum.SystemBase.OnDisabled(Quantum.Frame)"/>
         </member>
         <member name="T:Quantum.GameResult">
             <summary>
@@ -351,6 +345,13 @@
             <param name="player">The reference to the player being added.</param>
             <param name="firstTime">Indicates if this is the first time the player is added.</param>
         </member>
+        <member name="M:Quantum.Asteroids.AsteroidsPlayerSystem.OnPlayerDisconnected(Quantum.Frame,Quantum.PlayerRef)">
+            <summary>
+            Called when a new player is disconnected. This callback handles the ship destruction.
+            </summary>
+            <param name="f">The game frame.</param>
+            <param name="player">The reference to the player being desconnected.</param>
+        </member>
         <member name="T:Quantum.SystemMainThreadFilter`1">
              <summary>
              This type of system uses a FilterStruct of type T to filter a set of entities based on it, 
@@ -430,6 +431,9 @@
             <param name="e"></param>
             <returns>True if the callback has been handled by any subscriber</returns>
         </member>
+        <member name="M:Quantum.CallbackDispatcher.HasAnyListeners(Quantum.CallbackBase)">
+            <inheritdoc cref="M:Quantum.ICallbackDispatcher.HasAnyListeners(Quantum.CallbackBase)"/>
+        </member>
         <member name="F:Quantum.ShutdownCause.Ok">
             <summary>
             Expected shutdown
@@ -458,39 +462,32 @@
         <member name="T:Quantum.SystemMainThreadGroup">
             <summary>
             A Quantum main thread system that has a system hierarchy.
+            The class will be deprecated in future versions, use SystemGroup instead.
             </summary>
         </member>
-        <member name="M:Quantum.SystemMainThreadGroup.#ctor(System.String,Quantum.SystemMainThread[])">
+        <member name="M:Quantum.SystemMainThreadGroup.#ctor(Quantum.SystemBase[])">
             <summary>
-            Create a new system group.
+            Create a new system main thread group.
+            </summary>
+            <param name="children">The system children.</param>
+        </member>
+        <member name="M:Quantum.SystemMainThreadGroup.#ctor(System.String,Quantum.SystemBase[])">
+            <summary>
+            Create a new system main thread group.
             </summary>
             <param name="name">The system name.</param>
             <param name="children">The system children.</param>
         </member>
-        <member name="P:Quantum.SystemMainThreadGroup.ChildSystems">
-            <summary>
-            Returns all child systems of this instance.
-            </summary>
-        </member>
         <member name="M:Quantum.SystemMainThreadGroup.Schedule(Quantum.Frame,Quantum.Task.TaskHandle)">
-            <inheritdoc cref="M:Quantum.SystemMainThread.Schedule(Quantum.Frame,Quantum.Task.TaskHandle)"/>
-        </member>
-        <member name="M:Quantum.SystemMainThreadGroup.OnEnabled(Quantum.Frame)">
-            <inheritdoc cref="M:Quantum.SystemBase.OnEnabled(Quantum.Frame)"/>
-        </member>
-        <member name="M:Quantum.SystemMainThreadGroup.OnDisabled(Quantum.Frame)">
-            <inheritdoc cref="M:Quantum.SystemBase.OnDisabled(Quantum.Frame)"/>
-        </member>
-        <member name="M:Quantum.SystemMainThreadGroup.Update(Quantum.Frame)">
             <summary>
-            Override to add the workload.
+            Nothing to schedule, this is just a container for children.
             </summary>
-            <param name="f">The current frame.</param>
         </member>
         <member name="T:Quantum.DotNetSessionRunner">
             <summary>
             This class implements the <see cref="T:Photon.Deterministic.IDeterministicSessionRunner"/> interface and contains code to glue together the Quantum server and Quantum session runner.
             This was formerly part of the Quantum Server SDK.
+            The class will also work without running the server simulation only as wrapper for access to custom simulation code as resource manager and command serialization for example.
             </summary>
         </member>
         <member name="P:Quantum.DotNetSessionRunner.AssetSerializer">
@@ -498,10 +495,10 @@
             Get and set the AssetSerializer directly after <see cref="T:Photon.Deterministic.IDeterministicSessionRunner"/> creation, until it is possible to pass it internally.
             </summary>
         </member>
-        <member name="P:Quantum.DotNetSessionRunner.CustomResourceManager">
+        <member name="P:Quantum.DotNetSessionRunner.InitialDynamicAssetDB">
             <summary>
-            Assign a custom resource manager which will use the cached static resource manager as <see cref="P:Quantum.ResourceManagerStatic.FallbackResourceManager"/>.
-            Must be set right after creation.
+            Access the initial dynamic asset db, gets created after <see cref="M:Quantum.DotNetSessionRunner.AddInitialDynamicAsset(Quantum.AssetObject)"/> was used.
+            Will be disposed and nulled after <see cref="M:Quantum.DotNetSessionRunner.Start(Photon.Deterministic.DeterministicSessionRunnerStartArguments)"/>.
             </summary>
         </member>
         <member name="P:Quantum.DotNetSessionRunner.Runner">
@@ -524,11 +521,17 @@
             Callback raised on game result events from the simulation.
             </summary>
         </member>
-        <member name="M:Quantum.DotNetSessionRunner.Init(Photon.Deterministic.DeterministicSessionRunnerInitArguments)">
+        <member name="P:Quantum.DotNetSessionRunner.Session">
             <summary>
-            Initialized the server simulation. It initializes static classes like FPLut, Native.Utils and instantiates a static resource manager that is shared over multiple server simulations.
-            This method throws exceptions on errors.
+            Returns the session.
             </summary>
+        </member>
+        <member name="M:Quantum.DotNetSessionRunner.AddInitialDynamicAsset(Quantum.AssetObject)">
+            <summary>
+            Add an initial dynamic asset. Needs to be performed before the simulation starts. Use DeterministicServer.OnDeterministicSessionCanStart().
+            </summary>
+            <param name="asset">Asset to add to initial dynamic asset db.</param>
+            <returns>Guid of the asset or invalid guid when the simulation has already been started.</returns>
         </member>
         <member name="M:Quantum.DotNetSessionRunner.Shutdown">
             <summary>
@@ -773,6 +776,11 @@
             Destroy an entity or a component.
             </summary>
         </member>
+        <member name="F:Quantum.Core.DebugCommandType.Toggle">
+            <summary>
+            Toggle systems
+            </summary>
+        </member>
         <member name="F:Quantum.Core.DebugCommandType.UserCommandTypeStart">
             <summary>
             Add used defined debug commands types starting from this value.
@@ -837,6 +845,16 @@
             Serialized user data. For example entity prototype information to create a new entity.
             </summary>
         </member>
+        <member name="F:Quantum.Core.DebugCommand.Payload.SystemType">
+            <summary>
+            System.Type, pointing to a Quantum system type for example.
+            </summary>
+        </member>
+        <member name="F:Quantum.Core.DebugCommand.Payload.SystemRuntimeIndex">
+            <summary>
+            System runtime index.
+            </summary>
+        </member>
         <member name="M:Quantum.Core.DebugCommand.CreateDestroyPayload(Quantum.EntityRef)">
             <summary>
             Factory to create a destroy entity debug command payload.
@@ -859,6 +877,20 @@
             </summary>
             <param name="entityRef">The entity to remove a component from.</param>
             <param name="componentType">The component type to remove.</param>
+            <returns>The debug command payload.</returns>
+        </member>
+        <member name="M:Quantum.Core.DebugCommand.CreateToggleSystemPayload(System.Type)">
+            <summary>
+            Factory to create the payload for a toggle system command.
+            </summary>
+            <param name="systemType">System type to toggle</param>
+            <returns>The debug command payload.</returns>
+        </member>
+        <member name="M:Quantum.Core.DebugCommand.CreateToggleSystemPayload(System.Int32)">
+            <summary>
+            Factory to create the payload for a toggle system command.
+            </summary>
+            <param name="systemRuntimeIndex">System runtime index to toggle</param>
             <returns>The debug command payload.</returns>
         </member>
         <member name="T:Quantum.QuantumGame">
@@ -972,18 +1004,21 @@
         <member name="M:Quantum.QuantumGame.GetLocalPlayers">
             <summary>
             Returns an array that is unique on every client and represents the global player indices that the local client controls in the Quantum simulation.
+            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
             </summary>
             <returns>Array of global players this client controls.</returns>
         </member>
         <member name="M:Quantum.QuantumGame.GetLocalPlayerSlots">
             <summary>
             Returns an array that is unique on every client and represents the player slots that the local client controls in the Quantum simulation.
+            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
             </summary>
             <returns>Array of local player slots  this client controls.</returns>
         </member>
         <member name="M:Quantum.QuantumGame.PlayerIsLocal(Quantum.PlayerRef)">
             <summary>
              Helps to decide if a PlayerRef is associated with the local player.
+            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
             </summary>
             <param name="playerRef">Player reference</param>
             <returns>True if the player is the local player</returns>
@@ -1515,12 +1550,18 @@
             This input provider can store a certain amount of input sets in a ring buffer.
             </summary>
         </member>
-        <member name="M:Quantum.RingBufferInputProvider.#ctor(Photon.Deterministic.DeterministicSessionConfig,System.Int32)">
+        <member name="P:Quantum.RingBufferInputProvider.LocalActorNumber">
+            <summary>
+            The actor number of the client that recoded the replay.
+            </summary>
+        </member>
+        <member name="M:Quantum.RingBufferInputProvider.#ctor(Photon.Deterministic.DeterministicSessionConfig,System.Int32,System.Int32)">
             <summary>
             Create a ring buffer input provider.
             </summary>
             <param name="sessionConfig">Session config</param>
             <param name="capacity">Total capacity</param>
+            <param name="localActorNumber">The actor number of the client that recoded the replay.</param>
         </member>
         <member name="M:Quantum.RingBufferInputProvider.CanSimulate(System.Int32)">
             <summary>
@@ -1615,6 +1656,11 @@
             Set to <see langword="true"/> when the simulation should start with this system enabled.
             </summary>
         </member>
+        <member name="P:Quantum.SystemBase.ProfilerName">
+            <summary>
+            Profiler name.
+            </summary>
+        </member>
         <member name="M:Quantum.SystemBase.#ctor">
             <summary>
             Constructor.
@@ -1625,6 +1671,12 @@
             Create a new instance and setting the sample name.
             </summary>
             <param name="scheduleSample">The name of the system to identify in the profiler.</param>
+        </member>
+        <member name="M:Quantum.SystemBase.#ctor(Quantum.SystemBase[])">
+            <summary>
+            Create a new instance of a system with children.
+            </summary>
+            <param name="children">Children systems to create a hierarchy to toggle.</param>
         </member>
         <member name="M:Quantum.SystemBase.OnInit(Quantum.Frame)">
             <summary>
@@ -1821,6 +1873,11 @@
             Returns the max player count that the simulation was started with <see cref="F:Photon.Deterministic.DeterministicSessionConfig.PlayerCount"/>.
             </summary>
         </member>
+        <member name="P:Quantum.Frame.MaxPlayerCount">
+            <summary>
+            Returns the max player count that the simulation was started with, see <see cref="F:Photon.Deterministic.DeterministicSessionConfig.PlayerCount"/>.
+            </summary>
+        </member>
         <member name="P:Quantum.Frame.PlayerConnectedCount">
             <summary>
             Returns the number of players that are currently connected, requires the <see cref="T:Quantum.Core.PlayerConnectedSystem"/>.
@@ -1889,6 +1946,11 @@
         <member name="P:Quantum.Frame.SystemsAll">
             <summary>
             All systems running in the session.
+            </summary>
+        </member>
+        <member name="P:Quantum.Frame.SystemsRoot">
+            <summary>
+            List of root systems in the session.
             </summary>
         </member>
         <member name="P:Quantum.Frame.UpdateRate">
@@ -2008,38 +2070,136 @@
             </summary>
             <param name="frame">Input frame object</param>
         </member>
-        <member name="M:Quantum.Frame.SystemIsEnabledSelf``1">
+        <member name="M:Quantum.Frame.SystemAllEnabledSelf``1">
             <summary>
-            Test if a system is enabled.
+            Checks is all systems of the type are enabled themselves.
+            System can be enabled themselves but still be disabled by <see cref="P:Quantum.SystemBase.ParentSystem"/>.
+            Logs an error if the system type is not found.
             </summary>
             <typeparam name="T">System type</typeparam>
-            <returns>True if the system is enabled</returns>
+            <returns><see langword="true"/> if all systems are enabled themselves.</returns>
+        </member>
+        <member name="M:Quantum.Frame.SystemAllEnabledSelf(System.Type)">
+            <inheritdoc cref="M:Quantum.Frame.SystemAllEnabledSelf``1"/>
+        </member>
+        <member name="M:Quantum.Frame.SystemAnyEnabledSelf``1">
+            <summary>
+            Checks is any systems of the type is enabled itself.
+            System can be enabled themselves but still be disabled by <see cref="P:Quantum.SystemBase.ParentSystem"/>.
             Logs an error if the system type is not found.
+            </summary>
+            <typeparam name="T">System type</typeparam>
+            <returns><see langword="true"/> if any systems of the type is enabled itself.</returns>
+        </member>
+        <member name="M:Quantum.Frame.SystemAnyEnabledSelf(System.Type)">
+            <inheritdoc cref="M:Quantum.Frame.SystemAnyEnabledSelf``1"/>
+        </member>
+        <member name="M:Quantum.Frame.SystemIsEnabledSelf(System.Int32)">
+            <summary>
+            Checks if the system identified by its runtime index is enabled itself.
+            The system can be enabled but still disabled by <see cref="P:Quantum.SystemBase.ParentSystem"/>.
+            Logs an error if the system is not found.
+            </summary>
+            <param name="systemRuntimeIndex">System runtime index identified by <see cref="P:Quantum.SystemBase.RuntimeIndex"/></param>
+            <returns><see langword="true"/> if the system is enabled itself.</returns>
+        </member>
+        <member name="M:Quantum.Frame.SystemIsEnabledSelf(Quantum.SystemBase)">
+            <summary>
+            Checks if the system itself is enabled.
+            The system can be enabled but still disabled by <see cref="P:Quantum.SystemBase.ParentSystem"/>.
+            </summary>
+            <param name="system">System object.</param>
+            <returns><see langword="true"/> if the system is enabled itself.</returns>
+        </member>
+        <member name="M:Quantum.Frame.SystemAllEnabledInHierarchy``1">
+            <summary>
+            Checks is all systems of the type are enabled by their hierarchy <see cref="P:Quantum.SystemBase.ParentSystem"/>.
+            Logs an error if the system type is not found.
+            </summary>
+            <typeparam name="T">System type</typeparam>
+            <returns><see langword="true"/> if all systems of the type are enabled by hierarchy.</returns>
+        </member>
+        <member name="M:Quantum.Frame.SystemAllEnabledInHierarchy(System.Type)">
+            <inheritdoc cref="M:Quantum.Frame.SystemAllEnabledInHierarchy``1"/>
+        </member>
+        <member name="M:Quantum.Frame.SystemAnyEnabledInHierarchy``1">
+            <summary>
+            Checks is any system of the type is enabled by their hierarchy <see cref="P:Quantum.SystemBase.ParentSystem"/>.
+            Logs an error if the system type is not found.
+            </summary>
+            <typeparam name="T">System type</typeparam>
+            <returns><see langword="true"/> if any systems of the type is enabled by hierarchy.</returns>
+        </member>
+        <member name="M:Quantum.Frame.SystemAnyEnabledInHierarchy(System.Type)">
+            <inheritdoc cref="M:Quantum.Frame.SystemAnyEnabledInHierarchy``1"/>
+        </member>
+        <member name="M:Quantum.Frame.SystemIsEnabledInHierarchy(System.Int32)">
+            <summary>
+            Checks is the system is enabled and enabled by it's hierarchy <see cref="P:Quantum.SystemBase.ParentSystem"/>.
+            If multiple systems have the same type are used, only the state of the first system found with the lowest <see cref="P:Quantum.SystemBase.RuntimeIndex"/> will be returned.
+            Logs an error if the system is not found.
+            </summary>
+            <param name="systemRuntimeIndex">System runtime index identified by <see cref="P:Quantum.SystemBase.RuntimeIndex"/></param>
+            <returns><see langword="true"/> if the system is enabled itself and by hierarchy.</returns>
+        </member>
+        <member name="M:Quantum.Frame.SystemIsEnabledInHierarchy(Quantum.SystemBase)">
+            <summary>
+            Checks is the system is enabled and enabled by it's hierarchy <see cref="P:Quantum.SystemBase.ParentSystem"/>.
+            </summary>
+            <param name="system">System object</param>
+            <returns><see langword="true"/> if the system is enabled itself and by hierarchy.</returns>
         </member>
         <member name="M:Quantum.Frame.SystemEnable``1">
             <summary>
-            Enable a system.
+            Enables all systems of a type.
+            Will trigger <see cref="M:Quantum.SystemBase.OnEnabled(Quantum.Frame)"/> callback after the state of a system was successfully changed.
+            Logs an error if the system type is not found.
             </summary>
             <typeparam name="T">System type</typeparam>
+        </member>
+        <member name="M:Quantum.Frame.SystemEnable(System.Type)">
+            <inheritdoc cref="M:Quantum.Frame.SystemEnable``1"/>
+        </member>
+        <member name="M:Quantum.Frame.SystemEnable(System.Int32)">
+            <summary>
+            Enables a system.
+            Will trigger <see cref="M:Quantum.SystemBase.OnEnabled(Quantum.Frame)"/> callback after the state was successfully changed.
             Logs an error if the system type is not found.
+            </summary>
+            <param name="systemRuntimeIndex">System runtime index identified by <see cref="P:Quantum.SystemBase.RuntimeIndex"/></param>
+        </member>
+        <member name="M:Quantum.Frame.SystemEnable(Quantum.SystemBase)">
+            <summary>
+            Enables a system.
+            Will trigger <see cref="M:Quantum.SystemBase.OnEnabled(Quantum.Frame)"/> callback after the state was successfully changed.
+            </summary>
+            <param name="system">System object</param>
         </member>
         <member name="M:Quantum.Frame.SystemDisable``1">
             <summary>
-            Disables a system.
+            Disables all systems of a type.
+            Will trigger <see cref="M:Quantum.SystemBase.OnDisabled(Quantum.Frame)"/> callback after the state was successfully changed.
+            Logs an error if the system is not found.
             </summary>
             <typeparam name="T">System type</typeparam>
-            Logs an error if the system type is not found.
-            <example><code>
-            // test for a certain asset and disable the system during its OnInit method
-            public override void OnInit(Frame f) {
-              var testSettings = f.FindAsset&lt;NavMeshAgentsSettings&gt;(f.Map.UserAsset.Id);
-              if (testSettings == null) {
-                f.SystemDisable&lt;NavMeshAgentTestSystem&gt;();
-                return;
-               }
-               //..
-             }
-            </code></example>
+        </member>
+        <member name="M:Quantum.Frame.SystemDisable(System.Type)">
+            <inheritdoc cref="M:Quantum.Frame.SystemDisable``1"/>
+        </member>
+        <member name="M:Quantum.Frame.SystemDisable(System.Int32)">
+            <summary>
+            Disables a system.
+            Will trigger <see cref="M:Quantum.SystemBase.OnDisabled(Quantum.Frame)"/> callback after the state was successfully changed.
+            Logs an error if the system is not found.
+            </summary>
+            <param name="systemRuntimeIndex">System runtime index identified by <see cref="P:Quantum.SystemBase.RuntimeIndex"/></param>
+        </member>
+        <member name="M:Quantum.Frame.SystemDisable(Quantum.SystemBase)">
+            <summary>
+            Disables a system.
+            Will trigger <see cref="M:Quantum.SystemBase.OnDisabled(Quantum.Frame)"/> callback after the state was successfully changed.
+            </summary>
+            <param name="system">System object</param>
         </member>
         <member name="M:Quantum.Frame.InitStatic">
             <summary>
@@ -2801,12 +2961,18 @@
             The max frame that the stream has input for.
             </summary>
         </member>
-        <member name="M:Quantum.StreamReplayInputProvider.#ctor(System.IO.Stream,System.Int32)">
+        <member name="P:Quantum.StreamReplayInputProvider.LocalActorNumber">
+            <summary>
+            The actor number of the client that recoded the replay.
+            </summary>
+        </member>
+        <member name="M:Quantum.StreamReplayInputProvider.#ctor(System.IO.Stream,System.Int32,System.Int32)">
             <summary>
             Create a stream replay input provider.
             </summary>
             <param name="inputStream">Stream to read from</param>
             <param name="maxFrame">Max frame that input is available for</param>
+            <param name="localActorNumber">The actor number of the client that recorded the replay</param>
         </member>
         <member name="M:Quantum.StreamReplayInputProvider.Reset">
             <summary>
@@ -2885,16 +3051,6 @@
             </summary>
             <param name="startParameters">Start parameters</param>
             <returns>Instance of IDeterministicGame</returns>
-        </member>
-        <member name="M:Quantum.DotNetRunnerFactory.CreateProfiler(System.String,Photon.Deterministic.DeterministicSessionConfig,Photon.Deterministic.DeterministicPlatformInfo,Photon.Deterministic.IDeterministicGame)">
-            <summary>
-            The callback can be used to create and attach local profiler before the Quantum simulation has been started.
-            No profilers are created.
-            </summary>
-            <param name="clientId">Quantum client id</param>
-            <param name="deterministicConfig">Session config</param>
-            <param name="platformInfo">Platform info</param>
-            <param name="game">Game</param>
         </member>
         <member name="M:Quantum.DotNetRunnerFactory.CreateRunner(Quantum.SessionRunner.Arguments)">
             <summary>
@@ -3009,13 +3165,19 @@
             which uses a large memory footprint.
             </summary>
         </member>
-        <member name="M:Quantum.InputProvider.#ctor(Photon.Deterministic.DeterministicSessionConfig,System.Int32,System.Int32)">
+        <member name="P:Quantum.InputProvider.LocalActorNumber">
+            <summary>
+            The actor number of the client that recoded the replay.
+            </summary>
+        </member>
+        <member name="M:Quantum.InputProvider.#ctor(Photon.Deterministic.DeterministicSessionConfig,System.Int32,System.Int32,System.Int32)">
             <summary>
             Construct an input provider with a given capacity and grow size.
             </summary>
             <param name="config">Session config used to gather PlayerCount and RollbackWindow</param>
             <param name="capacity">The initial capacity</param>
             <param name="growSize">The grow size, 0 means doubling the buffer</param>
+            <param name="localActorNumber">The actor number of the client that recoded the replay.</param>
         </member>
         <member name="M:Quantum.InputProvider.#ctor(Photon.Deterministic.DeterministicTickInputSet[])">
             <summary>
@@ -3023,7 +3185,7 @@
             </summary>
             <param name="inputList">Input list</param>
         </member>
-        <member name="M:Quantum.InputProvider.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
+        <member name="M:Quantum.InputProvider.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
             Construct an input provider with a given player count, start frame, capacity and grow size.
             </summary>
@@ -3031,6 +3193,7 @@
             <param name="startFrame">Start frame</param>
             <param name="capacity">The initial capacity</param>
             <param name="growSize">The grow size, 0 means doubling the buffer</param>
+            <param name="localActorNumber">The actor number of the client that recoded the replay.</param>
         </member>
         <member name="M:Quantum.InputProvider.CanSimulate(System.Int32)">
             <summary>
@@ -3149,12 +3312,18 @@
             The max frame available to read.
             </summary>
         </member>
-        <member name="M:Quantum.BitStreamReplayInputProvider.#ctor(Photon.Deterministic.BitStream,System.Int32)">
+        <member name="P:Quantum.BitStreamReplayInputProvider.LocalActorNumber">
+            <summary>
+            The actor number of the client that recoded the replay.
+            </summary>
+        </member>
+        <member name="M:Quantum.BitStreamReplayInputProvider.#ctor(Photon.Deterministic.BitStream,System.Int32,System.Int32)">
             <summary>
             Create input provider.
             </summary>
             <param name="inputStream">The input bitstream</param>
             <param name="maxFrame">The max frame of the recorded replay</param>
+            <param name="localActorNumber">The actor number of the client that recorded the replay</param>
         </member>
         <member name="M:Quantum.BitStreamReplayInputProvider.Reset">
             <summary>
@@ -3292,6 +3461,11 @@
         <member name="F:Quantum.CallbackId.PlayerRemoveFailed">
             <summary>
             Callback when removing a local player failed.
+            </summary>
+        </member>
+        <member name="F:Quantum.CallbackId.ProfilerReportGenerated">
+            <summary>
+            Callback when profiler report has been generated.
             </summary>
         </member>
         <member name="F:Quantum.CallbackId.UserCallbackIdStart">
@@ -3707,6 +3881,21 @@
             The error debug message.
             </summary>
         </member>
+        <member name="T:Quantum.CallbackTaskProfilerReportGenerated">
+            <summary>
+            Callback when <see cref="T:Quantum.Profiling.ProfilerContextData"/> has been generated.
+            </summary>
+        </member>
+        <member name="F:Quantum.CallbackTaskProfilerReportGenerated.ID">
+            <summary>
+            The const CallbackProfilerReportGenerated callback id.
+            </summary>
+        </member>
+        <member name="F:Quantum.CallbackTaskProfilerReportGenerated.Report">
+            <summary>
+            The profiler report.
+            </summary>
+        </member>
         <member name="T:Quantum.ISignalOnCollision2D">
             <summary>
             Interface for receiving callbacks once per frame while two non-trigger 2D colliders are touching.
@@ -3957,6 +4146,17 @@
             <summary>
             Optional serialized asset database. Omit this for replays in production environments.
             Use AssetSerializer.SerializeAssets(stream, ResourceManager.LoadAllAssets().ToArray()
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumReplayFile.LocalActorNumber">
+            <summary>
+            The actor number of the local player that the replay was recorded from.
+            `0` means refers to clients in a local game.
+            Online clients will start with actor number `1`.
+            Setting the actor number will make <see cref="M:Photon.Deterministic.DeterministicSession.IsLocalPlayer(Quantum.PlayerRef)"/> work for replays similar to normal game sessions.
+            This is automatically set when using QuantumGame.GetRecordedReplay(), but needs to be explicitly set when running a replay captured by webhooks.
+            The current actor number can be retrieved by <see cref="M:Photon.Deterministic.DeterministicSession.GetActorNumber"/>.
+            The actor number can only be set once in the beginning of the replay simulation.
             </summary>
         </member>
         <member name="M:Quantum.QuantumReplayFile.CreateInputProvider">
@@ -4258,9 +4458,16 @@
             Create a new system.
             </summary>
         </member>
+        <member name="M:Quantum.SystemMainThread.#ctor(Quantum.SystemBase[])">
+            <summary>
+            Create a new main thread system with children.
+            </summary>
+            <param name="children"></param>
+        </member>
         <member name="M:Quantum.SystemMainThread.#ctor(System.String)">
             <summary>
             Create a new system with a custom name.
+            Unused, will be removed in future versions.
             </summary>
             <param name="name">The system name shows up in the task profiler for example.</param>
         </member>
@@ -4410,6 +4617,57 @@
             <param name="frame"></param>
             <returns></returns>
         </member>
+        <member name="T:Quantum.DotNetSessionContext">
+            <summary>
+            This class implements the <see cref="T:Photon.Deterministic.IDeterministicSessionContext"/> interface inside the simulation project.
+            It's used on the custom server to access Quantum simulation code like the resource manager and command serialization.
+            A static resource manager is created during Init() that is shared between multiple server simulation instances.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.AssetSerializer">
+            <summary>
+            Get and set the AssetSerializer directly after <see cref="T:Photon.Deterministic.IDeterministicSessionRunner"/> creation, until it is possible to pass it internally.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.CustomResourceManager">
+            <summary>
+            Assign a custom resource manager which will use the cached static resource manager as <see cref="P:Quantum.ResourceManagerStatic.FallbackResourceManager"/>.
+            Must be set right after creation.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.CommandSerializer">
+            <summary>
+            Returns the command serializer created when the simulation started.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.SharedResourceManager">
+            <summary>
+            Access the shared resource manager that was created from the asset database input during the initial creation of the first server instance.
+            </summary>
+        </member>
+        <member name="P:Quantum.DotNetSessionContext.ResourceManager">
+            <summary>
+            Return the resource manager assigned to the session context. 
+            If no custom resource manager is assigned the static shared resource manager is returned.
+            </summary>
+        </member>
+        <member name="M:Quantum.DotNetSessionContext.Init(Photon.Deterministic.DeterministicSessionContextInitArguments)">
+            <summary>
+            Initialized the server simulation. It initializes static classes like FPLut, Native.Utils and instantiates a static resource manager that is shared over multiple server simulations.
+            This method throws exceptions on errors.
+            </summary>
+        </member>
+        <member name="M:Quantum.DotNetSessionContext.Shutdown">
+            <summary>
+            Disposes the Quantum runner.
+            </summary>
+        </member>
+        <member name="M:Quantum.DotNetSessionContext.Start(Photon.Deterministic.DeterministicSessionContextStartArguments)">
+            <summary>
+            Implements the start of the Quantum online session. Instantiates a Quantum runner.
+            </summary>
+            <param name="args">Start arguments</param>
+        </member>
         <member name="T:Quantum.ISignalOnComponentAdded`1">
             <inheritdoc cref="M:Quantum.ISignalOnComponentAdded`1.OnAdded(Quantum.Frame,Quantum.EntityRef,`0*)"/>
             <typeparam name="T">Component type</typeparam>
@@ -4525,15 +4783,6 @@
             Create a Quantum task factory.
             </summary>
         </member>
-        <member name="M:Quantum.IRunnerFactory.CreateProfiler(System.String,Photon.Deterministic.DeterministicSessionConfig,Photon.Deterministic.DeterministicPlatformInfo,Photon.Deterministic.IDeterministicGame)">
-            <summary>
-            The callback can be used to create and attach local profiler before the Quantum simulation has been started.
-            </summary>
-            <param name="clientId">Quantum client id</param>
-            <param name="deterministicConfig">Session config</param>
-            <param name="platformInfo">Platform info</param>
-            <param name="game">Game</param>
-        </member>
         <member name="M:Quantum.IRunnerFactory.CreateGame(Quantum.QuantumGameStartParameters)">
             <summary>
             Instantiate an implementation of the <see cref="T:Photon.Deterministic.IDeterministicGame"/>. 
@@ -4563,7 +4812,9 @@
             <para>Always register new system types on the <see cref="T:Quantum.SystemsConfig"/>.</para>
         </member>
         <member name="M:Quantum.SystemSignalsOnly.Schedule(Quantum.Frame,Quantum.Task.TaskHandle)">
-            <inheritdoc cref="M:Quantum.SystemBase.Schedule(Quantum.Frame,Quantum.Task.TaskHandle)"/>/>
+            <summary>
+            Nothing to schedule, this is a system just for signals that requires not task processing.
+            </summary>
         </member>
         <member name="T:Quantum.SystemsConfig">
             <summary>
@@ -4617,12 +4868,11 @@
             </summary>
             <returns>List of child systems</returns>
         </member>
-        <member name="M:Quantum.SystemsConfig.SystemEntryBase`1.AddSystem``1(System.String,System.Boolean)">
+        <member name="M:Quantum.SystemsConfig.SystemEntryBase`1.AddSystem``1(System.Boolean)">
             <summary>
             Add a child system.
             </summary>
             <typeparam name="TSystem">System type</typeparam>
-            <param name="name">System name</param>
             <param name="enabled">Start enabled</param>
             <returns>The created child system entry</returns>
         </member>
@@ -4657,32 +4907,27 @@
             Converts the systems configuration into a list of system objects while calling the matching (Name, Children) constructors.
             This method throws AssertionExceptions on any invalid system configuration.
             
-                                                 SystemBase   
-                   __________________________________|___________________________________________________________
-                  |                 |                |                    |                     |                |
-            SystemGroup     SystemMainThread  SystemArrayComponent  SystemArrayFilter  SystemSignalsOnly  SystemThreadedFilter
-             children (SystemBase)  |
-                          __________|__________
-                         |                     |
-              SystemMainThreadGroup  SystemMainThreadFilter
-                   children (SystemMainThread)
+                                                           SystemBase   
+                                                       Children[] (SystemBase)
+                        _______________________________________|______________________________________
+                       |                    |                  |                  |                  |
+                SystemMainThread  SystemArrayComponent  SystemArrayFilter  SystemSignalsOnly  SystemThreadedFilter
+                       |
+             SystemMainThreadFilter
             </summary>
         </member>
-        <member name="M:Quantum.SystemsConfig.AddSystem``1(System.String,System.Boolean)">
+        <member name="M:Quantum.SystemsConfig.AddSystem``1(System.Boolean)">
             <summary>
             Add a system entry that describes a system to be instantiated on simulation start.
             </summary>
-            <typeparam name="T">System type</typeparam>
-            <param name="name">System name</param>
             <param name="enabled">System starts enabled</param>
             <returns>System entry that was added to the config</returns>
         </member>
-        <member name="M:Quantum.SystemsConfig.AddSystem(System.Type,System.String,System.Boolean)">
+        <member name="M:Quantum.SystemsConfig.AddSystem(System.Type,System.Boolean)">
             <summary>
             Add a system entry that describes a system to be instantiated on simulation start.
             </summary>
             <param name="systemType">System type</param>
-            <param name="name">System name</param>
             <param name="enabled">System starts enabled</param>
             <returns>System entry that was added to the config</returns>
             <exception cref="T:System.ArgumentNullException">Is raised of the systemType is null</exception>

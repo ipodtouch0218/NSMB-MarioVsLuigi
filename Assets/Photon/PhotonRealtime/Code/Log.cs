@@ -8,7 +8,6 @@
 // <author>developer@photonengine.com</author>
 // ----------------------------------------------------------------------------
 
-
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
@@ -24,9 +23,6 @@ namespace Photon.Realtime
 
     #if SUPPORTED_UNITY
     using UnityEngine;
-    #endif
-
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 

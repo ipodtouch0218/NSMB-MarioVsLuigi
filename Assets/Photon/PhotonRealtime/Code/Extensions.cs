@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // <copyright file="Extensions.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -23,8 +23,6 @@ namespace Photon.Realtime
     #if SUPPORTED_UNITY
     using UnityEngine;
     using Debug = UnityEngine.Debug;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -202,7 +200,6 @@ namespace Photon.Realtime
         {
             lock (keysWithNullValue)
             {
-
                 keysWithNullValue.Clear();
 
                 foreach (var entry in original)

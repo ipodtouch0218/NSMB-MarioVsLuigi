@@ -120,9 +120,8 @@ namespace Quantum {
       // set _instantReplay to null right away, because CallbackGameDestroyed is triggered from inside the runner shutdown
       var temp = _instantReplay;
       _instantReplay = null;
-      temp?.Dispose();
-
       OnReplayStopped();
+      temp?.Dispose();
     }
 
     /// <summary>

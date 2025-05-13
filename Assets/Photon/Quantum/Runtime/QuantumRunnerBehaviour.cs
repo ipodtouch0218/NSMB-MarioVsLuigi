@@ -1,4 +1,5 @@
 namespace Quantum {
+  using System;
   using UnityEngine;
   using UnityEngine.Rendering;
 
@@ -11,8 +12,7 @@ namespace Quantum {
     /// <summary>
     /// The runner object set during <see cref="QuantumRunner.StartGame(SessionRunner.Arguments)"/>
     /// </summary>
-    [InlineHelp]
-    public QuantumRunner Runner;
+    [InlineHelp] public QuantumRunner Runner;
 
     /// <summary>
     /// Unity OnEnable event is required to register to global camera callbacks for gizmos rendering.  
@@ -41,7 +41,7 @@ namespace Quantum {
       OnPostRenderInternal(camera);
     }
 
-    void OnPostRenderInternal( Camera camera) {
+    void OnPostRenderInternal(Camera camera) {
       if (Runner == null) {
         return;
       }
@@ -54,7 +54,68 @@ namespace Quantum {
         return;
       }
 
-      DebugDraw.OnPostRender(camera);
+#if UNITY_EDITOR
+      if (UnityEditor.Handles.ShouldRenderGizmos() == false) {
+        return;
+      }
+
+      if (QuantumGameGizmosSettingsScriptableObject.Global.Settings.DebugDraw.Enabled == false) {
+        return;
+      }
+#endif
+
+      DebugDraw.OnPostRender();
     }
+
+    private void OnGUI() {
+      if (Runner == null) {
+        return;
+      }
+
+      if (Runner.Session == null) {
+        return;
+      }
+
+      if (Runner.HideGizmos) {
+        return;
+      }
+
+#if UNITY_EDITOR
+      if (UnityEditor.Handles.ShouldRenderGizmos() == false) {
+        return;
+      }
+
+      if (QuantumGameGizmosSettingsScriptableObject.Global.Settings.DebugDraw.Enabled == false) {
+        return;
+      }
+#endif
+
+      DebugDraw.OnGUI();
+    }
+
+#if QUANTUM_ENABLE_REMOTE_PROFILER
+    QuantumProfilingClient _profilingClient;
+
+    void LateUpdate() {
+      if (Application.isEditor) {
+        return;
+      }
+      
+      if (_profilingClient == null) {
+        var game = Runner?.Game;
+        if (game == null) {
+          return;
+        }
+        
+        _profilingClient = new QuantumProfilingClient(game.Session.SessionConfig, game.Session.PlatformInfo);
+        QuantumCallback.Subscribe(this, (CallbackTaskProfilerReportGenerated c) => _profilingClient.SendProfilingData(c.Report), g => g == game && _profilingClient.IsConnected);
+      }
+      _profilingClient.Update();
+    }
+    
+    void OnDestroy() {
+      _profilingClient?.Dispose();
+    }
+#endif
   }
 }

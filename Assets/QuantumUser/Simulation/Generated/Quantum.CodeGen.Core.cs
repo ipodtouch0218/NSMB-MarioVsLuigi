@@ -169,6 +169,21 @@ namespace Quantum {
     public Boolean IsSet(Int32 bit) {
       fixed (UInt64* p = Bits) return ((p[bit/64])&(1UL<<(bit%64))) != 0UL;
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Int32 GetSetCount() {
+      fixed (UInt64* p = Bits) {
+        int result = 0;
+        result += Maths.CountSetBits(p[0] & 0x3FFUL);
+        return result;
+      }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Boolean IsAnySet() {
+      fixed (UInt64* p = Bits) {
+        if ((p[0] & 0x3FFUL) != 0) return true;
+        return false;
+      }
+    }
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 5483;
@@ -224,6 +239,23 @@ namespace Quantum {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Boolean IsSet(Int32 bit) {
       fixed (UInt64* p = Bits) return ((p[bit/64])&(1UL<<(bit%64))) != 0UL;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Int32 GetSetCount() {
+      fixed (UInt64* p = Bits) {
+        int result = 0;
+        result += Maths.CountSetBits(p[0]);
+        result += Maths.CountSetBits(p[1]);
+        return result;
+      }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Boolean IsAnySet() {
+      fixed (UInt64* p = Bits) {
+        if (p[0] != 0) return true;
+        if (p[1] != 0) return true;
+        return false;
+      }
     }
     public override Int32 GetHashCode() {
       unchecked { 
@@ -281,6 +313,25 @@ namespace Quantum {
     public Boolean IsSet(Int32 bit) {
       fixed (UInt64* p = Bits) return ((p[bit/64])&(1UL<<(bit%64))) != 0UL;
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Int32 GetSetCount() {
+      fixed (UInt64* p = Bits) {
+        int result = 0;
+        for (int i = 0; i < 32; ++i) {
+          result += Maths.CountSetBits(p[i]);
+        }
+        return result;
+      }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Boolean IsAnySet() {
+      fixed (UInt64* p = Bits) {
+        for (int i = 0; i < 32; ++i) {
+          if (p[i] != 0) return true;
+        }
+        return false;
+      }
+    }
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 3319;
@@ -336,6 +387,27 @@ namespace Quantum {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Boolean IsSet(Int32 bit) {
       fixed (UInt64* p = Bits) return ((p[bit/64])&(1UL<<(bit%64))) != 0UL;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Int32 GetSetCount() {
+      fixed (UInt64* p = Bits) {
+        int result = 0;
+        result += Maths.CountSetBits(p[0]);
+        result += Maths.CountSetBits(p[1]);
+        result += Maths.CountSetBits(p[2]);
+        result += Maths.CountSetBits(p[3]);
+        return result;
+      }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Boolean IsAnySet() {
+      fixed (UInt64* p = Bits) {
+        if (p[0] != 0) return true;
+        if (p[1] != 0) return true;
+        if (p[2] != 0) return true;
+        if (p[3] != 0) return true;
+        return false;
+      }
     }
     public override Int32 GetHashCode() {
       unchecked { 
@@ -393,6 +465,25 @@ namespace Quantum {
     public Boolean IsSet(Int32 bit) {
       fixed (UInt64* p = Bits) return ((p[bit/64])&(1UL<<(bit%64))) != 0UL;
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Int32 GetSetCount() {
+      fixed (UInt64* p = Bits) {
+        int result = 0;
+        for (int i = 0; i < 64; ++i) {
+          result += Maths.CountSetBits(p[i]);
+        }
+        return result;
+      }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Boolean IsAnySet() {
+      fixed (UInt64* p = Bits) {
+        for (int i = 0; i < 64; ++i) {
+          if (p[i] != 0) return true;
+        }
+        return false;
+      }
+    }
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 1433;
@@ -449,6 +540,25 @@ namespace Quantum {
     public Boolean IsSet(Int32 bit) {
       fixed (UInt64* p = Bits) return ((p[bit/64])&(1UL<<(bit%64))) != 0UL;
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Int32 GetSetCount() {
+      fixed (UInt64* p = Bits) {
+        int result = 0;
+        for (int i = 0; i < 8; ++i) {
+          result += Maths.CountSetBits(p[i]);
+        }
+        return result;
+      }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Boolean IsAnySet() {
+      fixed (UInt64* p = Bits) {
+        for (int i = 0; i < 8; ++i) {
+          if (p[i] != 0) return true;
+        }
+        return false;
+      }
+    }
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 17491;
@@ -504,6 +614,21 @@ namespace Quantum {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Boolean IsSet(Int32 bit) {
       fixed (UInt64* p = Bits) return ((p[bit/64])&(1UL<<(bit%64))) != 0UL;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Int32 GetSetCount() {
+      fixed (UInt64* p = Bits) {
+        int result = 0;
+        result += Maths.CountSetBits(p[0]);
+        return result;
+      }
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Boolean IsAnySet() {
+      fixed (UInt64* p = Bits) {
+        if (p[0] != 0) return true;
+        return false;
+      }
     }
     public override Int32 GetHashCode() {
       unchecked { 
@@ -1038,7 +1163,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2552;
+    public const Int32 SIZE = 2608;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -1046,65 +1171,65 @@ namespace Quantum {
     public FP DeltaTime;
     [FieldOffset(16)]
     public NavMeshRegionMask NavMeshRegions;
-    [FieldOffset(32)]
-    public PhysicsEngineState PhysicsState2D;
-    [FieldOffset(48)]
-    public PhysicsEngineState PhysicsState3D;
-    [FieldOffset(64)]
-    public RNGSession RngSession;
     [FieldOffset(80)]
+    public PhysicsEngineState PhysicsState2D;
+    [FieldOffset(96)]
+    public PhysicsEngineState PhysicsState3D;
+    [FieldOffset(112)]
+    public RNGSession RngSession;
+    [FieldOffset(128)]
     public FrameMetaData FrameMetaData;
-    [FieldOffset(120)]
+    [FieldOffset(176)]
     public BitSet1024 Systems;
-    [FieldOffset(248)]
+    [FieldOffset(304)]
     public PhysicsSceneSettings PhysicsSettings;
-    [FieldOffset(544)]
+    [FieldOffset(600)]
     public Int32 PlayerConnectedCount;
-    [FieldOffset(548)]
+    [FieldOffset(604)]
     [FramePrinter.FixedArrayAttribute(typeof(Input), 10)]
     private fixed Byte _input_[1080];
-    [FieldOffset(1632)]
-    public BitSet10 PlayerLastConnectionState;
-    [FieldOffset(1644)]
-    public UInt16 BigStarSpawnTimer;
-    [FieldOffset(1696)]
-    public EntityRef MainBigStar;
     [FieldOffset(1688)]
-    public BitSet64 UsedStarSpawns;
-    [FieldOffset(1660)]
-    public Int32 UsedStarSpawnCount;
-    [FieldOffset(1712)]
-    public GameRules Rules;
-    [FieldOffset(1642)]
-    public GameState GameState;
-    [FieldOffset(1652)]
-    public Int32 StartFrame;
-    [FieldOffset(1656)]
-    public Int32 TotalGamesPlayed;
-    [FieldOffset(1646)]
-    public UInt16 GameStartFrames;
-    [FieldOffset(1648)]
-    public UInt16 PlayerLoadFrames;
+    public BitSet10 PlayerLastConnectionState;
+    [FieldOffset(1700)]
+    public UInt16 BigStarSpawnTimer;
     [FieldOffset(1752)]
+    public EntityRef MainBigStar;
+    [FieldOffset(1744)]
+    public BitSet64 UsedStarSpawns;
+    [FieldOffset(1716)]
+    public Int32 UsedStarSpawnCount;
+    [FieldOffset(1768)]
+    public GameRules Rules;
+    [FieldOffset(1698)]
+    public GameState GameState;
+    [FieldOffset(1708)]
+    public Int32 StartFrame;
+    [FieldOffset(1712)]
+    public Int32 TotalGamesPlayed;
+    [FieldOffset(1702)]
+    public UInt16 GameStartFrames;
+    [FieldOffset(1704)]
+    public UInt16 PlayerLoadFrames;
+    [FieldOffset(1808)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[800];
-    [FieldOffset(1640)]
+    [FieldOffset(1696)]
     public Byte RealPlayers;
-    [FieldOffset(1641)]
+    [FieldOffset(1697)]
     public Byte TotalMarios;
-    [FieldOffset(1664)]
+    [FieldOffset(1720)]
     public Int32 WinningTeam;
-    [FieldOffset(1672)]
+    [FieldOffset(1728)]
     public QBoolean HasWinner;
-    [FieldOffset(1668)]
+    [FieldOffset(1724)]
     public PlayerRef Host;
-    [FieldOffset(1676)]
+    [FieldOffset(1732)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1680)]
+    [FieldOffset(1736)]
     [AllocateOnComponentAdded()]
     public QListPtr<BannedPlayerInfo> BannedPlayerIds;
-    [FieldOffset(1704)]
+    [FieldOffset(1760)]
     public FP Timer;
     public FixedArray<Input> input {
       get {
@@ -3527,9 +3652,7 @@ namespace Quantum {
       bitSet = new(_globals->PlayerLastConnectionState.Bits, _globals->PlayerLastConnectionState.Length);
     }
     partial void ResetPhysicsCodeGen() {
-      if (Context.Physics2D != null && Physics2D.Map != null && Physics2D.Map.Guid.IsDynamic) Physics2D.ResetMap();
       Physics2D.Init(_globals->PhysicsState2D.MapStaticCollidersState.TrackedMap);
-      if (Context.Physics3D != null && Physics3D.Map != null && Physics3D.Map.Guid.IsDynamic) Physics3D.ResetMap();
       Physics3D.Init(_globals->PhysicsState3D.MapStaticCollidersState.TrackedMap);
     }
     public unsafe partial struct FrameSignals {
@@ -3860,6 +3983,11 @@ namespace Quantum {
       typeRegistry.Register(typeof(IceBlockBreakReason), 1);
       typeRegistry.Register(typeof(Quantum.Input), Quantum.Input.SIZE);
       typeRegistry.Register(typeof(Quantum.InputButtons), 4);
+      typeRegistry.Register(typeof(InputDirection), InputDirection.SIZE);
+      typeRegistry.Register(typeof(InputDirectionMagnitude), InputDirectionMagnitude.SIZE);
+      typeRegistry.Register(typeof(InputPitchYaw), InputPitchYaw.SIZE);
+      typeRegistry.Register(typeof(IntVector2), IntVector2.SIZE);
+      typeRegistry.Register(typeof(IntVector3), IntVector3.SIZE);
       typeRegistry.Register(typeof(Quantum.Interactable), Quantum.Interactable.SIZE);
       typeRegistry.Register(typeof(Quantum.InteractionInitiator), Quantum.InteractionInitiator.SIZE);
       typeRegistry.Register(typeof(Quantum.InvisibleBlock), Quantum.InvisibleBlock.SIZE);

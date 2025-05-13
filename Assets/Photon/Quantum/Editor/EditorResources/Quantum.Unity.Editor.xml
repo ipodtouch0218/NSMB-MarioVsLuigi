@@ -101,6 +101,26 @@
             Appends the <see cref="T:Quantum.AssetGuid"/> to the hash.
             </summary>
         </member>
+        <member name="M:Quantum.Editor.QuantumMapNavMeshUnityEditor.UpdateDefaultMinAgentRadius">
+            <summary>
+            Set the static <see cref="F:Quantum.QuantumNavMesh.DefaultMinAgentRadius"/>
+            to the smallest agent radius found in the Unity NavMesh settings.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumMapNavMeshUnityEditor.BakeUnityNavmesh(UnityEngine.GameObject)">
+            <summary>
+            Runs Unity navmesh baking an all surfaces found in the given GameObject.
+            </summary>
+            <param name="go">Game object root</param>
+            <returns><see langword="true"/> to indicate that all navmeshes have been baked.</returns>
+        </member>
+        <member name="M:Quantum.Editor.QuantumMapNavMeshUnityEditor.ClearUnityNavmesh(UnityEngine.GameObject)">
+            <summary>
+            Searches for Unity namveshes surfaces and clears their data.
+            </summary>
+            <param name="go">Game object to clear.</param>
+            <returns><see langword="true"/> to stop processing any other game objects.</returns>
+        </member>
         <member name="T:Quantum.Editor.QuantumEditorToolbarUtilities">
             <summary>
             An editor script that places a drop down selection to quickly load Unity scenes, which are listed in the BuildSettings.
@@ -111,6 +131,11 @@
             <summary>
             An editor class that renders the Quantum state inspector used to reveal internal state of Quantum entities during run-time.
             Open the window by using Tools > Quantum > Window > State Inspectors
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumStateInspector.SystemState.Create(Quantum.SystemBase,Quantum.Frame,System.Collections.Generic.List{Quantum.Editor.QuantumStateInspector.SystemState}@,System.Boolean,System.Int32,System.Func{Quantum.SystemBase,System.Int32})">
+            <summary>
+            Recursion but without hierarchical child list, which causes serialization depth issues with Unity.
             </summary>
         </member>
         <member name="M:Quantum.Editor.QuantumEditorGUI.BoxScope.#ctor(System.String,System.Int32,System.Single)">
@@ -133,6 +158,23 @@
             Width of the foldout arrow
             </summary>
         </member>
+        <member name="M:Quantum.Editor.ReflectionUtils.GetMemberIncludingBaseTypes(System.Type,System.String,System.Reflection.BindingFlags,System.Type)">
+            <summary>
+              Returns the first found member of the given name. Includes private members.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.ReflectionUtils.GetFieldIncludingBaseTypes(System.Type,System.String,System.Reflection.BindingFlags,System.Type)">
+            <summary>
+              Normal reflection GetField() won't find private fields in parents (only will find protected). So this recurses the
+              hard to find privates.
+              This is needed since Unity serialization does find inherited privates.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumEditorHubSrpTools">
+            <summary>
+            Utilities for converting scene and prefab materials to the used SRP. This allows intro samples to imported into a project with any SRP.
+            </summary>
+        </member>
         <member name="T:Quantum.Editor.QuantumDotnetBuildSettingsInspector">
             <summary>
             Inspector code to manage the QuantumDotnetBuildSettings asset in the editor.
@@ -148,67 +190,56 @@
             Draw the inspector GUI.
             </summary>
         </member>
-        <member name="T:Quantum.Editor.ReplayMenu">
+        <member name="M:Quantum.Editor.QuantumEditorHubPage.UpdateStateHierarchy(Quantum.Editor.QuantumEditorHubPage.CustomConditionCheck)">
             <summary>
-            Unity menu items to export replays and savegames.
+            Creates mutable state objects and shared it with step elements.
             </summary>
         </member>
-        <member name="T:Quantum.Editor.QuantumUnityDBInspector">
+        <member name="M:Quantum.Editor.QuantumEditorHubPage.AddScenePathToBuildSettings(System.String,System.Boolean)">
             <summary>
-            An editor class that renders a windows displaying assets from the Quantum DB.
-            Open the windows by using Tools > Quantum > Window > Quantum Unity DB
+            Add a scene path to the build settings
             </summary>
+            <param name="scenePath">Path to the scene</param>
+            <param name="addToTop">Add the new scene to the top</param>
+        </member>
+        <member name="T:Quantum.Editor.QuantumEditorHubWidgetBase">
+            <summary>
+            Structured as such that a subclass has child elements to prevent Unity inspector recursion problems.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorHubWidget.Id">
+            <summary>
+            Hidden id is used for player prefs key to save step progress.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorHubWidget.State">
+            <summary>
+            Internal state saves mutable data for the widget.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorHubWidget.WidgetModeAsEnum">
+            <summary>
+            The mode is saved in string but can be cached into internal enum for convenience.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumEditorHubWidget.HasTypeAndTypeIsValid">
+            TODO: potentially slow 
         </member>
         <member name="T:Quantum.Editor.QuantumEditorHubWindow">
             <summary>
             The main class to manage the Quantum Hub window.
             The Hub for example completes the installation of a user project by creating vital config files that are not overwritten by upgrades.
-            It can also install samples and addons that are packaged with the Quantum SDK.
+            It can also install samples and addons that are packaged with the SDK.
             </summary>
         </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.QuantumHubSkin">
+        <member name="F:Quantum.Editor.QuantumEditorHubWindow.HubSkin">
             <summary>
-            The Quantum Hub Unity skin.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.SetupIcon">
-            <summary>
-            The setup icon.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.DocumentationIcon">
-            <summary>
-            The documentation icon.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.LinkIcon">
-            <summary>
-            The icon shown for link buttons
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.SamplesIcon">
-            <summary>
-            The samples icon.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.CommunityIcon">
-            <summary>
-            The community icon.
+            The Editor Hub Unity skin.
             </summary>
         </member>
         <member name="F:Quantum.Editor.QuantumEditorHubWindow.ProductLogo">
             <summary>
             The product logo.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.PhotonCloudIcon">
-            <summary>
-            The Photon cloud icon.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.InstallationIcon">
-            <summary>
-            The Installation icon.
             </summary>
         </member>
         <member name="F:Quantum.Editor.QuantumEditorHubWindow.CorrectIcon">
@@ -221,19 +252,14 @@
             The icon marking missing installation steps.
             </summary>
         </member>
-        <member name="F:Quantum.Editor.QuantumEditorHubWindow.TextIcon">
+        <member name="P:Quantum.Editor.QuantumEditorHubWindow.CurrentPage">
             <summary>
-            The icon marking missing installation steps.
+            Get and sets current page from PlayerPrefs. It's handy for domain reloads.
             </summary>
         </member>
-        <member name="M:Quantum.Editor.QuantumEditorHubWindow.Open">
+        <member name="P:Quantum.Editor.QuantumEditorHubWindow.ScrollRect">
             <summary>
-            Open the Quantum Hub window.
-            </summary>
-        </member>
-        <member name="M:Quantum.Editor.QuantumEditorHubWindow.EnsureUserFilesExists">
-            <summary>
-            Is used to check if important user files are installed and opens the Hub otherwise.
+            Get and sets current scrolling from PlayerPrefs. It's handy for domain reloads.
             </summary>
         </member>
         <member name="M:Quantum.Editor.QuantumEditorHubWindow.OnImportPackageCompleted(System.String)">
@@ -242,14 +268,49 @@
             Reimporting assets only works after the package import.
             </summary>
         </member>
-        <member name="M:Quantum.Editor.QuantumEditorHubWindow.AddToQuantumMenuConfig(System.String,System.String,System.Collections.Generic.Dictionary{System.String,Quantum.AssetRef})">
+        <member name="M:Quantum.Editor.QuantumEditorHubWindow.CheckPopupCondition">
             <summary>
-            Try to add the game scene to the Quantum menu config without using the actual menu dependencies.
+            Is used to check if important user files are installed and opens the Hub otherwise.
             </summary>
         </member>
         <member name="M:Quantum.Editor.QuantumEditorHubWindow.InstallAllUserFiles">
             <summary>
             This methods installs all user files and generates the workspace files.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBImporter.Verify">
+            <summary>
+            If enabled, performs an additional step during import to verify the imported assets have correct GUIDs and paths.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumUnityDBImporter.LogImportTimes">
+            <summary>
+            If enabled, logs the time it took to import assets. 
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.ReplayMenu">
+            <summary>
+            Unity menu items to export replays and save games.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumUnityDBInspector">
+            <summary>
+            An editor class that renders a windows displaying assets from the Quantum DB.
+            Open the windows by using Tools > Quantum > Window > Quantum Unity DB
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle">
+            <summary>
+            A <see cref="T:Quantum.Editor.IQuantumAssetSourceFactory"/> implementation that creates <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/>
+            if the asset is an Addressable.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle.Order">
+            <inheritdoc cref="P:Quantum.Editor.IQuantumAssetSourceFactory.Order"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumAssetSourceFactoryAssetBundle.TryCreateInternal``2(Quantum.Editor.QuantumAssetSourceFactoryContext@,``0@)">
+            <summary>
+            Creates <see cref="T:Quantum.QuantumAssetSourceAssetBundle`1"/> if the asset is an Addressable.
             </summary>
         </member>
         <member name="T:Quantum.Editor.QuantumEditorMapGizmoStylePopup">
@@ -339,7 +400,7 @@
             Create and save a new empty Quantum game scene and Quantum map asset inside <see cref="F:Quantum.QuantumEditorSettings.DefaultNewAssetsLocation"/>.
             </summary>
         </member>
-        <member name="M:Quantum.Editor.QuantumEditorMenuCreateScene.CreateNewQuantumScene(System.String,System.String,System.Boolean,System.Boolean)">
+        <member name="M:Quantum.Editor.QuantumEditorMenuCreateScene.CreateNewQuantumScene(System.String,System.String,System.Boolean,System.Boolean,System.Boolean)">
             <summary>
             Create a new empty Quantum game scene and Quantum map asset.
             </summary>
@@ -347,6 +408,7 @@
             <param name="mapAssetPath">The path to the map asset that is created with the scene</param>
             <param name="saveScene">Save the scene</param>
             <param name="addToBuildSettings">Add the scene to build settings</param>
+            <param name="createSceneInfoAsset"></param>
         </member>
         <member name="M:Quantum.Editor.QuantumEditorMenuCreateScene.CreateSimpleConnectionScene(System.String)">
             <summary>
@@ -504,6 +566,22 @@
             An Unity Editor hook to shutdown all Quantum sessions when the editor play mode is stopped.
             </summary>
         </member>
+        <member name="T:Quantum.Editor.QuantumMenuConfigEditor">
+            <summary>
+            Custom inspector for <see cref="T:Quantum.QuantumMenuSceneInfo"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumMenuConfigEditor.OnInspectorGUI">
+            <summary>
+            Overriding drawing.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumMenuConfigEditor.SetToCurrentScene(Quantum.QuantumMenuSceneInfo,Quantum.RuntimeConfig)">
+            <summary>
+            Add the current open Unity scene to a QuantumMenuConfig.
+            </summary>
+            <param name="runtimeConfig">Set an optional <see cref="T:Quantum.RuntimeConfig"/></param>
+        </member>
         <member name="T:Quantum.Editor.QuantumEditorMenuCreateAssets">
             <summary>
             Create Quantum asset and script files using the context menu.
@@ -522,6 +600,27 @@
         <member name="M:Quantum.Editor.QuantumProfilingServer.Update">
             <summary>
             Empty unity update method.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumEditorMenuProfilers">
+            <summary>
+            Utility methods to create and set up a Quantum Unity scene.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditorMenuProfilers.AddGraphProfilersToCurrentScene">
+            <summary>
+            Find the graph profiler prefab and instantiate it in the current scene.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditorMenuProfilers.AddQuantumStatsToCurrentScene">
+            <summary>
+            Find the Quantum stats prefab and instantiate it in the current scene.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditorObjectFactory.CreateAllPrimitives(UnityEditor.MenuCommand)">
+            <summary>
+            Creates an array of all the primitives we can create from the menu entries.
+            Useful for testing, e.g. rendering works on all Render Pipelines.
             </summary>
         </member>
         <member name="T:Quantum.Editor.IQuantumAssetSourceFactory">
@@ -642,69 +741,68 @@
             that lose the script guids this way.
             </summary>
         </member>
-        <member name="T:Quantum.Editor.QuantumEditorMenuPriority">
+        <member name="F:Quantum.Editor.QuantumEditorMenuDllToggle.ExtractToDirectory">
             <summary>
-            An enumeration to globally control the Unity menu item priorities set with the <see cref="T:UnityEditor.MenuItem"/> attribute.
+            Directory where the Quantum DLLs (Debug or Release) are extracted to.
             </summary>
         </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.TOP">
+        <member name="P:Quantum.Editor.QuantumEditorMenuDllToggle.IsQuantumDeterministicDllDebug">
             <summary>
-            Top priority.
+            Checks if the Debug version of Quantum.Deterministic.dll is being used.
             </summary>
         </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.SECTION_1">
+        <member name="P:Quantum.Editor.QuantumEditorMenuDllToggle.IsQuantumEngineDllDebug">
             <summary>
-            Generic section 1.
+            Checks if the Debug version of Quantum.Engine.dll is being used.
             </summary>
         </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Demo">
+        <member name="M:Quantum.Editor.QuantumEditorMenuDllToggle.SetToDebugCheck">
             <summary>
-            Demo and sample entries.
+            Checks if any of the Quantum DLLs are NOT Debug.
+            Use this to check if <see cref="M:Quantum.Editor.QuantumEditorMenuDllToggle.SetToDebug"/> needs to be called in order to switch to Debug.
+            </summary>
+            <returns>
+            <c>true</c> if either Quantum.Deterministic or Quantum.Engine.dll are NOT Debug.
+            <c>false</c> otherwise.
+            </returns>
+            <example>
+            <code>
+            if (QuantumEditorMenuDllToggle.SetToDebugCheck()) {
+              QuantumEditorMenuDllToggle.SetToDebug();
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditorMenuDllToggle.SetToDebug">
+            <summary>
+            Extracts the Debug versions of Quantum DLLs in the <see cref="F:Quantum.Editor.QuantumEditorMenuDllToggle.ExtractToDirectory">specified directory</see>.
             </summary>
         </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Export">
+        <member name="M:Quantum.Editor.QuantumEditorMenuDllToggle.SetToReleaseCheck">
             <summary>
-            Export entries.
+            Checks if any of the Quantum DLLs are Debug.
+            Use this to check if <see cref="M:Quantum.Editor.QuantumEditorMenuDllToggle.SetToRelease"/> needs to be called in order to switch to Release.
+            </summary>
+            <returns>
+            <c>true</c> if either Quantum.Deterministic or Quantum.Engine.dll are Debug.
+            <c>false</c> otherwise.
+            </returns>
+            <example>
+            <code>
+            if (QuantumEditorMenuDllToggle.SetToReleaseCheck()) {
+              QuantumEditorMenuDllToggle.SetToRelease();
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditorMenuDllToggle.SetToRelease">
+            <summary>
+            Extracts the Release versions of Quantum DLLs in the <see cref="F:Quantum.Editor.QuantumEditorMenuDllToggle.ExtractToDirectory">specified directory</see>.
             </summary>
         </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.GlobalConfigs">
+        <member name="M:Quantum.Editor.QuantumEditorHubWindowSdk.Open">
             <summary>
-            Configuration entries.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Setup">
-            <summary>
-            Setup and create entries.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Window">
-            <summary>
-            Select windows.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.SECTION_2">
-            <summary>
-            Generic section 2
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Bake">
-            <summary>
-            Map baking menu items.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.SECTION_3">
-            <summary>
-            Generic section 3
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.CodeGen">
-            <summary>
-            Quantum code gen menu items.
-            </summary>
-        </member>
-        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.BOTTOM">
-            <summary>
-            Bottom priority.
+            Open the Fusion Hub window.
             </summary>
         </member>
         <member name="T:Quantum.Editor.QuantumEditorSkin">
@@ -795,32 +893,40 @@
             OnGUI override to draw the Quantum global config window.
             </summary>
         </member>
-        <member name="M:Quantum.Editor.QuantumEditorShortcutsWindow.DrawIcon(System.String,System.Single)">
-            <summary>
-            Obsolete
-            </summary>
-        </member>
-        <member name="M:Quantum.Editor.QuantumEditorShortcutsWindow.DrawIcon(System.String)">
+        <member name="M:Quantum.Editor.QuantumEditorShortcutsWindow.DrawIcon(System.String,System.Boolean)">
             <summary>
             Draw an icon.
             </summary>
             <param name="iconName">Icon name that is found by EditorGUIUtility.IconContent()</param>
             <returns>Control rect</returns>
         </member>
-        <member name="M:Quantum.Editor.QuantumEditorShortcutsWindow.SearchAndSelect``1">
+        <member name="T:Quantum.Editor.QuantumEditorShortcutsWindow.SelectMode">
+            <summary>
+            Different selection modes for SearchAndSelect methods.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorShortcutsWindow.SelectMode.All">
+            <summary>
+            Select all
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorShortcutsWindow.SelectMode.First">
+            <summary>
+            Select the first asset found
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorShortcutsWindow.SelectMode.Steps">
+            <summary>
+            Select the next asset using <see cref="P:UnityEditor.Selection.activeObject"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditorShortcutsWindow.SearchAndSelect``1(Quantum.Editor.QuantumEditorShortcutsWindow.SelectMode)">
             <summary>
             Search and select any type.
             </summary>
             <typeparam name="T">Type to search</typeparam>
+            <param name="selectMode">Toggle the selection mode</param>
             <returns>The first asset of the type found</returns>
-        </member>
-        <member name="M:Quantum.Editor.QuantumEditorShortcutsWindow.SearchAndSelect``1(Quantum.AssetGuid)">
-            <summary>
-            Search and select any type by asset guid.
-            </summary>
-            <typeparam name="T">The asset type</typeparam>
-            <param name="assetGuid"></param>
-            <returns>The found asset</returns>
         </member>
         <member name="M:Quantum.Editor.QuantumEditorShortcutsWindow.SearchAndSelect``1(System.String)">
             <summary>
@@ -928,6 +1034,11 @@
             Returns <see langword="true"/> if the asset at <paramref name="assetPath"/> has any of the given <paramref name="labels"/>.
             </summary>
         </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasAnyLabel(UnityEngine.Object,System.String[])">
+            <summary>
+            Returns <see langword="true"/> if the <paramref name="asset"/> has any of the given <paramref name="labels"/>.
+            </summary>
+        </member>
         <member name="M:Quantum.Editor.AssetDatabaseUtils.SetLabel(System.String,System.String,System.Boolean)">
             <summary>
             Sets or unsets <paramref name="label"/> label for the asset at <paramref name="assetPath"/>, depending
@@ -947,6 +1058,11 @@
             Sets all the labels for the asset at <paramref name="assetPath"/>.
             </summary>
             <returns><see langword="true"/> if the asset was found</returns>
+        </member>
+        <member name="M:Quantum.Editor.AssetDatabaseUtils.HasScriptingDefineSymbol(UnityEditor.Build.NamedBuildTarget,System.String)">
+            <summary>
+            Checks if a scripting define <paramref name="value"/> is defined for <paramref name="target"/>.
+            </summary>
         </member>
         <member name="M:Quantum.Editor.AssetDatabaseUtils.HasScriptingDefineSymbol(UnityEditor.BuildTargetGroup,System.String)">
             <summary>
@@ -1118,6 +1234,71 @@
             The default flags
             </summary>
         </member>
+        <member name="T:Quantum.Editor.QuantumEditorMenuPriority">
+            <summary>
+            An enumeration to globally control the Unity menu item priorities set with the <see cref="T:UnityEditor.MenuItem"/> attribute.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.TOP">
+            <summary>
+            Top priority.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.SECTION_1">
+            <summary>
+            Generic section 1.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Demo">
+            <summary>
+            Demo and sample entries.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Export">
+            <summary>
+            Export entries.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.GlobalConfigs">
+            <summary>
+            Configuration entries.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Profilers">
+            <summary>
+            Select windows.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Setup">
+            <summary>
+            Setup and create entries.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Window">
+            <summary>
+            Select windows.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.Bake">
+            <summary>
+            Map baking menu items.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.SECTION_3">
+            <summary>
+            Generic section 3
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.CodeGen">
+            <summary>
+            code gen menu items.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumEditorMenuPriority.BOTTOM">
+            <summary>
+            Bottom priority.
+            </summary>
+        </member>
         <member name="T:Quantum.Editor.QuantumGlobalScriptableObjectUtils">
             <summary>
             Utility methods for working with <see cref="T:Quantum.QuantumGlobalScriptableObject"/>.
@@ -1164,29 +1345,9 @@
             <typeparam name="T"></typeparam>
             <returns><see langword="true"/> if the asset was found and reimported</returns>
         </member>
-        <member name="M:Quantum.Editor.ReflectionUtils.GetMemberIncludingBaseTypes(System.Type,System.String,System.Reflection.BindingFlags,System.Type)">
-            <summary>
-              Returns the first found member of the given name. Includes private members.
-            </summary>
-        </member>
-        <member name="M:Quantum.Editor.ReflectionUtils.GetFieldIncludingBaseTypes(System.Type,System.String,System.Reflection.BindingFlags,System.Type)">
-            <summary>
-              Normal reflection GetField() won't find private fields in parents (only will find protected). So this recurses the
-              hard to find privates.
-              This is needed since Unity serialization does find inherited privates.
-            </summary>
-        </member>
-        <member name="P:Quantum.Editor.DecoratingPropertyAttributeDrawer.MainDrawer">
-            <summary>
-              The drawer that's been chosen by Unity; its job is to
-              iterate all ForwardingPropertyDrawerBase drawers
-              that'd be created had Unity 2020.3 supported multiple
-              property drawers - including self.
-            </summary>
-        </member>
         <member name="T:Quantum.Editor.QuantumDotnetBuildSettings">
             <summary>
-            A configuration asset to generate and build the non-Unity Quantum simualtion dll.
+            A configuration asset to generate and build the non-Unity Quantum simulation dll.
             </summary>
         </member>
         <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.DefaultPath">
@@ -1229,6 +1390,11 @@
             If true, opens and highlights the DLL after compilation.
             </summary>
         </member>
+        <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.ShowFolderAfterGeneration">
+            <summary>
+            Open a popup of the location of the generated project.
+            </summary>
+        </member>
         <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.ProjectSettings">
             <summary>
             The project settings to use for the generated csproj.
@@ -1252,6 +1418,11 @@
         <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.BinOutputPath">
             <summary>
             Where to output the compiled DLL. Relative to the project folder.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.DotnetCommandPath">
+            <summary>
+            Optionally set a dotnet command path.
             </summary>
         </member>
         <member name="F:Quantum.Editor.QuantumDotnetBuildSettings.PluginSdkPath">
@@ -1296,11 +1467,12 @@
             </summary>
             <param name="settings"></param>
         </member>
-        <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.GenerateProject(Quantum.Editor.QuantumDotnetBuildSettings)">
+        <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.GenerateProject(Quantum.Editor.QuantumDotnetBuildSettings,System.Boolean)">
             <summary>
             Generate a csproj file from the ProjectSettings and ProjectTemplate.
             </summary>
             <param name="settings">Settings instance</param>
+            <param name="disablePopup">Disable all popups.</param>
         </member>
         <member name="M:Quantum.Editor.QuantumDotnetBuildSettings.BuildProject(Quantum.Editor.QuantumDotnetBuildSettings,System.String,System.Boolean)">
             <summary>
@@ -1387,12 +1559,13 @@
             </summary>
             <param name="outputPath">Destination path, should end with .csproj</param>
         </member>
-        <member name="M:Quantum.Editor.QuantumDotnetProjectSettings.Export(System.String,System.String[])">
+        <member name="M:Quantum.Editor.QuantumDotnetProjectSettings.Export(System.String,System.String[],System.String[])">
             <summary>
             Export the non-Unity simulation project to a certain location.
             </summary>
             <param name="outputPath">Destination path, should end with .csproj</param>
             <param name="includes">The list of files to add to the Includes list of the project file</param>
+            <param name="defines">The defines</param>
         </member>
         <member name="T:Quantum.QuantumDefaultConfigsAssetPostprocessor">
             <summary>

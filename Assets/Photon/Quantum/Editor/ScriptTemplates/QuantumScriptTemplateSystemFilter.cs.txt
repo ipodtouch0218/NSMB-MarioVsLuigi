@@ -6,7 +6,7 @@ namespace Quantum
     [Preserve]
     public unsafe class #SCRIPTNAME# : SystemMainThreadFilter<#SCRIPTNAME#.Filter>
     {
-        public override void Update(Frame f, ref Filter filter)
+        public override void Update(Frame frame, ref Filter filter)
         {
         }
 

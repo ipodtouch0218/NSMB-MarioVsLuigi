@@ -346,8 +346,12 @@ PrefabInstance:
         type: 3}
       propertyPath: Asset
       value: 
-      objectReference: {fileID: 11400000, guid: e2f52cfc3ee50884ba9f5b260e822fd0,
-        type: 2}
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: AssetRef.Id.Value
+      value: 472204063534919154
+      objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.size
@@ -729,7 +733,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 0
+      m_TileSpriteIndex: 8
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1319,7 +1323,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 0
+      m_TileSpriteIndex: 9
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1329,7 +1333,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 3
+      m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1919,7 +1923,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 0
-      m_TileSpriteIndex: 3
+      m_TileSpriteIndex: 1
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -3375,15 +3379,15 @@ Tilemap:
   - m_RefCount: 22
     m_Data: {fileID: 11400000, guid: 95716fa9d9afd16448ed70cb46c96703, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 56
+  - m_RefCount: 54
     m_Data: {fileID: -3604267399344534220, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 9
-    m_Data: {fileID: 464114312144006252, guid: a4f9db535870eae41abdc512667ac3d3, type: 3}
   - m_RefCount: 10
+    m_Data: {fileID: 464114312144006252, guid: a4f9db535870eae41abdc512667ac3d3, type: 3}
+  - m_RefCount: 11
     m_Data: {fileID: 7542390983593812097, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 51
+  - m_RefCount: 49
     m_Data: {fileID: -2204218097580962714, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
   - m_RefCount: 11
@@ -3397,10 +3401,10 @@ Tilemap:
   - m_RefCount: 18
     m_Data: {fileID: -3566987879499669825, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 1
+  - m_RefCount: 2
     m_Data: {fileID: 6870441859917194535, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
-  - m_RefCount: 1
+  - m_RefCount: 2
     m_Data: {fileID: -7328405571476808372, guid: a4f9db535870eae41abdc512667ac3d3,
       type: 3}
   - m_RefCount: 10
@@ -11208,12 +11212,16 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
+    IsEnabled: 1
     IsTrigger: 0
     Material:
       Id:
         Value: 0
     SourceCollider: {fileID: 0}
-    IsEnabled: 1
+    SourceShapeSettings:
+      IsScaledBySource: 0
+      CapsuleDirection2D: 0
+      CapsuleDirection3D: 0
     Shape2D:
       ShapeType: 16
       PolygonCollider:
@@ -11338,12 +11346,22 @@ MonoBehaviour:
     Config2D: 116
     Config3D: 58
     RotationFreeze: 0
+    InertiaMode: 0
     Mass:
       RawValue: 65536
     Drag:
       RawValue: 32768
     AngularDrag:
       RawValue: 32768
+    ExplicitInertia2D:
+      RawValue: 65536
+    ExplicitInertia3D:
+      X:
+        RawValue: 65536
+      Y:
+        RawValue: 65536
+      Z:
+        RawValue: 65536
     CenterOfMass2D:
       X:
         RawValue: 0
@@ -11356,6 +11374,71 @@ MonoBehaviour:
         RawValue: 0
       Z:
         RawValue: 0
+    ParametricInertiaShape2D:
+      ShapeType: 0
+      PolygonCollider:
+        Id:
+          Value: 0
+      CircleRadius:
+        RawValue: 32768
+      CapsuleSize:
+        X:
+          RawValue: 65536
+        Y:
+          RawValue: 131072
+      EdgeExtent:
+        RawValue: 32768
+      BoxExtents:
+        X:
+          RawValue: 32768
+        Y:
+          RawValue: 32768
+      PositionOffset:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+      RotationOffset:
+        RawValue: 0
+      UserTag: 0
+      IsPersistent: 1
+      CompoundShapes: []
+    ParametricInertiaShape3D:
+      ShapeType: 0
+      SphereRadius:
+        RawValue: 32768
+      CapsuleRadius:
+        RawValue: 32768
+      CapsuleHeight:
+        RawValue: 131072
+      PositionOffset:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      BoxExtents:
+        X:
+          RawValue: 32768
+        Y:
+          RawValue: 32768
+        Z:
+          RawValue: 32768
+      RotationOffset:
+        X:
+          RawValue: 0
+        Y:
+          RawValue: 0
+        Z:
+          RawValue: 0
+      UserTag: 0
+      IsPersistent: 1
+      CompoundShapes: []
+    InertiaScale:
+      _hasValue: 0
+      _value:
+        RawValue: 65536
     GravityScale:
       _hasValue: 0
       _value:
@@ -11464,6 +11547,8 @@ MonoBehaviour:
       Y:
         RawValue: 0
     IgnoreMovement:
+      Value: 0
+    CanCrushEntities:
       Value: 0
 --- !u!1001 &386921147
 PrefabInstance:

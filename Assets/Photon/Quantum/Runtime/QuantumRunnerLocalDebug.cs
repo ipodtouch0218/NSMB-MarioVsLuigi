@@ -21,12 +21,18 @@ namespace Quantum {
   /// </summary>
   public class QuantumRunnerLocalDebug : QuantumMonoBehaviour {
     /// <summary>
-    /// Set the <see cref="DeltaTypeType" /> to <see cref="SimulationUpdateTime.EngineDeltaTime" /> to not progress the
+    /// Set the <see cref="DeltaTimeType" /> to <see cref="SimulationUpdateTime.EngineDeltaTime" /> to not progress the
     /// simulation during break points.
     /// Has to be set before starting the runner and can only be changed on the runner directly during runtime: <see cref="SessionRunner.DeltaTimeType"/>.
     /// </summary>
     [InlineHelp]
-    public SimulationUpdateTime DeltaTypeType = SimulationUpdateTime.EngineDeltaTime;
+    [FormerlySerializedAs("DeltaTypeType")]
+    public SimulationUpdateTime DeltaTimeType = SimulationUpdateTime.EngineDeltaTime;
+    /// <summary>
+    /// Use <see cref="DeltaTimeType" /> instead.
+    /// </summary>
+    [Obsolete("Renamed to DeltaTimeType")]
+    public SimulationUpdateTime DeltaTypeType => DeltaTimeType;
     /// <summary>
     /// Set RecordingFlags of the local simulation to enable saving a replay.
     /// Caveat: Input recording allocates during runtime.
@@ -44,6 +50,11 @@ namespace Quantum {
     [FormerlySerializedAs("Config")]
     [InlineHelp]
     public RuntimeConfig RuntimeConfig;
+    /// <summary>
+    /// If set to true, the <see cref="RuntimeConfig.Seed"/> seed will be set to a random value.
+    /// </summary>
+    [InlineHelp]
+    public bool UseRandomSeed = false;
     /// <summary>
     /// Select the SessionConfig used for the local simulation. Will revert to the global default if not set.
     /// </summary>
@@ -75,11 +86,6 @@ namespace Quantum {
     /// </summary>
     [InlineHelp]
     public bool PreloadAddressables = false;
-    /// <summary>
-    /// Enable the Quantum task profiler. Must be set before starting. Works with debug and release Quantum dlls.
-    /// </summary>
-    [InlineHelp]
-    public bool IsTaskProfilerEnabled;
     /// <summary>
     /// Set a dynamic asset db.
     /// </summary>
@@ -123,7 +129,7 @@ namespace Quantum {
           // but it seems that they're not fully interchangeable, i.e. loading by label will not make loading by address
           // be reported as done immediately; hence the only way to preload an asset for Quantum is to replicate
           // what it does internally, i.e. load with the very same parameters
-          await Addressables.LoadAssetAsync<Quantum.AssetObject>(address).Task;
+          await Addressables.LoadAssetAsync<UnityEngine.Object>(address).Task;
         }
       }
 #endif
@@ -149,8 +155,13 @@ namespace Quantum {
       var serializer = new QuantumUnityJsonSerializer();
       var runtimeConfig = serializer.CloneConfig(RuntimeConfig);
 
+      // always randomize the Quantum simulation seed when UseRandomSeed is enabled and the simulation is started from frame 0
+      if (frameData == null && frameNumber == 0 && UseRandomSeed) {
+        runtimeConfig.Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+      }
+
       // set map to this maps asset
-      runtimeConfig.Map = mapdata.Asset;
+      runtimeConfig.Map = mapdata.AssetRef;
 
       // if not set, try to set simulation config from global default configs
       if (runtimeConfig.SimulationConfig.Id.IsValid == false && QuantumDefaultConfigs.TryGetGlobal(out var defaultConfigs)) {
@@ -174,8 +185,8 @@ namespace Quantum {
         PlayerCount           = MaxPlayerCount > 0 ? Math.Min(MaxPlayerCount, Input.MAX_COUNT) : Input.MAX_COUNT,
         InstantReplaySettings = InstantReplayConfig,
         InitialDynamicAssets  = dynamicDB,
-        DeltaTimeType         = DeltaTypeType,
-        GameFlags             = (IsTaskProfilerEnabled ? QuantumGameFlags.EnableTaskProfiler : 0),
+        DeltaTimeType         = DeltaTimeType,
+        GameFlags             = 0,
         RecordingFlags        = RecordingFlags
       };
       

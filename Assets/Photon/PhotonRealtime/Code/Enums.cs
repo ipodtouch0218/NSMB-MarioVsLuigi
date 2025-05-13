@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="Enums.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -18,8 +18,6 @@ namespace Photon.Realtime
     #if SUPPORTED_UNITY
     using UnityEngine;
     using Debug = UnityEngine.Debug;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -191,7 +189,18 @@ namespace Photon.Realtime
 
         /// <summary>Used in case the application quits. Can be useful to not load new scenes or re-connect in OnDisconnected.</summary>
         /// <remarks>ConnectionHandler.OnDisable() will use this, if the Unity engine already called OnApplicationQuit (ConnectionHandler.AppQuits = true).</remarks>
-        ApplicationQuit
+        ApplicationQuit,
+
+        /// <summary>Used by the ConnectionHandler to end a connection for lack of RealtimeClient.Service calls.</summary>
+        /// <remarks>
+        /// Without calling Service (or SendOutgoingCommands and DispatchIncomingCommands), the network connection does not process
+        /// messages and events. This can happen if apps are in the background or the main loop is paused (due to loading assets, etc).
+        /// 
+        /// ConnectionHandler.KeepAliveInBackground defines how long the connection is kept alive without calls to Service.
+        /// Closing such connections prevents clients from staying connected "forever" without actually processing network updates
+        /// (which would waste CCUs and connections).
+        /// </remarks>
+        ClientServiceInactivity
     }
 
 

@@ -36,6 +36,13 @@ namespace Quantum {
     [InlineHelp]
     public int EmptyRoomTtlInSeconds = 0;
     /// <summary>
+    /// Enable CRC for Photon networking to detect corrupted packages.
+    /// Building the checksum with <see cref="Photon.Client.PhotonPeer.CrcEnabled"/> has a low processing overhead but increases integrity of sent and received data.
+    /// This option could reduce client disconnects based on input corruption errors for example.
+    /// </summary>
+    [InlineHelp]
+    public bool EnableCrc;
+    /// <summary>
     /// Best region summary key used to store ping results in PlayerPrefs.
     /// </summary>
     [Header("Other Settings")]

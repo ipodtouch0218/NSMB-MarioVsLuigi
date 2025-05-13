@@ -20,11 +20,11 @@ public class VersusStageGizmos : MonoBehaviour {
     }
 
     public unsafe void OnDrawGizmos() {
-        if (!mapData || !mapData.Asset) {
+        if (!mapData) {
             return;
         }
 
-        var stage = QuantumUnityDB.GetGlobalAsset<VersusStageData>(mapData.Asset.UserAsset.Id);
+        var stage = QuantumUnityDB.GetGlobalAsset<VersusStageData>(mapData.GetAsset(false).UserAsset.Id);
 
         if (!stage) {
             return;

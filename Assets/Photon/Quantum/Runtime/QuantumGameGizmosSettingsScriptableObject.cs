@@ -9,7 +9,13 @@ namespace Quantum {
   [CreateAssetMenu(menuName = "Quantum/Configurations/GameGizmoSettings", fileName = "QuantumGameGizmoSettings",
     order = EditorDefines.AssetMenuPriorityConfigurations + 31)]
   [QuantumGlobalScriptableObject(DefaultPath)]
-  public class QuantumGameGizmosSettingsScriptableObject : QuantumGlobalScriptableObject<QuantumGameGizmosSettingsScriptableObject> {
+  public class QuantumGameGizmosSettingsScriptableObject : 
+#if UNITY_EDITOR
+    QuantumGlobalScriptableObject<QuantumGameGizmosSettingsScriptableObject>
+#else
+    QuantumScriptableObject
+#endif
+  {
     /// <summary>
     /// The default location where the initial asset is being created.
     /// </summary>

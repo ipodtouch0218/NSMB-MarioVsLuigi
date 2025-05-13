@@ -17,9 +17,19 @@ namespace Quantum.Editor {
     private const string LogPrefix              = "[QuantumUnityDBImporter] ";
     private const string AddressablesDependency = "QuantumUnityDBImporterAddressablesDependency";
     private const string AssetObjectsDependency = "QuantumUnityDBImporterAssetObjectsDependency";
-    
-    public bool Verify                 = true;
 
+    /// <summary>
+    /// If enabled, performs an additional step during import to verify the imported assets have correct GUIDs and paths.
+    /// </summary>
+    [InlineHelp]
+    public bool Verify = false;
+    
+    /// <summary>
+    /// If enabled, logs the time it took to import assets. 
+    /// </summary>
+    [InlineHelp] 
+    public bool LogImportTimes = false;
+    
 #if (QUANTUM_ADDRESSABLES || QUANTUM_ENABLE_ADDRESSABLES) && !QUANTUM_DISABLE_ADDRESSABLES
     [InitializeOnLoadMethod]
     static void RegisterAddressableEventListeners() {
@@ -28,8 +38,7 @@ namespace Quantum.Editor {
       });
     }
 #endif
-    
-    [FormerlySerializedAs("LogTiming")] public bool LogImportTimes = false;
+
 
     public override void OnImportAsset(AssetImportContext ctx) {
 
@@ -37,8 +46,9 @@ namespace Quantum.Editor {
         ctx.LogImportWarning($"{nameof(QuantumEditorSettings)} hasn't been created yet");
         return;
       }
+
+      var db = ScriptableObject.CreateInstance<QuantumUnityDB>();
       
-      var db      = ScriptableObject.CreateInstance<QuantumUnityDB>();
       var sources = new List<(IQuantumAssetObjectSource, AssetGuid, string)>();
 
       var logTimingStopwatch = Stopwatch.StartNew();
@@ -71,6 +81,11 @@ namespace Quantum.Editor {
       {
         Profiler.BeginSample("Adding Assets");
         foreach (var (source, guid, path) in sources) {
+          if ((guid.Value & AssetGuid.ReservedBits) != 0) {
+            ctx.LogImportError($"{LogPrefix}Failed to import asset {guid} ({path}): GUID uses reserved bits");
+            continue;
+          }
+          
           var existingSource = db.GetAssetSource(guid);
           if (existingSource != null) {
             var sourceInstance = source.EditorInstance;

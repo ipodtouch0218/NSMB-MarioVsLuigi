@@ -190,7 +190,7 @@ MonoBehaviour:
     MaxAvoidanceCandidates: 64
     VelocityObstacleTruncationFactor:
       RawValue: 72090
-  AutoLoadSceneFromMap: 3
+  AutoLoadSceneFromMap: 0
   DeltaTimeType: 0
   ThreadCount: 4
   ChecksumSnapshotHistoryLengthSeconds:

@@ -24,10 +24,6 @@ namespace Quantum {
     /// </summary>
     public Text Predicted;
     /// <summary>
-    /// Number of resimulated frames.
-    /// </summary>
-    public Text Resimulated;
-    /// <summary>
     /// The last simulation time.
     /// </summary>
     public Text SimulateTime;
@@ -52,13 +48,13 @@ namespace Quantum {
     /// </summary>
     public Text InputOffset;
     /// <summary>
-    /// Toggle button text.
+    /// Active state.
     /// </summary>
-    public Text ToggleButtonText;
+    public GameObject ToggleOn;
     /// <summary>
-    /// The UI objects to toggle on/off.
+    /// Inactive state.
     /// </summary>
-    public GameObject[] Toggles;
+    public GameObject ToggleOff;
     /// <summary>
     /// Start the game with an open stats window.
     /// </summary>
@@ -67,9 +63,18 @@ namespace Quantum {
     /// Use only the last second to measure <see cref="NetworkOut"/> and <see cref="NetworkOut"/> instead of the total time.
     /// </summary>
     public Boolean UseCurrentBandwidth = true;
+    /// <summary>
+    /// Shows frame and ping information on the toggle button.
+    /// </summary>
+    public Boolean ShowCompactStats = true;
+    /// <summary>
+    /// The text field set when <see cref="ShowCompactStats"/> is <see langword="true"/>."/>
+    /// </summary>
+    public Text CompactStatsText;
 
-    Stopwatch _networkTimer;
     double _lastTime = 0;
+    int _lastFrame = 0;
+    Stopwatch _networkTimer;
     TrafficStatsSnapshot _snapshotDelta;
 
     /// <summary>
@@ -86,14 +91,30 @@ namespace Quantum {
       var eventSystem = FindFirstObjectByType<EventSystem>();
       if (eventSystem == null) {
         gameObject.AddComponent<EventSystem>();
-        gameObject.AddComponent<StandaloneInputModule>();
+        gameObject.AddComponent<QuantumUnityInputSystemWithLegacyFallback>();
       }
 
       SetState(StartEnabled);
     }
 
-    void Update() {
-      if (QuantumRunner.Default && Toggles[0].activeSelf) {
+    void LateUpdate() {
+      if (QuantumRunner.Default && ToggleOff.activeSelf) {
+        if (QuantumRunner.Default.IsRunning) {
+          if (ShowCompactStats) {
+            var currentFrame = QuantumRunner.Default.Game.Session.FrameVerified.Number;
+            if (_lastFrame != currentFrame) {
+              _lastFrame = currentFrame;
+              var ping = QuantumRunner.Default.Game.Session.Stats.Ping;
+              CompactStatsText.text =
+                QuantumRunner.Default.Game.Session.IsOnline
+                ? $"Frame {FormatFrame(currentFrame, QuantumRunner.Default.Game.Session.IsStalling),5}  Ping {FormatPing(ping),3}"
+                : $"Frame {FormatFrame(currentFrame, QuantumRunner.Default.Game.Session.IsStalling),5}   (offline)";
+            }
+          }
+        }
+      }
+
+      if (QuantumRunner.Default && ToggleOn.activeSelf) {
         if (QuantumRunner.Default.IsRunning) {
           var gameInstance = QuantumRunner.Default.Game;
 
@@ -106,7 +127,6 @@ namespace Quantum {
           NetworkPing.text = gameInstance.Session.Stats.Ping.ToString();
           SimulateTime.text = Math.Round(gameInstance.Session.Stats.UpdateTime * 1000, 2) + " ms";
           InputOffset.text = gameInstance.Session.Stats.Offset.ToString();
-          Resimulated.text = gameInstance.Session.Stats.ResimulatedFrames.ToString();
 
           if (gameInstance.Session.IsStalling) {
             SimulationState.text = "Stalling";
@@ -127,8 +147,8 @@ namespace Quantum {
             if (deltaTime > 1) {
               if (_snapshotDelta != null) {
                 var snapShotDelta = QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.ToDelta(_snapshotDelta);
-                NetworkIn.text = (int)(snapShotDelta.BytesIn / (double)snapShotDelta.DeltaTime * 1000d) + " bytes/s";
-                NetworkOut.text = (int)(snapShotDelta.BytesOut / (double)snapShotDelta.DeltaTime * 1000d) + " bytes/s";
+                NetworkIn.text = FormatBandwidth(snapShotDelta.BytesIn / (double)snapShotDelta.DeltaTime * 1000d);
+                NetworkOut.text = FormatBandwidth(snapShotDelta.BytesOut / (double)snapShotDelta.DeltaTime * 1000d);
               }
 
               _snapshotDelta = QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.ToSnapshot();
@@ -136,8 +156,8 @@ namespace Quantum {
             }
           } else {
             QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.ToSnapshot();
-            NetworkIn.text = (int)(QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.BytesIn / _networkTimer.Elapsed.TotalSeconds) + " bytes/s";
-            NetworkOut.text = (int)(QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.BytesOut / _networkTimer.Elapsed.TotalSeconds) + " bytes/s";
+            NetworkIn.text = FormatBandwidth(QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.BytesIn / _networkTimer.Elapsed.TotalSeconds);
+            NetworkOut.text = FormatBandwidth(QuantumRunner.Default.NetworkClient.RealtimePeer.Stats.BytesOut / _networkTimer.Elapsed.TotalSeconds);
           }
         }
       } else {
@@ -146,18 +166,16 @@ namespace Quantum {
     }
 
     void SetState(bool state) {
-      for (int i = 0; i < Toggles.Length; ++i) {
-        Toggles[i].SetActive(state);
-      }
-
-      // ToggleButtonText.text = state ? "Hide Stats" : "Show Stats";
+      ToggleOn.SetActive(state);
+      ToggleOff.SetActive(!state);
     }
 
     /// <summary>
     /// Toggle the stats window.
     /// </summary>
     public void Toggle() {
-      SetState(!Toggles[0].activeSelf);
+      ToggleOn.SetActive(!ToggleOn.activeSelf);
+      ToggleOff.SetActive(!ToggleOff.activeSelf);
     }
 
     /// <summary>
@@ -187,6 +205,39 @@ namespace Quantum {
       }
 
       return stats;
+    }
+
+    static string FormatFrame(int frame, bool isStalling) {
+      if (isStalling) {
+        return $"<b><color=#FF9794>{frame}</color></b>";
+      }
+      return $"<b>{frame}</b>";
+    }
+
+    static string FormatPing(int ping) {
+      if (ping <= 50) {
+        return $"<b><color=#B6FFD3>{ping}</color></b>";
+      } else if (ping <= 100) {
+        return $"<b><color=#F9FFB6>{ping}</color></b>";
+      } else if (ping <= 150) {
+        return $"<b><color=#FFDAB6>{ping}</color></b>";
+      }
+
+      return $"<b><color=#FF9794>{ping}</color></b>";
+    }
+
+    static string[] BytesPerSecondUnits = { "B/s", "KB/s", "MB/s", "GB/s" };
+
+    static string FormatBandwidth(double byteCount) {
+      if (byteCount <= 0) {
+        return "0 B/s";
+      }
+
+      var bytes = Math.Abs((long)byteCount);
+      var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+      var num = Math.Round(bytes / Math.Pow(1024, place), 1);
+
+      return $"{(Math.Sign(byteCount) * num):0.0} {BytesPerSecondUnits[Math.Min(place, BytesPerSecondUnits.Length - 1)]}";
     }
   }
 }

@@ -1,18 +1,26 @@
 namespace Quantum {
   using Photon.Deterministic;
+  using System;
   using UnityEditor;
   using UnityEngine;
-  
+  using UnityEngine.Serialization;
+
   /// <summary>
   /// An example of how to start a Quantum replay simulation from a replay file.
   /// </summary>
   public class QuantumRunnerLocalReplay : QuantumMonoBehaviour {
     /// <summary>
-    /// Set the <see cref="DeltaTypeType" /> to <see cref="SimulationUpdateTime.EngineDeltaTime" /> to not progress the
+    /// Set the <see cref="DeltaTimeType" /> to <see cref="SimulationUpdateTime.EngineDeltaTime" /> to not progress the
     /// simulation time during break points.
     /// </summary>
     [InlineHelp]
-    public SimulationUpdateTime DeltaTypeType = SimulationUpdateTime.EngineDeltaTime;
+    [FormerlySerializedAs("DeltaTypeType")]
+    public SimulationUpdateTime DeltaTimeType = SimulationUpdateTime.EngineDeltaTime;
+    /// <summary>
+    /// Use <see cref="DeltaTimeType" /> instead.
+    /// </summary>
+    [Obsolete("Renamed to DeltaTimeType")]
+    public SimulationUpdateTime DeltaTypeType => DeltaTimeType;
     /// <summary>
     /// Replay JSON file.
     /// </summary>
@@ -84,7 +92,7 @@ namespace Quantum {
         InstantReplaySettings = InstantReplayConfig,
         InitialTick = replayFile.InitialTick,
         FrameData = replayFile.InitialFrameData,
-        DeltaTimeType = DeltaTypeType,
+        DeltaTimeType = DeltaTimeType,
       };
 
       var assets = replayFile.AssetDatabaseData?.Decode();

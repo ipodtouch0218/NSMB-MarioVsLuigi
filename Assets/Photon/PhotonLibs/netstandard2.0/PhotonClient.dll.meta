@@ -5,14 +5,15 @@ PluginImporter:
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
-  defineConstraints: []
+  defineConstraints:
+  - '!PHOTON_LIBS_RELEASE'
   isPreloaded: 0
   isOverridable: 0
   isExplicitlyReferenced: 0
   validateReferences: 1
   platformData:
   - first:
-      : Any
+      '': Any
     second:
       enabled: 0
       settings:
@@ -42,7 +43,7 @@ PluginImporter:
       settings:
         CPU: ARMv7
   - first:
-      Any: 
+      Any:
     second:
       enabled: 1
       settings: {}
@@ -57,45 +58,15 @@ PluginImporter:
   - first:
       Facebook: Win
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: AnyCPU
   - first:
       Facebook: Win64
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: AnyCPU
-  - first:
-      GameCoreScarlett: GameCoreScarlett
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      GameCoreXboxOne: GameCoreXboxOne
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Lumin: Lumin
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Nintendo Switch: Switch
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      PS4: PS4
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      PS5: PS5
-    second:
-      enabled: 1
-      settings: {}
   - first:
       Standalone: Linux
     second:
@@ -144,22 +115,52 @@ PluginImporter:
       settings:
         CPU: AnyCPU
         DontProcess: false
-        PlaceholderPath: 
+        PlaceholderPath:
         SDK: AnySDK
         ScriptingBackend: Il2Cpp
-  - first:
-      XboxOne: XboxOne
-    second:
-      enabled: 1
-      settings: {}
   - first:
       iPhone: iOS
     second:
       enabled: 1
       settings:
         AddToEmbeddedBinaries: false
-        CompileFlags: 
-        FrameworkDependencies: 
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+        CompileFlags:
+        FrameworkDependencies:
+  - first:
+      PS4: PS4
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      PS5: PS5
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Nintendo Switch: Switch
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      XboxOne: XboxOne
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      GameCoreScarlett: GameCoreScarlett
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      GameCoreXboxOne: GameCoreXboxOne
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Lumin: Lumin
+    second:
+      enabled: 1
+      settings: {}
+  userData:
+  assetBundleName:
+  assetBundleVariant:

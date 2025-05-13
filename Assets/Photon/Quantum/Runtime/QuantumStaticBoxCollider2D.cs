@@ -10,7 +10,11 @@ namespace Quantum {
     /// <summary>
     /// Link a Unity box collider to copy its size and position of during Quantum map baking.
     /// </summary>
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
     [InlineHelp, MultiTypeReference(typeof(BoxCollider2D), typeof(BoxCollider))]
+#else
+    [InlineHelp, SerializeReferenceTypePicker(typeof(BoxCollider2D))]
+#endif
     public Component SourceCollider;
     /// <summary>
     /// Set the size of the box collider.
@@ -46,6 +50,9 @@ namespace Quantum {
     /// Copy collider configuration from source collider if exist. 
     /// </summary>
     public void UpdateFromSourceCollider() {
+      Size.X = FPMath.Clamp(Size.X, 0, Size.X);
+      Size.Y = FPMath.Clamp(Size.Y, 0, Size.Y);
+      Height = FPMath.Clamp(Height, 0, Height);
       if (SourceCollider == null) {
         return;
       }

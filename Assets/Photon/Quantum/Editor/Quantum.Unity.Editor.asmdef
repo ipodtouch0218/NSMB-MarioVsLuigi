@@ -10,7 +10,9 @@
         "GUID:32c49a2b46293194aa4cf793bc0e6010",
         "GUID:fdae25391b6090942b63551d0cc45292",
         "GUID:8c4dd21966739024fbd72155091d199e",
-        "GUID:86c9d8e67265f41469be06142c397d17"
+        "GUID:86c9d8e67265f41469be06142c397d17",
+        "GUID:457756d89b35d2941b3e7b37b4ece6f1",
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95"
     ],
     "includePlatforms": [
         "Editor"
@@ -61,6 +63,11 @@
             "name": "com.unity.multiplayer.playmode",
             "expression": "1.0",
             "define": "QUANTUM_ENABLE_MPPM"
+        },
+        {
+            "name": "com.unity.render-pipelines.high-definition",
+            "expression": "12.1.0",
+            "define": "QUANTUM_ENABLE_HDRP"
         }
     ],
     "noEngineReferences": false

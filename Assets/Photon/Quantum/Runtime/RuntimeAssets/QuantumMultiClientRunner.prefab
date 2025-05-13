@@ -919,7 +919,7 @@ GameObject:
   - component: {fileID: 2021115081190985097}
   - component: {fileID: 2021115081190985098}
   - component: {fileID: 2021115081190985099}
-  - component: {fileID: 2021115081190985204}
+  - component: {fileID: 4561471880429409991}
   - component: {fileID: 6299772394577043129}
   m_Layer: 5
   m_Name: QuantumMultiClientRunner
@@ -966,6 +966,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1025,7 +1026,7 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
---- !u!114 &2021115081190985204
+--- !u!114 &4561471880429409991
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1034,7 +1035,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2021115081190985205}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Script: {fileID: 11500000, guid: fce8460d911af2a42b36b57fc3a34b98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
@@ -1059,7 +1060,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerViewTemplate: {fileID: 447790728273906331}
   CreatePlayerBtn: {fileID: 3703235822472929290}
-  AddLocalPlayersToggle: {fileID: 0}
   DisableOnStart: []
   GizmosSettings: {fileID: 0}
   ServerSettings: {fileID: 0}

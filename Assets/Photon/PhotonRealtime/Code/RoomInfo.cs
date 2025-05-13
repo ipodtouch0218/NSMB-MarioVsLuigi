@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // <copyright file="RoomInfo.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -19,7 +19,7 @@ namespace Photon.Realtime
     using System.Collections;
     using Photon.Client;
 
-    #if SUPPORTED_UNITY || NETFX_CORE
+    #if SUPPORTED_UNITY
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -272,6 +272,7 @@ namespace Photon.Realtime
 
             // merge the custom properties (from your application) to the cache (only string-typed keys will be kept)
             this.customProperties.Merge(propertiesToCache);
+            this.customProperties.StripKeysWithNullValues();
         }
     }
 }

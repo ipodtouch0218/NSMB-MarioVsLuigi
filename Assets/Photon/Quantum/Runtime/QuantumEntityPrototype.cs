@@ -11,7 +11,6 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace Quantum {
-
   /// <summary>
   /// Entity Prototypes are similar to blueprints or prefabs, they carry information
   /// to create a Quantum Entity with its components and initialized them with pre-configured data.
@@ -50,10 +49,37 @@ namespace Quantum {
     }
 
     /// <summary>
+    /// Extra settings for shapes
+    /// </summary>
+    [Serializable]
+    public struct SourceShapeGenericSettings {
+      /// <summary>
+      /// If the settings baked from a source collider are already scaled by the source GameObject.
+      /// This can be used to avoid scaling the settings multiple times when the source is a child of the prototype.
+      /// </summary>
+      public bool IsScaledBySource;
+#if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
+      /// <summary>
+      /// The world axis that define the direction of the capsule in 2D.
+      /// </summary>
+      public UnityEngine.CapsuleDirection2D CapsuleDirection2D;
+#endif
+      /// <summary>
+      /// The world axis that define the direction of the capsule in 3D.
+      /// </summary>
+      public Quantum.CapsuleDirection3D CapsuleDirection3D;
+    }
+
+    /// <summary>
     /// A all-purpose physics collider info.
     /// </summary>
     [Serializable]
     public struct PhysicsColliderGeneric {
+      /// <summary>
+      /// Is this prototype toggled on.
+      /// </summary>
+      [HideInInspector]
+      public bool IsEnabled;
       /// <summary>
       /// Is the collider a trigger.
       /// </summary>
@@ -62,16 +88,17 @@ namespace Quantum {
       /// <summary>
       /// The physics material to be set on the collider component.
       /// </summary>
-      public AssetRef<PhysicsMaterial> Material;
+      // Keep Quantum namespace here for migration with Unity 6 purposes.
+      public AssetRef<Quantum.PhysicsMaterial> Material;
       /// <summary>
       /// The source collider to be used for the shape.
       /// </summary>
       public Component SourceCollider;
       /// <summary>
-      /// Is this prototype toggled on.
+      /// Specific settings for the any type of shape
       /// </summary>
       [HideInInspector]
-      public bool IsEnabled;
+      public SourceShapeGenericSettings SourceShapeSettings;
       /// <summary>
       /// The 2D shape.
       /// </summary>
@@ -123,6 +150,10 @@ namespace Quantum {
       /// </summary>
       public RotationFreezeFlags RotationFreeze;
       /// <summary>
+      /// 
+      /// </summary>
+      public Quantum.Prototypes.PhysicsBodyInertiaMode InertiaMode;
+      /// <summary>
       /// The body mass.
       /// </summary>
       public FP Mass;
@@ -135,6 +166,18 @@ namespace Quantum {
       /// </summary>
       public FP AngularDrag;
       /// <summary>
+      /// 
+      /// </summary>
+      [DrawIf(nameof(InertiaMode), (int)Quantum.Prototypes.PhysicsBodyInertiaMode.Explicit, Hide = true)]
+      [DisplayName("Explicit Inertia")]
+      public FP ExplicitInertia2D;
+      /// <summary>
+      /// 
+      /// </summary>
+      [DrawIf(nameof(InertiaMode), (int)Quantum.Prototypes.PhysicsBodyInertiaMode.Explicit, Hide = true)]
+      [DisplayName("Explicit Inertia Tensor")]
+      public FPVector3 ExplicitInertia3D;
+      /// <summary>
       /// The center of mass in 2d.
       /// </summary>
       [DisplayName("Center Of Mass")]
@@ -144,6 +187,22 @@ namespace Quantum {
       /// </summary>
       [DisplayName("Center Of Mass")]
       public FPVector3 CenterOfMass3D;
+      /// <summary>
+      /// 
+      /// </summary>
+      [DrawIf(nameof(InertiaMode), (int)Quantum.Prototypes.PhysicsBodyInertiaMode.ParametricShape, Hide = true)]
+      [DisplayName("Parametric Inertia Shape")]
+      public Shape2DConfig ParametricInertiaShape2D;
+      /// <summary>
+      /// 
+      /// </summary>
+      [DrawIf(nameof(InertiaMode), (int)Quantum.Prototypes.PhysicsBodyInertiaMode.ParametricShape, Hide = true)]
+      [DisplayName("Parametric Inertia Shape")]
+      public Shape3DConfig ParametricInertiaShape3D;
+      /// <summary>
+      /// The scale applied to the body's inertia tensor.
+      /// </summary>
+      public NullableFP InertiaScale;
       /// <summary>
       /// The gravity scale.
       /// </summary>
@@ -272,19 +331,14 @@ namespace Quantum {
     /// <summary>
     /// The transform 2d info.
     /// </summary>
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.Transform2D, mode: DrawIfMode.Hide)]
     public Transform2DVerticalInfo Transform2DVertical;
     /// <summary>
     /// The physics collider info.
     /// </summary>
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public PhysicsColliderGeneric PhysicsCollider;
     /// <summary>
     /// The physics body info.
     /// </summary>
-    [DrawIf("PhysicsCollider.IsTrigger", 0, mode: DrawIfMode.Hide)]
-    [DrawIf("PhysicsCollider.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     [Tooltip("To enable make sure PhysicsCollider is enabled and not a trigger")]
     public PhysicsBodyGeneric PhysicsBody = new PhysicsBodyGeneric() {
       Config2D = PhysicsBody2D.ConfigFlags.Default,
@@ -298,24 +352,27 @@ namespace Quantum {
         _hasValue = 0,
         _value = FP._1
       },
+      InertiaScale = new NullableFP() {
+        _hasValue = 0,
+        _value = FP._1
+      },
+      InertiaMode = Quantum.Prototypes.PhysicsBodyInertiaMode.ColliderShape,
+      ExplicitInertia2D = FP._1,
+      ExplicitInertia3D = FPVector3.One,
+      ParametricInertiaShape2D = null,
+      ParametricInertiaShape3D = null,
     };
     /// <summary>
     /// The pathfinder agent info.
     /// </summary>
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public NavMeshPathfinderInfo NavMeshPathfinder;
     /// <summary>
     /// The navmesh steering agent info.
     /// </summary>
-    [DrawIf("NavMeshPathfinder.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public NavMeshSteeringAgentInfo NavMeshSteeringAgent;
     /// <summary>
     /// The navmesh avoidance agent info.
     /// </summary>
-    [DrawIf("NavMeshPathfinder.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("NavMeshSteeringAgent.IsEnabled", 1, mode: DrawIfMode.Hide)]
-    [DrawIf("TransformMode", (int)QuantumEntityPrototypeTransformMode.None, CompareOperator.NotEqual, DrawIfMode.Hide)]
     public NavMeshAvoidanceAgentInfo NavMeshAvoidanceAgent;
     /// <summary>
     /// The entity view asset reference.
@@ -327,7 +384,7 @@ namespace Quantum {
     /// </summary>
     public void PreSerialize() {
       if (TransformMode == QuantumEntityPrototypeTransformMode.Transform2D) {
-        if (QPrototypePhysicsCollider2D.TrySetShapeConfigFromSourceCollider(PhysicsCollider.Shape2D, transform, PhysicsCollider.SourceCollider, out var isTrigger)) {
+        if (QPrototypePhysicsCollider2D.TrySetShapeConfigFromSourceCollider(PhysicsCollider.Shape2D, ref PhysicsCollider.SourceShapeSettings, transform, PhysicsCollider.SourceCollider, out var isTrigger)) {
           PhysicsCollider.IsTrigger = isTrigger;
 
           if (PhysicsCollider.LayerSource != QuantumEntityPrototypeColliderLayerSource.Explicit) {
@@ -336,16 +393,40 @@ namespace Quantum {
         } else if (PhysicsCollider.LayerSource == QuantumEntityPrototypeColliderLayerSource.GameObject) {
           PhysicsCollider.Layer = this.gameObject.layer;
         }
+        if (PhysicsCollider.Shape2D != null) {
+          PhysicsCollider.Shape2D.CircleRadius = FPMath.Clamp(PhysicsCollider.Shape2D.CircleRadius, 0, PhysicsCollider.Shape2D.CircleRadius);
+          PhysicsCollider.Shape2D.CapsuleSize.X = FPMath.Clamp(PhysicsCollider.Shape2D.CapsuleSize.X, 0, PhysicsCollider.Shape2D.CapsuleSize.X);
+          PhysicsCollider.Shape2D.CapsuleSize.Y = FPMath.Clamp(PhysicsCollider.Shape2D.CapsuleSize.Y, 0, PhysicsCollider.Shape2D.CapsuleSize.Y);
+          PhysicsCollider.Shape2D.BoxExtents.X = FPMath.Clamp(PhysicsCollider.Shape2D.BoxExtents.X, 0, PhysicsCollider.Shape2D.BoxExtents.X);
+          PhysicsCollider.Shape2D.BoxExtents.Y = FPMath.Clamp(PhysicsCollider.Shape2D.BoxExtents.Y, 0, PhysicsCollider.Shape2D.BoxExtents.Y);
+        }
+
+        Transform2DVertical.Height = FPMath.Clamp(Transform2DVertical.Height, 0, Transform2DVertical.Height);
 
       } else if (TransformMode == QuantumEntityPrototypeTransformMode.Transform3D) {
-        if (QPrototypePhysicsCollider3D.TrySetShapeConfigFromSourceCollider(PhysicsCollider.Shape3D, transform, PhysicsCollider.SourceCollider, out var isTrigger)) {
+        if (QPrototypePhysicsCollider3D.TrySetShapeConfigFromSourceCollider(PhysicsCollider.Shape3D, ref PhysicsCollider.SourceShapeSettings, transform, PhysicsCollider.SourceCollider, out var isTrigger)) {
           PhysicsCollider.IsTrigger = isTrigger;
 
           if (PhysicsCollider.LayerSource != QuantumEntityPrototypeColliderLayerSource.Explicit) {
             PhysicsCollider.Layer = PhysicsCollider.SourceCollider.gameObject.layer;
           }
+          if (PhysicsCollider.Shape3D != null) {
+            PhysicsCollider.Shape3D.BoxExtents.X = FPMath.Abs(PhysicsCollider.Shape3D.BoxExtents.X);
+            PhysicsCollider.Shape3D.BoxExtents.Y = FPMath.Abs(PhysicsCollider.Shape3D.BoxExtents.Y);
+            PhysicsCollider.Shape3D.BoxExtents.Z = FPMath.Abs(PhysicsCollider.Shape3D.BoxExtents.Z);
+          }
         } else if (PhysicsCollider.LayerSource == QuantumEntityPrototypeColliderLayerSource.GameObject) {
           PhysicsCollider.Layer = this.gameObject.layer;
+          if (PhysicsCollider.Shape3D != null) {
+            PhysicsCollider.Shape3D.BoxExtents.X = FPMath.Clamp(PhysicsCollider.Shape3D.BoxExtents.X, 0, PhysicsCollider.Shape3D.BoxExtents.X);
+            PhysicsCollider.Shape3D.BoxExtents.Y = FPMath.Clamp(PhysicsCollider.Shape3D.BoxExtents.Y, 0, PhysicsCollider.Shape3D.BoxExtents.Y);
+            PhysicsCollider.Shape3D.BoxExtents.Z = FPMath.Clamp(PhysicsCollider.Shape3D.BoxExtents.Z, 0, PhysicsCollider.Shape3D.BoxExtents.Z);
+          }
+        }
+        if (PhysicsCollider.Shape3D != null) {
+          PhysicsCollider.Shape3D.SphereRadius = FPMath.Clamp(PhysicsCollider.Shape3D.SphereRadius, 0, PhysicsCollider.Shape3D.SphereRadius);
+          PhysicsCollider.Shape3D.CapsuleRadius = FPMath.Clamp(PhysicsCollider.Shape3D.CapsuleRadius, 0, PhysicsCollider.Shape3D.CapsuleRadius);
+          PhysicsCollider.Shape3D.CapsuleHeight = FPMath.Clamp(PhysicsCollider.Shape3D.CapsuleHeight, 0, PhysicsCollider.Shape3D.CapsuleHeight);
         }
       }
 
@@ -369,32 +450,57 @@ namespace Quantum {
       }
     }
 
-    internal Shape2DConfig GetScaledShape2DConfig() {
+    internal Shape2DConfig GetScaledShape2DConfig(Shape2DConfig from) {
       var result = new Shape2DConfig();
-      ScaleShapeConfig2D(transform, PhysicsCollider.Shape2D, result);
+      var settings = default(SourceShapeGenericSettings);
+      ScaleShapeConfig2D(transform, from, ref settings, result);
       return result;
     }
     
-    internal Shape3DConfig GetScaledShape3DConfig() {
+    internal Shape3DConfig GetScaledShape3DConfig(Shape3DConfig from) {
       var result = new Shape3DConfig();
-      ScaleShapeConfig3D(transform, PhysicsCollider.Shape3D, result);
+      var settings = default(SourceShapeGenericSettings);
+      ScaleShapeConfig3D(transform, from, ref settings, result);
+      return result;
+    }
+
+    internal Shape2DConfig GetScaledShape2DConfig(ref PhysicsColliderGeneric colliderGeneric) {
+      var result = new Shape2DConfig();
+      ScaleShapeConfig2D(transform, colliderGeneric.Shape2D, ref colliderGeneric.SourceShapeSettings, result);
       return result;
     }
     
-    private static void ScaleShapeConfig2D(Transform t, Shape2DConfig from, Shape2DConfig scaledTo) {
+    internal Shape3DConfig GetScaledShape3DConfig(ref PhysicsColliderGeneric colliderGeneric) {
+      var result = new Shape3DConfig();
+      ScaleShapeConfig3D(transform, colliderGeneric.Shape3D, ref colliderGeneric.SourceShapeSettings, result);
+      return result;
+    }
+    
+    private static void ScaleShapeConfig2D(Transform t, Shape2DConfig from, ref SourceShapeGenericSettings settings, Shape2DConfig scaledTo) {
       if (Shape2DConfig.Copy(from, scaledTo) == false) {
         return;
       }
-      
-      var scale = t.lossyScale.ToRoundedFPVector2();
 
-      scaledTo.BoxExtents.X *= scale.X;
-      scaledTo.BoxExtents.Y *= scale.Y;
-      scaledTo.CircleRadius *= FPMath.Max(scale.X, scale.Y);
-      scaledTo.EdgeExtent *= scale.X;
+      var scale = settings.IsScaledBySource ? FPVector2.One : t.lossyScale.ToRoundedFPVector2();
 
-      scaledTo.CapsuleSize.X *= scale.X;
-      scaledTo.CapsuleSize.Y *= scale.Y;
+      var absScale = scale;
+      absScale.X = FPMath.Abs(absScale.X);
+      absScale.Y = FPMath.Abs(absScale.Y);
+
+      scaledTo.BoxExtents.X *= absScale.X;
+      scaledTo.BoxExtents.Y *= absScale.Y;
+      scaledTo.CircleRadius *= FPMath.Max(absScale.X, absScale.Y);
+      scaledTo.EdgeExtent *= absScale.X;
+
+#if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
+      if(settings.CapsuleDirection2D == CapsuleDirection2D.Horizontal) {
+        scaledTo.CapsuleSize.X *= absScale.Y;
+        scaledTo.CapsuleSize.Y *= absScale.X;
+      } else {
+        scaledTo.CapsuleSize.X *= absScale.X;
+        scaledTo.CapsuleSize.Y *= absScale.Y;
+      }
+#endif
 
       scaledTo.PositionOffset.X *= scale.X;
       scaledTo.PositionOffset.Y *= scale.Y;
@@ -409,35 +515,61 @@ namespace Quantum {
       for (int i = 0; i < scaledTo.CompoundShapes.Length; i++) {
         ref var scaledCompoundTo = ref scaledTo.CompoundShapes[i];
 
-        scaledCompoundTo.BoxExtents.X *= scale.X;
-        scaledCompoundTo.BoxExtents.Y *= scale.Y;
-        scaledCompoundTo.CircleRadius *= FPMath.Max(scale.X, scale.Y);
-        scaledCompoundTo.EdgeExtent *= scale.X;
+        scaledCompoundTo.BoxExtents.X *= absScale.X;
+        scaledCompoundTo.BoxExtents.Y *= absScale.Y;
+        scaledCompoundTo.CircleRadius *= FPMath.Max(absScale.X, absScale.Y);
+        scaledCompoundTo.EdgeExtent *= absScale.X;
 
-        scaledCompoundTo.CapsuleSize.X *= scale.X;
-        scaledCompoundTo.CapsuleSize.Y *= scale.Y;
+#if QUANTUM_ENABLE_PHYSICS2D && !QUANTUM_DISABLE_PHYSICS2D
+        if (settings.CapsuleDirection2D == CapsuleDirection2D.Horizontal) {
+          scaledCompoundTo.CapsuleSize.X *= absScale.Y;
+          scaledCompoundTo.CapsuleSize.Y *= absScale.X;
+        } else {
+          scaledCompoundTo.CapsuleSize.X *= absScale.X;
+          scaledCompoundTo.CapsuleSize.Y *= absScale.Y;
+        }
 
-        scaledCompoundTo.PositionOffset.X *= scale.X;
-        scaledCompoundTo.PositionOffset.Y *= scale.Y;
+        scaledCompoundTo.PositionOffset.X *= absScale.X;
+        scaledCompoundTo.PositionOffset.Y *= absScale.Y;
+#endif
       }
     }
 
-    private static void ScaleShapeConfig3D(Transform t, Shape3DConfig from, Shape3DConfig scaledTo) {
+    private static void ScaleShapeConfig3D(Transform t, Shape3DConfig from, ref SourceShapeGenericSettings settings, Shape3DConfig scaledTo) {
       if (Shape3DConfig.Copy(from, scaledTo) == false) {
         return;
       }
 
-      var scale        = t.lossyScale.ToRoundedFPVector3();
-      var sphereRadius = FPMath.Max(scale.X, scale.Y, scale.Z);
+      var scale = settings.IsScaledBySource ? FPVector3.One : t.lossyScale.ToRoundedFPVector3();
 
-      scaledTo.BoxExtents.X *= scale.X;
-      scaledTo.BoxExtents.Y *= scale.Y;
-      scaledTo.BoxExtents.Z *= scale.Z;
+      var absScale = scale;
+      absScale.X = FPMath.Abs(absScale.X);
+      absScale.Y = FPMath.Abs(absScale.Y);
+      absScale.Z = FPMath.Abs(absScale.Z);
+
+      var sphereRadius = FPMath.Max(absScale.X, absScale.Y, absScale.Z);
+
+      scaledTo.BoxExtents.X *= absScale.X;
+      scaledTo.BoxExtents.Y *= absScale.Y;
+      scaledTo.BoxExtents.Z *= absScale.Z;
 
       scaledTo.SphereRadius *= sphereRadius;
-      scaledTo.CapsuleRadius *= FPMath.Max(scale.X, scale.Z);
-      scaledTo.CapsuleHeight *= scale.Y;
 
+      switch (settings.CapsuleDirection3D) {
+        case CapsuleDirection3D.X:
+          scaledTo.CapsuleRadius *= FPMath.Max(absScale.Y, absScale.Z);
+          scaledTo.CapsuleHeight *= absScale.X;
+          break;
+        case CapsuleDirection3D.Y:
+          scaledTo.CapsuleRadius *= FPMath.Max(absScale.X, absScale.Z);
+          scaledTo.CapsuleHeight *= absScale.Y;
+          break;
+        case CapsuleDirection3D.Z:
+          scaledTo.CapsuleRadius *= FPMath.Max(absScale.X, absScale.Y);
+          scaledTo.CapsuleHeight *= absScale.Z;
+          break;
+      }
+      
       scaledTo.PositionOffset.X *= scale.X;
       scaledTo.PositionOffset.Y *= scale.Y;
       scaledTo.PositionOffset.Z *= scale.Z;
@@ -452,17 +584,30 @@ namespace Quantum {
       for (int i = 0; i < scaledTo.CompoundShapes.Length; i++) {
         ref var scaledCompoundTo = ref scaledTo.CompoundShapes[i];
 
-        scaledCompoundTo.BoxExtents.X *= scale.X;
-        scaledCompoundTo.BoxExtents.Y *= scale.Y;
-        scaledCompoundTo.BoxExtents.Z *= scale.Z;
+        scaledCompoundTo.BoxExtents.X *= absScale.X;
+        scaledCompoundTo.BoxExtents.Y *= absScale.Y;
+        scaledCompoundTo.BoxExtents.Z *= absScale.Z;
 
         scaledCompoundTo.SphereRadius *= sphereRadius;
-        scaledCompoundTo.CapsuleRadius *= sphereRadius;
-        scaledCompoundTo.CapsuleHeight *= scale.Y;
 
-        scaledCompoundTo.PositionOffset.X *= scale.X;
-        scaledCompoundTo.PositionOffset.Y *= scale.Y;
-        scaledCompoundTo.PositionOffset.Z *= scale.Z;
+        switch (settings.CapsuleDirection3D) {
+          case CapsuleDirection3D.X:
+            scaledCompoundTo.CapsuleRadius *= FPMath.Max(absScale.Y, absScale.Z);
+            scaledCompoundTo.CapsuleHeight *= absScale.X;
+            break;
+          case CapsuleDirection3D.Y:
+            scaledCompoundTo.CapsuleRadius *= FPMath.Max(absScale.X, absScale.Z);
+            scaledCompoundTo.CapsuleHeight *= absScale.Y;
+            break;
+          case CapsuleDirection3D.Z:
+            scaledCompoundTo.CapsuleRadius *= FPMath.Max(absScale.X, absScale.Y);
+            scaledCompoundTo.CapsuleHeight *= absScale.Z;
+            break;
+        }
+
+        scaledCompoundTo.PositionOffset.X *= absScale.X;
+        scaledCompoundTo.PositionOffset.Y *= absScale.Y;
+        scaledCompoundTo.PositionOffset.Z *= absScale.Z;
       }
     }
 
@@ -484,6 +629,8 @@ namespace Quantum {
 #else
           var verticalScale = transform.lossyScale.y.ToFP();
 #endif
+          verticalScale = FPMath.Abs(verticalScale);
+
           result.Add(new Quantum.Prototypes.Transform2DVerticalPrototype() {
             Position = transform.position.ToFPVerticalPosition() + (Transform2DVertical.PositionOffset * verticalScale),
             Height = Transform2DVertical.Height * verticalScale,
@@ -495,7 +642,7 @@ namespace Quantum {
             IsTrigger = PhysicsCollider.IsTrigger,
             Layer = PhysicsCollider.Layer,
             PhysicsMaterial = PhysicsCollider.Material,
-            ShapeConfig = GetScaledShape2DConfig(),
+            ShapeConfig = GetScaledShape2DConfig(ref PhysicsCollider),
           });
 
           result.Add(new Quantum.Prototypes.PhysicsCallbacks2DPrototype() {
@@ -510,6 +657,10 @@ namespace Quantum {
               Mass = PhysicsBody.Mass,
               CenterOfMass = PhysicsBody.CenterOfMass2D,
               GravityScale = PhysicsBody.GravityScale,
+              InertiaScale = PhysicsBody.InertiaScale,
+              InertiaMode = PhysicsBody.InertiaMode,
+              ExplicitInertia = PhysicsBody.ExplicitInertia2D,
+              ParametricInertiaShape = GetScaledShape2DConfig(PhysicsBody.ParametricInertiaShape2D),
             });
           }
         }
@@ -524,7 +675,7 @@ namespace Quantum {
             IsTrigger = PhysicsCollider.IsTrigger,
             Layer = PhysicsCollider.Layer,
             PhysicsMaterial = PhysicsCollider.Material,
-            ShapeConfig = GetScaledShape3DConfig(),
+            ShapeConfig = GetScaledShape3DConfig(ref PhysicsCollider),
           });
 
           result.Add(new Quantum.Prototypes.PhysicsCallbacks3DPrototype() {
@@ -540,6 +691,10 @@ namespace Quantum {
               RotationFreeze = PhysicsBody.RotationFreeze,
               CenterOfMass = PhysicsBody.CenterOfMass3D,
               GravityScale = PhysicsBody.GravityScale,
+              InertiaScale = PhysicsBody.InertiaScale,
+              InertiaMode = PhysicsBody.InertiaMode,
+              ExplicitInertiaTensor = PhysicsBody.ExplicitInertia3D,
+              ParametricInertiaShape = GetScaledShape3DConfig(PhysicsBody.ParametricInertiaShape3D),
             });
           }
         }

@@ -1,3 +1,311 @@
+# 3.0.3
+
+## Stable
+
+### Build 1685 (Apr 25, 2025)
+
+**Breaking Changes**
+
+- Inconsistencies of the system API have been cleaned up: it is possible to add multiple systems of the same type but toggling was only affecting the first one in the list
+- All systems of a type are now enabled or disabled when using `Frame.SystemEnable(Type)` or `Frame.SystemDisable<T>()`
+- `Frame.SystemIsEnabledSelf(Type)` and `Frame.SystemIsEnabledInHierarchy(Type)` are deprecated and instead methods that apply to `Any` and `All` are introduced e.g. `SystemAllEnabledSelf(Type)` and `SystemAnyEnabledSelf(Type)`
+
+**What's New**
+
+- The ability to draw text gizmos directly from the simulation using `Draw.Text()`
+- Improved `Draw.Sphere()` wire mode by using circles instead of a mesh
+- Improved debug `Draw()` gizmo rendering with shading for the debug material
+- Support for negative for the physics shapes scale in Unity Editor
+- 3D and 2D Capsule shape prototypes now support all direction axes from Unity Capsule colliders used as source
+- New Random utility methods `RNGSession.InUnitCircle()`, `OnUnitCircle()`, `InUnitSphere()`, `OnUnitSphere()`, `Rotation()` and `ColorHSV()`
+- `QuantumLookupTables` - a global SO that aggregates LUTs. By default it is created in user Resources, but can be moved around and be made addressable. To fully take advantage of that, consider adding `QUANTUM_ENABLE_ASYNC_LUT_LOADING` define
+- `UnityJsonUtilityConvert.SerializeObject` support for `[SerializeReference]` attribute, enabling standalone/plugin build to Unity assets serialization
+- Any Quantum system types now supports a system hierarchy and `SystemGroup` and `SystemMainThreadGroup` do not have to be explicitly used or derived
+- Toggling systems using the `SystemBase.RuntimeIndex`, which is used by the Quantum State Inspector Windows to toggle individual systems
+- Physics `QueryOptions.HitSolids` flag to have queries checking all non-trigger colliders
+- Added an overload for `NavMesh.FindRandomPointOnNavmesh()` that includes the frame and makes the result much more reliable
+- An alternative method to find a random position on the navmesh `FindAnyRandomPointOnNavmesh()`, it will be more reliable but imprecise at is considers the entire triangles inside the radius
+- Added the culling interface `IQuantumEntityViewCulling` that can be added to the `EntityViewUpdater` to custom cull entity views
+- Shape handles drawing API in `QuantumColliderHandles` can now also be used in user scripts
+- Upgraded to Photon Realtime `5.1.5`, read the `changes-realtime.txt` for more details
+
+**Changes**
+
+- LUTs moved from the `Photon/Quantum/Resources/LUT` folder to `Photon/Quantum/Runtime/RuntimeAssets/LUT`, please move the files by hand after upgrading
+- `QuantumMapData` no longer statically references `Map` asset
+- `QuantumMapData.Asset` was made obsolete - use `QuantumMapData.GetAsset` or `QuantumMapData.AssetRef` instead
+- The `[FormerlyNamed]` DSL attribute now also works with component names without the `QPrototype` prefix: to rename component `Foo` to `Bar` add the attribute `[FormerlyNamed("Foo")]`
+- Renamed `Frame.PlayerCount` to `Frame.MaxPlayerCount` for more clarity that this property does not represent the number of connected players
+- Searching `EntityViewComponents` on an entity view now uses `includeInactive: true` as default which can be disabled by setting the flag `QuantumEntityViewFlags.DisableSearchInactiveForEntityViewComponents`
+- Removing `QuantumAsyncOperationExtension` from Unity 6 as they rolled out their own `AsyncOperationAwaitableExtensions`
+- `Frame.Culled` method was renamed to `IsPredictionCulled` to avoid confusion with the existing `IsCulled` method. The old method is kept as an obsolete API
+- Optimized the API that uses `NavMeshRegionMask` by adding the `in` keyword to the parameter
+- The Quantum Hub will not show a completed checkmark if the `QuantumUnityDB` asset is missing
+- Marked `UnmanagedTriangleArray.UsedCount` as obsolete
+- Renamed `StateInspector > SystemOptions > Hide Disabled` to `Show Disabled`
+
+**Bug Fixes**
+
+- Fixed: An issue that caused the `QuantumHub` to generate memory leaks in Unity 6
+- Fixed: An issue that caused the party room creation to get stuck during "Fetching Regions" in Unity 6 and `WebGL`
+- Fixed: An issue that caused the Party UI screen copy party code button to not work in `WebGL`
+- Fixed: An issue that could cause view objects of hijacked entities to be created a frame a later
+- Fixed: An issue that caused the debug version of `Quantum.Deterministic.dll` to not throw assertions
+- Fixed: An issue that caused the `StateInspector` system hierarchy to not collapse properly
+- Fixed: An issue that caused the Quantum game gizmos to reference a random `MapData` and `EntityViewUpdater` to access the `GameObject`-selected state for example
+- Fixed: Issues during migration from Q2 by adding redundant namespaces
+- Fixed: An issue that cause cause extensive object searching every frame inside `InvokeGizmoUser()`
+- Fixed: An issue that caused the `InputDirectionMagnitude` type to have a wrong magnitude
+- Fixed: An issue that caused `SystemMainThreadGroup` and `SystemGroup` to be stripped from builds and now marks them as [Preserve]
+- Fixed: An issue that could cause desyncs when using DynamicMap with toggleable static colliders during late-join
+- Fixed: An issue in `DynamicMap` mesh serialization when there were pockets of unused triangles in the all-triangles buffer
+- Fixed: An issue that caused `FindFirstObjectByType()` to be called excessively in the menu scene
+- Fixed: An issue that could caused exceptions when switching inspector windows and using collider handles
+- Fixed: Am issue that caused toggleable 3D static mesh colliders to be re-injected into physics engine during reset regardless of its toggleable state
+- Fixed: An issue in 2D Physics engine when using `HJGS` solver that could potentially cause a crash due to an internal buffer overflowing
+- Fixed: An issue that caused the 2D capsule missed the pseudo height property in the editor
+- Fixed: An issue that could cause 2D Capsule-Box collisions to be incorrect on rotated box colliders
+- Fixed: An issue that caused the contact point between the capsule and the circle overlap to be on the surface of the wrong shape
+- Fixed: An issue that caused 2D collider prototypes with scaled source colliders without `QUANTUM_XY` to scale the wrong axis on their shape prototypes
+- Fixed: An issue that caused 2D static polygon colliders to use local scale instead of use the GameObject lossy scale
+- Fixed: An issue that caused GC allocations 3D physics queries
+- Fixed: An issue that caused compile errors when removing physics or physics 2D modules from the Unity project
+- Fixed: An issue that caused the scene mesh to not be updated when resizing triangles
+- Fixed: An issue that caused imported `NavMeshLinks` to not be `MainArea` when `ImportRegionMode` is set to `Advanced` mode and not specifying a `QuantumNavMeshRegion` script for the link
+- Fixed: An issue that caused imported `NavMeshLinks` to not be `MainArea` when `ImportRegionMode` is set to `Disabled`
+- Fixed: An issue that caused the `NavMeshArea` and `NavMeshGrid` gizmo to not be drawn correctly, now selected navmesh gizmos are drawn when selecting the related `QuantumMapNavMeshUnity` script
+- Fixed: An issue that caused the `SessionRunner` to fail with `Parameter name: scheduler` when using `ShutdownAsync`() without prior using `StartAsync()`
+- Fixed: An issue that caused the multi runner sample to create a different `AppVersion` on every start which could lead to the Photon cloud triggering security measurements and blocking connecting attempts
+- Fixed: An issue that caused the plugin to throw an exception when trying to dump contents of an array of Enums
+- Fixed: An issue that caused an `AuthOnce` warning when connecting to a local server after loading the local server app settings on the `PhotonServerSettings` inspector
+
+# 3.0.2
+
+## Stable
+
+### Build 1639 (Feb 25, 2025)
+
+**Breaking Changes**
+
+- The `FrameTimer` API has been revised (too verbose and complicated to use): the concept of `IsExpired` was replaced by `IsRunning`, other property names were renamed to be more compact e.g. `TimeInFramesSinceStart()` to `FramesSinceStart()`, all  return values are not `nullable` anymore and the `Value` field was renamed to `TargetFrame`. `Obsolete` tags help to quickly migrate.
+
+**What's New**
+
+- Added player and system hierarchies to the StateInspector (toggle the StateInspector using `CTRL+T`)
+- Added prediction culled status icons to entities in the StateInspector
+- Added `Edit Collider` controls for Quantum colliders to the Unity inspector
+- Added center of mass gizmos
+- Added `IntVector2` and `IntVector3` property drawers
+- Added enable-CRC option to `PhotonServerSettings` and `MatchmakingArguments`
+- Added `LocalActorNumber` to Quantum replays which can be assigned to a `IDeterministicReplayProvider` to make `DeterministicSession.IsLocalPlayer(PlayerRef)`-checks work as the original recordings
+- Added support for loading Addressable scenes, which need to be marked with the `QuantumScenes` label (inside the `Addressables Groups` window)
+- Stepping the Unity Editor during pause mode now only progresses one frame at the time in local mode
+- Added virtual user callbacks `OnConnect()`, `OnConnected()`, `OnStart(),` `OnStarted()` and `OnCleanup()` to the `QuantumMenuConnectionBehaviourSDK` class
+- Added properties to overwrite the `RoomOptions` and set initial `IsVisible` or `IsOpen` using the Photon Realtime MatchmakingExtensions API
+- The `QuantumDotnetBuildSettings` asset can optionally specify the dotnet command path used to create and compile the project
+- Added `MoveTowards(FP, FP, FP)` method to `FPMath`
+- Added `GetSetCount()` and `IsAnySet()` methods to the generated `BitSet` classes
+- Added new built-in types for input: `InputDirection`, `InputDirectionMagnitude` and `InputPitchYaw`
+- Added `Contains()` methods to both `FPBounds` classes
+- Added an optional `TransformSpace` parameter to `Transform3D.Rotate` (defaults to `Local` space as before)
+- Added CodeGen support for multiple newline-separated attributes for fields
+- Added CodeGen support for decimal literals in attributes (e.g. `[RangeEx(0, 0.25)]`)
+
+**Changes**
+
+- Increased the max navmesh region count from `128` to `512`, navmesh assets have to be re-baked to enable more regions
+- The demo inputs reuses built-in input types now
+- Frame dumps no longer print `Ptr.Offset` fields, which are not guaranteed nor required to be the same in all clients and could cause false-positive diffs
+- `LiteNetLib` integrated as a merged `.cs` file, which simplifies toggling profiling on and off, at a possible cost of increased compile times when `QUANTUM_ENABLE_REMOTE_PROFILER` is enabled
+- Gravity is now fully integrated at the beginning of the Physics Engine update, instead of in two steps, preventing residual velocity when the object is still
+- `SimulationConfig.MinContactInverseMass` now also applies to 3D Legacy Gauss-Seidel solver, helping prevent impulse spikes when perceived mass is out of usable range
+- `SimulationConfig.ThreadCount` will now display an error on Editor if smaller than 1 and the value is clamped when the asset is loaded
+- Quantum asset shortcuts in the `Global Configs` window now iterate over multiple instances on each click
+- `Transform3D.RotateAround()` now considers the axis parameter as being defined in World space (same as in Unity's `RotateAround`) instead of `Local` space
+- Changed the Quantum Hub shortcut on Mac to `Ctrl-H` to avoid clashing with the MacOS `Hide` shortcut
+
+**Removed**
+
+- Removed the method `CreateProfiler()` from the `IRunnerFactory` interface
+- `FPQuaternion.SimpleLookAt()` is now marked as obsolete, use `LookRotation()` instead
+- `QUANTUM_REMOTE_PROFILER` is obsolete,  use `QUANTUM_ENABLE_REMOTE_PROFILER` instead
+- `Assets/Photon/Quantum/Assemblies/LiteNetLib.dll` can be deleted from the project
+
+**Bug Fixes**
+
+- Fixed: An issue that could cause an `ArgumentOutOfRangeException` during `DeterministicNetwork.GetRpc()` when using multiple local players
+- Fixed: An issue that could cause a `NotSupportedException` thrown by `DummyPropertyDrawer` if custom property drawing system is used (e.g. Odin, but with `QUANTUM_ODIN_DISABLED` defined), a one-time warning is logged now instead
+- Fixed: An issue that could cause a `DivideByZeroException` in 2D and 3D Physics Engines when CCD is enabled
+- Fixed: An issue that caused a `QuantumEntityViewComponent.EntityRef` if the entity view is `null`
+- Fixed: An issue that could cause an `IndexOutOfRangeException` exception is thrown when using a wrong triangle `UsedCount` in `DynamicMap`
+- Fixed: An issue that caused exceptions when `SceneViewComponents` were destroyed before the `EntityViewUpdater` had a chance to add them properly
+- Fixed: An issue that could cause a `NullReferenceException` inside `ComponentPrototypeSet` during `Initialize()`
+- Fixed: An issue that caused a `NullReferenceException` inside 2D Physics `CheckOverlap()` API when the Hit argument referenced a static polygon collider
+- Fixed: An issue that caused a UnityEditor crash on `Create->Undo->Redo` when creating a 3D Character Controller Entity
+- Fixed: An issue that could cause a crash when undoing & redoing Quantum gameObject creation in the editor for a Quantum gameObject with a parent
+- Fixed: An issue that caused errors during instantiating systems that have a `name` parameter inside their constructors but were no setting the name in the `SystemsConfig`
+- Fixed: An issue that caused compiler errors when using `IntVector2` or `IntVector3` as dictionary keys
+- Fixed: An issue that caused jitter on entity view interpolation when the simulation `Frame.DeltaTime` was set to a different value than the inverse of the simulation `UpdateRate`
+- Fixed: An issue that caused the `QuantumUnityComponentPrototype` references not being properly baked on maps
+- Fixed: An issue that caused the `.qprototype` assets not being refreshed occasionally on prefab changes
+- Fixed: An issue that caused 2D static capsules to be added to the wrong list in `StaticCollider` in `QuantumMapData`
+- Fixed: An issue in 3D Raycasts resolved against Capsule colliders that would cause hit normals to be incorrect
+- Fixed: An issue that caused the StaticMesh `SmoothSphereMeshCollision` option to be disregarded
+- Fixed: An issue with Physics Queries resolved against 2D and 3D Capsules that would cause the hit `Point` to not always be at the surface of the collider hit
+- Fixed: An issue that caused the 2D and 3D Physics Query hit point to not be computed against Capsule colliders unless the `ComputeDetailedInfo` option was set
+- Fixed: An issue that could cause 3D Capsule-Capsule collision to be missed on rotated colliders
+- Fixed: An issue that caused `DynamicMap` static colliders to not properly be rendered as gizmos
+- Fixed: An issue in `DynamicMap` that caused moved colliders to not update the `StaticData.ColliderIndex`
+- Fixed: An issue in `DynamicMap` that caused the triangle capacity to not be updated when calling `ReserveCapacity()`
+- Fixed: An issue that caused `GetPlayerData()` to not return player data for the new local player during the `OnLocalPlayerAddConfirmed` callback
+- Fixed: An issue in `FrameTimerPrototype` that materialized frame counters with `0` leading to an unexpected state
+- Fixed: An issue that caused multiple navmesh regions encoded on triangles to be missed under certain conditions when performing `LineOfSight()`, `FindClosestTriangle()` or similar methods
+- Fixed: An issue that caused the `Draw.Shape2D` box to be incorrectly drawn
+- Fixed: An issue that caused nested assets with AssetBundles to be not loaded correctly
+- Fixed: An issue to support new and legacy InputSystem by introducing the `QuantumUnityInputSystemWithLegacyFallback` script
+- Fixed: An issue in `FP.FromString()` that parsed `.1` correctly but `-.1` incorrectly
+- Fixed: An issue that caused the CodeGen to crash if a `.qtn` file contains the `/` character
+- Fixed: An issue that caused the TMP text to be invisible after installing the menu scene from the Hub
+- Fixed: An issue that caused exceptions and broken Unity input for projects migrating to the new Unity input systems package due to a Unity bug
+- Fixed: Added missing `Sirenix.Odin` reference
+- Fixed: An issue that could cause multiple `[DrawIf]` attributes to occasionally be ignored
+
+# 3.0.1
+
+## Stable
+
+### Build 1609 (Jan 14, 2025)
+
+**Bug Fixes**
+
+- Fixed: An issue that could caused late joiners to desync after toggling systems on or off
+
+### Build 1599 (Dec 05, 2024)
+
+**Bug Fixes**
+
+- Fixed: An issue that caused exceptions when `SceneViewComponents` were destroyed before the `EntityViewUpdater` had a chance to add them properly
+- Fixed: An issue with supporting new and legacy InputSystem by introducing the `QuantumUnityInputSystemWithLegacyFallback` script
+- Fixed: `DynamicMap.RemoveCollider2D` now properly updates `StaticData.ColliderIndex` of moved colliders
+
+### Build 1595 (Dec 03, 2024)
+
+**Bug Fixes**
+
+- Fixed: A warning shown in Unity about using obsolete API (`EnableTaskProfiler`)
+- Fixed: An issue that the `QuantumStats` prefab was using a Quantum logo from the menu package
+- Fixed: `QuantumDotnetProjectSettings` - support for `Packages/` paths
+
+### Build 1594 (Nov 29, 2024)
+
+**What's New**
+
+- Added a text viewer for Quantum QTN assets in the Unity inspector
+- Added support for the `[OnlyInPrototype]` attribute - applied to a field will not include the field in the state object, only in its prototype, an alternative approach is to apply it to a type in `[OnlyInPrototype("fieldType", "fieldName")]`
+- Added support for `ref` parameters in Quantum signal arguments
+- Added support for using `input` in DSL `structs` and components
+- Added `Frame.AddAsset(AssetObject, AssetGuid)` and `DynamicAssetDB.AddAsset(AssetObject, AssetGuid)` - a way of adding dynamic assets with a GUID known ahead of time, the GUID needs to be of `AssetGuidType.DynamicExplicit` type
+- Added support for multithreading in WebGL if enabled in Unity Editor 6+
+- The Add-Entity-Component menu on `QuantumEntityPrototype` is now sorted alphabetically and searchable
+- Added a demo input unitypackage that can be used to quickly setup Quantum input for most common game genres
+- `QuantumEditorSettings` "Enable Task Profiler" build feature - enables task profiler in builds. Behind the scenes, all it does is it adds `QUANTUM_REMOTE_PROFILER` define
+- `QuantumTaskProfilerWindow` will now display `QUANTUM_REMOTE_PROFILER not defined` message in source selection dropdown, if the define is not enabled for the current platform
+- The demo menu now listens to session shutdown events to be able to react on unexpected errors
+- The Quantum graph profiler and the Quantum stats prefabs can now be added to scene using the Quantum menu
+- Added a simple navmesh region import option that directly maps Unity navmesh regions to Quantum navmesh regions, this mode is easy to set up, but the maximum number of regions is limited to 30. Toggle the `ImportRegionMode` on the navmesh script. The `ImportRegion` field is marked as obsolete and will automatically be converted to `Advanced` mode for projects that are upgraded
+- Added new `structs` `IntVector2` and `IntVector3` to the Quantum math libraries which can also be used inside the DSL
+- Added an optional `maxLength` param to `BitStream.SerializeArray()` and `SerializeArrayLength`, it can be used to secure for example command deserialization against unwanted large buffer allocations
+- Decoding and encoding can now be done using `DeterministicCommandSerializer.TryDecodeCommand()` and `EncodeCommand()` methods
+- Added `RotateAround()` method to the `Transform3D`
+- Added `GetIterator()` method to the `RingBuffer<T>` class
+- Added `CreateRuntimeDeterministicGuid()` method to the `QuantumUnityDB` class to be able to create deterministic Asset GUIDS used by static assets added at runtime to the DB
+- `QuantumUnityDB.AddAsset()` will now generate a deterministic GUID if none was provided
+- Added the `Capacity` property to 2D and 3D compound shapes
+- Added `RemoveAllColliders3D()` and `RemoveAllColliders2D()` to `DynamicMap` to remove all colliders in one shot
+- Added Gizmo toggle for debug draw calls (i.e. Draw.Box)
+- Added `TriangleCCW.VertexHashMapper`, a helper class that can be used to serialize triangles with shared vertices to a `ByteStream` more efficiently
+- Added `ByteSerializerHashMapper<T>`, a helper class that can be used in combination with a `ByteSerializer` to avoid fully serializing multiple instances of the same value
+- Added `DynamicMap.SerializeRuntimeTriangles` and `.DeserializeRuntimeTriangles` virtual methods for custom (de-)serialization of runtime triangles
+- Added `DynamicMap.TriangleCcwSerializer` type, an improved triangle serializer for built-in or custom serialization
+- Added `DynamicMap.TriangleSerializer` member, an improved triangle serializer for built-in or custom serialization
+- Added an API to `DynamicMap` to mass reserve colliders and remove triangles
+
+**Changes**
+
+- `QuantumGame.ProfilerSampleGenerated` is now obsolete and no longer functional. Use the new callback (`CallbackTaskProfilerReportGenerated`) instead
+- The `QuantumEntityViewComponent` does not receive update callbacks anymore when the `GameObject` or `Behavior` is disabled
+- Upgraded to Photon Realtime version `5.1.2`, see `changes-realtime.txt` for more details, the updates introduces debug and release dlls and it's best to delete the `Photon\PhotonLibs` folder before upgrading
+- Systems in `SystemsConfig` now display system type and name instead of `Element <index>`
+- Removing `TRACE` defines from release dLLs
+- `QuantumMapDataBaker.UpdateManagedReferenceIds()` method is now public, allowing the creation of new entity prototypes during custom map-baking callbacks
+- `QEnums` are now drawn with Odin-style drop-down
+- `QuantumUnityLogger` moved to `Quantum.Log` assembly, use partial `QuantumLogInitializer.InitializeUnityLoggerUser` to customize
+- Added `QUANTUM_LOGLEVEL_*` conditional attributes to `Log` static methods, which means that logs below the current log level will be compiled out completely
+- `QUANTUM_LOGLEVEL_TRACE` is now obsolete. To enabled trace logs, add `QUANTUM_TRACE_*` defines or use `QuantumEditorSettings` editor
+- The `QuantumStats` UI got a visual upgrade
+- Debug draw (e.g. `Draw.Sphere()` now respects the scene and game view gizmo toggles
+- Clicking `QuickMatch` in the sample menu now opens a popup when missing the Photon AppId
+- Unity navmesh import now ignores disabled or deactivated `NavMeshLinks` and `OffmeshLinks`
+- Improved the Quantum navmesh baking performance, for example FallbackTriangle generation is now optional by setting `NavMeshBakeDataFindClosestTriangle.None`
+- The Quantum Hub is now data-driven and can be used by Quantum sample projects
+- `QuantumEditorMenuDllToggle` now has key methods and properties exposed as public
+- Increased the size of a button on the in-game menu to be more usable on mobile devices
+- Reduced the serialization size of triangles in a DynamicMap
+
+**Bug Fixes**
+
+- Fixed: Dotnet generate project and build on Mac
+- Fixed: An issue that caused the `ActorId` of clients displayed as `0` on frame snapshots when using sever simulation
+- Fixed: An issue that caused the layer import buttons to not be visible
+- Fixed: An issue that caused creating BinaryAsset spams log with errors, until the file is saved
+- Fixed: An issue that caused the `FrameTimer.IsRunning()` returning `true` when it's invalid
+- Fixed: An issue that caused the predicted frames to be used for initial entity view placement and `Activate(Frame)` callbacks when verified bind behavior was selected
+- Fixed: An issue that caused an error log flood when deleting an entity view controlled by the EntityViewUpdater even when setting `ManualDisposal`
+- Fixed: An issue that spammed error logs when a disconnect was not detected and the online simulation kept running
+- Fixed: Performance of `ShapeConfigDrawer`, `QuantumEntityPrototypeEditor` and `QuantumEntityViewEditor` improved
+- Fixed: The Asteroids demo now works correctly with HDRP and URP
+- Fixed: Ensure that Asteroids renders correctly in builds for all render pipelines
+- Fixed: An issue in the instant replay demo with the order of cleanup steps that caused the view to dispose before the `OnReplayStopped` callback
+- Fixed: `EntityPrototype had unsorted components` trace message when loading prototypes and maps
+- Fixed: `QDictionary` and `QHashSet` no longer throw `OverflowException` in case their respective Key and Value types have a negative hash code and numeric casts are `checked` by default
+- Fixed: An issue in the 2.1 migration for upgrading AssetObjects to only consider paths from `QuantumEditorSettings.AssetSearchPaths`
+- Fixed: 2D Edge-Edge false-positive collisions and wrong de-penetration
+- Fixed: Exceptions in the 2D Physics Engine when using polygons inside compound shapes
+- Fixed: An issue in `PhysicsEngine2D.Api.CheckOverlap()` that modified the rotation of its argument if the shape had a rotation offset
+- Fixed: An issue in the collision detection of two 3D capsules that resulted in different `Extents` to be used
+- Fixed: An issue that could cause incorrect normal vector computation for capsule-box collision 2D
+- Fixed: An issue that was accepting negative values for capsule 2D
+- Fixed: The drawing of capsules 2D when the extent is greater than the radius
+- Fixed: The penetration computation between two capsules 2D using the radius of the two capsules
+- Fixed: The penetration between the circle and polygon shapes when the contact points are the vertices of the polygon
+- Fixed: An issue in collision detection capsule 3D vs. triangle
+- Fixed: An issue in `PhysicsEngine3D.Linecast()` vs shapes that was returning the incorrect UserTag
+- Fixed: An issue that could cause `FP` overflow exceptions on 2D and 3D shape casts with larger objects
+- Fixed: An issue that could cause `FP` overflow exceptions on raycasts by increasing the range of usable sphere radii and ray lengths
+- Fixed: Issue on `DynamicMap.AddCollider2D` that was causing 2D Physics Engine to not be properly reset
+- Fixed: DynamicMap.FromStaticMap is now generic
+- Fixed: DynamicMap crashing builds when editing a disabled collider
+- Fixed: `DynamicMap.RemoveMeshCollider` not updating collider indices correctly
+- Fixed: Invalid 3D collider rotations are automatically set to  `Identity` when being added to the `DynamicMap` using `AddCollider3D()`
+- Fixed: An issue in the Unity scripts with `QuantumEntityViewUpdater.AddViewComponent()` that caused view components to not get added after toggling them on/off
+- Fixed: Preloading Addressables in `QuantumRunnerLocalDebug` correctly attempts to load `AssetObject` instead of `UnityEngine.Object`, only loading the latter will make sure assets are properly preloaded
+- Fixed: Unity scripts leak into dotnet simulation project generation
+- Fixed: Re-exposed the `DrawShape2DGizmo` and `DrawShape3DGizmo` methods for usage in user code
+- Fixed: `LayerMask` inspector overriding property values in multi-select mode
+- Fixed: An issue that caused a stack overflow when baking a scene prototype with `EntityRef` fields if Quantum 2 migration is enabled
+- Fixed: Incorrect Unity version check for `UnityEngine.AI.NavMesh.GetAreaNames`
+- Fixed: A typo of field `DeltaTimeType` inside the `QuantumRunnerLocalDebug` and `QuantumRunnerLocalReplay` scripts
+- Fixed: 3D Shape prototypes not displaying Rotation offset field in the Editor
+- Fixed: An issue in the demo menu party screen that failed to connect to party codes
+- Fixed: An issue in the replay menu that prevented replays to be exported when only `RecordingFlags.Input` were selected
+- Fixed: `QuantumMenuConnectionBehaviour.RequestAvailableOnlineRegionsAsync()` properly returns a faulted task on errors
+- Fixed: An issue that caused a wrong rotation on the 2D variant of `Draw.Rectangle()`
+- Fixed: 2D and 3D Collider Prototypes applying scale twice when using a child Source Collider
+- Fixed: An issue that caused changing the scene in the QuantumMenu not to be saved to PlayerPrefs
+- Fixed: An issue in the Quantum menu that caused the preferred region to not be previewed correctly in the main menu
+- Fixed: An issues that caused Frame Heap errors when late-joining with a snapshot when a CompoundShape buffer had been expanded
+- Fixed: Removed debug assertion that expected all inputs to be polled exactly once on the clients, which might not be the case in extreme conditions
+
 # 3.0.0
 
 **Breaking Changes**

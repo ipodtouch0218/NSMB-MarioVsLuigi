@@ -10,7 +10,11 @@ namespace Quantum {
     /// <summary>
     /// Link a Unity circle collider to copy its size and position of during Quantum map baking.
     /// </summary>
+#if QUANTUM_ENABLE_PHYSICS3D && !QUANTUM_DISABLE_PHYSICS3D
     [InlineHelp, MultiTypeReference(typeof(CircleCollider2D), typeof(SphereCollider))]
+#else
+    [InlineHelp, SerializeReferenceTypePicker(typeof(CircleCollider2D))]
+#endif
     public Component SourceCollider;
     /// <summary>
     /// The radius of the circle.
@@ -41,6 +45,8 @@ namespace Quantum {
     /// Copy collider configuration from source collider if exist. 
     /// </summary>
     public void UpdateFromSourceCollider() {
+      Radius = FPMath.Clamp(Radius, 0, Radius);
+      Height = FPMath.Clamp(Height, 0, Height);
       if (SourceCollider == null) {
         return;
       }

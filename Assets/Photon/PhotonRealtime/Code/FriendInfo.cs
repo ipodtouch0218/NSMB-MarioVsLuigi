@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // <copyright file="FriendInfo.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -17,7 +17,7 @@ namespace Photon.Realtime
 {
     using Photon.Client;
 
-    #if SUPPORTED_UNITY || NETFX_CORE
+    #if SUPPORTED_UNITY
     using SupportClass = Photon.Client.SupportClass;
     #endif
 

@@ -18,8 +18,6 @@ namespace Photon.Realtime
     #if SUPPORTED_UNITY
     using UnityEngine;
     using Debug = UnityEngine.Debug;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 

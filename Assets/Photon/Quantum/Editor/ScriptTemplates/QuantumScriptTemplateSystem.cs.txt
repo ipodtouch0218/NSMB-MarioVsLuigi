@@ -6,7 +6,7 @@ namespace Quantum
     [Preserve]
     public unsafe class #SCRIPTNAME# : SystemMainThread
     {
-        public override void Update(Frame f)
+        public override void Update(Frame frame)
         {
         }
     }

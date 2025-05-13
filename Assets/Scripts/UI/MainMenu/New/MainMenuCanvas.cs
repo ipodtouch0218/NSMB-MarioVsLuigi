@@ -52,7 +52,9 @@ namespace NSMB.UI.MainMenu {
         public void OnDisable() {
             while (submenuStack.Count > 0) {
                 if (submenuStack[^1] is PromptSubmenu ps) {
-                    ps.Hide(SubmenuHideReason.Closed);
+                    CloseSubmenu(ps);
+                } else {
+                    break;
                 }
             }
         }

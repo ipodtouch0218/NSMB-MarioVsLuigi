@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // <copyright file="ConnectionHandler.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -7,7 +7,6 @@
 // </summary>
 // <author>developer@photonengine.com</author>
 // ----------------------------------------------------------------------------
-
 
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
@@ -49,6 +48,7 @@ namespace Photon.Realtime
         ///
         /// If false, a regular timeout time will have to pass (on top) to time out the client.
         /// </remarks>
+        [Obsolete("After the KeepAliveInBackground, the client will always properly disconnect with DisconnectCause.ClientServiceInactivity.")]
         public bool DisconnectAfterKeepAlive = false;
 
         /// <summary>Defines for how long the Fallback Thread should keep the connection, before it may time out as usual.</summary>
@@ -298,16 +298,19 @@ namespace Photon.Realtime
                 // check if the client should disconnect after some seconds in background
                 if (this.backgroundStopwatch.ElapsedMilliseconds > this.KeepAliveInBackground)
                 {
-                    if (this.DisconnectAfterKeepAlive)
-                    {
-                        this.Client.Disconnect();
-                    }
+                    this.Client.Disconnect(DisconnectCause.ClientServiceInactivity);
                     return;
                 }
 
 
                 this.didSendAcks = true;
                 this.CountSendAcksOnly++;
+
+                // one time logging to warn about lack of service calls
+                if (this.CountSendAcksOnly == 200)
+                {
+                    Log.Warn($"RealtimeClient.SendOutgoing() was not called for {Math.Round(this.backgroundStopwatch.Elapsed.TotalSeconds)}sec. After the KeepAliveInBackground ({this.KeepAliveInBackground/1000}sec) this causes a disconnect.", this.Client.LogLevel, this.Client.LogPrefix);
+                }
 
                 this.Client.RealtimePeer.SendAcksOnly();
             }

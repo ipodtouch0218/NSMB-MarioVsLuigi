@@ -22,8 +22,6 @@ namespace Photon.Realtime
 
     #if SUPPORTED_UNITY
     using UnityEngine;
-    #endif
-    #if SUPPORTED_UNITY || NETFX_CORE
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -253,6 +251,7 @@ namespace Photon.Realtime
             }
 
             this.CustomProperties.Merge(properties);
+            this.CustomProperties.StripKeysWithNullValues();
         }
 
 

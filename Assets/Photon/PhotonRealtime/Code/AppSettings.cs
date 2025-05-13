@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="AppSettings.cs" company="Exit Games GmbH">
 // Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
@@ -10,12 +10,13 @@
 #define SUPPORTED_UNITY
 #endif
 
+
 namespace Photon.Realtime
 {
     using System;
     using Photon.Client;
 
-    #if SUPPORTED_UNITY || NETFX_CORE
+    #if SUPPORTED_UNITY
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
@@ -26,7 +27,7 @@ namespace Photon.Realtime
     /// <remarks>
     /// This is Serializable for Unity, so it can be included in ScriptableObject instances.
     /// </remarks>
-    #if !NETFX_CORE || SUPPORTED_UNITY
+    #if SUPPORTED_UNITY
     [Serializable]
     #endif
     public class AppSettings
@@ -99,12 +100,15 @@ namespace Photon.Realtime
         /// <summary>The network level protocol to use.</summary>
         public ConnectionProtocol Protocol = ConnectionProtocol.Udp;
 
-        /// <summary>Enables a fallback to another protocol in case a connect to the Name Server fails.</summary>
+        /// <summary>Enables the fallback to WSS, should the initial connect to the Name Server fail. Some exceptions apply.</summary>
         /// <remarks>
-        /// When connecting to the Name Server does not succeed, the client will select an alternative
-        /// transport protocol and automatically try to connect with that.
-        /// The fallback for TCP is UDP. All other protocols fallback to TCP.
+        /// For security reasons, a fallback to another protocol is not done when using WSS or AuthMode.AuthOnceWss.
+        /// That would compromise the expected security.
         ///
+        /// If the fallback is impossible or if that connection also fails, the app logic must handle the case.
+        /// It might even make sense to just try the same connection settings once more (or ask the user to do something about
+        /// the network connectivity, firewalls, etc).
+        /// 
         /// The fallback will use the default Name Server port as defined by ProtocolToNameServerPort.
         /// </remarks>
         public bool EnableProtocolFallback = true;

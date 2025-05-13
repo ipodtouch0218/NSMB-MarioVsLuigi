@@ -82,7 +82,7 @@ namespace Quantum {
     /// Raised when an asset is unloaded.
     /// </summary>
     public event AssetObjectDisposingDelegate AssetObjectDisposing;
-
+    
     #region Unity Messages
     
     /// <summary>
@@ -155,6 +155,39 @@ namespace Quantum {
     public uint Version => _version;
     
     /// <summary>
+    /// Returns a deterministic <see cref="AssetGuid"/> for the given <paramref name="assetObject"/>. Used for adding static assets at runtime to the DB.
+    /// </summary>
+    /// <param name="assetObject">The <see cref="AssetObject"/> generate the <see cref="AssetGuid"/> for.</param>
+    /// <returns>The generated <see cref="AssetGuid"/>.</returns>
+    public static AssetGuid CreateRuntimeDeterministicGuid(AssetObject assetObject) {
+      Assert.Check(string.IsNullOrEmpty(assetObject.name) == false, "AssetObject name is empty.");
+      var type = assetObject.GetType();
+
+      AssetGuid guid = CreateRuntimeDeterministicGuid(assetObject.name, type);
+
+      if (GetGlobalAsset(guid) != null) {
+        throw new Exception("Guid generated matches an existing DB entry, please rename your asset.");
+      }
+      
+      return guid;
+    }
+    
+    /// <summary>
+    /// Creates a deterministic guid based on the asset name and type.
+    /// </summary>
+    /// <param name="assetName"></param>
+    /// <param name="assetType"></param>
+    /// <returns></returns>
+    public static AssetGuid CreateRuntimeDeterministicGuid(string assetName, Type assetType) {
+      Assert.Check(string.IsNullOrEmpty(assetName) == false, $"{nameof(assetName)} is empty.");
+
+      var guid = CreateRuntimeDeterministicGuid(assetName);
+      guid = CreateRuntimeDeterministicGuid<char>(assetType.FullName, guid.Value & ~AssetGuid.ReservedBits);
+      
+      return guid;
+    }
+    
+    /// <summary>
     /// Registers a source for the asset with the given <paramref name="guid"/> and an optional <paramref name="path"/>.
     /// </summary>
     /// <param name="source"></param>
@@ -181,7 +214,7 @@ namespace Quantum {
 
       ++_version;
     }
-    
+
     /// <summary>
     /// Registers a static asset. This is equivalent to calling <see cref="AddSource"/> with a <see cref="QuantumAssetObjectSourceStatic"/>.
     /// </summary>
@@ -242,6 +275,28 @@ namespace Quantum {
 
       if (!string.IsNullOrEmpty(path)) {
         _pathToIndex.Add(path, index);
+      }
+    }
+
+    /// <summary>
+    /// Creates a deterministic GUID based and the provided path.
+    /// </summary>
+    public static AssetGuid CreateRuntimeDeterministicGuid(string path) {
+      return CreateRuntimeDeterministicGuid<char>(path);
+    }
+    
+    /// <summary>
+    /// Creates a deterministic GUID based and the provided data.
+    /// </summary>
+    /// <remarks>T.GetHashCode() must be deterministic.</remarks>
+    public static AssetGuid CreateRuntimeDeterministicGuid<T>(ReadOnlySpan<T> data, long initialHash = 0) where T : unmanaged {
+      unchecked {
+        long hash = initialHash;
+        foreach (var c in data) {
+          hash = hash * 31 + c.GetHashCode();
+        }
+        hash &= ~AssetGuid.ReservedBits;
+        return new AssetGuid(hash, AssetGuidType.RuntimeGenerated);
       }
     }
     
@@ -475,7 +530,7 @@ namespace Quantum {
       if (!entry.State.TryCompareExchange(immediate ? EntryState.UnloadingInvokingCallbacks : EntryState.UnloadingEnqueued, EntryState.Loaded)) {
         return true;
       }
-
+      
       Log.TraceAssets($"Enqueuing asset {guid} for disposal.");
       AssetObjectDisposing?.Invoke(guid);
 
@@ -649,12 +704,13 @@ namespace Quantum {
             if (synchronous) {
               try {
                 var asset = entry.Source.WaitForResult();
-                Debug.Assert(asset != null);
+                Assert.Check(asset != null);
+                Assert.Check(asset.Guid == guid, "Expected to load {0}, but {1} was loaded instead", asset.Guid, guid);
 
                 entry.LoadedAsset = asset;
                 entry.State.Exchange(EntryState.LoadedInvokingCallbacks);
 
-                Log.TraceAssets($"Invoking Loaded callback for {guid}.");
+                Log.TraceAssets(asset, $"Invoking Loaded callback for {guid}.");
                 asset.Loaded(this, _allocator);
                 entry.State.Exchange(EntryState.Loaded);
               } catch (Exception) {
@@ -867,6 +923,12 @@ namespace Quantum {
       /// </summary>
       [NonSerialized]
       internal AtomicEnum<EntryState> State;
+
+      /// <inheritdoc/>
+      public override string ToString() {
+        return $"[Path: {Path}, Guid: {Guid}, State: {State}, Source: {Source?.Description}, Asset: {LoadedAsset}]";
+      }
+
     }
   }
 }

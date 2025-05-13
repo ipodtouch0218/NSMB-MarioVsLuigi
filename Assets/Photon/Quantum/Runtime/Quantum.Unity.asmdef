@@ -8,7 +8,8 @@
         "GUID:84651a3751eca9349aac36a66bba901b",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:24d1938c8a2a52448984e88465363863",
-        "GUID:8c4dd21966739024fbd72155091d199e"
+        "GUID:8c4dd21966739024fbd72155091d199e",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -72,6 +73,11 @@
             "name": "com.unity.multiplayer.playmode",
             "expression": "0.6",
             "define": "QUANTUM_ENABLE_MPPM"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0",
+            "define": "QUANTUM_ENABLE_INPUTSYSTEM"
         }
     ],
     "noEngineReferences": false

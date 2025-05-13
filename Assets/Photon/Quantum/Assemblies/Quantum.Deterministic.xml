@@ -1582,6 +1582,13 @@
             <param name="bounds"></param>
             <returns></returns>
         </member>
+        <member name="M:Photon.Deterministic.FPBounds2.Contains(Photon.Deterministic.FPVector2)">
+            <summary>
+            Returns <see langword="true"/> if the <paramref name="point"/> is inside the bounds.
+            </summary>
+            <param name="point"></param>
+            <returns></returns>
+        </member>
         <member name="M:Photon.Deterministic.FPBounds2.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
             <summary>
             Serializes the FPBounds2 struct by serializing its FPVector2 fields.
@@ -1674,6 +1681,13 @@
             Returns <see langword="true"/> if there is an intersection between bounds.
             </summary>
             <param name="bounds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.FPBounds3.Contains(Photon.Deterministic.FPVector3)">
+            <summary>
+            Returns <see langword="true"/> if the <paramref name="point"/> is inside the bounds.
+            </summary>
+            <param name="point"></param>
             <returns></returns>
         </member>
         <member name="M:Photon.Deterministic.FPBounds3.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
@@ -2742,6 +2756,11 @@
             </summary>
             <param name="lutProvider"></param>
         </member>
+        <member name="M:Photon.Deterministic.FPLut.Init(System.Byte[],System.Byte[],System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            Initialize LUT using using byte arrays.
+            </summary>
+        </member>
         <member name="M:Photon.Deterministic.FPLut.GenerateTables(System.String)">
             <summary>
             Generate lookup tables in <paramref name="directoryPath"/>.
@@ -3003,6 +3022,16 @@
             <param name="start"></param>
             <param name="end"></param>
             <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.FPMath.MoveTowards(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+            <summary>
+            Moves a value <paramref name="from"/> towards <paramref name="to"/> by a value no greater than <paramref name="maxDelta"/>.
+            Negative values of <paramref name="maxDelta"/> push the value away from <paramref name="to"/>.
+            </summary>
+            <param name="from"></param>
+            <param name="to"></param>
+            <param name="maxDelta"></param>
             <returns></returns>
         </member>
         <member name="M:Photon.Deterministic.FPMath.SmoothStep(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP)">
@@ -5424,6 +5453,573 @@
             <param name="point">The point from which to calculate the distance.</param>
             <returns>The signed distance from the point to the plane.</returns>
         </member>
+        <member name="T:Photon.Deterministic.IntVector2">
+            <summary>
+            Represents a two-dimensional vector with integer components.
+            </summary>
+            \ingroup MathApi
+        </member>
+        <member name="F:Photon.Deterministic.IntVector2.SIZE">
+            <summary>
+            The size of the struct in memory.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.Zero">
+            <summary>
+            A vector with components (0,0);
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.One">
+            <summary>
+            A vector with components (1,1);
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.Right">
+            <summary>
+            A vector with components (1,0);
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.Left">
+            <summary>
+            A vector with components (-1,0);
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.Up">
+            <summary>
+            A vector with components (0,1);
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.Down">
+            <summary>
+            A vector with components (0,-1);
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.MaxValue">
+            <summary>
+            A vector with components (int.MaxValue, int.MaxValue);
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.MinValue">
+            <summary>
+            A vector with components (int.MinValue, int.MinValue);
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.IntVector2.X">
+            <summary>The X component of the vector.</summary>
+        </member>
+        <member name="F:Photon.Deterministic.IntVector2.Y">
+            <summary>The Y component of the vector.</summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the IntVector2 struct.
+            </summary>
+            <param name="x">The x-coordinate of the vector.</param>
+            <param name="y">The y-coordinate of the vector.</param>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XOY">
+            <summary>
+            Returns vector (X, 0, Y).
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XYO">
+            <summary>
+            Returns vector (X, Y, 0).
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.OXY">
+            <summary>
+            Returns vector (0, X, Y).
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.GetHashCode">
+            <summary>
+            Returns a hash code for this instance.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.ToString">
+            <summary>
+            Returns a string that represents the current IntVector2.
+            </summary>
+            <returns>A string that represents the current IntVector2.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
+            <summary>
+            Serializes or deserializes a IntVector2 struct using the provided IDeterministicFrameSerializer object.
+            </summary>
+            <param name="ptr">A pointer to the IntVector2 struct to serialize or deserialize.</param>
+            <param name="serializer">The IDeterministicFrameSerializer object used for serialization or deserialization.</param>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.Magnitude">
+            <summary>
+            Gets the magnitude of the vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.SqrMagnitude">
+            <summary>
+            Gets the squared magnitude of the vector.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.Clamp(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Clamps a IntVector2 value between a minimum and maximum value.
+            </summary>
+            <param name="value">The IntVector2 value to clamp</param>
+            <param name="min">The minimum IntVector2 value to clamp to</param>
+            <param name="max">The maximum IntVector2 value to clamp to</param>
+            <returns>The clamped IntVector2 value</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.Distance(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Calculates the distance between two IntVector2 points.
+            </summary>
+            <param name="a">The first IntVector2 point</param>
+            <param name="b">The second IntVector2 point</param>
+            <returns>The distance between the two IntVector2 points</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.Max(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Returns a new IntVector2 with the largest components of the input vectors.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.Min(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Returns a new IntVector2 with the smallest components of the input vectors.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.RoundToInt(Photon.Deterministic.FPVector2)">
+            <summary>
+            Rounds a FPVector2 to the nearest whole numbers, and returns a new IntVector2.
+            </summary>
+            <param name="v">The FPVector2 to round.</param>
+            <returns>A new IntVector2 with the rounded components of the input vector.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.FloorToInt(Photon.Deterministic.FPVector2)">
+            <summary>
+            Returns the largest integer less than or equal to the specified floating-point number.
+            </summary>
+            <param name="v">The floating-point number.</param>
+            <returns>The largest integer less than or equal to <paramref name="v"/>.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.CeilToInt(Photon.Deterministic.FPVector2)">
+            <summary>
+            Returns a new IntVector2 with the smallest integer greater than or equal to the components of the given FPVector2.
+            </summary>
+            <param name="v">The FPVector2 to ceil.</param>
+            <returns>A new IntVector2 with the components ceil'd.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Implicit(Photon.Deterministic.IntVector2)~Photon.Deterministic.FPVector2">
+            <summary>
+            Implicitly converts a IntVector2 instance to an FPVector2 instance.
+            This conversion creates a new FPVector2 instance with the X and Y coordinates
+            from the input IntVector2 instance.
+            </summary>
+            <param name="v">The IntVector2 instance to convert.</param>
+            <returns>A new FPVector2 instance with the X and Y coordinates from the input IntVector2 instance.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Explicit(Photon.Deterministic.FPVector2)~Photon.Deterministic.IntVector2">
+            <summary>
+            Converts a FPVector2 instance to a IntVector2 instance.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Addition(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Adds two IntVector2 instances.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Subtraction(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Subtracts the second IntVector2 from the first.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Multiply(Photon.Deterministic.IntVector2,System.Int32)">
+            <summary>
+            Multiplies a IntVector2 by an integer scalar.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Multiply(System.Int32,Photon.Deterministic.IntVector2)">
+            <summary>
+            Multiplies a IntVector2 by an integer scalar.
+            </summary>
+            <param name="d"></param>
+            <param name="a"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Division(Photon.Deterministic.IntVector2,System.Int32)">
+            <summary>
+            Divides a IntVector2 by an integer scalar.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Equality(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Compares two IntVector2 instances for equality.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_Inequality(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Compares two IntVector2 instances for inequality.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.op_UnaryNegation(Photon.Deterministic.IntVector2)">
+            <summary>
+            Negates an IntVector2.
+            </summary>
+            <param name="a"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.Equals(Photon.Deterministic.IntVector2)">
+            <summary>
+            Determines whether the specified IntVector2 is equal to the current IntVector2.
+            </summary>
+            <param name="other">The IntVector2 to compare with the current IntVector2.</param>
+            <returns>true if the specified IntVector2 is equal to the current IntVector2; otherwise, false.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.Equals(System.Object)">
+            <summary>
+            Determines whether the specified object is equal to the current IntVector2.
+            </summary>
+            <param name="obj">The object to compare with the current IntVector2.</param>
+            <returns>true if the specified object is equal to the current IntVector2; otherwise, false.</returns>
+        </member>
+        <member name="T:Photon.Deterministic.IntVector2.EqualityComparer">
+            <summary>
+            Represents an equality comparer for IntVector2 objects.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.IntVector2.EqualityComparer.Instance">
+            <summary>
+            The global equality comparer instance.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.EqualityComparer.Equals(Photon.Deterministic.IntVector2,Photon.Deterministic.IntVector2)">
+            <summary>
+            Determines whether the current instance is equal to the specified object.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector2.EqualityComparer.GetHashCode(Photon.Deterministic.IntVector2)">
+            <summary>
+            Computes the hash code for the IntVector2.
+            </summary>
+            <returns>
+            The computed hash code.
+            </returns>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XXX">
+            <summary>
+            Returns a new IntVector3 using the X, X and X components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XXY">
+            <summary>
+            Returns a new IntVector3 using the X, X and Y components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XYX">
+            <summary>
+            Returns a new IntVector3 using the X, Y and X components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XYY">
+            <summary>
+            Returns a new IntVector3 using the X, Y and Y components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XX">
+            <summary>
+            Returns a new IntVector2 using the X and X components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.XY">
+            <summary>
+            Returns a new IntVector2 using the X and Y components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.YYY">
+            <summary>
+            Returns a new IntVector3 using the Y, Y and Y components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.YYX">
+            <summary>
+            Returns a new IntVector3 using the Y, Y and X components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.YXY">
+            <summary>
+            Returns a new IntVector3 using the Y, X and Y components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.YXX">
+            <summary>
+            Returns a new IntVector3 using the Y, X and X components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.YY">
+            <summary>
+            Returns a new IntVector2 using the Y and Y components of this vector.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector2.YX">
+            <summary>
+            Returns a new IntVector2 using the Y and X components of this vector.
+            </summary>
+        </member>
+        <member name="T:Photon.Deterministic.IntVector3">
+            <summary>
+            Represents a three-dimensional vector with integer components.
+            </summary>
+            \ingroup MathApi
+        </member>
+        <member name="F:Photon.Deterministic.IntVector3.SIZE">
+            <summary>
+            The size of the struct in memory.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Constructs a new IntVector3 with the given components.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.MaxValue">
+            <summary>
+            A vector with the components (int.MaxValue, int.MaxValue, int.MaxValue).
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.MinValue">
+            <summary>
+            A vector with the components (int.MinValue, int.MinValue, int.MinValue).
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.Up">
+            <summary>
+            Represents an upward vector with x = 0, y = 1, and z = 0.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.Down">
+            <summary>
+            Represents the downward direction with coordinates (0, -1, 0).
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.Left">
+            <summary>
+            Represents a 3-dimensional vector with integer components.
+            </summary>
+            <remarks>
+            This struct is part of the <see cref="N:Photon.Deterministic"/> namespace.
+            </remarks>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.Right">
+            <summary>
+            The right direction vector (1, 0, 0).
+            </summary>
+            <value>The right direction vector.</value>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.One">
+            <summary>
+            The vector representing a coordinate of (1, 1, 1).
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.Zero">
+            <summary>
+            Represents a zero vector with all components set to 0.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.IntVector3.X">
+            <summary>
+            The X component of the vector.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.IntVector3.Y">
+            <summary>
+            The Y component of the vector.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.IntVector3.Z">
+            <summary>
+            The Z component of the vector.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.GetHashCode">
+            <summary>
+            Returns a hash code for the vector.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.ToString">
+            <summary>
+            Returns a string representation of the IntVector3.
+            </summary>
+            <returns>A string representation of the IntVector3.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
+            <summary>
+            Serializes a IntVector3 to a stream using an IDeterministicFrameSerializer.
+            If the serializer is in writing mode, the method writes the X, Y, and Z components of the vector to the stream.
+            If the serializer is in reading mode, the method reads the X, Y, and Z components from the stream and assigns them to the vector.
+            </summary>
+            <param name="ptr">A pointer to the IntVector3 that is being serialized.</param>
+            <param name="serializer">The IDeterministicFrameSerializer used for serialization.</param>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.Magnitude">
+            <summary>
+            Calculates the magnitude (length) of the IntVector3.
+            </summary>
+            <value>
+            The magnitude of the IntVector3.
+            </value>
+        </member>
+        <member name="P:Photon.Deterministic.IntVector3.SqrMagnitude">
+            <summary>
+            Gets the square of the magnitude of the vector.
+            </summary>
+            <value>The square of the magnitude of the vector.</value>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.Distance(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Calculates the distance between two IntVector3 points.
+            </summary>
+            <param name="a">The first IntVector3 point.</param>
+            <param name="b">The second IntVector3 point.</param>
+            <returns>The distance between the two IntVector3 points.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.Clamp(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Clamps a IntVector3 value between a minimum and maximum IntVector3 value.
+            </summary>
+            <param name="value">The IntVector3 value to clamp.</param>
+            <param name="min">The minimum IntVector3 value.</param>
+            <param name="max">The maximum IntVector3 value.</param>
+            <returns>The clamped IntVector3 value.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.Min(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Returns a new IntVector3 with the smallest components of the input vectors.
+            </summary>
+            <param name="a">The first IntVector3.</param>
+            <param name="b">The second IntVector3.</param>
+            <returns>A new IntVector3 with the smallest components of the input vectors.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.Max(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Returns a new IntVector3 with the largest components of the input vectors.
+            </summary>
+            <param name="a">The first IntVector3.</param>
+            <param name="b">The second IntVector3.</param>
+            <returns>A new IntVector3 with the largest components of the input vectors.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.RoundToInt(Photon.Deterministic.FPVector3)">
+            <summary>
+            Rounds the components of the given FPVector3 to the nearest integer values.
+            </summary>
+            <param name="v">The vector to round.</param>
+            <returns>A new IntVector3 with the rounded integer values.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.FloorToInt(Photon.Deterministic.FPVector3)">
+            <summary>
+            Returns the largest integer less than or equal to the specified floating-point number.
+            </summary>
+            <param name="v">The number to round down.</param>
+            <returns>The largest integer less than or equal to the specified number.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.CeilToInt(Photon.Deterministic.FPVector3)">
+            <summary>
+            Returns a new IntVector3 with the ceiling of the components of the input vector.
+            </summary>
+            <param name="v">The input vector.</param>
+            <returns>A new IntVector3 with the ceiling of the components.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Implicit(Photon.Deterministic.IntVector3)~Photon.Deterministic.FPVector3">
+            <summary>
+            Converts a IntVector3 object to FPVector3 object.
+            </summary>
+            <param name="v">The IntVector3 object to convert.</param>
+            <returns>A new FPVector3 object created using the values of the IntVector3 object.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Explicit(Photon.Deterministic.FPVector3)~Photon.Deterministic.IntVector3">
+            <summary>
+            Converts a FPVector3 object to a IntVector3 object.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Equality(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Returns <see langword="true"/> if two vectors are exactly equal.
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Inequality(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Returns <see langword="true"/> if two vectors are not exactly equal.
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_UnaryNegation(Photon.Deterministic.IntVector3)">
+            <summary>
+            Negates each component of <paramref name="v"/> vector.
+            </summary>
+            <param name="v"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Multiply(Photon.Deterministic.IntVector3,System.Int32)">
+            <summary>
+            Multiplies each component of <paramref name="v"/> times <paramref name="s"/>.
+            </summary>
+            <param name="v"></param>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Multiply(System.Int32,Photon.Deterministic.IntVector3)">
+            <summary>
+            Multiplies each component of <paramref name="v"/> times <paramref name="s"/>.
+            </summary>
+            <param name="v"></param>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Division(Photon.Deterministic.IntVector3,System.Int32)">
+            <summary>
+            Divides each component of <paramref name="v"/> by <paramref name="s"/>.
+            </summary>
+            <param name="v"></param>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Subtraction(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Subtracts <paramref name="b"/> from <paramref name="a"/>
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.op_Addition(Photon.Deterministic.IntVector3,Photon.Deterministic.IntVector3)">
+            <summary>
+            Adds two vectors.
+            </summary>
+            <param name="a"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.Equals(Photon.Deterministic.IntVector3)">
+            <summary>
+            Returns true if the vector is exactly equal to another vector.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IntVector3.Equals(System.Object)">
+            <inheritdoc cref="M:Photon.Deterministic.IntVector3.Equals(Photon.Deterministic.IntVector3)"/>
+        </member>
+        <member name="T:Photon.Deterministic.IntVector3.EqualityComparer">
+            <summary>
+            Represents an equality comparer for IntVector3 objects.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.IntVector3.EqualityComparer.Instance">
+            <summary>
+            The global equality comparer instance.
+            </summary>
+        </member>
         <member name="T:Photon.Deterministic.NullableFP">
             <summary>
             A serializable equivalent of Nullable&lt;FP&gt;.
@@ -6025,6 +6621,13 @@
         <member name="M:Photon.Deterministic.Native.MSVCRTUtility.Compare(System.Void*,System.Void*,System.Int32)">
             <inheritdoc/>
         </member>
+        <member name="M:Photon.Deterministic.Native.SizeOf(System.Type)">
+            <summary>
+            Gets the size of the specified type.
+            </summary>
+            <param name="t">The type to get the size of.</param>
+            <returns>The size of the specified type in bytes.</returns>
+        </member>
         <member name="T:Photon.Deterministic.Native.PInvokeAllocator">
             <summary>
             A specific allocator that tracks allocations in Debug mode.
@@ -6121,34 +6724,77 @@
             </summary>
             <param name="onEventReceived">The incoming message callback to be called</param>
         </member>
-        <member name="T:Photon.Deterministic.DeterministicSessionRunnerInitArguments">
+        <member name="T:Photon.Deterministic.DeterministicSessionContextInitArguments">
             <summary>
-            The arguments to initialize a deterministic session runner.
+            The arguments to initialize a <see cref="T:Photon.Deterministic.IDeterministicSessionContext"/>.
             </summary>
         </member>
-        <member name="F:Photon.Deterministic.DeterministicSessionRunnerInitArguments.LutPath">
+        <member name="F:Photon.Deterministic.DeterministicSessionContextInitArguments.LutPath">
             <summary>
             The path to folder that contains the look up tables.
             </summary>
         </member>
-        <member name="F:Photon.Deterministic.DeterministicSessionRunnerInitArguments.AssetDBPath">
+        <member name="F:Photon.Deterministic.DeterministicSessionContextInitArguments.AssetDBPath">
             <summary>
             The path to the asset database to load.
             </summary>
         </member>
-        <member name="F:Photon.Deterministic.DeterministicSessionRunnerInitArguments.EmbeddedAssetDBName">
+        <member name="F:Photon.Deterministic.DeterministicSessionContextInitArguments.EmbeddedAssetDBName">
             <summary>
             The name of the embedded asset database to load.
             </summary>
         </member>
-        <member name="F:Photon.Deterministic.DeterministicSessionRunnerInitArguments.AssetSerializer">
+        <member name="F:Photon.Deterministic.DeterministicSessionContextInitArguments.AssetSerializer">
             <summary>
             The asset serializer object (IAssetSerializer).
             </summary>
         </member>
+        <member name="T:Photon.Deterministic.DeterministicSessionContextStartArguments">
+            <summary>
+            The arguments to start a <see cref="T:Photon.Deterministic.IDeterministicSessionContext"/>.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.DeterministicSessionContextStartArguments.RuntimeConfig">
+            <summary>
+            The custom RuntimeConfig used.
+            </summary>
+        </member>
+        <member name="T:Photon.Deterministic.IDeterministicSessionContext">
+            <summary>
+            The interface describes the context of a Quantum session that is running on the server.
+            The implementation is provided by the game/Unity side and has full access to all custom game code and Quantum.Engine.dll.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IDeterministicSessionContext.CommandSerializer">
+            <summary>
+            Returns the command serializer created when the simulation started.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IDeterministicSessionContext.ResourceManager">
+            <summary>
+            Return the resource manager as an object. Cast to ResourceManagerStatic.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IDeterministicSessionContext.Init(Photon.Deterministic.DeterministicSessionContextInitArguments)">
+            <summary>
+            Init the simulation.
+            </summary>
+            <param name="args">Initialization arguments</param>
+        </member>
+        <member name="M:Photon.Deterministic.IDeterministicSessionContext.Start(Photon.Deterministic.DeterministicSessionContextStartArguments)">
+            <summary>
+            Start the simulation.
+            </summary>
+            <param name="args">Start arguments</param>
+        </member>
+        <member name="M:Photon.Deterministic.IDeterministicSessionContext.Shutdown">
+            <summary>
+            Shutdown the context.
+            </summary>
+        </member>
         <member name="T:Photon.Deterministic.DeterministicSessionRunnerStartArguments">
             <summary>
-            The arguments to start a deterministic session runner.
+            The arguments to start a <see cref="T:Photon.Deterministic.IDeterministicSessionRunner"/>.
             </summary>
         </member>
         <member name="F:Photon.Deterministic.DeterministicSessionRunnerStartArguments.InputProvider">
@@ -6166,9 +6812,15 @@
             The custom RuntimeConfig used.
             </summary>
         </member>
+        <member name="F:Photon.Deterministic.DeterministicSessionRunnerStartArguments.ResourceManager">
+            <summary>
+            Resource manager from <see cref="T:Photon.Deterministic.IDeterministicSessionContext"/>
+            </summary>
+        </member>
         <member name="T:Photon.Deterministic.IDeterministicSessionRunner">
             <summary>
-            When using server simulation, this interface is used by the Quantum plugin to start and run a simulation.
+            The interface describes the runner of a Quantum session that is executed on the server.
+            The implementation is provided by the game/Unity side and has full access to all custom game code and Quantum.Engine.dll.
             </summary>
         </member>
         <member name="P:Photon.Deterministic.IDeterministicSessionRunner.EventDispatcher">
@@ -6187,11 +6839,10 @@
             It is automatically picked up by the server and triggers a webhook.
             </summary>
         </member>
-        <member name="M:Photon.Deterministic.IDeterministicSessionRunner.Init(Photon.Deterministic.DeterministicSessionRunnerInitArguments)">
+        <member name="P:Photon.Deterministic.IDeterministicSessionRunner.Session">
             <summary>
-            Init the simulation.
+            Returns the session.
             </summary>
-            <param name="args">Initialization arguments</param>
         </member>
         <member name="M:Photon.Deterministic.IDeterministicSessionRunner.Shutdown">
             <summary>
@@ -6251,6 +6902,11 @@
         <member name="F:Photon.Deterministic.RoomProperties.Start">
             <summary>
             This room property can be controlled through Photon dashboard settings.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.RoomProperties.WebHookBaseUrl">
+            <summary>
+            User can set this during CreateGame to change the webhook base url provided by an allow list.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.Protocol.AddPlayer">
@@ -6847,7 +7503,7 @@
         </member>
         <member name="M:Photon.Deterministic.DeterministicCommand.#ctor">
             <summary>
-            Empty contructor.
+            Empty constructor.
             </summary>
         </member>
         <member name="M:Photon.Deterministic.DeterministicCommand.Serialize(Photon.Deterministic.BitStream,Photon.Deterministic.DeterministicCommandSerializer)">
@@ -6878,7 +7534,8 @@
         </member>
         <member name="M:Photon.Deterministic.DeterministicCommand.Dispose">
             <summary>
-            Disposes the command object and returns it to the pool.
+            Disposing commands is done internally and does not need to be called manually.
+            The method is public because of the <see cref="T:System.IDisposable"/> interface and to be able to derive it.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.DeterministicCommandPool`1">
@@ -6920,11 +7577,13 @@
         <member name="F:Photon.Deterministic.DeterministicCommandSerializer.CommandSerializerStreamRead">
             <summary>
             The reusable read stream.
+            Use <see cref="M:Photon.Deterministic.BitStream.SetBuffer(System.Byte[])"/> before using.
             </summary>
         </member>
         <member name="F:Photon.Deterministic.DeterministicCommandSerializer.CommandSerializerStreamWrite">
             <summary>
-            The reuseable write stream.
+            The re-useable write stream.
+            Use <see cref="M:Photon.Deterministic.BitStream.Reset(System.Int32)"/> before using.
             </summary>
         </member>
         <member name="M:Photon.Deterministic.DeterministicCommandSerializer.#ctor">
@@ -6943,6 +7602,25 @@
             Register a list of command factories.
             </summary>
             <param name="factories">Factory params</param>
+        </member>
+        <member name="M:Photon.Deterministic.DeterministicCommandSerializer.TryDecodeCommand``1(System.Byte[],``0@)">
+            <summary>
+            Decodes command message byte array into a specific command type.
+            </summary>
+            <typeparam name="T">Command type to cast to</typeparam>
+            <param name="data">Serialized command data.</param>
+            <param name="result">Resulting command instance.</param>
+            <returns>Returns <see langword="true"/> when successfully decoded and casted.</returns>
+        </member>
+        <member name="M:Photon.Deterministic.DeterministicCommandSerializer.EncodeCommand(Photon.Deterministic.DeterministicCommand,System.Byte[]@)">
+            <summary>
+            Encodes the command into a byte array.
+            Creates a new byte array and returns it. 
+            Reusing byte arrays is not recommended because of the uncertain resulting size.
+            </summary>
+            <param name="command">Command instance</param>
+            <param name="result">Serialized command to be send to the clients for example.</param>
+            <returns>Returns <see langword="true"/> when successfully encoded.</returns>
         </member>
         <member name="M:Photon.Deterministic.DeterministicCommandSerializer.PackNext(Photon.Deterministic.BitStream,Photon.Deterministic.DeterministicCommand)">
             <summary>
@@ -7849,16 +8527,25 @@
         <member name="M:Photon.Deterministic.DeterministicSession.IsPlayerLocal(Quantum.PlayerRef)">
             <summary>
             Tests whereas this PlayerRef is controlled by this local client/session.
+            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.DeterministicSession.GetActorNumber">
+            <summary>
+            Returns the Photon Actor Number of the connection, if in online mode.
+            Otherwise, returns 0.
             </summary>
         </member>
         <member name="M:Photon.Deterministic.DeterministicSession.TryGetLocalPlayer(System.Int32,Quantum.PlayerRef@)">
             <summary>
             Returns <see langword="true"/> and fills in the corresponding global PlayerRef if playerSlot is a valid local slot, for which the session can send input.
+            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
             </summary>
         </member>
         <member name="M:Photon.Deterministic.DeterministicSession.IsPlayerSlotLocal(System.Int32)">
             <summary>
             Checks if this local player slot is currently in use (local slots can be added/removed dynamically).
+            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
             </summary>
         </member>
         <member name="P:Photon.Deterministic.DeterministicSession.PlayerCount">
@@ -7886,7 +8573,7 @@
             Stats: Number of predicted frames simulated during the last call to Update().
             </summary>
         </member>
-        <member name="P:Photon.Deterministic.DeterministicSession.SimulationTimeElasped">
+        <member name="P:Photon.Deterministic.DeterministicSession.SimulationTimeElapsed">
             <summary>
             Stats: Precise time in seconds used by the last call to Update(). Includes all session internal input handling, rollbacks, verified and predicted frames simulation.
             </summary>
@@ -7957,9 +8644,19 @@
             <see langword="true"/> when the final input in the replay stream has been consumed to simulate forward a verified frame.
             </summary>
         </member>
+        <member name="P:Photon.Deterministic.DeterministicSession.HasStarted">
+            <summary>
+            The initial state is idle, then it will be started after confirmation from the server.
+            </summary>
+        </member>
         <member name="P:Photon.Deterministic.DeterministicSession.IsRunning">
             <summary>
             <see langword="true"/> if local session is started and active.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.DeterministicSession.IsDestroyed">
+            <summary>
+            Returns <see langword="true"/> when <see cref="M:Photon.Deterministic.DeterministicSession.Destroy"/> has been called.
             </summary>
         </member>
         <member name="P:Photon.Deterministic.DeterministicSession.ReplayProvider">
@@ -7981,6 +8678,11 @@
         <member name="P:Photon.Deterministic.DeterministicSession.Runner">
             <summary>
             Runner is the wrapper for session/game that can be attached to Unity, a .Net console app, or a Quantum Custom Server Plugin. 
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.DeterministicSession.OnDestroyed">
+            <summary>
+            Is executed in the end of <see cref="M:Photon.Deterministic.DeterministicSession.Destroy"/>. Is used by the server simulation.
             </summary>
         </member>
         <member name="P:Photon.Deterministic.DeterministicSession.InputPool">
@@ -9093,6 +9795,11 @@
         <member name="T:Photon.Deterministic.IDeterministicReplayProvider">
             <summary>
             An internal interface to encapsulate managing rpc and input.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IDeterministicReplayProvider.LocalActorNumber">
+            <summary>
+            Setting the correct local actor number makes <see cref="M:Photon.Deterministic.DeterministicSession.IsLocalPlayer(Quantum.PlayerRef)"/> work in replays similar to normal Quantum sessions.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.IDeterministicStreamReplayInputProvider">
@@ -10322,20 +11029,23 @@
             <param name="length">The length of the byte array.</param>
             <param name="fixedSize">The fixed size of the byte array.</param>
         </member>
-        <member name="M:Photon.Deterministic.BitStream.SerializeArrayLength``1(``0[]@)">
+        <member name="M:Photon.Deterministic.BitStream.SerializeArrayLength``1(``0[]@,System.Int32)">
             <summary>
             Serializes or deserializes the length of a generic array.
             </summary>
             <typeparam name="T">The type of the elements in the array.</typeparam>
             <param name="array">The array to serialize or deserialize.</param>
+            <param name="maxLength">The max size of the input array as a safety mechanism to limit the buffers allocated on deserializing commands for example.</param>
+            <returns>The length of the array secured by maxLength.</returns>
         </member>
-        <member name="M:Photon.Deterministic.BitStream.SerializeArray``1(``0[]@,Photon.Deterministic.BitStream.ArrayElementSerializer{``0})">
+        <member name="M:Photon.Deterministic.BitStream.SerializeArray``1(``0[]@,Photon.Deterministic.BitStream.ArrayElementSerializer{``0},System.Int32)">
             <summary>
             Serializes or deserializes an array using a custom serializer.
             </summary>
             <typeparam name="T">The type of elements in the array.</typeparam>
             <param name="array">The array to serialize or deserialize.</param>
             <param name="serializer">The custom serializer for the array elements.</param>
+            <param name="maxLength">The max size of the input array as a safety mechanism to limit the buffers allocated on deserializing commands for example.</param>
             <remarks>
             If write mode is enabled, the method serializes the length of the array, followed by each element of the array using the provided serializer.
             If write mode is disabled, the method deserializes the length of the array, creates a new array of the appropriate length,
@@ -10926,6 +11636,57 @@
         <member name="P:Photon.Deterministic.DeterministicStats.UpdateTime">
             <summary>
             The total time of the last update.
+            </summary>
+        </member>
+        <member name="T:Photon.Deterministic.StopwatchTimer">
+            <summary>
+            Represents a high-resolution timer.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.StopwatchTimer.StartNew">
+            <summary>
+            Creates and starts a new timer.
+            </summary>
+            <returns>A new instance of the <see cref="T:Photon.Deterministic.StopwatchTimer"/> struct.</returns>
+        </member>
+        <member name="P:Photon.Deterministic.StopwatchTimer.ElapsedInTicks">
+            <summary>
+            Gets the elapsed time in ticks.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.StopwatchTimer.ElapsedInMilliseconds">
+            <summary>
+            Gets the elapsed time in milliseconds.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.StopwatchTimer.ElapsedInSeconds">
+            <summary>
+            Gets the elapsed time in seconds.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.StopwatchTimer.IsRunning">
+            <summary>
+            Gets a value indicating whether the timer is running.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.StopwatchTimer.Start">
+            <summary>
+            Starts the timer if it is not already running.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.StopwatchTimer.Stop">
+            <summary>
+            Stops the timer if it is running and updates the elapsed time.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.StopwatchTimer.Reset">
+            <summary>
+            Resets the timer to its initial state.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.StopwatchTimer.Restart">
+            <summary>
+            Restarts the timer, setting the elapsed time to zero and starting it.
             </summary>
         </member>
         <member name="T:Quantum.PlayerRef">

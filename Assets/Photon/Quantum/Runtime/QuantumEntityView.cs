@@ -60,7 +60,9 @@ namespace Quantum {
     public QuantumEntityViewBindBehaviour BindBehaviour;
 
     /// <summary>
-    /// If enabled the QuantumEntityViewUpdater will not destroy (or disable, in case of map entities) this instance, and you are responsible for removing it from the game world yourself.\n\nYou will still receive the OnEntityDestroyed callback.
+    /// If enabled the QuantumEntityViewUpdater will not destroy (or disable, in case of map entities) this instance.
+    /// The responsibility to destroy the game object is on the user.
+    /// The <see cref="OnEntityDestroyed"/> callback will still be called.
     /// </summary>
     [FormerlySerializedAs("ManualDestroy")]
     [FormerlySerializedAs("ManualDiposal")]
@@ -454,7 +456,8 @@ namespace Quantum {
       if ((ViewFlags & QuantumEntityViewFlags.DisableSearchChildrenForEntityViewComponents) > 0) {
         _viewComponents = GetComponents<IQuantumViewComponent>();
       } else {
-        _viewComponents = GetComponentsInChildren<IQuantumViewComponent>();
+        _viewComponents = GetComponentsInChildren<IQuantumViewComponent>(
+          includeInactive: (ViewFlags & QuantumEntityViewFlags.DisableSearchInactiveForEntityViewComponents) == 0);
       }
 
       EntityViewUpdater = entityViewUpdater;
@@ -504,14 +507,14 @@ namespace Quantum {
       }
 
       Game = game;
-
+     
       OnActivate(frame);
 
       TryInitSnapshotInterpolation();
 
       for (int i = 0; i < _viewComponents.Length; i++) {
 #if QUANTUM_ENABLE_MIGRATION
-      _viewComponents[i].Activate(frame, Game, (QuantumEntityView)this);
+        _viewComponents[i].Activate(frame, Game, (QuantumEntityView)this);
 #else
         _viewComponents[i].Activate(frame, Game, this);
 #endif
@@ -573,7 +576,7 @@ namespace Quantum {
         OnUpdateView();
 
         for (int i = 0; i < _viewComponents.Length; i++) {
-          if (_viewComponents[i].IsActive) {
+          if (_viewComponents[i].IsActiveAndEnabled) {
             _viewComponents[i].UpdateView();
           }
         }
@@ -588,7 +591,7 @@ namespace Quantum {
       OnLateUpdateView();
 
       for (int i = 0; i < _viewComponents.Length; i++) {
-        if (_viewComponents[i].IsActive) {
+        if (_viewComponents[i].IsActiveAndEnabled) {
           _viewComponents[i].LateUpdateView();
         }
       }

@@ -33,6 +33,12 @@ namespace Quantum {
     [InlineHelp, DrawInline, Space]
     public QuantumStaticColliderSettings Settings = new QuantumStaticColliderSettings();
 
+    private void ClampSize() {
+      Size.X = FPMath.Clamp(Size.X, 0, Size.X);
+      Size.Y = FPMath.Clamp(Size.Y, 0, Size.Y);
+      Size.Z = FPMath.Clamp(Size.Z, 0, Size.Z);
+    }
+
     private void OnValidate() {
       UpdateFromSourceCollider();
     }
@@ -42,10 +48,14 @@ namespace Quantum {
     /// </summary>
     public void UpdateFromSourceCollider() {
       if (SourceCollider == null) {
+        ClampSize();
         return;
       }
 
       Size = SourceCollider.size.ToFPVector3();
+      Size.X = FPMath.Abs(Size.X);
+      Size.Y = FPMath.Abs(Size.Y);
+      Size.Z = FPMath.Abs(Size.Z);
       PositionOffset = SourceCollider.center.ToFPVector3();
       Settings.Trigger = SourceCollider.isTrigger;
     }

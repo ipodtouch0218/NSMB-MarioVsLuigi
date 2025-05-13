@@ -6,10 +6,10 @@
 // <author>developer@exitgames.com</author>
 // ----------------------------------------------------------------------------
 
-
 #if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
+
 
 #if SUPPORTED_UNITY
 namespace Photon.Realtime

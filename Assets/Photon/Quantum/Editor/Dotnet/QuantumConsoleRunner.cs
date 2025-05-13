@@ -41,7 +41,8 @@ namespace Quantum {
     /// <param name="checksumPath">Optionally an extra path to the checksum file.</param>
     /// <returns></returns>
     public bool Run(string replayPath, string lutPath, string dbPath, string checksumPath) {
-      Quantum.Log.InitForConsole();
+      
+      Quantum.Log.InitializeForConsole(LogLevel.Info);
 
       if (string.IsNullOrEmpty(replayPath)) { Log.Error("ReplayPath must be specified"); return false; }
       if (File.Exists(replayPath) == false) { Log.Error($"File not found {replayPath}"); return false; }

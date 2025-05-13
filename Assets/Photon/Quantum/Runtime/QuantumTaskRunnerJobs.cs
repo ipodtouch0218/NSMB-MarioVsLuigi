@@ -31,7 +31,15 @@ namespace Quantum {
 
     protected virtual int CustomQuantumJobsMaxCount => DefaultQuantumJobsMaxCount;
 
-    protected int DefaultQuantumJobsMaxCount => JobsUtility.JobWorkerCount - 1;
+    protected int DefaultQuantumJobsMaxCount {
+      get {
+#if UNITY_WEBGL && !UNITY_6000_0_OR_NEWER
+        return 0;
+#else
+        return JobsUtility.JobWorkerCount - 1;
+#endif
+      }
+    }
 
     [StaticField(StaticFieldResetMode.None)]
     static Action[] _delegates;

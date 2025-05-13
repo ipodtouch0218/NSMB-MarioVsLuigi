@@ -1884,8 +1884,12 @@ PrefabInstance:
         type: 3}
       propertyPath: Asset
       value: 
-      objectReference: {fileID: 11400000, guid: bd5808d9e85ad8b4592ca36eaff24b8f,
-        type: 2}
+      objectReference: {fileID: 0}
+    - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: AssetRef.Id.Value
+      value: 420358832928607506
+      objectReference: {fileID: 0}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: MapEntityReferences.Array.size

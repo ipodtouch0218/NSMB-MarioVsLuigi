@@ -17,7 +17,7 @@ namespace Photon.Realtime
 {
     using Photon.Client;
 
-    #if SUPPORTED_UNITY || NETFX_CORE
+    #if SUPPORTED_UNITY
     using SupportClass = Photon.Client.SupportClass;
     #endif
 
