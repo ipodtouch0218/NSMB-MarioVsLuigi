@@ -1028,6 +1028,8 @@ namespace Quantum {
                 mario->WallslideRight = false;
                 mario->IsCrouching = false;
                 mario->IsInShell = false;
+            } else {
+                QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
             }
         }
 
@@ -1628,8 +1630,6 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
             var collider = filter.PhysicsCollider;
-
-            QuantumUtils.Decrement(ref mario->DamageInvincibilityFrames);
 
             FPVector2 iceBlockSize = collider->Shape.Box.Extents;
             FP newHeight;

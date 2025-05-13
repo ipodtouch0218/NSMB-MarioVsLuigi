@@ -49,6 +49,14 @@ namespace NSMB.UI.MainMenu {
             Settings.Controls.UI.Enable();
         }
 
+        public void OnDisable() {
+            while (submenuStack.Count > 0) {
+                if (submenuStack[^1] is PromptSubmenu ps) {
+                    ps.Hide(SubmenuHideReason.Closed);
+                }
+            }
+        }
+
         public void Awake() {
             Instance = this;
             defaultHeaderColor = headerImage.color;

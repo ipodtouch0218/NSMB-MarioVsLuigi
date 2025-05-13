@@ -18,7 +18,7 @@ namespace Quantum {
             for (int i = bans.Count - 1; i >= 0; i--) {
                 if (bans[i].UserId == TargetUserId) {
                     f.Events.PlayerUnbanned(bans[i]);
-                    bans.RemoveAtUnordered(i);
+                    bans.RemoveAt(i);
                 }
             }
         }
