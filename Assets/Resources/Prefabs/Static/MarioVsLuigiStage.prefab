@@ -45,7 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0413bd8db4f29e3488d92156dc397190, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Asset: {fileID: 0}
+  AssetRef:
+    Id:
+      Value: 0
   BakeAllMode: 112
   NavMeshSerializeType: 0
   StaticCollider2DReferences: []
@@ -61,6 +63,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  Asset: {fileID: 0}
 --- !u!114 &2164258291205668163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,6 +411,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bde109c23ab3a64f9ccec5ac787f04b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 2550855901662361809}
+  UseFindUpdater: 0
   particles:
   - particle: 5
     prefab: {fileID: 5903185039186744869, guid: d5777f79309ac1e428227e6c2ade9525,
@@ -801,7 +806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba1cef2e59fba6443b0b8a032263be28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DeltaTypeType: 1
+  DeltaTimeType: 1
   RecordingFlags: 0
   InstantReplayConfig:
     SnapshotsPerSecond: 1
@@ -819,6 +824,7 @@ MonoBehaviour:
       Id:
         Value: 3654882389298375385
     IsRealGame: 0
+  UseRandomSeed: 0
   SessionConfig: {fileID: 11400000, guid: a095ff8a2ef576047bdebfec7a20e387, type: 2}
   LocalPlayers:
   - PlayerAvatar:
@@ -834,7 +840,6 @@ MonoBehaviour:
   SimulationSpeedMultiplier: 1
   DisplaySaveAndReloadButton: 0
   PreloadAddressables: 0
-  IsTaskProfilerEnabled: 1
   DynamicAssetDB:
     OnInitialDynamicAssetsRequested:
       m_PersistentCalls:

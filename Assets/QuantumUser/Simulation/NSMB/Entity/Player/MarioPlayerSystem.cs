@@ -2283,6 +2283,7 @@ namespace Quantum {
         private static void MarioMarioStomp(Frame f, EntityRef attacker, EntityRef defender, bool fromRight, bool dropStars) {
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
             var defenderMario = f.Unsafe.GetPointer<MarioPlayer>(defender);
+            var defenderPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(defender);
 
             // Hit them from above
             attackerMario->DoEntityBounce = !attackerMario->IsGroundpounding && !attackerMario->IsDrilling;
@@ -2304,6 +2305,15 @@ namespace Quantum {
                 defenderMario->SpawnStars(f, defender, 3);
                 defenderMario->Death(f, defender, false, false);
                 attackerMario->DoEntityBounce = false;
+            } else if (defenderMario->CurrentPowerupState == PowerupState.HammerSuit && defenderPhysicsObject->IsTouchingGround && defenderMario->IsCrouching && !groundpounded) {
+                // Bounce
+                var attackerPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(attacker);
+                if (FPMath.Abs(attackerPhysicsObject->Velocity.X) < 2) {
+                    attackerPhysicsObject->Velocity.X = fromRight ? -2 : 2;
+                }
+                attackerPhysicsObject->Velocity.Y = 4;
+                attackerMario->DoEntityBounce = false;
+                f.Events.EnemyKicked(defender, false);
             } else {
                 // Normal knockbacks
                 if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {

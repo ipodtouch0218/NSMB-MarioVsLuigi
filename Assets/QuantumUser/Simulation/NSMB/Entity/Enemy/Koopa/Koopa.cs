@@ -1,4 +1,6 @@
 using Photon.Deterministic;
+using System;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct Koopa {
@@ -45,7 +47,7 @@ namespace Quantum {
             f.Unsafe.GetPointer<ComboKeeper>(entity)->Combo = 1;
 
             f.Events.PlayComboSound(entity, 0);
-            f.Events.KoopaKicked(entity, false);
+            f.Events.EnemyKicked(entity, false);
         }
 
         public void Kill(Frame f, EntityRef koopaEntity, EntityRef killerEntity, KillReason reason) {

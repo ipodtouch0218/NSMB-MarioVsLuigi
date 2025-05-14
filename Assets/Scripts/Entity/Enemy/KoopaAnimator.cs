@@ -32,7 +32,6 @@ public class KoopaAnimator : QuantumEntityViewComponent {
     public void Start() {
         QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
-        QuantumEvent.Subscribe<EventKoopaKicked>(this, OnKoopaKicked, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public override unsafe void OnUpdateView() {
@@ -116,17 +115,6 @@ public class KoopaAnimator : QuantumEntityViewComponent {
         }
 
         sfx.PlayOneShot(QuantumUtils.GetComboSoundEffect(e.Combo));
-    }
-
-    private unsafe void OnKoopaKicked(EventKoopaKicked e) {
-        if (e.Entity != EntityRef) {
-            return;
-        }
-
-        Instantiate(
-            Enums.PrefabParticle.Enemy_HardKick.GetGameObject(),
-            transform.position + (Vector3.back * 5) + (Vector3.up * 0.1f),
-            Quaternion.identity);
     }
 
     /*

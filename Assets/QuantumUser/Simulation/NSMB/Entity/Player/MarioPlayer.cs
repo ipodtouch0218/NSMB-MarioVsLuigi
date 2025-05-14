@@ -9,7 +9,6 @@ namespace Quantum {
         public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
-        public bool IsInWeakKnockback => CurrentKnockback == KnockbackStrength.CollisionBump || CurrentKnockback == KnockbackStrength.FireballBump;
 
         public byte? GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
@@ -432,6 +431,7 @@ namespace Quantum {
             physicsObject->HoverFrames = 0;
 
             CurrentKnockback = strength;
+            IsInWeakKnockback = CurrentKnockback == KnockbackStrength.CollisionBump || (CurrentKnockback == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround);
             KnockbackWasOriginallyFacingRight = FacingRight;
             KnockbackTick = f.Number;
             KnockForwards = FacingRight != fromRight;
@@ -455,7 +455,7 @@ namespace Quantum {
             DamageInvincibilityFrames = (byte) (90 + KnockbackGetupFrames);
             ////DoEntityBounce = false;
             CurrentKnockback = KnockbackStrength.None;
-            //IsForwardsKnockback = false;
+            IsInWeakKnockback = false;
             FacingRight = KnockbackWasOriginallyFacingRight;
             
             physicsObject->Velocity.X = 0;

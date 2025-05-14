@@ -14,8 +14,3 @@ component Koopa {
 	[ExcludeFromPrototype] ushort WakeupFrames;
 	[ExcludeFromPrototype] byte TurnaroundWaitFrames;
 }
-
-event KoopaKicked {
-	EntityRef Entity;
-	bool Groundpounded;
-}

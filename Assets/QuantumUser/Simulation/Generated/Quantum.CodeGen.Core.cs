@@ -2287,7 +2287,7 @@ namespace Quantum {
     [FieldOffset(80)]
     [ExcludeFromPrototype()]
     public QBoolean FireDeath;
-    [FieldOffset(112)]
+    [FieldOffset(116)]
     [ExcludeFromPrototype()]
     public QBoolean IsRespawning;
     [FieldOffset(6)]
@@ -2305,10 +2305,10 @@ namespace Quantum {
     [FieldOffset(76)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(116)]
+    [FieldOffset(120)]
     [ExcludeFromPrototype()]
     public QBoolean IsSkidding;
-    [FieldOffset(132)]
+    [FieldOffset(136)]
     [ExcludeFromPrototype()]
     public QBoolean IsTurnaround;
     [FieldOffset(7)]
@@ -2347,10 +2347,10 @@ namespace Quantum {
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public Byte ForceJumpTimer;
-    [FieldOffset(156)]
+    [FieldOffset(160)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideLeft;
-    [FieldOffset(160)]
+    [FieldOffset(164)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
     [FieldOffset(35)]
@@ -2377,10 +2377,13 @@ namespace Quantum {
     [FieldOffset(38)]
     [ExcludeFromPrototype()]
     public KnockbackStrength CurrentKnockback;
-    [FieldOffset(136)]
+    [FieldOffset(108)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsInWeakKnockback;
+    [FieldOffset(140)]
     [ExcludeFromPrototype()]
     public QBoolean KnockForwards;
-    [FieldOffset(140)]
+    [FieldOffset(144)]
     [ExcludeFromPrototype()]
     public QBoolean KnockbackWasOriginallyFacingRight;
     [FieldOffset(52)]
@@ -2398,16 +2401,16 @@ namespace Quantum {
     [FieldOffset(84)]
     [ExcludeFromPrototype()]
     public QBoolean IsCrouching;
-    [FieldOffset(120)]
+    [FieldOffset(124)]
     [ExcludeFromPrototype()]
     public QBoolean IsSliding;
-    [FieldOffset(124)]
+    [FieldOffset(128)]
     [ExcludeFromPrototype()]
     public QBoolean IsSpinnerFlying;
     [FieldOffset(92)]
     [ExcludeFromPrototype()]
     public QBoolean IsDrilling;
-    [FieldOffset(128)]
+    [FieldOffset(132)]
     [ExcludeFromPrototype()]
     public QBoolean IsStuckInBlock;
     [FieldOffset(42)]
@@ -2422,7 +2425,7 @@ namespace Quantum {
     [FieldOffset(16)]
     [ExcludeFromPrototype()]
     public Byte MegaMushroomEndFrames;
-    [FieldOffset(144)]
+    [FieldOffset(148)]
     [ExcludeFromPrototype()]
     public QBoolean MegaMushroomStationaryEnd;
     [FieldOffset(22)]
@@ -2443,7 +2446,7 @@ namespace Quantum {
     [FieldOffset(29)]
     [ExcludeFromPrototype()]
     public Byte ShellSlowdownFrames;
-    [FieldOffset(108)]
+    [FieldOffset(112)]
     [ExcludeFromPrototype()]
     public QBoolean IsPropellerFlying;
     [FieldOffset(26)]
@@ -2452,7 +2455,7 @@ namespace Quantum {
     [FieldOffset(27)]
     [ExcludeFromPrototype()]
     public Byte PropellerSpinFrames;
-    [FieldOffset(152)]
+    [FieldOffset(156)]
     [ExcludeFromPrototype()]
     public QBoolean UsedPropellerThisJump;
     [FieldOffset(24)]
@@ -2473,7 +2476,7 @@ namespace Quantum {
     [FieldOffset(216)]
     [ExcludeFromPrototype()]
     public FPVector2 PipeDirection;
-    [FieldOffset(148)]
+    [FieldOffset(152)]
     [ExcludeFromPrototype()]
     public QBoolean PipeEntering;
     [FieldOffset(20)]
@@ -2532,6 +2535,7 @@ namespace Quantum {
         hash = hash * 31 + GroundpoundCooldownFrames.GetHashCode();
         hash = hash * 31 + GroundpoundStandFrames.GetHashCode();
         hash = hash * 31 + (Byte)CurrentKnockback;
+        hash = hash * 31 + IsInWeakKnockback.GetHashCode();
         hash = hash * 31 + KnockForwards.GetHashCode();
         hash = hash * 31 + KnockbackWasOriginallyFacingRight.GetHashCode();
         hash = hash * 31 + KnockbackTick.GetHashCode();
@@ -2631,6 +2635,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsGroundpoundActive, serializer);
         QBoolean.Serialize(&p->IsGroundpounding, serializer);
         QBoolean.Serialize(&p->IsInShell, serializer);
+        QBoolean.Serialize(&p->IsInWeakKnockback, serializer);
         QBoolean.Serialize(&p->IsPropellerFlying, serializer);
         QBoolean.Serialize(&p->IsRespawning, serializer);
         QBoolean.Serialize(&p->IsSkidding, serializer);

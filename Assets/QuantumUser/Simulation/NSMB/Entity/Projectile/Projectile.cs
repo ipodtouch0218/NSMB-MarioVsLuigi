@@ -41,35 +41,14 @@ namespace Quantum {
             Owner = owner;
             FacingRight = right;
 
-            // Speed
-            Speed = asset.Speed;
-            physicsObject->Gravity = asset.Gravity;
-            f.Unsafe.TryGetPointer(owner, out PhysicsObject* ownerPhysicsObject);
-            if (asset.InheritShooterVelocity
-                && ownerPhysicsObject != null
-                // Moving in same direction
-                && FPMath.Sign(ownerPhysicsObject->Velocity.X) == 1 == FacingRight) {
-
-                Speed += FPMath.Abs(ownerPhysicsObject->Velocity.X / 3);
-            }
-
-            if (asset.LockTo45Degrees) {
-                physicsObject->TerminalVelocity = -Speed;
-            }
-
-            // Physics
+            // Initial Velocity
+            FPVector2 velocity = playerHoldingUp ? new FPVector2(FP.FromString("3.8822"), FP.FromString("14.4888")) : new FPVector2(FP.FromString("6.25"), FP.FromString("7.5"));
+            Speed = velocity.X;
+            
+            // Apply
             transform->Position = spawnpoint;
-
-            if (playerHoldingUp) {
-                Speed /= 2;
-                physicsObject->Velocity.Y = asset.Speed * 2;
-            } else {
-                physicsObject->Velocity.Y = asset.Speed;
-            }
-            physicsObject->Velocity.X = Speed * (FacingRight ? 1 : -1);
-            if (ownerPhysicsObject != null) {
-                physicsObject->Velocity.Y += FPMath.Max(0, ownerPhysicsObject->Velocity.Y);
-            }
+            physicsObject->Velocity = velocity;
+            physicsObject->Gravity = FPVector2.Up * (playerHoldingUp ? FP.FromString("-37.512") : FP.FromString("-28.125"));
         }
     }
 }

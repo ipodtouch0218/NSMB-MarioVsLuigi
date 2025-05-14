@@ -40,3 +40,8 @@ event PlayComboSound {
 event PlayBumpSound {
 	EntityRef Entity;
 }
+
+event EnemyKicked {
+	EntityRef Entity;
+	bool Groundpounded;
+}

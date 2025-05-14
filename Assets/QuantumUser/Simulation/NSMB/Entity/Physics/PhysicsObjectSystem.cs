@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
@@ -12,7 +11,7 @@ namespace Quantum {
 #endif
 
         public static readonly FP RaycastSkin = FP._0_05;
-        public static readonly FP Skin = FP.FromString("0.001");
+        public static readonly FP Skin = FP.FromString("0.005");
         public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 1 - cos(22.5 degrees)
         public static readonly FPVector2 oneFourthVector2 = FPVector2.One / 4;
 
@@ -684,7 +683,7 @@ namespace Quantum {
                         
                         if (earlyContinue
                             || (min.HasValue && min.Value > 0 && contact.Distance - min.Value > tolerance)
-                            || contact.Distance > FPMath.Abs(velocityX)
+                            || contact.Distance - Skin > FPMath.Abs(velocityX) + Skin
                             /* || removedContacts.Contains(contact) */
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
@@ -1056,8 +1055,8 @@ namespace Quantum {
             var extents = shape.Box.Extents;
 
             FPVector2 origin = position + shape.Centroid;
-            FPVector2 boxMin = origin - extents + new FPVector2(Skin, Skin);
-            FPVector2 boxMax = origin + extents - new FPVector2(Skin, Skin);
+            FPVector2 boxMin = origin - extents;
+            FPVector2 boxMax = origin + extents;
 
             Span<FPVector2> boxCorners = stackalloc FPVector2[4];
             boxCorners[0] = new(boxMin.X, boxMax.Y);

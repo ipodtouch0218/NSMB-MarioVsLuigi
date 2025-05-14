@@ -65,9 +65,10 @@ namespace Quantum {
                     continue;
                 }
 
-                bool movingAway = FPVector2.Dot(physicsObject->Velocity.Normalized, velocity.Normalized) < 0;
+                bool movingAway = FPVector2.Dot(physicsObject->Velocity.Normalized, velocity.Normalized) > 0;
                 if (shape->Type == Shape2DType.Edge) {
                     // Semisolid logic
+                    movingAway = !movingAway;
                     if (!movingAway) {
                         continue;
                     }

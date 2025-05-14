@@ -1,7 +1,7 @@
 using System;
 
 public enum SoundEffect : byte {
-    //CURRENT HIGHEST NUMBER: 108 (use 109 next)
+    //CURRENT HIGHEST NUMBER: 109 (use 110 next)
     //Enemy
     [SoundData("enemy/freeze")] Enemy_Generic_Freeze = 0,
     [SoundData("enemy/freeze_shatter")] Enemy_Generic_FreezeShatter = 1,
@@ -80,7 +80,7 @@ public enum SoundEffect : byte {
     [SoundData("powerup/propellermushroom_spin")] Powerup_PropellerMushroom_Spin = 58,
     [SoundData("powerup/propellermushroom_start")] Powerup_PropellerMushroom_Start = 59,
     [SoundData("powerup/hammer_throw")] Powerup_HammerSuit_Throw = 106, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
-
+    [SoundData("powerup/hammersuit_bounce")] Powerup_HammerSuit_Bounce = 109,
 
     //UI Sounds / Songs / Jingles
     [SoundData("ui/hurry_up")] UI_HurryUp = 60,

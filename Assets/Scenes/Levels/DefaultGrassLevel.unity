@@ -5331,11 +5331,6 @@ PrefabInstance:
       propertyPath: 'MapEntityReferences.Array.data[16]'
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 8642252342915534796, guid: dcdc633a29f212843ae9cbdf4be58fb2,
-        type: 3}
-      propertyPath: IsTaskProfilerEnabled
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 1639410889847947372, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}

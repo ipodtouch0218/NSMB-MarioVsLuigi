@@ -87,6 +87,7 @@ component MarioPlayer {
 
 	// Knockback
     [ExcludeFromPrototype] KnockbackStrength CurrentKnockback;
+	[ExcludeFromPrototype] bool IsInWeakKnockback;
 	[ExcludeFromPrototype] bool KnockForwards;
 	[ExcludeFromPrototype] bool KnockbackWasOriginallyFacingRight;
 	[ExcludeFromPrototype] int KnockbackTick;

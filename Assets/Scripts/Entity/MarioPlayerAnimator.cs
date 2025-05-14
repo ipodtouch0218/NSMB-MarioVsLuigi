@@ -158,7 +158,8 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation);
+            QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, NetworkHandler.FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -1171,6 +1172,14 @@ namespace NSMB.Entities.Player {
             }
 
             animator.Play("jumplanding");
+        }
+
+        private void OnEnemyKicked(EventEnemyKicked e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            sfx.PlayOneShot(SoundEffect.Powerup_HammerSuit_Bounce);
         }
     }
 }
