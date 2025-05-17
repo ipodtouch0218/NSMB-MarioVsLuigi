@@ -46,6 +46,7 @@ Material:
     - _ColorOffset: {r: 0, g: 0, b: 0, a: 0}
     - _Overlay: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,9 +59,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84a92b25f83d49b9bc132d206b370281, type: 3}
   m_Name: UISymbols
   m_EditorClassIdentifier: 
-  hashCode: 3964
-  material: {fileID: -2478370977588193814}
-  materialHashCode: 0
   m_Version: 1.1.0
   m_FaceInfo:
     m_FaceIndex: 0
@@ -84,6 +82,7 @@ MonoBehaviour:
     m_StrikethroughOffset: 0
     m_StrikethroughThickness: 0
     m_TabWidth: 0
+  m_Material: {fileID: -2478370977588193814}
   spriteSheet: {fileID: 2800000, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   m_SpriteCharacterTable:
   - m_ElementType: 2
@@ -91,488 +90,437 @@ MonoBehaviour:
     m_GlyphIndex: 39
     m_Scale: 1
     m_Name: hudnumber_x
-    m_HashCode: -148913443
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 0
     m_Scale: 1
     m_Name: room_timer
-    m_HashCode: 867888999
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 1
     m_Scale: 1
     m_Name: room_private
-    m_HashCode: -1283174355
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 2
     m_Scale: 1
     m_Name: room_powerups
-    m_HashCode: -73908759
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 3
     m_Scale: 1
     m_Name: room_lives
-    m_HashCode: 857849509
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 4
     m_Scale: 1
     m_Name: room_coins
-    m_HashCode: 850032728
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 5
     m_Scale: 1
     m_Name: room_stars
-    m_HashCode: 868325095
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 6
     m_Scale: 1
     m_Name: room_teams
-    m_HashCode: 867471086
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 7
     m_Scale: 1
     m_Name: room_reconnect
-    m_HashCode: -1344258039
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 8
     m_Scale: 0.75
     m_Name: room_smallnumber_1
-    m_HashCode: -657421294
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 9
     m_Scale: 0.75
     m_Name: room_smallnumber_2
-    m_HashCode: -657421295
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 10
     m_Scale: 0.75
     m_Name: room_smallnumber_3
-    m_HashCode: -657421296
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 11
     m_Scale: 0.75
     m_Name: room_smallnumber_4
-    m_HashCode: -657421289
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 12
     m_Scale: 0.75
     m_Name: room_smallnumber_5
-    m_HashCode: -657421290
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 13
     m_Scale: 0.75
     m_Name: room_smallnumber_6
-    m_HashCode: -657421291
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 14
     m_Scale: 0.75
     m_Name: room_smallnumber_7
-    m_HashCode: -657421292
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 15
     m_Scale: 0.75
     m_Name: room_smallnumber_8
-    m_HashCode: -657421285
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 16
     m_Scale: 0.75
     m_Name: room_smallnumber_9
-    m_HashCode: -657421286
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 17
     m_Scale: 0.75
     m_Name: room_smallnumber_0
-    m_HashCode: -657421293
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 18
     m_Scale: 1
     m_Name: hud_mario
-    m_HashCode: -1100819682
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 19
     m_Scale: 1
     m_Name: hud_luigi
-    m_HashCode: -1098800616
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 20
     m_Scale: 1
     m_Name: room_host
-    m_HashCode: 936916128
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 21
     m_Scale: 1
     m_Name: connection_great
-    m_HashCode: -11015284
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 22
     m_Scale: 1
     m_Name: connection_good
-    m_HashCode: 1301140458
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 23
     m_Scale: 1
     m_Name: connection_fair
-    m_HashCode: 1301397845
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 24
     m_Scale: 1
     m_Name: connection_bad
-    m_HashCode: -2042976434
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 25
     m_Scale: 1
     m_Name: connection_host
-    m_HashCode: 1300767049
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 26
     m_Scale: 1
     m_Name: connection_disconnected
-    m_HashCode: 670330728
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 27
     m_Scale: 1
     m_Name: room_wins
-    m_HashCode: 937532707
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 28
     m_Scale: 1
     m_Name: hud_star
-    m_HashCode: -1464538382
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 29
     m_Scale: 1
     m_Name: hudnumber_0
-    m_HashCode: -148913515
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 30
     m_Scale: 1
     m_Name: hudnumber_1
-    m_HashCode: -148913516
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 31
     m_Scale: 1
     m_Name: hudnumber_2
-    m_HashCode: -148913513
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 32
     m_Scale: 1
     m_Name: hudnumber_3
-    m_HashCode: -148913514
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 33
     m_Scale: 1
     m_Name: hudnumber_4
-    m_HashCode: -148913519
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 34
     m_Scale: 1
     m_Name: hudnumber_5
-    m_HashCode: -148913520
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 35
     m_Scale: 1
     m_Name: hudnumber_6
-    m_HashCode: -148913517
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 36
     m_Scale: 1
     m_Name: hudnumber_7
-    m_HashCode: -148913518
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 37
     m_Scale: 1
     m_Name: hudnumber_8
-    m_HashCode: -148913507
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 38
     m_Scale: 1
     m_Name: hudnumber_9
-    m_HashCode: -148913508
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 40
     m_Scale: 1
     m_Name: hudnumber_coin
-    m_HashCode: 26133774
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 41
     m_Scale: 1
     m_Name: hudnumber_star
-    m_HashCode: 26682065
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 42
     m_Scale: 1
     m_Name: hudnumber_slash
-    m_HashCode: 881369504
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 43
     m_Scale: 1
     m_Name: hudnumber_colon
-    m_HashCode: 862426052
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 44
     m_Scale: 1
     m_Name: coinnumber_0
-    m_HashCode: 27254983
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 45
     m_Scale: 1
     m_Name: coinnumber_1
-    m_HashCode: 27254982
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 46
     m_Scale: 1
     m_Name: coinnumber_2
-    m_HashCode: 27254981
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 47
     m_Scale: 1
     m_Name: coinnumber_3
-    m_HashCode: 27254980
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 48
     m_Scale: 1
     m_Name: coinnumber_4
-    m_HashCode: 27254979
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 49
     m_Scale: 1
     m_Name: coinnumber_5
-    m_HashCode: 27254978
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 50
     m_Scale: 1
     m_Name: coinnumber_6
-    m_HashCode: 27254977
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 51
     m_Scale: 1
     m_Name: coinnumber_7
-    m_HashCode: 27254976
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 52
     m_Scale: 1
     m_Name: coinnumber_8
-    m_HashCode: 27254991
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 53
     m_Scale: 1
     m_Name: coinnumber_9
-    m_HashCode: 27254990
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 54
     m_Scale: 1
     m_Name: team_red
-    m_HashCode: -1881873775
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 55
     m_Scale: 1
     m_Name: team_red_alt
-    m_HashCode: 1574421847
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 56
     m_Scale: 1
     m_Name: team_green
-    m_HashCode: -675809447
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 57
     m_Scale: 1
     m_Name: team_green_alt
-    m_HashCode: 1459017759
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 58
     m_Scale: 1
     m_Name: team_blue
-    m_HashCode: -1972857156
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 59
     m_Scale: 1
     m_Name: team_blue_alt
-    m_HashCode: 639787066
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 60
     m_Scale: 1
     m_Name: team_yellow
-    m_HashCode: 165637638
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 61
     m_Scale: 1
     m_Name: team_yellow_alt
-    m_HashCode: -1472539840
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 62
     m_Scale: 1
     m_Name: team_magenta
-    m_HashCode: -1597024137
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 63
     m_Scale: 1
     m_Name: team_magenta_alt
-    m_HashCode: -1325722895
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 64
     m_Scale: 1
     m_Name: team_blue_alt_big
-    m_HashCode: 876404425
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 65
     m_Scale: 1
     m_Name: team_green_alt_big
-    m_HashCode: 681596332
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 66
     m_Scale: 1
     m_Name: team_magenta_alt_big
-    m_HashCode: 224401730
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 67
     m_Scale: 1
     m_Name: team_red_alt_big
-    m_HashCode: 1685185252
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 68
     m_Scale: 1
     m_Name: team_yellow_alt_big
-    m_HashCode: 601799859
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 69
     m_Scale: 1
     m_Name: room_customlevel
-    m_HashCode: -736204123
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 70
     m_Scale: 1
     m_Name: room_spectator
-    m_HashCode: 870276505
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 71
     m_Scale: 1
     m_Name: hudnumber_timer
-    m_HashCode: 868715650
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 72
     m_Scale: 1
     m_Name: dpad_button
-    m_HashCode: 214552312
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 73
     m_Scale: 1
     m_Name: x_button
-    m_HashCode: 1179271441
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 74
     m_Scale: 1
     m_Name: b_button
-    m_HashCode: -1361642805
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 75
     m_Scale: 1
     m_Name: a_button
-    m_HashCode: 1326989032
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 76
     m_Scale: 1
     m_Name: y_button
-    m_HashCode: 143318512
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 77
     m_Scale: 1
     m_Name: r_button
-    m_HashCode: -706822949
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 78
     m_Scale: 1
     m_Name: l_button
-    m_HashCode: 1761898117
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 79
     m_Scale: 1
     m_Name: player_muted
-    m_HashCode: -1484968703
   - m_ElementType: 2
     m_Unicode: 65534
     m_GlyphIndex: 80
     m_Scale: 1
     m_Name: room_create
-    m_HashCode: -2000648188
-  m_SpriteGlyphTable:
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 81
+    m_Scale: 1
+    m_Name: room_camera
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 82
+    m_Scale: 1
+    m_Name: checkmark
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 83
+    m_Scale: 1
+    m_Name: room_layers
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 84
+    m_Scale: 1
+    m_Name: dropdown_arrow
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 85
+    m_Scale: 1
+    m_Name: level_composer
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 86
+    m_Scale: 1
+    m_Name: level_author
+  m_GlyphTable:
   - m_Index: 0
     m_Metrics:
       m_Width: 13
@@ -709,8 +657,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 113
-      m_Y: 243
+      m_X: 141
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -725,8 +673,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 119
-      m_Y: 243
+      m_X: 147
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -741,8 +689,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 125
-      m_Y: 243
+      m_X: 153
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -757,8 +705,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 131
-      m_Y: 243
+      m_X: 159
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -773,8 +721,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 137
-      m_Y: 243
+      m_X: 165
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -789,8 +737,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 143
-      m_Y: 243
+      m_X: 171
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -805,8 +753,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 149
-      m_Y: 243
+      m_X: 177
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -821,8 +769,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 155
-      m_Y: 243
+      m_X: 183
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -837,8 +785,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 161
-      m_Y: 243
+      m_X: 189
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -853,8 +801,8 @@ MonoBehaviour:
       m_HorizontalBearingY: 4.5
       m_HorizontalAdvance: 4
     m_GlyphRect:
-      m_X: 167
-      m_Y: 243
+      m_X: 195
+      m_Y: 186
       m_Width: 5
       m_Height: 7
     m_Scale: 1
@@ -1690,7 +1638,7 @@ MonoBehaviour:
       m_HorizontalBearingY: 13
       m_HorizontalAdvance: 7
     m_GlyphRect:
-      m_X: 174
+      m_X: 112
       m_Y: 243
       m_Width: 13
       m_Height: 13
@@ -1706,7 +1654,7 @@ MonoBehaviour:
       m_HorizontalBearingY: 13
       m_HorizontalAdvance: 19
     m_GlyphRect:
-      m_X: 188
+      m_X: 126
       m_Y: 243
       m_Width: 13
       m_Height: 13
@@ -1850,7 +1798,7 @@ MonoBehaviour:
       m_HorizontalBearingY: 13
       m_HorizontalAdvance: 15
     m_GlyphRect:
-      m_X: 202
+      m_X: 140
       m_Y: 243
       m_Width: 13
       m_Height: 13
@@ -1866,7 +1814,7 @@ MonoBehaviour:
       m_HorizontalBearingY: 13
       m_HorizontalAdvance: 17
     m_GlyphRect:
-      m_X: 216
+      m_X: 154
       m_Y: 243
       m_Width: 13
       m_Height: 13
@@ -1874,5 +1822,101 @@ MonoBehaviour:
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
     sprite: {fileID: 1496232669, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 81
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -6.5
+      m_HorizontalBearingY: 6.5
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 182
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: -1332971411, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 82
+    m_Metrics:
+      m_Width: 17
+      m_Height: 16
+      m_HorizontalBearingX: -8.5
+      m_HorizontalBearingY: 8
+      m_HorizontalAdvance: 17
+    m_GlyphRect:
+      m_X: 225
+      m_Y: 202
+      m_Width: 17
+      m_Height: 16
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: 380926162, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 83
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -6.5
+      m_HorizontalBearingY: 6.5
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 196
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: -1043678390, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 84
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -6.5
+      m_HorizontalBearingY: 6.5
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 168
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: -2027879749, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 85
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -5
+      m_HorizontalBearingY: 13
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 210
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: -152457862, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 86
+    m_Metrics:
+      m_Width: 13
+      m_Height: 13
+      m_HorizontalBearingX: -4
+      m_HorizontalBearingY: 13
+      m_HorizontalAdvance: 13
+    m_GlyphRect:
+      m_X: 224
+      m_Y: 243
+      m_Width: 13
+      m_Height: 13
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: -1902142894, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []

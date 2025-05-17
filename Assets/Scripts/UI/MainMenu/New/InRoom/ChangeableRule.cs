@@ -10,8 +10,11 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
 
     //---Properties
     public bool Editing {
-        get => _editing;
+        get => !clickToEdit || _editing;
         set {
+            if (!clickToEdit) {
+                return;
+            }
             label.color = value ? editingColor : inactiveColor;
             _editing = value;
             UpdateState();
@@ -24,7 +27,9 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     [SerializeField] protected MainMenuCanvas canvas;
     [SerializeField] protected TMP_Text label;
     [SerializeField] protected string labelPrefix;
-    [SerializeField] protected CommandChangeRules.Rules ruleType;
+    [SerializeField] public CommandChangeRules.Rules ruleType;
+    [SerializeField] private bool clickToEdit;
+    [SerializeField] protected bool dontAutosave;
     [SerializeField] private Color editingColor, inactiveColor;
     [SerializeField] private TMP_Text leftArrow, rightArrow;
     [SerializeField] protected AudioSource cursorSfx;
@@ -47,7 +52,7 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
     }
 
     public unsafe void OnSubmit(BaseEventData eventData) {
-        if (Editing) {
+        if (clickToEdit && Editing) {
             Editing = false;
             canvas.PlaySound(SoundEffect.UI_Back);
             return;
@@ -77,11 +82,11 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         case MoveDirection.Left:
             DecreaseValue();
             break;
-            /*
         default:
-            base.OnMove(eventData);
+            if (!clickToEdit) {
+                base.OnMove(eventData);
+            }
             break;
-            */
         }
     }
 
@@ -96,7 +101,6 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         Editing = true;
     }
 
-    Vector2 sum;
     public void OnScroll(PointerEventData eventData) {
         if (!Editing) {
             return;

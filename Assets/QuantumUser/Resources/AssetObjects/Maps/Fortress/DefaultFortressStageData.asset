@@ -16,9 +16,10 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Fortress/DefaultFortressStageData
     Guid:
       Value: 373777738286135472
-  StageAuthor: 
-  MusicComposer: 
+  StageAuthor: Nintendo
+  MusicComposer: Nintendo
   TranslationKey: level.default.fortress
+  GroupingTranslationKey: level.header.default
   DiscordStageImage: level-fortress
   Icon: {fileID: 21300000, guid: c8510af529294be40a5f09eeddf3d764, type: 3}
   OverrideAutomaticTilemapSettings: 0

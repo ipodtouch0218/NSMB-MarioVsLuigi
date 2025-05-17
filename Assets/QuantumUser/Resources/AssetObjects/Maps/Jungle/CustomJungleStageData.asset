@@ -19,6 +19,7 @@ MonoBehaviour:
   StageAuthor: ipodtouch0218
   MusicComposer: Cubby Crazes
   TranslationKey: level.custom.jungle
+  GroupingTranslationKey: level.header.custom
   DiscordStageImage: level-jungle
   Icon: {fileID: 21300000, guid: 6987e74b8fb9963428ec6417fab82773, type: 3}
   OverrideAutomaticTilemapSettings: 1

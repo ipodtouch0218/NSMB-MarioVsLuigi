@@ -28,13 +28,13 @@ public class GlobalController : Singleton<GlobalController> {
     public PauseOptionMenuManager optionsManager;
 
     public ScriptableRendererFeature outlineFeature;
-    public GameObject fourByThreeImage, anyAspectImage, graphy, connecting;
+    public GameObject graphy, connecting;
     public LoadingCanvas loadingCanvas;
     public Image fullscreenFadeImage;
     public AudioSource sfx;
 
-    public bool checkedForVersion = false, firstConnection = true;
-    public int windowWidth = 1280, windowHeight = 720;
+    [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
+    [NonSerialized] public int windowWidth = 1280, windowHeight = 720;
 
  
     //---Serialized Variables

@@ -2109,14 +2109,10 @@ namespace Quantum {
                 } else if (marioAShell) {
                     if (!marioBAbove) {
                         // Hit them, powerdown them
-                        bool damaged = false;
                         if (dropStars) {
-                            damaged |= marioB->Powerdown(f, marioBEntity, false);
+                            marioB->Powerdown(f, marioBEntity, false);
                         }
-                        damaged |= marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity);
-                        if (damaged) {
-                            f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, KnockbackStrength.Normal, avgPosition);
-                        }
+                        marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity);
                         marioA->FacingRight = !marioA->FacingRight;
                         f.Events.PlayBumpSound(marioAEntity);
                         return;
@@ -2124,14 +2120,10 @@ namespace Quantum {
                 } else if (marioBShell) {
                     if (!marioAAbove) {
                         // Hit them, powerdown them
-                        bool damaged = false;
                         if (dropStars) {
-                            damaged |= marioA->Powerdown(f, marioAEntity, false);
+                            marioA->Powerdown(f, marioAEntity, false);
                         }
-                        damaged |= marioA->DoKnockback(f, marioAEntity, !fromRight, 0, KnockbackStrength.Normal, marioBEntity);
-                        if (damaged) {
-                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.Normal, avgPosition);
-                        }
+                        marioA->DoKnockback(f, marioAEntity, !fromRight, 0, KnockbackStrength.Normal, marioBEntity);
                         marioB->FacingRight = !marioB->FacingRight;
                         f.Events.PlayBumpSound(marioBEntity);
                         return;

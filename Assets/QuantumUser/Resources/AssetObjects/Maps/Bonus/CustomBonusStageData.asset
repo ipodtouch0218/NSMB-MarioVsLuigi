@@ -19,6 +19,7 @@ MonoBehaviour:
   StageAuthor: mindnomad
   MusicComposer: RENREN
   TranslationKey: level.custom.bonus
+  GroupingTranslationKey: level.header.custom
   DiscordStageImage: level-bonus
   Icon: {fileID: 21300000, guid: 204191df3a0fc884cb8fc1030f65465d, type: 3}
   OverrideAutomaticTilemapSettings: 0

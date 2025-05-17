@@ -16,9 +16,10 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Grass/DefaultGrassStageData
     Guid:
       Value: 274863242883854470
-  StageAuthor: 
-  MusicComposer: 
+  StageAuthor: Nintendo
+  MusicComposer: Nintendo
   TranslationKey: level.default.grass
+  GroupingTranslationKey: level.header.default
   DiscordStageImage: level-grassland
   Icon: {fileID: 21300000, guid: e65b552347cbc084fae4f7174a2f115e, type: 3}
   OverrideAutomaticTilemapSettings: 0

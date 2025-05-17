@@ -19,6 +19,7 @@ MonoBehaviour:
   StageAuthor: Skarph, AwertJ
   MusicComposer: RENREN
   TranslationKey: level.custom.sky
+  GroupingTranslationKey: level.header.custom
   DiscordStageImage: level-sky
   Icon: {fileID: 21300000, guid: d65bece2d20a7eb49bb91fd73710962e, type: 3}
   OverrideAutomaticTilemapSettings: 1

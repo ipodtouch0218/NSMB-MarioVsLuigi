@@ -19,6 +19,7 @@ MonoBehaviour:
   StageAuthor: Ave
   MusicComposer: RENREN
   TranslationKey: level.custom.ghosthouse
+  GroupingTranslationKey: level.header.custom
   DiscordStageImage: level-ghosthouse
   Icon: {fileID: 21300000, guid: e00eadcdd090bc14aa07e74014d7968f, type: 3}
   OverrideAutomaticTilemapSettings: 0

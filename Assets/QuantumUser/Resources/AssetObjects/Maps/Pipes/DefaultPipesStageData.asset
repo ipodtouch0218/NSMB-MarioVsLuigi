@@ -16,9 +16,10 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Pipes/DefaultPipesStageData
     Guid:
       Value: 516894112774610642
-  StageAuthor: 
-  MusicComposer: 
+  StageAuthor: Nintendo
+  MusicComposer: Nintendo
   TranslationKey: level.default.pipes
+  GroupingTranslationKey: level.header.default
   DiscordStageImage: level-pipes
   Icon: {fileID: 21300000, guid: c82b36c5c4874c44d9e79480880ddc16, type: 3}
   OverrideAutomaticTilemapSettings: 0

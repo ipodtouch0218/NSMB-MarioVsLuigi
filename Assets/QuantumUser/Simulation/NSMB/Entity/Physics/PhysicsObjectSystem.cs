@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
@@ -340,8 +341,8 @@ namespace Quantum {
 
                 position += shape.Centroid;
                 FP checkPointY = position.Y + shape.Box.Extents.Y * (velocityY > 0 ? 1 : -1);
-                FPVector2 leftWorldCheckPoint = new(position.X - shape.Box.Extents.X + Skin, checkPointY);
-                FPVector2 rightWorldCheckPoint = new(position.X + shape.Box.Extents.X - Skin, checkPointY);
+                FPVector2 leftWorldCheckPoint = new(position.X - shape.Box.Extents.X, checkPointY);
+                FPVector2 rightWorldCheckPoint = new(position.X + shape.Box.Extents.X, checkPointY);
 
                 // Move in the direction and check for any intersections with tiles.
                 FP left = FPMath.Floor(leftWorldCheckPoint.X * 2) / 2;
@@ -567,8 +568,8 @@ namespace Quantum {
 
                 position += shape.Centroid;
                 FP checkPointX = position.X + shape.Box.Extents.X * (velocityX > 0 ? 1 : -1);
-                FPVector2 bottomWorldCheckPoint = new(checkPointX, position.Y - shape.Box.Extents.Y + Skin);
-                FPVector2 topWorldCheckPoint = new(checkPointX, position.Y + shape.Box.Extents.Y - Skin);
+                FPVector2 bottomWorldCheckPoint = new(checkPointX, position.Y - shape.Box.Extents.Y);
+                FPVector2 topWorldCheckPoint = new(checkPointX, position.Y + shape.Box.Extents.Y);
 
                 // Move in the direction and check for any intersections with tiles.
                 FP bottom = FPMath.Floor(bottomWorldCheckPoint.Y * 2) / 2;

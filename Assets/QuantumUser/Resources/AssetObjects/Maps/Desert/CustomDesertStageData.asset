@@ -19,6 +19,7 @@ MonoBehaviour:
   StageAuthor: mindnomad
   MusicComposer: LiamNayru
   TranslationKey: level.custom.desert
+  GroupingTranslationKey: level.header.custom
   DiscordStageImage: level-desert
   Icon: {fileID: 21300000, guid: 8f78382475e08064f8dbe0c4d5897670, type: 3}
   OverrideAutomaticTilemapSettings: 1

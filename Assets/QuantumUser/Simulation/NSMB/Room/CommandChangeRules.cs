@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System;
 
 namespace Quantum {
     public class CommandChangeRules : DeterministicCommand, ILobbyCommand {
@@ -74,6 +75,7 @@ namespace Quantum {
         }
 
         public enum Rules : ushort {
+            None = 0,
             Stage = 1 << 0,
             StarsToWin = 1 << 1,
             CoinsForPowerup = 1 << 2,
