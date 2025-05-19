@@ -824,7 +824,7 @@ MonoBehaviour:
       Id:
         Value: 3654882389298375385
     IsRealGame: 0
-  UseRandomSeed: 0
+  UseRandomSeed: 1
   SessionConfig: {fileID: 11400000, guid: a095ff8a2ef576047bdebfec7a20e387, type: 2}
   LocalPlayers:
   - PlayerAvatar:
@@ -836,7 +836,7 @@ MonoBehaviour:
     NicknameColor: 
     Character: 0
     Palette: 0
-  MaxPlayerCount: 1
+  MaxPlayerCount: 10
   SimulationSpeedMultiplier: 1
   DisplaySaveAndReloadButton: 0
   PreloadAddressables: 0

@@ -103,7 +103,11 @@ public class MarioPlayerPhysicsInfo : AssetObject {
     public FP SpinnerLaunchVelocity = 12;
 
     // --- Knockback
-    public FP KnockbackDeceleration = FF(7.9101585f);
+    public FPVector2 KnockbackMiniMultiplier = new(2, FP._1_50);
+    public FP SittingKnockbackDeceleration = FF(7.9101585f);
+    public FP StomachKnockbackDeceleration = FF(3.955081725f);
+    public FP SittingKnockbackIceDeceleration = FF(7.9101585f);
+    public FP StomachKnockbackIceDeceleration = FF(3.955081725f);
 
     // --- Sliding
     public FP SlideMaxVelocity = FF(7.5f);

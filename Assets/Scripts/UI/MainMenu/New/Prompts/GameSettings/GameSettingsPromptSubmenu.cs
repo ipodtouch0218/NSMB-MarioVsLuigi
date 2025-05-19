@@ -121,8 +121,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 nav2.selectOnUp = currentButtonRow[currentButtonRow.Count / 2];
                 backButton.navigation = nav2;
             }
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) transform);
         }
 
         private int IndexOfNullIsMax<T>(IReadOnlyList<T> arr, T thing) where T : IComparable {
@@ -210,7 +208,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void ChangeTabWithSound(int newTabIndex) {
-            ChangeTab(newTabIndex, true);
+            ChangeTab(newTabIndex, activeTab != newTabIndex);
         }
 
         public unsafe void ChangeTab(int newTabIndex, bool playSound) {
@@ -233,6 +231,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (newTabIndex == 0) {
                 var stage = QuantumUnityDB.GetGlobalAsset(QuantumRunner.DefaultGame.Frames.Predicted.Global->Rules.Stage).UserAsset;
                 var buttons = newTab.Root.GetComponentsInChildren<StageSelectionButton>(true);
+                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) transform);
+                UnityEngine.Canvas.ForceUpdateCanvases();
                 Canvas.EventSystem.SetSelectedGameObject(buttons.FirstOrDefault(ssb => ssb.stage == stage).gameObject);
             } else {
                 Canvas.EventSystem.SetSelectedGameObject(newTab.DefaultSelection);

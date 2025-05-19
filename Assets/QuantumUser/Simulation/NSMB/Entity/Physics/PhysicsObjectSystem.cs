@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
-    public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
+    public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnEntityEnterExitLiquid {
 #else
-    public unsafe class PhysicsObjectSystem : SystemMainThread, ISignalOnTryLiquidSplash, ISignalOnEntityEnterExitLiquid {
+    public unsafe class PhysicsObjectSystem : SystemMainThread, ISignalOnEntityEnterExitLiquid {
 #endif
 
         public static readonly FP RaycastSkin = FP._0_05;
@@ -715,18 +715,16 @@ namespace Quantum {
                     transform->Position += directionVector * (min.Value - Skin);
 
                     // Readjust the remaining velocity
-                    FP remainingVelocity = velocity.Magnitude - min.Value;
-                    FPVector2 newDirection = new(-avgNormal.Y, avgNormal.X);
-
-                    FPVector2 newVelocity = Project(velocity.Normalized * remainingVelocity, newDirection);
-                    if (FPMath.Abs(FPVector2.Dot(newDirection, FPVector2.Right)) > GroundMaxAngle) {
-                        newVelocity.X = velocityX / f.DeltaTime;
+                    FPVector2 newDirection = new(avgNormal.Y, -avgNormal.X);
+                    FPVector2 newVelocity = new(0, velocity.Y);
+                    if (FPVector2.Dot(avgNormal, FPVector2.Up) > GroundMaxAngle) {
+                        newVelocity = Project(velocity, newDirection) - (physicsObject->Gravity * f.DeltaTime);
                     }
                     hitObject = true;
                     return newVelocity;
                 }
             }
-
+            
             // Good to move
             transform->Position += directionVector * FPMath.Abs(velocityX);
             hitObject = false;
@@ -1075,6 +1073,14 @@ namespace Quantum {
             for (int i = 0; i < overlappingTiles; i++) {
                 StageTileInstance tile = tiles[i].Tile;
                 StageTile stageTile = f.FindAsset(tile.Tile);
+                Vector2Int location = tiles[i].Position;
+
+                while (stageTile is TileInteractionRelocator tir) {
+                    location += tir.RelocateTo;
+                    tile = stage.GetTileRelative((Frame) f, location);
+                    stageTile = f.FindAsset(tile.Tile);
+                }
+
                 if (stageTile == null
                     || !stageTile.IsPolygon
                     || (!includeMegaBreakable && stageTile is BreakableBrickTile breakable && breakable.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.MegaMario))) {
@@ -1340,19 +1346,6 @@ namespace Quantum {
             int num2 = num;
             QuickSortSpan(span, lo, num2 - 1);
             QuickSortSpan(span, num2 + 1, hi);
-        }
-
-        public void OnTryLiquidSplash(Frame f, EntityRef entity, EntityRef liquidEntity, QBoolean exit, bool* doSplash) {
-            if (!f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
-                return;
-            }
-
-            var colliders = f.ResolveHashSet(physicsObject->LiquidContacts);
-            if (exit) {
-                colliders.Remove(liquidEntity);
-            } else {
-                colliders.Add(liquidEntity);
-            }
         }
 
         public void OnEntityEnterExitLiquid(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {

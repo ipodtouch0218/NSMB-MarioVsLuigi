@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class StageSelectionButton : Selectable, ISubmitHandler {
+public class StageSelectionButton : Selectable, ISubmitHandler, IPointerClickHandler {
 
     //---Public Variables
     [NonSerialized] public Map map;
@@ -45,13 +45,18 @@ public class StageSelectionButton : Selectable, ISubmitHandler {
         };
 
         QuantumGame game = NetworkHandler.Game;
-        int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
-        if (slot != -1) {
+        int index = game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host);
+        if (index != -1) {
+            int slot = game.GetLocalPlayerSlots()[index];
             game.SendCommand(slot, cmd);
             canvas.PlayConfirmSound();
         } else {
             canvas.PlaySound(SoundEffect.UI_Error);
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData) {
+        OnSubmit(eventData);
     }
 
     public void UpdateText() {

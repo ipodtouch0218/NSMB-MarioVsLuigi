@@ -578,7 +578,7 @@ MonoBehaviour:
           X:
             RawValue: 16384
           Y:
-            RawValue: 180224
+            RawValue: 212992
         Rotation:
           RawValue: 0
     - rid: 3395932105807495169
@@ -654,7 +654,7 @@ MonoBehaviour:
           X:
             RawValue: 49152
           Y:
-            RawValue: 180224
+            RawValue: 212992
         Rotation:
           RawValue: 0
     - rid: 4446608830146543617

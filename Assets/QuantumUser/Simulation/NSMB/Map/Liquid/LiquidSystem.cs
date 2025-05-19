@@ -13,9 +13,10 @@ namespace Quantum {
                 return;
             }
 
+            bool callSignals = true;
             if (f.Unsafe.TryGetPointer(info.Entity, out Interactable* interactable)
                 && interactable->ColliderDisabled) {
-                return;
+                callSignals = false;
             } 
 
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
@@ -27,10 +28,15 @@ namespace Quantum {
                 // Enter splash
                 splashed.Add(info.Entity);
 
-                bool doSplash = !isEntityUnderwater;
-                f.Signals.OnTryLiquidSplash(info.Entity, info.Other, false, &doSplash);
-                if (doSplash) {
-                    f.Events.LiquidSplashed(info.Other, info.Entity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), false);
+                var colliders = f.ResolveHashSet(entityPhysicsObject->LiquidContacts);
+                colliders.Add(info.Other);
+
+                if (callSignals) {
+                    bool doSplash = !isEntityUnderwater;
+                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, false, &doSplash);
+                    if (doSplash) {
+                        f.Events.LiquidSplashed(info.Other, info.Entity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), false);
+                    }
                 }
             }
         }
@@ -44,12 +50,6 @@ namespace Quantum {
                 return;
             }
 
-            bool callSignals = true;
-            if (f.Unsafe.TryGetPointer(info.Entity, out Interactable* interactable)
-                && interactable->ColliderDisabled) {
-                callSignals = false;
-            }
-
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
             FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y;
             bool isEntityUnderwater = checkHeight <= surface;
@@ -58,15 +58,11 @@ namespace Quantum {
             if (isEntityUnderwater && !underwater.Contains(info.Entity)) {
                 // Enter state
                 underwater.Add(info.Entity);
-                if (callSignals) {
-                    f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, true);
-                }
+                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, true);
             } else if (!isEntityUnderwater && underwater.Contains(info.Entity)) {
                 // Exit state
                 underwater.Remove(info.Entity);
-                if (callSignals) {
-                    f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
-                }
+                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
             }
         }
 
@@ -75,7 +71,7 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(info.Other, out Transform2D* liquidTransform)
                 || !f.Unsafe.TryGetPointer(info.Entity, out Transform2D* entityTransform)
                 || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsCollider2D* entityCollider)
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* liquidPhysicsObject)) {
+                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* entityPhysicsObject)) {
                 return;
             }
 
@@ -83,17 +79,30 @@ namespace Quantum {
             FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y;
             bool isEntityUnderwater = checkHeight <= surface;
 
+
+            bool callSignals = true;
+            if (f.Unsafe.TryGetPointer(info.Entity, out Interactable* interactable)
+                && interactable->ColliderDisabled) {
+                callSignals = false;
+            }
+
             QHashSet<EntityRef> splashed = f.ResolveHashSet(liquid->SplashedEntities);
             QHashSet<EntityRef> underwater = f.ResolveHashSet(liquid->UnderwaterEntities);
 
             if (splashed.Remove(info.Entity)) {
                 // Exit splash
                 // "checkHeight - surface < 1" prevents teleportation splashes
-                bool doSplash = !isEntityUnderwater && (f.Number - entityTransform->PositionTeleportFrame) > 3;
-                f.Signals.OnTryLiquidSplash(info.Entity, info.Other, true, &doSplash);
-                
-                if (doSplash) {
-                    f.Events.LiquidSplashed(info.Other, info.Entity, FPMath.Abs(liquidPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
+
+                var colliders = f.ResolveHashSet(entityPhysicsObject->LiquidContacts);
+                colliders.Remove(info.Other);
+
+                if (callSignals) {
+                    bool doSplash = !isEntityUnderwater && (f.Number - entityTransform->PositionTeleportFrame) > 3;
+                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, true, &doSplash);
+
+                    if (doSplash) {
+                        f.Events.LiquidSplashed(info.Other, info.Entity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
+                    }
                 }
             }
 

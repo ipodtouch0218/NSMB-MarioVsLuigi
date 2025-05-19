@@ -1481,4 +1481,4 @@ MonoBehaviour:
         IgnoreMovement:
           Value: 0
         CanCrushEntities:
-          Value: 0
+          Value: 1

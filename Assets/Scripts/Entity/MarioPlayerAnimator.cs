@@ -288,17 +288,14 @@ namespace NSMB.Entities.Player {
             drillPlayer.SetSoundData(mario->IsPropellerFlying ? propellerDrillData : spinnerDrillData);
             bubblesParticle.transform.localPosition = new(bubblesParticle.transform.localPosition.x, physicsCollider->Shape.Box.Extents.Y.AsFloat * 2);
 
-            bool isInWaterLiquid = false;
-            var waterColliders = f.ResolveHashSet(physicsObject->LiquidContacts);
-            float marioTop = transform.position.y + physicsCollider->Shape.Centroid.Y.AsFloat + physicsCollider->Shape.Box.Extents.Y.AsFloat;
-            foreach (EntityRef water in waterColliders) {
-                var liquidCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(water);
-                var liquidTransform = f.Unsafe.GetPointer<Transform2D>(water);
-                var liquid = f.Unsafe.GetPointer<Liquid>(water);
+            if (!mario->IsDead) {
+                var waterColliders = f.ResolveHashSet(physicsObject->LiquidContacts);
+                float marioTop = transform.position.y + physicsCollider->Shape.Centroid.Y.AsFloat + physicsCollider->Shape.Box.Extents.Y.AsFloat;
+                foreach (EntityRef water in waterColliders) {
+                    var liquidCollider = f.Unsafe.GetPointer<PhysicsCollider2D>(water);
+                    var liquidTransform = f.Unsafe.GetPointer<Transform2D>(water);
+                    var liquid = f.Unsafe.GetPointer<Liquid>(water);
 
-                isInWaterLiquid |= liquid->LiquidType == LiquidType.Water;
-
-                if (!mario->IsDead) {
                     liquidCollider->Shape.Compound.GetShapes(f, out Shape2D* shapes, out _);
                     float waterTop = liquidTransform->Position.Y.AsFloat + liquidCollider->Shape.Centroid.Y.AsFloat + shapes[0].Box.Extents.Y.AsFloat;
                     if (marioTop >= waterTop - 0.125f) {
@@ -315,7 +312,7 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            animator.SetLayerWeight(3, isInWaterLiquid ? 1 : 0);
+            animator.SetLayerWeight(3, physicsObject->IsUnderwater ? 1 : 0);
         }
 
         private IEnumerator BlinkRoutine() {
@@ -333,17 +330,6 @@ namespace NSMB.Entities.Player {
 
         private void SetFacingDirection(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject) {
             using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.SetFacingDirection");
-            //TODO: refactor
-            /*
-            if (GameManager.Instance.GameEnded) {
-                if (mario->IsDead) {
-                    modelRotationTarget.Set(0, 180, 0);
-                    modelRotateInstantly = true;
-                }
-                return;
-            }
-            */
-
             float delta = Time.deltaTime;
 
             modelRotateInstantly = false;

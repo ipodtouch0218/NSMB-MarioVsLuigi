@@ -61,7 +61,7 @@ namespace Quantum {
                     continue;
                 }
                 var physicsObject = physicsSystemFilter.PhysicsObject;
-                if (physicsObject->DisableCollision) {
+                if (physicsObject->IsFrozen || physicsObject->DisableCollision) {
                     continue;
                 }
 
