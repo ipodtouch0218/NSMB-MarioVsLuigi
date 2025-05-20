@@ -33,7 +33,7 @@ public class ReplayListManager : Selectable {
     [SerializeField] private ReplayDeletePromptSubmenu deletePrompt;
     [SerializeField] private ReplayRenamePromptSubmenu renamePrompt;
     [SerializeField] private ReplayListEntry replayTemplate;
-    [SerializeField] private TMP_Text noReplaysText, hiddenReplaysText;
+    [SerializeField] private TMP_Text noReplaysText, hiddenReplaysText, headerTemplate;
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] internal VerticalLayoutGroup layout;
     [SerializeField] private TMP_Dropdown sortDropdown;
@@ -43,6 +43,7 @@ public class ReplayListManager : Selectable {
     [SerializeField] private GameObject importButton, loadingIcon;
 
     //---Private Variables
+    private readonly List<TMP_Text> headers = new();
     private readonly List<ReplayListEntry> replays = new();
     private readonly SortedSet<ReplayListEntry> temporaryReplays = new(new ReplayDateComparer());
     private bool sortAscending;
@@ -207,7 +208,11 @@ public class ReplayListManager : Selectable {
         foreach (var replay in replays) {
             Destroy(replay.gameObject);
         }
+        foreach (var header in headers) {
+            Destroy(header.gameObject);
+        }
         replays.Clear();
+        headers.Clear();
         temporaryReplays.Clear();
         hiddenReplaysText.gameObject.SetActive(false);
 
@@ -255,8 +260,8 @@ public class ReplayListManager : Selectable {
                 }
             }
 
-            // Max 10ms per frame.
-            if (stopwatch.ElapsedMilliseconds > 10) {
+            // Max 8ms per frame.
+            if (stopwatch.ElapsedMilliseconds > 8) {
                 yield return null;
                 stopwatch.Restart();
             }
@@ -302,6 +307,9 @@ public class ReplayListManager : Selectable {
 
                 replays.Add(newReplayEntry);
                 newReplayEntry.UpdateText();
+                SortReplays();
+
+                canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
 
                 noReplaysText.text = "";
             } else {
@@ -331,7 +339,22 @@ public class ReplayListManager : Selectable {
             2 => SortByStage,
             _ => SortByDate,
         });
+        foreach (var header in headers) {
+            Destroy(header.gameObject);
+        }
+        headers.Clear();
+        string previousHeader = null;
         foreach (var replay in replays) {
+            string currentHeader = "- " + GetHeader(replay) + " -";
+            if (previousHeader != currentHeader && currentHeader != null) {
+                TMP_Text newHeader = Instantiate(headerTemplate, headerTemplate.transform.parent);
+                newHeader.gameObject.SetActive(true);
+                newHeader.text = currentHeader;
+
+                headers.Add(newHeader); 
+            }
+            previousHeader = currentHeader;
+
             replay.transform.SetAsLastSibling();
         }
         hiddenReplaysText.transform.SetAsLastSibling();
@@ -402,6 +425,24 @@ public class ReplayListManager : Selectable {
         }
 
         return replays[0];
+    }
+
+    private string GetHeader(ReplayListEntry rle) {
+        if (sortIndex == 1) {
+            // Name
+            return null;
+        } else if (sortIndex == 2) {
+            // Stage
+            if (QuantumUnityDB.TryGetGlobalAsset(rle.ReplayFile.Header.Rules.Stage, out Map map)) {
+                if (QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
+                    return GlobalController.Instance.translationManager.GetTranslation(stage.TranslationKey);
+                }
+            }
+            return "???";
+        } else {
+            // Date
+            return DateTime.UnixEpoch.AddSeconds(rle.ReplayFile.Header.UnixTimestamp).ToLocalTime().ToShortDateString();
+        }
     }
 
     public int SortByDate(ReplayListEntry a, ReplayListEntry b) {

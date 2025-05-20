@@ -228,7 +228,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             // It's a private method. Because of course it is.
             NetworkHandler.IsReplayFastForwarding = true;
             var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
-            resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
+            resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, false });
 
             // Fix accumulated time applying
             if (session.AccumulatedTime > 0) {
@@ -320,7 +320,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             // It's a private method. Because of course it is.
             NetworkHandler.IsReplayFastForwarding = true;
             var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
-            resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, true });
+            resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, false });
             NetworkHandler.IsReplayFastForwarding = false;
 
             // Fix accumulated time applying
@@ -351,7 +351,7 @@ public class ReplayUI : QuantumSceneViewComponent {
         // It's a private method. Because of course it is.
         NetworkHandler.IsReplayFastForwarding = true;
         var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
-        resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[0], NetworkHandler.ReplayStart, true });
+        resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[0], NetworkHandler.ReplayStart, false });
         NetworkHandler.IsReplayFastForwarding = false;
 
         // Fix accumulated time applying
