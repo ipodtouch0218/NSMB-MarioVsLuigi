@@ -158,23 +158,10 @@ namespace Quantum {
             var koopaB = f.Unsafe.GetPointer<Koopa>(koopaEntityB);
 
             bool eitherBeingHeld = f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityA)->Holder) || f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityB)->Holder);
-
-            bool koopaAKicked = koopaA->IsKicked;
-            bool koopaBKicked = koopaB->IsKicked;
-
-            bool turn = true;
-            if (eitherBeingHeld || koopaAKicked) {
+            if (eitherBeingHeld || koopaA->IsKicked || koopaB->IsKicked) {
                 // Destroy them
                 koopaB->Kill(f, koopaEntityB, koopaEntityA, KillReason.Special);
-                turn = false;
-            }
-            if (eitherBeingHeld || koopaBKicked) {
-                // Destroy ourselves
-                koopaA->Kill(f, koopaEntityA, koopaEntityB, KillReason.Special);
-                turn = false;
-            }
-
-            if (turn) {
+            } else {
                 EnemySystem.EnemyBumpTurnaround(f, koopaEntityA, koopaEntityB);
             }
         }
@@ -190,6 +177,7 @@ namespace Quantum {
             if (koopa->IsKicked || eitherBeingHeld) {
                 // Destroy them
                 bobomb->Kill(f, bobombEntity, koopaEntity, KillReason.Special);
+                koopa->Kill(f, koopaEntity, bobombEntity, KillReason.Special);
                 turn = false;
             }
             var bobombPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(bobombEntity);
@@ -393,6 +381,7 @@ namespace Quantum {
                 // Kill boo
                 var boo = f.Unsafe.GetPointer<Boo>(booEntity);
                 boo->Kill(f, booEntity, koopaEntity, KillReason.Special);
+                koopa->Kill(f, koopaEntity, booEntity, KillReason.Special);
             }
         }
 
@@ -406,10 +395,8 @@ namespace Quantum {
                 var piranhaPlant = f.Unsafe.GetPointer<PiranhaPlant>(piranhaPlantEntity);
                 piranhaPlant->Kill(f, piranhaPlantEntity, koopaEntity, KillReason.Special);
 
-                if (beingHeld) {
-                    // Kill self, too.
-                    koopa->Kill(f, koopaEntity, piranhaPlantEntity, KillReason.Special);
-                }
+                // Kill self, too.
+                koopa->Kill(f, koopaEntity, piranhaPlantEntity, KillReason.Special);
             } else {
                 // Turn
                 EnemySystem.EnemyBumpTurnaround(f, koopaEntity, piranhaPlantEntity, false);
@@ -426,10 +413,8 @@ namespace Quantum {
                 var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
                 bulletBill->Kill(f, bulletBillEntity, koopaEntity, KillReason.Special);
 
-                if (beingHeld) {
-                    // Kill self, too.
-                    koopa->Kill(f, koopaEntity, bulletBillEntity, KillReason.Special);
-                }
+                // Kill self, too.
+                koopa->Kill(f, koopaEntity, bulletBillEntity, KillReason.Special);
             }
         }
         #endregion

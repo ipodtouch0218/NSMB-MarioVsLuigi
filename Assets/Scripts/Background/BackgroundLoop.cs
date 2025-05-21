@@ -13,22 +13,27 @@ namespace NSMB.Background {
         //---Misc Variables
         private GameObject[] children;
         private Vector3[] truePositions;
-        private float[] ppus, halfWidths;
+        private float[] halfWidths;
         private Dictionary<Camera, FPVector2> lastPositions = new();
 
         public void Start() {
             Instance = this;
 
             children = new GameObject[transform.childCount];
-            ppus = new float[transform.childCount];
             truePositions = new Vector3[transform.childCount];
             halfWidths = new float[transform.childCount];
 
             for (int i = 0; i < transform.childCount; i++) {
                 children[i] = transform.GetChild(i).gameObject;
-                SpriteRenderer sr = children[i].GetComponent<SpriteRenderer>();
-                ppus[i] = sr.sprite.pixelsPerUnit;
-                halfWidths[i] = sr.bounds.extents.x - 0.00004f;
+
+                Bounds bounds = default;
+                if (children[i].TryGetComponent(out BoundsContainer bc)) {
+                    bounds = bc.Bounds;
+                } else if (children[i].TryGetComponent(out SpriteRenderer sr)) {
+                    bounds = sr.bounds;
+                }
+
+                halfWidths[i] = bounds.extents.x - 0.00004f;
                 truePositions[i] = children[i].transform.position;
             }
 
@@ -73,12 +78,15 @@ namespace NSMB.Background {
         private void LoadChildObjects(GameObject obj) {
             float objectWidth = halfWidths[Array.IndexOf(children, obj)] * 2f;
             int childsNeeded = (int) Mathf.Ceil(ViewContext.Stage.TileDimensions.x * 0.5f / objectWidth);
+            Debug.Log(childsNeeded);
             GameObject clone = Instantiate(obj);
+            List<GameObject> spawnedChildren = new();
             for (int i = 0; i <= childsNeeded; i++) {
                 GameObject c = Instantiate(clone);
                 c.transform.SetParent(obj.transform);
                 c.transform.position = new Vector3(objectWidth * i, obj.transform.position.y, obj.transform.position.z);
                 c.name = obj.name + i;
+                spawnedChildren.Add(c);
             }
             Destroy(clone);
             if (obj.TryGetComponent(out LegacyAnimateSpriteRenderer anim)) {
@@ -86,6 +94,13 @@ namespace NSMB.Background {
             }
             if (obj.TryGetComponent(out SpriteRenderer sRenderer)) {
                 Destroy(sRenderer);
+            }
+
+            for (int i = 0; i < obj.transform.childCount; i++) {
+                GameObject go = obj.transform.GetChild(i).gameObject;
+                if (!spawnedChildren.Contains(go)) {
+                    Destroy(go);
+                }
             }
         }
 

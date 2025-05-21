@@ -988,7 +988,7 @@ namespace Quantum {
 
             continueGroundpound &= interactedAny;
 
-            if (!filter.Inputs.Down.IsDown) {
+            if (!mario->IsDrilling && !filter.Inputs.Down.IsDown) {
                 mario->IsGroundpounding = false;
                 continueGroundpound = false;
             }

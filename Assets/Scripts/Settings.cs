@@ -330,7 +330,7 @@ public class Settings : Singleton<Settings> {
         GraphicsNdsEnabled = PlayerPrefs.GetInt("NDSResolution", 0) != 0;
         GraphicsNdsForceAspect = PlayerPrefs.GetInt("NDS4by3", 0) != 0;
         GraphicsNdsPixelPerfect = false;
-        GraphicsVsync = PlayerPrefs.GetInt("VSync", 0) != 0;
+        GraphicsVsync = PlayerPrefs.GetInt("VSync", 1) != 0;
         GraphicsMaxFps = 0;
         GraphicsPlayerOutlines = true;
         GraphicsPlayerNametags = true;

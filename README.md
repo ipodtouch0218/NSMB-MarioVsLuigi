@@ -120,6 +120,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 
 ### QA Testing:
 * Ave
+* CreativeGhost
 * Cubby Crazes
 * Fawndue
 * Grape

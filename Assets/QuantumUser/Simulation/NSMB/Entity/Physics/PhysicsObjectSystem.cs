@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
@@ -715,10 +714,20 @@ namespace Quantum {
                     transform->Position += directionVector * (min.Value - Skin);
 
                     // Readjust the remaining velocity
-                    FPVector2 newDirection = new(avgNormal.Y, -avgNormal.X);
                     FPVector2 newVelocity = new(0, velocity.Y);
-                    if (FPVector2.Dot(avgNormal, FPVector2.Up) > GroundMaxAngle) {
-                        newVelocity = Project(velocity, newDirection) - (physicsObject->Gravity * f.DeltaTime);
+                    if (FPMath.Abs(FPVector2.Dot(avgNormal, FPVector2.Up)) > GroundMaxAngle) {
+                        // Slope/ground/ceiling
+                        FPVector2 newDirection = new(avgNormal.Y, -avgNormal.X);
+                        if ((avgNormal.X > 0) ^ (avgNormal.Y < 0)) {
+                            newDirection *= -1;
+                        }
+                        FP speed = velocity.Y > 0 ? velocity.Magnitude : FPMath.Abs(velocity.X);
+                        FPVector2 projected = newDirection * speed;
+                        if (avgNormal.Y > 0) {
+                            projected -= physicsObject->Gravity * f.DeltaTime;
+                        }
+
+                        newVelocity = projected;
                     }
                     hitObject = true;
                     return newVelocity;

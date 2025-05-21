@@ -10788,6 +10788,7 @@ GameObject:
   - component: {fileID: 2086669541939803744}
   - component: {fileID: 5606758098101283109}
   - component: {fileID: 8947250497995652351}
+  - component: {fileID: 192008340861224286}
   m_Layer: 5
   m_Name: Bumper R
   m_TagString: Untagged
@@ -10852,6 +10853,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &192008340861224286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5039617453341879111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerElements: {fileID: 2058053739306675502}
+  inputType: 6
+  display: {fileID: 8947250497995652351}
+  unpressedColor: {r: 0, g: 0, b: 0, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5070059830902574553
 GameObject:
   m_ObjectHideFlags: 0
@@ -12119,7 +12137,6 @@ GameObject:
   - component: {fileID: 1078237534928586948}
   - component: {fileID: 75457780979778416}
   - component: {fileID: 991155624498728158}
-  - component: {fileID: 7074784813699513659}
   m_Layer: 5
   m_Name: Button A
   m_TagString: Untagged
@@ -12184,23 +12201,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7074784813699513659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5837373609990777352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerElements: {fileID: 2058053739306675502}
-  inputType: 6
-  display: {fileID: 991155624498728158}
-  unpressedColor: {r: 0, g: 0, b: 0, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5883717732910564279
 GameObject:
   m_ObjectHideFlags: 0
@@ -14050,6 +14050,7 @@ GameObject:
   - component: {fileID: 1891160852823138316}
   - component: {fileID: 3043887213851111318}
   - component: {fileID: 6423858333021708214}
+  - component: {fileID: 7845206404109234456}
   m_Layer: 5
   m_Name: Bumper L
   m_TagString: Untagged
@@ -14114,6 +14115,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7845206404109234456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6444026695248139948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerElements: {fileID: 2058053739306675502}
+  inputType: 7
+  display: {fileID: 6423858333021708214}
+  unpressedColor: {r: 0, g: 0, b: 0, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &6469716614916040358
 GameObject:
   m_ObjectHideFlags: 0
@@ -19251,7 +19269,6 @@ GameObject:
   - component: {fileID: 8552938714438127319}
   - component: {fileID: 1645266099318331611}
   - component: {fileID: 408316038991635666}
-  - component: {fileID: 1377040253595972136}
   m_Layer: 5
   m_Name: Button X
   m_TagString: Untagged
@@ -19316,23 +19333,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1377040253595972136
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9087528479016181634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerElements: {fileID: 2058053739306675502}
-  inputType: 7
-  display: {fileID: 408316038991635666}
-  unpressedColor: {r: 0, g: 0, b: 0, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &9156465974138585194
 GameObject:
   m_ObjectHideFlags: 0

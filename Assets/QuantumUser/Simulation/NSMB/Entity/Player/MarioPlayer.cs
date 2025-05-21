@@ -432,13 +432,19 @@ namespace Quantum {
                 knockbackVelocity.Y *= physics.KnockbackMiniMultiplier.Y;
             }
 
+            if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
+                FacingRight = fromRight;
+                knockbackVelocity.X *= FP._0_75;
+            }
+
+            CurrentKnockback = strength;
+            IsInWeakKnockback = strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround);
+
             physicsObject->Velocity = knockbackVelocity;
             physicsObject->IsTouchingGround = false;
             physicsObject->WasTouchingGround = false;
             physicsObject->HoverFrames = 0;
 
-            CurrentKnockback = strength;
-            IsInWeakKnockback = strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround);
             KnockbackWasOriginallyFacingRight = FacingRight;
             KnockbackTick = f.Number;
             KnockForwards = FacingRight != fromRight;

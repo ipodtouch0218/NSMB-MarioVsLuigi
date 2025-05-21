@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/QuantumUser/Resources/NewQuantumGameScene.unity
-    guid: 55c736cc340735844be9f063d6000625
-  - enabled: 1
     path: Assets/Scenes/Intro.unity
     guid: f3be7726c3fe3e448be4d6050f0eb49b
   - enabled: 1

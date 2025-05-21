@@ -70,6 +70,7 @@ vlco_o
 
 <color=yellow>{ui.about.credits.qa}</color>
 Ave
+CreativeGhost
 Cubby Crazes
 Fawndue
 Grape
