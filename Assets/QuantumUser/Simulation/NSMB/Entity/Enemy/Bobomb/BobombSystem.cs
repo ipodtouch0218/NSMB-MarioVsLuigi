@@ -1,9 +1,8 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
 
-    public unsafe class BobombSystem : SystemMainThreadFilter<BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
+    public unsafe class BobombSystem : SystemMainThreadEntityFilter<Bobomb, BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
         ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnMarioPlayerBecameInvincible {
         
         public struct Filter {
@@ -26,7 +25,7 @@ namespace Quantum {
             f.Context.Interactions.Register<Bobomb, IceBlock>(f, OnBobombIceBlockInteraction);
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var bobomb = filter.Bobomb;
             var enemy = filter.Enemy;
 

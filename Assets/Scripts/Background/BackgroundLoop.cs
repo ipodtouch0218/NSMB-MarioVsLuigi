@@ -78,7 +78,6 @@ namespace NSMB.Background {
         private void LoadChildObjects(GameObject obj) {
             float objectWidth = halfWidths[Array.IndexOf(children, obj)] * 2f;
             int childsNeeded = (int) Mathf.Ceil(ViewContext.Stage.TileDimensions.x * 0.5f / objectWidth);
-            Debug.Log(childsNeeded);
             GameObject clone = Instantiate(obj);
             List<GameObject> spawnedChildren = new();
             for (int i = 0; i <= childsNeeded; i++) {

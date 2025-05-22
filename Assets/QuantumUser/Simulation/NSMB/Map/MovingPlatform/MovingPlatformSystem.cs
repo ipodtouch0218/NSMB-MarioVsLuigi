@@ -1,9 +1,8 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using UnityEngine;
 
 namespace Quantum {
-    public unsafe class MovingPlatformSystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
+    public unsafe class MovingPlatformSystem : SystemMainThreadEntityFilter<MovingPlatform, MovingPlatformSystem.Filter> {
 
         public struct Filter {
             public EntityRef Entity;

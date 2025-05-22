@@ -364,7 +364,7 @@ namespace NSMB.Entities.Player {
 
             } else if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner)
                        && physicsObject->IsTouchingGround && mario->ProjectileDelayFrames == 0
-                       && Mathf.Abs(physicsObject->Velocity.X.AsFloat) < 0.3f && !mario->HeldEntity.IsValid
+                       && Mathf.Abs(physicsObject->Velocity.X.AsFloat) < 0.3f && !f.Exists(mario->HeldEntity)
                        && !animator.GetCurrentAnimatorStateInfo(0).IsName("fireball")) {
 
                 modelRotationTarget *= Quaternion.Euler(0, spinner->AngularVelocity.AsFloat * delta, 0);

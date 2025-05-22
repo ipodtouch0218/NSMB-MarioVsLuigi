@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadFilterStage<PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
+    public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
         private static readonly FP BumpForce = Constants._5_50;

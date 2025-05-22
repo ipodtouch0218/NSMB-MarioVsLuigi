@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class BlockBumpSystem : SystemMainThreadFilter<BlockBumpSystem.Filter> {
+    public unsafe class BlockBumpSystem : SystemMainThreadEntityFilter<BlockBump, BlockBumpSystem.Filter> {
 
         private static readonly FPVector2 BumpOffset = new FPVector2(0, -FP._0_25);
 
@@ -12,7 +12,7 @@ namespace Quantum {
             public PhysicsCollider2D* Collider;
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var blockBump = filter.BlockBump;
             var collider = filter.Collider;
             var transform = filter.Transform;

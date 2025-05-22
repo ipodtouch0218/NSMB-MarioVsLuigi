@@ -1,9 +1,8 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
 
-    public unsafe class HoldableObjectSystem : SystemMainThreadFilterStage<HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
+    public unsafe class HoldableObjectSystem : SystemMainThreadEntityFilter<Holdable, HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
         ISignalOnTryLiquidSplash, ISignalOnEntityFreeze {
         
         public struct Filter {

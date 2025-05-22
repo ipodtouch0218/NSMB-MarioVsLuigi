@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum;
 using Quantum.Collections;
+using Quantum.Core;
 using System;
 using System.Collections.Generic;
 
@@ -143,7 +144,7 @@ public static unsafe class QuantumUtils {
         return unityTile;
     }
 
-    public static FPVector2 WrapWorld(Frame f, FPVector2 worldPos, out WrapDirection wrapDirection) {
+    public static FPVector2 WrapWorld(FrameBase f, FPVector2 worldPos, out WrapDirection wrapDirection) {
         return WrapWorld(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos, out wrapDirection);
     }
 

@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class ProjectileSystem : SystemMainThreadFilterStage<ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
+    public unsafe class ProjectileSystem : SystemMainThreadEntityFilter<Projectile, ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;

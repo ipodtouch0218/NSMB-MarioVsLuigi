@@ -136,7 +136,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] byte PipeFrames;
 	[ExcludeFromPrototype] byte PipeCooldownFrames;
 
-	[ExcludeFromPrototype] EntityRef CurrentSpinner;
+	[ExcludeFromPrototype] EntityRef CurrentSpinBlock;
 }
 
 enum KnockbackStrength : Byte {

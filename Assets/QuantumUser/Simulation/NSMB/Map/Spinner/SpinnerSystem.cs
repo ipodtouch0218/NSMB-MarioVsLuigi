@@ -2,7 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    public unsafe class SpinnerSystem : SystemMainThreadFilter<SpinnerSystem.Filter> {
+    public unsafe class SpinnerSystem : SystemMainThreadEntityFilter<Spinner, SpinnerSystem.Filter> {
 
         public struct Filter {
             public EntityRef Entity;
@@ -15,7 +15,7 @@ namespace Quantum {
             f.Context.Interactions.Register<MarioPlayer, Spinner>(f, OnSpinnerMarioPlayerInteraction);
         }
 
-        public override void Update(Frame f, ref Filter filter) {
+        public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var transform = filter.Transform;
             var spinner = filter.Spinner;
             var movingPlatform = filter.MovingPlatform;

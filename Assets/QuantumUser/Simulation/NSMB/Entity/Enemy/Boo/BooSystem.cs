@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class BooSystem : SystemMainThreadFilterStage<BooSystem.Filter>, ISignalOnEnemyRespawned, ISignalOnBobombExplodeEntity {
+    public unsafe class BooSystem : SystemMainThreadEntityFilter<Boo, BooSystem.Filter>, ISignalOnEnemyRespawned, ISignalOnBobombExplodeEntity {
         private const byte BooUnscaredFrames = 12;
 
         public struct Filter {

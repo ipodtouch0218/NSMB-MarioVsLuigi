@@ -552,7 +552,10 @@ PlayerSettings:
     m_TextureStreamingPriority: 0
   m_BuildTargetGroupLoadStoreDebugModeSettings: []
   m_BuildTargetNormalMapEncoding: []
-  m_BuildTargetDefaultTextureCompressionFormat: []
+  m_BuildTargetDefaultTextureCompressionFormat:
+  - serializedVersion: 3
+    m_BuildTarget: WebGL
+    m_Formats: 05000000
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
@@ -819,27 +822,27 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Android: QUANTUM_XY
+    Android: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
     CloudRendering: 
-    EmbeddedLinux: QUANTUM_XY
-    GameCoreScarlett: QUANTUM_XY
-    GameCoreXboxOne: QUANTUM_XY
-    Kepler: QUANTUM_XY
-    LinuxHeadlessSimulation: QUANTUM_XY
+    EmbeddedLinux: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    GameCoreScarlett: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    GameCoreXboxOne: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    Kepler: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    LinuxHeadlessSimulation: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
     Lumin: 
-    Nintendo Switch: QUANTUM_XY
-    PS4: QUANTUM_XY
-    PS5: QUANTUM_XY
-    QNX: QUANTUM_XY
-    ReservedCFE: QUANTUM_XY
+    Nintendo Switch: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    PS4: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    PS5: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    QNX: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    ReservedCFE: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
     Stadia: QUANTUM_XY
-    Standalone: QUANTUM_DISABLE_AI;QUANTUM_DISABLE_PHYSICS3D;QUANTUM_XY;QUANTUM_REMOTE_PROFILER
-    VisionOS: QUANTUM_XY
-    WebGL: FUSION_WEAVER;FUSION2;QUANTUM_XY
-    Windows Store Apps: FUSION_WEAVER;QUANTUM_XY
-    XboxOne: QUANTUM_XY
-    iPhone: QUANTUM_XY
-    tvOS: QUANTUM_XY
+    Standalone: QUANTUM_DISABLE_AI;QUANTUM_DISABLE_PHYSICS3D;QUANTUM_XY;QUANTUM_LOGLEVEL_WARN;QUANTUM_ENABLE_REMOTE_PROFILER
+    VisionOS: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    WebGL: FUSION_WEAVER;FUSION2;QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    Windows Store Apps: FUSION_WEAVER;QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    XboxOne: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    iPhone: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    tvOS: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

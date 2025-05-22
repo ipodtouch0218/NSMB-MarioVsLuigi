@@ -1,11 +1,10 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
 
-    public unsafe class KoopaSystem : SystemMainThreadFilterStage<KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
+    public unsafe class KoopaSystem : SystemMainThreadEntityFilter<Koopa, KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
         ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEnemyTurnaround, ISignalOnEntityCrushed,
         ISignalOnMarioPlayerBecameInvincible {
        

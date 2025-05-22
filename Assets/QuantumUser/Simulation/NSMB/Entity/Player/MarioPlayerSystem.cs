@@ -5,7 +5,7 @@ using System;
 using static IInteractableTile;
 
 namespace Quantum {
-    public unsafe class MarioPlayerSystem : SystemMainThreadFilterStage<MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
+    public unsafe class MarioPlayerSystem : SystemMainThreadEntityFilter<MarioPlayer, MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
         ISignalOnGameStarting, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
         ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
 
@@ -380,11 +380,11 @@ namespace Quantum {
             }
 
             if (!mario->DoEntityBounce
-                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner) && spinner->ArmPosition <= FP._0_75
+                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* Spinner) && Spinner->ArmPosition <= FP._0_75
                 && !f.Exists(mario->HeldEntity) && !mario->IsInShell) {
                 // Jump of spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
-                spinner->PlatformWaitFrames = 6;
+                Spinner->PlatformWaitFrames = 6;
 
                 mario->IsSkidding = false;
                 mario->IsTurnaround = false;
@@ -1815,9 +1815,9 @@ namespace Quantum {
             }
 
             var transform = filter.Transform;
-            var spinnerTransform = f.Unsafe.GetPointer<Transform2D>(currentSpinner);
+            var spinBlockTransform = f.Unsafe.GetPointer<Transform2D>(currentSpinner);
 
-            FP moveVelocity = QuantumUtils.MoveTowards(transform->Position.X, spinnerTransform->Position.X, 4) - transform->Position.X;
+            FP moveVelocity = QuantumUtils.MoveTowards(transform->Position.X, spinBlockTransform->Position.X, 4) - transform->Position.X;
 
             if (FPMath.Abs(moveVelocity) > 0) {
                 PhysicsObjectSystem.Filter physicsSystemFilter = new PhysicsObjectSystem.Filter {

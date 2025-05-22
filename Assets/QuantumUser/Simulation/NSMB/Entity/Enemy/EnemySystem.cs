@@ -1,6 +1,6 @@
 namespace Quantum {
 
-    public unsafe class EnemySystem : SystemMainThreadFilterStage<EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction,
+    public unsafe class EnemySystem : SystemMainThreadEntityFilter<Enemy, EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction,
         ISignalOnEnemyDespawned, ISignalOnEnemyRespawned {
         public struct Filter {
             public EntityRef Entity;

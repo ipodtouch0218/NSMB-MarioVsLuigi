@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class GoombaSystem : SystemMainThreadFilterStage<GoombaSystem.Filter>, ISignalOnEntityBumped, ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken,
+    public unsafe class GoombaSystem : SystemMainThreadEntityFilter<Goomba, GoombaSystem.Filter>, ISignalOnEntityBumped, ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken,
         ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnEnemyRespawned {
 
         public struct Filter {

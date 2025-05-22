@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class IceBlockSystem : SystemMainThreadFilterStage<IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
+    public unsafe class IceBlockSystem : SystemMainThreadEntityFilter<IceBlock, IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
         ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityChangeUnderwaterState {
 
         public struct Filter {
