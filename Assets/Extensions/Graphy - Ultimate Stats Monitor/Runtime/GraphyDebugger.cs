@@ -542,6 +542,7 @@ namespace Tayx.Graphy
                     }
                 }
 
+                /*
                 if (debugPacket.TakeScreenshot)
                 {
                     string path = debugPacket.ScreenshotFileName + "_" + System.DateTime.Now + ".png";
@@ -553,6 +554,7 @@ namespace Tayx.Graphy
                     Application.CaptureScreenshot(path);
 #endif
                 }
+                */
 
                 debugPacket.UnityEvents.Invoke();
 

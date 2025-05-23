@@ -84311,6 +84311,7 @@ MonoBehaviour:
 
 
     `and formatted text`'
+  _TextMesh: {fileID: 1605459374}
   RenderSettings:
     Bold:
       RenderBold: 1
@@ -84323,7 +84324,11 @@ MonoBehaviour:
       UseCustomFont: 0
       FontAssetPathRelativeToResources: Noto/Noto Mono/NotoMono-Regular
       DrawOverlay: 1
-      OverlayColor: {r: 1, g: 1, b: 1, a: 0.078431375}
+      OverlayColor:
+        r: 1
+        g: 1
+        b: 1
+        a: 0.078431375
       OverlayPaddingPixels: 25
       ManuallySetCharacterSpacing: 1
       CharacterSpacing: 0.85
@@ -84340,7 +84345,11 @@ MonoBehaviour:
     Links:
       RenderLinks: 1
       RenderAutoLinks: 1
-      LinkColor: {r: 0.11372549, g: 0.4862745, b: 0.91764706, a: 1}
+      LinkColor:
+        r: 0.11372549
+        g: 0.4862745
+        b: 0.91764706
+        a: 1
     Headers:
       RenderPoundSignHeaders: 1
       RenderLineHeaders: 0

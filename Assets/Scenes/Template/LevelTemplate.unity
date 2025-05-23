@@ -365,6 +365,11 @@ PrefabInstance:
       propertyPath: EmissionModule.enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3858190478831269541, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4655134995783614807, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -533,6 +538,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dcdc633a29f212843ae9cbdf4be58fb2, type: 3}
+--- !u!114 &258286267 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2550855901662361809, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+    type: 3}
+  m_PrefabInstance: {fileID: 258286266}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c533cfed317c8854c9d8c177029943ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &402974982
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,7 +559,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 402974983}
-  m_Layer: 0
+  - component: {fileID: 402974984}
+  m_Layer: 21
   m_Name: Backgrounds
   m_TagString: Backgrounds
   m_Icon: {fileID: 0}
@@ -568,6 +586,20 @@ Transform:
   - {fileID: 1902688426}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &402974984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402974982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25b361eadac6e5f4fa3ade17a2c54574, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Updater: {fileID: 258286267}
+  UseFindUpdater: 0
 --- !u!1001 &528156795
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -700,7 +732,7 @@ GameObject:
   - component: {fileID: 680514969}
   - component: {fileID: 680514971}
   - component: {fileID: 680514970}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: BigClouds
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1538,7 +1570,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1128498886}
   - component: {fileID: 1128498887}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1872,7 +1904,7 @@ GameObject:
   - component: {fileID: 1679754272}
   - component: {fileID: 1679754274}
   - component: {fileID: 1679754273}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: SmallClouds
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2157,7 +2189,7 @@ GameObject:
   - component: {fileID: 1816989173}
   - component: {fileID: 1816989172}
   - component: {fileID: 1816989174}
-  m_Layer: 8
+  m_Layer: 20
   m_Name: Tilemap_Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4793,10 +4825,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452690fbcbac2c84793b5dc35da00380, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Updater: {fileID: 0}
+  Updater: {fileID: 258286267}
   UseFindUpdater: 0
   tilemap: {fileID: 1816989173}
-  tileBreakParticleSystem: {fileID: 0}
+  tileBreakParticleSystem: {fileID: 4829880438140776504, guid: e1e481681ce723d41ba61becae047562,
+    type: 3}
 --- !u!1 &1902688425
 GameObject:
   m_ObjectHideFlags: 0
@@ -4807,7 +4840,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1902688426}
   - component: {fileID: 1902688427}
-  m_Layer: 1
+  m_Layer: 21
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
