@@ -63,7 +63,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
             var stages = GlobalController.Instance.config.AllStages;
             var stageGroups = stages.Select(QuantumUnityDB.GetGlobalAsset)
-                .Select(m => (m, (VersusStageData) QuantumUnityDB.GetGlobalAsset(m.UserAsset)))
+                .Select(m => (m, m ? (VersusStageData) QuantumUnityDB.GetGlobalAsset(m.UserAsset) : null))
+                .Where(vsd => vsd.Item2)
                 .GroupBy(vsd => vsd.Item2.GroupingTranslationKey).OrderBy(g => IndexOfNullIsMax(headerOrder, g.Key));
 
             TranslationManager tm = GlobalController.Instance.translationManager;

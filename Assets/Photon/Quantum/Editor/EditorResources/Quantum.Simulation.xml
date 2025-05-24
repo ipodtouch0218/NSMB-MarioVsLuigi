@@ -1843,6 +1843,11 @@
             Is set the frame dump will not print the IsVerified information.
             </summary>
         </member>
+        <member name="F:Quantum.Frame.DumpFlag_SceneMesh3D">
+            <summary>
+            If set the 3D Physics SceneMesh metadata will be dumped.
+            </summary>
+        </member>
         <member name="P:Quantum.Frame.Global">
             <summary>
             Access the global read and write struct with generated variables by the Quantum DSL compiler.
@@ -4378,6 +4383,11 @@
         <member name="F:Quantum.SimulationConfigChecksumErrorDumpOptions.ComponentChecksums">
             <summary>
             Dumps component checksums.
+            </summary>
+        </member>
+        <member name="F:Quantum.SimulationConfigChecksumErrorDumpOptions.SceneMesh3D">
+            <summary>
+            Dumps 3D Physics SceneMesh metadata.
             </summary>
         </member>
         <member name="T:Quantum.EventDispatcher">

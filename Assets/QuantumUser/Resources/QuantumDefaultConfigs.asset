@@ -199,7 +199,7 @@ MonoBehaviour:
   HeapTrackingMode: 1
   HeapPageShift: 15
   HeapPageCount: 256
-  HeapExtraCount: 0
+  HeapExtraCount: 1
   InvisibleSolidTile:
     Id:
       Value: 282924479522535788
@@ -249,8 +249,6 @@ MonoBehaviour:
       Value: 372234066173501830
   - Id:
       Value: 503647763446439242
-  - Id:
-      Value: 487644643616636672
   FallbackPowerup:
     Id:
       Value: 390055422968795145

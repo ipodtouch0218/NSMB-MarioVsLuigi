@@ -213,7 +213,7 @@ public unsafe class CameraAnimator : ResizingCamera {
         ourCamera.transform.position = newPosition;
 
         // Zoom
-        float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y / -12f;
+        float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y * -12;
         Vector3? worldPosBefore = (zoomAmount != 0) ? ourCamera.ViewportToWorldPoint(pointer) : null;
 
         if (!ignoreKeyboard) {

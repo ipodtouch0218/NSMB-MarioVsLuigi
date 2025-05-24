@@ -16,9 +16,15 @@ public class MvLEditorUtils : EditorWindow {
         GetWindow<MvLEditorUtils>();
     }
 
-    [MenuItem("MvLO/Find VersusStageData")]
-    public static void Find() {
+    [MenuItem("MvLO/Find VersusStageData Asset")]
+    public static void FindStageData() {
+        QuantumMapData qmd = GameObject.FindFirstObjectByType<QuantumMapData>();
+        if (!qmd) {
+            Debug.LogWarning("Not within a stage!");
+            return;
+        }
 
+        EditorGUIUtility.PingObject(QuantumUnityDB.GetGlobalAsset(qmd.GetAsset(true).UserAsset));
     }
 
     public void OnGUI() {

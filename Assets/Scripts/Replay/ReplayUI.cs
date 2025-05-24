@@ -4,14 +4,17 @@ using NSMB.UI.Game;
 using NSMB.UI.Pause;
 using NSMB.Utils;
 using Quantum;
+using Quantum.Core;
 using System.Collections;
 using System.Reflection;
 using System.Text;
 using TMPro;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static Quantum.FPAnimationCurve;
 
 public class ReplayUI : QuantumSceneViewComponent {
 
@@ -46,6 +49,7 @@ public class ReplayUI : QuantumSceneViewComponent {
     private StringBuilder builder = new();
     private ReplayUITab activeTab;
     private bool gameEnded;
+    private Frame resetFrame;
 
     public void OnValidate() {
         this.SetIfNull(ref playerElements, UnityExtensions.GetComponentType.Parent);
@@ -63,6 +67,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             return;
         }
 
+        resetFrame = Game.CreateFrame();
         replayCanvasGroup.interactable = true;
         replayLength = Utils.SecondsToMinuteSeconds(NetworkHandler.ReplayLength / f.UpdateRate);
         trackArrowText.gameObject.SetActive(false);
@@ -198,11 +203,14 @@ public class ReplayUI : QuantumSceneViewComponent {
 
         var session = NetworkHandler.Runner.Session;
 
-        // It's a private method. Because of course it is.
         NetworkHandler.IsReplayFastForwarding = true;
+        resetFrame.Deserialize(NetworkHandler.ReplayFrameCache[newIndex]);
+        session.ResetReplay(resetFrame);
+        /*
+        // It's a private method. Because of course it is.
         var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
         resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, true });
-        NetworkHandler.IsReplayFastForwarding = false;
+        */
 
         // Fix accumulated time applying
         if (session.AccumulatedTime > 0) {
@@ -210,6 +218,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
             adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
         }
+        NetworkHandler.IsReplayFastForwarding = false;
     }
 
     public void FastForwardReplay() {
@@ -225,10 +234,14 @@ public class ReplayUI : QuantumSceneViewComponent {
         var session = NetworkHandler.Runner.Session;
         if (newIndex < NetworkHandler.ReplayFrameCache.Count) {
             // We already have this frame
-            // It's a private method. Because of course it is.
             NetworkHandler.IsReplayFastForwarding = true;
+            resetFrame.Deserialize(NetworkHandler.ReplayFrameCache[newIndex]);
+            session.ResetReplay(resetFrame);
+            /*
+            // It's a private method. Because of course it is.
             var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
             resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newIndex], newFrame, false });
+            */
 
             // Fix accumulated time applying
             if (session.AccumulatedTime > 0) {
@@ -317,11 +330,14 @@ public class ReplayUI : QuantumSceneViewComponent {
 
         var session = runner.Session;
         if (cachedFrame > f.Number || newFrame < f.Number) {
-            // It's a private method. Because of course it is.
             NetworkHandler.IsReplayFastForwarding = true;
+            resetFrame.Deserialize(NetworkHandler.ReplayFrameCache[newFrameCacheIndex]);
+            session.ResetReplay(resetFrame);
+            /*
+            // It's a private method. Because of course it is.
             var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
             resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[newFrameCacheIndex], cachedFrame, false });
-            NetworkHandler.IsReplayFastForwarding = false;
+            */
 
             // Fix accumulated time applying
             if (session.AccumulatedTime > 0) {
@@ -329,6 +345,7 @@ public class ReplayUI : QuantumSceneViewComponent {
                 var adjustTimeMethod = simulator.GetType().GetMethod("AdjustClock", BindingFlags.Instance | BindingFlags.Public, null, new System.Type[] { typeof(double) }, null);
                 adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
             }
+            NetworkHandler.IsReplayFastForwarding = false;
         }
 
         // Simulate up to the target frame
@@ -348,11 +365,15 @@ public class ReplayUI : QuantumSceneViewComponent {
         QuantumRunner runner = NetworkHandler.Runner;
         var session = runner.Session;
 
-        // It's a private method. Because of course it is.
         NetworkHandler.IsReplayFastForwarding = true;
+        resetFrame.Deserialize(NetworkHandler.ReplayFrameCache[0]);
+        session.ResetReplay(resetFrame);
+
+        /*
+        // It's a private method. Because of course it is.
         var resetMethod = session.GetType().GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Instance, null, new System.Type[] { typeof(byte[]), typeof(int), typeof(bool) }, null);
         resetMethod.Invoke(session, new object[] { NetworkHandler.ReplayFrameCache[0], NetworkHandler.ReplayStart, false });
-        NetworkHandler.IsReplayFastForwarding = false;
+        */
 
         // Fix accumulated time applying
         if (session.AccumulatedTime > 0) {
@@ -361,6 +382,7 @@ public class ReplayUI : QuantumSceneViewComponent {
             adjustTimeMethod.Invoke(simulator, new object[] { -session.AccumulatedTime });
         }
 
+        NetworkHandler.IsReplayFastForwarding = false;
         replayPaused = false;
         Time.timeScale = replaySpeed;
     }

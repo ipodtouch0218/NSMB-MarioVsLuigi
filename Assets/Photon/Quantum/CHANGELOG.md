@@ -1,8 +1,24 @@
+# 3.0.4
+
+## Stable
+
+### Build 1707 (May 20, 2025)
+
+**What's New**
+
+- Added the flag `ChecksumErrorDumpOptions.SceneMesh3D` to dump 3D Physics scene mesh metadata
+
+**Bug Fixes**
+
+- Fixed: An issue that could cause assertions `Old predicted command for player..` for application that are under severe performance problems
+- Fixed: An issue that could cause a desync in the 3D physics scene mesh serialization
+- Fixed: An issue that caused the Quantum menu to display a connection error stating the map could not be found if `SimulationConfig.AutoLoadSceneFromMap` is set to `Disabled`
+
 # 3.0.3
 
 ## Stable
 
-### Build 1685 (Apr 25, 2025)
+### Build 1683 (Apr 24, 2025)
 
 **Breaking Changes**
 

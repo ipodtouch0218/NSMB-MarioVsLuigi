@@ -262,6 +262,10 @@ namespace Quantum {
     /// Dumps component checksums.
     /// </summary>
     ComponentChecksums   = 1 << 3,
+    /// <summary>
+    /// Dumps 3D Physics SceneMesh metadata.
+    /// </summary>
+    SceneMesh3D          = 1 << 4,
   }
 
 }

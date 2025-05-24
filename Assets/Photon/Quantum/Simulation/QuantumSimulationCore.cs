@@ -435,6 +435,10 @@ namespace Quantum {
     /// Is set the frame dump will not print the IsVerified information.
     /// </summary>
     public const int DumpFlag_NoIsVerified                 = 1 << 11;
+    /// <summary>
+    /// If set the 3D Physics SceneMesh metadata will be dumped.
+    /// </summary>
+    public const int DumpFlag_SceneMesh3D                  = 1 << 12;
 
     struct RuntimePlayerData {
       public Int32         ActorId;
@@ -1101,6 +1105,12 @@ namespace Quantum {
         printer.AddLine();
         printer.AddLine("# 3D PHYSICS STATE");
         PhysicsEngineState.Print(_physicsState3D, printer);
+
+        if ((dumpFlags & DumpFlag_SceneMesh3D) == DumpFlag_SceneMesh3D && Physics3D.SceneMesh != null) {
+          printer.AddLine();
+          printer.AddLine("# 3D SCENE MESH");
+          TriangleMesh.Print(Physics3D.SceneMesh, printer);
+        }
       }
 
       // heap state
@@ -4890,6 +4900,9 @@ namespace Quantum {
             }
             if (options.HasFlag(SimulationConfigChecksumErrorDumpOptions.ComponentChecksums)) {
               dumpFlags |= Frame.DumpFlag_ComponentChecksums;
+            }
+            if (options.HasFlag(SimulationConfigChecksumErrorDumpOptions.SceneMesh3D)) {
+              dumpFlags |= Frame.DumpFlag_SceneMesh3D;
             }
 
             _frameDump = QTuple.Create(true, Frame.DumpFrame(dumpFlags));

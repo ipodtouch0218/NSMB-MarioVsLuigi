@@ -541,7 +541,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: true);
         }
         var deterministicConfig = DeterministicSessionConfig.FromByteArray(replay.DecompressedDeterministicConfigData);
-        var inputStream = new Photon.Deterministic.BitStream(replay.DecompressedInputData);
+        var inputStream = new BitStream(replay.DecompressedInputData);
         var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);
         
         // Disable checksums- they murder performance.
@@ -558,7 +558,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             InitialTick = ReplayStart,
             FrameData = replay.DecompressedInitialFrameData,
             DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
-            GameFlags = QuantumGameFlags.EnableTaskProfiler,
         };
 
         GlobalController.Instance.loadingCanvas.Initialize(null);

@@ -44,10 +44,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
             if (inputField.text != target.ReplayFile.Header.GetDisplayName()) {
                 // Confirm + no change = no change. Do this because translations matter.
-                target.ReplayFile.Header.CustomName = inputField.text;
-
                 try {
-                    target.ReplayFile.LoadAllIfNeeded();
+                    if (target.ReplayFile.LoadAllIfNeeded() != Replay.ReplayParseResult.Success) {
+                        throw new Exception();
+                    }
+                    target.ReplayFile.Header.CustomName = inputField.text;
                     using FileStream file = new FileStream(target.ReplayFile.FilePath, FileMode.OpenOrCreate);
                     file.SetLength(0);
                     target.ReplayFile.WriteToStream(file);
