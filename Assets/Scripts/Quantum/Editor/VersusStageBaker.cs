@@ -44,7 +44,7 @@ public class VersusStageBaker : MapDataBakerCallback {
         }
 
         this.data = data;
-        var stage = QuantumUnityDB.GetGlobalAssetEditorInstance<VersusStageData>(data.GetAsset(true).UserAsset);
+        var stage = QuantumUnityDB.GetGlobalAssetEditorInstance<VersusStageData>(data.Asset.UserAsset);
         if (!stage) {
             LogError("Scene does not have a VersusStageData instance as the Map's UserAsset", data);
             return;
@@ -245,7 +245,7 @@ public class VersusStageBaker : MapDataBakerCallback {
     }
 
     private void LogError(string message, UnityEngine.Object focus = null) {
-        Debug.LogWarning($"[VersusStageBaker] Unable to bake scene \"{data.GetAsset(false).ScenePath}\": {message}", focus);
+        Debug.LogWarning($"[VersusStageBaker] Unable to bake scene \"{data.Asset.ScenePath}\": {message}", focus);
     }
 
     // https://discussions.unity.com/t/getting-all-assets-of-the-specified-type/75031/5

@@ -86,8 +86,6 @@ namespace Photon.Realtime
                     client.AuthValues = arguments.AuthValues.CopyTo(new AuthenticationValues());
                 }
 
-                client.RealtimePeer.CrcEnabled = arguments.EnableCrc;
-
                 await client.ConnectUsingSettingsAsync(arguments.PhotonSettings, asyncConfig);
 
                 short result = 0;
@@ -197,8 +195,6 @@ namespace Photon.Realtime
             return asyncConfig.TaskFactory.StartNew(async () =>
             {
                 client = (client ?? arguments.NetworkClient) ?? new RealtimeClient();
-
-                client.RealtimePeer.CrcEnabled = arguments.EnableCrc;
 
                 if (client.State == ClientState.PeerCreated)
                 {
@@ -319,11 +315,11 @@ namespace Photon.Realtime
                 Lobby = arguments.Lobby,
                 Ticket = arguments.Ticket,
                 ExpectedUsers = arguments.ExpectedUsers,
-                RoomOptions = arguments.CustomRoomOptions ?? new RoomOptions()
+                RoomOptions = new RoomOptions()
                 {
                     MaxPlayers = (byte)arguments.MaxPlayers,
-                    IsOpen = arguments.IsRoomOpen.HasValue ? arguments.IsRoomOpen.Value : true,
-                    IsVisible = arguments.IsRoomVisible.HasValue ? arguments.IsRoomVisible.Value : true,
+                    IsOpen = true,
+                    IsVisible = true,
                     DeleteNullProperties = true,
                     PlayerTtl = arguments.PlayerTtlInSeconds * 1000,
                     EmptyRoomTtl = arguments.EmptyRoomTtlInSeconds * 1000,
@@ -450,24 +446,6 @@ namespace Photon.Realtime
         /// Set on <see cref="JoinRandomRoomArgs.MatchingType"/>
         /// </summary>
         public MatchmakingMode RandomMatchingType;
-        /// <summary>
-        /// Optionally set explicit room options to use for <see cref="EnterRoomArgs.RoomOptions"/>.
-        /// No properties will be set internally when this is set (see BuildEnterRoomArgs).
-        /// </summary>
-        public RoomOptions CustomRoomOptions;
-        /// <summary>
-        /// Optionally set an explicit initial <see cref="RoomOptions.IsVisible"/> value. Default is <see langword="true"/>
-        /// </summary>
-        public bool? IsRoomVisible;
-        /// <summary>
-        /// Optionally set an explicit initial <see cref="RoomOptions.IsOpen"/> value. Default is <see langword="true"/>
-        /// </summary>
-        public bool? IsRoomOpen;
-        /// <summary>
-        /// Enable CRC for Photon networking to detect corrupted packages.
-        /// Building the checksum with <see cref="PhotonPeer.CrcEnabled"/> has a low processing overhead but increases integrity of sent and received data. 
-        /// </summary>
-        public bool EnableCrc;
 
         /// <summary>
         /// Creates authentication values object in field <see cref="AuthValues"/> and sets the <see cref="AuthenticationValues.UserId"/>.

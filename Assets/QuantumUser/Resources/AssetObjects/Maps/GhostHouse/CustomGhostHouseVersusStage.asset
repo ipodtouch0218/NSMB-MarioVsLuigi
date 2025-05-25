@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/GhostHouse/CustomGhostHouseVersusStage
     Guid:
       Value: 383632825767239939
+  ShowAuthorAndComposer: 1
   StageAuthor: Ave
   MusicComposer: RENREN
   TranslationKey: level.custom.ghosthouse

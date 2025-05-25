@@ -3,12 +3,13 @@ using UnityEngine.Serialization;
 using TMPro;
 using NSMB.Extensions;
 
+[ExecuteAlways]
 public class NumberParticle : MonoBehaviour {
 
     //---Serialized Variables
     [SerializeField] private TMP_Text text;
     [SerializeField] private Vector3 colorOffset;
-    [SerializeField] private Color overlay;
+    [SerializeField] private float overlay;
 
     //---Components
     [SerializeField] private AnimationCurve yMovement;
@@ -47,7 +48,7 @@ public class NumberParticle : MonoBehaviour {
     public void Update() {
         if (final) {
             mpb.SetVector("_ColorOffset", colorOffset);
-            mpb.SetColor("_Overlay", overlay);
+            mpb.SetFloat("_Overlay", overlay);
             mr.SetPropertyBlock(mpb);
         }
 

@@ -42,11 +42,6 @@ namespace Quantum {
     [InlineHelp, DrawInline, Space]
     public QuantumStaticColliderSettings Settings = new QuantumStaticColliderSettings();
 
-    private void OnValidate() {
-      Height = FPMath.Clamp(Height, 0, Height);
-      UpdateFromSourceCollider();
-    }
-
     /// <summary>
     /// Copy collider configuration from source collider if exist. 
     /// </summary>
@@ -80,9 +75,9 @@ namespace Quantum {
       end = trs.MultiplyPoint(localEnd.ToUnityVector3());
 
 #if QUANTUM_XY
-      height = localHeight.AsFloat * Mathf.Abs(scale.z);
+      height = localHeight.AsFloat * -scale.z;
 #else
-      height = localHeight.AsFloat * Mathf.Abs(scale.y);
+      height = localHeight.AsFloat * scale.y;
 #endif
     }
 

@@ -1,7 +1,7 @@
 namespace Quantum.Editor {
   using System;
   using System.Collections.Generic;
-  using System.Linq;
+  using Quantum;
   using UnityEditor;
   using UnityEngine;
 
@@ -18,54 +18,63 @@ namespace Quantum.Editor {
     /// Search and select PhotonServerSettings.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Photon Server Settings", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 0)]
-    public static void SearchPhotonServerSettings() => Selection.activeObject = PhotonServerSettings.TryGetGlobal(out var settings) ? settings : null;
+    public static void SearchPhotonServerSettings() => SearchAndSelect<PhotonServerSettings>();
     /// <summary>
     /// Search and select QuantumEditorSettings.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Editor Settings", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 11)]
-    public static void SearchQuantumEditorSettings() => Selection.activeObject = QuantumEditorSettings.TryGetGlobal(out var settings) ? settings : null;
+    public static void SearchQuantumEditorSettings() => SearchAndSelect<QuantumEditorSettings>("QuantumEditorSettings");
     /// <summary>
     /// Search and select game gizmo settings.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Gizmo Settings", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 11)]
-    public static void SearchQuantumGizmoSettings() => Selection.activeObject = QuantumGameGizmosSettingsScriptableObject.TryGetGlobal(out var settings) ? settings : null;
+    public static void SearchQuantumGizmoSettings() => SearchAndSelect<QuantumGameGizmosSettingsScriptableObject>("QuantumGameGizmosSettings");
     /// <summary>
     /// Search and select the Quantum default config asset.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Default Configs", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 22)]
-    public static void SearchDefaultConfigs() => Selection.activeObject = QuantumDefaultConfigs.TryGetGlobal(out var settings) ? settings : null;
+    public static void SearchDefaultConfigs() => SearchAndSelect<QuantumDefaultConfigs>();
     /// <summary>
     /// Search and select the session config.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Session Config", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 22)]
-    public static void SearchSessionConfig() => Selection.activeObject = QuantumDeterministicSessionConfigAsset.TryGetGlobal(out var settings) ? settings : null;
+    public static void SearchSessionConfig() => SearchAndSelect<QuantumDeterministicSessionConfigAsset>();
     /// <summary>
     /// Search and select simulation config assets.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Simulation Config", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 22)]
-    public static void SearchSimulationConfig() => SearchAndSelect<Quantum.SimulationConfig>(selectMode: SelectMode.First);
+    public static void SearchSimulationConfig() => SearchAndSelect<Quantum.SimulationConfig>();
     /// <summary>
     /// Search and select the Quantum Unity DB file.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Unity DB", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 22)]
-    public static void SearchUnityDB() => Selection.activeObject = QuantumUnityDB.TryGetGlobal(out var settings) ? settings : null;
+    public static void SearchUnityDB() => SearchAndSelect<QuantumUnityDB>();
     /// <summary>
     /// Search and select the Quantum .net build settings.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Dotnet Build Settings", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 33)]
-    public static void SearchQuantumDotnetBuildSettings() => Selection.activeObject = QuantumDotnetBuildSettings.TryGetGlobal(out var settings) ? settings : null;
+    public static void SearchQuantumDotnetBuildSettings() {
+      if (QuantumDotnetBuildSettings.TryGetGlobal(out var settings)) {
+        Selection.activeObject = settings;
+      }
+    }
     /// <summary>
     /// Search and select the Quantum .net project settings.
     /// </summary>
     [MenuItem("Tools/Quantum/Find Config/Quantum Dotnet Project Settings", priority = (int)QuantumEditorMenuPriority.GlobalConfigs + 33)]
-    public static void SearchQuantumDotnetProjectSettings() => Selection.activeObject = QuantumDotnetProjectSettings.TryGetGlobal(out var settings) ? settings : null; 
-    
+    public static void SearchQuantumDotnetProjectSettings() {
+      if (QuantumDotnetProjectSettings.TryGetGlobal(out var settings)) {
+        Selection.activeObject = settings;
+      }
+    }
     /// <summary>
     /// Open the global config shortcut window.
     /// </summary>
     [MenuItem("Window/Quantum/Global Configs")]
     [MenuItem("Tools/Quantum/Window/Global Configs", priority = (int)QuantumEditorMenuPriority.Window + 3)]
-    public static void ShowWindow() => GetWindow(typeof(QuantumEditorShortcutsWindow), false, "Quantum Global Configs");
+    public static void ShowWindow() {
+      GetWindow(typeof(QuantumEditorShortcutsWindow), false, "Quantum Global Configs");
+    }
 
     /// <summary>
     /// A grid scope for the Quantum global config window.
@@ -105,47 +114,66 @@ namespace Quantum.Editor {
       var currentColumn = 0;
 
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("NetworkView Icon", false), "Photon Server Settings", EditorStyles.miniButton) && PhotonServerSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
+        if (GUI.Button(DrawIcon("NetworkView Icon"), "Photon Server Settings", EditorStyles.miniButton) && PhotonServerSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon(QuantumEditorSkin.QuantumIcon), "Session Configs", EditorStyles.miniButton) && QuantumDeterministicSessionConfigAsset.TryGetGlobal(out var settings)) Selection.activeObject = settings;
+        if (GUI.Button(DrawIcon("Grid Icon"), "Session Configs", EditorStyles.miniButton) && QuantumDeterministicSessionConfigAsset.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon(QuantumEditorSkin.QuantumIcon), "Simulation Configs", EditorStyles.miniButton)) SearchAndSelect<Quantum.SimulationConfig>(selectMode: SelectMode.Steps);
+        if (GUI.Button(DrawIcon("Settings"), "Default Configs", EditorStyles.miniButton) && QuantumDefaultConfigs.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon(QuantumEditorSkin.QuantumIcon), "Systems Config", EditorStyles.miniButton)) SearchAndSelect<SystemsConfig>(selectMode: SelectMode.Steps);
+        if (GUI.Button(DrawIcon("Settings"), "Simulation Configs", EditorStyles.miniButton)) SearchAndSelect<Quantum.SimulationConfig>();
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("BuildSettings.Editor.Small", false), "Editor Settings", EditorStyles.miniButton) && QuantumEditorSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
+        if (GUI.Button(DrawIcon("BuildSettings.Editor.Small"), "Editor Settings", EditorStyles.miniButton) && QuantumEditorSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("BuildSettings.Editor.Small", false), "Gizmo Settings", EditorStyles.miniButton) && QuantumGameGizmosSettingsScriptableObject.TryGetGlobal(out var settings)) Selection.activeObject = settings;
+        if (GUI.Button(DrawIcon("BuildSettings.Editor.Small"), "Gizmo Settings", EditorStyles.miniButton) && QuantumGameGizmosSettingsScriptableObject.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("BuildSettings.Editor.Small", false), "Unity DB", EditorStyles.miniButton)) SearchAndSelect<QuantumUnityDB>(selectMode: SelectMode.First);
+        if (GUI.Button(DrawIcon("BuildSettings.Editor.Small"), "Unity DB", EditorStyles.miniButton)) SearchAndSelect<QuantumUnityDB>();
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("Settings", true), "Dotnet Build Settings", EditorStyles.miniButton) && QuantumDotnetBuildSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
+        if (GUI.Button(DrawIcon("Settings"), "Dotnet Build Settings", EditorStyles.miniButton) && QuantumDotnetBuildSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("Settings", true), "Dotnet Project Settings", EditorStyles.miniButton) && QuantumDotnetProjectSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
+        if (GUI.Button(DrawIcon("Settings"), "Dotnet Project Settings", EditorStyles.miniButton) && QuantumDotnetProjectSettings.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon(QuantumEditorSkin.QuantumIcon), "Default Configs", EditorStyles.miniButton) && QuantumDefaultConfigs.TryGetGlobal(out var settings)) Selection.activeObject = settings;
+        if (GUI.Button(DrawIcon("Settings"), "Default Config", EditorStyles.miniButton) && QuantumDefaultConfigs.TryGetGlobal(out var settings)) Selection.activeObject = settings;
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("Profiler.Physics", true), "Physics Materials", EditorStyles.miniButton)) SearchAndSelect<Quantum.PhysicsMaterial>(selectMode: SelectMode.Steps);
+        if (GUI.Button(DrawIcon("PhysicMaterial Icon"), "Physics Materials", EditorStyles.miniButton)) SearchAndSelect<Quantum.PhysicsMaterial>();
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("NavMeshData Icon", true), "NavMesh Agent Configs", EditorStyles.miniButton)) SearchAndSelect<Quantum.NavMeshAgentConfig>(selectMode: SelectMode.Steps);
+        if (GUI.Button(DrawIcon("NavMeshData Icon"), "NavMesh Agent Configs", EditorStyles.miniButton)) SearchAndSelect<Quantum.NavMeshAgentConfig>();
       }
       using (new GridScope(columnCount, ref currentColumn)) {
-        if (GUI.Button(DrawIcon("CapsuleCollider2D Icon", true), "Character Controller 2D", EditorStyles.miniButton)) SearchAndSelect<Quantum.CharacterController2DConfig>(selectMode: SelectMode.Steps);
+        if (GUI.Button(DrawIcon("CapsuleCollider2D Icon"), "Character Controller 2D", EditorStyles.miniButton)) SearchAndSelect<Quantum.CharacterController2DConfig>();
+      }
+      using (new GridScope(columnCount, ref currentColumn)) {
+        if (GUI.Button(DrawIcon("CapsuleCollider Icon"), "Character Controller 3D", EditorStyles.miniButton)) SearchAndSelect<Quantum.CharacterController3DConfig>();
       }
       using (new GridScope(columnCount, ref currentColumn, true)) {
-        if (GUI.Button(DrawIcon("CapsuleCollider Icon", true), "Character Controller 3D", EditorStyles.miniButton)) SearchAndSelect<Quantum.CharacterController3DConfig>(selectMode: SelectMode.Steps);
+        if (GUI.Button(DrawIcon("DefaultAsset Icon"), "Asset Database Window", EditorStyles.miniButton)) {
+          var windows = (QuantumUnityDBInspector[])UnityEngine.Resources.FindObjectsOfTypeAll(typeof(QuantumUnityDBInspector));
+          if (windows.Length > 0) {
+            windows[0].Close();
+          } else {
+            QuantumUnityDBInspector window = (QuantumUnityDBInspector)GetWindow(typeof(QuantumUnityDBInspector), false, "Quantum Asset DB");
+            window.Show();
+          }
+        }
       }
+    }
+
+    /// <summary>
+    /// Obsolete
+    /// </summary>
+    [Obsolete("Use DrawIcon() without width parameter")]
+    public static Rect DrawIcon(string iconName, float width) {
+      return DrawIcon(iconName);
     }
 
     /// <summary>
@@ -153,75 +181,72 @@ namespace Quantum.Editor {
     /// </summary>
     /// <param name="iconName">Icon name that is found by EditorGUIUtility.IconContent()</param>
     /// <returns>Control rect</returns>
-    public static Rect DrawIcon(string iconName, bool hasDarkIcon) {
-      if (hasDarkIcon && EditorGUIUtility.isProSkin) {
-        iconName = $"d_{iconName}";
-      }
-      return DrawIcon(EditorGUIUtility.IconContent(iconName));
-    }
-
-    private static Rect DrawIcon(Texture2D texture) {
-      return DrawIcon(new GUIContent(string.Empty, texture));
-    }
-
-    private static Rect DrawIcon(GUIContent content) {
+    public static Rect DrawIcon(string iconName) {
       var rect = EditorGUILayout.GetControlRect();
       var width = rect.width;
       rect.width = 20;
-      EditorGUI.LabelField(rect, content);
-      rect.xMin += rect.width;
+      EditorGUI.LabelField(rect, EditorGUIUtility.IconContent(iconName));
+      rect.xMin  += rect.width;
       rect.width = width - rect.width;
       return rect;
-    }
-
-    /// <summary>
-    /// Different selection modes for SearchAndSelect methods.
-    /// </summary>
-    public enum SelectMode {
-      /// <summary>
-      /// Select all
-      /// </summary>
-      All,
-      /// <summary>
-      /// Select the first asset found
-      /// </summary>
-      First,
-      /// <summary>
-      /// Select the next asset using <see cref="Selection.activeObject"/>
-      /// </summary>
-      Steps
     }
 
     /// <summary>
     /// Search and select any type.
     /// </summary>
     /// <typeparam name="T">Type to search</typeparam>
-    /// <param name="selectMode">Toggle the selection mode</param>
     /// <returns>The first asset of the type found</returns>
-    public static IEnumerable<T> SearchAndSelect<T>(SelectMode selectMode = SelectMode.All) where T : UnityEngine.Object {
-      var guids = AssetDatabase.FindAssets("t:" + typeof(T).Name, null);
+    public static T SearchAndSelect<T>() where T : UnityEngine.Object {
+      var t = typeof(T);
+      var guids = AssetDatabase.FindAssets("t:" + t.Name, null);
       if (guids.Length == 0) {
-        QuantumEditorLog.Log($"No UnityEngine.Objects of type '{typeof(T).Name}' found.");
-        return Enumerable.Empty<T>();
+        QuantumEditorLog.Log($"No UnityEngine.Objects of type '{t.Name}' found.");
+        return null;
       }
 
-      var objects = guids.Select(g => AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(g), typeof(T))).ToArray();
-
-      switch (selectMode) {
-        case SelectMode.All: 
-          break;
-        case SelectMode.First:
-          objects = new UnityEngine.Object[] { objects[0] };
-          break;
-        case SelectMode.Steps:
-          var index = (ArrayUtility.FindIndex(objects, o => Selection.activeObject == o) + 1) % objects.Length;
-          objects = new UnityEngine.Object[] { objects[index] };
-          break;
+      var selectedObjects = new List<UnityEngine.Object>();
+      for (int i = 0; i < guids.Length; i++) {
+        selectedObjects.Add(AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guids[i]), t));
       }
 
-      Selection.objects = objects.ToArray();
-      return objects.Select(t => t as T);
+      Selection.objects = selectedObjects.ToArray();
+      return (T)selectedObjects[0];
+    }
 
+    /// <summary>
+    /// Search and select any type by asset guid.
+    /// </summary>
+    /// <typeparam name="T">The asset type</typeparam>
+    /// <param name="assetGuid"></param>
+    /// <returns>The found asset</returns>
+    public static T SearchAndSelect<T>(AssetGuid assetGuid) where T : UnityEngine.Object {
+      var t = typeof(T);
+      var guids = AssetDatabase.FindAssets("t:" + t.Name, null);
+      if (guids.Length == 0) {
+        QuantumEditorLog.Log($"No UnityEngine.Objects of type '{t.Name}' found.");
+        return null;
+      }
+
+      if (guids.Length < 2) {
+        return SearchAndSelect<T>();
+      }
+
+      T specificAsset = null;
+      for (int i = 0; i < guids.Length; i++) {
+        var asset = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guids[i]), t);
+        if (typeof(Quantum.AssetObject).IsAssignableFrom(typeof(T)) &&
+          ((Quantum.AssetObject)asset).Identifier.Guid == assetGuid) {
+          specificAsset = (T)asset;
+          break;
+        }
+      }
+
+      if (specificAsset == null || Selection.objects.Length == 1 && Selection.objects[0] == specificAsset) {
+        return SearchAndSelect<T>();
+      }
+
+      Selection.objects = new UnityEngine.Object[1] { specificAsset };
+      return specificAsset;
     }
 
     /// <summary>
@@ -230,16 +255,33 @@ namespace Quantum.Editor {
     /// <typeparam name="T">Asset type</typeparam>
     /// <param name="name">Asset name</param>
     /// <returns>The asset matching the type and name</returns>
-    public static IEnumerable<T> SearchAndSelect<T>(string name) where T : UnityEngine.Object {
-      foreach (var asset in SearchAndSelect<T>(selectMode: SelectMode.All)) {
-        if (String.Equals(asset.name, name, StringComparison.Ordinal)) {
-          return new T[] { asset };
+    public static T SearchAndSelect<T>(string name) where T : UnityEngine.Object {
+      var t = typeof(T);
+      var guids = AssetDatabase.FindAssets("t:" + t.Name, null);
+      if (guids.Length == 0) {
+        Debug.LogFormat("No UnityEngine.Objects of type '{0}' found.", t.Name);
+        return null;
+      }
+
+      if (guids.Length < 2) {
+        return SearchAndSelect<T>();
+      }
+
+      T specificAsset = null;
+      for (int i = 0; i < guids.Length; i++) {
+        var asset = AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guids[i]), t);
+        if (asset.name == name) { 
+          specificAsset = (T)asset;
+          break;
         }
       }
-      return Enumerable.Empty<T>();
-    }
 
-    [Obsolete("Use QuantumUnityDB.Global.GetAsset() instead")]
-    public static IEnumerable<T> SearchAndSelect<T>(AssetGuid assetGuid) where T : UnityEngine.Object => null;
+      if (specificAsset == null || Selection.objects.Length == 1 && Selection.objects[0] == specificAsset) {
+        return SearchAndSelect<T>();
+      }
+
+      Selection.objects = new UnityEngine.Object[1] { specificAsset };
+      return specificAsset;
+    }
   }
 }

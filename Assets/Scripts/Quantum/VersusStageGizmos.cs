@@ -24,7 +24,7 @@ public class VersusStageGizmos : MonoBehaviour {
             return;
         }
 
-        var stage = QuantumUnityDB.GetGlobalAsset<VersusStageData>(mapData.GetAsset(false).UserAsset.Id);
+        var stage = QuantumUnityDB.GetGlobalAsset<VersusStageData>(mapData.Asset.UserAsset.Id);
 
         if (!stage) {
             return;

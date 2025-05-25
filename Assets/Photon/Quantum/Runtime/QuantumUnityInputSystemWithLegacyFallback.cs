@@ -14,41 +14,7 @@ namespace Quantum {
     UnityEngine.MonoBehaviour
 #endif
   {
-
-#if ENABLE_INPUT_SYSTEM && QUANTUM_ENABLE_INPUTSYSTEM
-    /// <summary>
-    /// Overwriting OnEnable only to workaround a bug in com.unity.inputsystem.
-    /// </summary>
-    protected override void OnEnable() {
-      try {
-        if (HasNoActions()) {
-          AssignDefaultActions();
-        }
-      } catch (InvalidOperationException) {
-        // Catching a bug in the input system (1.8.0 to 1.11.2+)
-        // https://issuetracker.unity3d.com/issues/invalidoperationexception-is-thrown-when-re-entering-the-play-mode-with-reload-domain-disabled
-        UnassignActions();
-      }
-
-      base.OnEnable();
-    }
-
-    private bool HasNoActions() {
-      if (actionsAsset != null)
-        return false;
-
-      return point?.action == null
-          && leftClick?.action == null
-          && rightClick?.action == null
-          && middleClick?.action == null
-          && submit?.action == null
-          && cancel?.action == null
-          && scrollWheel?.action == null
-          && trackedDeviceOrientation?.action == null
-          && trackedDevicePosition?.action == null;
-    }
-#endif
-
+   
 #if UNITY_EDITOR
     [CustomEditor(typeof(QuantumUnityInputSystemWithLegacyFallback))]
     class FallbackEditor : Editor {

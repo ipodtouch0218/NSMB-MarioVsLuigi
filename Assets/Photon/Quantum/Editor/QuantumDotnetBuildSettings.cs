@@ -81,11 +81,6 @@ namespace Quantum.Editor {
     public string BinOutputPath = "bin";
 
     /// <summary>
-    /// Optionally set a dotnet command path.
-    /// </summary>
-    public string DotnetCommandPath;
-
-    /// <summary>
     /// The path to the Photon Server SDK.
     /// </summary>
     public string PluginSdkPath = "";
@@ -178,7 +173,7 @@ namespace Quantum.Editor {
     /// <param name="settings">Settings instance</param>
     /// <param name="disablePopup">Disable all popups.</param>
     public static void GenerateProject(QuantumDotnetBuildSettings settings, bool disablePopup = false) {
-      if (RunDotnetCommand("--version", settings.DotnetCommandPath) == false) {
+      if (RunDotnetCommand("--version") == false) {
         QuantumEditorLog.Error("Dotnet installation not found");
         return;
       }
@@ -209,9 +204,9 @@ namespace Quantum.Editor {
 
       // Create the solution file
       if (File.Exists($"{settings.ProjectBasePath}/{settings.ProjectBasePath}.sln") == false) {
-        RunDotnetCommand($" new sln --output {settings.ProjectBasePath}", settings.DotnetCommandPath);
-        RunDotnetCommand($" sln {settings.ProjectBasePath}/{settings.ProjectBasePath}.sln add {settings.ProjectBasePath}/Quantum.Simulation.Dotnet", settings.DotnetCommandPath);
-        RunDotnetCommand($" sln {settings.ProjectBasePath}/{settings.ProjectBasePath}.sln add {settings.ProjectBasePath}/Quantum.Runner.Dotnet", settings.DotnetCommandPath);
+        RunDotnetCommand($" new sln --output {settings.ProjectBasePath}");
+        RunDotnetCommand($" sln {settings.ProjectBasePath}/{settings.ProjectBasePath}.sln add {settings.ProjectBasePath}/Quantum.Simulation.Dotnet");
+        RunDotnetCommand($" sln {settings.ProjectBasePath}/{settings.ProjectBasePath}.sln add {settings.ProjectBasePath}/Quantum.Runner.Dotnet");
       }
 
       if (settings.ShowFolderAfterGeneration && disablePopup == false) {
@@ -229,22 +224,22 @@ namespace Quantum.Editor {
     /// <param name="copyOutputDir">Copy result to output dir</param>
     /// <param name="disablePopup">Disable file explorer popup</param>
     public static void BuildProject(QuantumDotnetBuildSettings settings, string copyOutputDir = null, bool disablePopup = false) {
-      if (RunDotnetCommand("--version", settings.DotnetCommandPath) == false) {
+      if (RunDotnetCommand("--version") == false) {
         QuantumEditorLog.Error("Dotnet installation not found");
         return;
       }
 
-      var arguments = $" build \"{Path.GetFullPath(settings.ProjectBasePath)}/Quantum.Simulation.Dotnet/Quantum.Simulation.Dotnet.csproj\"";
+      var arguments = $" build {Path.GetFullPath(settings.ProjectBasePath)}/Quantum.Simulation.Dotnet/Quantum.Simulation.Dotnet.csproj";
       arguments += $" --configuration {settings.TargetConfiguration}";
       arguments += $" --property:TargetPlatform={settings.TargetPlatform}";
-      arguments += $" --property:OutputPath=\"{settings.BinOutputPath}/\"";
+      arguments += $" --property:OutputPath={settings.BinOutputPath}/";
 
       if (string.IsNullOrEmpty(copyOutputDir) == false) {
         arguments += $" --property:CopyOutput=true";
-        arguments += $" --property:CopyOutputDir=\"{copyOutputDir}\"";
+        arguments += $" --property:CopyOutputDir={copyOutputDir}";
       }
 
-      if (RunDotnetCommand(arguments, settings.DotnetCommandPath)) {
+      if (RunDotnetCommand(arguments)) {
         if (settings.ShowCompiledDllAfterBuild && disablePopup == false) {
           var simulationDllPath = $"{Path.GetFullPath(settings.ProjectBasePath)}/Quantum.Simulation.Dotnet/bin/Quantum.Simulation.dll";
           if (File.Exists(simulationDllPath)) {
@@ -254,22 +249,21 @@ namespace Quantum.Editor {
       }
     }
 
-    private static bool RunDotnetCommand(string arguments, string dotnetCommandPath = null) {
-      return RunDotnetCommand(arguments, out _, dotnetCommandPath);
+    private static bool RunDotnetCommand(string arguments) {
+      return RunDotnetCommand(arguments, out _);
     }
 
-    private static bool RunDotnetCommand(string arguments, out string output, string dotnetCommandPath = null) {
-      dotnetCommandPath = string.IsNullOrEmpty(dotnetCommandPath) ? "dotnet" : dotnetCommandPath;
-
+    private static bool RunDotnetCommand(string arguments, out string output) {
       try {
+        var applicationName = "dotnet";
 #if UNITY_EDITOR_WIN
-        var fileName = dotnetCommandPath;
+        var fileName = applicationName;
         var fullArguments = arguments;
 #else
         // search paths are minimal without a login shell on Mac
         // likely the same for Linux
         var fileName = "sh";
-        var fullArguments = $" --login -c '{dotnetCommandPath} {arguments}'";
+        var fullArguments = $" --login -c '{applicationName} {arguments}'";
 #endif
 
         var startInfo = new System.Diagnostics.ProcessStartInfo() {
@@ -353,15 +347,21 @@ namespace Quantum.Editor {
       var assetPath = assetDirectory.FullName;
 
       // copy lut files
-      if (QuantumLookupTables.TryGetGlobal(out var lut)) {
-        var lutAssetDirectory = Directory.CreateDirectory($"{assetPath}/LUT");
-        var lutAssetPath = lutAssetDirectory.FullName;
-        File.Copy(Path.GetFullPath($"{AssetDatabase.GetAssetPath(lut.TableAcos)}"), $"{lutAssetPath}/{Path.GetFileName(AssetDatabase.GetAssetPath(lut.TableAcos))}", true);
-        File.Copy(Path.GetFullPath($"{AssetDatabase.GetAssetPath(lut.TableAsin)}"), $"{lutAssetPath}/{Path.GetFileName(AssetDatabase.GetAssetPath(lut.TableAsin))}", true);
-        File.Copy(Path.GetFullPath($"{AssetDatabase.GetAssetPath(lut.TableAtan)}"), $"{lutAssetPath}/{Path.GetFileName(AssetDatabase.GetAssetPath(lut.TableAtan))}", true);
-        File.Copy(Path.GetFullPath($"{AssetDatabase.GetAssetPath(lut.TableSinCos)}"), $"{lutAssetPath}/{Path.GetFileName(AssetDatabase.GetAssetPath(lut.TableSinCos))}", true);
-        File.Copy(Path.GetFullPath($"{AssetDatabase.GetAssetPath(lut.TableSqrt)}"), $"{lutAssetPath}/{Path.GetFileName(AssetDatabase.GetAssetPath(lut.TableSqrt))}", true);
-        File.Copy(Path.GetFullPath($"{AssetDatabase.GetAssetPath(lut.TableTan)}"), $"{lutAssetPath}/{Path.GetFileName(AssetDatabase.GetAssetPath(lut.TableTan))}", true);
+      var lutAssetDirectory = Directory.CreateDirectory($"{assetPath}/LUT");
+      var lutAssetPath = lutAssetDirectory.FullName;
+      string[] lutFiles = { "FPAcos", "FPAsin", "FPAtan", "FPCos", "FPSin", "FPSinCos", "FPSqrt", "FPTan" };
+      foreach (var file in lutFiles) {
+        var guids = AssetDatabase.FindAssets(file);
+        foreach (var guid in guids) {
+          var path = AssetDatabase.GUIDToAssetPath(guid);
+          try {
+            File.Copy(Path.GetFullPath($"{path}"), $"{lutAssetPath}/{Path.GetFileName(path)}", true);
+          } catch (IOException e) {
+            QuantumEditorLog.Exception(e);
+          }
+
+          break;
+        }
       }
     }
 

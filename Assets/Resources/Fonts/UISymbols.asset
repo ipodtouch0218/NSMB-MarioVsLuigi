@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: TextMeshPro/Sprite
-  m_Shader: {fileID: 4800000, guid: cf81c85f95fe47e1a27f6ae460cf182c, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0c733e9120ddc4a4da95071a94eae111, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -32,6 +32,7 @@ Material:
     - _ColorMask: 15
     - _CullMode: 0
     - _FirstCharOffset: 0
+    - _Overlay: 0
     - _SecondCharOffset: 0
     - _Stencil: 0
     - _StencilComp: 8
@@ -44,7 +45,7 @@ Material:
     - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ColorOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _Overlay: {r: 0, g: 0, b: 0, a: 0}
+    - _Overlay: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &11400000

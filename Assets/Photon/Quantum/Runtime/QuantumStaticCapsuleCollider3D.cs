@@ -37,12 +37,7 @@ namespace Quantum {
     [InlineHelp, DrawInline, Space]
     public QuantumStaticColliderSettings Settings = new QuantumStaticColliderSettings();
 
-    internal CapsuleDirection3D Direction = CapsuleDirection3D.Y;
-    
-
     private void OnValidate() {
-      Radius = FPMath.Clamp(Radius, 0, Radius);
-      Height = FPMath.Clamp(Height, 0, Height);
       UpdateFromSourceCollider();
     }
 
@@ -53,17 +48,7 @@ namespace Quantum {
       if (SourceCollider == null) {
         return;
       }
-      switch (SourceCollider.direction) {
-        case 0:
-          Direction = CapsuleDirection3D.X;
-          break;
-        case 1:
-          Direction = CapsuleDirection3D.Y;
-          break;
-        case 2:
-          Direction = CapsuleDirection3D.Z;
-          break;
-      }
+
       Radius = SourceCollider.radius.ToFP();
       Height = SourceCollider.height.ToFP();
       PositionOffset = SourceCollider.center.ToFPVector3();

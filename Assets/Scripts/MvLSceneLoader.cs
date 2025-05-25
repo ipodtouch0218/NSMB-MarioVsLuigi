@@ -39,9 +39,10 @@ public class MvLSceneLoader : MonoBehaviour {
 
     private IEnumerator SceneChangeCoroutine(QuantumGame game, Map oldMap, Map newMap) {
         if (oldMap == newMap) {
+            loadingCoroutine = null;
             yield break;
         }
-
+        
         // Load new map
         AsyncOperation loadingOp;
         QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneLoadBegin(game));

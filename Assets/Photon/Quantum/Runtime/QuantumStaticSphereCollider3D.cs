@@ -29,7 +29,6 @@ namespace Quantum {
     public QuantumStaticColliderSettings Settings = new QuantumStaticColliderSettings();
 
     private void OnValidate() {
-      Radius = FPMath.Clamp(Radius, 0, Radius);
       UpdateFromSourceCollider();
     }
 

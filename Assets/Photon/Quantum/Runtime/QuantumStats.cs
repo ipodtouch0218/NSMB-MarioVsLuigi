@@ -24,6 +24,10 @@ namespace Quantum {
     /// </summary>
     public Text Predicted;
     /// <summary>
+    /// Number of resimulated frames.
+    /// </summary>
+    public Text Resimulated;
+    /// <summary>
     /// The last simulation time.
     /// </summary>
     public Text SimulateTime;
@@ -97,7 +101,7 @@ namespace Quantum {
       SetState(StartEnabled);
     }
 
-    void LateUpdate() {
+    void Update() {
       if (QuantumRunner.Default && ToggleOff.activeSelf) {
         if (QuantumRunner.Default.IsRunning) {
           if (ShowCompactStats) {
@@ -127,6 +131,7 @@ namespace Quantum {
           NetworkPing.text = gameInstance.Session.Stats.Ping.ToString();
           SimulateTime.text = Math.Round(gameInstance.Session.Stats.UpdateTime * 1000, 2) + " ms";
           InputOffset.text = gameInstance.Session.Stats.Offset.ToString();
+          Resimulated.text = gameInstance.Session.Stats.ResimulatedFrames.ToString();
 
           if (gameInstance.Session.IsStalling) {
             SimulationState.text = "Stalling";

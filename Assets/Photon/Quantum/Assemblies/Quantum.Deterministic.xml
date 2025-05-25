@@ -1582,13 +1582,6 @@
             <param name="bounds"></param>
             <returns></returns>
         </member>
-        <member name="M:Photon.Deterministic.FPBounds2.Contains(Photon.Deterministic.FPVector2)">
-            <summary>
-            Returns <see langword="true"/> if the <paramref name="point"/> is inside the bounds.
-            </summary>
-            <param name="point"></param>
-            <returns></returns>
-        </member>
         <member name="M:Photon.Deterministic.FPBounds2.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
             <summary>
             Serializes the FPBounds2 struct by serializing its FPVector2 fields.
@@ -1681,13 +1674,6 @@
             Returns <see langword="true"/> if there is an intersection between bounds.
             </summary>
             <param name="bounds"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Photon.Deterministic.FPBounds3.Contains(Photon.Deterministic.FPVector3)">
-            <summary>
-            Returns <see langword="true"/> if the <paramref name="point"/> is inside the bounds.
-            </summary>
-            <param name="point"></param>
             <returns></returns>
         </member>
         <member name="M:Photon.Deterministic.FPBounds3.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
@@ -2756,11 +2742,6 @@
             </summary>
             <param name="lutProvider"></param>
         </member>
-        <member name="M:Photon.Deterministic.FPLut.Init(System.Byte[],System.Byte[],System.Byte[],System.Byte[],System.Byte[],System.Byte[])">
-            <summary>
-            Initialize LUT using using byte arrays.
-            </summary>
-        </member>
         <member name="M:Photon.Deterministic.FPLut.GenerateTables(System.String)">
             <summary>
             Generate lookup tables in <paramref name="directoryPath"/>.
@@ -3022,16 +3003,6 @@
             <param name="start"></param>
             <param name="end"></param>
             <param name="value"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Photon.Deterministic.FPMath.MoveTowards(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <summary>
-            Moves a value <paramref name="from"/> towards <paramref name="to"/> by a value no greater than <paramref name="maxDelta"/>.
-            Negative values of <paramref name="maxDelta"/> push the value away from <paramref name="to"/>.
-            </summary>
-            <param name="from"></param>
-            <param name="to"></param>
-            <param name="maxDelta"></param>
             <returns></returns>
         </member>
         <member name="M:Photon.Deterministic.FPMath.SmoothStep(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP)">
@@ -5543,7 +5514,7 @@
             </summary>
             <returns>A string that represents the current IntVector2.</returns>
         </member>
-        <member name="M:Photon.Deterministic.IntVector2.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
+        <member name="M:Photon.Deterministic.IntVector2.Serialize(Photon.Deterministic.IntVector2*,Photon.Deterministic.IDeterministicFrameSerializer)">
             <summary>
             Serializes or deserializes a IntVector2 struct using the provided IDeterministicFrameSerializer object.
             </summary>
@@ -5850,7 +5821,7 @@
             </summary>
             <returns>A string representation of the IntVector3.</returns>
         </member>
-        <member name="M:Photon.Deterministic.IntVector3.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
+        <member name="M:Photon.Deterministic.IntVector3.Serialize(Photon.Deterministic.IntVector3*,Photon.Deterministic.IDeterministicFrameSerializer)">
             <summary>
             Serializes a IntVector3 to a stream using an IDeterministicFrameSerializer.
             If the serializer is in writing mode, the method writes the X, Y, and Z components of the vector to the stream.
@@ -6621,13 +6592,6 @@
         <member name="M:Photon.Deterministic.Native.MSVCRTUtility.Compare(System.Void*,System.Void*,System.Int32)">
             <inheritdoc/>
         </member>
-        <member name="M:Photon.Deterministic.Native.SizeOf(System.Type)">
-            <summary>
-            Gets the size of the specified type.
-            </summary>
-            <param name="t">The type to get the size of.</param>
-            <returns>The size of the specified type in bytes.</returns>
-        </member>
         <member name="T:Photon.Deterministic.Native.PInvokeAllocator">
             <summary>
             A specific allocator that tracks allocations in Debug mode.
@@ -6839,11 +6803,6 @@
             It is automatically picked up by the server and triggers a webhook.
             </summary>
         </member>
-        <member name="P:Photon.Deterministic.IDeterministicSessionRunner.Session">
-            <summary>
-            Returns the session.
-            </summary>
-        </member>
         <member name="M:Photon.Deterministic.IDeterministicSessionRunner.Shutdown">
             <summary>
             Shutdown the simulation.
@@ -6902,11 +6861,6 @@
         <member name="F:Photon.Deterministic.RoomProperties.Start">
             <summary>
             This room property can be controlled through Photon dashboard settings.
-            </summary>
-        </member>
-        <member name="F:Photon.Deterministic.RoomProperties.WebHookBaseUrl">
-            <summary>
-            User can set this during CreateGame to change the webhook base url provided by an allow list.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.Protocol.AddPlayer">
@@ -8527,25 +8481,16 @@
         <member name="M:Photon.Deterministic.DeterministicSession.IsPlayerLocal(Quantum.PlayerRef)">
             <summary>
             Tests whereas this PlayerRef is controlled by this local client/session.
-            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
-            </summary>
-        </member>
-        <member name="M:Photon.Deterministic.DeterministicSession.GetActorNumber">
-            <summary>
-            Returns the Photon Actor Number of the connection, if in online mode.
-            Otherwise, returns 0.
             </summary>
         </member>
         <member name="M:Photon.Deterministic.DeterministicSession.TryGetLocalPlayer(System.Int32,Quantum.PlayerRef@)">
             <summary>
             Returns <see langword="true"/> and fills in the corresponding global PlayerRef if playerSlot is a valid local slot, for which the session can send input.
-            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
             </summary>
         </member>
         <member name="M:Photon.Deterministic.DeterministicSession.IsPlayerSlotLocal(System.Int32)">
             <summary>
             Checks if this local player slot is currently in use (local slots can be added/removed dynamically).
-            <para>Caveat: This method will behave differently in replays, read the replay online documentation for more information.</para>
             </summary>
         </member>
         <member name="P:Photon.Deterministic.DeterministicSession.PlayerCount">
@@ -8573,7 +8518,7 @@
             Stats: Number of predicted frames simulated during the last call to Update().
             </summary>
         </member>
-        <member name="P:Photon.Deterministic.DeterministicSession.SimulationTimeElapsed">
+        <member name="P:Photon.Deterministic.DeterministicSession.SimulationTimeElasped">
             <summary>
             Stats: Precise time in seconds used by the last call to Update(). Includes all session internal input handling, rollbacks, verified and predicted frames simulation.
             </summary>
@@ -8678,11 +8623,6 @@
         <member name="P:Photon.Deterministic.DeterministicSession.Runner">
             <summary>
             Runner is the wrapper for session/game that can be attached to Unity, a .Net console app, or a Quantum Custom Server Plugin. 
-            </summary>
-        </member>
-        <member name="P:Photon.Deterministic.DeterministicSession.OnDestroyed">
-            <summary>
-            Is executed in the end of <see cref="M:Photon.Deterministic.DeterministicSession.Destroy"/>. Is used by the server simulation.
             </summary>
         </member>
         <member name="P:Photon.Deterministic.DeterministicSession.InputPool">
@@ -9795,11 +9735,6 @@
         <member name="T:Photon.Deterministic.IDeterministicReplayProvider">
             <summary>
             An internal interface to encapsulate managing rpc and input.
-            </summary>
-        </member>
-        <member name="P:Photon.Deterministic.IDeterministicReplayProvider.LocalActorNumber">
-            <summary>
-            Setting the correct local actor number makes <see cref="M:Photon.Deterministic.DeterministicSession.IsLocalPlayer(Quantum.PlayerRef)"/> work in replays similar to normal Quantum sessions.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.IDeterministicStreamReplayInputProvider">
@@ -11636,57 +11571,6 @@
         <member name="P:Photon.Deterministic.DeterministicStats.UpdateTime">
             <summary>
             The total time of the last update.
-            </summary>
-        </member>
-        <member name="T:Photon.Deterministic.StopwatchTimer">
-            <summary>
-            Represents a high-resolution timer.
-            </summary>
-        </member>
-        <member name="M:Photon.Deterministic.StopwatchTimer.StartNew">
-            <summary>
-            Creates and starts a new timer.
-            </summary>
-            <returns>A new instance of the <see cref="T:Photon.Deterministic.StopwatchTimer"/> struct.</returns>
-        </member>
-        <member name="P:Photon.Deterministic.StopwatchTimer.ElapsedInTicks">
-            <summary>
-            Gets the elapsed time in ticks.
-            </summary>
-        </member>
-        <member name="P:Photon.Deterministic.StopwatchTimer.ElapsedInMilliseconds">
-            <summary>
-            Gets the elapsed time in milliseconds.
-            </summary>
-        </member>
-        <member name="P:Photon.Deterministic.StopwatchTimer.ElapsedInSeconds">
-            <summary>
-            Gets the elapsed time in seconds.
-            </summary>
-        </member>
-        <member name="P:Photon.Deterministic.StopwatchTimer.IsRunning">
-            <summary>
-            Gets a value indicating whether the timer is running.
-            </summary>
-        </member>
-        <member name="M:Photon.Deterministic.StopwatchTimer.Start">
-            <summary>
-            Starts the timer if it is not already running.
-            </summary>
-        </member>
-        <member name="M:Photon.Deterministic.StopwatchTimer.Stop">
-            <summary>
-            Stops the timer if it is running and updates the elapsed time.
-            </summary>
-        </member>
-        <member name="M:Photon.Deterministic.StopwatchTimer.Reset">
-            <summary>
-            Resets the timer to its initial state.
-            </summary>
-        </member>
-        <member name="M:Photon.Deterministic.StopwatchTimer.Restart">
-            <summary>
-            Restarts the timer, setting the elapsed time to zero and starting it.
             </summary>
         </member>
         <member name="T:Quantum.PlayerRef">

@@ -3,33 +3,14 @@ Photon Realtime C# Client - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
-Version 5.1.5 (24. April 2025 - rev7920)
-    Fixed: DisconnectAsync() to run the client's Service method until OnDisconnectedMsg gets fired. This makes sure the OnDisconnected callback and message are dispatched.
-
-Version 5.1.4 (10. April 2025 - rev7900)
-    Fixed: Async extension ConnectToNameserverAndWaitForRegionsAsync() to use async config task scheduler for continuation during region ping.
-    Changed: ConfigUnitySockets() for WebGL. It no longer logs a warning if the SocketWebTcp is missing in the Editor but logs an error in WebGL builds if the JS lib for WebSockets is missing.
-    Changed: PingHttp will now use HTTPs if running in Unity 6 or newer. These versions require secure http connections. In previous Unity versions, we used http for Best Region selection, as that gave more reliable results (with more stable roundtrip times).
-
-Version 5.1.3 (06. March 2025 - rev7864)
-    Added: UTC timestamp when logging ConnectUsingSettings (info level).
-    Changed: Operations which may contain any UserId, will be sent encrypted if they do. This improves security on the network layer. This affects OpFindFriends, OpJoinRandomRoom, OpJoinRandomOrCreateRoom, OpJoinRoomIntern and OpCreateRoomIntern.
-    Added: Properties to overwrite the `RoomOptions` and set initial `IsVisible` or `IsOpen` using the Photon Realtime MatchmakingExtensions API.
-    Added: Setting CrcEnabled using matchmaking extensions.
-    Moved: DNS resolution is no longer done in RegionPinger.Start() but in RegionPingThreaded() / RegionPingCoroutine(), which is off the main thread, where possible.
-    Added: Log.Info() in case the DNS resolution took longer than 100ms to finish for any given address.
-    Changed: One of the LogStats() conditions from "LogStatsInterval != 0" to "LogStatsInterval > 0". This ignores accidental negative values.
-    Changed: OpLeaveRoom() to only change local state if the leave op can actually be queued.
-    Changed: Disconnect() to queue the resulting status-change callbacks. This makes sure they happen on the Main Thread. This avoids issues in Unity where a disconnect likely affects or destroys GameObjects, which can only happen on the Main Thread.
-
 Version 5.1.2 (19. November 2024 - rev7770)
     Changed: IConnectionCallbacks.OnConnected() and the related callback message OnConnectedMsg are now obsolete and no longer called. Both will be removed in a later version.
     Note: Use OnConnectedToMaster instead. To confirm the client connected in a debug scenario, check the debug log level output.
-
+	
 	Added: Warning log to RealtimeFallback() about lack of service calls.
 	Added: DisconnectCause.ClientServiceInactivity used after the KeepAliveInBackground.
 	Changed: ConnectionHandler.DisconnectAfterKeepAlive is now obsolete. After the KeepAliveInBackground, the client will disconnect with DisconnectCause.ClientServiceInactivity.
-	Changed: Protocol Fallback. Any fallback is only done towards WSS (when another protocol fails). Unlike before, a fallback is done when the initial connection to a Name Server or Master Server fails.
+	Changed: Protocol Fallback. Any fallback is only done towards WSS (when another protocol fails). Unlike before, a fallback is done when the initial connection to a Name Server or Master Server fails. 
 	Note: WSS is commonly used on the Name Server connection (due to AuthOnceWss), so the initial UDP connection attempt is on the Master Server. This can fallback now, too.
 
 Version 5.1.1 (22. Oktober 2024 - rev7739)

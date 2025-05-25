@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using System;
 
 namespace Quantum {
     public class CommandChangeRules : DeterministicCommand, ILobbyCommand {

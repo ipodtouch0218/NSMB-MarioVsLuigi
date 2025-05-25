@@ -704,8 +704,7 @@ namespace Quantum {
             if (synchronous) {
               try {
                 var asset = entry.Source.WaitForResult();
-                Assert.Check(asset != null);
-                Assert.Check(asset.Guid == guid, "Expected to load {0}, but {1} was loaded instead", asset.Guid, guid);
+                Debug.Assert(asset != null);
 
                 entry.LoadedAsset = asset;
                 entry.State.Exchange(EntryState.LoadedInvokingCallbacks);
@@ -923,12 +922,6 @@ namespace Quantum {
       /// </summary>
       [NonSerialized]
       internal AtomicEnum<EntryState> State;
-
-      /// <inheritdoc/>
-      public override string ToString() {
-        return $"[Path: {Path}, Guid: {Guid}, State: {State}, Source: {Source?.Description}, Asset: {LoadedAsset}]";
-      }
-
     }
   }
 }

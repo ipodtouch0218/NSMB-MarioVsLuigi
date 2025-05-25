@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Desert/CustomDesertStageData
     Guid:
       Value: 311970299389930735
+  ShowAuthorAndComposer: 1
   StageAuthor: mindnomad
   MusicComposer: LiamNayru
   TranslationKey: level.custom.desert

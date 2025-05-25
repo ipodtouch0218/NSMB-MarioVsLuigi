@@ -81,7 +81,6 @@ namespace Quantum {
     /// Override the number of threads used internally. Default is 2.
     /// </summary>
     [InlineHelp]
-    [ErrorIf(nameof(ThreadCount), 0, "Thread Count must be greater than 0.", CompareOperator.LessOrEqual)]
     public int ThreadCount = 2;
 
     /// <summary>
@@ -135,7 +134,6 @@ namespace Quantum {
     /// <param name="allocator">The allocator.</param>
     public override void Loaded(IResourceManager resourceManager, Native.Allocator allocator) {
       Physics.PenetrationCorrection = FPMath.Clamp01(Physics.PenetrationCorrection);
-      ThreadCount = Math.Max(1, ThreadCount);
     }
     
 #if QUANTUM_UNITY
@@ -262,10 +260,6 @@ namespace Quantum {
     /// Dumps component checksums.
     /// </summary>
     ComponentChecksums   = 1 << 3,
-    /// <summary>
-    /// Dumps 3D Physics SceneMesh metadata.
-    /// </summary>
-    SceneMesh3D          = 1 << 4,
   }
 
 }

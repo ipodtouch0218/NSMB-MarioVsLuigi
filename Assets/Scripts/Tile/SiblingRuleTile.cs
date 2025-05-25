@@ -52,7 +52,7 @@ namespace NSMB.Tiles {
                 if (!(mapData = FindFirstObjectByType<QuantumMapData>(FindObjectsInactive.Include))) {
                     return result;
                 }
-                cachedStage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(mapData.GetAsset(false).UserAsset);
+                cachedStage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(mapData.Asset.UserAsset);
                 if (!cachedStage) {
                     return result;
                 }
@@ -76,7 +76,7 @@ namespace NSMB.Tiles {
                 if (!(mapData = FindFirstObjectByType<QuantumMapData>(FindObjectsInactive.Include))) {
                     return result;
                 }
-                cachedStage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(mapData.GetAsset(false).UserAsset);
+                cachedStage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(mapData.Asset.UserAsset);
                 if (!cachedStage) {
                     return result;
                 }

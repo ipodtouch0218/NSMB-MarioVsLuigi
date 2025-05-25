@@ -166,18 +166,18 @@
             </summary>
             <remarks>If the Size exceeded the remaining message length, only the remaining data is read. This may be null, if the size was somehow less than 1.</remarks>
         </member>
-        <member name="M:Photon.Client.Encryption.DiffieHellmanCryptoProvider.#ctor">
+        <member name="M:Photon.Client.Security.DiffieHellmanCryptoProvider.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:Photon.Client.Encryption.DiffieHellmanCryptoProvider"/> class.
+            Initializes a new instance of the <see cref="T:Photon.Client.Security.DiffieHellmanCryptoProvider"/> class.
             </summary>
         </member>
-        <member name="P:Photon.Client.Encryption.DiffieHellmanCryptoProvider.PublicKey">
+        <member name="P:Photon.Client.Security.DiffieHellmanCryptoProvider.PublicKey">
             <summary>
             Gets the public key that can be used by another DiffieHellmanCryptoProvider object
             to generate a shared secret agreement.
             </summary>
         </member>
-        <member name="M:Photon.Client.Encryption.DiffieHellmanCryptoProvider.DeriveSharedKey(System.Byte[])">
+        <member name="M:Photon.Client.Security.DiffieHellmanCryptoProvider.DeriveSharedKey(System.Byte[])">
             <summary>
             Derives the shared key is generated from the secret agreement between two parties,
             given a byte array that contains the second party's public key.
@@ -186,40 +186,40 @@
             The second party's public key.
             </param>
         </member>
-        <member name="T:Photon.Client.Encryption.IPhotonEncryptor">
-            <summary>Interface for DatagramEncryptor implementations.</summary>
-        </member>
-        <member name="M:Photon.Client.Encryption.IPhotonEncryptor.Init(System.Byte[],System.Byte[],System.Byte[],System.Boolean,System.Int32)">
-            <summary>Initialize the encryptor.</summary>
-        </member>
-        <member name="T:Photon.Client.Encryption.ICryptoProvider">
+        <member name="T:Photon.Client.Security.ICryptoProvider">
             <summary>Interface for Photon's DiffieHellman/Payload Encryption.</summary>
         </member>
-        <member name="T:Photon.Client.Encryption.OakleyGroups">
+        <member name="T:Photon.Client.Security.OakleyGroups">
             <summary>
             Provides classical Diffie-Hellman Modular Exponentiation Groups defined by the
             OAKLEY Key Determination Protocol (RFC 2412).
             </summary>
         </member>
-        <member name="F:Photon.Client.Encryption.OakleyGroups.Generator">
+        <member name="F:Photon.Client.Security.OakleyGroups.Generator">
             <summary>
             Gets the generator (N) used by the the well known groups 1,2 and 5.
             </summary>
         </member>
-        <member name="F:Photon.Client.Encryption.OakleyGroups.OakleyPrime768">
+        <member name="F:Photon.Client.Security.OakleyGroups.OakleyPrime768">
             <summary>
             Gets the 768 bit prime for the well known group 1.
             </summary>
         </member>
-        <member name="F:Photon.Client.Encryption.OakleyGroups.OakleyPrime1024">
+        <member name="F:Photon.Client.Security.OakleyGroups.OakleyPrime1024">
             <summary>
             Gets the 1024 bit prime for the well known group 2.
             </summary>
         </member>
-        <member name="F:Photon.Client.Encryption.OakleyGroups.OakleyPrime1536">
+        <member name="F:Photon.Client.Security.OakleyGroups.OakleyPrime1536">
             <summary>
             Gets the 1536  bit prime for the well known group 5.
             </summary>
+        </member>
+        <member name="T:Photon.Client.Encryption.IPhotonEncryptor">
+            <summary>Interface for DatagramEncryptor implementations.</summary>
+        </member>
+        <member name="M:Photon.Client.Encryption.IPhotonEncryptor.Init(System.Byte[],System.Byte[],System.Byte[],System.Boolean,System.Int32)">
+            <summary>Initialize the encryptor.</summary>
         </member>
         <member name="F:Photon.Client.EnetChannel.outgoingReliableUnsequencedNumber">
             <summary>Number for reliable unsequenced commands (separate from "standard" reliable sequenced). Used to avoid duplicates.</summary>
@@ -1054,7 +1054,7 @@
             <summary>Target framework this dll was built for.</summary>
         </member>
         <member name="F:Photon.Client.PhotonPeer.ClientSdkId">
-            <summary>A simplified identifier for client SDKs. Helps debugging. Only Photon APIs should set this.</summary>
+            <summary>A simplified identifier for client SDKs. Photon's APIs might modify this (as a dll can be used in more than one product). Helps debugging.</summary>
         </member>
         <member name="P:Photon.Client.PhotonPeer.ClientSdkIdShifted">
             <summary>For the Init-request, we shift the ClientId by one and the last bit signals a "debug" (0) or "release" build (1).</summary>
@@ -1641,12 +1641,9 @@
              <remarks>
              Calling this method does not immediately close a connection. Disconnect lets the server
              know that this client is no longer listening. For the server, this is a much faster way
-             to detect that the client is gone, but it requires the client to send a few final messages.
+             to detect that the client is gone but it requires the client to send a few final messages.
             
              On completion, OnStatusChanged is called with the StatusCode.Disconnect.
-             
-             Any resulting callbacks are queued and need to be dispatched (call Peer.DispatchIncomingCommands()).
-             This avoids issues when Disconnect() in Unity when Disconnect gets called off main-thread.
             
              If the client is disconnected already or the connection thread is stopped, then there is no callback.
             

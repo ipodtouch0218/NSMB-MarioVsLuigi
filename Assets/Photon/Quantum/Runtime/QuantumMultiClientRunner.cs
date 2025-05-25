@@ -38,11 +38,6 @@ namespace Quantum {
   /// </code></example>
   public class QuantumMultiClientRunner : QuantumMonoBehaviour {
     /// <summary>
-    /// PlayerPrefs key that the private app version can be stored.
-    /// </summary>
-    public const string AppVersionPlayerPrefsKey = "Quantum.MultiRunner.AppVersion";
-
-    /// <summary>
     /// Get instantiated for each client and makes connection controls for that client available.
     /// </summary>
     public QuantumMultiClientPlayerView PlayerViewTemplate;
@@ -121,18 +116,13 @@ namespace Quantum {
     public bool UseRandomMatchmaking = false;
 
     /// <summary>
-    /// Use a private AppVersion when connecting to isolate matchmaking players from other room created by different machines/builds/editors using the same <see cref="ServerSettings"/>.
+    /// Use a private AppVersion when connecting to isolate matchmaking players
     /// </summary>
     public bool UsePrivateAppVersion = true;
 
-    /// <summary>
-    /// The app version to use when <see cref="UsePrivateAppVersion"/> is enabled.
-    /// If <see cref="UsePrivateAppVersion"/> is set but this field is empty, a unique key is created and stored in PlayerPrefs under <see cref="AppVersionPlayerPrefsKey"/>.
-    /// </summary>
-    public string PrivateAppVersion;
-
     List<QuantumMultiClientPlayer> _players = new List<QuantumMultiClientPlayer>();
     string _currentRoomName;
+    string _privateAppVersion;
     string _appGuid;
 
     private static int _clientIdCounter = 0;
@@ -172,15 +162,12 @@ namespace Quantum {
 #if !UNITY_WEBGL
           if ((int)(InitialPlayerDelayInSec * 1000.0f) > 0) {
             await System.Threading.Tasks.Task.Delay((int)(InitialPlayerDelayInSec * 1000.0f));
-          } else if (j == 0) {
-            // Runner.IsRunning (see below) will be flipped after a short delay
-            await System.Threading.Tasks.Task.Delay(1);
           }
+#endif
 
           if (mainPlayer.Runner.IsRunning == false) {
             break;
           }
-#endif
         }
       }
     }
@@ -259,6 +246,10 @@ namespace Quantum {
         _currentRoomName = Guid.NewGuid().ToString();
       }
 
+      if (UsePrivateAppVersion && IsFirstPlayer) {
+        _privateAppVersion = Guid.NewGuid().ToString();
+      }
+
       // Create player UI
       var playerName = $"Client {NewClientId:00}";
       var viewGo = Instantiate(PlayerViewTemplate.gameObject, transform.GetChild(0));
@@ -271,21 +262,11 @@ namespace Quantum {
       CreatePlayerBtn.interactable = false;
       CreatePlayerBtn.transform.parent.SetAsLastSibling();
 
-      var appSettings = new AppSettings(ServerSettings.AppSettings);
-      if (UsePrivateAppVersion) {
-        if (string.IsNullOrEmpty(PrivateAppVersion)) {
-          // Private app version is selected, but not set. Use PlayerPrefs for convenience.
-          if (PlayerPrefs.HasKey(AppVersionPlayerPrefsKey) == false) {
-            PlayerPrefs.SetString(AppVersionPlayerPrefsKey, Guid.NewGuid().ToString());
-          }
-          PrivateAppVersion = PlayerPrefs.GetString(AppVersionPlayerPrefsKey);
-        }
-
-        appSettings.AppVersion = PrivateAppVersion;
-      }
+      var appSettingsCopy = new AppSettings(ServerSettings.AppSettings);
+      appSettingsCopy.AppVersion = _privateAppVersion;
 
       var connectionArguments = new MatchmakingArguments {
-        PhotonSettings = appSettings,
+        PhotonSettings = appSettingsCopy,
         PluginName = "QuantumPlugin",
         MaxPlayers = PlayerCount,
         UserId = $"{_appGuid}_{playerName}",
@@ -306,9 +287,9 @@ namespace Quantum {
       }
 
       var runtimeConfig = RuntimeConfig ?? new RuntimeConfig();
-      var mapAssetRef = FindFirstObjectByType<QuantumMapData>().AssetRef;
-      if (mapAssetRef.IsValid) {
-        runtimeConfig.Map = mapAssetRef;
+      var mapGuid = FindFirstObjectByType<QuantumMapData>().Asset.Guid;
+      if (mapGuid.IsValid) {
+        runtimeConfig.Map.Id = mapGuid;
       }
 
       var startArguments = new SessionRunner.Arguments {

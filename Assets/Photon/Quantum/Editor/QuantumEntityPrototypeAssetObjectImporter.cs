@@ -51,8 +51,6 @@ namespace Quantum.Editor {
       
       ctx.DependsOnSourceAsset(new GUID(prefabGuid));
       ctx.DependsOnSourceAsset(prefabPath);
-      ctx.DependsOnArtifact(new GUID(prefabGuid));
-      
       QuantumUnityDBUtilities.AddAssetGuidOverridesDependency(ctx);
       
       if (!prefab.TryGetComponent(out QuantumEntityPrototype component)) {

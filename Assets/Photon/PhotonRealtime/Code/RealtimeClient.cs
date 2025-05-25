@@ -21,7 +21,6 @@ namespace Photon.Realtime
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using Photon.Client;
 
     #if SUPPORTED_UNITY
@@ -647,7 +646,7 @@ namespace Photon.Realtime
                 }
 
                 this.State = ClientState.ConnectingToNameServer;
-                Log.Info(this.ConnectLog($"ConnectUsingSettings() {DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} UTC"),  this.LogLevel, this.LogPrefix);
+                Log.Info(this.ConnectLog("ConnectUsingSettings()"),  this.LogLevel, this.LogPrefix);
             }
             else
             {
@@ -661,7 +660,7 @@ namespace Photon.Realtime
                 }
 
                 this.State = ClientState.ConnectingToMasterServer;
-                Log.Info(this.ConnectLog($"ConnectUsingSettings() {DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} UTC"),  this.LogLevel, this.LogPrefix);
+                Log.Info(this.ConnectLog("ConnectUsingSettings()"),  this.LogLevel, this.LogPrefix);
             }
 
             return true;
@@ -715,7 +714,7 @@ namespace Photon.Realtime
         private void CheckConnectSetupWebGl()
         {
             #if UNITY_WEBGL
-            if (this.AppSettings.Protocol != ConnectionProtocol.WebSocket && this.AppSettings.Protocol != ConnectionProtocol.WebSocketSecure)
+            if (this.RealtimePeer.TransportProtocol != ConnectionProtocol.WebSocket && this.RealtimePeer.TransportProtocol != ConnectionProtocol.WebSocketSecure)
             {
                 Log.Warn("WebGL requires WebSockets. Switching TransportProtocol to WebSocketSecure.", this.LogLevel, this.LogPrefix);
                 this.AppSettings.Protocol = ConnectionProtocol.WebSocketSecure;
@@ -862,7 +861,6 @@ namespace Photon.Realtime
             {
                 this.lastJoinType = JoinType.JoinRoom;
                 this.enterRoomArgumentsCache.JoinMode = JoinMode.RejoinOnly;
-                this.enterRoomArgumentsCache.Ticket = null;
                 return this.CallConnect(ServerConnection.GameServer);
             }
 
@@ -870,7 +868,7 @@ namespace Photon.Realtime
         }
 
 
-        /// <summary>Disconnects the client from a server or stays disconnected. If the client was connected, a callback will be triggered (via DispatchIncomingCommands calls).</summary>
+        /// <summary>Disconnects the client from a server or stays disconnected. If the client was connected, a callback will be triggered.</summary>
         /// <remarks>
         /// Disconnect will attempt to notify the server of the client closing the connection.
         ///
@@ -1049,7 +1047,7 @@ namespace Photon.Realtime
         /// <summary>Logs vital stats in interval.</summary>
         private void LogStats()
         {
-            if (this.LogLevel >= LogLevel.Info && this.LogStatsInterval > 0 && this.State != ClientState.Disconnected)
+            if (this.LogLevel >= LogLevel.Info && this.LogStatsInterval != 0 && this.State != ClientState.Disconnected)
             {
                 int delta = this.RealtimePeer.ConnectionTime - this.lastStatsLogTime;
                 if (delta >= this.LogStatsInterval)
@@ -1114,10 +1112,10 @@ namespace Photon.Realtime
             {
                 websocketType = Type.GetType("Photon.Client.SocketWebTcp, Assembly-CSharp", false);
             }
-            #if UNITY_WEBGL && !UNITY_EDITOR
-            if (websocketType == null && this.LogLevel >= LogLevel.Error)
+            #if UNITY_WEBGL
+            if (websocketType == null && this.LogLevel >= LogLevel.Warning)
             {
-                Log.Error("WebSocket implementation for WebGL could not be found! Your project should have the folder PhotonLibs\\WebSocket available.", this.LogLevel, this.LogPrefix);
+                Log.Warn("SocketWebTcp type not found in the usual Assemblies. This is required as wrapper for the browser WebSocket API. Make sure to make the PhotonLibs\\WebSocket code available.", this.LogLevel, this.LogPrefix);
             }
             #endif
             #endif

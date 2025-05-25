@@ -161,7 +161,7 @@ namespace Quantum {
       }
 
       // set map to this maps asset
-      runtimeConfig.Map = mapdata.AssetRef;
+      runtimeConfig.Map = mapdata.Asset;
 
       // if not set, try to set simulation config from global default configs
       if (runtimeConfig.SimulationConfig.Id.IsValid == false && QuantumDefaultConfigs.TryGetGlobal(out var defaultConfigs)) {

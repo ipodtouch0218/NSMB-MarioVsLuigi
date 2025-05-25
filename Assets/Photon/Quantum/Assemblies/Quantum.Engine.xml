@@ -117,12 +117,6 @@
             <param name="newSize">New array size</param>
             <returns>New array</returns>
         </member>
-        <member name="M:Quantum.Allocator.Heap.AllocationTracker.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
-        </member>
         <member name="P:Quantum.Allocator.Heap.Reserved">
             <summary>
             Set and get the reserved flag.
@@ -1671,7 +1665,7 @@
         </member>
         <member name="F:Quantum.Map.NavMeshLinks">
             <summary>
-            The list of navmesh assets baked into this map.
+            The list not navmesh assets baked into this map.
             </summary>
         </member>
         <member name="F:Quantum.Map.Regions">
@@ -1845,13 +1839,6 @@
             How the NavMesh should be serialized.
             </summary>
         </member>
-        <member name="F:Quantum.NavMesh.RegionMaskBlockCount">
-            <summary>
-            Used to migrate to a higher max region count. This number will limit the amount of regions blocks serialized.
-            Default is 2 to migrate old projects. Should be set to <see cref="F:Quantum.NavMeshRegionMask.BLOCK_COUNT"/> to enable max region count.
-            Navmesh must be re-baked after changing.
-            </summary>
-        </member>
         <member name="F:Quantum.NavMesh.DataAsset">
             <summary>
             Asset that contains the actual binary navmesh data.
@@ -1957,10 +1944,10 @@
             <param name="v0">Point in triangle</param>
             <returns>Height at point in triangle as raw value.</returns>
         </member>
-        <member name="M:Quantum.NavMesh.FindClosestTriangle(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,System.Int32@,Photon.Deterministic.FPVector3@)">
+        <member name="M:Quantum.NavMesh.FindClosestTriangle(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,System.Int32@,Photon.Deterministic.FPVector3@)">
             <summary>
             Finds the closest navmesh triangle at the position plus radius. Works in 2D and 3D. 
-            This method sets the mailboxing optimization internally which requires the frame object. Otherwise it's identical to <see cref="M:Quantum.NavMesh.FindClosestTriangle(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,System.Int32@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)"/>.
+            This method sets the mailboxing optimization internally which requires the frame object. Otherwise it's identical to <see cref="M:Quantum.NavMesh.FindClosestTriangle(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,System.Int32@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)"/>.
             Caveat: The result is only a heuristic and not 100% accurate due to simplified calculations to reduce precision issues. 
             For example: in 3D the input position is projected down instead of finding the correct closest position.
             The search can be performance heavy so carefully choose the radius.
@@ -1973,10 +1960,10 @@
             <param name="closestPosition">The corrected source position on the navmesh</param>
             <returns><see langword="true"/> when a triangle was found</returns>
         </member>
-        <member name="M:Quantum.NavMesh.FindClosestTriangle(Quantum.Core.FrameBase,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,System.Int32@,Photon.Deterministic.FPVector3@)">
+        <member name="M:Quantum.NavMesh.FindClosestTriangle(Quantum.Core.FrameBase,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,System.Int32@,Photon.Deterministic.FPVector3@)">
             <summary>
             Finds the closest navmesh triangle at the position plus radius. Works in 2D and 3D. 
-            This method sets the mailboxing optimization internally which requires the frame object. Otherwise it's identical to <see cref="M:Quantum.NavMesh.FindClosestTriangle(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,System.Int32@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)"/>.
+            This method sets the mailboxing optimization internally which requires the frame object. Otherwise it's identical to <see cref="M:Quantum.NavMesh.FindClosestTriangle(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,System.Int32@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)"/>.
             Caveat: The result is only a heuristic and not 100% accurate due to simplified calculations to reduce precision issues. 
             For example: in 3D the input position is projected down instead of finding the correct closest position.
             The search can be performance heavy so carefully choose the radius.
@@ -1989,7 +1976,7 @@
             <param name="closestPosition">The corrected source position on the navmesh</param>
             <returns><see langword="true"/> when a triangle was found</returns>
         </member>
-        <member name="M:Quantum.NavMesh.FindClosestTriangle(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,System.Int32@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)">
+        <member name="M:Quantum.NavMesh.FindClosestTriangle(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,System.Int32@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)">
             <summary>
             Finds the closest navmesh triangle at the position plus radius. Works in 2D and 3D.
             Caveat: The result is only a heuristic and not 100% accurate due to simplified calculations to reduce precision issues. 
@@ -2004,7 +1991,7 @@
             <param name="mailbox">Optionally add a mailbox data structure to optimize the performance of search by filtering out already checked triangles.</param>
             <returns><see langword="true"/> when a triangle was found</returns>
         </member>
-        <member name="M:Quantum.NavMesh.FindTriangle2D(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask@,System.Boolean)">
+        <member name="M:Quantum.NavMesh.FindTriangle2D(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask,System.Boolean)">
             <summary>
             Finds the triangle at position (X,Z). This will not work in 3D as overlapping triangles may occur. Always use FindClosestTriangle() in 3D.
             </summary>
@@ -2013,7 +2000,7 @@
             <param name="inclusive">Use inclusive <see langword="true"/> when you want include the border and the vertices of the triangle</param>
             <returns>Triangle id or -1</returns>
         </member>
-        <member name="M:Quantum.NavMesh.FindClosestTriangleFast(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMesh.FindClosestTriangleFast(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask)">
             <summary>
             Searches the closest triangle to the input position by using the fallback triangle saved for each grid cell. Result is quite inaccurate.
             To use this API the navmesh generation must generate fallback triangles enabled by setting to something else than <see cref="F:Quantum.NavMeshBakeDataFindClosestTriangle.None"/>.
@@ -2031,68 +2018,22 @@
             <param name="rngSession">Random number generator usually f->RNG.</param>
             <param name="result">Random position on the triangle or Zero if the triangle does not exists.</param>
         </member>
-        <member name="M:Quantum.NavMesh.FindRandomPointOnNavmesh(Quantum.Core.FrameBase,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Photon.Deterministic.RNGSession*,Quantum.NavMeshRegionMask@,Photon.Deterministic.FPVector3@)">
+        <member name="M:Quantum.NavMesh.FindRandomPointOnNavmesh(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Photon.Deterministic.RNGSession*,Quantum.NavMeshRegionMask,Photon.Deterministic.FPVector3@)">
             <summary>
             Tries to find a random position on the navmesh using the input position and radius. This can fail when there is no navmesh in range.
-            Using this method instead of <see cref="M:Quantum.NavMesh.FindRandomPointOnNavmesh(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Photon.Deterministic.RNGSession*,Quantum.NavMeshRegionMask@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)"/>
-            will be more costly, but the result is more reliable as it checks more triangles.
-            </summary>
-            <param name="frame">Frame object to use the multi-threaded mailbox optimization</param>
-            <param name="position">Center of random position circle</param>
-            <param name="radius">Search a random position inside this radius</param>
-            <param name="rngSession">The randomization session</param>
-            <param name="regionMask">The region mask to check</param>
-            <param name="result">The resulting randomized position</param>
-            <returns><see langword="true"/> if a position has been found, <see langword="false"/> if the search failed.</returns>
-            <remarks>Creates a randomized position first, then tries validate it by finding the closest triangle around the random position, then tries to find any valid near position inside the radius</remarks>
-            <remarks>Creating random points during edit more leads to more efficient and reliable results.</remarks>
-        </member>
-        <member name="M:Quantum.NavMesh.FindRandomPointOnNavmesh(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Photon.Deterministic.RNGSession*,Quantum.NavMeshRegionMask@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)">
-            <summary>
-            Tries to find a random position on the navmesh using the input position and radius.
-            This can fail when there is no navmesh in range.
-            Consider using <see cref="M:Quantum.NavMesh.FindRandomPointOnNavmesh(Quantum.Core.FrameBase,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Photon.Deterministic.RNGSession*,Quantum.NavMeshRegionMask@,Photon.Deterministic.FPVector3@)"/> for more reliable results but less performant.
             </summary>
             <param name="position">Center of random position circle</param>
             <param name="radius">Search a random position inside this radius</param>
             <param name="rngSession">The randomization session</param>
             <param name="regionMask">The region mask to check</param>
-            <param name="result">The resulting randomized position</param>
-            <param name="mailbox">Mailbox to improve reliability while adding performance overhead</param>
-            <returns><see langword="true"/> if a position has been found, <see langword="false"/> if the search failed.</returns>
-            <remarks>Creates a randomized position first, then tries validate it by finding the closest triangle around the random position.</remarks>
-            <remarks>Creating random points during edit more leads to more efficient and reliable results.</remarks>
+            <param name="result">The resulting randomized position.</param>
+            <returns><see langword="true"/> if a position has been found.</returns>
+            <remarks>Creates a randomized position first, then tries validate it by finding a triangle at the random position (FindClosestTriangle). 
+            If all fail, <see langword="false"/> is returned.
+            </remarks>
+            <remarks>Processing this offline and saving a custom data structure will probably result in more reliable and appealing results.</remarks>
         </member>
-        <member name="M:Quantum.NavMesh.FindAnyRandomPointOnNavmesh(Quantum.Core.FrameBase,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Photon.Deterministic.RNGSession*,Quantum.NavMeshRegionMask@,Photon.Deterministic.FPVector3@)">
-            <summary>
-            Will return a random point on the navmesh on any of the triangles that intersect the circle weighted by the triangle area.
-            The point can be outside of the radius.
-            It's a good choice to find any point on the navmesh, when it's not important that the point is inside the defined circle.
-            </summary>
-            <param name="frame">Frame object to use the multi-threaded mailbox optimization</param>
-            <param name="position">Circle position</param>
-            <param name="radius">Circle radius</param>
-            <param name="rngSession">Rng session from Frame</param>
-            <param name="regionMask">Regions to ignore</param>
-            <param name="result">Resulting position</param>
-            <returns>Returns <see langword="true"/> when a random position was found, otherwise <see langword="false"/>.</returns>
-        </member>
-        <member name="M:Quantum.NavMesh.FindAnyRandomPointOnNavmesh(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Photon.Deterministic.RNGSession*,Quantum.NavMeshRegionMask@,Photon.Deterministic.FPVector3@,Quantum.MailboxSet8)">
-            <summary>
-            Will return a random point on the navmesh on any of the triangles that intersect the circle weighted by the triangle area.
-            The point can be outside of the radius.
-            It's a good choice to find any point on the navmesh, when it's not important that the point is inside the defined circle.
-            Becomes more accurate (uniform) and performant when setting a mailbox.
-            </summary>
-            <param name="position">Circle position</param>
-            <param name="radius">Circle radius</param>
-            <param name="rngSession">Rng session from Frame</param>
-            <param name="regionMask">Regions to ignore</param>
-            <param name="result">Resulting position</param>
-            <param name="mailbox">Mailbox to improve performance</param>
-            <returns>Returns <see langword="true"/> when a random position was found, otherwise <see langword="false"/>.</returns>
-        </member>
-        <member name="M:Quantum.NavMesh.IsBorderActive(System.Int32,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMesh.IsBorderActive(System.Int32,Quantum.NavMeshRegionMask)">
             <summary>
             Test if the region of the border at index is enabled.
             </summary>
@@ -2100,7 +2041,7 @@
             <param name="regionMask">Region mask</param>
             <returns><see langword="true"/> if region that the border belongs to is active</returns>
         </member>
-        <member name="M:Quantum.NavMesh.Contains(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask@,System.Boolean)">
+        <member name="M:Quantum.NavMesh.Contains(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask,System.Boolean)">
             <summary>
             Checks if the position is on a navmesh triangle. Does only check the 2D coordinates.
             </summary>
@@ -2109,7 +2050,7 @@
             <param name="inclusive">Set to <see langword="true"/> if positions exactly on a triangle edge or border are considered to be inside (default is <see langword="false"/>)</param>
             <returns><see langword="true"/> if the position is on the navmesh</returns>
         </member>
-        <member name="M:Quantum.NavMesh.LineOfSight(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask@,System.Int32,System.Int32,System.Boolean)">
+        <member name="M:Quantum.NavMesh.LineOfSight(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask,System.Int32,System.Int32,System.Boolean)">
             <summary>
             Check line of sight inside the navmesh. This also works in 3D and creates a funnel through the navmesh triangles. Start and destination must be inside the navmesh.
             </summary>
@@ -2121,7 +2062,7 @@
             <param name="considerCost">If the cost changes from triangle to triangle consider this non-line of sight</param>
             <returns><see langword="true"/> if there is a unobstructed line of sight on the navmesh</returns>
         </member>
-        <member name="M:Quantum.NavMesh.Raycast2D(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.MailboxSet8,Photon.Deterministic.FPVector2@,System.Int32@)">
+        <member name="M:Quantum.NavMesh.Raycast2D(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.MailboxSet8,Photon.Deterministic.FPVector2@,System.Int32@)">
             <summary>
             Raycast through the navmesh. Only works 2D, even when the navmesh is 3D. The ray is tested against navmesh borders.
             </summary>
@@ -2134,7 +2075,7 @@
             <param name="borderIndex">The index of the border that was hit</param>
             <returns><see langword="true"/> is a hit was generated.</returns>
         </member>
-        <member name="M:Quantum.NavMesh.MovePositionIntoNavmesh(Quantum.Core.FrameBase,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMesh.MovePositionIntoNavmesh(Quantum.Core.FrameBase,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask)">
             <summary>
             This performs a correction of the agent movement against the navmesh borders much like solving physics contacts. This works only in 2D for now.
             Used internally if <see cref="F:Quantum.NavMeshAgentConfig.ClampAgentToNavmesh"/> is set.
@@ -2146,7 +2087,7 @@
             <param name="regionMask">Region mask to check for active borders</param>
             <returns>Corrected position</returns>
         </member>
-        <member name="M:Quantum.NavMesh.MovePositionIntoNavmesh(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMesh.MovePositionIntoNavmesh(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask)">
             <summary>
             This performs a correction of the agent movement against the navmesh borders much like solving physics contacts. This works only in 2D for now.
             Used internally if <see cref="F:Quantum.NavMeshAgentConfig.ClampAgentToNavmesh"/> is set.
@@ -3840,7 +3781,7 @@
             If the <see cref="P:Quantum.Core.FrameBase.CommitCommandsMode"/> is set to <see cref="F:Quantum.CommitCommandsModes.OnFrameSimulationEnd"/>, this method commits all commands.
             </remarks>
         </member>
-        <member name="M:Quantum.Core.FrameBase.IsPredictionCulled(Quantum.EntityRef)">
+        <member name="M:Quantum.Core.FrameBase.Culled(Quantum.EntityRef)">
             <summary>
             If the entity is prediction-culled.
             </summary>
@@ -6969,26 +6910,6 @@
             The PhysicsBody's gravity scale.
             </summary>
         </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody2DPrototype.InertiaScale">
-            <summary>
-            The scale of the body inertia tensor. 
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody2DPrototype.InertiaMode">
-            <summary>
-            The mode in which the body's inertia tensor is computed.
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody2DPrototype.ExplicitInertia">
-            <summary>
-            The body inertia tensor when <see cref="F:Quantum.Prototypes.PhysicsBody2DPrototype.InertiaMode"/> is set to <see cref="F:Quantum.Prototypes.PhysicsBodyInertiaMode.Explicit"/>. 
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody2DPrototype.ParametricInertiaShape">
-            <summary>
-            The parametric shape used to compute the body inertia tensor when <see cref="F:Quantum.Prototypes.PhysicsBody2DPrototype.InertiaMode"/> is set to <see cref="F:Quantum.Prototypes.PhysicsBodyInertiaMode.ParametricShape"/>. 
-            </summary>
-        </member>
         <member name="M:Quantum.Prototypes.PhysicsBody2DPrototype.Materialize(Quantum.Core.FrameBase,Quantum.PhysicsBody2D@)">
             <summary>
             Applies the prototype's fields to the actual component.
@@ -7084,26 +7005,6 @@
         <member name="F:Quantum.Prototypes.PhysicsBody3DPrototype.GravityScale">
             <summary>
             The PhysicsBody's gravity scale.
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody3DPrototype.InertiaScale">
-            <summary>
-            The scale of the body inertia tensor. 
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody3DPrototype.InertiaMode">
-            <summary>
-            The mode in which the body's inertia tensor is computed.
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody3DPrototype.ExplicitInertiaTensor">
-            <summary>
-            The body inertia tensor when <see cref="F:Quantum.Prototypes.PhysicsBody3DPrototype.InertiaMode"/> is set to <see cref="F:Quantum.Prototypes.PhysicsBodyInertiaMode.Explicit"/>. 
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBody3DPrototype.ParametricInertiaShape">
-            <summary>
-            The parametric shape used to compute the body inertia tensor when <see cref="F:Quantum.Prototypes.PhysicsBody3DPrototype.InertiaMode"/> is set to <see cref="F:Quantum.Prototypes.PhysicsBodyInertiaMode.ParametricShape"/>. 
             </summary>
         </member>
         <member name="M:Quantum.Prototypes.PhysicsBody3DPrototype.Materialize(Quantum.Core.FrameBase,Quantum.PhysicsBody3D@)">
@@ -8031,29 +7932,6 @@
             as an array of entries, rather than a dictionary.
             </summary>
         </member>
-        <member name="T:Quantum.Prototypes.PhysicsBodyInertiaMode">
-            <summary>
-            Enumerates different ways to compute the inertia tensor of a dynamic body.
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBodyInertiaMode.ColliderShape">
-            <summary>
-            The inertia tensor is computed based on the shape of the entity collider,
-            assuming a uniform distribution of Mass over the collider area (2D) or volume (3D). 
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBodyInertiaMode.ParametricShape">
-            <summary>
-            The inertia tensor is computed based on a specific shape (not necessarily the colliders shape),
-            assuming a uniform distribution of Mass over the collider area (2D) or volume (3D). 
-            </summary>
-        </member>
-        <member name="F:Quantum.Prototypes.PhysicsBodyInertiaMode.Explicit">
-            <summary>
-            The inertia tensor is set to be a value explicitly configured.
-            In this mode, neither the Mass of the body nor the shape of the collider affect the body's inertia.
-            </summary>
-        </member>
         <member name="T:Quantum.Prototypes.PrototypeAttribute">
             <summary>
             Attribute to mark a class as a prototype of a struct or a component. Automatically applied by the CodeGen.
@@ -8335,7 +8213,7 @@
         </member>
         <member name="P:Quantum.ComponentFilter`1.UseCulling">
             <summary>
-            (Prediction-) Culled entities are removed from the filter.
+            Include culled entities in the filter.
             </summary>
         </member>
         <member name="M:Quantum.ComponentFilter`1.Next(Quantum.EntityRef@,`0@)">
@@ -9569,14 +9447,6 @@
             <param name="internalAssetId">Index of the entity prototype</param>
             <returns></returns>
         </member>
-        <member name="M:Quantum.EntityPrototypeRef.FromMasterAsset(Quantum.AssetRef{Quantum.Map},System.Int32)">
-            <summary>
-            Creates a new entity prototype reference from an entity in a map asset.
-            </summary>
-            <param name="asset">Map asset</param>
-            <param name="internalAssetId">Index of the entity prototype</param>
-            <returns></returns>
-        </member>
         <member name="T:Quantum.EntityRef">
             <summary>
             Quantum entity reference identifies a unique Entity.
@@ -10597,18 +10467,6 @@
             <summary>
             Resets the checksum to 0.
             </summary>
-        </member>
-        <member name="M:Quantum.FrameMetaData.QHashCollectionList.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
-        </member>
-        <member name="M:Quantum.FrameMetaData.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
         </member>
         <member name="T:Quantum.GlobalsCore">
             <summary>
@@ -11729,16 +11587,16 @@
         </member>
         <member name="M:Quantum.EditMeshScope.ReserveTriangleCapacity(Quantum.Core.FrameBase,System.Int32)">
             <summary>
-            Ensures that the mesh capacity is at least the specified <paramref name="requestedCapacity"/> value.
+            Ensures that the mesh capacity is at least the specified <paramref name="capacity"/> value.
             </summary>
             <param name="f">Current Frame instance.</param>
-            <param name="requestedCapacity">
+            <param name="capacity">
             The requested capacity to be reserved.
             If smaller than the current capacity, nothing happens.
             </param>
             <returns>
             The new triangle capacity of the mesh.
-            If the requested <paramref name="requestedCapacity"/> is smaller than or equal the current capacity, it returns the current capacity
+            If the requested <paramref name="capacity"/> is smaller than or equal the current capacity, it returns the current capacity
             </returns>
         </member>
         <member name="M:Quantum.EditMeshScope.SetTriangle(System.Int32,Quantum.TriangleCCW@)">
@@ -11975,7 +11833,7 @@
             <param name="meshes">The dictionary from collider index to triangle references.</param>
             <param name="allocator">The allocator for this asset.</param>
         </member>
-        <member name="M:Quantum.DynamicMap.ReserveMeshColliders(Quantum.Core.FrameBase,System.Int32,System.Int32,System.Nullable{Quantum.StaticColliderData}@,System.Boolean)">
+        <member name="M:Quantum.DynamicMap.ReserveMeshColliders(Quantum.Core.FrameBase,System.Int32,System.Int32,System.Nullable{Quantum.StaticColliderData},System.Boolean)">
             <summary>
             Pre-allocates space for a specified number of mesh colliders.
             </summary>
@@ -11993,7 +11851,7 @@
             </code>
             </example>
         </member>
-        <member name="M:Quantum.DynamicMap.AddMeshCollider(Quantum.Core.FrameBase,System.Collections.Generic.IList{Photon.Deterministic.FPVector3},System.Collections.Generic.IList{System.Int32},System.Int32,System.Nullable{Quantum.StaticColliderData}@,System.Boolean,System.Nullable{Photon.Deterministic.FPVector3},System.Nullable{Photon.Deterministic.FPQuaternion},System.Nullable{Quantum.AssetRef{Quantum.PhysicsMaterial}},System.Boolean)">
+        <member name="M:Quantum.DynamicMap.AddMeshCollider(Quantum.Core.FrameBase,System.Collections.Generic.IList{Photon.Deterministic.FPVector3},System.Collections.Generic.IList{System.Int32},System.Int32,System.Nullable{Quantum.StaticColliderData},System.Boolean,System.Nullable{Photon.Deterministic.FPVector3},System.Nullable{Photon.Deterministic.FPQuaternion},System.Nullable{Quantum.AssetRef{Quantum.PhysicsMaterial}},System.Boolean)">
              <summary>
              Adds a mesh collider to the map.
              </summary>
@@ -12438,14 +12296,6 @@
             <param name="freeCount">How many triangles are free.</param>
             <returns><see langword="true"/> if this mesh collider has free triangles. <see langword="false"/> otherwise.</returns>
         </member>
-        <member name="M:Quantum.MeshUnmanagedTrianglesRef.ToManagedTriangles(Quantum.MeshUnmanagedTrianglesRef)">
-            <summary>
-            Converts a MeshUnmanagedTrianglesRef to a MeshTriangleVerticesCcw.
-            This is useful when needing to convert from runtime triangle data to an editor/managed format.
-            </summary>
-            <param name="unmanagedRef">The unmanaged triangles reference to convert</param>
-            <returns>A new MeshTriangleVerticesCcw containing the converted data</returns>
-        </member>
         <member name="T:Quantum.MapEntityId">
             <summary>
             Represents a Quantum entity that is part of a map.
@@ -12672,7 +12522,7 @@
             Asset serialization.
             </summary>
             <param name="stream">Input stream</param>
-            <param name="write">Writing or reading.</param>
+            <param name="write">Writing or readin.</param>
         </member>
         <member name="T:Quantum.NavMeshBakeDataFindClosestTriangle">
             <summary>
@@ -12694,7 +12544,7 @@
         <member name="F:Quantum.NavMeshBakeDataFindClosestTriangle.None">
             <summary>
             No fallback triangle search. 
-            Will speed up navmesh baking considerably but make <see cref="M:Quantum.NavMesh.FindClosestTriangleFast(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask@)"/> be not usable.
+            Will speed up navmesh baking considerably but make <see cref="M:Quantum.NavMesh.FindClosestTriangleFast(Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask)"/> be not usable.
             </summary>
         </member>
         <member name="T:Quantum.NavMeshBakeDataLink">
@@ -13318,7 +13168,7 @@
             <param name="handle">The task handle to add tasks to</param>
             <returns>Update handle.</returns>
         </member>
-        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMesh,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMesh,Quantum.NavMeshRegionMask)">
             <summary>
             Find a path (thread-safe). Uses automatic target correction with radius 1 and PathQuality Good.
             </summary>
@@ -13330,7 +13180,7 @@
             <returns>The corrected start position</returns>
             \ingroup NavigationApi
         </member>
-        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMesh,Quantum.NavMeshRegionMask@,System.Boolean,Photon.Deterministic.FP,Quantum.Navigation.PathQuality)">
+        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMesh,Quantum.NavMeshRegionMask,System.Boolean,Photon.Deterministic.FP,Quantum.Navigation.PathQuality)">
             <summary>
             Find a path (thread-safe). 
             </summary>
@@ -13345,7 +13195,7 @@
             <returns>The corrected start position</returns>
             \ingroup NavigationApi
         </member>
-        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Quantum.NavMesh,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Quantum.NavMesh,Quantum.NavMeshRegionMask)">
             <summary>
             Find a path (thread-safe). 
             </summary>
@@ -13357,7 +13207,7 @@
             <returns>The corrected start position</returns>
             \ingroup NavigationApi
         </member>
-        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Quantum.NavMesh,Quantum.NavMeshRegionMask@,System.Boolean,Photon.Deterministic.FP,Quantum.Navigation.PathQuality)">
+        <member name="M:Quantum.Navigation.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Quantum.NavMesh,Quantum.NavMeshRegionMask,System.Boolean,Photon.Deterministic.FP,Quantum.Navigation.PathQuality)">
             <summary>
             Find a path (thread-safe). 
             </summary>
@@ -13372,7 +13222,7 @@
             <returns>The corrected start position</returns>
             \ingroup NavigationApi
         </member>
-        <member name="M:Quantum.Navigation.LineOfSight(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask@,Quantum.NavMesh,System.Int32,System.Int32)">
+        <member name="M:Quantum.Navigation.LineOfSight(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Quantum.NavMeshRegionMask,Quantum.NavMesh,System.Int32,System.Int32)">
             <summary>
             Check line of sight inside the navmesh. This also works in 3D and creates a funnel through the navmesh triangles. Start and destination must be inside the navmesh.
             </summary>
@@ -13385,7 +13235,7 @@
             <returns><see langword="true"/> if there is an unobstructed line of sight on the navmesh</returns>
             \ingroup NavigationApi
         </member>
-        <member name="M:Quantum.Navigation.LineOfSight(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Quantum.NavMeshRegionMask@,Quantum.NavMesh,System.Int32,System.Int32)">
+        <member name="M:Quantum.Navigation.LineOfSight(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Quantum.NavMeshRegionMask,Quantum.NavMesh,System.Int32,System.Int32)">
             <summary>
             Check line of sight inside the navmesh. This also works in 3D and creates a funnel through the navmesh triangles. Start and destination must be inside the navmesh.
             </summary>
@@ -13398,7 +13248,7 @@
             <returns><see langword="true"/> if there is a unobstructed line of sight on the navmesh</returns>
             \ingroup NavigationApi
         </member>
-        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.NavMesh,Photon.Deterministic.FPVector2@,System.Int32@)">
+        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.NavMesh,Photon.Deterministic.FPVector2@,System.Int32@)">
             <summary>
             Raycast through the navmesh. Only works 2D, even when the navmesh is 3D. The ray is tested against navmesh borders.
             </summary>
@@ -13412,7 +13262,7 @@
             <param name="borderIndex">Index of the border that was hit (Navmesh.Borders[i])</param>
             <returns><see langword="true"/> is a hit was generated.</returns>
         </member>
-        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.NavMesh,Photon.Deterministic.FPVector2@,System.Int32@)">
+        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.NavMesh,Photon.Deterministic.FPVector2@,System.Int32@)">
             <summary>
             Raycast through the navmesh. Only works 2D, even when the navmesh is 3D. The ray is tested against navmesh borders.
             </summary>
@@ -13426,12 +13276,12 @@
             <param name="borderIndex">Index of the border that was hit (Navmesh.Borders[i])</param>
             <returns><see langword="true"/> is a hit was generated.</returns>
         </member>
-        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.NavMesh,Photon.Deterministic.FPVector2@)">
+        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.NavMesh,Photon.Deterministic.FPVector2@)">
             <summary>
             Obsolete method.
             </summary>
         </member>
-        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.NavMesh,Photon.Deterministic.FPVector2@)">
+        <member name="M:Quantum.Navigation.Raycast2D(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.NavMesh,Photon.Deterministic.FPVector2@)">
             <summary>
             Obsolete method.
             </summary>
@@ -13576,7 +13426,7 @@
             Dispose the pathfinder object.
             </summary>
         </member>
-        <member name="M:Quantum.Navigation.PathFinder.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Boolean,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.Navigation.PathQuality,Quantum.NavMesh)">
+        <member name="M:Quantum.Navigation.PathFinder.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Boolean,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.Navigation.PathQuality,Quantum.NavMesh)">
             <summary>
             Find path.
             </summary>
@@ -13590,9 +13440,9 @@
             <param name="navmesh">The navmesh to operate on</param>
             <returns>The corrected end position</returns>
         </member>
-        <member name="M:Quantum.Navigation.PathFinder.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Boolean,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.Navigation.PathQuality,Quantum.NavMesh)">
+        <member name="M:Quantum.Navigation.PathFinder.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Boolean,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.Navigation.PathQuality,Quantum.NavMesh)">
             <summary>
-            See <see cref="M:Quantum.Navigation.PathFinder.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Boolean,Photon.Deterministic.FP,Quantum.NavMeshRegionMask@,Quantum.Navigation.PathQuality,Quantum.NavMesh)"/>
+            See <see cref="M:Quantum.Navigation.PathFinder.FindPath(Quantum.FrameThreadSafe,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Boolean,Photon.Deterministic.FP,Quantum.NavMeshRegionMask,Quantum.Navigation.PathQuality,Quantum.NavMesh)"/>
             </summary>
         </member>
         <member name="P:Quantum.Navigation.PathFinder.PathSize">
@@ -13865,7 +13715,7 @@
         </member>
         <member name="T:Quantum.NavMeshPortal">
             <summary>
-            The Quantum navmesh stores connections between neighboring triangles as portals.
+            The Quantum navmesh stores connections between neighbouring triangles as portals.
             </summary>
         </member>
         <member name="F:Quantum.NavMeshPortal.LeftVertex">
@@ -13897,17 +13747,17 @@
         </member>
         <member name="F:Quantum.NavMeshTriangle.Vertex0">
             <summary>
-            Vertex index 0 pointing into the <see cref="F:Quantum.NavMesh.Vertices"/> array.
+            Vertex index 0 poiting into the <see cref="F:Quantum.NavMesh.Vertices"/> array.
             </summary>
         </member>
         <member name="F:Quantum.NavMeshTriangle.Vertex1">
             <summary>
-            Vertex index 1 pointing into the <see cref="F:Quantum.NavMesh.Vertices"/> array.
+            Vertex index 1 poiting into the <see cref="F:Quantum.NavMesh.Vertices"/> array.
             </summary>
         </member>
         <member name="F:Quantum.NavMeshTriangle.Vertex2">
             <summary>
-            Vertex index 2 pointing into the <see cref="F:Quantum.NavMesh.Vertices"/> array.
+            Vertex index 2 poiting into the <see cref="F:Quantum.NavMesh.Vertices"/> array.
             </summary>
         </member>
         <member name="F:Quantum.NavMeshTriangle.Neighbors">
@@ -13932,7 +13782,7 @@
         </member>
         <member name="F:Quantum.NavMeshTriangle.Regions">
             <summary>
-            The region mask of this triangle. 
+            The region mask of this triangle.
             </summary>
         </member>
         <member name="F:Quantum.NavMeshTriangle.Cost">
@@ -13968,7 +13818,7 @@
         </member>
         <member name="M:Quantum.NavMeshTriangle.Serialize(Quantum.ByteStream,System.Boolean,Quantum.NavMesh)">
             <summary>
-            Serializes the triangle data.
+            Serilizes the triangle data.
             </summary>
             <param name="stream">Stream</param>
             <param name="write">Write or read</param>
@@ -13996,7 +13846,7 @@
             <param name="stream">Stream</param>
             <param name="write">Write or read</param>
         </member>
-        <member name="M:Quantum.NavMeshVertex.CalculateNormal(System.Int32,Quantum.NavMesh,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMeshVertex.CalculateNormal(System.Int32,Quantum.NavMesh,Quantum.NavMeshRegionMask)">
             <summary>
             Computes the normal of the vertex against all adjacent borders.
             </summary>
@@ -14119,13 +13969,12 @@
             The name of the link.
             </summary>
         </member>
-        <member name="M:Quantum.NavMeshLink.Serialize(Quantum.ByteStream,System.Boolean,System.Int32)">
+        <member name="M:Quantum.NavMeshLink.Serialize(Quantum.ByteStream,System.Boolean)">
             <summary>
             Serialize or deserialize the vertex data to an asset.
             </summary>
             <param name="stream">Asset stream</param>
             <param name="write">Write or read</param>
-            <param name="regionBlockCount">Make transition from 2 to 8 mask blocks non-breaking.</param>
         </member>
         <member name="T:Quantum.NavMeshTriangleCenterGridNode">
             <summary>
@@ -14146,7 +13995,7 @@
         </member>
         <member name="T:Quantum.NavMeshRegionMask">
             <summary>
-            Internally stores a unsigned long to be able to toggle 512 different regions. 
+            Internally stores a unsigned long to be able to toggle 128 different regions. 
             </summary>
             <remarks>When instantiating a NavMeshRegionMask, all regions are toggled off.</remarks>
             <remarks>Use <see cref="P:Quantum.NavMeshRegionMask.Default"/> to create a mask with all regions toggled on.</remarks>
@@ -14156,7 +14005,7 @@
             // Check if a region id is active
             var isRegionActive = f.NavMeshRegionMask-&gt;IsRegionEnabled(regionId);
             // Check if a NavMeshRegionMask (found on the pathfinder component) is active
-            var isTriangleActive = f.Unsafe.GetPointer&lt;NavMeshPathfinder&gt;(entity)-&gt;RegionMask.Overlaps(*f.NavMeshRegionMask);
+            var isRegionActive = f.Unsafe.GetPointer&lt;NavMeshPathfinder&gt;(entity)-&gt;RegionMask.IsSubset(*f.NavMeshRegionMask);
             </code></example>
         </member>
         <member name="F:Quantum.NavMeshRegionMask.SIZE">
@@ -14167,11 +14016,6 @@
         <member name="F:Quantum.NavMeshRegionMask.MAX_REGIONS">
             <summary>
             The maximum number of regions.
-            </summary>
-        </member>
-        <member name="F:Quantum.NavMeshRegionMask.BLOCK_COUNT">
-            <summary>
-            The number of 4 byte blocks that the mask uses.
             </summary>
         </member>
         <member name="P:Quantum.NavMeshRegionMask.Default">
@@ -14189,7 +14033,7 @@
             Mask that includes no area.
             </summary>
         </member>
-        <member name="M:Quantum.NavMeshRegionMask.Combine(Quantum.NavMeshRegionMask,Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMeshRegionMask.Combine(Quantum.NavMeshRegionMask,Quantum.NavMeshRegionMask)">
             <summary>
             Combine two region masks. 
             </summary>
@@ -14211,19 +14055,19 @@
             <param name="ptr">The component pointer</param>
             <param name="printer">The printer</param>
         </member>
-        <member name="M:Quantum.NavMeshRegionMask.#ctor(System.UInt64,System.UInt64,System.UInt64,System.UInt64,System.UInt64,System.UInt64,System.UInt64,System.UInt64)">
+        <member name="M:Quantum.NavMeshRegionMask.#ctor(System.UInt64)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="regions">Raw region mask</param>
+        </member>
+        <member name="M:Quantum.NavMeshRegionMask.#ctor(System.UInt64,System.UInt64)">
             <summary>
             Constructor with all flag masks.
             This method could change in the future if the max regions count is increased again.
             </summary>
             <param name="regionMask1"></param>
             <param name="regionMask2"></param>
-            <param name="regionMask3"></param>
-            <param name="regionMask4"></param>
-            <param name="regionMask5"></param>
-            <param name="regionMask6"></param>
-            <param name="regionMask7"></param>
-            <param name="regionMask8"></param>
         </member>
         <member name="M:Quantum.NavMeshRegionMask.Create(System.Int32)">
             <summary>
@@ -14231,20 +14075,6 @@
             </summary>
             <param name="region">Region id to enabled.</param>
             <returns>Region Mask</returns>
-        </member>
-        <member name="M:Quantum.NavMeshRegionMask.Create(System.Int32[])">
-            <summary>
-            Create a mask using a list of region ids.
-            </summary>
-            <param name="regionList">List of region ids/indices</param>
-            <returns>Region mask</returns>
-        </member>
-        <member name="M:Quantum.NavMeshRegionMask.Create(System.Collections.Generic.List{System.Int32})">
-            <summary>
-            Create a mask using a list of region ids.
-            </summary>
-            <param name="regionList">List of region ids/indices</param>
-            <returns>Region mask</returns>
         </member>
         <member name="P:Quantum.NavMeshRegionMask.HasValidRegions">
             <summary>
@@ -14259,6 +14089,11 @@
         <member name="P:Quantum.NavMeshRegionMask.IsMainArea">
             <summary>
             Checks if the mask only contains the main area
+            </summary>
+        </member>
+        <member name="P:Quantum.NavMeshRegionMask.Mask">
+            <summary>
+            Access to underlying bit mask.
             </summary>
         </member>
         <member name="M:Quantum.NavMeshRegionMask.ToggleRegion(System.Int32,System.Boolean)">
@@ -14287,26 +14122,19 @@
             <param name="region">Region id (or index)</param>
             <returns><see langword="true"/> if the region is active.</returns>
         </member>
-        <member name="M:Quantum.NavMeshRegionMask.IsSubset(Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMeshRegionMask.IsSubset(Quantum.NavMeshRegionMask)">
             <summary>
             Check if the region mask is included inside the other.
             </summary>
             <param name="other">Other mask, usually the one from Frame</param>
             <returns><see langword="true"/> if all regions are included in other</returns>
         </member>
-        <member name="M:Quantum.NavMeshRegionMask.IsSuperset(Quantum.NavMeshRegionMask@)">
+        <member name="M:Quantum.NavMeshRegionMask.IsSuperset(Quantum.NavMeshRegionMask)">
             <summary>
             Check is the region mask of other is included in ours.
             </summary>
             <param name="other">Other region mask</param>
             <returns><see langword="true"/> if all regions inside the other mask are also active in ours</returns>
-        </member>
-        <member name="M:Quantum.NavMeshRegionMask.Overlaps(Quantum.NavMeshRegionMask@)">
-            <summary>
-            Returns <see langword="true"/> if the mask and <paramref name="other"/> have at least one region in common.
-            </summary>
-            <param name="other">Other region mask</param>
-            <returns><see langword="true"/> if masks have one region in common</returns>
         </member>
         <member name="M:Quantum.NavMeshRegionMask.Clear">
             <summary>
@@ -14314,13 +14142,6 @@
             </summary>
         </member>
         <member name="M:Quantum.NavMeshRegionMask.Equals(Quantum.NavMeshRegionMask)">
-            <summary>
-            Equality check.
-            </summary>
-            <param name="other">Other mask</param>
-            <returns><see langword="true"/>, if both masks are equal.</returns>
-        </member>
-        <member name="M:Quantum.NavMeshRegionMask.Equals(Quantum.NavMeshRegionMask@)">
             <summary>
             Equality check.
             </summary>
@@ -14346,24 +14167,12 @@
             </summary>
             <returns>A debug string representation of the mask.</returns>
         </member>
-        <member name="M:Quantum.NavMeshRegionMask.Serialize(Quantum.ByteStream,System.Boolean,System.Int32)">
+        <member name="M:Quantum.NavMeshRegionMask.Serialize(Quantum.ByteStream,System.Boolean)">
             <summary>
             Serialize the mask into a byte stream, used by asset serialization and deserialization.
             </summary>
             <param name="stream">Stream object.</param>
             <param name="write">Write or read.</param>
-            <param name="blockCount">Optionally customize block count.</param>
-        </member>
-        <member name="M:Quantum.NavMeshRegionMask.#ctor(System.UInt64)">
-            <summary>
-            Constructor.
-            </summary>
-            <param name="regions">Raw region mask</param>
-        </member>
-        <member name="P:Quantum.NavMeshRegionMask.Mask">
-            <summary>
-            Access to underlying bit mask.
-            </summary>
         </member>
         <member name="T:Quantum.NavMeshSerializeType">
             <summary>
@@ -16173,19 +15982,11 @@
         <member name="M:Quantum.Physics2D.HitCollection.Sort(Photon.Deterministic.FPVector2)">
             <summary>
             Sort all hits in the collection, in ascending order, based on the distance from the <see cref="F:Quantum.Physics2D.Hit.Point"/> to the target <paramref name="point"/>.
-            <remarks>
-            Queries must have the <see cref="F:Quantum.QueryOptions.ComputeDetailedInfo"/> option set in order to compute hit Points and Cast Distance.
-            Include this flag if intending to sort the query results.
-            </remarks>
             </summary>
         </member>
         <member name="M:Quantum.Physics2D.HitCollection.SortCastDistance">
             <summary>
             Sort all hits in the collection, in ascending order, based on the <see cref="F:Quantum.Physics2D.Hit.CastDistanceNormalized"/>.
-            <remarks>
-            Queries must have the <see cref="F:Quantum.QueryOptions.ComputeDetailedInfo"/> option set in order to compute hit Points and Cast Distance.
-            Include this flag if intending to sort the query results.
-            </remarks>
             </summary>
         </member>
         <member name="M:Quantum.Physics2D.HitCollection.Free(Photon.Deterministic.Native.Allocator)">
@@ -16681,12 +16482,6 @@
             The multiplier for the gravity force applied at this physics body. 
             </summary>
         </member>
-        <member name="P:Quantum.PhysicsBody2D.InertiaScale">
-            <summary>
-            A multiplier for the body inertia tensor.
-            When setting a value, the inertia tensor is immediately updated. 
-            </summary>
-        </member>
         <member name="P:Quantum.PhysicsBody2D.IsKinematic">
             <summary>
             Prevents the physics update integrating the linear and angular velocities of this physics body.
@@ -16698,24 +16493,14 @@
             Gets the physics body inertia, the resistance to changes in angular velocity.
             </summary>
         </member>
-        <member name="M:Quantum.PhysicsBody2D.GetInertiaInverse">
+        <member name="M:Quantum.PhysicsBody2D.SetInertia(Photon.Deterministic.FP)">
             <summary>
-            Returns the inverse form of the inertia tensor, as it is stored internally.
+            Sets the inertia value. 
+            <remarks>
+            The inertia value is computed automatically when it is attached to an entity and the flag <see cref="F:Quantum.PhysicsBody2D.ConfigFlags.ResetInertiaOnAdded"/> is set. 
+            The value is based on the shape and mass of the body.
+            </remarks>
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Quantum.PhysicsBody2D.SetInertia(Photon.Deterministic.FP,Photon.Deterministic.NullableFP)">
-            <summary>
-            Sets the inertia tensor value. The greater the value of inertia, the more torque will be required to achieve the
-            same delta angular velocity. This value is automatically recomputed when the value of mass is set.
-            </summary>
-            <param name="inertia">The inertia tensor value. This value is scaled by the <see cref="P:Quantum.PhysicsBody2D.InertiaScale"/>
-            or by <paramref name="resetInertiaScale"/> if provided and its inverse value is stored on the component.
-            </param>
-            <param name="resetInertiaScale">
-            If specified, resets the body <see cref="P:Quantum.PhysicsBody2D.InertiaScale"/> and immediately applies the new scale to the
-            provided <paramref name="inertia"/>.
-            </param>
         </member>
         <member name="M:Quantum.PhysicsBody2D.CreateDynamic(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean,System.Boolean,System.Boolean,System.Nullable{Photon.Deterministic.FPVector2},Photon.Deterministic.NullableFP)">
             <summary>
@@ -16742,7 +16527,7 @@
             <returns>A <see cref="T:Quantum.PhysicsBody2D"/> component.</returns>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.PhysicsBody2D.InitBody(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP,Quantum.PhysicsBody2D.ConfigFlags,System.Nullable{Photon.Deterministic.FPVector2},Photon.Deterministic.NullableFP,Photon.Deterministic.NullableFP,Photon.Deterministic.NullableFP)">
+        <member name="M:Quantum.PhysicsBody2D.InitBody(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP,Quantum.PhysicsBody2D.ConfigFlags,System.Nullable{Photon.Deterministic.FPVector2},Photon.Deterministic.NullableFP)">
             <summary>
             Initializes a <see cref="T:Quantum.PhysicsBody2D"/> component with custom settings.
             </summary>
@@ -16752,13 +16537,6 @@
             <param name="bodyConfig">The <see cref="T:Quantum.PhysicsBody2D.ConfigFlags"/> used in the physics body.</param>
             <param name="centerOfMass">The center of mass position relative to the transform's origin.</param>
             <param name="gravityScale">The multiplier for the gravity force applied for this physics body.</param>
-            <param name="inertiaScale">A multiplier for the inertia tensor value.</param>
-            <param name="inertia">
-            An optional value for the body's inertia tensor.
-            If not specified AND the <see cref="F:Quantum.PhysicsBody2D.ConfigFlags.ResetInertiaOnAdded"/> is set in the <paramref name="bodyConfig"/>,
-            then the inertia tensor will be computed when the body component is added to an entity, based on the shape of the
-            collider, assuming uniform mass distribution.
-            </param>
             \ingroup Physics2dApi
         </member>
         <member name="M:Quantum.PhysicsBody2D.ResetInertia(Quantum.Core.FrameBase,Quantum.EntityRef)">
@@ -18081,12 +17859,6 @@
             Constructor that initializes the instance with the values from a <see cref="T:Quantum.Shape2DConfig"/>.
             </summary>
             <param name="fromConfig">Shape config used as source</param>
-        </member>
-        <member name="M:Quantum.Shape2DConfig.CompoundShapeData2D.CopyToConfig(Quantum.Shape2DConfig)">
-            <summary>
-            Copies the current instance's values to a <see cref="T:Quantum.Shape2DConfig"/> instance.
-            </summary>
-            <param name="toConfig">Shape config to receive the values</param>
         </member>
         <member name="M:Quantum.Shape2DConfig.CompoundShapeData2D.CreateShape(Quantum.Core.FrameBase)">
             <summary>
@@ -19738,19 +19510,11 @@
         <member name="M:Quantum.Physics3D.HitCollection3D.Sort(Photon.Deterministic.FPVector3)">
             <summary>
             Sort all hits in the collection, in ascending order, based on the distance from the <see cref="F:Quantum.Physics3D.Hit3D.Point"/> to the target <paramref name="point"/>.
-            <remarks>
-            Queries must have the <see cref="F:Quantum.QueryOptions.ComputeDetailedInfo"/> option set in order to compute hit Points and Cast Distance.
-            Include this flag if intending to sort the query results.
-            </remarks>
             </summary>
         </member>
         <member name="M:Quantum.Physics3D.HitCollection3D.SortCastDistance">
             <summary>
             Sort all hits in the collection, in ascending order, based on the <see cref="F:Quantum.Physics3D.Hit3D.CastDistanceNormalized"/>.
-            <remarks>
-            Queries must have the <see cref="F:Quantum.QueryOptions.ComputeDetailedInfo"/> option set in order to compute hit Points and Cast Distance.
-            Include this flag if intending to sort the query results.
-            </remarks>
             </summary>
         </member>
         <member name="M:Quantum.Physics3D.HitCollection3D.Free(Photon.Deterministic.Native.Allocator)">
@@ -20163,9 +19927,6 @@
         <member name="P:Quantum.PhysicsBody3D.GravityScale">
             <inheritdoc cref="P:Quantum.PhysicsBody2D.GravityScale"/>
         </member>
-        <member name="P:Quantum.PhysicsBody3D.InertiaScale">
-            <inheritdoc cref="P:Quantum.PhysicsBody2D.InertiaScale"/>
-        </member>
         <member name="P:Quantum.PhysicsBody3D.CenterOfMass">
             <inheritdoc cref="F:Quantum.PhysicsBody2D.CenterOfMass"/>
         </member>
@@ -20177,24 +19938,11 @@
             Returns the inertia tensor based on the stored inverse inertia tensor values.
             </summary>
         </member>
-        <member name="M:Quantum.PhysicsBody3D.GetInertiaTensorInverse">
-            <summary>
-            Returns the inverse form of the inertia tensor, as it is stored internally.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Quantum.PhysicsBody3D.SetInertiaTensor(Photon.Deterministic.FPVector3,Photon.Deterministic.NullableFP)">
+        <member name="M:Quantum.PhysicsBody3D.SetInertiaTensor(Photon.Deterministic.FPVector3)">
             <summary>
             Sets the inertia tensor value. The greater the value of inertia on a given axis, the more torque will be required to achieve the same delta angular velocity on that axis.
             This value is automatically recomputed when the value of mass is set.
             </summary>
-            <param name="inertiaTensor">The inertia tensor value. This value is scaled by the <see cref="P:Quantum.PhysicsBody3D.InertiaScale"/>
-            or by <paramref name="resetInertiaScale"/> if provided and its inverse value is stored on the component.
-            </param>
-            <param name="resetInertiaScale">
-            If specified, resets the body <see cref="P:Quantum.PhysicsBody3D.InertiaScale"/> and immediately applies the new scale to the
-            provided <paramref name="inertiaTensor"/>.
-            </param>
         </member>
         <member name="M:Quantum.PhysicsBody3D.CreateDynamic(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean,System.Boolean,Quantum.RotationFreezeFlags,System.Nullable{Photon.Deterministic.FPVector3},Photon.Deterministic.NullableFP)">
             <summary>
@@ -20220,7 +19968,7 @@
             </summary>
             <returns>A <see cref="T:Quantum.PhysicsBody3D"/> component.</returns>
         </member>
-        <member name="M:Quantum.PhysicsBody3D.InitBody(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP,Quantum.PhysicsBody3D.ConfigFlags,Quantum.RotationFreezeFlags,System.Nullable{Photon.Deterministic.FPVector3},Photon.Deterministic.NullableFP,Photon.Deterministic.NullableFP,Photon.Deterministic.NullableFPVector3)">
+        <member name="M:Quantum.PhysicsBody3D.InitBody(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP,Quantum.PhysicsBody3D.ConfigFlags,Quantum.RotationFreezeFlags,System.Nullable{Photon.Deterministic.FPVector3},Photon.Deterministic.NullableFP)">
             <summary>
             Initializes a <see cref="T:Quantum.PhysicsBody3D"/> component with custom settings.
             </summary>
@@ -20231,13 +19979,6 @@
             <param name="rotationFlags">The <see cref="T:Quantum.RotationFreezeFlags"/> used in the physics body.</param>
             <param name="centerOfMass">The center of mass position relative to the transform's origin.</param>
             <param name="gravityScale">The multiplier for the gravity force applied for this physics body.</param>
-            <param name="inertiaScale">A multiplier for the inertia tensor value.</param>
-            <param name="inertiaTensor">
-            An optional value for the body's inertia tensor.
-            If not specified AND the <see cref="F:Quantum.PhysicsBody3D.ConfigFlags.ResetInertiaOnAdded"/> is set in the <paramref name="bodyConfig"/>,
-            then the inertia tensor will be computed when the body component is added to an entity, based on the shape of the
-            collider, assuming uniform mass distribution.
-            </param>
             \ingroup Physics3dApi
         </member>
         <member name="M:Quantum.PhysicsBody3D.ResetInertia(Quantum.Core.FrameBase,Quantum.EntityRef)">
@@ -21799,12 +21540,6 @@
             </summary>
             <param name="fromConfig">Shape config used as source</param>
         </member>
-        <member name="M:Quantum.Shape3DConfig.CompoundShapeData3D.CopyToConfig(Quantum.Shape3DConfig)">
-            <summary>
-            Copies the current instance's values to a <see cref="T:Quantum.Shape3DConfig"/> instance.
-            </summary>
-            <param name="dest">Shape config to receive the values</param>
-        </member>
         <member name="M:Quantum.Shape3DConfig.CompoundShapeData3D.CreateShape(Quantum.Core.FrameBase)">
             <summary>
             Creates a <see cref="T:Quantum.Shape3D"/> using the all the data set in the <see cref="T:Quantum.Shape3DConfig.CompoundShapeData3D"/>.
@@ -21925,12 +21660,6 @@
             The size of the struct in bytes.
             </summary>
         </member>
-        <member name="M:Quantum.CCDSettings.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
-        </member>
         <member name="M:Quantum.CCDSettings.Serialize(Quantum.CCDSettings*,Quantum.FrameSerializer)">
             <summary>
             Serializes a <see cref="T:Quantum.CCDSettings"/> into a <see cref="T:Quantum.FrameSerializer"/>.
@@ -21942,12 +21671,6 @@
             <summary>
             The size of the struct in bytes.
             </summary>
-        </member>
-        <member name="M:Quantum.GJKSettings.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
         </member>
         <member name="M:Quantum.GJKSettings.Serialize(Quantum.GJKSettings*,Quantum.FrameSerializer)">
             <summary>
@@ -22248,12 +21971,6 @@
             The sorting axis for the queries in a bucket that are sorted according to their position.
             </summary>
         </member>
-        <member name="M:Quantum.PhysicsCommon.StaticCollidersState.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
-        </member>
         <member name="M:Quantum.PhysicsCommon.StaticCollidersState.Serialize(System.Void*,Quantum.FrameSerializer)">
             <summary>
             Serializes a <see cref="T:Quantum.PhysicsCommon.StaticCollidersState"/> into a <see cref="T:Quantum.FrameSerializer"/>.
@@ -22438,11 +22155,6 @@
             To filter some of these options out, combine specific flags instead.
             </summary>
         </member>
-        <member name="F:Quantum.QueryOptions.HitSolids">
-            <summary>
-            The query checks all non-trigger colliders: statics, kinematics and dynamics.
-            </summary>
-        </member>
         <member name="F:Quantum.QueryOptions.ComputeDetailedInfo">
             <summary>
             Detailed info (e.g. contact point, normal, penetration) will be computed for the query hits.
@@ -22548,12 +22260,6 @@
             The size of the struct in bytes.
             </summary>
         </member>
-        <member name="M:Quantum.PhysicsSceneSettings.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
-        </member>
         <member name="M:Quantum.PhysicsSceneSettings.Serialize(Quantum.PhysicsSceneSettings*,Quantum.FrameSerializer)">
             <summary>
             Serializes a <see cref="T:Quantum.PhysicsSceneSettings"/> into a <see cref="T:Quantum.FrameSerializer"/>.
@@ -22573,12 +22279,6 @@
             </summary>
             <param name="ptr">The pointer to the <see cref="T:Quantum.PhysicsQueryRef"/>.</param>
             <param name="serializer">The <see cref="T:Quantum.FrameSerializer"/> instance into which the struct will be serialized.</param>
-        </member>
-        <member name="M:Quantum.PhysicsEngineState.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
         </member>
         <member name="M:Quantum.PhysicsEngineState.Serialize(System.Void*,Quantum.FrameSerializer)">
             <summary>
@@ -24331,6 +24031,19 @@
             <param name="rotation">The initial rotation.</param>
             <returns>New initialized Transform3D component.</returns>
         </member>
+        <member name="M:Quantum.Transform3D.RotateAround(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Boolean)">
+            <summary>
+            Rotates around a given pivot point.
+            <para>
+            The method works as expected but does generate slightly different results than Unity's Transform.RotateAround(). 
+            The algorithm may be subject to change in future versions.
+            </para>
+            </summary>
+            <param name="point">The pivot point.</param>
+            <param name="axis">What axis to rotate.</param>
+            <param name="angle">The angle.</param>
+            <param name="rotateTransform"></param>
+        </member>
         <member name="M:Quantum.Transform3D.Teleport(Quantum.Core.FrameBase,Photon.Deterministic.FPVector3)">
             <inheritdoc cref="M:Quantum.Transform2D.Teleport(Quantum.Core.FrameBase,Photon.Deterministic.FPVector2)"/>
         </member>
@@ -24461,39 +24174,16 @@
             This prevents rounding error from accumulating and potentially rounding the quaternion magnitude towards zero over time.
             </param>
         </member>
-        <member name="M:Quantum.Transform3D.Rotate(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Boolean,Quantum.TransformSpace)">
+        <member name="M:Quantum.Transform3D.Rotate(Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Rotates the object around the given axis by the number of degrees defined by the given angle.
             </summary>
-            <param name="axis">The axis around which to rotate.</param>
-            <param name="angle">The angle of rotation around the axis.</param>
+            <param name="axis"></param>
+            <param name="angle"></param>
             <param name="normalize">
             If the resultant quaternion should be normalized before being set to the <see cref="F:Quantum.Transform3D.Rotation"/>.
             This prevents rounding error from accumulating and potentially rounding the quaternion magnitude towards zero over time.
             </param>
-            <param name="space">If the <paramref name="axis"/> is defined in the Local space of the Transform (default) or in the World space.</param>
-        </member>
-        <member name="M:Quantum.Transform3D.RotateAround(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Boolean)">
-            <summary>
-            Rotates around a given pivot point and axis.
-            </summary>
-            <param name="point">The pivot point around which to rotate.</param>
-            <param name="axis">The axis in WORLD space around which to rotate.</param>
-            <param name="angle">The angle of rotation around the axis.</param>
-            <param name="rotateTransform">
-            If the transform Rotation should also be modified.
-            If false, only the transform Position is modified.
-            </param>
-        </member>
-        <member name="F:Quantum.TransformSpace.World">
-            <summary>
-            Applies transformation relative to the world coordinate system.
-            </summary>
-        </member>
-        <member name="F:Quantum.TransformSpace.Local">
-            <summary>
-            Applies transformation relative to the local coordinate system.
-            </summary>
         </member>
         <member name="T:Quantum.ArrayUtils">
             <summary>
@@ -25330,7 +25020,7 @@
             Issues a debug shape to be drawn in Unity. 
             The shape drawing is based on the DEBUG define which is enabled in UnityEditor and development builds.
             Can be globally toggled of by using DebugDraw.IsEnabled in Unity.
-            Different implementation can be attached using <see cref="M:Quantum.Draw.Init(System.Action{Quantum.Draw.DebugRay},System.Action{Quantum.Draw.DebugLine},System.Action{Quantum.Draw.DebugCircle},System.Action{Quantum.Draw.DebugSphere},System.Action{Quantum.Draw.DebugRectangle},System.Action{Quantum.Draw.DebugBox},System.Action{Quantum.Draw.DebugCapsule},System.Action{Quantum.Draw.DebugText},System.Action)"/>.
+            Different implementation can be attached using <see cref="M:Quantum.Draw.Init(System.Action{Quantum.Draw.DebugRay},System.Action{Quantum.Draw.DebugLine},System.Action{Quantum.Draw.DebugCircle},System.Action{Quantum.Draw.DebugSphere},System.Action{Quantum.Draw.DebugRectangle},System.Action{Quantum.Draw.DebugBox},System.Action{Quantum.Draw.DebugCapsule},System.Action)"/>.
             </summary>
         </member>
         <member name="T:Quantum.Draw.DebugLine">
@@ -25371,46 +25061,6 @@
         <member name="F:Quantum.Draw.DebugRay.Color">
             <summary>
             Ray color.
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.Scaling.Fixed">
-            <summary>
-            Scale does not change based on distance.
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.Scaling.World">
-            <summary>
-            Scale changes depending on distance from camera.
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.Position">
-            <summary>
-            World position of the text
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.Text">
-            <summary>
-            The text to display.
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.Size">
-            <summary>
-            The font size
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.Color">
-            <summary>
-            The primary color of the text.
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.BackgroundColor">
-            <summary>
-            The optional background color of the text.
-            </summary>
-        </member>
-        <member name="F:Quantum.Draw.DebugText.DrawScaling">
-            <summary>
-            The scaling mode to use for the text.
             </summary>
         </member>
         <member name="T:Quantum.Draw.DebugCircle">
@@ -25588,7 +25238,7 @@
             Calculate the diameter of the capsule.
             </summary>
         </member>
-        <member name="M:Quantum.Draw.Init(System.Action{Quantum.Draw.DebugRay},System.Action{Quantum.Draw.DebugLine},System.Action{Quantum.Draw.DebugCircle},System.Action{Quantum.Draw.DebugSphere},System.Action{Quantum.Draw.DebugRectangle},System.Action{Quantum.Draw.DebugBox},System.Action{Quantum.Draw.DebugCapsule},System.Action{Quantum.Draw.DebugText},System.Action)">
+        <member name="M:Quantum.Draw.Init(System.Action{Quantum.Draw.DebugRay},System.Action{Quantum.Draw.DebugLine},System.Action{Quantum.Draw.DebugCircle},System.Action{Quantum.Draw.DebugSphere},System.Action{Quantum.Draw.DebugRectangle},System.Action{Quantum.Draw.DebugBox},System.Action{Quantum.Draw.DebugCapsule},System.Action)">
             <summary>
             Initializes the debug draw system with the given draw functions.
             </summary>
@@ -25599,13 +25249,7 @@
             <param name="drawRectangle">Draw rectangle method</param>
             <param name="drawBox">Draw box method</param>
             <param name="drawCapsule">Draw capsule method</param>
-            <param name="drawText">Draw text method</param>
             <param name="clear">Clear all queued debug shapes</param>
-        </member>
-        <member name="M:Quantum.Draw.Init(System.Action{Quantum.Draw.DebugRay},System.Action{Quantum.Draw.DebugLine},System.Action{Quantum.Draw.DebugCircle},System.Action{Quantum.Draw.DebugSphere},System.Action{Quantum.Draw.DebugRectangle},System.Action{Quantum.Draw.DebugBox},System.Action{Quantum.Draw.DebugCapsule},System.Action)">
-            <summary>
-            Obsolete. Use the Init method with the text drawer.
-            </summary>
         </member>
         <member name="M:Quantum.Draw.Init(System.Action{Quantum.Draw.DebugRay},System.Action{Quantum.Draw.DebugLine},System.Action{Quantum.Draw.DebugCircle},System.Action{Quantum.Draw.DebugSphere},System.Action{Quantum.Draw.DebugRectangle},System.Action{Quantum.Draw.DebugBox},System.Action)">
             <summary>
@@ -25645,17 +25289,6 @@
             <param name="rotation">The rotation of the shape, can be <see langword="null"/></param>
             <param name="color">The color, can be <see langword="null"/></param>
             <param name="wire">Draw the shape as wireframe</param>
-        </member>
-        <member name="M:Quantum.Draw.Text(System.String,Photon.Deterministic.FPVector3,System.Int32,System.Nullable{Quantum.ColorRGBA},System.Nullable{Quantum.ColorRGBA},Quantum.Draw.DebugText.Scaling)">
-            <summary>
-            Draw a text box at the given position
-            </summary>
-            <param name="text"></param>
-            <param name="position"></param>
-            <param name="fontSize"></param>
-            <param name="color"></param>
-            <param name="backgroundColor"></param>
-            <param name="drawScaling"></param>
         </member>
         <member name="M:Quantum.Draw.Ray(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Nullable{Quantum.ColorRGBA})">
             <summary>
@@ -25975,7 +25608,7 @@
         </member>
         <member name="T:Quantum.FrameTimer">
             <summary>
-            Built-in timer struct for game logic.
+            Built in timer used for timing game logic.
             </summary>
         </member>
         <member name="F:Quantum.FrameTimer.SIZE">
@@ -25989,9 +25622,9 @@
             Empty timer.
             </summary>
         </member>
-        <member name="F:Quantum.FrameTimer.TargetFrame">
+        <member name="F:Quantum.FrameTimer.Value">
             <summary>
-            The frame number at which the timer will run out.
+            The frame number at which the timer will expire.
             </summary>
         </member>
         <member name="F:Quantum.FrameTimer.StartFrame">
@@ -25999,33 +25632,61 @@
             The frame number at which the timer has started.
             </summary>
         </member>
-        <member name="P:Quantum.FrameTimer.IsSet">
+        <member name="P:Quantum.FrameTimer.IsValid">
             <summary>
-            If the timer is has been set.
+            If the timer is valid.
             A valid timer has a <see cref="F:Quantum.FrameTimer.StartFrame"/> greater than 0
-            and the target frame <see cref="F:Quantum.FrameTimer.TargetFrame"/> greater than or equal to the <see cref="F:Quantum.FrameTimer.StartFrame"/>.
+            and the target frame <see cref="F:Quantum.FrameTimer.Value"/> greater than or equal to the <see cref="F:Quantum.FrameTimer.StartFrame"/>.
             </summary>
+        </member>
+        <member name="P:Quantum.FrameTimer.TargetFrame">
+            <summary>
+            The target frame of the timer, if the timer is valid.
+            </summary>
+            <returns>
+            If the timer is <see cref="P:Quantum.FrameTimer.IsValid">valid</see>, the target frame <see cref="F:Quantum.FrameTimer.Value"/>.
+            Otherwise, returns <see langword="null"/>.</returns>
+        </member>
+        <member name="M:Quantum.FrameTimer.IsExpired(Quantum.Core.FrameBase)">
+            <summary>
+            If the timer is valid and has expired.
+            </summary>
+            <param name="frame">The current Frame instance.</param>
+            <returns>
+            <see langword="true"/> if the timer is <see cref="P:Quantum.FrameTimer.IsValid">valid</see> and the current <paramref name="frame"/> number is greater than or equal to the target frame <see cref="F:Quantum.FrameTimer.Value"/>.
+            <see langword="false"/> othewise.
+            </returns>
+        </member>
+        <member name="M:Quantum.FrameTimer.IsExpiredThisFrame(Quantum.Core.FrameBase)">
+            <summary>
+            If the timer expired during this frame.
+            </summary>
+            <param name="frame">The current Frame instance.</param>
+            <returns>
+            <see langword="true"/> if the timer is <see cref="M:Quantum.FrameTimer.IsExpired(Quantum.Core.FrameBase)">expired</see> and the current <paramref name="frame"/> number is equal to the target frame number <see cref="F:Quantum.FrameTimer.Value"/>.
+            <see langword="false"/> othewise.
+            </returns>
+            <remarks>Useful for one time operations that happen only at timer expiry.</remarks>
         </member>
         <member name="M:Quantum.FrameTimer.IsRunning(Quantum.Core.FrameBase)">
             <summary>
-            Is the timer set and still running.
+            If the timer is not expired.
             </summary>
             <param name="frame">The current Frame instance.</param>
             <returns>
-            <see langword="true"/> if the timer is <see cref="P:Quantum.FrameTimer.IsSet">valid</see> and the current <paramref name="frame"/>> number is smaller than <see cref="F:Quantum.FrameTimer.TargetFrame"/>.
+            <see langword="true"/> if the timer is not <see cref="M:Quantum.FrameTimer.IsExpired(Quantum.Core.FrameBase)">expired</see>.
             <see langword="false"/> otherwise.
             </returns>
         </member>
-        <member name="M:Quantum.FrameTimer.HasStoppedThisFrame(Quantum.Core.FrameBase)">
+        <member name="M:Quantum.FrameTimer.IsExpiredOrNotValid(Quantum.Core.FrameBase)">
             <summary>
-            Has the timer expired during this frame.
+            If the timer is not valid or has expired.
             </summary>
             <param name="frame">The current Frame instance.</param>
             <returns>
-            <see langword="true"/> if the timer is not <see cref="M:Quantum.FrameTimer.IsRunning(Quantum.Core.FrameBase)">expired</see> and the current <paramref name="frame"/> number is equal to <see cref="F:Quantum.FrameTimer.TargetFrame"/>.
+            <see langword="true"/> if the timer is <see cref="M:Quantum.FrameTimer.IsExpired(Quantum.Core.FrameBase)">expired</see> or is not <see cref="P:Quantum.FrameTimer.IsValid">valid</see>.
             <see langword="false"/> otherwise.
             </returns>
-            <remarks>Useful for one time operations that happen only at timer expiry.</remarks>
         </member>
         <member name="M:Quantum.FrameTimer.RemainingFrames(Quantum.Core.FrameBase)">
             <summary>
@@ -26033,34 +25694,40 @@
             </summary>
             <param name="frame">The current Frame instance.</param>
             <returns>
-            <see cref="F:Quantum.FrameTimer.TargetFrame"/> - current Frame number. Never returns a negative value.
+            If the timer is <see cref="P:Quantum.FrameTimer.IsValid">valid</see>, the number of frames remaining until the timer expires.
+            Otherwise, returns <see langword="null"/>.
             </returns>
         </member>
-        <member name="M:Quantum.FrameTimer.RemainingSeconds(Quantum.Core.FrameBase)">
+        <member name="M:Quantum.FrameTimer.RemainingTime(Quantum.Core.FrameBase)">
             <summary>
-            How much time is remaining until the timer expires in seconds.
+            How much time is remaining until the timer expires.
             </summary>
             <param name="frame">The current Frame instance.</param>
             <returns>
-            Multiplies the remaining frame count by the frame delta time.
+            If the timer is <see cref="P:Quantum.FrameTimer.IsValid">valid</see>, the remaining time in seconds until the timer expires, assuming
+            that the frame <see cref="P:Quantum.Core.FrameBase.DeltaTime"/> will remain constant.
+            Otherwise, returns <see langword="null"/>.
             </returns>
         </member>
-        <member name="M:Quantum.FrameTimer.ElapsedFrames(Quantum.Core.FrameBase)">
+        <member name="M:Quantum.FrameTimer.TimeInFramesSinceStart(Quantum.Core.FrameBase)">
             <summary>
-            How many frames or ticks since the timer was started.
+            How long since the timer has started in frames.
             </summary>
             <param name="frame">The current Frame instance.</param>
             <returns>
-            Returns current frame number - the start frame number. Never returns a negative value.
+            If the <see cref="F:Photon.Deterministic.DeterministicFrame.Number">current frame</see> is greater than or equal to the <see cref="F:Quantum.FrameTimer.StartFrame">start frame</see>,
+            returns the difference between those values. Otherwise, returns <see langword="null"/>.
             </returns>
         </member>
-        <member name="M:Quantum.FrameTimer.ElapsedSeconds(Quantum.Core.FrameBase)">
+        <member name="M:Quantum.FrameTimer.TimeInSecondsSinceStart(Quantum.Core.FrameBase)">
             <summary>
             How long since the timer has started in seconds.
             </summary>
             <param name="frame">The current Frame instance.</param>
             <returns>
-            Returns the timer since the timer start. Never returns a negative value.
+            If the timer is <see cref="P:Quantum.FrameTimer.IsValid">valid</see>, the time in seconds since the timer has started, assuming
+            that the frame <see cref="P:Quantum.Core.FrameBase.DeltaTime"/> has remained constant.
+            Otherwise, returns <see langword="null"/>.
             </returns>
         </member>
         <member name="M:Quantum.FrameTimer.Restart(Quantum.Core.FrameBase)">
@@ -26074,16 +25741,16 @@
             Create a new timer from a delay in seconds.
             </summary>
             <param name="frame"></param>
-            <param name="durationInSeconds"></param>
-            <returns>A new <see cref="T:Quantum.FrameTimer"/> instance with the specified duration.</returns>
+            <param name="delayInSeconds"></param>
+            <returns></returns>
         </member>
         <member name="M:Quantum.FrameTimer.FromFrames(Quantum.Core.FrameBase,System.Int32)">
             <summary>
             Create a new timer from a delay in frames.
             </summary>
             <param name="frame">The current Frame instance.</param>
-            <param name="durationInFrames">The number of frames to wait before the timer expires.</param>
-            <returns>A new <see cref="T:Quantum.FrameTimer"/> instance with the specified duration.</returns>
+            <param name="frames">The number of frames to wait before the timer expires.</param>
+            <returns>A new <see cref="T:Quantum.FrameTimer"/> instance with the specified expiration frame.</returns>
         </member>
         <member name="M:Quantum.FrameTimer.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
             <summary>
@@ -26152,128 +25819,6 @@
             <param name="arr">Input array</param>
             <param name="initialHash">Initial hash value</param>
             <returns>Hashcode</returns>
-        </member>
-        <member name="T:Quantum.InputDirection">
-            <summary>
-            Compressed direction (always normalized) to be used as part of input to optimize bandwidth, encoded as an angle using a single byte (2 degrees of accuracy).
-            </summary>
-        </member>
-        <member name="F:Quantum.InputDirection.SIZE">
-            <summary>
-            The size of the component (or struct/type) in-memory inside the Frame data-buffers or stack (when passed as value parameter).
-            Not related to the snapshot payload this occupies, which is bit-packed and compressed.
-            </summary>
-        </member>
-        <member name="F:Quantum.InputDirection._encodedAngle">
-            <summary>
-            The angle encoded as a byte (0 means default/zeroed vector).
-            </summary>
-        </member>
-        <member name="M:Quantum.InputDirection.op_Implicit(Quantum.InputDirection)~Photon.Deterministic.FPVector2">
-            <summary>
-            Casts to normalized FPVector2. Defaults to zero-vector.
-            </summary>
-        </member>
-        <member name="M:Quantum.InputDirection.op_Implicit(Photon.Deterministic.FPVector2)~Quantum.InputDirection">
-            <summary>
-            Casts from normalized FPVector2 into encoded angle.
-            </summary>
-        </member>
-        <member name="M:Quantum.InputDirection.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
-            <summary>
-            Serializes an <see cref="T:Quantum.InputDirection"/> into a <see cref="T:Quantum.FrameSerializer"/> to write or read from a frame snapshot.
-            </summary>
-            <param name="ptr">The pointer to the <see cref="T:Quantum.InputDirection"/>.</param>
-            <param name="serializer">The <see cref="T:Quantum.FrameSerializer"/> instance into which the struct will be serialized.</param>
-        </member>
-        <member name="M:Quantum.InputDirection.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
-        </member>
-        <member name="T:Quantum.InputDirectionMagnitude">
-            <summary>
-            Compressed direction with magnitude (range 0 to 1) to be used as part of input to optimize bandwidth, encoded as an angle and magnitude using two bytes.
-            </summary>
-        </member>
-        <member name="F:Quantum.InputDirectionMagnitude.SIZE">
-            <summary>
-            The size of the component (or struct/type) in-memory inside the Frame data-buffers or stack (when passed as value parameter).
-            Not related to the snapshot payload this occupies, which is bit-packed and compressed.
-            </summary>
-        </member>
-        <member name="F:Quantum.InputDirectionMagnitude._encodedAngle">
-            <summary>
-            The angle encoded as a byte (0 means default/zeroed vector).
-            </summary>
-        </member>
-        <member name="F:Quantum.InputDirectionMagnitude._encodedMagnitude">
-            <summary>
-            The magnitude encoded as a byte (range 0 - 1).
-            </summary>
-        </member>
-        <member name="M:Quantum.InputDirectionMagnitude.op_Implicit(Quantum.InputDirectionMagnitude)~Photon.Deterministic.FPVector2">
-            <summary>
-            Casts to FPVector2 with magnitude (range 0 to 1). Defaults to zero-vector.
-            </summary>
-        </member>
-        <member name="M:Quantum.InputDirectionMagnitude.op_Implicit(Photon.Deterministic.FPVector2)~Quantum.InputDirectionMagnitude">
-            <summary>
-            Casts from FPVector2 into encoded angle and magnitude (must be in the range 0 to 1).
-            </summary>
-        </member>
-        <member name="M:Quantum.InputDirectionMagnitude.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
-            <summary>
-            Serializes an <see cref="T:Quantum.InputDirectionMagnitude"/> into a <see cref="T:Quantum.FrameSerializer"/> to write or read from a frame snapshot.
-            </summary>
-            <param name="ptr">The pointer to the <see cref="T:Quantum.InputDirectionMagnitude"/>.</param>
-            <param name="serializer">The <see cref="T:Quantum.FrameSerializer"/> instance into which the struct will be serialized.</param>
-        </member>
-        <member name="M:Quantum.InputDirectionMagnitude.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
-        </member>
-        <member name="T:Quantum.InputPitchYaw">
-            <summary>
-            Compressed pitch + yaw angles (ranges -89 to 89 and -+ 180)) to be used as part of input to optimize bandwidth, encoded as two shorts.
-            </summary>
-        </member>
-        <member name="F:Quantum.InputPitchYaw.SIZE">
-            <summary>
-            The size of the component (or struct/type) in-memory inside the Frame data-buffers or stack (when passed as value parameter).
-            Not related to the snapshot payload this occupies, which is bit-packed and compressed.
-            </summary>
-        </member>
-        <member name="P:Quantum.InputPitchYaw.Pitch">
-            <summary>
-            Mouse-look pitch (Euler X, clamped to -90, 90).
-            </summary>
-        </member>
-        <member name="P:Quantum.InputPitchYaw.Yaw">
-            <summary>
-            Mouse-look Yaw (Euler Y, clamped to -90, 90).
-            </summary>
-        </member>
-        <member name="P:Quantum.InputPitchYaw.LookRotation">
-            <summary>
-            Generates an FPQuaternion using Pitch and Yaw as Euler X and Y respectively.
-            </summary>
-        </member>
-        <member name="M:Quantum.InputPitchYaw.Serialize(System.Void*,Photon.Deterministic.IDeterministicFrameSerializer)">
-            <summary>
-            Serializes an <see cref="T:Quantum.InputPitchYaw"/> into a <see cref="T:Quantum.FrameSerializer"/> to write or read from a frame snapshot.
-            </summary>
-            <param name="ptr">The pointer to the <see cref="T:Quantum.InputPitchYaw"/>.</param>
-            <param name="serializer">The <see cref="T:Quantum.FrameSerializer"/> instance into which the struct will be serialized.</param>
-        </member>
-        <member name="M:Quantum.InputPitchYaw.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
         </member>
         <member name="T:Quantum.LayerInfo">
             <summary>
@@ -26650,85 +26195,6 @@
             Overrides the hash code generation of this type.
             </summary>
             <returns>A hash code of the current state of this instance.</returns>
-        </member>
-        <member name="T:Quantum.RNGExtensions">
-            <summary>
-            Extension methods for the RNGSession struct to provide additional random number generation functionality
-            for quaternions, colors, and vectors in various geometric distributions.
-            </summary>
-        </member>
-        <member name="M:Quantum.RNGExtensions.Rotation(Photon.Deterministic.RNGSession@)">
-            <summary>
-            Generates a random quaternion with each component in the range [0,1].
-            </summary>
-            <param name="rng">The random number generator session.</param>
-            <returns>A randomly generated quaternion.</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.ColorHSV(Photon.Deterministic.RNGSession@)">
-            <summary>
-            Generates a random color using HSV values, converted to RGB.
-            </summary>
-            <param name="rng">The random number generator session.</param>
-            <returns>A randomly generated color in RGBA format.</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.InUnitCircle(Photon.Deterministic.RNGSession@,System.Boolean)">
-            <summary>
-            Returns a random 2D vector inside the unit circle.
-            </summary>
-            <param name="rng">The random number generator session.</param>
-            <param name="uniform">If true, distribution is uniform over the area. Note: This requires an additional
-            square root operation which has a minor performance cost but provides better distribution.</param>
-            <returns>A random 2D vector inside the unit circle.</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.OnUnitCircle(Photon.Deterministic.RNGSession@)">
-            <summary>
-            Returns a random point on the perimeter of the unit circle.
-            </summary>
-            <param name="rng">The random number generator session.</param>
-            <returns>A random point on the unit circle perimeter.</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.InUnitSphere(Photon.Deterministic.RNGSession@,System.Boolean)">
-            <summary>
-            Returns a random point inside the unit sphere.
-            </summary>
-            <param name="rng">The random number generator session.</param>
-            <param name="uniform">If true, distribution is uniform over the volume. Note: This requires
-            an additional cube root calculation which has a higher performance cost but provides a statistically
-            correct distribution of points throughout the volume.</param>
-            <returns>A random point inside the unit sphere.</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.OnUnitSphere(Photon.Deterministic.RNGSession@,System.Boolean)">
-            <summary>
-            Returns a random point on the surface of the unit sphere.
-            </summary>
-            <param name="rng">The random number generator session.</param>
-            <param name="uniform">If true, points are uniformly distributed over the surface. Note: The uniform
-            distribution uses a different algorithm which has a minor performance impact but ensures points
-            are not clustered at the poles of the sphere.</param>
-            <returns>A random point on the unit sphere surface.</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.ConvertToByte(Photon.Deterministic.FP)">
-            <summary>
-            Converts a floating-point value in range [0,1] to a byte value in range [0,255].
-            </summary>
-            <param name="value">The floating-point value to convert.</param>
-            <returns>The value converted to a byte in range [0,255].</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.HSV2RGB(Photon.Deterministic.FP,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <summary>
-            Converts HSV color values to an RGB color.
-            </summary>
-            <param name="hue">The hue component [0,1].</param>
-            <param name="saturation">The saturation component [0,1].</param>
-            <param name="value">The value component [0,1].</param>
-            <returns>A color in RGBA format.</returns>
-        </member>
-        <member name="M:Quantum.RNGExtensions.CubeRootRaw(Photon.Deterministic.FP)">
-            <summary>
-            Calculates the cube root of a value using Newton's method.
-            </summary>
-            <param name="value">The value to calculate the cube root of.</param>
-            <returns>The approximate cube root of the input value.</returns>
         </member>
         <member name="T:Quantum.TypeRegistry">
             <summary>

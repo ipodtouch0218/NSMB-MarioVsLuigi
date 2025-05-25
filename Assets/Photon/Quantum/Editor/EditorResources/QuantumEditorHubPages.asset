@@ -34,7 +34,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: e8fd0db9-b29b-4c6a-bcd5-ca3c4b97e49b
@@ -54,7 +56,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: e547250b-7d41-4373-9be2-b234e2b2f9b1
@@ -75,7 +79,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 0}
         Id: becfca26-dbc4-45b6-9478-6969c5665767
@@ -94,7 +100,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 0}
         Id: becfca26-dbc4-45b6-9478-6969c5665767
@@ -114,8 +122,10 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: AsteroidsGameConfig
         ScriptableObject: 
-        Class: AsteroidsGameConfig
+        MonoBehaviour: 
+        Class: 
       Asset: {fileID: 102900000, guid: 4b3bb7bcca93ef748a68af25d13db229, type: 3}
       Id: fdd69fd4-9268-44d6-9136-9f67f653477e
       StepElements:
@@ -135,7 +145,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 102900000, guid: 4b3bb7bcca93ef748a68af25d13db229, type: 3}
         Id: 6861967a-1e87-4fa7-85ec-ad198c24c6ca
@@ -155,7 +167,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 97006100-31d0-4249-be0e-1721da7d730c
@@ -178,7 +192,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 0}
         Id: a375765f-4f17-47d7-aee8-bf70ee016eee
@@ -197,7 +213,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: https://dashboard.photonengine.com
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 0}
         Id: 676930dd-0aff-451f-b078-ea9f3e08b90d
@@ -216,7 +234,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 0}
         Id: cbfc9fb4-9126-4a15-99e4-65a10d0dec57
@@ -236,7 +256,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: QuantumMenuConfig
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 102900000, guid: d0bb1444b9231574e8dc3305f8a7946a, type: 3}
       Id: 28de5e25-3ed0-4cbd-9583-8a6a9af38221
@@ -256,7 +278,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 102900000, guid: d0bb1444b9231574e8dc3305f8a7946a, type: 3}
         Id: e42a1602-dea2-486c-a803-175b1fac2798
@@ -275,7 +299,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 12d32080-4474-4711-84bf-7f02fef626ca
@@ -298,7 +324,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 7dd52118-7d0c-4da6-ab1b-c940967541b5
@@ -319,7 +347,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: QUANTUM_XY
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 1a18c0e4-0129-45fd-97eb-c2bfa3f136fb
@@ -339,7 +369,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 94d5d5d5-cf50-40a1-9f66-199a6ed3e6e9
@@ -358,9 +390,11 @@ MonoBehaviour:
       Icon: {fileID: 2800000, guid: 48362b7bdabe49d4b93c092e53f3c269, type: 3}
       StatusIcon: {fileID: 0}
       StartPlayMode: 0
-      Url: https://doc.photonengine.com/quantum/current/quantum-intro
+      Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 0f1e4b63-13b1-41e9-b86e-8a83dac311ef
@@ -388,7 +422,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 102900000, guid: 4b3bb7bcca93ef748a68af25d13db229, type: 3}
       Id: 
@@ -409,8 +445,10 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: AsteroidsGameConfig
           ScriptableObject: 
-          Class: AsteroidsGameConfig
+          MonoBehaviour: 
+          Class: 
         Asset: {fileID: 102900000, guid: 4b3bb7bcca93ef748a68af25d13db229, type: 3}
         Id: 
       - Text: Reimport Quantum Asteroids Sample Game
@@ -428,8 +466,10 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: AsteroidsGameConfig
           ScriptableObject: 
-          Class: AsteroidsGameConfig
+          MonoBehaviour: 
+          Class: 
         Asset: {fileID: 102900000, guid: 4b3bb7bcca93ef748a68af25d13db229, type: 3}
         Id: 
     - Text: Install the <b>menu package</b> to have a fully functional online game
@@ -450,7 +490,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 102900000, guid: d0bb1444b9231574e8dc3305f8a7946a, type: 3}
       Id: 
@@ -470,7 +512,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: QuantumMenuConfig
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 102900000, guid: d0bb1444b9231574e8dc3305f8a7946a, type: 3}
         Id: 
@@ -489,7 +533,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: QuantumMenuConfig
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 102900000, guid: d0bb1444b9231574e8dc3305f8a7946a, type: 3}
         Id: 
@@ -511,7 +557,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 102900000, guid: 46baf9431b7dc7e45932f7fba6c3aa0d, type: 3}
       Id: 
@@ -531,8 +579,10 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
-          Class: QuantumDemoInputPlatformer2DPolling
+          MonoBehaviour: QuantumDemoInputPlatformer2DPolling
+          Class: 
         Asset: {fileID: 102900000, guid: 46baf9431b7dc7e45932f7fba6c3aa0d, type: 3}
         Id: 
       - Text: Reimport the Quantum Demo Input Package
@@ -550,8 +600,10 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
-          Class: QuantumDemoInputPlatformer2DPolling
+          MonoBehaviour: QuantumDemoInputPlatformer2DPolling
+          Class: 
         Asset: {fileID: 102900000, guid: 46baf9431b7dc7e45932f7fba6c3aa0d, type: 3}
         Id: 
     - Text: Create and set up a Unity scene that demonstrates how to connect and
@@ -570,7 +622,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -590,7 +644,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 0}
         Id: 
@@ -609,7 +665,9 @@ MonoBehaviour:
         StartPlayMode: 0
         Url: 
         Type:
+          AssetObject: 
           ScriptableObject: 
+          MonoBehaviour: 
           Class: 
         Asset: {fileID: 0}
         Id: 
@@ -629,7 +687,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -649,7 +709,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://doc.photonengine.com/quantum/v3/tutorials/asteroids/1-overview
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -675,7 +737,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -696,7 +760,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://www.photonengine.com/gaming
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -716,7 +782,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://dashboard.photonengine.com/discord/joinphotonengine
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -737,7 +805,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://doc.photonengine.com/quantum/v3
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -757,7 +827,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://doc.photonengine.com/quantum/v3/getting-started/release-notes
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -777,7 +849,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://doc-api.photonengine.com/en/quantum/v3/index.html
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -804,28 +878,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
-        Class: 
-      Asset: {fileID: 0}
-      Id: 
-      StepElements: []
-    - Text: Upgrade SDK 3.0.3
-      Subtext: Create QuantumLookupTables global scriptable asset inside the QuantumUser
-        folder
-      WidgetMode:
-        Value: EnsureGlobalScriptableObjectExists
-      AutoComplete:
-        Value: GlobalScriptableObjectExists
-      Hide:
-        Value: GlobalScriptableObjectExists
-      Scene: 
-      AddSceneToTop: 0
-      Icon: {fileID: 2800000, guid: 1706062cff9ddc54bb26fb4afe08dc61, type: 3}
-      StatusIcon: {fileID: 2800000, guid: 8491ac03603357649a00077468789d52, type: 3}
-      StartPlayMode: 0
-      Url: 
-      Type:
-        ScriptableObject: Quantum.QuantumLookupTables
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -846,7 +901,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -866,7 +923,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -889,7 +948,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -909,7 +970,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://dashboard.photonengine.com
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -929,7 +992,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -938,7 +1003,7 @@ MonoBehaviour:
       Subtext: Select the Photon network transport configuration asset that the AppId
         is stored in
       WidgetMode:
-        Value: PingGlobalScriptableObject
+        Value: PingPhotonServerSettings
       AutoComplete:
         Value: None
       Hide:
@@ -950,7 +1015,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -970,7 +1037,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -996,7 +1065,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -1016,7 +1087,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 4900000, guid: 8b2a0c58c02fc7342a40f7ab8446a1c7, type: 3}
       Id: 
@@ -1036,7 +1109,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: https://doc.photonengine.com/quantum/v3/getting-started/release-notes
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -1056,7 +1131,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 4900000, guid: 8b2a0c58c02fc7342a40f7ab8446a1c7, type: 3}
       Id: 
@@ -1083,7 +1160,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 0}
       Id: 
@@ -1103,7 +1182,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 4900000, guid: 530dcba8d8fbbc24a8894ca925cadd8a, type: 3}
       Id: 
@@ -1123,7 +1204,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 4900000, guid: 530dcba8d8fbbc24a8894ca925cadd8a, type: 3}
       Id: 
@@ -1149,7 +1232,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 4900000, guid: 265ee2b8899374c4daacf1b15f99a002, type: 3}
       Id: 
@@ -1169,7 +1254,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: 
       Asset: {fileID: 4900000, guid: 265ee2b8899374c4daacf1b15f99a002, type: 3}
       Id: 
@@ -1189,7 +1276,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: FP
       Asset: {fileID: -1121539586, guid: da1c83ff0dd6e394292ac05c4584c4fe, type: 3}
       Id: 
@@ -1209,7 +1298,9 @@ MonoBehaviour:
       StartPlayMode: 0
       Url: 
       Type:
+        AssetObject: 
         ScriptableObject: 
+        MonoBehaviour: 
         Class: Transform2D
       Asset: {fileID: 0}
       Id: 

@@ -10,7 +10,6 @@ namespace NSMB.UI.MainMenu.Submenus {
     public class RoomPanel : InRoomSubmenuPanel {
 
         //---Properties
-        public override GameObject DefaultSelectedObject => rules[0].gameObject;
         public override bool IsInSubmenu => rules.Any(r => r.Editing);
 
         //---Serialized Variables

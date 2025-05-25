@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Bonus/CustomBonusStageData
     Guid:
       Value: 531038173362895130
+  ShowAuthorAndComposer: 1
   StageAuthor: mindnomad
   MusicComposer: RENREN
   TranslationKey: level.custom.bonus

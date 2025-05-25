@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Jungle/CustomJungleStageData
     Guid:
       Value: 537076513214161987
+  ShowAuthorAndComposer: 1
   StageAuthor: ipodtouch0218
   MusicComposer: Cubby Crazes
   TranslationKey: level.custom.jungle

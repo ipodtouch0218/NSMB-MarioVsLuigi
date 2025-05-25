@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Sky/CustomSkyStageData
     Guid:
       Value: 441965699003373968
+  ShowAuthorAndComposer: 1
   StageAuthor: Skarph, AwertJ
   MusicComposer: RENREN
   TranslationKey: level.custom.sky

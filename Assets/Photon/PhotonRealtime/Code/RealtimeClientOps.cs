@@ -152,9 +152,8 @@ namespace Photon.Realtime
                 opParameters[ParameterCode.FindFriendsOptions] = args.ToIntFlags();
             }
 
-            
-            SendOptions sendOptions = new SendOptions() { Reliability = true, Encrypt = true };
-            bool sending = this.RealtimePeer.SendOperation(OperationCode.FindFriends, opParameters, sendOptions);
+
+            bool sending = this.RealtimePeer.SendOperation(OperationCode.FindFriends, opParameters, SendOptions.SendReliable);
             this.paramDictionaryPool.Release(opParameters);
 
             this.friendListRequested = sending ? filteredArray : null;
@@ -394,7 +393,6 @@ namespace Photon.Realtime
             }
 
             ParameterDictionary opParameters = this.paramDictionaryPool.Acquire();
-            SendOptions sendOptions = new SendOptions() { Reliability = true };
             if (expectedRoomProperties.Count > 0)
             {
                 opParameters[ParameterCode.GameProperties] = expectedRoomProperties;
@@ -419,7 +417,6 @@ namespace Photon.Realtime
             if (joinRandomRoomArgs.ExpectedUsers != null && joinRandomRoomArgs.ExpectedUsers.Length > 0)
             {
                 opParameters[ParameterCode.Add] = joinRandomRoomArgs.ExpectedUsers;
-                sendOptions.Encrypt = true;
             }
 
             if (joinRandomRoomArgs.Ticket != null)
@@ -431,7 +428,7 @@ namespace Photon.Realtime
 
 
             //this.Listener.DebugReturn(LogLevel.Info, "OpJoinRandomRoom: " + SupportClass.DictionaryToString(opParameters));
-            bool sending = this.RealtimePeer.SendOperation(OperationCode.JoinRandomGame, opParameters, sendOptions);
+            bool sending = this.RealtimePeer.SendOperation(OperationCode.JoinRandomGame, opParameters, SendOptions.SendReliable);
             this.paramDictionaryPool.Release(opParameters);
 
             if (sending)
@@ -525,7 +522,6 @@ namespace Photon.Realtime
             }
 
             ParameterDictionary opParameters = this.paramDictionaryPool.Acquire();
-            SendOptions sendOptions = new SendOptions() { Reliability = true };
             if (expectedRoomProperties.Count > 0)
             {
                 opParameters[ParameterCode.GameProperties] = expectedRoomProperties; // used as filter. below, RoomOptionsToOpParameters has usePropertiesKey = true
@@ -550,7 +546,6 @@ namespace Photon.Realtime
             if (joinRandomRoomArgs.ExpectedUsers != null && joinRandomRoomArgs.ExpectedUsers.Length > 0)
             {
                 opParameters[ParameterCode.Add] = joinRandomRoomArgs.ExpectedUsers;
-                sendOptions.Encrypt = true;
             }
 
             if (joinRandomRoomArgs.Ticket != null)
@@ -573,7 +568,7 @@ namespace Photon.Realtime
 
 
             //this.Listener.DebugReturn(LogLevel.Info, "OpJoinRandomOrCreateRoom: " + SupportClass.DictionaryToString(opParameters, false));
-            bool sending = this.RealtimePeer.SendOperation(OperationCode.JoinRandomGame, opParameters, sendOptions);
+            bool sending = this.RealtimePeer.SendOperation(OperationCode.JoinRandomGame, opParameters, SendOptions.SendReliable);
             this.paramDictionaryPool.Release(opParameters);
 
             if (sending)
@@ -840,7 +835,6 @@ namespace Photon.Realtime
 
 
             ParameterDictionary opParameters = this.paramDictionaryPool.Acquire();
-            SendOptions sendOptions = new SendOptions() { Reliability = true };
 
             if (!string.IsNullOrEmpty(opArgs.RoomName))
             {
@@ -855,7 +849,6 @@ namespace Photon.Realtime
             if (opArgs.ExpectedUsers != null && opArgs.ExpectedUsers.Length > 0)
             {
                 opParameters[ParameterCode.Add] = opArgs.ExpectedUsers;
-                sendOptions.Encrypt = true;
             }
             if (opArgs.Ticket != null)
             {
@@ -891,7 +884,7 @@ namespace Photon.Realtime
 
 
             //this.Listener.DebugReturn(LogLevel.Info, "OpCreateRoom: " + SupportClass.DictionaryToString(op));
-            bool sending = this.RealtimePeer.SendOperation(OperationCode.CreateGame, opParameters, sendOptions);
+            bool sending = this.RealtimePeer.SendOperation(OperationCode.CreateGame, opParameters, SendOptions.SendReliable);
             this.paramDictionaryPool.Release(opParameters);
 
             return sending;
@@ -922,7 +915,6 @@ namespace Photon.Realtime
 
 
             ParameterDictionary opParameters = this.paramDictionaryPool.Acquire();
-            SendOptions sendOptions = new SendOptions() { Reliability = true };
             if (!string.IsNullOrEmpty(opArgs.RoomName))
             {
                 opParameters[ParameterCode.RoomName] = opArgs.RoomName;
@@ -945,7 +937,6 @@ namespace Photon.Realtime
             if (opArgs.ExpectedUsers != null && opArgs.ExpectedUsers.Length > 0)
             {
                 opParameters[ParameterCode.Add] = opArgs.ExpectedUsers;
-                sendOptions.Encrypt = true;
             }
             if (opArgs.Ticket != null)
             {
@@ -979,7 +970,7 @@ namespace Photon.Realtime
             }
 
             //Log.Info("OpJoinRoomIntern: " + SupportClass.DictionaryToString(opParameters), this.LogLevel, this.LogPrefix);
-            bool sending = this.RealtimePeer.SendOperation(OperationCode.JoinGame, opParameters, sendOptions);
+            bool sending = this.RealtimePeer.SendOperation(OperationCode.JoinGame, opParameters, SendOptions.SendReliable);
             this.paramDictionaryPool.Release(opParameters);
 
             return sending;
@@ -995,7 +986,7 @@ namespace Photon.Realtime
         /// OpLeaveRoom returns false in those cases and won't change the state, so check return of this method.
         ///
         /// In some cases, this method will skip the OpLeave call and just call Disconnect(),
-        /// which not only leaves the room but also the server. Disconnect also triggers a leave and so that workflow is quicker.
+        /// which not only leaves the room but also the server. Disconnect also triggers a leave and so that workflow is is quicker.
         /// </remarks>
         /// <param name="becomeInactive">If true, this player becomes inactive in the game and can return later (if PlayerTTL of the room is != 0).</param>
         /// <returns>If the current room could be left (impossible while not in a room).</returns>
@@ -1007,7 +998,13 @@ namespace Photon.Realtime
             }
 
             Log.Info(string.Format("OpLeaveRoom({0})", becomeInactive ? "inactive=true" : ""), this.LogLevel, this.LogPrefix);
-            
+
+
+            this.State = ClientState.Leaving;
+            this.GameServerAddress = String.Empty;
+            this.enterRoomArgumentsCache = null;
+
+
             ParameterDictionary opParameters = this.paramDictionaryPool.Acquire();
             if (becomeInactive)
             {
@@ -1016,13 +1013,6 @@ namespace Photon.Realtime
 
             bool sending = this.RealtimePeer.SendOperation(OperationCode.Leave, opParameters, SendOptions.SendReliable);
             this.paramDictionaryPool.Release(opParameters);
-            
-            if (sending)
-            {
-                this.State = ClientState.Leaving;
-                this.GameServerAddress = String.Empty;
-                this.enterRoomArgumentsCache = null;
-            }
 
             return sending;
         }
@@ -1655,7 +1645,7 @@ namespace Photon.Realtime
         {
             if (!this.IsConnectedAndReady || this.Server != ServerConnection.MasterServer)
             {
-                //Log.Debug($"OpSettings() skipping because IsConnectedAndReady: {IsConnectedAndReady} / Server: {Server}", this.LogLevel, this.LogPrefix);
+                Log.Debug($"OpSettings() skipping because IsConnectedAndReady: {IsConnectedAndReady} / Server: {Server}", this.LogLevel, this.LogPrefix);
                 return false;
             }
 

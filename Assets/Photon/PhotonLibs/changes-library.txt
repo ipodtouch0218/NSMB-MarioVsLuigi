@@ -3,22 +3,6 @@ Photon C# Client Library - Changelog
 www.photonengine.com  -  Join our Discord Server: https://dashboard.photonengine.com/account/profile
 
 
-Version 5.1.5 (24. April 2025 - rev7920)
-    Fixed: Bug in QueueIncomingCommand() which allowed duplicates of commands being queued. This affected fragment reassembly, leading to exceptions and disconnects. This bug has been in v5.1.3 and v5.1.4.
-    
-Version 5.1.4 (10. April 2025 - rev7900)
-    Changed: WebSocket implementation for Unity WebGL/JS. It is compatible with Unity 6, Emscripten 2023 and C/C++ Threading support. This makes the WebSocket.jslib require Unity 2021.3.x or newer. Mail us to get support for older Unity versions if necessary.
-    Removed: Internally outdated call of OnConnect() from the WebGL SocketWebTcp implementation.
-    Changed: Internally used classes from namespace Photon.Client.Security are moved to Photon.Client.Encryption.
-    Fixed: Handling of unsequenced reliable commands in QueueIncomingCommand().
-
-Version 5.1.3 (06. March 2025 - rev7864)
-    Changed: WebSocket implementation for Unity WebGL/JS exports and WebSocket-sharp based implementation (in PhotonLibs\WebSocket\).
-    Note: The goal is to process incoming messages in WebGL (and with WebSocket-sharp) more directly. This specifically helps the Voice SDK on WebGL to process the stream while in background.
-    Changed: WebSocketTcp and WebSocket to receive incoming messages via callbacks. At the same time our WebSocket code now also implements all typical callbacks for WS/WSS.
-    Changed: WebSocket.jslib replicates "standard" JS websocket methods and callbacks in its interface instead of caching messages for polling.
-    Changed: PreserveAttribute in SupportClass.cs is now public, so it can be used in WebSocket code as needs be.
-
 Version 5.1.2 (19. November 2024 - rev7770)
 	Fixed: Some allocations that can be avoided. For example the EventData.Sender is no longer allocating anything, if the Sender of an event was not set (it is considered ActorNumber 0).
 

@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Fortress/DefaultFortressStageData
     Guid:
       Value: 373777738286135472
+  ShowAuthorAndComposer: 0
   StageAuthor: Nintendo
   MusicComposer: Nintendo
   TranslationKey: level.default.fortress

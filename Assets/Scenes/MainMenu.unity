@@ -14260,6 +14260,7 @@ GameObject:
   - component: {fileID: 400794473}
   - component: {fileID: 400794475}
   - component: {fileID: 400794474}
+  - component: {fileID: 400794477}
   - component: {fileID: 400794476}
   m_Layer: 5
   m_Name: Preview
@@ -14345,6 +14346,37 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: 10
   m_LayoutPriority: 1
+--- !u!114 &400794477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400794472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180adc824ff60734aa65f4bcd71fb401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 892953789}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.GameSettingsPromptSubmenu,
+          Assembly-CSharp
+        m_MethodName: OpenOnTab
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Interactable: 1
+  RepeatOnHold: 0
+  OnRelease: 0
 --- !u!1 &401990414
 GameObject:
   m_ObjectHideFlags: 0
@@ -84297,86 +84329,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcb87846e43a704469d9be7ef4faa09a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Source: 'This is where I will put text.
-
-    It supports *markdown* and **stuff**.
-
-    *
-    Like lists!
-
-    1. Maybe even numbered ones
-
-    [And links](a) to https://google.com
-    and other places!
-
-
-    `and formatted text`'
-  _TextMesh: {fileID: 1605459374}
-  RenderSettings:
-    Bold:
-      RenderBold: 1
-    Italics:
-      RenderItalics: 1
-    Strikethrough:
-      RenderStrikethrough: 1
-    Monospace:
-      RenderMonospace: 1
-      UseCustomFont: 0
-      FontAssetPathRelativeToResources: Noto/Noto Mono/NotoMono-Regular
-      DrawOverlay: 1
-      OverlayColor:
-        r: 1
-        g: 1
-        b: 1
-        a: 0.078431375
-      OverlayPaddingPixels: 25
-      ManuallySetCharacterSpacing: 1
-      CharacterSpacing: 0.85
-      AddSeparationSpacing: 1
-      SeparationSpacing: 0.3
-    Lists:
-      RenderUnorderedLists: 1
-      RenderOrderedLists: 1
-      UnorderedListBullet: "\u2022"
-      OrderedListNumberSuffix: .
-      VerticalOffset: 0.25
-      BulletOffsetPixels: 40
-      ContentSeparationPixels: 20
-    Links:
-      RenderLinks: 1
-      RenderAutoLinks: 1
-      LinkColor:
-        r: 0.11372549
-        g: 0.4862745
-        b: 0.91764706
-        a: 1
-    Headers:
-      RenderPoundSignHeaders: 1
-      RenderLineHeaders: 0
-      Levels:
-      - Size: 2
-        Bold: 0
-        Underline: 0
-        Case: 2
-        VerticalSpacing: 0.45
-      - Size: 1.7
-        Bold: 0
-        Underline: 0
-        Case: 0
-        VerticalSpacing: 0.3
-      - Size: 1.5
-        Bold: 0
-        Underline: 0
-        Case: 0
-        VerticalSpacing: 0
-      - Size: 1.3
-        Bold: 0
-        Underline: 0
-        Case: 0
-        VerticalSpacing: 0
-    Superscript:
-      RenderSuperscript: 0
-      RenderChainSuperscript: 1
 --- !u!1 &1608603916
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,6 +11,7 @@ public unsafe class VersusStageData : AssetObject {
 
     //---Serialized
     [Header("-- Information")]
+    public bool ShowAuthorAndComposer;
     public string StageAuthor;
     public string MusicComposer;
     public string TranslationKey;

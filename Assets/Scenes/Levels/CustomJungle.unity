@@ -676,7 +676,8 @@ PrefabInstance:
         type: 3}
       propertyPath: Asset
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: 44e13c15080ad0c4eb6de49738be371f,
+        type: 2}
     - target: {fileID: 7682502346014357760, guid: dcdc633a29f212843ae9cbdf4be58fb2,
         type: 3}
       propertyPath: AssetRef.Id.Value
