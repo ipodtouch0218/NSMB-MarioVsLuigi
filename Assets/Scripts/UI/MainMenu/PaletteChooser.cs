@@ -38,19 +38,19 @@ namespace NSMB.UI.MainMenu {
                 return;
             }
 
-            PaletteSet[] colors = ScriptableManager.Instance.skins;
+            AssetRef<PaletteSet>[] palettes = GlobalController.Instance.config.Palettes;
 
-            for (int i = 0; i < colors.Length; i++) {
-                PaletteSet color = colors[i];
+            for (int i = 0; i < palettes.Length; i++) {
+                PaletteSet palette = QuantumUnityDB.GetGlobalAsset(palettes[i]);
 
                 GameObject newButton = Instantiate(template, template.transform.parent);
                 PaletteButton cb = newButton.GetComponent<PaletteButton>();
                 paletteButtons.Add(cb);
-                cb.palette = color;
+                cb.palette = palette;
 
                 Button b = newButton.GetComponent<Button>();
-                newButton.name = color ? color.name : "Reset";
-                if (color == null) {
+                newButton.name = palette ? palette.name : "Reset";
+                if (!palette) {
                     b.image.sprite = clearSprite;
                 }
 
@@ -95,17 +95,18 @@ namespace NSMB.UI.MainMenu {
 
         public void ChangePaletteButton(int index) {
             selected = index;
-            PaletteSet[] palettes = ScriptableManager.Instance.skins;
+            AssetRef<PaletteSet>[] palettes = GlobalController.Instance.config.Palettes;
             PaletteSet palette = null;
+
             if (index >= 0 && index < palettes.Length) {
-                palette = palettes[index];
+                palette = QuantumUnityDB.GetGlobalAsset(palettes[index]);
             }
 
             if (palette) {
                 overallsImage.enabled = true;
-                overallsImage.color = palette.GetPaletteForCharacter(character).overallsColor;
+                overallsImage.color = palette.GetPaletteForCharacter(character).OverallsColor.AsColor;
                 shirtImage.enabled = true;
-                shirtImage.color = palette.GetPaletteForCharacter(character).shirtColor;
+                shirtImage.color = palette.GetPaletteForCharacter(character).ShirtColor.AsColor;
                 baseImage.sprite = baseSprite;
             } else {
                 overallsImage.enabled = false;

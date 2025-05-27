@@ -25,7 +25,6 @@ public class BigStarAnimator : QuantumEntityViewComponent {
 
     //--Private Variables
     private float pulseEffectCounter;
-    private bool stationary;
 
     public void OnValidate() {
         this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
@@ -39,11 +38,10 @@ public class BigStarAnimator : QuantumEntityViewComponent {
 
         graphicTransform.rotation = Quaternion.identity;
         sRenderer.enabled = true;
-        stationary = star->IsStationary;
         if (f.Global->GameState == GameState.Playing && !NetworkHandler.IsReplayFastForwarding) {
             sfx2.PlayOneShot(SoundEffect.World_Star_Spawn);
         }
-        if (stationary) {
+        if (star->IsStationary) {
             legacyAnimation.Play();
         }
 
@@ -67,16 +65,18 @@ public class BigStarAnimator : QuantumEntityViewComponent {
 
         var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
 
-        if (stationary) {
+        if (star->IsStationary) {
             pulseEffectCounter += Time.deltaTime;
             float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
-            graphicTransform.localScale = Vector3.one * 3f + new Vector3(sin, sin, 0);
+            graphicTransform.localScale = Vector3.one + new Vector3(sin, sin, 0);
             sRenderer.enabled = true;
-        } else if (!stationary) {
+        } else {
+            graphicTransform.localScale = Vector3.one;
             graphicTransform.Rotate(new(0, 0, rotationSpeed * 30 * (star->FacingRight ? -1 : 1) * Time.deltaTime), Space.Self);
             float timeRemaining = star->Lifetime / 60f;
             sRenderer.enabled = !(timeRemaining < 5 && timeRemaining * 2 % (blinkingSpeed * 2) < blinkingSpeed);
             sRenderer.color = star->UncollectableFrames > 0 ? uncollectableColor : Color.white;
+            legacyAnimation.Stop();
         }
     }
 }

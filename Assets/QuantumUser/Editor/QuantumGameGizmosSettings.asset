@@ -15,6 +15,14 @@ MonoBehaviour:
   Settings:
     IconScale: 1
     SelectedBrightness: 1.1
+    DebugDraw:
+      Enabled: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Scale: 0
+      OnlyDrawSelected:
+        _value: 0
+      DisableFill:
+        _value: 0
     PredictionArea:
       Enabled: 1
       Color: {r: 1, g: 0, b: 0, a: 0.5}

@@ -16,15 +16,20 @@ namespace NSMB.UI.Game.Track {
             this.SetIfNull(ref animator);
         }
 
-        public void Start() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
-            var star = f.Unsafe.GetPointer<BigStar>(targetEntity);
+        public override void OnUpdateView() {
+            base.OnUpdateView();
 
-            if (star->IsStationary) {
-                animator.enabled = true;
-                transform.localScale = Vector3.zero;
+            if (PredictedFrame.Unsafe.TryGetPointer(targetEntity, out BigStar* star)) {
+                if (star->IsStationary) {
+                    animator.enabled = true;
+                    transform.localScale = Vector3.zero;
+                } else {
+                    animator.enabled = false;
+                    transform.localScale = ThreeFourths;
+                }
+                image.enabled = true;
             } else {
-                transform.localScale = ThreeFourths;
+                image.enabled = false;
             }
         }
     }

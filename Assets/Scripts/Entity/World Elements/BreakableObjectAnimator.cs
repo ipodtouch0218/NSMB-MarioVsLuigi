@@ -9,12 +9,17 @@ public unsafe class BreakableObjectAnimator : QuantumEntityViewComponent {
     [SerializeField] private Sprite unbrokenSprite, brokenSprite;
     [SerializeField] private SimplePhysicsMover breakPrefab;
 
+    //---Private Variables
+    private SimplePhysicsMover activeParticle;
+    private EventKey currentEventKey;
+
     public void OnValidate() {
         this.SetIfNull(ref sRenderer);
     }
 
     public virtual void Start() {
         QuantumEvent.Subscribe<EventBreakableObjectBroken>(this, OnBreakableObjectBroken, NetworkHandler.FilterOutReplayFastForward);
+        QuantumCallback.Subscribe<CallbackEventCanceled>(this, OnEventCanceled);
     }
 
     public override unsafe void OnUpdateView() {
@@ -50,7 +55,19 @@ public unsafe class BreakableObjectAnimator : QuantumEntityViewComponent {
         float angularVelocity = (a.x * b.y) - (b.x * a.y);
         particle.angularVelocity = angularVelocity * -(400f/5);
 
+        activeParticle = particle;
+        currentEventKey = e;
         Destroy(particle.gameObject, 3f);
+    }
+
+    private void OnEventCanceled(CallbackEventCanceled e) {
+        if (!e.EventKey.Equals(currentEventKey)) {
+            return;
+        }
+
+        if (activeParticle && activeParticle.gameObject) {
+            Destroy(activeParticle.gameObject);
+        }
     }
 
 #if UNITY_EDITOR

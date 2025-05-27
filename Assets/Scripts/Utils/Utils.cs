@@ -175,20 +175,39 @@ namespace NSMB.Utils {
             }
 
             // Then id based color
-            PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
             int ourIndex = 0;
             int totalPlayers = 0;
+            if (f.Global->GameState == GameState.PreGameRoom) {
+                // use PlayerData here
+                PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
 
-            var playerFilter = f.Filter<PlayerData>();
-            playerFilter.UseCulling = false;
-            while (playerFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
-                if (otherPlayerData->IsSpectator) {
-                    continue;
+                var playerFilter = f.Filter<PlayerData>();
+                playerFilter.UseCulling = false;
+                while (playerFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
+                    if (otherPlayerData->IsSpectator) {
+                        continue;
+                    }
+
+                    totalPlayers++;
+                    if (otherPlayerData->JoinTick < ourPlayerData->JoinTick) {
+                        ourIndex++;
+                    }
+                }
+            } else {
+                // use PlayerInformation here
+                ourIndex = -1;
+                totalPlayers = f.Global->RealPlayers;
+                var playerInfos = f.Global->PlayerInfo;
+                for (int i = 0; i < totalPlayers; i++) {
+                    if (playerInfos[i].PlayerRef == player) {
+                        ourIndex = i;
+                        break;
+                    }
                 }
 
-                totalPlayers++;
-                if (otherPlayerData->JoinTick < ourPlayerData->JoinTick) {
-                    ourIndex++;
+                if (ourIndex == -1) {
+                    // Spectator
+                    return spectatorColor;
                 }
             }
 

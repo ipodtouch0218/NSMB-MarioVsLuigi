@@ -166,11 +166,11 @@ namespace NSMB.Entities.Player {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
 
             var playerData = QuantumUtils.GetPlayerData(f, mario->PlayerRef);
-            var skins = ScriptableManager.Instance.skins;
-            int skinIndex = Mathf.Clamp(playerData != null ? playerData->Palette : 0, 0, skins.Length - 1);
+            var palettes = GlobalController.Instance.config.Palettes;
+            int paletteIndex = Mathf.Clamp(playerData != null ? playerData->Palette : 0, 0, palettes.Length - 1);
 
-            if (skins[skinIndex] is PaletteSet colorSet) {
-                skin = colorSet.GetPaletteForCharacter(character);
+            if (QuantumUnityDB.TryGetGlobalAsset(palettes[paletteIndex], out var paletteSet)) {
+                skin = paletteSet.GetPaletteForCharacter(character);
             }
 
             GlowColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
@@ -592,9 +592,9 @@ namespace NSMB.Entities.Player {
             materialBlock = new();
 
             // Customizable player color
-            materialBlock.SetVector(ParamOverallsColor, skin?.overallsColor.linear ?? Color.clear);
-            materialBlock.SetVector(ParamShirtColor, skin?.shirtColor != null ? skin.shirtColor.linear : Color.clear);
-            materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.hatUsesOverallsColor ?? false) ? 1 : 0);
+            materialBlock.SetVector(ParamOverallsColor, skin?.OverallsColor.AsColor.linear ?? Color.clear);
+            materialBlock.SetVector(ParamShirtColor, skin?.ShirtColor != null ? skin.ShirtColor.AsColor.linear : Color.clear);
+            materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.HatUsesOverallsColor ?? false) ? 1 : 0);
         }
 
         private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {

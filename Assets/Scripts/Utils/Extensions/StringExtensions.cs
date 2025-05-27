@@ -21,7 +21,7 @@ namespace NSMB.Utils {
                 return false;
             }
 
-            UsernameRegex ??= $"^[0-9A-Za-z]{{{NicknameMin},{NicknameMax}}}";
+            UsernameRegex ??= $"^[\\w]{{{NicknameMin},{NicknameMax}}}";
             return Regex.IsMatch(input, UsernameRegex);
         }
 
@@ -29,7 +29,7 @@ namespace NSMB.Utils {
             input ??= "";
 
             // Valid characters
-            input = Regex.Replace(input, @"[^A-Za-z0-9]", "");
+            input = Regex.Replace(input, @"[^\w]", "");
 
             // Name character maximum
             input = input[..Mathf.Min(input.Length, NicknameMax)];

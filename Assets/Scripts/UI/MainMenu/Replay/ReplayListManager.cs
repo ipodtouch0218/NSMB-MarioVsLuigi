@@ -345,11 +345,11 @@ public class ReplayListManager : Selectable {
         headers.Clear();
         string previousHeader = null;
         foreach (var replay in replays) {
-            string currentHeader = "- " + GetHeader(replay) + " -";
+            string currentHeader = GetHeader(replay);
             if (previousHeader != currentHeader && currentHeader != null) {
                 TMP_Text newHeader = Instantiate(headerTemplate, headerTemplate.transform.parent);
                 newHeader.gameObject.SetActive(true);
-                newHeader.text = currentHeader;
+                newHeader.text = $"- {currentHeader} -";
 
                 headers.Add(newHeader); 
             }

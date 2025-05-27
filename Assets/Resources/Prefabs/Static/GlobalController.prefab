@@ -15973,7 +15973,6 @@ GameObject:
   m_Component:
   - component: {fileID: 872951940700544769}
   - component: {fileID: 4494389995658572530}
-  - component: {fileID: 7169378182498397569}
   - component: {fileID: 1217248114408797113}
   - component: {fileID: 6974483067213173336}
   - component: {fileID: 405963795238578845}
@@ -16068,55 +16067,12 @@ MonoBehaviour:
   optionsManager: {fileID: 6650708626366051462}
   outlineFeature: {fileID: 8738572190042607270, guid: 5f58d6b1c480f4b4f9c77b6264ddfa5b,
     type: 2}
-  fourByThreeImage: {fileID: 0}
-  anyAspectImage: {fileID: 0}
   graphy: {fileID: 3294752702581592890}
   connecting: {fileID: 8037377025181158649}
   loadingCanvas: {fileID: 8956540992486063079}
   fullscreenFadeImage: {fileID: 8865099243651785905}
   sfx: {fileID: 405963795238578845}
-  checkedForVersion: 0
-  firstConnection: 0
-  windowWidth: 0
-  windowHeight: 0
   mixer: {fileID: 24100000, guid: b73add24eb026c844b85593f8bab1f8c, type: 2}
---- !u!114 &7169378182498397569
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4938254683282774592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3edd7125116ee9545a0159eb376163fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skins:
-  - {fileID: 0}
-  - {fileID: 11400000, guid: f63a082ed1de1ac46a4d175774638d5a, type: 2}
-  - {fileID: 11400000, guid: 8af1f8b5ba79cd049815d2650240b98c, type: 2}
-  - {fileID: 11400000, guid: b64a87dbaa8184d4b865712efee298f4, type: 2}
-  - {fileID: 11400000, guid: 49daddea50a684d4a90c97b006f72d5d, type: 2}
-  - {fileID: 11400000, guid: 6dac31169dec15444bae7e4839c1d015, type: 2}
-  - {fileID: 11400000, guid: 9f9900ffd217e0045bdcd9ea3a2d34aa, type: 2}
-  - {fileID: 11400000, guid: 6515d3ef9d0c3bd43ac4e3929756e63d, type: 2}
-  - {fileID: 11400000, guid: de9f9a7f672095f44a57282c61d019ae, type: 2}
-  - {fileID: 11400000, guid: f83e89891288e5e478a5a58f234378b7, type: 2}
-  - {fileID: 11400000, guid: 60d3730ab1b17f644bbb11fc34ea6a27, type: 2}
-  - {fileID: 11400000, guid: cac922f297f268e449a78c6771201040, type: 2}
-  - {fileID: 11400000, guid: a8c174de2dd567e42ab2dc347d0d049b, type: 2}
-  - {fileID: 11400000, guid: 8bafc3c7840b969449455cc52e12a5b0, type: 2}
-  - {fileID: 11400000, guid: 90095050131f1f24589e75ffe7755bba, type: 2}
-  - {fileID: 11400000, guid: b4869f2279eca3d4492309f6333b6e77, type: 2}
-  - {fileID: 11400000, guid: dad94b67e7d7bc548a6f59716db157d2, type: 2}
-  - {fileID: 11400000, guid: df93808b9a7f2cd4faa25234bc48b4c1, type: 2}
-  - {fileID: 11400000, guid: edcd276a8acb45a46948d7f46b3acc57, type: 2}
-  - {fileID: 11400000, guid: 3211edc9ee1951f4780bd104a9fbd597, type: 2}
-  - {fileID: 11400000, guid: 245cea6ccab8e0d47a215ef6df104e09, type: 2}
-  - {fileID: 11400000, guid: 2ea8c39849fd3704cb659e2d4ef905c3, type: 2}
-  - {fileID: 11400000, guid: 080293b8f6a11c5438f0703a4c9a77b5, type: 2}
-  - {fileID: 11400000, guid: 222d170caee45db4090ed4bb3fb53965, type: 2}
 --- !u!114 &1217248114408797113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27288,7 +27244,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22.95
+  m_fontSize: 23.15
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

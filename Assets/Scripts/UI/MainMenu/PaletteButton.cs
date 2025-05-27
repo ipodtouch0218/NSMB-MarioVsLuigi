@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using Quantum;
 
 public class PaletteButton : MonoBehaviour, ISelectHandler {
 
@@ -14,8 +15,7 @@ public class PaletteButton : MonoBehaviour, ISelectHandler {
 
     public void Instantiate(CharacterAsset player) {
         if (palette == null) {
-            if (shirt && overalls)
-            {
+            if (shirt && overalls) {
                 Destroy(shirt.gameObject);
                 Destroy(overalls.gameObject);
             }
@@ -23,15 +23,19 @@ public class PaletteButton : MonoBehaviour, ISelectHandler {
         }
 
         CharacterSpecificPalette col = palette.GetPaletteForCharacter(player);
-        shirt.color = col.shirtColor;
-        overalls.color = col.overallsColor;
+        shirt.color = col.ShirtColor.AsColor;
+        overalls.color = col.OverallsColor.AsColor;
     }
 
     public void OnSelect(BaseEventData eventData) {
-        colorNameString.text = palette ? palette.Name : GlobalController.Instance.translationManager.GetTranslation("skin.default");
+        UpdateLabel();
     }
 
     public void OnPress() {
-        colorNameString.text = palette ? palette.Name : GlobalController.Instance.translationManager.GetTranslation("skin.default");
+        UpdateLabel();
+    }
+
+    private void UpdateLabel() {
+        colorNameString.text = GlobalController.Instance.translationManager.GetTranslation(palette ? palette.translationKey : "skin.default");
     }
 }

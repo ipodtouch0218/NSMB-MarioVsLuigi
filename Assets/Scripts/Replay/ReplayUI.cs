@@ -4,17 +4,14 @@ using NSMB.UI.Game;
 using NSMB.UI.Pause;
 using NSMB.Utils;
 using Quantum;
-using Quantum.Core;
 using System.Collections;
 using System.Reflection;
 using System.Text;
 using TMPro;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using static Quantum.FPAnimationCurve;
 
 public class ReplayUI : QuantumSceneViewComponent {
 
