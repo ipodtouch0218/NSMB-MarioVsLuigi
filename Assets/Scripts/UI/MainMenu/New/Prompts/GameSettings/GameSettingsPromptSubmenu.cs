@@ -20,6 +20,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             set {
                 roomIdLabel.text = value ? NetworkHandler.Client.CurrentRoom.Name : GlobalController.Instance.translationManager.GetTranslation("ui.inroom.settings.room.roomid.hidden");
                 _roomIdVisible = value;
+                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) roomIdLabel.transform.parent);
             }
         }
         public override GameObject BackButton => tabs[activeTab].BackButton;
@@ -278,6 +279,14 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public void RoomIdClicked() {
             RoomIdVisible = !RoomIdVisible;
             Canvas.PlayCursorSound();
+        }
+
+        public void CopyRoomIdClicked() {
+            TextEditor te = new TextEditor();
+            te.text = NetworkHandler.Client.CurrentRoom.Name;
+            te.SelectAll();
+            te.Copy();
+            Canvas.PlayConfirmSound();
         }
 
         public void OnPlayerEnteredRoom(Player newPlayer) { }

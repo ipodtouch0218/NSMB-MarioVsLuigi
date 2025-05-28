@@ -1,4 +1,6 @@
 using NSMB.Extensions;
+using Quantum;
+using Quantum.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,6 +9,7 @@ public class ShowOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     //---Serialized Variables
     [SerializeField] private Canvas parentCanvas;
     [SerializeField] private GameObject objectToShow;
+    [SerializeField] private bool followCursor = true;
     [SerializeField] private Vector2 offset;
 
     public void OnValidate() {
@@ -26,7 +29,7 @@ public class ShowOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
 
     public void Update() {
-        if (objectToShow && objectToShow.activeInHierarchy) {
+        if (objectToShow && objectToShow.activeInHierarchy && followCursor) {
             objectToShow.transform.position = Settings.Controls.UI.Point.ReadValue<Vector2>() + offset;
         }
     }

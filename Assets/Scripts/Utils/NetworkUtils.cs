@@ -14,11 +14,11 @@ namespace NSMB.Utils {
         public static Dictionary<short, string> RealtimeErrorCodes = new() {
             [ErrorCode.CustomAuthenticationFailed] = "ui.error.authentication",
             [ErrorCode.MaxCcuReached] = "ui.error.ccu",
-
             [ErrorCode.GameDoesNotExist] = "ui.error.join.notfound",
             [ErrorCode.GameClosed] = "ui.error.join.closed",
             [ErrorCode.GameFull] = "ui.error.join.full",
             [ErrorCode.JoinFailedFoundActiveJoiner] = "ui.error.join.alreadyingame",
+            [ErrorCode.JoinFailedPeerAlreadyJoined] = "ui.error.join.alreadyingame",
         };
 
         public static Dictionary<DisconnectCause, string> RealtimeDisconnectCauses = new() {

@@ -2080,6 +2080,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: copy
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 243
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: acd6ac46f256cf047aac4a6655ba9e91
+      internalID: -1032943485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -2113,6 +2135,7 @@ TextureImporter:
       connection_good: -1507071055
       connection_great: 1763873500
       connection_host: -1762235557
+      copy: -1032943485
       dpad_button: -1771438400
       dropdown_arrow: -2027879749
       hud_luigi: -7975249404588759376

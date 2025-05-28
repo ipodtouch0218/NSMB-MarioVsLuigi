@@ -1,11 +1,28 @@
 using Photon.Deterministic;
+using Quantum.Task;
 
 namespace Quantum {
-    public unsafe class MvLCullingSystem : SystemMainThread {
-        public override void Update(Frame f) {
-            f.ClearCulledState();
-            VersusStageData stage;
-            if (f.IsVerified || f.Context.CullingCameraPositions.Count <= 0 || f.Map == null || (stage = f.FindAsset<VersusStageData>(f.Map.UserAsset)) == null) {
+    public unsafe class MvLCullingSystem : SystemBase {
+
+        private TaskDelegateHandle updateTaskHandle;
+
+        protected override TaskHandle Schedule(Frame f, TaskHandle taskHandle) {
+            if (f.IsVerified || f.ComponentCount<Cullable>() == 0 || f.Context.CullingCameraPositions.Count <= 0 || f.Map == null) {
+                return taskHandle;
+            }
+
+            if (!updateTaskHandle.IsValid) {
+                f.Context.TaskContext.RegisterDelegate(UpdateTask, $"{GetType().Name}.UpdateTask", ref updateTaskHandle);
+            }
+
+            return f.Context.TaskContext.AddMainThreadTask(updateTaskHandle, null, taskHandle);
+        }
+
+        public void UpdateTask(FrameThreadSafe fts, int off, int count, void* args) {
+            Frame f = (Frame) fts;
+
+            VersusStageData stage = stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            if (stage == null) {
                 return;
             }
 
