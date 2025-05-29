@@ -39,9 +39,9 @@ namespace NSMB.Utils {
                     Capture mainCapture = match.Captures[0];
 
                     result.Remove(mainCapture.Index, mainCapture.Length);
-                    result.Insert(mainCapture.Index, "***");
+                    result.Insert(mainCapture.Index, "*", mainCapture.Length);
                     filtered.Remove(mainCapture.Index, mainCapture.Length);
-                    filtered.Insert(mainCapture.Index, "***");
+                    filtered.Insert(mainCapture.Index, "*", mainCapture.Length);
                 }
             }
 

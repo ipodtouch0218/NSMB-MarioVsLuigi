@@ -15,13 +15,12 @@ namespace NSMB.Utils {
             return input;
         }
 
-        private static string UsernameRegex = null;
+        private static readonly string UsernameRegex = $"^[\\w]{{{NicknameMin},{NicknameMax}}}";
         public static bool IsValidUsername(this string input) {
             if (input == null) {
                 return false;
             }
 
-            UsernameRegex ??= $"^[\\w]{{{NicknameMin},{NicknameMax}}}";
             return Regex.IsMatch(input, UsernameRegex);
         }
 

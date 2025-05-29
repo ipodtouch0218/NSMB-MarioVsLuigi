@@ -32727,6 +32727,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentCanvas: {fileID: 2030938838}
   objectToShow: {fileID: 1890072590}
+  followCursor: 1
   offset: {x: 6, y: 0}
 --- !u!1 &820690677
 GameObject:
@@ -46865,7 +46866,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.81573784
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -82337,7 +82338,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -22.600006}
-  m_SizeDelta: {x: 406.2964, y: 0}
+  m_SizeDelta: {x: 406.42084, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -83280,7 +83281,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000015258789}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1576260155
@@ -88429,6 +88430,7 @@ GameObject:
   - component: {fileID: 1657840393}
   - component: {fileID: 1657840395}
   - component: {fileID: 1657840394}
+  - component: {fileID: 1657840396}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -88554,6 +88556,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1657840392}
   m_CullTransparentMesh: 0
+--- !u!114 &1657840396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657840392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.main.quit
+  text: {fileID: 1657840394}
 --- !u!1 &1658852699
 GameObject:
   m_ObjectHideFlags: 0
@@ -105232,6 +105248,7 @@ GameObject:
   - component: {fileID: 2038837711}
   - component: {fileID: 2038837710}
   - component: {fileID: 2038837709}
+  - component: {fileID: 2038837712}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -105357,6 +105374,20 @@ RectTransform:
   m_AnchoredPosition: {x: 12.002014, y: 2}
   m_SizeDelta: {x: -24, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2038837712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038837708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.main.about
+  text: {fileID: 2038837709}
 --- !u!1 &2040720865
 GameObject:
   m_ObjectHideFlags: 0

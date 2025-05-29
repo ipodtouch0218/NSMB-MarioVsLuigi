@@ -242,7 +242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 355ab346dbbd7cc42b7387d789f091c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pulseAmount: 0.15
+  pulseAmount: 0.05
   pulseSpeed: 16
   rotationSpeed: 6
   blinkingSpeed: 0.25

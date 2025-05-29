@@ -152,6 +152,9 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
             return;
         }
 #endif
+        if (!gameObject.activeInHierarchy) {
+            return;
+        }
         UpdateLabel();
         leftArrow.enabled = Editing && CanDecreaseValue;
         rightArrow.enabled = Editing && CanIncreaseValue;

@@ -4,6 +4,7 @@ ipodtouch0218
 
 <color=yellow>{ui.about.credits.github}</color>
 Amy54Desu
+AprilShade
 ArianLust
 AtwerJ
 Ave
@@ -22,7 +23,6 @@ mindnomad
 Pordrack
 skarph
 Skillz
-ShadowWalker
 TheMoogle
 Tombuntu
 xFrostyCake123
@@ -37,36 +37,47 @@ LiamNayru
 vincells
 
 <color=yellow>{ui.about.credits.translation}</color>
-3UP
-Akselai
-AtwerJ
-Bilhal
-Cecilia
-Davo
-Filipianosol
-Flandre Scarlet
-Flichka
-Freeze
-HatsuneMiku
-haywireghost
-HD Erick Games
-Hyruyoshi
-Iketarou
-Kate Karui
-Lyroy The Toad
-marbo
-Mark19
-MasterMindo
-Med Animations
-miyavmeow
-Mr-STF
-ossdekasaihassei
-Shadow_Walker13
-Snick, It's Him.
-Thebababois369
-Tombuntu
-Windows10V
-vlco_o
+3UP <color=#AAAAAA>(ja-jp)</color>
+6Alexis8 <color=#AAAAAA>(fr-fr)</color>
+Akselai <color=#AAAAAA>(zh-cn, zh-tw)</color>
+Aktan <color=#AAAAAA>(de-de)</color>
+AprilShade <color=#AAAAAA>(en-gb)</color>
+ArianLust <color=#AAAAAA>(de-de)</color>
+AtwerJ <color=#AAAAAA>(fr-FR)</color>
+Bilhal <color=#AAAAAA>(el-gr)</color>
+Cecilia <color=#AAAAAA>(es-es)</color>
+Davodio <color=#AAAAAA>(de-de)</color>
+Filipianosol <color=#AAAAAA>(pl-pl)</color>
+Floofdoge <color=#AAAAAA>(ar-eg)</color>
+Foxyyy <color=#AAAAAA>(es-la)</color>
+Freeze <color=#AAAAAA>(es-la)</color>
+HatsuneMiku <color=#AAAAAA>(pl-pl)</color>
+haywireghost <color=#AAAAAA>(es-la)</color>
+HD Erick Games <color=#AAAAAA>(pt-br)</color>
+Hyruyoshi <color=#AAAAAA>(fr-fr)</color>
+ibroekmahphone <color=#AAAAAA>(ru-ru)</color>
+Iketarou <color=#AAAAAA>(ja-jp)</color>
+IvythePoS <color=#AAAAAA>(es-la)</color>
+Kate Karui <color=#AAAAAA>(sv-sv)</color>
+Lyroy The Toad <color=#AAAAAA>(it-it)</color>
+Maestrike <color=#AAAAAA>(it-it)</color>
+marbo <color=#AAAAAA>(pt-br)</color>
+Mark19 <color=#AAAAAA>(es-es)</color>
+MasterMindo <color=#AAAAAA>(it-it)</color>
+Med Animations <color=#AAAAAA>(ar-eg)</color>
+Meddourk95 <color=#AAAAAA>(ar-eg)</color>
+Moddimation <color=#AAAAAA>(de-de)</color>
+miyavmeow <color=#AAAAAA>(tr-tr)</color>
+Mr-STF <color=#AAAAAA>(es-la)</color>
+notossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
+ossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
+SadenceZinzap <color=#AAAAAA>(tr-tr)</color>
+SLG64 <color=#AAAAAA>(es-la)</color>
+Snayp <color=#AAAAAA>(fr-fr)</color>
+Thebababois369 <color=#AAAAAA>(id-id)</color>
+Tombuntu <color=#AAAAAA>(ja-jp)</color>
+Windows10V <color=#AAAAAA>(pt-br)</color>
+vlco_o <color=#AAAAAA>(es-es, ro-ro)</color>
 
 <color=yellow>{ui.about.credits.qa}</color>
 Ave
@@ -74,6 +85,7 @@ CreativeGhost
 Cubby Crazes
 Fawndue
 Grape
+MiiBumm
 mindnomad
 Shadow_Walker13
 TheCyVap
