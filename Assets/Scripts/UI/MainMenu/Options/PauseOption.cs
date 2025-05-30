@@ -50,11 +50,7 @@ namespace NSMB.UI.Pause.Options {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
-        private void OnLanguageChanged(TranslationManager tm) {
-            UpdateLabel();
-        }
-
-        public void UpdateLabel() {
+        public virtual void UpdateLabel() {
             if (!label) {
                 return;
             }
@@ -64,6 +60,7 @@ namespace NSMB.UI.Pause.Options {
             } else {
                 label.text = GetTranslatedString();
             }
+            label.horizontalAlignment = GlobalController.Instance.translationManager.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
         public virtual void Selected() {
@@ -76,14 +73,18 @@ namespace NSMB.UI.Pause.Options {
             UpdateLabel();
         }
 
+        private string GetTranslatedString() {
+            return GlobalController.Instance.translationManager.GetTranslation(translationKey);
+        }
+
         public virtual void OnClick() { }
         public virtual void OnLeftPress() { }
         public virtual void OnLeftHeld() { }
         public virtual void OnRightPress() { }
         public virtual void OnRightHeld() { }
 
-        private string GetTranslatedString() {
-            return GlobalController.Instance.translationManager.GetTranslation(translationKey);
+        private void OnLanguageChanged(TranslationManager tm) {
+            UpdateLabel();
         }
     }
 }

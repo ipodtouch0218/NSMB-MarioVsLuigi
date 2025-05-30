@@ -93,7 +93,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Aktan *(de-de)*
 * AprilShade *(en-gb)*
 * ArianLust *(de-de)*
-* AtwerJ *(fr-FR)*
+* Atwer *(fr-FR)*
 * Bilhal *(el-gr)*
 * Cecilia *(es-es)*
 * Davodio *(de-de)*
@@ -119,8 +119,10 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Moddimation *(de-de)*
 * miyavmeow *(tr-tr)*
 * Mr-STF *(es-la)*
+* MUI_Noam *(he-il)*
 * notossdekasaihassei *(ja-jp)*
 * ossdekasaihassei *(ja-jp)*
+* pixelated *(he-il)*
 * SadenceZinzap *(tr-tr)*
 * SLG64 *(es-la)*
 * Snayp *(fr-fr)*

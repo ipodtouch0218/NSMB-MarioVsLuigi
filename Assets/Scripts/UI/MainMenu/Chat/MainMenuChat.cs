@@ -149,6 +149,7 @@ namespace NSMB.UI.MainMenu {
             }
 
             chatPrompt.text = tm.GetTranslation(key);
+            chatPrompt.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
         public void OnTextboxChanged() {

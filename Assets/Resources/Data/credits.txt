@@ -1,4 +1,3 @@
-
 <color=yellow>{ui.about.credits.gameby}</color>
 ipodtouch0218
 
@@ -43,7 +42,7 @@ Akselai <color=#AAAAAA>(zh-cn, zh-tw)</color>
 Aktan <color=#AAAAAA>(de-de)</color>
 AprilShade <color=#AAAAAA>(en-gb)</color>
 ArianLust <color=#AAAAAA>(de-de)</color>
-AtwerJ <color=#AAAAAA>(fr-FR)</color>
+Atwer <color=#AAAAAA>(fr-FR)</color>
 Bilhal <color=#AAAAAA>(el-gr)</color>
 Cecilia <color=#AAAAAA>(es-es)</color>
 Davodio <color=#AAAAAA>(de-de)</color>
@@ -69,8 +68,10 @@ Meddourk95 <color=#AAAAAA>(ar-eg)</color>
 Moddimation <color=#AAAAAA>(de-de)</color>
 miyavmeow <color=#AAAAAA>(tr-tr)</color>
 Mr-STF <color=#AAAAAA>(es-la)</color>
+MUI_Noam <color=#AAAAAA>(he-il)</color>
 notossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
 ossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
+pixelated <color=#AAAAAA>(he-il)</color>
 SadenceZinzap <color=#AAAAAA>(tr-tr)</color>
 SLG64 <color=#AAAAAA>(es-la)</color>
 Snayp <color=#AAAAAA>(fr-fr)</color>

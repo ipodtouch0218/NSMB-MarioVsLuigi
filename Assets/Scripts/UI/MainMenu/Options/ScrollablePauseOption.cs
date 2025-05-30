@@ -21,8 +21,9 @@ namespace NSMB.UI.Pause.Options {
 
         public override void Awake() {
             base.Awake();
-            if (!loader)
+            if (!loader) {
                 SetValue(0, false);
+            }
         }
 
         public override void Selected() {
@@ -42,19 +43,26 @@ namespace NSMB.UI.Pause.Options {
             int previous = value;
             value = Mathf.Clamp(newIndex, 0, options.Count - 1);
 
-            display.text = options.Count > 0 ? options[value] : GlobalController.Instance.translationManager.GetTranslation("ui.generic.none");
-            //display.isRightToLeftText = options.Count > 0 ? GlobalController.Instance.translationManager.RightToLeft : false;
             leftButton.interactable = value != 0;
             rightButton.interactable = value != options.Count - 1;
 
             if (callback && previous != value) {
                 OnValueChanged?.Invoke();
 
-                if (loader)
+                if (loader) {
                     loader.OnValueChanged(this, value);
+                }
 
                 Settings.Instance.SaveSettings();
             }
+
+            UpdateLabel();
+        }
+
+        public override void UpdateLabel() {
+            base.UpdateLabel();
+
+            display.text = options.Count > 0 ? options[value] : GlobalController.Instance.translationManager.GetTranslation("ui.generic.none");
         }
     }
 }

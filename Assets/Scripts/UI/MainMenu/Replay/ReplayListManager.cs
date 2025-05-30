@@ -200,7 +200,9 @@ public class ReplayListManager : Selectable {
                 noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
             }
         }
+        int index = replays.IndexOf(replay);
         replays.Remove(replay);
+        SortReplays(index);
     }
 
     public void FindReplays() {
@@ -319,7 +321,7 @@ public class ReplayListManager : Selectable {
         }
     }
 
-    public void UpdateReplayNavigation() {
+    public void UpdateReplayNavigation(int? selectIndex = null) {
         ReplayListEntry previous = null;
         foreach (var replay in replays) {
             if (!replay.gameObject.activeSelf) {
@@ -329,11 +331,15 @@ public class ReplayListManager : Selectable {
             replay.UpdateNavigation(previous);
             previous = replay;
         }
-        Select(null, false);
-        scrollRect.verticalNormalizedPosition = 1;
+        if (selectIndex.HasValue && replays.Count > 0) {
+            Select(replays[Mathf.Clamp(selectIndex.Value, 0, replays.Count -1 )], true);
+        } else {
+            Select(null, false);
+            scrollRect.verticalNormalizedPosition = 1;
+        }
     }
 
-    public void SortReplays() {
+    public void SortReplays(int? selectedIndex = null) {
         replays.Sort(sortIndex switch {
             1 => SortByName,
             2 => SortByStage,
@@ -359,7 +365,7 @@ public class ReplayListManager : Selectable {
         }
         hiddenReplaysText.transform.SetAsLastSibling();
         
-        UpdateReplayNavigation();
+        UpdateReplayNavigation(selectedIndex);
     }
 
     public void FilterReplays() {

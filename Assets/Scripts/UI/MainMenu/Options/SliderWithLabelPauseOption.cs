@@ -25,12 +25,13 @@ namespace NSMB.UI.Pause.Options {
             UpdateLabel(newValue);
         }
         private void UpdateLabel(float value) {
-            if (!string.IsNullOrEmpty(zeroOverride) && Mathf.Abs(value) < 0.01f)
-                valueLabel.text = zeroOverride;
-            else if (!string.IsNullOrEmpty(maxOverride) && Mathf.Abs(value - slider.maxValue) < 0.01f)
-                valueLabel.text = maxOverride;
-            else
+            if (!string.IsNullOrEmpty(zeroOverride) && Mathf.Abs(value) < 0.01f) {
+                valueLabel.text = GlobalController.Instance.translationManager.GetTranslation(zeroOverride);
+            } else if (!string.IsNullOrEmpty(maxOverride) && Mathf.Abs(value - slider.maxValue) < 0.01f) {
+                valueLabel.text = GlobalController.Instance.translationManager.GetTranslation(maxOverride);
+            } else {
                 valueLabel.text = (value * numberMultiplier).ToString(numberFormat);
+            }
         }
     }
 }

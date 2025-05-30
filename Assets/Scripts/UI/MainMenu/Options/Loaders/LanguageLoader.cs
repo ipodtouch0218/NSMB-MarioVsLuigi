@@ -19,7 +19,7 @@ namespace NSMB.UI.Pause.Loaders {
             spo.options.Clear();
             locales = GlobalController.Instance.translationManager.GetLocaleData();
             spo.options.AddRange(locales.Select(ld => {
-                return ld.Locale.ToLower().StartsWith("ar") ? ArabicSupport.ArabicFixer.Fix(ld.Name, false) : ld.Name;
+                return ld.RTL ? ArabicSupport.ArabicFixer.Fix(ld.Name, false) : ld.Name;
             }));
 
             string current = GlobalController.Instance.translationManager.CurrentLocale;
@@ -31,7 +31,7 @@ namespace NSMB.UI.Pause.Loaders {
             if (option is not ScrollablePauseOption spo) {
                 return;
             }
-
+            
             GlobalController.Instance.translationManager.ChangeLanguage(locales[spo.value].Locale);
             option.manager.RequireReconnect |= option.requireReconnect;
         }

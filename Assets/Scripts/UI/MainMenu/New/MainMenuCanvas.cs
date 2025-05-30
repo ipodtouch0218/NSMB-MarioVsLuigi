@@ -34,7 +34,6 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private GameObject header;
         [SerializeField] private Image headerImage;
         [SerializeField] private TMP_Text headerPath;
-        [SerializeField] private string headerSeparation;
 
         //---Private Variables
         private readonly List<MainMenuSubmenu> allSubmenus = new();
@@ -96,7 +95,11 @@ namespace NSMB.UI.MainMenu {
 
             bool showHeader = false;
             Color? newHeaderColor = null;
-            foreach (var menu in submenuStack) {
+
+            bool rtl = GlobalController.Instance.translationManager.RightToLeft;
+            IEnumerable<MainMenuSubmenu> submenus = rtl ? submenuStack.Reverse<MainMenuSubmenu>() : submenuStack;
+            string headerSeparation = rtl ? " < " : " > ";
+            foreach (var menu in submenus) {
                 showHeader |= menu.ShowHeader;
                 if (!string.IsNullOrEmpty(menu.Header)) {
                     builder.Append(menu.Header).Append(headerSeparation);
@@ -109,6 +112,7 @@ namespace NSMB.UI.MainMenu {
             if (builder.Length > 0) {
                 builder.Remove(builder.Length - headerSeparation.Length, headerSeparation.Length);
                 headerPath.text = builder.ToString();
+                headerPath.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
             }
 
             Color newColor = newHeaderColor ?? defaultHeaderColor;

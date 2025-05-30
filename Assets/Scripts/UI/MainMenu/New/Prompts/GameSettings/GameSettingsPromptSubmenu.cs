@@ -213,6 +213,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             ChangeTab(newTabIndex, activeTab != newTabIndex);
         }
 
+        public void AddTabWithSound(int increment) {
+            ChangeTabWithSound(activeTab + increment);
+        }
+
         public unsafe void ChangeTab(int newTabIndex, bool playSound) {
             if (newTabIndex < 0 || newTabIndex >= tabs.Count) {
                 return;

@@ -174,6 +174,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 startGameButton.interactable = !isHost || QuantumUtils.IsGameStartable(f);
                 if (isHost) {
                     startGameButtonText.text = tm.GetTranslation("ui.inroom.buttons.start");
+                    startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
                 } else {
                     // Check if we're readyed-up
                     bool ready;
@@ -185,6 +186,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                         ready = false;
                     }
                     startGameButtonText.text = tm.GetTranslation(ready ? "ui.inroom.buttons.unready" : "ui.inroom.buttons.readyup");
+                    startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
                 }
 
                 if (fadeMusicCoroutine != null) {
@@ -196,6 +198,7 @@ namespace NSMB.UI.MainMenu.Submenus {
                 // Starting
                 startGameButton.interactable = isHost;
                 startGameButtonText.text = tm.GetTranslationWithReplacements("ui.inroom.buttons.starting", "countdown", seconds.ToString());
+                startGameButtonText.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
 
                 if (seconds == 1) {
                     // Start fade

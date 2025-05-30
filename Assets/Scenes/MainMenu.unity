@@ -1624,6 +1624,7 @@ GameObject:
   - component: {fileID: 43467190}
   - component: {fileID: 43467189}
   - component: {fileID: 43467191}
+  - component: {fileID: 43467192}
   m_Layer: 5
   m_Name: Header
   m_TagString: Untagged
@@ -1769,12 +1770,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 252585805}
-        m_TargetAssemblyTypeName: InRoomMenu, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenu, Assembly-CSharp
         m_MethodName: SelectPanel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: InRoomPanel, Assembly-CSharp
+          m_ObjectArgument: {fileID: 305467052}
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenuPanel,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1783,6 +1785,20 @@ MonoBehaviour:
   Interactable: 1
   RepeatOnHold: 0
   OnRelease: 0
+--- !u!114 &43467192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 43467187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.inroom.headers.profile
+  text: {fileID: 43467189}
 --- !u!1 &45605789
 GameObject:
   m_ObjectHideFlags: 0
@@ -5791,7 +5807,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 228466977}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.1872695
+  m_Size: 0.18712199
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7098,7 +7114,7 @@ RectTransform:
   - {fileID: 972787655}
   m_Father: {fileID: 400640346}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.8127305}
+  m_AnchorMin: {x: 0, y: 0.812878}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 24, y: 20}
@@ -7267,7 +7283,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -10, y: 3052.53}
+  m_SizeDelta: {x: -10, y: 3054}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &238448607
 MonoBehaviour:
@@ -8861,6 +8877,7 @@ GameObject:
   - component: {fileID: 280243178}
   - component: {fileID: 280243180}
   - component: {fileID: 280243179}
+  - component: {fileID: 280243181}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -8986,6 +9003,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 280243177}
   m_CullTransparentMesh: 1
+--- !u!114 &280243181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 280243177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.inroom.settings.game.header
+  text: {fileID: 280243179}
 --- !u!1 &281110113
 GameObject:
   m_ObjectHideFlags: 0
@@ -10977,8 +11008,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 366.91364, y: -1526.265}
-  m_SizeDelta: {x: 703.8273, y: 3022.53}
+  m_AnchoredPosition: {x: 367.0174, y: -1527}
+  m_SizeDelta: {x: 704.0348, y: 3024}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &327174008
 MonoBehaviour:
@@ -12753,6 +12784,7 @@ GameObject:
   - component: {fileID: 364636659}
   - component: {fileID: 364636661}
   - component: {fileID: 364636660}
+  - component: {fileID: 364636662}
   m_Layer: 5
   m_Name: Header
   m_TagString: Untagged
@@ -12881,6 +12913,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 364636658}
   m_CullTransparentMesh: 1
+--- !u!114 &364636662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364636658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.inroom.settings.header
+  text: {fileID: 364636660}
 --- !u!1 &364950738
 GameObject:
   m_ObjectHideFlags: 0
@@ -24600,7 +24646,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &562389158
 RectTransform:
   m_ObjectHideFlags: 0
@@ -46866,7 +46912,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.81573784
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -53765,6 +53811,7 @@ GameObject:
   - component: {fileID: 1396152744}
   - component: {fileID: 1396152743}
   - component: {fileID: 1396152745}
+  - component: {fileID: 1396152746}
   m_Layer: 5
   m_Name: Header
   m_TagString: Untagged
@@ -53908,12 +53955,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 252585805}
-        m_TargetAssemblyTypeName: InRoomMenu, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenu, Assembly-CSharp
         m_MethodName: SelectPanel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: InRoomPanel, Assembly-CSharp
+          m_ObjectArgument: {fileID: 560333881}
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenuPanel,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -53922,6 +53970,20 @@ MonoBehaviour:
   Interactable: 1
   RepeatOnHold: 0
   OnRelease: 0
+--- !u!114 &1396152746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1396152741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.inroom.headers.players
+  text: {fileID: 1396152743}
 --- !u!1 &1399885732
 GameObject:
   m_ObjectHideFlags: 0
@@ -81577,6 +81639,7 @@ GameObject:
   - component: {fileID: 1514149608}
   - component: {fileID: 1514149610}
   - component: {fileID: 1514149609}
+  - component: {fileID: 1514149611}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -81702,6 +81765,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1514149607}
   m_CullTransparentMesh: 1
+--- !u!114 &1514149611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514149607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.inroom.settings.room.header
+  text: {fileID: 1514149609}
 --- !u!1 &1515842850
 GameObject:
   m_ObjectHideFlags: 0
@@ -82337,7 +82414,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -22.600006}
+  m_AnchoredPosition: {x: 0, y: -22.61}
   m_SizeDelta: {x: 406.42084, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
@@ -100070,6 +100147,7 @@ GameObject:
   - component: {fileID: 1914644893}
   - component: {fileID: 1914644892}
   - component: {fileID: 1914644894}
+  - component: {fileID: 1914644895}
   m_Layer: 5
   m_Name: Header
   m_TagString: Untagged
@@ -100216,12 +100294,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 252585805}
-        m_TargetAssemblyTypeName: InRoomMenu, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenu, Assembly-CSharp
         m_MethodName: SelectPanel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: InRoomPanel, Assembly-CSharp
+          m_ObjectArgument: {fileID: 950123092}
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoomSubmenuPanel,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -100230,6 +100309,20 @@ MonoBehaviour:
   Interactable: 1
   RepeatOnHold: 0
   OnRelease: 0
+--- !u!114 &1914644895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914644890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.inroom.headers.room
+  text: {fileID: 1914644892}
 --- !u!1 &1921642266
 GameObject:
   m_ObjectHideFlags: 0
@@ -101139,6 +101232,7 @@ GameObject:
   - component: {fileID: 1931140277}
   - component: {fileID: 1931140276}
   - component: {fileID: 1931140275}
+  - component: {fileID: 1931140278}
   m_Layer: 16
   m_Name: L
   m_TagString: Untagged
@@ -101223,6 +101317,37 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1931140278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1931140273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180adc824ff60734aa65f4bcd71fb401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 892953789}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.GameSettingsPromptSubmenu,
+          Assembly-CSharp
+        m_MethodName: AddTabWithSound
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: -1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Interactable: 1
+  RepeatOnHold: 0
+  OnRelease: 0
 --- !u!1 &1932200463
 GameObject:
   m_ObjectHideFlags: 0
@@ -103100,6 +103225,7 @@ GameObject:
   - component: {fileID: 1968440553}
   - component: {fileID: 1968440552}
   - component: {fileID: 1968440551}
+  - component: {fileID: 1968440554}
   m_Layer: 16
   m_Name: R
   m_TagString: Untagged
@@ -103184,6 +103310,37 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1968440554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968440549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180adc824ff60734aa65f4bcd71fb401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 892953789}
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.Prompts.GameSettingsPromptSubmenu,
+          Assembly-CSharp
+        m_MethodName: AddTabWithSound
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Interactable: 1
+  RepeatOnHold: 0
+  OnRelease: 0
 --- !u!1 &1971282305
 GameObject:
   m_ObjectHideFlags: 0
@@ -104956,7 +105113,6 @@ MonoBehaviour:
   header: {fileID: 1318933034}
   headerImage: {fileID: 1318933036}
   headerPath: {fileID: 281110115}
-  headerSeparation: ' > '
 --- !u!82 &2030938840
 AudioSource:
   m_ObjectHideFlags: 0
