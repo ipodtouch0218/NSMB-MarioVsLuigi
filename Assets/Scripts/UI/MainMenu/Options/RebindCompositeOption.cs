@@ -79,7 +79,11 @@ namespace NSMB.UI.Pause.Options {
             }
 
             if (selected) {
-                label.text = "» " + label.text;
+                if (tm.RightToLeft) {
+                    label.text = label.text + " «";
+                } else {
+                    label.text = "» " + label.text;
+                }
             }
         }
     }

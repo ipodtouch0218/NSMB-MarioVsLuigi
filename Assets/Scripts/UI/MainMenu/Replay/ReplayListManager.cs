@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using TMPro;
@@ -136,6 +137,7 @@ public class ReplayListManager : Selectable {
             replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Center;
             return;
         }
+        TranslationManager tm = GlobalController.Instance.translationManager;
 
         // TODO: possibly parse from initial frame instead of storing as separate members
         // Playerlist
@@ -172,25 +174,59 @@ public class ReplayListManager : Selectable {
         builder.AppendLine();
 
         // Add rules
-        TranslationManager tm = GlobalController.Instance.translationManager;
         string off = tm.GetTranslation("ui.generic.off");
         string on = tm.GetTranslation("ui.generic.on");
 
         builder.Append("<align=center><color=white>");
         var rules = header.Rules;
-        builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
-        builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
-        builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
-        builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append("    ");
-        builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
-        builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
+        if (tm.RightToLeft) {
+            builder.Append(rules.TeamsEnabled ? on : off).Append(" <sprite name=room_teams>").Append("    ");
+            builder.Append(rules.CustomPowerupsEnabled ? on : off).Append(" <sprite name=room_powerups>").Append("    ");
+            builder.Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append(" <sprite name=room_timer>").Append("    ");
+            builder.Append(rules.Lives > 0 ? rules.Lives : off).Append(" <sprite name=room_lives>").Append("    ");
+            builder.Append(rules.CoinsForPowerup).Append(" <sprite name=room_coins>").Append("    ");
+            builder.Append(rules.StarsToWin).AppendLine(" <sprite name=room_stars> ");
+        } else {
+            builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
+            builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
+            builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
+            builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append("    ");
+            builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
+            builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
+        }
 
         // Add date
-        builder.Append("<color=#aaa>").Append(DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp).ToLocalTime().ToString()).Append(" - ");
+        builder.Append("<color=#aaa>").Append(DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp), false, false)).Append(" - ");
         builder.Append(Utils.SecondsToMinuteSeconds(header.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(replay.ReplayFile.FileSize));
 
         replayInformation.text = builder.ToString();
         replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Left;
+    }
+
+    public static string DateTimeToLocalizedString(in DateTime dt, bool shortDisplay, bool dateOnly) {
+        TranslationManager tm = GlobalController.Instance.translationManager;
+        try {
+            CultureInfo culture = new(tm.CurrentLocale);
+            if (dateOnly) {
+                if (shortDisplay) {
+                    return dt.ToString(culture.DateTimeFormat.ShortDatePattern);
+                } else {
+                    return dt.ToString(culture.DateTimeFormat.LongDatePattern);
+                }
+            } else {
+                return dt.ToString(culture.DateTimeFormat);
+            }
+        } catch {
+            if (dateOnly) {
+                if (shortDisplay) {
+                    return dt.ToLocalTime().ToShortDateString();
+                } else {
+                    return dt.ToLocalTime().ToLongDateString();
+                }
+            } else {
+                return dt.ToLocalTime().ToString();
+            }
+        }
     }
 
     public void RemoveReplay(ReplayListEntry replay) {
@@ -373,18 +409,24 @@ public class ReplayListManager : Selectable {
         foreach (var replay in replays) {
             replay.gameObject.SetActive(true);
         }
+        foreach (var header in headers) {
+            header.gameObject.SetActive(true);
+        }
 
+        List<string> enabledHeaders = new();
         int hidden = 0;
         TranslationManager tm = GlobalController.Instance.translationManager;
         if (!string.IsNullOrWhiteSpace(searchField.text)) {
             foreach (var replay in replays) {
                 // Check display name
                 if (replay.ReplayFile.Header.GetDisplayName().Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
                 // Check date
-                if (DateTime.UnixEpoch.AddSeconds(replay.ReplayFile.Header.UnixTimestamp).ToLocalTime().ToString().Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                if (DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(replay.ReplayFile.Header.UnixTimestamp), false, false).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
@@ -393,6 +435,7 @@ public class ReplayListManager : Selectable {
                     && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
                     if (tm.GetTranslation(stage.TranslationKey).Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                        enabledHeaders.Add(GetHeader(replay));
                         continue;
                     }
                 }
@@ -406,17 +449,24 @@ public class ReplayListManager : Selectable {
                     }
                 }
                 if (found) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
                 // Check status
                 if (replay.warningText.text.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                    enabledHeaders.Add(GetHeader(replay));
                     continue;
                 }
 
                 // Did not match
                 replay.gameObject.SetActive(false);
                 hidden++;
+            }
+
+            // Activate headers w/ replays only
+            foreach (var header in headers) {
+                header.gameObject.SetActive(enabledHeaders.Contains(header.text[2..^2]));
             }
         }
 
@@ -447,7 +497,7 @@ public class ReplayListManager : Selectable {
             return "???";
         } else {
             // Date
-            return DateTime.UnixEpoch.AddSeconds(rle.ReplayFile.Header.UnixTimestamp).ToLocalTime().ToShortDateString();
+            return DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(rle.ReplayFile.Header.UnixTimestamp), true, true);
         }
     }
 
@@ -485,9 +535,10 @@ public class ReplayListManager : Selectable {
         int index = sortDropdown.value;
 
         sortDropdown.ClearOptions();
-        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = tm.GetTranslation("ui.extras.replays.sort.date") });
-        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = tm.GetTranslation("ui.extras.replays.sort.alphabetical") });
-        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = tm.GetTranslation("ui.extras.replays.sort.stage") });
+        string prefix = tm.RightToLeft ? "<align=right>" : "";
+        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation("ui.extras.replays.sort.date") });
+        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation("ui.extras.replays.sort.alphabetical") });
+        sortDropdown.options.Add(new TMP_Dropdown.OptionData { text = prefix + tm.GetTranslation("ui.extras.replays.sort.stage") });
 
         sortDropdown.SetValueWithoutNotify(index);
         sortDropdown.RefreshShownValue();

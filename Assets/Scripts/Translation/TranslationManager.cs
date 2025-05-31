@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using Newtonsoft.Json;
+using ArabicSupport;
 
 namespace NSMB.Translation {
 
@@ -109,7 +110,7 @@ namespace NSMB.Translation {
                 foreach (string key in translations.Keys.ToList()) {
                     if (key == "rtl") continue;
                     try {
-                        translations[key] = ArabicSupport.ArabicFixer.Fix(translations[key], true);
+                        translations[key] = ArabicFixer.Fix(translations[key], true, false);
                     } catch { }
                 }
             }
@@ -157,8 +158,8 @@ namespace NSMB.Translation {
             // Open the files and get the locale name from the "lang" key
             foreach (LocaleData data in results) {
                 string json = data.Name;
-                Dictionary<string, string> keys = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                 try {
+                    Dictionary<string, string> keys = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                     data.Name = keys["lang"];
                     data.RTL = keys["rtl"] == "true";
                 } catch {

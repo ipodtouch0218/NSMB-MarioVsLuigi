@@ -1,6 +1,8 @@
+using NSMB.Extensions;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace NSMB.UI.Pause.Options {
 
@@ -15,6 +17,12 @@ namespace NSMB.UI.Pause.Options {
         //---Serialized Variables
         [SerializeField] private RebindPauseOptionButton[] buttons;
         [SerializeField] private PauseOptionControlsTab rebindManager;
+        [SerializeField] private HorizontalLayoutGroup layoutGroup;
+
+        public override void OnValidate() {
+            base.OnValidate();
+            this.SetIfNull(ref layoutGroup);
+        }
 
         public override void Awake() {
             base.Awake();
@@ -52,11 +60,13 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public override void OnLeftPress() {
-            SetCurrentOption(selectedIndex - 1);
+            int change = layoutGroup.reverseArrangement ? 1 : -1;
+            SetCurrentOption(selectedIndex + change);
         }
 
         public override void OnRightPress() {
-            SetCurrentOption(selectedIndex + 1);
+            int change = layoutGroup.reverseArrangement ? -1 : 1;
+            SetCurrentOption(selectedIndex + change);
         }
 
         public override void OnClick() {

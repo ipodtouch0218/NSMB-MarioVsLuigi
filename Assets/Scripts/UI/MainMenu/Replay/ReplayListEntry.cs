@@ -174,8 +174,13 @@ public class ReplayListEntry : MonoBehaviour {
         BinaryReplayHeader header = ReplayFile.Header;
 
         nameText.text = header.GetDisplayName();
-        dateText.text = DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp).ToLocalTime().ToString();
-        
+        dateText.text = ReplayListManager.DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp), false, false);
+
+        bool rtl = tm.RightToLeft;
+        warningText.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
+        dateText.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+        nameText.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+
         if (!header.IsCompatible) {
             warningText.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToString());
             warningText.color = criticalColor;

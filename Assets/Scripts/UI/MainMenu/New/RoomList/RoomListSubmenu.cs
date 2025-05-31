@@ -1,3 +1,4 @@
+using NSMB.Translation;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.Utils;
 using Photon.Realtime;
@@ -161,14 +162,11 @@ namespace NSMB.UI.MainMenu.Submenus {
                 // Update existing options
                 RegionOption selected = (RegionOption) regionDropdown.options[regionDropdown.value];
 
-                if (NetworkHandler.Regions != null) {
-                    foreach (var option in regionDropdown.options) {
-                        if (option is RegionOption ro) {
-                            ro.Ping = NetworkHandler.Regions.ElementAt(ro.Index).Ping;
-                        }
+                foreach (var option in regionDropdown.options) {
+                    if (option is RegionOption ro) {
+                        ro.Ping = NetworkHandler.Regions.ElementAt(ro.Index).Ping;
                     }
                 }
-
                 regionDropdown.options.Sort();
                 regionDropdown.SetValueWithoutNotify(regionDropdown.options.IndexOf(selected));
             }
@@ -227,10 +225,16 @@ namespace NSMB.UI.MainMenu.Submenus {
                     }
 
                     _ping = value;
-                    if (!GlobalController.Instance.translationManager.TryGetTranslation("region." + Region, out string translation)) {
+                    TranslationManager tm = GlobalController.Instance.translationManager;
+                    if (!tm.TryGetTranslation("region." + Region, out string translation)) {
                         translation = Region;
                     }
-                    text = "<align=left>" + translation + "<line-height=0>\n<align=right><font=\"PauseFont\">" + _ping + "ms " + Utils.Utils.GetPingSymbol(_ping);
+
+                    if (tm.RightToLeft) {
+                        text = "<align=right>" + translation + "<line-height=0>\n<align=left><font=\"PauseFont\">" + _ping + "ms " + Utils.Utils.GetPingSymbol(_ping);
+                    } else {
+                        text = "<align=left>" + translation + "<line-height=0>\n<align=right><font=\"PauseFont\">" + _ping + "ms " + Utils.Utils.GetPingSymbol(_ping);
+                    }
                 }
             }
 

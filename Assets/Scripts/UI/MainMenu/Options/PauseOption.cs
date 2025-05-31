@@ -55,12 +55,17 @@ namespace NSMB.UI.Pause.Options {
                 return;
             }
 
+            bool rtl = GlobalController.Instance.translationManager.RightToLeft;
             if (IsSelected) {
-                label.text = "» " + GetTranslatedString();
+                if (rtl) {
+                    label.text = GetTranslatedString() + " «";
+                } else {
+                    label.text = "» " + GetTranslatedString();
+                }
             } else {
                 label.text = GetTranslatedString();
             }
-            label.horizontalAlignment = GlobalController.Instance.translationManager.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            label.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
         }
 
         public virtual void Selected() {

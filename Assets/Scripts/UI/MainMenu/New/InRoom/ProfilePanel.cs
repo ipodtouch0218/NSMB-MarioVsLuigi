@@ -76,7 +76,6 @@ namespace NSMB.UI.MainMenu.Submenus {
             for (int i = 0; i < characterButtonImages.Length; i++) {
                 var image = characterButtonImages[i];
                 image.sprite = disabledCharacterButtonSprites[i];
-                image.transform.SetAsLastSibling();
 
                 if (i < characterButtonLogos.Length && characterButtonLogos[i]) {
                     characterButtonLogos[i].color = disabledCharacterButtonLogoColor;
@@ -85,7 +84,6 @@ namespace NSMB.UI.MainMenu.Submenus {
 
             characterButtonImages[index].sprite = enabledCharacterButtonSprites[index];
             paletteBackground.sprite = disabledCharacterButtonSprites[index];
-            characterButtonImages[index].transform.SetAsLastSibling();
             if (index < characterButtonLogos.Length && characterButtonLogos[index]) {
                 characterButtonLogos[index].color = enabledCharacterButtonLogoColor;
             }

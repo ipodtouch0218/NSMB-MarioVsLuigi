@@ -73,7 +73,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             List<StageSelectionButton> currentButtonRow = null;
             foreach (var grouping in stageGroups) {
                 TMP_Text newHeader = Instantiate(headerTemplate, headerTemplate.transform.parent);
-                newHeader.text = tm.GetTranslation(grouping.Key);
+                TMP_Translatable translatable = newHeader.GetComponent<TMP_Translatable>();
+                translatable.key = grouping.Key;
+                translatable.Run();
                 newHeader.gameObject.SetActive(true);
 
                 GameObject row = null;

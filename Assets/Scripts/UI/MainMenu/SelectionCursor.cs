@@ -32,6 +32,15 @@ public class SelectionCursor : MonoBehaviour {
         if (current != old) {
             fadeValue = 2f;
             old = current;
+            /* this works. but if the parent gets destroyed we lose the cursor forever. bummer.
+            if (current) {
+                if (current.transform.parent) {
+                    rectTransform.SetParent(current.transform.parent);
+                } else {
+                    rectTransform.SetParent(current.transform);
+                }
+            }
+            */
             newObject = true;
         }
 

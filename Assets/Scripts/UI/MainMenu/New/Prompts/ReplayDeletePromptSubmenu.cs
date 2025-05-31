@@ -1,7 +1,6 @@
 using System.IO;
 using TMPro;
 using UnityEngine;
-using static ReplayListManager;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
     public class ReplayDeletePromptSubmenu : PromptSubmenu {

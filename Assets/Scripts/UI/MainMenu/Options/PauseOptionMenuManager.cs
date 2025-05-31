@@ -152,11 +152,15 @@ namespace NSMB.UI.Pause.Options {
             if (diff == 0) {
                 return;
             }
+            bool rtl = GlobalController.Instance.translationManager.RightToLeft;
+            if (rtl) {
+                diff = -diff;
+            }
 
             if (Back && diff > 0) {
                 Back = false;
                 if (currentTabIndex != 0) {
-                    SetTab(0, false);
+                    SetTab(0, sound: false);
                 } else {
                     SelectedTab.Highlighted();
                 }

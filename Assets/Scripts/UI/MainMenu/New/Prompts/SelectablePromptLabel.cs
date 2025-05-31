@@ -22,12 +22,17 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         //---Private Variables
         private bool selected;
         private string originalText;
+        private HorizontalAlignmentOptions originalAlignment;
 
         public void OnValidate() {
             this.SetIfNull(ref label);
             if (!eventSystem) {
                 eventSystem = FindFirstObjectByType<EventSystem>(FindObjectsInactive.Include);
             }
+        }
+
+        public void Awake() {
+            originalAlignment = label.horizontalAlignment;
         }
 
         public void OnEnable() {
@@ -63,26 +68,40 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void UpdateLabel() {
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            bool rtl = tm.RightToLeft;
             if (changeText) {
+                string text;
                 if (string.IsNullOrWhiteSpace(translationKey)) {
-                    label.text = originalText;
+                    text = originalText;
                 } else {
-                    label.text = GlobalController.Instance.translationManager.GetTranslation(translationKey);
+                    text = tm.GetTranslation(translationKey);
                 }
 
                 if (selected) {
                     if (twoSided) {
-                        label.text = "» " + label.text + " «";
+                        text = "» " + text + " «";
                     } else {
-                        label.text = "» " + label.text;
+                        if (rtl) {
+                            text = text + " «";
+                        } else {
+                            text = "» " + text;
+                        }
                     }
                 }
+                label.text = text;
             } else {
                 label.enabled = selected;
             }
 
             if (changeColor) {
                 label.color = selected ? selectedColor : deselectedColor;
+            }
+
+            if (originalAlignment == HorizontalAlignmentOptions.Left) {
+                label.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+            } else if (originalAlignment == HorizontalAlignmentOptions.Right) {
+                label.horizontalAlignment = rtl ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
             }
         }
 

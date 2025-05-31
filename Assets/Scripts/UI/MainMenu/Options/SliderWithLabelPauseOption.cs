@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using NSMB.Translation;
 
 namespace NSMB.UI.Pause.Options {
 
@@ -25,13 +26,16 @@ namespace NSMB.UI.Pause.Options {
             UpdateLabel(newValue);
         }
         private void UpdateLabel(float value) {
+            TranslationManager tm = GlobalController.Instance.translationManager;
             if (!string.IsNullOrEmpty(zeroOverride) && Mathf.Abs(value) < 0.01f) {
-                valueLabel.text = GlobalController.Instance.translationManager.GetTranslation(zeroOverride);
+                valueLabel.text = tm.GetTranslation(zeroOverride);
             } else if (!string.IsNullOrEmpty(maxOverride) && Mathf.Abs(value - slider.maxValue) < 0.01f) {
-                valueLabel.text = GlobalController.Instance.translationManager.GetTranslation(maxOverride);
+                valueLabel.text = tm.GetTranslation(maxOverride);
             } else {
                 valueLabel.text = (value * numberMultiplier).ToString(numberFormat);
             }
+
+            valueLabel.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
         }
     }
 }

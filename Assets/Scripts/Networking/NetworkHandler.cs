@@ -33,7 +33,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     public static long? Ping => Client?.RealtimePeer.Stats.RoundtripTime;
     public static QuantumRunner Runner { get; private set; }
     public static QuantumGame Game => Runner?.Game ?? QuantumRunner.DefaultGame;
-    public static IEnumerable<Region> Regions => Client.RegionHandler.EnabledRegions.OrderBy(r => r.Code);
+    public static IEnumerable<Region> Regions => Client?.RegionHandler?.EnabledRegions?.OrderBy(r => r.Code);
     public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
     public static bool IsReplay => CurrentReplay != null;
     public static int ReplayStart => CurrentReplay?.Header.InitialFrameNumber ?? -1;

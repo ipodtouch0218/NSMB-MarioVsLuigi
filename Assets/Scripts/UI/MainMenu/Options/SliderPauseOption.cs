@@ -45,7 +45,6 @@ namespace NSMB.UI.Pause.Options {
 
             float range = slider.maxValue - slider.minValue;
             if (slider.wholeNumbers) {
-
                 if (holdTime > 3f / range) {
                     slider.value--;
                     holdTime = 0;
@@ -58,9 +57,9 @@ namespace NSMB.UI.Pause.Options {
         public override void OnRightHeld() {
             holdTime += Time.unscaledDeltaTime;
 
-            float range = slider.maxValue - slider.minValue;
-            if (slider.wholeNumbers) {
+            float range = slider.maxValue - slider.minValue; bool rtl = GlobalController.Instance.translationManager.RightToLeft;
 
+            if (slider.wholeNumbers) {
                 if (holdTime > 3f / range) {
                     slider.value++;
                     holdTime = 0;
@@ -71,8 +70,9 @@ namespace NSMB.UI.Pause.Options {
         }
 
         public virtual void OnSliderValueChanged(float newValue) {
-            if (loader)
+            if (loader) {
                 loader.OnValueChanged(this, newValue);
+            }
 
             Settings.Instance.SaveSettings();
         }
