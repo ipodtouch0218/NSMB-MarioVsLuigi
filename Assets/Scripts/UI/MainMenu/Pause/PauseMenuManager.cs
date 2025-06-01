@@ -133,9 +133,10 @@ namespace NSMB.UI.Pause {
 
             Vector2 input = context.ReadValue<Vector2>();
             if (isInConfirmation) {
-                if (input.x < 0.2f) {
+                bool rtl = GlobalController.Instance.translationManager.RightToLeft;
+                if ((!rtl && input.x < 0.2f) || (rtl && input.x > 0.2f)) {
                     SelectConfirmYes(true);
-                } else if (input.x > 0.2f) {
+                } else if ((!rtl && input.x > 0.2f) || (rtl && input.x < 0.2f)) {
                     SelectConfirmNo(true);
                 }
                 return;
