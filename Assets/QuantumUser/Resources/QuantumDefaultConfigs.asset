@@ -347,7 +347,7 @@ MonoBehaviour:
     Lives: 0
     TimerSeconds: 0
     TeamsEnabled:
-      Value: 0
+      Value: 1
     CustomPowerupsEnabled:
       Value: 1
     DrawOnTimeUp:
