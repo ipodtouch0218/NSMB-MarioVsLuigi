@@ -232,7 +232,9 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     public unsafe void SaveReplay(QuantumGame game, sbyte winner) {
-#if UNITY_STANDALONE
+#if !UNITY_STANDALONE
+        return;
+#endif
         if (IsReplay || game.RecordInputStream == null) {
             SavedRecordingPath = null;
             return;
@@ -340,7 +342,6 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         // Complete
         Debug.Log($"[Replay] Saved new temporary replay '{finalFilePath}' ({Utils.BytesToString(writtenBytes)})");
         DisposeReplay();
-#endif
     }
 
     private void DisposeReplay() {

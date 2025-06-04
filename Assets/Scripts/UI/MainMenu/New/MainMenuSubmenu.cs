@@ -43,10 +43,13 @@ namespace NSMB.UI.MainMenu {
 
         }
 
+        internal void InternalShow(bool first) {
+            Show(first);
+            Canvas.EventSystem.SetSelectedGameObject(first ? DefaultSelection : savedSelection);
+        }
+
         public virtual void Show(bool first) {
             gameObject.SetActive(true);
-            Canvas.EventSystem.SetSelectedGameObject(first ? DefaultSelection : savedSelection);
-
             OnShow?.Invoke(first);
         }
 

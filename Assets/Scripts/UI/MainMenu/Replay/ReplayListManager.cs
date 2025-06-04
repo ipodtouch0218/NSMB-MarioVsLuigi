@@ -1,3 +1,4 @@
+using JimmysUnityUtilities;
 using NSMB.Extensions;
 using NSMB.Replay;
 using NSMB.Translation;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -58,21 +60,23 @@ public class ReplayListManager : Selectable {
     }
 #endif
 
+    public void Initialize() {
+        FindReplays();
+    }
+
+    private static readonly Vector3[] corners = new Vector3[4];
     public void Show() {
         sortDropdown.value = 0;
         ascendingToggle.isOn = false;
         searchField.SetTextWithoutNotify("");
         replayTemplate.gameObject.SetActive(false);
-        FindReplays();
-    }
+        scrollRect.verticalNormalizedPosition = 1;
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
+        Canvas.ForceUpdateCanvases();
 
-    public void Close() {
-        foreach (var replay in replays) {
-            Destroy(replay.gameObject);
-        }
-        replays.Clear();
-        temporaryReplays.Clear();
-        // GC.Collect();
+        FindReplays();
+        SortReplays();
+        OnScrollRectScrolled(default);
     }
 
     protected override void OnEnable() {
@@ -236,22 +240,17 @@ public class ReplayListManager : Selectable {
                 noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
             }
         }
-        int index = replays.IndexOf(replay);
+        int? index = isActiveAndEnabled ? replays.IndexOf(replay) : null;
         replays.Remove(replay);
         SortReplays(index);
     }
 
     public void FindReplays() {
         Instance = this;
-        foreach (var replay in replays) {
-            Destroy(replay.gameObject);
+        if (findReplaysCoroutine != null) {
+            return;
         }
-        foreach (var header in headers) {
-            Destroy(header.gameObject);
-        }
-        replays.Clear();
-        headers.Clear();
-        temporaryReplays.Clear();
+
         hiddenReplaysText.gameObject.SetActive(false);
 
         string tempPath = Path.Combine(ReplayDirectory, "temp");
@@ -260,10 +259,8 @@ public class ReplayListManager : Selectable {
         Directory.CreateDirectory(Path.Combine(ReplayDirectory, "saved"));
 
         string[] files = Directory.GetFiles(Path.Combine(ReplayDirectory), "*.mvlreplay", SearchOption.AllDirectories);
-        if (findReplaysCoroutine != null) {
-            StopCoroutine(findReplaysCoroutine);
-        }
-        findReplaysCoroutine = StartCoroutine(FindReplaysCoroutine(files));
+        // Use the globalcontroller since it'll always be active. this is dumb.
+        findReplaysCoroutine = GlobalController.Instance.StartCoroutine(FindReplaysCoroutine(files));
     }
 
     private IEnumerator FindReplaysCoroutine(string[] files) {
@@ -273,36 +270,45 @@ public class ReplayListManager : Selectable {
         Stopwatch stopwatch = new();
         stopwatch.Start();
         foreach (var filepath in files) {
-            if (!File.Exists(filepath)) {
+            if (!File.Exists(filepath)
+                || replays.Any(r => r.ReplayFile.FilePath == filepath)) {
                 continue;
             }
 
             if (BinaryReplayFile.TryLoadNewFromFile(filepath, false, out BinaryReplayFile replay) == ReplayParseResult.Success) {
                 ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
                 newReplayEntry.Initialize(this, replay);
-                newReplayEntry.name = Path.GetFileName(filepath);
                 newReplayEntry.UpdateText();
+                newReplayEntry.name = Path.GetFileName(filepath);
                 replays.Add(newReplayEntry);
 
                 if (newReplayEntry.IsTemporary) {
                     temporaryReplays.Add(newReplayEntry);
                 }
 
-                SortReplays();
-                scrollRect.verticalNormalizedPosition = 1;
-                // FilterReplays();
-
-                if (replays[0] == newReplayEntry) {
-                    Select(newReplayEntry, false);
-                    StartCoroutine(SelectAtEndOfFrame());
+                if (isActiveAndEnabled) {
+                    newReplayEntry.gameObject.SetActive(true);
+                    SortReplays();
+                    if (replays[0] == newReplayEntry) {
+                        Select(newReplayEntry, false);
+                        StartCoroutine(SelectAtEndOfFrame());
+                    }
+                    canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
+                    scrollRect.verticalNormalizedPosition = 1;
                 }
             }
 
-            // Max 8ms per frame.
-            if (stopwatch.ElapsedMilliseconds > 8) {
+            // Max ~2ms per frame.
+            if (stopwatch.ElapsedMilliseconds > 2) {
                 yield return null;
                 stopwatch.Restart();
             }
+        }
+
+        // Update a second time to fix the "Temporary" label.
+        foreach (var createdReplays in replays) {
+            createdReplays.UpdateText();
+            createdReplays.gameObject.SetActive(true);
         }
 
         FilterReplays();
@@ -360,7 +366,7 @@ public class ReplayListManager : Selectable {
     public void UpdateReplayNavigation(int? selectIndex = null) {
         ReplayListEntry previous = null;
         foreach (var replay in replays) {
-            if (!replay.gameObject.activeSelf) {
+            if (!replay.gameObject.activeInHierarchy) {
                 continue;
             }
 
@@ -368,7 +374,7 @@ public class ReplayListManager : Selectable {
             previous = replay;
         }
         if (selectIndex.HasValue && replays.Count > 0) {
-            Select(replays[Mathf.Clamp(selectIndex.Value, 0, replays.Count -1 )], true);
+            Select(replays[Mathf.Clamp(selectIndex.Value, 0, replays.Count - 1)], true);
         } else {
             Select(null, false);
             scrollRect.verticalNormalizedPosition = 1;
@@ -396,7 +402,6 @@ public class ReplayListManager : Selectable {
                 headers.Add(newHeader); 
             }
             previousHeader = currentHeader;
-
             replay.transform.SetAsLastSibling();
         }
         hiddenReplaysText.transform.SetAsLastSibling();
@@ -528,6 +533,15 @@ public class ReplayListManager : Selectable {
             return
                 allStages.IndexOf(map => map == b.ReplayFile.Header.Rules.Stage)
                 - allStages.IndexOf(map => map == a.ReplayFile.Header.Rules.Stage);
+        }
+    }
+
+    public void OnScrollRectScrolled(Vector2 pos) {
+        RectTransform parent = (RectTransform) canvas.transform;
+        parent.GetWorldCorners(corners);
+        Rect parentRect = new((Vector2) corners[0], parent.rect.size);
+        foreach (var replay in replays) {
+            replay.UpdateVisibility(parentRect);
         }
     }
 

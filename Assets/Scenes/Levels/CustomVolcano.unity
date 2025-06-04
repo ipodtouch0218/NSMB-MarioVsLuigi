@@ -16144,7 +16144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 698239489}
   - component: {fileID: 698239490}
-  m_Layer: 0
+  m_Layer: 21
   m_Name: Anim
   m_TagString: Untagged
   m_Icon: {fileID: 0}

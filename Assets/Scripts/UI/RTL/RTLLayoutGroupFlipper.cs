@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,7 +20,12 @@ namespace NSMB.UI.RTL {
         }
 
         protected override void ApplyDirection(bool rtl) {
-            component.reverseArrangement = rtl ? !isFlippedByDefault : isFlippedByDefault;
+            bool newValue = rtl ? !isFlippedByDefault : isFlippedByDefault;
+            if (component.reverseArrangement == newValue) {
+                return;
+            }
+
+            component.reverseArrangement = newValue;
 
             if (flipChildrenNavigation) {
                 Selectable[] children = GetComponentsInChildren<Selectable>();

@@ -152,7 +152,7 @@ namespace NSMB.UI.MainMenu {
                 submenuStack.Add(menu);
             }
 
-            menu.Show(first);
+            menu.InternalShow(first);
             UpdateHeader();
             ShowHideMainPanel();
         }
@@ -179,7 +179,7 @@ namespace NSMB.UI.MainMenu {
                 menu.Hide(SubmenuHideReason.Closed);
                 var newHead = submenuStack[^1];
                 if (newHead != head) {
-                    newHead.Show(false);
+                    newHead.InternalShow(false);
                     UpdateHeader();
                 }
             }
@@ -202,7 +202,7 @@ namespace NSMB.UI.MainMenu {
             if (force || currentSubmenu.TryGoBack(out playSound)) {
                 currentSubmenu.Hide(SubmenuHideReason.Closed);
                 submenuStack.RemoveAt(submenuStack.Count - 1);
-                submenuStack[^1].Show(false);
+                submenuStack[^1].InternalShow(false);
             }
 
             if (playSound) {

@@ -18,20 +18,17 @@ namespace NSMB.UI.MainMenu.Submenus {
         //---Serialized Variables
         [SerializeField] private ReplayListManager replayList;
 
+        public override void Initialize() {
+            base.Initialize();
+
+            replayList.Initialize();
+        }
+
         public override void Show(bool first) {
             base.Show(first);
             
             if (first) {
                 replayList.Show();
-            }
-        }
-
-        public override void Hide(SubmenuHideReason hideReason) {
-            base.Hide(hideReason);
-
-            if (hideReason == SubmenuHideReason.Closed) {
-                // Dispose
-                replayList.Close();
             }
         }
 
