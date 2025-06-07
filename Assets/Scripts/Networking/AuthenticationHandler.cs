@@ -5,15 +5,13 @@ using UnityEngine.Networking;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using NSMB.UI.MainMenu;
 using Newtonsoft.Json;
-using JetBrains.Annotations;
-using NSMB.Translation;
 
 public class AuthenticationHandler {
 
     //---Static Variables
-    private static readonly string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
+    private const string URL = "https://mariovsluigi.azurewebsites.net/auth/init";
+    private const string DiscordURL = "https://discord.gg/dgKVaUKpj5";
 
     public static bool IsAuthenticating { get; set; }
 
@@ -69,7 +67,8 @@ public class AuthenticationHandler {
                     string msg = GlobalController.Instance.translationManager.GetTranslationWithReplacements(template,
                         "banreason", reason,
                         "banid", ban.Id.ToString(),
-                        "expiration", ban.Expiration.HasValue ? DateTimeOffset.FromUnixTimeSeconds(ban.Expiration.Value).LocalDateTime.ToString() : "");
+                        "expiration", ban.Expiration.HasValue ? DateTimeOffset.FromUnixTimeSeconds(ban.Expiration.Value).LocalDateTime.ToString() : "",
+                        "discord", DiscordURL);
                     NetworkHandler.ThrowError(msg, true);
                 }
             } catch { }

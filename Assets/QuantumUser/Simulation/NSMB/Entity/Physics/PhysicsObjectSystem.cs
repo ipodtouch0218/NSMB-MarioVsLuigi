@@ -1187,7 +1187,7 @@ namespace Quantum {
             while ((dist += distIncrement) < distMax) {
                 for (int i = 0; i < increments; i++) {
                     FPVector2 checkPos = transform->Position + (offsets[i] * dist);
-                    if (BoxInGround((FrameThreadSafe) f, checkPos, collider->Shape, stage: stage, entity: entity)) {
+                    if (BoxInGround(f, checkPos, collider->Shape, stage: stage, entity: entity)) {
                         continue;
                     }
 

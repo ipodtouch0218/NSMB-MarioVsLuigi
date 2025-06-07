@@ -2391,21 +2391,27 @@ namespace Quantum {
         }
 
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef bumper) {
-            if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
-                if (mario->IsInKnockback) {
-                    return;
-                }
+            if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {    
+                return;
+            }
 
-                FPVector2 bumperPosition = f.Unsafe.GetPointer<Transform2D>(bumper)->Position;
-                var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+            if (mario->IsInKnockback || mario->KnockbackGetupFrames > 0) {
+                return;
+            }
 
-                QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, bumperPosition, out FPVector2 ourPos, out FPVector2 theirPos);
-                bool onRight = ourPos.X > theirPos.X;
+            FPVector2 bumperPosition;
+            if (f.Unsafe.TryGetPointer(bumper, out Transform2D* bumperTransform)) {
+                bumperPosition = bumperTransform->Position;
+            } else {
+                bumperPosition = tileWorldPosition;
+            }
+            var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
+            QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, bumperPosition, out FPVector2 ourPos, out FPVector2 theirPos);
+            bool onRight = ourPos.X > theirPos.X;
 
-                bool damaged = mario->DoKnockback(f, entity, !onRight, 1, KnockbackStrength.Normal, bumper, bypassDamageInvincibility: true);
-                if (damaged) {
-                    f.Events.PlayKnockbackEffect(entity, bumper, KnockbackStrength.Normal, tileWorldPosition);
-                }
+            bool damaged = mario->DoKnockback(f, entity, !onRight, 1, KnockbackStrength.Normal, bumper, bypassDamageInvincibility: true);
+            if (damaged) {
+                f.Events.PlayKnockbackEffect(entity, bumper, KnockbackStrength.Normal, tileWorldPosition);
             }
         }
 
@@ -2477,7 +2483,7 @@ namespace Quantum {
             case IceBlockBreakReason.Timer:
             default:
                 // Do nothing
-                mario->DamageInvincibilityFrames = 30;
+                mario->DamageInvincibilityFrames = 90;
                 break;
             }
 

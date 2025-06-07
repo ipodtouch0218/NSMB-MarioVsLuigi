@@ -107,17 +107,19 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         }
 
         if (eventData.scrollDelta.y > 0) {
-            IncreaseValue();
+            IncreaseValue(false);
         } else if (eventData.scrollDelta.y < 0) {
-            DecreaseValue();
+            DecreaseValue(false);
         }
     }
 
-    public unsafe void IncreaseValue() {
+    public unsafe void IncreaseValue(bool playSound = true) {
         QuantumGame game = NetworkHandler.Game;
         PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
-            canvas.PlaySound(SoundEffect.UI_Error);
+            if (playSound) {
+                canvas.PlaySound(SoundEffect.UI_Error);
+            }
             return;
         }
 
@@ -125,11 +127,13 @@ public class ChangeableRule : Selectable, ISubmitHandler, IPointerClickHandler, 
         UpdateState();
     }
 
-    public unsafe void DecreaseValue() {
+    public unsafe void DecreaseValue(bool playSound = true) {
         QuantumGame game = NetworkHandler.Game;
         PlayerRef host = game.Frames.Predicted.Global->Host;
         if (!game.PlayerIsLocal(host)) {
-            canvas.PlaySound(SoundEffect.UI_Error);
+            if (playSound) {
+                canvas.PlaySound(SoundEffect.UI_Error);
+            }
             return;
         }
 

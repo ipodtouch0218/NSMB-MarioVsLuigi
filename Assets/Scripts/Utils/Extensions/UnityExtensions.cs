@@ -88,7 +88,7 @@ namespace NSMB.Extensions {
             return Mathf.Clamp(scrollPos, 0f, 1f);
         }
 
-        // Missing component-wise multiply and divide operators for vector3
+        // Missing component-wise functions for vector3
         public static Vector3 Multiply(this Vector3 a, Vector3 b) {
             return new(a.x * b.x, a.y * b.y, a.z * b.z);
         }

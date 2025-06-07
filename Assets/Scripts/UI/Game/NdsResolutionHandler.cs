@@ -29,13 +29,13 @@ namespace NSMB.UI.Game {
             if (!Settings.Instance.GraphicsNdsEnabled) {
                 ReleaseRenderTexture();
                 if (fitter.enabled) {
-                    fitter.enabled = false;
-                    RectTransform fitterTransform = (RectTransform) fitter.transform;
-                    fitterTransform.anchorMin = Vector2.zero;
-                    fitterTransform.anchorMax = Vector2.one;
-                    fitterTransform.sizeDelta = Vector2.zero;
                     pixelPerfect = false;
+                    fitter.enabled = false;
                 }
+                RectTransform fitterTransform = (RectTransform) fitter.transform;
+                fitterTransform.anchorMin = Vector2.zero;
+                fitterTransform.anchorMax = Vector2.one;
+                fitterTransform.sizeDelta = Vector2.zero;
                 return;
             }
 

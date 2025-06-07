@@ -1,3 +1,4 @@
+using NSMB.Extensions;
 using NSMB.UI.Game;
 using Quantum;
 using System;
@@ -301,6 +302,16 @@ namespace NSMB.Utils {
             // Four seconds per revolution
             double time = (Time.timeAsDouble * 0.25d) % 1d;
             return GlobalController.Instance.rainbowGradient.Evaluate((float) time);
+        }
+
+        public static Color SampleIQGradient(Vector3 a, Vector3 b, Vector3 c, Vector3 d) {
+            float time = (Time.time * 0.25f) % 1f;
+            Vector3 result = a + b.Multiply(Vector3Cos(Mathf.PI * 2 * (c * time + d)));
+            return new Color(result.x, result.y, result.z);
+        }
+
+        private static Vector3 Vector3Cos(Vector3 vec) {
+            return new(Mathf.Cos(vec.x), Mathf.Cos(vec.y), Mathf.Cos(vec.z));
         }
 
         public static float Luminance(Color color) {

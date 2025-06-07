@@ -432,7 +432,7 @@ namespace Quantum {
                 knockbackVelocity.Y *= physics.KnockbackMiniMultiplier.Y;
             }
 
-            if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
+            if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround && !freezable->IsFrozen(f)) {
                 FacingRight = fromRight;
                 knockbackVelocity.X *= FP._0_75;
             }
