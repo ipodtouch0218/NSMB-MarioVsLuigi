@@ -45,7 +45,7 @@ public class InputCollector : MonoBehaviour {
             bool right = Vector2.Dot(normalizedJoystick, Vector2.right) > 0.4f;
 
             bool jump = Settings.Controls.Player.Jump.ReadValue<float>() > 0.5f;
-            bool sprint = Settings.Controls.Player.Sprint.ReadValue<float>() > 0.5f;
+            bool sprint = (Settings.Controls.Player.Sprint.ReadValue<float>() > 0.5f) ^ Settings.Instance.controlsAutoSprint;
             bool powerupAction = Settings.Controls.Player.PowerupAction.ReadValue<float>() > 0.5f;
 
             i = new() {
@@ -54,7 +54,7 @@ public class InputCollector : MonoBehaviour {
                 Left = left,
                 Right = right,
                 Jump = jump,
-                Sprint = sprint ^ Settings.Instance.controlsAutoSprint,
+                Sprint = sprint,
                 PowerupAction = powerupAction,
                 FireballPowerupAction = Settings.Instance.controlsFireballSprint && sprint,
                 PropellerPowerupAction = Settings.Instance.controlsPropellerJump && jump,

@@ -121,7 +121,7 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedCoin(marioEntity, *mario, newCoins, item, worldLocation, fromBlock, downwards);
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out Coin* coin)
                 || !f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || coin->IsCollected) {

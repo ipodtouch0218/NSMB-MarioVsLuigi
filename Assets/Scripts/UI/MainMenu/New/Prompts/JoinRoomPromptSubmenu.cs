@@ -20,6 +20,8 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             if (first) {
                 // Default values
                 idInputField.text = "";
+                idInputField.characterLimit = NetworkHandler.RoomIdLength;
+                ((TMP_Text) idInputField.placeholder).text = new string('#', NetworkHandler.RoomIdLength);
                 IDTextChanged();
             }
             success = false;

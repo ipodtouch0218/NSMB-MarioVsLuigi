@@ -23,7 +23,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     //---Constants
     public static readonly string RoomIdValidChars = "BCDFGHJKLMNPRQSTVWXYZ";
-    private static readonly int RoomIdLength = 8;
+    public static readonly int RoomIdLength = 4;
     private static readonly List<DisconnectCause> NonErrorDisconnectCauses = new() {
         DisconnectCause.None, DisconnectCause.DisconnectByClientLogic, DisconnectCause.ApplicationQuit,
     };
@@ -219,7 +219,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         }
         id = id.ToUpper();
         regionIndex = RoomIdValidChars.IndexOf(id[0]);
-        return regionIndex >= 0 && regionIndex < Regions.Count() && Regex.IsMatch(id, $"[{RoomIdValidChars}]{{8}}");
+        return regionIndex >= 0 && regionIndex < Regions.Count() && Regex.IsMatch(id, $"[{RoomIdValidChars}]{{{RoomIdLength}}}");
     }
 
     public static async Task<short> JoinRoom(EnterRoomArgs args) {

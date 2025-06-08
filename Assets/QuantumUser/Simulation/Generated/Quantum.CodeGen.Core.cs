@@ -3023,7 +3023,7 @@ namespace Quantum {
     void OnMarioPlayerCollectedStar(Frame f, EntityRef entity);
   }
   public unsafe partial interface ISignalOnEntityBumped : ISignal {
-    void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump);
+    void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump, QBoolean fromBelow);
   }
   public unsafe partial interface ISignalOnBobombExplodeEntity : ISignal {
     void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity);
@@ -3547,12 +3547,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnEntityBumped(EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump) {
+      public void OnEntityBumped(EntityRef entity, FPVector2 tileWorldPosition, EntityRef blockBump, QBoolean fromBelow) {
         var array = _f._ISignalOnEntityBumpedSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnEntityBumped(_f, entity, tileWorldPosition, blockBump);
+            s.OnEntityBumped(_f, entity, tileWorldPosition, blockBump, fromBelow);
           }
         }
       }

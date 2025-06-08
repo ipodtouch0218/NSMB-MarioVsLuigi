@@ -38,7 +38,7 @@ namespace Quantum {
                 + new FPVector2(0, blockBump->IsDownwards ? (bumpScale.Y * 2 - newSize.Y) : newSize.Y);
 
             if (!blockBump->HasBumped) {
-                Bump(f, transform->Position, blockBump->Owner, blockBump->AllowSelfDamage, bumpScale.X, -bumpOffset.Y / 2);
+                Bump(f, transform->Position, blockBump->Owner, blockBump->AllowSelfDamage, !blockBump->IsDownwards, bumpScale.X, -bumpOffset.Y / 2);
                 blockBump->HasBumped = true;
             }
 
@@ -92,7 +92,7 @@ namespace Quantum {
             f.Destroy(filter.Entity);
         }
 
-        public static void Bump(Frame f, FPVector2 position, EntityRef bumpee, bool allowSelfDamage, FP? width = null, FP? height = null) {
+        public static void Bump(Frame f, FPVector2 position, EntityRef bumpee, bool allowSelfDamage, bool fromBelow, FP? width = null, FP? height = null) {
             // TODO change extents to be customizable
             FPVector2 extents = new(width ?? FP._0_25, FP._0_10);
             Transform2D transform = new() {
@@ -108,7 +108,7 @@ namespace Quantum {
                     continue;
                 }
 
-                f.Signals.OnEntityBumped(hit.Entity, position, bumpee);
+                f.Signals.OnEntityBumped(hit.Entity, position, bumpee, fromBelow);
             }
         }
     }

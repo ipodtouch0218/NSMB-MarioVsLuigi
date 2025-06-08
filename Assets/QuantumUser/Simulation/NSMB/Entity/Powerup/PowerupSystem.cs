@@ -2,7 +2,8 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
-    public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
+    public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed,
+        ISignalOnStageReset {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
         private static readonly FP BumpForce = Constants._5_50;
@@ -265,7 +266,7 @@ namespace Quantum {
             return PowerupReserveResult.ReserveOldPowerup;
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
@@ -289,6 +290,22 @@ namespace Quantum {
 
                 f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                 f.Destroy(entity);
+            }
+        }
+
+        public void OnStageReset(Frame f, QBoolean full) {
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            Filter filter = default;
+            var filterStruct = f.Unsafe.FilterStruct<Filter>();
+            while (filterStruct.Next(&filter)) {
+                if (filter.Powerup->SpawnAnimationFrames > 0 || !filter.Collider->Enabled) {
+                    continue;
+                }
+                
+                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.Collider->Shape, stage: stage, entity: filter.Entity)) {
+                    // Insta-despawn. Crushed by blocks respawning.
+                    filter.Powerup->Lifetime = 1;
+                }
             }
         }
     }

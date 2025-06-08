@@ -238,7 +238,7 @@ namespace Quantum {
         #endregion
 
         #region Signals
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)

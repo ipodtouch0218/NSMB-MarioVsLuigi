@@ -70,7 +70,7 @@ namespace Quantum {
                 }
             }
 
-            return (input.Sprint.IsDown || forceHold)
+            return (input.Sprint.IsDown || forceHold || (f.Exists(HeldEntity) && !f.IsPlayerVerifiedOrLocal(PlayerRef)))
                 && !freezable->IsFrozen(f) && CurrentPowerupState != PowerupState.MiniMushroom && !IsSkidding 
                 && !IsInKnockback && KnockbackGetupFrames == 0 && !IsTurnaround && !IsPropellerFlying && !IsSpinnerFlying && !IsCrouching && !IsDead
                 && !IsInShell && !WallslideLeft && !WallslideRight && (f.Exists(item) || physicsObject->IsTouchingGround || JumpState < JumpState.DoubleJump)
@@ -383,7 +383,7 @@ namespace Quantum {
                 strength = KnockbackStrength.Normal;
             }
 
-            if (CurrentKnockback == strength) {
+            if (IsImmuneFromKnockbackStrength(CurrentKnockback, strength)) {
                 return false;
             }
 
@@ -432,13 +432,17 @@ namespace Quantum {
                 knockbackVelocity.Y *= physics.KnockbackMiniMultiplier.Y;
             }
 
-            if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround && !freezable->IsFrozen(f)) {
+            bool forceWeak = false;
+            if (freezable->IsFrozen(f)) {
+                strength = KnockbackStrength.FireballBump;
+                forceWeak = true;
+            } else if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
                 FacingRight = fromRight;
                 knockbackVelocity.X *= FP._0_75;
             }
 
             CurrentKnockback = strength;
-            IsInWeakKnockback = strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround);
+            IsInWeakKnockback = forceWeak || (CurrentPowerupState != PowerupState.MegaMushroom && (strength == KnockbackStrength.CollisionBump || (strength == KnockbackStrength.FireballBump && physicsObject->IsTouchingGround)));
 
             physicsObject->Velocity = knockbackVelocity;
             physicsObject->IsTouchingGround = false;
@@ -460,6 +464,12 @@ namespace Quantum {
 
             SpawnStars(f, entity, starsToDrop);
             return true;
+        }
+
+        private static bool IsImmuneFromKnockbackStrength(KnockbackStrength currentStrength, KnockbackStrength newStrength) {
+            return currentStrength == newStrength
+                || (currentStrength == KnockbackStrength.Groundpound && newStrength == KnockbackStrength.Normal)
+                || (currentStrength == KnockbackStrength.Normal && newStrength == KnockbackStrength.Groundpound);
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {

@@ -1020,8 +1020,8 @@ namespace Quantum {
                 bool swimming = physicsObject->IsUnderwater;
                 int framesInKnockback = f.Number - mario->KnockbackTick;
                 if (mario->DoEntityBounce
-                    || (swimming && framesInKnockback > 90)
-                    || (!swimming && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) < FP._0_33 && framesInKnockback > 30)
+                    || (swimming && framesInKnockback > 60)
+                    || (!swimming && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) < FP._0_33 && framesInKnockback > 20)
                     || (!swimming && physicsObject->IsTouchingGround && framesInKnockback > 120)
                     || (!swimming && mario->IsInWeakKnockback && framesInKnockback > 30)) {
 
@@ -2118,10 +2118,11 @@ namespace Quantum {
                 } else if (marioAShell) {
                     if (!marioBAbove) {
                         // Hit them, powerdown them
+                        marioB->FacingRight = !fromRight;
+                        marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity);
                         if (dropStars) {
                             marioB->Powerdown(f, marioBEntity, false);
                         }
-                        marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity);
                         marioA->FacingRight = !marioA->FacingRight;
                         f.Events.PlayBumpSound(marioAEntity);
                         return;
@@ -2129,10 +2130,11 @@ namespace Quantum {
                 } else if (marioBShell) {
                     if (!marioAAbove) {
                         // Hit them, powerdown them
+                        marioA->FacingRight = fromRight;
+                        marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.Normal, marioBEntity);
                         if (dropStars) {
                             marioA->Powerdown(f, marioAEntity, false);
                         }
-                        marioA->DoKnockback(f, marioAEntity, !fromRight, 0, KnockbackStrength.Normal, marioBEntity);
                         marioB->FacingRight = !marioB->FacingRight;
                         f.Events.PlayBumpSound(marioBEntity);
                         return;
@@ -2390,12 +2392,12 @@ namespace Quantum {
             }
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef bumper) {
+        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 tileWorldPosition, EntityRef bumper, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {    
                 return;
             }
 
-            if (mario->IsInKnockback || mario->KnockbackGetupFrames > 0) {
+            if (!fromBelow || mario->IsInKnockback || mario->KnockbackGetupFrames > 0) {
                 return;
             }
 
@@ -2464,11 +2466,21 @@ namespace Quantum {
                 }
             }
 
+            if (breakReason == IceBlockBreakReason.HitWall) {
+                // Set facing right to be the wall we hit
+                var iceBlockPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(brokenIceBlock);
+                if (iceBlockPhysicsObject->IsTouchingLeftWall) {
+                    mario->FacingRight = true;
+                } else if (iceBlockPhysicsObject->IsTouchingRightWall) {
+                    mario->FacingRight = false;
+                }
+            }
+
             bool damaged = false;
             KnockbackStrength strength = KnockbackStrength.Normal;
             switch (breakReason) {
-            case IceBlockBreakReason.BlockBump:
             case IceBlockBreakReason.HitWall:
+            case IceBlockBreakReason.BlockBump:
             case IceBlockBreakReason.Fireball:
             case IceBlockBreakReason.Other:
                 // Soft knockback, 1 star
@@ -2481,12 +2493,18 @@ namespace Quantum {
                 break;
 
             case IceBlockBreakReason.Timer:
+                // Damage holder, if we can.
+                var iceBlockHoldable = f.Unsafe.GetPointer<Holdable>(brokenIceBlock);
+                if (f.Unsafe.TryGetPointer(iceBlockHoldable->Holder, out MarioPlayer* holderMario)) {
+                    OnMarioMarioInteraction(f, entity, iceBlockHoldable->Holder);
+                }
+                break;
             default:
-                // Do nothing
-                mario->DamageInvincibilityFrames = 90;
+                // Fall through.
                 break;
             }
 
+            mario->DamageInvincibilityFrames = 120;
             if (damaged) {
                 FPVector2 particlePos = f.Unsafe.GetPointer<Transform2D>(brokenIceBlock)->Position;
                 particlePos.Y += iceBlock->Size.Y / 2;
@@ -2526,6 +2544,7 @@ namespace Quantum {
 
             if (underwater && mario->IsInKnockback) {
                 mario->KnockbackTick = f.Number;
+                physicsObject->Velocity.Y = -1;
             }
             if (!underwater && physicsObject->Velocity.Y > 0 && !physicsObject->IsTouchingGround) {
                 mario->ForceJumpTimer = 10;
