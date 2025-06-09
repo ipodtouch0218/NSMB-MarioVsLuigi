@@ -74,8 +74,8 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            nametag.SetActive(elements.Entity != Entity && !(mario->IsDead && mario->IsRespawning) && f.Global->GameState >= GameState.Playing);
-            if (!nametag.activeSelf) {
+            nametag.SetActive(elements.Entity != Entity && !(mario->IsDead && (mario->IsRespawning || transform.position.y <= stage.StageWorldMin.Y.AsFloat + 0.1f)) && f.Global->GameState >= GameState.Playing);
+            if (!nametag.activeInHierarchy) {
                 return;
             }
 
@@ -92,7 +92,7 @@ namespace NSMB.UI.Game {
             }
 
             RectTransform parentTransform = (RectTransform) transform.parent;
-            transform.localPosition = (cam.WorldToViewportPoint(worldPos, Camera.MonoOrStereoscopicEye.Mono) * 2) - Vector3.one;
+            transform.localPosition = (cam.WorldToViewportPoint(worldPos) * 2) - Vector3.one;
             transform.localPosition = transform.localPosition.Multiply(parentTransform.rect.size / 2);
             transform.localScale = Vector3.one * (3.5f / cam.orthographicSize);
 

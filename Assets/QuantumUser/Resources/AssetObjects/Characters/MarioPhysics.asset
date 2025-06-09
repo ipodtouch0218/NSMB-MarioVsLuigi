@@ -203,11 +203,14 @@ MonoBehaviour:
   SpinnerLaunchVelocity:
     RawValue: 786432
   KnockbackMiniMultiplier:
-    RawValue: 98304
+    X:
+      RawValue: 131072
+    Y:
+      RawValue: 98304
   SittingKnockbackDeceleration:
     RawValue: 518400
   StomachKnockbackDeceleration:
-    RawValue: 126976
+    RawValue: 253952
   SittingKnockbackIceDeceleration:
     RawValue: 253952
   StomachKnockbackIceDeceleration:

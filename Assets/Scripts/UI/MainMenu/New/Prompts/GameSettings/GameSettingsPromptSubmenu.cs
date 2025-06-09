@@ -57,6 +57,9 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             foreach (var rule in rules) {
                 rule.Initialize();
             }
+            foreach (var tab in tabs) {
+                tab.Root.SetActive(false);
+            }
 
             headerTemplate.gameObject.SetActive(false);
             horizontalTemplate.SetActive(false);

@@ -63,8 +63,10 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
             // This is a cancelled tile change event.
             tilemap.SetTile(coords, undoData[0].tile);
             tilemap.SetTransformMatrix(coords, undoData[0].transform);
-            tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime));
             tilemap.RefreshTile(coords);
+            if (undoData[0].tile is AnimatedTile at) {
+                tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);
+            }
         }
 
         if (undoData.Count > 0) {
@@ -109,8 +111,10 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
 
         tilemap.SetTile(coords, unityTile);
         tilemap.SetTransformMatrix(coords, mat);
-        tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime));
         tilemap.RefreshTile(coords);
+        if (unityTile is AnimatedTile at) {
+            tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);
+        }
     }
 
     private unsafe void OnTileBroken(EventTileBroken e) {
@@ -159,10 +163,11 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
                 tilemap.SetTile(coords, unityTile);
                 Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, tileInstance.Rotation / (float) (ushort.MaxValue / 360f)), scale);
                 tilemap.SetTransformMatrix(coords, mat);
-                tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime));
+                tilemap.RefreshTile(coords);
+                if (unityTile is AnimatedTile at) {
+                    tilemap.SetAnimationTime(coords, (float) (Time.timeAsDouble - startTime) * at.m_MaxSpeed % at.m_AnimatedSprites.Length);
+                }
             }
         }
-
-        tilemap.RefreshAllTiles();
     }
 }

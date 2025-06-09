@@ -72,6 +72,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
         QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
         QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+        QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
 
         CurrentReplay = null;
     }
@@ -469,6 +470,12 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
     private unsafe void OnRulesChanged(EventRulesChanged e) {
         UpdateRealtimeProperties();
+    }
+
+    private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
+        if (e.Game.PlayerIsLocal(e.Player)) {
+            Runner.Shutdown(ShutdownCause.Ok);
+        }
     }
 
     private void OnGameEnded(EventGameEnded e) {
