@@ -1,10 +1,12 @@
 ﻿using NSMB.Extensions;
 using NSMB.Loading;
+using NSMB.Replay;
 using NSMB.Translation;
 using NSMB.UI.Pause.Options;
 using Quantum;
 using System;
 using System.Collections;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -33,7 +35,7 @@ public class GlobalController : Singleton<GlobalController> {
     public Image fullscreenFadeImage;
     public AudioSource sfx;
 
-    [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
+    [NonSerialized] public bool checkedForVersion = false, firstConnection = true, bootedWithReplayArg = false;
     [NonSerialized] public int windowWidth = 1280, windowHeight = 720;
 
  
@@ -75,6 +77,12 @@ public class GlobalController : Singleton<GlobalController> {
         Settings.Controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
         QuantumEvent.Subscribe<EventStartGameEndFade>(this, OnStartGameEndFade);
         QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
+        
+        var commandLineArgs = Environment.GetCommandLineArgs();
+        for (int i = 0; i < commandLineArgs.Length; i++) {
+            if (commandLineArgs[i] == "-replay" && commandLineArgs.Length > i + 1)
+                StartReplayFromArgs(commandLineArgs[i + 1]);
+        }
     }
 
     public void OnDestroy() {
@@ -203,6 +211,18 @@ public class GlobalController : Singleton<GlobalController> {
             fullscreenFadeImage.color = color;
             yield return null;
         }
+    }
+    
+    private void StartReplayFromArgs(string argReplayPath)
+    {
+        using FileStream input = new(argReplayPath, FileMode.Open);
+        if (BinaryReplayFile.TryLoadNewFromStream(input, true, out var result) != ReplayParseResult.Success)
+        {
+            Debug.LogError("Failed to parse replay file when booting with cmdline args...");
+            return;
+        }
+        bootedWithReplayArg = true;
+        NetworkHandler.StartReplay(result);
     }
 
     private void OnStartGameEndFade(EventStartGameEndFade e) {
