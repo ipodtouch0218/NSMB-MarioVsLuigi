@@ -44,8 +44,7 @@ namespace NSMB.UI.MainMenu {
         private EntityRef playerDataEntity;
         private string userId;
         private string cachedNickname;
-        private string nicknameColor;
-        private bool constantNicknameColor;
+        private NicknameColor nicknameColor = NicknameColor.White;
         private int orderIndex;
         private int cachedWins;
 
@@ -84,8 +83,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnUpdateView(CallbackUpdateView e) {
-            if (!constantNicknameColor) {
-                nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out _);
+            if (!nicknameColor.Constant) {
+                nameText.color = nicknameColor.Sample();
             }
 
             if (typingCounter > 0 && !ChatManager.Instance.mutedPlayers.Contains(userId)) {
@@ -100,10 +99,10 @@ namespace NSMB.UI.MainMenu {
         public unsafe void SetPlayer(Frame f, PlayerRef player) {
             this.player = player;
             RuntimePlayer runtimePlayer = NetworkHandler.Game.Frames.Predicted.GetPlayerData(player);
-            nicknameColor = runtimePlayer?.NicknameColor ?? "#FFFFFF";
+            nicknameColor = NicknameColor.Parse(runtimePlayer?.NicknameColor);
             cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, player);
             userId = runtimePlayer?.UserId;
-            nameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            nameText.color = nicknameColor.Sample();
 
             playerExistsGameObject.SetActive(true);
             joinTick = QuantumUtils.GetPlayerData(f, player)->JoinTick;
@@ -113,11 +112,10 @@ namespace NSMB.UI.MainMenu {
 
         public void RemovePlayer() {
             player = PlayerRef.None;
-            nicknameColor = default;
+            nicknameColor = NicknameColor.White;
             userId = default;
             joinTick = int.MaxValue;
             playerExistsGameObject.SetActive(false);
-            constantNicknameColor = true;
             dropdownOptions.SetActive(false);
         }
 

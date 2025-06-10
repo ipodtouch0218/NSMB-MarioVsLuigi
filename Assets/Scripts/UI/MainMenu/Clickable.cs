@@ -26,9 +26,13 @@ public class Clickable : MonoBehaviour, IPointerDownHandler, IPointerExitHandler
         }
     }
 
+    public void Click() {
+        OnClick?.Invoke();
+    }
+
     public void OnPointerDown(PointerEventData eventData) {
         if (Interactable && !OnRelease) {
-            OnClick?.Invoke();
+            Click();
             held = true;
             holdTime = 0; 
         }
@@ -40,7 +44,7 @@ public class Clickable : MonoBehaviour, IPointerDownHandler, IPointerExitHandler
 
     public void OnPointerUp(PointerEventData eventData) {
         if (Interactable && OnRelease) {
-            OnClick?.Invoke();
+            Click();
         }
         held = false;
     }

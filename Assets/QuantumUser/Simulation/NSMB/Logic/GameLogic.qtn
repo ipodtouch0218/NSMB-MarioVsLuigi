@@ -20,7 +20,7 @@ global {
 struct PlayerInformation {
 	PlayerRef PlayerRef;
 	QString<48> Nickname;
-	QString<16> NicknameColor;
+	QStringUtf8<48> NicknameColor;
 	byte Team;
 	byte Character;
 	bool Disconnected;

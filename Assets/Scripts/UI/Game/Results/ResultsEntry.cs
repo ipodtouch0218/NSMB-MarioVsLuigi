@@ -18,9 +18,8 @@ namespace NSMB.UI.Game.Results {
         [SerializeField] private float slideInTimeSeconds = 0.1f;
 
         //---Private Variables
-        private string nicknameColor;
         private PlayerRef player;
-        private bool constantNicknameColor;
+        private NicknameColor nicknameColor = NicknameColor.White;
 
         public void Start() {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
@@ -35,8 +34,8 @@ namespace NSMB.UI.Game.Results {
                 player = info.Value.PlayerRef;
 
                 usernameText.text = info.Value.Nickname.ToString().ToValidUsername(f, player);
-                nicknameColor = info.Value.NicknameColor.ToString();
-                usernameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+                nicknameColor = NicknameColor.Parse(info.Value.NicknameColor.ToString());
+                usernameText.color = nicknameColor.Sample();
                 characterIcon.sprite = f.FindAsset(f.SimulationConfig.CharacterDatas[info.Value.Character]).ReadySprite;
 
                 if (stars < 0) {
@@ -58,7 +57,7 @@ namespace NSMB.UI.Game.Results {
                 readyCheckmark.SetActive(playerData != null && playerData->VotedToContinue);
             } else {
                 player = PlayerRef.None;
-                constantNicknameColor = true;
+                nicknameColor = NicknameColor.White;
                 leftHalf.color = rightHalf.color = unrankedColor;
                 readyCheckmark.SetActive(false);
             }
@@ -67,8 +66,8 @@ namespace NSMB.UI.Game.Results {
         }
 
         public void Update() {
-            if (!constantNicknameColor) {
-                usernameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            if (!nicknameColor.Constant) {
+                usernameText.color = nicknameColor.Sample();
             }
         }
 

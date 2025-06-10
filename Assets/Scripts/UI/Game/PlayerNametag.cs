@@ -28,8 +28,7 @@ namespace NSMB.UI.Game {
 
         private PlayerElements elements;
         private string cachedNickname = "noname";
-        private string nicknameColor = "#FFFFFF";
-        private bool constantNicknameColor = true;
+        private NicknameColor nicknameColor = NicknameColor.White;
         private QuantumGame game;
 
         public unsafe void Initialize(QuantumGame game, Frame f, PlayerElements elements, MarioPlayerAnimator parent) {
@@ -43,7 +42,7 @@ namespace NSMB.UI.Game {
             UpdateCachedNickname(f, mario);
 
             arrow.color = parent.GlowColor;
-            text.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            text.color = nicknameColor.Sample();
             gameObject.SetActive(true);
 
             UpdateText(f);
@@ -96,8 +95,8 @@ namespace NSMB.UI.Game {
             transform.localPosition = transform.localPosition.Multiply(parentTransform.rect.size / 2);
             transform.localScale = Vector3.one * (3.5f / cam.orthographicSize);
 
-            if (!constantNicknameColor) {
-                text.color = Utils.Utils.SampleNicknameColor(nicknameColor, out _);
+            if (!nicknameColor.Constant) {
+                text.color = nicknameColor.Sample();
             }
         }
 
@@ -129,7 +128,7 @@ namespace NSMB.UI.Game {
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
             if (runtimePlayer != null) {
                 cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
-                nicknameColor = runtimePlayer.NicknameColor;
+                nicknameColor = NicknameColor.Parse(runtimePlayer.NicknameColor);
             }
         }
 

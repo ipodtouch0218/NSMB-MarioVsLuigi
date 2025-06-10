@@ -18,8 +18,9 @@ namespace NSMB.UI.Game.Scoreboard {
         //---Private Variables
         private ScoreboardUpdater updater;
         private int informationIndex;
-        private string cachedNickname, nicknameColor, cachedPingSymbol;
-        private bool constantNicknameColor = true, nicknameMayHaveChanged;
+        private NicknameColor nicknameColor = NicknameColor.White;
+        private string cachedNickname, cachedPingSymbol;
+        private bool nicknameMayHaveChanged;
 
         public void Start() {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
@@ -42,8 +43,8 @@ namespace NSMB.UI.Game.Scoreboard {
             informationIndex = index;
             ref PlayerInformation info = ref f.Global->PlayerInfo[index];
             cachedNickname = info.Nickname.ToString().ToValidUsername(f, info.PlayerRef);
-            nicknameColor = info.NicknameColor;
-            nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            nicknameColor = NicknameColor.Parse(info.NicknameColor.ToString());
+            nicknameText.color = nicknameColor.Sample();
             nicknameMayHaveChanged = true;
 
             UpdateEntry(f);
@@ -51,8 +52,8 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         public void Update() {
-            if (!constantNicknameColor) {
-                nicknameText.color = Utils.Utils.SampleNicknameColor(nicknameColor, out constantNicknameColor);
+            if (!nicknameColor.Constant) {
+                nicknameText.color = nicknameColor.Sample();
             }
         }
 
