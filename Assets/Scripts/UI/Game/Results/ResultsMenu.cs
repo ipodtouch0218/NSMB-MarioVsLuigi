@@ -154,7 +154,7 @@ namespace NSMB.UI.Game.Results {
 
         public void Select(int index) {
             Deselect(index);
-            labels[index].text = "� " + labels[index].text;
+            labels[index].text = "» " + labels[index].text;
             labels[index].color = labelSelectedColor;
         }
 
@@ -173,7 +173,7 @@ namespace NSMB.UI.Game.Results {
 
                     var newReplay = replayManager.Replays[(replayIndex + 1) % replayManager.Replays.Count];
                     if (replayIndex + 1 >= replayManager.Replays.Count || newReplay.ReplayFile == NetworkHandler.CurrentReplay) {
-                        labels[0].text = "� " + GlobalController.Instance.translationManager.GetTranslation("ui.game.results.nextreplay.nomore");
+                        labels[0].text = "» " + GlobalController.Instance.translationManager.GetTranslation("ui.game.results.nextreplay.nomore");
                         sfx.PlayOneShot(SoundEffect.UI_Error);
                         if (noReplaysCoroutine != null) {
                             StopCoroutine(noReplaysCoroutine);

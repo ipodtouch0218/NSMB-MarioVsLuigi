@@ -201,7 +201,7 @@ namespace NSMB.UI.Pause {
             }
 
             isInConfirmationYesSelected = true;
-            yesConfirmText.text = "� " + originalYesText + " �";
+            yesConfirmText.text = "» " + originalYesText + " «";
             noConfirmText.text = originalNoText;
         }
 
@@ -212,7 +212,7 @@ namespace NSMB.UI.Pause {
 
             isInConfirmationYesSelected = false;
             yesConfirmText.text = originalYesText;
-            noConfirmText.text = "� " + originalNoText + " �";
+            noConfirmText.text = "» " + originalNoText + " «";
         }
 
         public unsafe void ClickConfirmYes() {
@@ -320,7 +320,7 @@ namespace NSMB.UI.Pause {
 
             for (int i = 0; i < options.Length; i++) {
                 PauseMenuOptionWrapper option = options[i];
-                option.text.text = (selected == i) ? ("� " + option.originalText + " �") : option.originalText;
+                option.text.text = (selected == i) ? ("» " + option.originalText + " «") : option.originalText;
                 //option.text.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             }
         }
