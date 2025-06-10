@@ -68,13 +68,9 @@ namespace NSMB.UI.MainMenu {
                 }
 
                 if ((timer += Time.deltaTime) >= backHoldRequirement) {
-                    canvas.GoBack();
-                    BackHeld = false;
-                    timer = 0;
-                    backButtonSfx.Stop();
+                    GoBack();
                 }
                 goBackButton.color = clickColor;
-
             } else {
                 if (timer > 0) {
                     if (!backButtonSfx.isPlaying || (backButtonSfx.time > 0.2f && backButtonSfx.clip != shrinkClip)) {
@@ -94,10 +90,20 @@ namespace NSMB.UI.MainMenu {
             goBackImageFill.fillAmount = backHoldRequirement > 0 ? (timer / backHoldRequirement) : 0;
         }
 
+        public void GoBack() {
+            canvas.GoBack();
+            BackHeld = false;
+            timer = 0;
+            backButtonSfx.Stop();
+        }
+
         //---Callbacks
         public void OnPointerDown(PointerEventData eventData) {
+#if MOUSE_HOLD
             backHeldViaClick = true;
-
+#else
+            GoBack();
+#endif 
         }
 
         public void OnPointerUp(PointerEventData eventData) {

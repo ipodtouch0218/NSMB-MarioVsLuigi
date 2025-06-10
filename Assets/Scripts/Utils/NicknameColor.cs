@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using UnityEngine;
 
 namespace NSMB.Utils {
@@ -43,20 +44,20 @@ namespace NSMB.Utils {
                 if (colorStr[0] == '#') {
                     // Solid color
                     ret[0] = new Vector3(
-                        byte.Parse(colorStr[1..3], System.Globalization.NumberStyles.HexNumber) / 255f,
-                        byte.Parse(colorStr[3..5], System.Globalization.NumberStyles.HexNumber) / 255f,
-                        byte.Parse(colorStr[5..7], System.Globalization.NumberStyles.HexNumber) / 255f);
+                        byte.Parse(colorStr[1..3], NumberStyles.HexNumber) / 255f,
+                        byte.Parse(colorStr[3..5], NumberStyles.HexNumber) / 255f,
+                        byte.Parse(colorStr[5..7], NumberStyles.HexNumber) / 255f);
                 } else {
                     // Gradient
                     int i = 0;
                     while (i < ValueCount && !colorStr.IsEmpty) {
                         int separator = colorStr.IndexOf(',');
                         if (separator != -1) {
-                            ret.values[i] = float.Parse(colorStr[0..separator]);
+                            ret.values[i] = float.Parse(colorStr[0..separator], provider: CultureInfo.InvariantCulture);
                             colorStr = colorStr[(separator + 1)..];
                             i++;
                         } else {
-                            ret.values[i] = float.Parse(colorStr);
+                            ret.values[i] = float.Parse(colorStr, provider: CultureInfo.InvariantCulture);
                             break;
                         }
                     }
