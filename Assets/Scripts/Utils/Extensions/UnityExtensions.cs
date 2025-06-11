@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -147,6 +148,18 @@ namespace NSMB.Extensions {
             Self,
             Parent,
             Children
+        }
+
+        public static void SetTextIfDifferent(this TMP_Text text, string newText) {
+            if (!text.text.Equals(newText)) {
+                text.text = newText;
+            }
+        }
+
+        public static void SetHorizontalAlignmentIfDifferent(this TMP_Text text, HorizontalAlignmentOptions alignment) {
+            if (text.horizontalAlignment != alignment) {
+                text.horizontalAlignment = alignment;
+            }
         }
     }
 }

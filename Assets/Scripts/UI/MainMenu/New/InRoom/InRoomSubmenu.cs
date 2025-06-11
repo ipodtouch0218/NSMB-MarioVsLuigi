@@ -63,7 +63,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         //---Private Variables
         private InRoomSubmenuPanel selectedPanel;
         private int lastCountdownStartFrame;
-        private bool invalidStart;
+        private bool countdownStarted;
         private Coroutine fadeMusicCoroutine;
 
         public override void OnValidate() {
@@ -167,7 +167,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         private unsafe void UpdateStartButton(QuantumGame game, Frame f, int? seconds = null) {
             TranslationManager tm = GlobalController.Instance.translationManager;
             bool isHost = game.PlayerIsLocal(f.Global->Host);
-            seconds ??= f.Global->GameStartFrames / 60;
+            seconds ??= Mathf.RoundToInt(f.Global->GameStartFrames / 60f);
 
             if (seconds <= 0) {
                 // Cancelled
@@ -192,8 +192,8 @@ namespace NSMB.UI.MainMenu.Submenus {
                 if (fadeMusicCoroutine != null) {
                     StopCoroutine(fadeMusicCoroutine);
                     fadeMusicCoroutine = null;
-                    musicSource.volume = 1;
                 }
+                musicSource.volume = 1;
             } else {
                 // Starting
                 startGameButton.interactable = isHost;
@@ -309,21 +309,16 @@ namespace NSMB.UI.MainMenu.Submenus {
 
             bool isHost = e.Game.PlayerIsLocal(f.Global->Host);
             
-            if (isHost
-                || (f.Number - lastCountdownStartFrame) > (f.UpdateRate * 3)
-                || !invalidStart) {
-
+            if (isHost || countdownStarted || (e.IsGameStarting && (f.Number - lastCountdownStartFrame) > (f.UpdateRate * 3))) {
                 Canvas.PlaySound(e.IsGameStarting ? SoundEffect.UI_FileSelect : SoundEffect.UI_Back);
                 if (e.IsGameStarting) {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.starting", ChatManager.Red, "countdown", "3");
-                    invalidStart = false;
+                    countdownStarted = true;
                 } else {
                     ChatManager.Instance.AddSystemMessage("ui.inroom.chat.server.startcancelled", ChatManager.Red);
-                    invalidStart = true;
+                    countdownStarted = false;
                 }
                 lastCountdownStartFrame = f.Number;
-            } else if (e.IsGameStarting) {
-                invalidStart = true;
             }
         }
 

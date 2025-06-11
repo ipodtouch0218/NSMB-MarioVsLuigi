@@ -46,7 +46,7 @@ namespace NSMB.UI.RTL {
                 }
             }
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) component.transform);
+            LayoutRebuilder.MarkLayoutForRebuild((RectTransform) component.transform);
         }
     }
 }

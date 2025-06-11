@@ -282,6 +282,7 @@ public class ReplayListManager : Selectable {
                 newReplayEntry.Initialize(this, replay);
                 newReplayEntry.UpdateText();
                 newReplayEntry.name = Path.GetFileName(filepath);
+                newReplayEntry.gameObject.SetActive(true);
                 replays.Add(newReplayEntry);
 
                 if (newReplayEntry.IsTemporary) {
@@ -310,7 +311,6 @@ public class ReplayListManager : Selectable {
         // Update a second time to fix the "Temporary" label.
         foreach (var createdReplays in replays) {
             createdReplays.UpdateText();
-            createdReplays.gameObject.SetActive(true);
         }
 
         FilterReplays();
@@ -353,6 +353,7 @@ public class ReplayListManager : Selectable {
 
                 replays.Add(newReplayEntry);
                 newReplayEntry.UpdateText();
+                newReplayEntry.gameObject.SetActive(true);
                 SortReplays();
 
                 canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
@@ -539,12 +540,14 @@ public class ReplayListManager : Selectable {
     }
 
     public void OnScrollRectScrolled(Vector2 pos) {
+        /*
         RectTransform parent = (RectTransform) canvas.transform;
         parent.GetWorldCorners(corners);
         Rect parentRect = new((Vector2) corners[0], parent.rect.size);
         foreach (var replay in replays) {
             replay.UpdateVisibility(parentRect);
         }
+        */
     }
 
     private void OnLanguageChanged(TranslationManager tm) {

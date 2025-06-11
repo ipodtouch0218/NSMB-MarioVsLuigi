@@ -68,7 +68,8 @@ namespace Quantum {
                 bool movingAway = FPVector2.Dot(physicsObject->Velocity.Normalized, velocity.Normalized) >= 0;
                 if (shape->Type == Shape2DType.Edge) {
                     // Semisolid logic
-                    if (movingAway || physicsSystemFilter.Transform->Position.Y < hit.Point.Y) {
+                    bool below = physicsSystemFilter.Transform->Position.Y < (hit.Point.Y - (filter.Platform->Velocity.Y * 2 * f.DeltaTime));
+                    if (movingAway || below) {
                         continue;
                     } else {
                         movingAway = !movingAway;
