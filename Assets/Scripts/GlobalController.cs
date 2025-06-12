@@ -206,8 +206,11 @@ public class GlobalController : Singleton<GlobalController> {
     }
 
     private void OnStartGameEndFade(EventStartGameEndFade e) {
-        StartCoroutine(FadeFullscreenImage(1, 1/3f));
-        totalFadeRoutine = StartCoroutine(FadeVolume("OverrideVolume"));
+        if (MvLSceneLoader.Instance.CurrentLoadedMap != null) {
+            // In a game scene
+            StartCoroutine(FadeFullscreenImage(1, 1/3f));
+            totalFadeRoutine = StartCoroutine(FadeVolume("OverrideVolume"));
+        }
     }
 
     private void ToggleFpsMonitor(InputAction.CallbackContext obj) {

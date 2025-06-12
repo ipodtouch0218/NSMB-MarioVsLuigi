@@ -5,11 +5,18 @@ using UnityEngine.SceneManagement;
 
 public class MvLSceneLoader : MonoBehaviour {
 
+    //---Static
+    public static MvLSceneLoader Instance;
+
+    //---Properties
+    public Map CurrentLoadedMap => currentMap;
+
     //---Private Variables
     private Map currentMap;
     private Coroutine loadingCoroutine;
 
     public void Start() {
+        Instance = this;
         QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
     }

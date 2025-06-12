@@ -410,7 +410,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
             },
             SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
             GameMode = DeterministicGameMode.Multiplayer,
-            PlayerCount = 10,
+            PlayerCount = Constants.MaxPlayers,
             Communicator = new QuantumNetworkCommunicator(Client),
         };
 

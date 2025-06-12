@@ -278,7 +278,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 // Canvas.PlaySound(SoundEffect.UI_Error);
                 maxPlayerSlider.SetValueWithoutNotify(currentRoom.MaxPlayers);
             } else {
-                maxPlayerSlider.SetValueWithoutNotify(Mathf.Clamp((int) maxPlayerSlider.value, Mathf.Max(2, currentRoom.PlayerCount), 10));
+                maxPlayerSlider.SetValueWithoutNotify(Mathf.Clamp((int) maxPlayerSlider.value, Mathf.Max(2, currentRoom.PlayerCount), Constants.MaxPlayers));
                 currentRoom.MaxPlayers = (int) maxPlayerSlider.value;
             }
 
