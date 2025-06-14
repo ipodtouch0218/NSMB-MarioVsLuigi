@@ -6,8 +6,8 @@ using UnityEngine;
 public unsafe class VersusStageData : AssetObject {
 
     //---Properties
-    public FPVector2 StageWorldMin => new FPVector2(TileOrigin.x, TileOrigin.y) / 2 + TilemapWorldPosition;
-    public FPVector2 StageWorldMax => new FPVector2(TileOrigin.x + TileDimensions.x, TileOrigin.y + TileDimensions.y) / 2 + TilemapWorldPosition;
+    public FPVector2 StageWorldMin => new FPVector2(TileOrigin.X, TileOrigin.Y) / 2 + TilemapWorldPosition;
+    public FPVector2 StageWorldMax => new FPVector2(TileOrigin.X + TileDimensions.X, TileOrigin.Y + TileDimensions.Y) / 2 + TilemapWorldPosition;
 
     //---Serialized
     [Header("-- Information")]
@@ -23,8 +23,8 @@ public unsafe class VersusStageData : AssetObject {
 
     [Header("-- Tilemap")]
     public bool OverrideAutomaticTilemapSettings;
-    public Quantum.Vector2Int TileDimensions;
-    public Quantum.Vector2Int TileOrigin;
+    public IntVector2 TileDimensions;
+    public IntVector2 TileOrigin;
     public FPVector2 TilemapWorldPosition;
     public bool IsWrappingLevel = true;
     public bool ExtendCeilingHitboxes = false;
@@ -68,33 +68,29 @@ public unsafe class VersusStageData : AssetObject {
         result.Y -= FP._0_50;
         return result;
     }
-
-    public StageTileInstance GetTileRelative(Frame f, int x, int y) {
-        if (x < 0 || y < 0 || x >= TileDimensions.x || y >= TileDimensions.y) {
+    
+    public StageTileInstance GetTileRelative(Frame f, IntVector2 tile) {
+        if (tile.X < 0 || tile.Y < 0 || tile.X >= TileDimensions.X || tile.Y >= TileDimensions.Y) {
             return default;
         }
 
-        return f.StageTiles[x + y * TileDimensions.x];
-    }
-
-    public StageTileInstance GetTileRelative(Frame f, Quantum.Vector2Int tile) {
-        return GetTileRelative(f, tile.x, tile.y);
+        return f.StageTiles[tile.X + tile.Y * TileDimensions.X];
     }
 
     public StageTileInstance GetTileWorld(Frame f, FPVector2 worldPosition) {
         return GetTileRelative(f, QuantumUtils.WorldToRelativeTile(this, worldPosition));
     }
 
-    public void SetTileRelative(Frame f, int x, int y, StageTileInstance tile) {
-        int index = x + y * TileDimensions.x;
+    public void SetTileRelative(Frame f, IntVector2 tilePosition, StageTileInstance tile) {
+        int index = tilePosition.X + tilePosition.Y * TileDimensions.X;
         StageTileInstance[] stageLayout = f.StageTiles;
         if (index < 0 || index >= stageLayout.Length) {
             return;
         }
 
         stageLayout[index] = tile;
-        f.Signals.OnTileChanged(x, y, tile);
-        f.Events.TileChanged(x + TileOrigin.x, y + TileOrigin.y, tile);
+        f.Signals.OnTileChanged(tilePosition, tile);
+        f.Events.TileChanged(tilePosition + TileOrigin, tile);
     }
 
     public void ResetStage(Frame f, bool full) {
@@ -105,10 +101,11 @@ public unsafe class VersusStageData : AssetObject {
             ref StageTileInstance newTile = ref TileData[i];
             if (!stageData[i].Equals(newTile)) {
                 using var callbackScope = HostProfiler.Start("VersusStageData.ExecuteCallbacks");
-                int x = i % TileDimensions.x + TileOrigin.x;
-                int y = i / TileDimensions.x + TileOrigin.y;
-                f.Signals.OnTileChanged(x, y, newTile);
-                f.Events.TileChanged(x, y, newTile);
+                int x = i % TileDimensions.X;
+                int y = i / TileDimensions.X;
+                IntVector2 tile = new(x, y);
+                f.Signals.OnTileChanged(tile, newTile);
+                f.Events.TileChanged(tile + TileOrigin, newTile);
             }
             stageData[i] = newTile;
         }

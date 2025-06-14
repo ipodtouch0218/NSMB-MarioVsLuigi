@@ -1,4 +1,3 @@
-using JimmysUnityUtilities;
 using NSMB.Extensions;
 using NSMB.Replay;
 using NSMB.Translation;
@@ -66,12 +65,10 @@ public class ReplayListManager : Selectable {
         TranslationManager.OnLanguageChanged += OnLanguageChanged;
     }
 
-    protected override void OnDestroy() {
-        base.OnDestroy();
+    public void OnDestroyCustom() {
         TranslationManager.OnLanguageChanged -= OnLanguageChanged;
     }
 
-    private static readonly Vector3[] corners = new Vector3[4];
     public void Show() {
         sortDropdown.value = 0;
         ascendingToggle.isOn = false;
@@ -180,7 +177,7 @@ public class ReplayListManager : Selectable {
         if (tm.RightToLeft) {
             builder.Append(rules.TeamsEnabled ? on : off).Append(" <sprite name=room_teams>").Append("    ");
             builder.Append(rules.CustomPowerupsEnabled ? on : off).Append(" <sprite name=room_powerups>").Append("    ");
-            builder.Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append(" <sprite name=room_timer>").Append("    ");
+            builder.Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds * 60) : off).Append(" <sprite name=room_timer>").Append("    ");
             builder.Append(rules.Lives > 0 ? rules.Lives : off).Append(" <sprite name=room_lives>").Append("    ");
             builder.Append(rules.CoinsForPowerup).Append(" <sprite name=room_coins>").Append("    ");
             builder.Append(rules.StarsToWin).AppendLine(" <sprite name=room_stars> ");
@@ -188,7 +185,7 @@ public class ReplayListManager : Selectable {
             builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
             builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
             builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
-            builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds) : off).Append("    ");
+            builder.Append("<sprite name=room_timer> ").Append(rules.TimerSeconds > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerSeconds * 60) : off).Append("    ");
             builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
             builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
         }

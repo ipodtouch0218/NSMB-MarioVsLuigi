@@ -110,6 +110,8 @@
   "ui.options.general.filter": "Filtrar chat y nombres de jugador",
   "ui.options.general.language": "Idioma",
   "ui.options.general.usenicknamecolor": "Utilizar un color de apodo especial (si está disponible)",
+  "ui.options.general.refreshnicknamecolor": "Asocia una cuenta de Discord para obtener color de apodo ",
+  "ui.options.general.refreshnicknamecolor.button": "Asociar cuenta",
   "ui.options.general.discordintegration": "Integración con Discord",
   "ui.options.general.replays": "Grabación de Repeticiones",
   "ui.options.general.replays.maximum": "Núm. máximo de repeticiones temporales ",

@@ -1,10 +1,11 @@
+using Photon.Deterministic;
 using Quantum;
 
 public class TileInteractionRelocator : StageTile, IInteractableTile {
 
-    public Vector2Int RelocateTo;
+    public IntVector2 RelocateTo;
 
-    public bool Interact(Frame f, EntityRef entity, IInteractableTile.InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
+    public bool Interact(Frame f, EntityRef entity, IInteractableTile.InteractionDirection direction, IntVector2 tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
         if (RelocateTo == tilePosition) {
             // Don't redirect to the same tile.
             goto fail;

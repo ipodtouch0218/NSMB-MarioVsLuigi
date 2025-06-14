@@ -106,7 +106,7 @@ public unsafe class CameraAnimator : ResizingCamera {
         if (distance > 10) {
             // Wrapped the level
             //difference.X *= -1;
-            FP width = stage.TileDimensions.x / (FP) 2;
+            FP width = (FP) stage.TileDimensions.X / 2;
             difference.X += (difference.X < 0) ? width : -width;
             target = origin + difference;
         }
@@ -222,7 +222,7 @@ public unsafe class CameraAnimator : ResizingCamera {
             zoomAmount += (zoomOut - zoomIn);
         }
 
-        float maxOrthoSize = stage.TileDimensions.x * 0.25f / ourCamera.aspect;
+        float maxOrthoSize = stage.TileDimensions.X * 0.25f / ourCamera.aspect;
         if (zoomAmount != 0) {
             float newOrthoSize = ourCamera.orthographicSize + (zoomAmount * zoomSpeed * Time.unscaledDeltaTime);
             newOrthoSize = Mathf.Clamp(newOrthoSize, 0.5f, maxOrthoSize);

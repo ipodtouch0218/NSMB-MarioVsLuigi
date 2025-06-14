@@ -32,6 +32,6 @@ MonoBehaviour:
   LockTo45Degrees: 0
   InheritShooterVelocity: 0
   HasCollision: 0
-  DoesntEffectBlueShell: 0
-  DestroyParticleEffect: 5
+  DoesntEffectBlueShell: 1
+  DestroyParticleEffect: 0
   ShootSound: 106

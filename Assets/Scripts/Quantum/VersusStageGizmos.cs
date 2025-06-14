@@ -41,26 +41,26 @@ public class VersusStageGizmos : MonoBehaviour {
         Gizmos.color = Color.gray;
         Gizmos.DrawWireCube(cameraCenter, cameraDimensions);
 
-        Vector2 levelWorldOrigin = ((Vector2) stage.TileOrigin) * 0.5f + stage.TilemapWorldPosition.ToUnityVector2();
-        Vector2 levelWorldDimensions = ((Vector2) stage.TileDimensions) * 0.5f;
+        Vector2 levelWorldOrigin = ((Vector2) stage.TileOrigin.ToVector2Int()) * 0.5f + stage.TilemapWorldPosition.ToUnityVector2();
+        Vector2 levelWorldDimensions = ((Vector2) stage.TileDimensions.ToVector2Int()) * 0.5f;
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(levelWorldOrigin + levelWorldDimensions / 2, levelWorldDimensions);
 
-        for (int x = 0; x < stage.TileDimensions.x; x++) {
-            for (int y = 0; y < stage.TileDimensions.y; y++) {
-                if (stage.TileData.Length <= (x + y * stage.TileDimensions.x)) {
+        for (int x = 0; x < stage.TileDimensions.X; x++) {
+            for (int y = 0; y < stage.TileDimensions.Y; y++) {
+                if (stage.TileData.Length <= (x + y * stage.TileDimensions.X)) {
                     break;
                 }
-                StageTileInstance tile = stage.TileData[x + y * stage.TileDimensions.x];
+                StageTileInstance tile = stage.TileData[x + y * stage.TileDimensions.X];
                 StageTile stageTile = QuantumUnityDB.GetGlobalAsset(tile.Tile);
                 if (!stageTile) {
                     continue;
                 }
                 StageTile originalTile = stageTile;
-                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, new Quantum.Vector2Int(x, y));
+                FPVector2 worldPos = QuantumUtils.RelativeTileToWorldRounded(stage, new IntVector2(x, y));
                 if (stageTile is TileInteractionRelocator tir) {
-                    tile = stage.TileData[tir.RelocateTo.x + tir.RelocateTo.y * stage.TileDimensions.x];
+                    tile = stage.TileData[tir.RelocateTo.X + tir.RelocateTo.Y * stage.TileDimensions.X];
                     stageTile = QuantumUnityDB.GetGlobalAsset(tile.Tile);
                 }
 

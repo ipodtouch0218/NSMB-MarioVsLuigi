@@ -631,14 +631,14 @@ namespace Quantum.Prototypes {
     public FPVector2 Normal;
     public FP Distance;
     public Int32 Frame;
-    public Quantum.Prototypes.Vector2IntPrototype Tile;
+    public IntVector2 Tile;
     public MapEntityId Entity;
     public void Materialize(Frame frame, ref Quantum.PhysicsContact result, in PrototypeMaterializationContext context = default) {
         result.Position = this.Position;
         result.Normal = this.Normal;
         result.Distance = this.Distance;
         result.Frame = this.Frame;
-        this.Tile.Materialize(frame, ref result.Tile, in context);
+        result.Tile = this.Tile;
         PrototypeValidator.FindMapEntity(this.Entity, in context, out result.Entity);
     }
   }
@@ -831,18 +831,6 @@ namespace Quantum.Prototypes {
         result.Tile = this.Tile;
         result.Rotation = this.Rotation;
         result.Flags = this.Flags;
-        MaterializeUser(frame, ref result, in context);
-    }
-  }
-  [System.SerializableAttribute()]
-  [Quantum.Prototypes.Prototype(typeof(Quantum.Vector2Int))]
-  public unsafe partial class Vector2IntPrototype : StructPrototype {
-    public Int32 x;
-    public Int32 y;
-    partial void MaterializeUser(Frame frame, ref Quantum.Vector2Int result, in PrototypeMaterializationContext context);
-    public void Materialize(Frame frame, ref Quantum.Vector2Int result, in PrototypeMaterializationContext context = default) {
-        result.x = this.x;
-        result.y = this.y;
         MaterializeUser(frame, ref result, in context);
     }
   }

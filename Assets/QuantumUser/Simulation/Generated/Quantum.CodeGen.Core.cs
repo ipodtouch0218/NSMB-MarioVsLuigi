@@ -899,7 +899,7 @@ namespace Quantum {
     [FieldOffset(0)]
     public Int32 Frame;
     [FieldOffset(24)]
-    public Vector2Int Tile;
+    public IntVector2 Tile;
     [FieldOffset(8)]
     public EntityRef Entity;
     public override Int32 GetHashCode() {
@@ -919,7 +919,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->Frame);
         EntityRef.Serialize(&p->Entity, serializer);
         FP.Serialize(&p->Distance, serializer);
-        Quantum.Vector2Int.Serialize(&p->Tile, serializer);
+        IntVector2.Serialize(&p->Tile, serializer);
         FPVector2.Serialize(&p->Normal, serializer);
         FPVector2.Serialize(&p->Position, serializer);
     }
@@ -1012,28 +1012,6 @@ namespace Quantum {
         serializer.Stream.Serialize((Byte*)&p->Flags);
         serializer.Stream.Serialize(&p->Rotation);
         AssetRef.Serialize(&p->Tile, serializer);
-    }
-  }
-  [StructLayout(LayoutKind.Explicit)]
-  public unsafe partial struct Vector2Int {
-    public const Int32 SIZE = 8;
-    public const Int32 ALIGNMENT = 4;
-    [FieldOffset(0)]
-    public Int32 x;
-    [FieldOffset(4)]
-    public Int32 y;
-    public override Int32 GetHashCode() {
-      unchecked { 
-        var hash = 18397;
-        hash = hash * 31 + x.GetHashCode();
-        hash = hash * 31 + y.GetHashCode();
-        return hash;
-      }
-    }
-    public static void Serialize(void* ptr, FrameSerializer serializer) {
-        var p = (Vector2Int*)ptr;
-        serializer.Stream.Serialize(&p->x);
-        serializer.Stream.Serialize(&p->y);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -1293,31 +1271,28 @@ namespace Quantum {
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public Byte Lifetime;
-    [FieldOffset(32)]
+    [FieldOffset(24)]
     public AssetRef<StageTile> StartTile;
     [FieldOffset(64)]
     public StageTileInstance ResultTile;
-    [FieldOffset(24)]
+    [FieldOffset(16)]
     public AssetRef<EntityPrototype> Powerup;
-    [FieldOffset(20)]
+    [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsDownwards;
     [FieldOffset(48)]
     [ExcludeFromPrototype()]
     public FPVector2 Origin;
-    [FieldOffset(4)]
-    [ExcludeFromPrototype()]
-    public Int32 TileX;
-    [FieldOffset(8)]
-    [ExcludeFromPrototype()]
-    public Int32 TileY;
     [FieldOffset(40)]
     [ExcludeFromPrototype()]
+    public IntVector2 Tile;
+    [FieldOffset(32)]
+    [ExcludeFromPrototype()]
     public EntityRef Owner;
-    [FieldOffset(12)]
+    [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public QBoolean AllowSelfDamage;
-    [FieldOffset(16)]
+    [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public QBoolean HasBumped;
     public override Int32 GetHashCode() {
@@ -1329,8 +1304,7 @@ namespace Quantum {
         hash = hash * 31 + Powerup.GetHashCode();
         hash = hash * 31 + IsDownwards.GetHashCode();
         hash = hash * 31 + Origin.GetHashCode();
-        hash = hash * 31 + TileX.GetHashCode();
-        hash = hash * 31 + TileY.GetHashCode();
+        hash = hash * 31 + Tile.GetHashCode();
         hash = hash * 31 + Owner.GetHashCode();
         hash = hash * 31 + AllowSelfDamage.GetHashCode();
         hash = hash * 31 + HasBumped.GetHashCode();
@@ -1340,14 +1314,13 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (BlockBump*)ptr;
         serializer.Stream.Serialize(&p->Lifetime);
-        serializer.Stream.Serialize(&p->TileX);
-        serializer.Stream.Serialize(&p->TileY);
         QBoolean.Serialize(&p->AllowSelfDamage, serializer);
         QBoolean.Serialize(&p->HasBumped, serializer);
         QBoolean.Serialize(&p->IsDownwards, serializer);
         AssetRef.Serialize(&p->Powerup, serializer);
         AssetRef.Serialize(&p->StartTile, serializer);
         EntityRef.Serialize(&p->Owner, serializer);
+        IntVector2.Serialize(&p->Tile, serializer);
         FPVector2.Serialize(&p->Origin, serializer);
         Quantum.StageTileInstance.Serialize(&p->ResultTile, serializer);
     }
@@ -3098,7 +3071,7 @@ namespace Quantum {
     void OnStageReset(Frame f, QBoolean full);
   }
   public unsafe partial interface ISignalOnTileChanged : ISignal {
-    void OnTileChanged(Frame f, Int32 tileX, Int32 tileY, StageTileInstance newTile);
+    void OnTileChanged(Frame f, IntVector2 position, StageTileInstance newTile);
   }
   public static unsafe partial class Constants {
     public const Int32 MaxPlayers = 10;
@@ -3772,12 +3745,12 @@ namespace Quantum {
           }
         }
       }
-      public void OnTileChanged(Int32 tileX, Int32 tileY, StageTileInstance newTile) {
+      public void OnTileChanged(IntVector2 position, StageTileInstance newTile) {
         var array = _f._ISignalOnTileChangedSystems;
         for (Int32 i = 0; i < array.Length; ++i) {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
-            s.OnTileChanged(_f, tileX, tileY, newTile);
+            s.OnTileChanged(_f, position, newTile);
           }
         }
       }
@@ -3936,7 +3909,6 @@ namespace Quantum {
       typeRegistry.Register(typeof(Transform2D), Transform2D.SIZE);
       typeRegistry.Register(typeof(Transform2DVertical), Transform2DVertical.SIZE);
       typeRegistry.Register(typeof(Transform3D), Transform3D.SIZE);
-      typeRegistry.Register(typeof(Quantum.Vector2Int), Quantum.Vector2Int.SIZE);
       typeRegistry.Register(typeof(View), View.SIZE);
       typeRegistry.Register(typeof(Quantum.WrappingObject), Quantum.WrappingObject.SIZE);
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);

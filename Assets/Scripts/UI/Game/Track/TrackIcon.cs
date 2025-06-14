@@ -31,7 +31,7 @@ namespace NSMB.UI.Game.Track {
             this.stage = stage;
             levelMinX = stage.StageWorldMin.X.AsFloat;
             trackWidth = trackMaxX - trackMinX;
-            levelWidthReciprocal = 2f / stage.TileDimensions.x;
+            levelWidthReciprocal = 2f / stage.TileDimensions.X;
         }
 
         public override void OnLateUpdateView() {

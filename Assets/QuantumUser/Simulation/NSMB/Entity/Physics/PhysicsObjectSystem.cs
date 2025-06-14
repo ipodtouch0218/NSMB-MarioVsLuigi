@@ -328,7 +328,7 @@ namespace Quantum {
                     if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
                         // Close enough- check over the level seam.
                         FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                        wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
+                        wrappedRaycastOrigin.X += stage.TileDimensions.X * FP._0_50;
 
                         var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                         for (int i = 0; i < wrappedHits.Count; i++) {
@@ -365,11 +365,12 @@ namespace Quantum {
                     for (FP x = left; x <= right; x += FP._0_50) {
                         FPVector2 worldPos = new FPVector2(x, y) + oneFourthVector2;
                         StageTileInstance tile = stage.GetTileWorld((Frame) f, worldPos);
-                        Vector2Int tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
                         if (!tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos)) {
                             continue;
                         }
+
+                        IntVector2 tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
                         if (stageTile.CollisionData.IsFullTile) {
                             FPVector2 contactPos = new(FPMath.Clamp(position.X, x, x + FP._0_50), y + (direction < 0 ? FP._0_50 : 0));
@@ -555,7 +556,7 @@ namespace Quantum {
                     if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
                         // Close enough- check over the level seam.
                         FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                        wrappedRaycastOrigin.X += stage.TileDimensions.x * FP._0_50;
+                        wrappedRaycastOrigin.X += stage.TileDimensions.X * FP._0_50;
 
                         var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, &shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                         for (int i = 0; i < wrappedHits.Count; i++) {
@@ -592,11 +593,12 @@ namespace Quantum {
                     for (FP y = bottom; y <= top; y += FP._0_50) {
                         FPVector2 worldPos = new FPVector2(x, y) + oneFourthVector2;
                         StageTileInstance tile = stage.GetTileWorld((Frame) f, worldPos);
-                        Vector2Int tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
                         if (!tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos)) {
                             continue;
                         }
+
+                        IntVector2 tilePos = QuantumUtils.WorldToRelativeTile(stage, worldPos);
 
                         if (stageTile.CollisionData.IsFullTile) {
                             FPVector2 contactPos = new(x + (direction < 0 ? FP._0_50 : 0), y + FP._0_25);
@@ -822,17 +824,17 @@ namespace Quantum {
             Span<int> shapeVertexCountBuffer = stackalloc int[16];
             Span<PhysicsContact> contactBuffer = stackalloc PhysicsContact[32];
 
-            Vector2Int tilePosition = QuantumUtils.WorldToRelativeTile(stage, worldPos);
+            IntVector2 tilePosition = QuantumUtils.WorldToRelativeTile(stage, worldPos);
             FP distance = 0;
             while (distance < maxDistance) {
                 bool steppedX;
                 if (rayLength.X < rayLength.Y) {
-                    tilePosition.x += step.x;
+                    tilePosition.X += step.x;
                     distance = rayLength.X;
                     rayLength.X += stepSize.X;
                     steppedX = true;
                 } else {
-                    tilePosition.y += step.y;
+                    tilePosition.Y += step.y;
                     distance = rayLength.Y;
                     rayLength.Y += stepSize.Y;
                     steppedX = false;
@@ -1084,7 +1086,7 @@ namespace Quantum {
             for (int i = 0; i < overlappingTiles; i++) {
                 StageTileInstance tile = tiles[i].Tile;
                 StageTile stageTile = f.FindAsset(tile.Tile);
-                Vector2Int location = tiles[i].Position;
+                IntVector2 location = tiles[i].Position;
 
                 while (stageTile is TileInteractionRelocator tir) {
                     location += tir.RelocateTo;
@@ -1132,7 +1134,7 @@ namespace Quantum {
         }
 
         public struct LocationTilePair {
-            public Vector2Int Position;
+            public IntVector2 Position;
             public StageTileInstance Tile;
         }
 
@@ -1141,15 +1143,16 @@ namespace Quantum {
             var extents = shape.Box.Extents;
 
             FPVector2 origin = position + shape.Centroid;
-            Vector2Int min = QuantumUtils.WorldToRelativeTile(stage, origin - extents, extend: false);
-            Vector2Int max = QuantumUtils.WorldToRelativeTile(stage, origin + extents, extend: false);
+            IntVector2 min = QuantumUtils.WorldToRelativeTile(stage, origin - extents, extend: false);
+            IntVector2 max = QuantumUtils.WorldToRelativeTile(stage, origin + extents, extend: false);
 
             int count = 0;
-            for (int x = min.x; x <= max.x; x++) {
-                for (int y = min.y; y <= max.y; y++) {
+            for (int x = min.X; x <= max.X; x++) {
+                for (int y = min.Y; y <= max.Y; y++) {
+                    IntVector2 pos = new IntVector2(x, y);
                     buffer[count++] = new LocationTilePair {
-                        Position = new Vector2Int(x, y),
-                        Tile = stage.GetTileRelative(f, x, y)
+                        Position = pos,
+                        Tile = stage.GetTileRelative(f, pos)
                     };
 
                     if (count == buffer.Length) {

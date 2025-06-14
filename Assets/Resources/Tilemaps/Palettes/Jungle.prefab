@@ -127,7 +127,7 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: 07b90ffcac5366a48bb24d14a10ddce9, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 1
-    m_Data: {fileID: -2023444736949204580, guid: 2845314df9e561d4abdd9e9e7b4db417,
+    m_Data: {fileID: 6879162233729988653, guid: 2845314df9e561d4abdd9e9e7b4db417,
       type: 3}
   - m_RefCount: 1
     m_Data: {fileID: -2409467939832598147, guid: 02501bf114d1a0a4f98fa72f08e7c70c,
@@ -197,6 +197,9 @@ TilemapRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

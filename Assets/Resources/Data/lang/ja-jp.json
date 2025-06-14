@@ -110,6 +110,8 @@
   "ui.options.general.filter": "チャットで不快な言葉を伏字にする",
   "ui.options.general.language": "言語",
   "ui.options.general.usenicknamecolor": "名前を特別な色に変える (利用できる場合)",
+  "ui.options.general.refreshnicknamecolor": "Discordアカウントと連携して名前の色に反映させる",
+  "ui.options.general.refreshnicknamecolor.button": "連携",
   "ui.options.general.discordintegration": "DiscordRPCを有効にする",
   "ui.options.general.replays": "リプレイ録画を有効にする",
   "ui.options.general.replays.maximum": "最大一時リプレイ数",

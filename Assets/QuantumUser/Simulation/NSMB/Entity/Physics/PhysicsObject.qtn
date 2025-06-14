@@ -34,7 +34,7 @@ struct PhysicsContact {
     FPVector2 Normal;
     FP Distance;
     int Frame;
-    Vector2Int Tile;
+    IntVector2 Tile;
     EntityRef Entity;
 }
 

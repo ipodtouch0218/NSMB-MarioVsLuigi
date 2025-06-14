@@ -60,15 +60,15 @@ public class VersusStageBaker : MapDataBakerCallback {
         tilemap.CompressBounds();
         stage.TilemapWorldPosition = tilemap.transform.position.ToFPVector2();
         if (!stage.OverrideAutomaticTilemapSettings) {
-            stage.TileOrigin = new Quantum.Vector2Int(tilemap.cellBounds.xMin, tilemap.cellBounds.yMin);
-            stage.TileDimensions = new Quantum.Vector2Int(tilemap.cellBounds.size.x, tilemap.cellBounds.size.y);
+            stage.TileOrigin = new IntVector2(tilemap.cellBounds.xMin, tilemap.cellBounds.yMin);
+            stage.TileDimensions = new IntVector2(tilemap.cellBounds.size.x, tilemap.cellBounds.size.y);
             LogInfo($"Automatically found stage dimensions: origin={stage.TileOrigin} size={stage.TileDimensions}");
         }
 
         // --- Camera Settings
         if (!stage.OverrideAutomaticCameraSettings) {
-            stage.CameraMinPosition = stage.TilemapWorldPosition + (((Vector2) stage.TileOrigin).ToFPVector2() / 2);
-            stage.CameraMaxPosition = stage.CameraMinPosition + (((Vector2) stage.TileDimensions).ToFPVector2() / 2);
+            stage.CameraMinPosition = stage.TilemapWorldPosition + ((FPVector2) stage.TileOrigin / 2);
+            stage.CameraMaxPosition = stage.CameraMinPosition + ((FPVector2) stage.TileDimensions / 2);
 
             if (stage.IsWrappingLevel) {
                 stage.CameraMinPosition.X = -1000;
@@ -81,14 +81,14 @@ public class VersusStageBaker : MapDataBakerCallback {
 
         // --- Bake Tilemap
         HashSet<AssetRef<StageTile>> uniqueTiles = new();
-        BoundsInt stageBounds = new(stage.TileOrigin.x, stage.TileOrigin.y, 0, stage.TileDimensions.x, stage.TileDimensions.y, 1);
+        BoundsInt stageBounds = new(stage.TileOrigin.X, stage.TileOrigin.Y, 0, stage.TileDimensions.X, stage.TileDimensions.Y, 1);
         TileBase[] stageTiles = tilemap.GetTilesBlock(stageBounds);
         stage.TileData = new StageTileInstance[stageTiles.Length];
         for (int i = 0; i < stageTiles.Length; i++) {
             Matrix4x4 mat = tilemap.GetTransformMatrix(
                 new Vector3Int(
-                    i % stage.TileDimensions.x + stage.TileOrigin.x,
-                    i / stage.TileDimensions.x + stage.TileOrigin.y
+                    i % stage.TileDimensions.X + stage.TileOrigin.X,
+                    i / stage.TileDimensions.X + stage.TileOrigin.Y
             ));
             stage.TileData[i] = GetStageTileInstance(stageTiles[i], mat);
             uniqueTiles.Add(stage.TileData[i].Tile);

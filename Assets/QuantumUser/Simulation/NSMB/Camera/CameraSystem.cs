@@ -109,7 +109,7 @@ namespace Quantum {
             bool right = newCameraPosition.X > camera->LastPlayerPosition.X;
 
             if (xDifference >= 2) {
-                newCameraPosition.X += (right ? -1 : 1) * stage.TileDimensions.x * FP._0_50;
+                newCameraPosition.X += (right ? -1 : 1) * stage.TileDimensions.X * FP._0_50;
                 xDifference = FPVector2.Distance(FPVector2.Right * newCameraPosition.X, FPVector2.Right * camera->LastPlayerPosition.X);
                 right = newCameraPosition.X > camera->LastPlayerPosition.X;
             }

@@ -1,8 +1,8 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class PiranhaPlantSystem : SystemMainThreadEntityFilter<PiranhaPlant, PiranhaPlantSystem.Filter>, ISignalOnTileChanged, ISignalOnEnemyRespawned,
-        ISignalOnBreakableObjectChangedHeight, ISignalOnIceBlockBroken {
+    public unsafe class PiranhaPlantSystem : SystemMainThreadEntityFilter<PiranhaPlant, PiranhaPlantSystem.Filter>, ISignalOnTileChanged,
+        ISignalOnEnemyRespawned, ISignalOnBreakableObjectChangedHeight, ISignalOnIceBlockBroken {
         
         public struct Filter {
             public EntityRef Entity;
@@ -101,7 +101,7 @@ namespace Quantum {
             }
         }
 
-        public void OnTileChanged(Frame f, int tileX, int tileY, StageTileInstance newTile) {
+        public void OnTileChanged(Frame f, IntVector2 tilePosition, StageTileInstance newTile) {
             var filter = f.Filter<Transform2D, PiranhaPlant, Enemy>();
             VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
@@ -110,8 +110,8 @@ namespace Quantum {
                     continue;
                 }
 
-                Vector2Int tile = QuantumUtils.WorldToRelativeTile(stage, enemy->Spawnpoint);
-                if (tile.x == tileX && tile.y == tileY) {
+                IntVector2 tile = QuantumUtils.WorldToRelativeTile(stage, enemy->Spawnpoint);
+                if (tile.Equals(tilePosition)) {
                     piranhaPlant->Kill(f, entity, EntityRef.None, KillReason.Special);
                 }
             }

@@ -32,7 +32,7 @@ namespace Quantum {
             }
 
             if (stageTile is TileInteractionRelocator tir) {
-                if (!f.TryFindAsset(stage.GetTileRelative((Frame) f, tir.RelocateTo.x, tir.RelocateTo.y).Tile, out stageTile)) {
+                if (!f.TryFindAsset(stage.GetTileRelative((Frame) f, tir.RelocateTo).Tile, out stageTile)) {
                     return false;
                 }
             }

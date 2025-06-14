@@ -25,11 +25,11 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: db2bb15e68990db4582869c4a4d80c44, type: 3}
   OverrideAutomaticTilemapSettings: 1
   TileDimensions:
-    x: 80
-    y: 31
+    X: 80
+    Y: 31
   TileOrigin:
-    x: -33
-    y: -11
+    X: -33
+    Y: -11
   TilemapWorldPosition:
     X:
       RawValue: -229376

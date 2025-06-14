@@ -51,14 +51,16 @@ namespace Quantum {
             var blockBump = filter.BlockBump;
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
-            stage.SetTileRelative(f, blockBump->TileX, blockBump->TileY, blockBump->ResultTile);
+            stage.SetTileRelative(f, blockBump->Tile, blockBump->ResultTile);
 
             if (blockBump->Powerup.IsValid) {
                 EntityRef newPowerup = f.Create(blockBump->Powerup);
                 if (f.Unsafe.TryGetPointer(newPowerup, out Powerup* powerup)) {
                     // Launch if downwards bump and theres a (solid) block below us
                     BreakableBrickTile tile = (BreakableBrickTile) f.FindAsset(blockBump->StartTile);
-                    StageTileInstance belowTileInstance = stage.GetTileRelative(f, blockBump->TileX, blockBump->TileY - FPMath.RoundToInt(tile.BumpSize.Y * 2));
+                    IntVector2 below = blockBump->Tile;
+                    below.Y -= FPMath.RoundToInt(tile.BumpSize.Y * 2);
+                    StageTileInstance belowTileInstance = stage.GetTileRelative(f, below);
                     bool launch = blockBump->IsDownwards && belowTileInstance.HasWorldPolygons(f);
 
                     FP powerupHeight = f.Unsafe.GetPointer<PhysicsCollider2D>(newPowerup)->Shape.Box.Extents.Y;

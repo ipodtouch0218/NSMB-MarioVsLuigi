@@ -14,18 +14,16 @@ global {
 }
 
 signal OnStageReset(bool full);
-signal OnTileChanged(int tileX, int tileY, StageTileInstance newTile);
+signal OnTileChanged(IntVector2 position, StageTileInstance newTile);
 
 event TileChanged {
-    int TileX;
-    int TileY;
+    IntVector2 Position;
     StageTileInstance NewTile;
 }
 
 event TileBroken {
     EntityRef Entity;
-    int TileX;
-    int TileY;
+    IntVector2 Position;
     StageTileInstance Tile;
     bool BrokenByMega;
 }

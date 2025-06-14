@@ -9,22 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b93d28497a61f0143858347120ac96a6, type: 3}
-  m_Name: RightRedirectStageTile
+  m_Script: {fileID: 11500000, guid: 6d97847a2693b724f89fe1384eaa00a4, type: 3}
+  m_Name: sky-mushroom_73StageTile
   m_EditorClassIdentifier: 
   Identifier:
-    Path: Resources/Tilemaps/Tiles/Bonus/RightRedirectStageTile
+    Path: Resources/Tilemaps/Tiles/Sky/sky-mushroom_73StageTile
     Guid:
-      Value: 495999676551921477
-  Tile: {fileID: 11400000, guid: 0cae8a6f72d6b9f49a5f1b949985e6c9, type: 2}
+      Value: 472979719447624384
+  Tile: {fileID: 11400000, guid: e059d600b348f7446af3348cedd664e3, type: 2}
   CollisionData:
-    IsFullTile: 1
+    IsFullTile: 0
     Shapes: []
   IsSlipperyGround: 0
   IsSlideableGround: 0
   IsPolygon: 1
   FootstepSound: 31
   FootstepParticle: 0
-  RelocateTo:
-    X: 103
-    Y: 9

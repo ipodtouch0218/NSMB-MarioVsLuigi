@@ -26,5 +26,5 @@ MonoBehaviour:
   FootstepSound: 31
   FootstepParticle: 0
   RelocateTo:
-    x: 39
-    y: 9
+    X: 39
+    Y: 9

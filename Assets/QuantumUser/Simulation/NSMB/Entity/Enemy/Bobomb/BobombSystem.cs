@@ -98,7 +98,7 @@ namespace Quantum {
             // Destroy tiles
             int sizeTiles = FPMath.FloorToInt(bobomb->ExplosionRadius * 2);
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            Vector2Int origin = QuantumUtils.WorldToRelativeTile(stage, transform->Position + filter.Collider->Shape.Centroid);
+            IntVector2 origin = QuantumUtils.WorldToRelativeTile(stage, transform->Position + filter.Collider->Shape.Centroid);
             for (int x = -sizeTiles; x <= sizeTiles; x++) {
                 for (int y = -sizeTiles; y <= sizeTiles; y++) {
                     // Taxicab distance
@@ -106,7 +106,7 @@ namespace Quantum {
                         continue;
                     }
 
-                    Vector2Int tilePos = origin + new Vector2Int(x, y);
+                    IntVector2 tilePos = origin + new IntVector2(x, y);
                     StageTileInstance tileInstance = stage.GetTileRelative(f, tilePos);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {

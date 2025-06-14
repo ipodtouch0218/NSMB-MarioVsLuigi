@@ -40,9 +40,11 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
         startTime = Time.timeAsDouble;
     }
 
+    /*
     public override void OnUpdateView() {
-        LevelWrapRenderPass.wrapAmount = ViewContext.Stage.TileDimensions.x * 0.5f;
+        LevelWrapRenderPass.wrapAmount = ViewContext.Stage.TileDimensions.X * 0.5f;
     }
+    */
 
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.Playing) {
@@ -88,7 +90,7 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
     }
 
     private void OnTileChanged(EventTileChanged e) {
-        Vector3Int coords = new(e.TileX, e.TileY, 0);
+        Vector3Int coords = (Vector3Int) e.Position.ToVector2Int();
         Vector2 scale = new Vector2 {
             x = e.NewTile.Flags.HasFlag(StageTileFlags.MirrorX) ? -1 : 1,
             y = e.NewTile.Flags.HasFlag(StageTileFlags.MirrorY) ? -1 : 1,
@@ -119,7 +121,7 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
 
     private unsafe void OnTileBroken(EventTileBroken e) {
         ParticleSystem particle = Instantiate(tileBreakParticleSystem,
-            QuantumUtils.RelativeTileToWorld(ViewContext.Stage, new Quantum.Vector2Int(e.TileX, e.TileY)).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
+            QuantumUtils.RelativeTileToWorld(ViewContext.Stage, e.Position).ToUnityVector2() + (Vector2.one * 0.25f), Quaternion.identity);
 
         if (QuantumUnityDB.GetGlobalAsset(e.Tile.Tile) is BreakableBrickTile bbt) {
             var main = particle.main;
@@ -140,16 +142,16 @@ public class TilemapAnimator : QuantumSceneViewComponent<StageContext> {
     
     private void RefreshMap(Frame f) {
         VersusStageData stage = ViewContext.Stage;
+        int width = stage.TileDimensions.X;
         if (f == null
             || f.StageTiles == null 
-            || f.StageTiles.Length != stage.TileDimensions.x * stage.TileDimensions.y) {
+            || f.StageTiles.Length != width * stage.TileDimensions.Y) {
             return;
         }
 
-        int width = stage.TileDimensions.x;
         for (int x = 0; x < width; x++) {
-            for (int y = 0; y < stage.TileDimensions.y; y++) {
-                Vector3Int coords = new(stage.TileOrigin.x + x, stage.TileOrigin.y + y, 0);
+            for (int y = 0; y < stage.TileDimensions.Y; y++) {
+                Vector3Int coords = new(stage.TileOrigin.X + x, stage.TileOrigin.Y + y, 0);
 
                 StageTileInstance tileInstance = f.StageTiles[x + y * width];
                 StageTile stageTile = QuantumUnityDB.GetGlobalAsset(tileInstance.Tile);

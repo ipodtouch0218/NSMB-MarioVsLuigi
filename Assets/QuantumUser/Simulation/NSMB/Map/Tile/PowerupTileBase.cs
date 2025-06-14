@@ -1,3 +1,4 @@
+using Photon.Deterministic;
 using Quantum;
 using static IInteractableTile;
 
@@ -5,7 +6,7 @@ public unsafe abstract class PowerupTileBase : BreakableBrickTile {
 
     public StageTileInstance resultTile;
 
-    public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, Vector2Int tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
+    public override bool Interact(Frame f, EntityRef entity, InteractionDirection direction, IntVector2 tilePosition, StageTileInstance tileInstance, out bool playBumpSound) {
         if (base.Interact(f, entity, direction, tilePosition, tileInstance, out playBumpSound)) {
             return true;
         }

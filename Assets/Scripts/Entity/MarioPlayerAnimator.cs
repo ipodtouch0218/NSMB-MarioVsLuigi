@@ -537,7 +537,6 @@ namespace NSMB.Entities.Player {
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;
-
             largeModel.SetActive(large);
             smallModel.SetActive(!large);
             blueShell.SetActive(mario->CurrentPowerupState == PowerupState.BlueShell);

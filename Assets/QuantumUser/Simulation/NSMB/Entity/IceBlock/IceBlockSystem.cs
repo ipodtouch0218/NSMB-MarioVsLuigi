@@ -39,7 +39,7 @@ namespace Quantum {
             if (childFreezable->IsCarryable) {
                 var childTransform = f.Unsafe.GetPointer<Transform2D>(iceBlock->Entity);
                 FPVector2 newPosition = transform->Position - iceBlock->ChildOffset;
-                if (stage.IsWrappingLevel && FPVector2.Distance(childTransform->Position, newPosition) > stage.TileDimensions.x / (FP) 4) {
+                if (stage.IsWrappingLevel && FPVector2.Distance(childTransform->Position, newPosition) > stage.TileDimensions.X / (FP) 4) {
                     childTransform->Teleport(f, newPosition);
                 } else {
                     childTransform->Position = newPosition;

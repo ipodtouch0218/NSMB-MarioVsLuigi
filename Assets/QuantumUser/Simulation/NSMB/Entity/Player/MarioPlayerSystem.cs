@@ -1070,7 +1070,7 @@ namespace Quantum {
                     }
 
                     // Wall tiles.
-                    Vector2Int tileCoords = contact.Tile;
+                    IntVector2 tileCoords = contact.Tile;
                     var tileInstance = stage.GetTileRelative(f, tileCoords);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
@@ -1414,7 +1414,7 @@ namespace Quantum {
             EntityRef newEntity = f.Create(f.SimulationConfig.HammerPrototype);
 
             var projectile = f.Unsafe.GetPointer<Projectile>(newEntity);
-            projectile->InitializeHammer(f, newEntity, filter.Entity, spawnPos, mario->FacingRight, filter.Inputs.Up.IsDown);
+            projectile->InitializeHammer(f, newEntity, filter.Entity, spawnPos, mario->FacingRight, false /* filter.Inputs.Up.IsDown */);
             return projectile;
         }
 
@@ -1717,14 +1717,6 @@ namespace Quantum {
 
             bool wasStuckLastTick = mario->IsStuckInBlock;
 
-            mario->IsStuckInBlock = true;
-            mario->CurrentKnockback = KnockbackStrength.None;
-            mario->IsGroundpounding = false;
-            mario->IsPropellerFlying = false;
-            mario->IsDrilling = false;
-            mario->IsSpinnerFlying = false;
-            physicsObject->IsTouchingGround = false;
-
             if (!wasStuckLastTick || (f.Number + filter.Entity.Index) % 4 == 0) {
                 // Code for mario to instantly teleport to the closest free position when he gets stuck
                 if (PhysicsObjectSystem.TryEject((FrameThreadSafe) f, filter.Entity, stage)) {
@@ -1737,6 +1729,13 @@ namespace Quantum {
                 }
             }
 
+            mario->IsStuckInBlock = true;
+            mario->CurrentKnockback = KnockbackStrength.None;
+            mario->IsGroundpounding = false;
+            mario->IsPropellerFlying = false;
+            mario->IsDrilling = false;
+            mario->IsSpinnerFlying = false;
+            physicsObject->IsTouchingGround = false;
             physicsObject->Gravity = FPVector2.Zero;
             physicsObject->Velocity = FPVector2.Right * 2;
             physicsObject->DisableCollision = true;
@@ -1965,6 +1964,7 @@ namespace Quantum {
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
                 && mario->IsDamageable
                 && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell);
+
             if (damageable) {
                 bool didKnockback = false;
                 switch (projectileAsset.Effect) {
@@ -1993,7 +1993,7 @@ namespace Quantum {
                 }
             }
 
-            if (damageable || projectileAsset.DestroyOnHit) {
+            if (damageable || projectileAsset.DestroyOnHit || ((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell)) {
                 f.Signals.OnProjectileHitEntity(f, projectileEntity, marioEntity);
             }
         }
@@ -2559,6 +2559,10 @@ namespace Quantum {
             mario->IsPropellerFlying = false;
             mario->IsSpinnerFlying = false;
             mario->IsDrilling = false;
+            mario->IsCrouching = false;
+            mario->IsGroundpounding = false;
+            mario->IsSliding = false;
+
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
                 mario->HeldEntity = EntityRef.None;
                 holdable->Holder = EntityRef.None;

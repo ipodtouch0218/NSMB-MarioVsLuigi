@@ -44,7 +44,7 @@ namespace Quantum {
             VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             FP min = stage.StageWorldMin.X;
             FP max = stage.StageWorldMax.X;
-            FP offset = stage.TileDimensions.x * FP._0_50;
+            FP offset = stage.TileDimensions.X * FP._0_50;
 
             Filter filter = default;
             var it = f.Unsafe.FilterStruct<Filter>();

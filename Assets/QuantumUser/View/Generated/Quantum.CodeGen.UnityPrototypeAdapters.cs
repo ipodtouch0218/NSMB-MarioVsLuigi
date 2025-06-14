@@ -72,7 +72,7 @@ namespace Quantum.Prototypes.Unity {
     public FPVector2 Normal;
     public FP Distance;
     public Int32 Frame;
-    public Quantum.Prototypes.Vector2IntPrototype Tile;
+    public IntVector2 Tile;
     public Quantum.QuantumEntityPrototype Entity;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.PhysicsContactPrototype prototype);
     public override Quantum.Prototypes.PhysicsContactPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {

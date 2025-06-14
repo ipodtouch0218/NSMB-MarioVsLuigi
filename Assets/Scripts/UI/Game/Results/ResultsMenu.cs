@@ -44,11 +44,9 @@ namespace NSMB.UI.Game.Results {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             RefreshAll();
 
-            if (!NetworkHandler.IsReplay) {
-                countdown.enabled = false;
-                checkmark.enabled = false;
-                checkbox.enabled = false;
-            }
+            countdown.gameObject.SetActive(!NetworkHandler.IsReplay);
+            checkmark.gameObject.SetActive(!NetworkHandler.IsReplay);
+            checkbox.gameObject.SetActive(!NetworkHandler.IsReplay);
         }
 
         public override void OnDisable() {

@@ -20,8 +20,12 @@ namespace NSMB.UI.MainMenu.Submenus {
 
         public override void Initialize() {
             base.Initialize();
-
             replayList.Initialize();
+        }
+
+        public override void OnDestroy() {
+            base.OnDestroy();
+            replayList.OnDestroyCustom();
         }
 
         public override void Show(bool first) {

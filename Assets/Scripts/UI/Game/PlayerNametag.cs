@@ -85,8 +85,8 @@ namespace NSMB.UI.Game {
             Camera cam = elements.Camera;
             if (stage.IsWrappingLevel) {
                 // Wrapping
-                if (Mathf.Abs(worldPos.x - cam.transform.position.x) > (stage.TileDimensions.x * 0.25f)) {
-                    worldPos.x += (cam.transform.position.x > ((stage.StageWorldMin.X + stage.StageWorldMax.X) / 2).AsFloat ? 1 : -1) * (stage.TileDimensions.x * 0.5f);
+                if (Mathf.Abs(worldPos.x - cam.transform.position.x) > (stage.TileDimensions.X * 0.25f)) {
+                    worldPos.x += (cam.transform.position.x > ((stage.StageWorldMin.X + stage.StageWorldMax.X) / 2).AsFloat ? 1 : -1) * (stage.TileDimensions.X * 0.5f);
                 }
             }
 

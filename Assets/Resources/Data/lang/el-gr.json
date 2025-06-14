@@ -110,6 +110,8 @@
   "ui.options.general.filter": "Φιλτράρισμα/Λογοκρισία ",
   "ui.options.general.language": "Ρύθμιση Γλώσσας",
   "ui.options.general.usenicknamecolor": "Ιδιαίτερο χρώμα στο όνομα (αν είναι διαθέσιμο)",
+  "ui.options.general.refreshnicknamecolor": "Βάλτε Link στο λογαριασμό Discord σας για να αποκτήσετε χρώμα στο όνομα σας",
+  "ui.options.general.refreshnicknamecolor.button": "Link το λογαριασμό σας",
   "ui.options.general.discordintegration": "Ρύθμιση εμφάνισης στο Discord",
   "ui.options.general.replays": "Ρύθμιση Καταγραφής Επανάληψης",
   "ui.options.general.replays.maximum": "Μaximum Προσωρινές Επαναλήψεις",

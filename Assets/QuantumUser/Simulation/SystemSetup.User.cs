@@ -44,7 +44,6 @@ namespace Quantum {
                     new HoldableObjectSystem(),
                     new IceBlockSystem(),
                     new CameraSystem(),
-                    new StageSystem(),
                     new LiquidSystem(),
                     new BreakableObjectSystem(),
                     new MarioBrosPlatformSystem(),
@@ -53,6 +52,7 @@ namespace Quantum {
                     // new BetterPhysicsObjectSystem()
                 )
             );
+            systems.Add(new StageSystem());
         }
     }
 }

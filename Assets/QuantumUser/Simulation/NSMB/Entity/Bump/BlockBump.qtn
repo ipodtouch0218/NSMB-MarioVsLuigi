@@ -6,8 +6,7 @@ component BlockBump {
 	
 	[ExcludeFromPrototype] bool IsDownwards;
 	[ExcludeFromPrototype] FPVector2 Origin;
-	[ExcludeFromPrototype] int TileX;
-	[ExcludeFromPrototype] int TileY;
+	[ExcludeFromPrototype] IntVector2 Tile;
 	[ExcludeFromPrototype] EntityRef Owner;
 	
 	[ExcludeFromPrototype] bool AllowSelfDamage;
