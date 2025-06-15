@@ -274,6 +274,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
         // Find end-game data
         Frame f = game.Frames.Verified;
+        var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
 
         int players = f.Global->RealPlayers;
         ReplayPlayerInformation[] playerInformation = new ReplayPlayerInformation[players];
@@ -294,7 +295,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
 
                 // Found him :)
                 if (mario->Lives > 0 || !f.Global->Rules.IsLivesEnabled) {
-                    playerInformation[i].FinalStarCount = mario->Stars;
+                    playerInformation[i].FinalObjectiveCount = gamemode.GetObjectiveCount(f, mario);
                 }
                 break;
             }

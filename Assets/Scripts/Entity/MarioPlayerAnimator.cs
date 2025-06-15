@@ -137,6 +137,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedPowerup>(this, OnMarioPlayerCollectedPowerup, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUsedReserveItem>(this, OnMarioPlayerUsedReserveItem, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCollectedObjectiveCoin>(this, OnMarioPlayerCollectedObjectiveCoin, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerWalljumped>(this, OnMarioPlayerWalljumped, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerShotProjectile>(this, OnMarioPlayerShotProjectile, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUsedPropeller>(this, OnMarioPlayerUsedPropeller, NetworkHandler.FilterOutReplayFastForward);
@@ -954,10 +955,12 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
+            var mario = VerifiedFrame.Unsafe.GetPointer<MarioPlayer>(EntityRef);
+
             GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(), Quaternion.identity);
             number.GetComponentInChildren<NumberParticle>().Initialize(
                 Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
-                Utils.Utils.GetPlayerColor(VerifiedFrame, e.Mario.PlayerRef),
+                Utils.Utils.GetPlayerColor(VerifiedFrame, mario->PlayerRef),
                 e.ItemSpawned
             );
 
@@ -971,6 +974,14 @@ namespace NSMB.Entities.Player {
                 coin.GetComponentInChildren<Animator>().SetBool("down", e.Downwards);
                 Destroy(coin, 1);
             }
+        }
+
+        private void OnMarioPlayerCollectedObjectiveCoin(EventMarioPlayerCollectedObjectiveCoin e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            PlaySound(SoundEffect.World_Coin_Collect);
         }
 
         private void OnMarioPlayerUsedReserveItem(EventMarioPlayerUsedReserveItem e) {

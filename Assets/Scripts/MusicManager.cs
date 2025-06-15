@@ -90,7 +90,11 @@ namespace NSMB.Sound {
             }
 
             speedup |= rules.IsTimerEnabled && f.Global->Timer <= 60;
-            speedup |= QuantumUtils.GetFirstPlaceStars(f) >= rules.StarsToWin - 1;
+
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            if (gamemode is StarChasersGamemode) {
+                speedup |= gamemode.GetFirstPlaceObjectiveCount(f) >= rules.StarsToWin - 1;
+            }
 
             if (!speedup && rules.IsLivesEnabled) {
                 // Also speed up the music if:

@@ -1,7 +1,9 @@
 using NSMB.Extensions;
+using NSMB.UI.Game;
 using Quantum;
 using Quantum.Profiling;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public unsafe class CoinAnimator : QuantumEntityViewComponent {
 
@@ -22,6 +24,8 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType);
         QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected);
         QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced, NetworkHandler.FilterOutReplayFastForward);
+
+        RenderPipelineManager.beginCameraRendering += URPOnPreRender;
     }
 
     public override void OnActivate(Frame f) {
@@ -31,6 +35,11 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         defaultCoinAnimate.isDisplaying = !dotted;
         dottedCoinAnimate.isDisplaying = dotted;
         sRenderer.enabled = true;
+
+        if (looseCoin) {
+            defaultCoinAnimate.frame = Random.Range(0, defaultCoinAnimate.frames.Length);
+            dottedCoinAnimate.frame = Random.Range(0, dottedCoinAnimate.frames.Length);
+        }
     }
 
     public override void OnDeactivate() {
@@ -41,8 +50,12 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
             sparkles.gameObject.SetActive(true);
             sparkles.transform.position = sRenderer.transform.position;
             sparkles.Play();
-            // Destroy(sparkles, 0.5f);
+            Destroy(sparkles, 0.5f);
         }
+    }
+
+    public void OnDestroy() {
+        RenderPipelineManager.beginCameraRendering -= URPOnPreRender;
     }
 
     public override void OnUpdateView() {
@@ -53,13 +66,41 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         }
 
         var coin = f.Unsafe.GetPointer<Coin>(EntityRef);
-        if (coin->IsFloating) {
+        if (coin->CoinType.HasFlag(CoinType.BakedInStage)) {
             // Bodge: OnCoinChangedCollected doesnt work when collecting a coin at the exact same time as a level reset 
             sRenderer.enabled = !coin->IsCollected;
         } else {
             float despawnTimeRemaining = coin->Lifetime / 60f;
             sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
         }
+    }
+
+    private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
+        if (!PredictedFrame.Unsafe.TryGetPointer(EntityRef, out Coin* coin)) {
+            return;
+        }
+
+        Color newColor = sRenderer.color;
+        if (!coin->CoinType.HasFlag(CoinType.Objective) || coin->UncollectableByTeam == 0) {
+            newColor.a = 1;
+        } else {
+            newColor.a = IsSameTeamAsCamera(coin->UncollectableByTeam - 1, camera) ? 0.5f : 1f;
+        }
+        sRenderer.color = newColor;
+    }
+
+    private bool IsSameTeamAsCamera(int team, Camera camera) {
+        Frame f = PredictedFrame;
+        foreach (var playerElement in PlayerElements.AllPlayerElements) {
+            if (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera) {
+                if (!f.Unsafe.TryGetPointer(playerElement.Entity, out MarioPlayer* mario)) {
+                    return false;
+                }
+
+                return (mario->GetTeam(f) ?? -1) == team;
+            }
+        }
+        return false;
     }
 
     private void OnCoinBounced(EventCoinBounced e) {

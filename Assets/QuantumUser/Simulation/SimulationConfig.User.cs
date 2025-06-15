@@ -10,7 +10,8 @@
         public AssetRef<PaletteSet>[] Palettes;
         public AssetRef<TeamAsset>[] Teams;
 
-        public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, HammerPrototype, BigStarPrototype, BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype;
+        public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, HammerPrototype, BigStarPrototype,
+            BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype, ObjectiveCoinPrototype;
 
         public GameRules DefaultRules;
     }

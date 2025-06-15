@@ -4046,7 +4046,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4816589439766496887}
   m_Layer: 5
-  m_Name: Stars
+  m_Name: Objective
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6917,7 +6917,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5165031852593466068}
   m_Layer: 5
-  m_Name: TeamStars
+  m_Name: TeamObjective
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12869,8 +12869,8 @@ MonoBehaviour:
   starTrackTemplate: {fileID: 5220781289269746384}
   storedItemNull: {fileID: -4773353537684922170, guid: a87d3b028baa82640b06b88398a8c4f0,
     type: 3}
-  uiTeamStars: {fileID: 6351876667869609118}
-  uiStars: {fileID: 6356617607841636795}
+  uiTeamObjective: {fileID: 6351876667869609118}
+  uiMainObjective: {fileID: 6356617607841636795}
   uiCoins: {fileID: 8244829103061859479}
   uiDebug: {fileID: 5638134669428853890}
   uiLives: {fileID: 1202268358476825055}

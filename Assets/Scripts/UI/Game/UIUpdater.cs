@@ -23,7 +23,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private CanvasGroup toggler;
         [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
-        [SerializeField] private TMP_Text uiTeamStars, uiStars, uiCoins, uiDebug, uiLives, uiCountdown;
+        [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
         [SerializeField] private GameObject boos, reserveItemBox;
         [SerializeField] private Animation reserveAnimation;
@@ -39,7 +39,7 @@ namespace NSMB.UI.Game {
         private Material timerMaterial;
 
         //private TeamManager teamManager;
-        private int cachedCoins = -1, cachedTeamStars = -1, cachedStars = -1, cachedLives = -1, cachedTimer = -1;
+        private int cachedCoins = -1, cachedTeamObjective = -1, cachedObjective = -1, cachedLives = -1, cachedTimer = -1;
         private PowerupAsset previousPowerup;
         private EntityRef previousTarget;
         private bool previousMarioExists;
@@ -77,8 +77,8 @@ namespace NSMB.UI.Game {
         }
 
         public void Awake() {
-            teamsParent = uiTeamStars.transform.parent.gameObject;
-            starsParent = uiStars.transform.parent.gameObject;
+            teamsParent = uiTeamObjective.transform.parent.gameObject;
+            starsParent = uiMainObjective.transform.parent.gameObject;
             coinsParent = uiCoins.transform.parent.gameObject;
             livesParent = uiLives.transform.parent.gameObject;
             timerParent = uiCountdown.transform.parent.gameObject;
@@ -236,10 +236,10 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void UpdateTextUI(Frame f, MarioPlayer* mario) {
-
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             var rules = f.Global->Rules;
 
-            int starRequirement = rules.StarsToWin;
+            //int starRequirement = rules.StarsToWin;
             int coinRequirement = rules.CoinsForPowerup;
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
@@ -248,24 +248,26 @@ namespace NSMB.UI.Game {
             // TEAMS
             if (teamsEnabled) {
                 if (mario->GetTeam(f) is byte teamIndex) {
-                    int teamStars = QuantumUtils.GetTeamStars(f, teamIndex);
-                    if (cachedTeamStars != teamStars) {
-                        cachedTeamStars = teamStars;
+                    int teamObjective = gamemode.GetTeamObjectiveCount(f, teamIndex);
+                    if (cachedTeamObjective != teamObjective) {
+                        cachedTeamObjective = teamObjective;
                         TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
-                        uiTeamStars.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamStars + "/" + starRequirement);
+                        // TODO: fix teams for coin runners.
+                        uiTeamObjective.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamObjective + "/" + rules.StarsToWin);
                     }
                 }
             }
 
             // STARS
-            if (mario->Stars != cachedStars) {
-                cachedStars = mario->Stars;
-                string starString = "Sx" + cachedStars;
-                if (!teamsEnabled) {
-                    starString += "/" + starRequirement;
+            int objective = gamemode.GetObjectiveCount(f, mario);
+            if (objective != cachedObjective) {
+                cachedObjective = mario->GamemodeData.StarChasers->Stars;
+                string objectiveString = gamemode.ObjectiveSymbolPrefix + "x" + cachedObjective;
+                if (gamemode is StarChasersGamemode && !teamsEnabled) {
+                    objectiveString += "/" + rules.StarsToWin;
                 }
 
-                uiStars.text = Utils.Utils.GetSymbolString(starString);
+                uiMainObjective.text = Utils.Utils.GetSymbolString(objectiveString);
             }
 
             // COINS

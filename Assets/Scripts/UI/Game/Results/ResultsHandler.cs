@@ -69,11 +69,13 @@ namespace NSMB.UI.Game.Results {
         }
 
         public unsafe void InitializeResultsEntries(Frame f, float additionalDelay) {
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+
             // Generate scores
             Dictionary<int, int> teamRankings = null;
             if (f.Global->HasWinner) {
-                Span<short> teamScores = stackalloc short[10];
-                QuantumUtils.GetAllTeamsStars(f, teamScores);
+                Span<int> teamScores = stackalloc int[10];
+                gamemode.GetAllTeamsObjectiveCounts(f, teamScores);
 
                 Dictionary<int, int> teamScoresDict = new();
                 for (int i = 0; i < teamScores.Length; i++) {
@@ -81,20 +83,20 @@ namespace NSMB.UI.Game.Results {
                 }
 
                 teamRankings = new();
-                int previousStarCount = -1;
+                int previousObjectiveCount = -1;
                 int repeatedCount = 0;
                 int currentRanking = 1;
-                foreach ((int teamIndex, int stars) in teamScoresDict.OrderByDescending(x => x.Value)) {
-                    if (stars < 0) {
+                foreach ((int teamIndex, int objectiveCount) in teamScoresDict.OrderByDescending(x => x.Value)) {
+                    if (objectiveCount < 0) {
                         teamRankings[teamIndex] = Constants.MaxPlayers;
-                    } else if (previousStarCount == stars) {
+                    } else if (previousObjectiveCount == objectiveCount) {
                         repeatedCount++;
                         teamRankings[teamIndex] = currentRanking - 1;
                     } else {
                         currentRanking += repeatedCount;
                         teamRankings[teamIndex] = currentRanking;
                         currentRanking++;
-                        previousStarCount = stars;
+                        previousObjectiveCount = objectiveCount;
                         repeatedCount = 0;
                     }
                 }
@@ -107,9 +109,9 @@ namespace NSMB.UI.Game.Results {
                 infos.Add(f.Global->PlayerInfo[i]);
             }
             infos.Sort((x, y) => {
-                int starDiff = y.GetStarCount(f) - x.GetStarCount(f);
-                if (starDiff != 0) {
-                    return starDiff;
+                int objectiveDiff = gamemode.GetObjectiveCount(f, y.PlayerRef) - gamemode.GetObjectiveCount(f, x.PlayerRef);
+                if (objectiveDiff != 0) {
+                    return objectiveDiff;
                 }
 
                 int xRank = teamRankings != null ? teamRankings[x.Team] : Constants.MaxPlayers;
@@ -118,13 +120,13 @@ namespace NSMB.UI.Game.Results {
             });
             foreach (var info in infos) {
                 int rank = teamRankings != null ? teamRankings[info.Team] : Constants.MaxPlayers;
-                entries[initializeCount].Initialize(f, info, rank, (initializeCount * delayPerEntry) + additionalDelay, info.GetStarCount(f));
+                entries[initializeCount].Initialize(f, gamemode, info, rank, (initializeCount * delayPerEntry) + additionalDelay, gamemode.GetObjectiveCount(f, info.PlayerRef));
                 initializeCount++;
             }
 
             // Initialize remaining scores
             for (int i = initializeCount; i < entries.Count; i++) {
-                entries[i].Initialize(f, null, -1, (i * delayPerEntry) + additionalDelay);
+                entries[i].Initialize(f, gamemode, null, -1, (i * delayPerEntry) + additionalDelay);
             }
         }
 

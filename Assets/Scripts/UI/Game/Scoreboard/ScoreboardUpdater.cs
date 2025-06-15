@@ -98,6 +98,7 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         public unsafe void SortScoreboard(Frame f) {
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             entries.Sort((se1, se2) => {
                 if (f.Exists(se1.Target) && !f.Exists(se2.Target)) {
                     return -1;
@@ -122,7 +123,7 @@ namespace NSMB.UI.Game.Scoreboard {
                     return mario2->Lives - mario1->Lives;
                 }
 
-                int starDiff = mario2->Stars - mario1->Stars;
+                int starDiff = gamemode.GetObjectiveCount(f, mario2) - gamemode.GetObjectiveCount(f, mario1);
                 if (starDiff != 0) {
                     return starDiff;
                 }
@@ -152,8 +153,9 @@ namespace NSMB.UI.Game.Scoreboard {
             AssetRef<TeamAsset>[] teamAssets = f.SimulationConfig.Teams;
             StringBuilder result = new();
 
-            Span<short> teamStars = stackalloc short[10];
-            QuantumUtils.GetAllTeamsStars(f, teamStars);
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            Span<int> teamObjectiveCounts = stackalloc int[10];
+            gamemode.GetAllTeamsObjectiveCounts(f, teamObjectiveCounts);
             int aliveTeams = QuantumUtils.GetValidTeams(f);
             for (int i = 0; i < 10; i++) {
                 if ((aliveTeams & (1 << i)) == 0) {
@@ -161,13 +163,13 @@ namespace NSMB.UI.Game.Scoreboard {
                     continue;
                 }
 
-                short stars = teamStars[i];
-                if (stars < 0) {
-                    stars = 0;
+                int objectiveCount = teamObjectiveCounts[i];
+                if (objectiveCount < 0) {
+                    objectiveCount = 0;
                 }
                 TeamAsset team = f.FindAsset(teamAssets[i]);
                 result.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
-                result.Append(Utils.Utils.GetSymbolString("x" + stars));
+                result.Append(Utils.Utils.GetSymbolString("x" + objectiveCount));
             }
 
             teamHeaderText.text = result.ToString();

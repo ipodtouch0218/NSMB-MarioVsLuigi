@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
-        ISignalOnLoadingComplete, ISignalOnMarioPlayerCollectedStar, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
+        ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
@@ -110,6 +110,10 @@ namespace Quantum {
                     // Respawn all players and enable systems
                     f.Global->StartFrame = f.Number;
                     f.SystemEnable<StartDisabledSystemGroup>();
+
+                    var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+                    gamemode.EnableGamemode(f);
+
                     f.Signals.OnGameStarting();
                     f.Events.GameStarted();
                 }
@@ -121,6 +125,13 @@ namespace Quantum {
                         f.Global->Timer = 0;
                         CheckForGameEnd(f);
                         f.Events.TimerExpired(f);
+                    }
+                }
+
+                if (f.Global->AutomaticStageRefreshInterval > 0) {
+                    if (QuantumUtils.Decrement(ref f.Global->AutomaticStageRefreshTimer)) {
+                        
+                        f.Global->AutomaticStageRefreshTimer = f.Global->AutomaticStageRefreshInterval;
                     }
                 }
 
@@ -158,63 +169,8 @@ namespace Quantum {
         }
 
         public static void CheckForGameEnd(Frame f) {
-            // End Condition: only one team alive
-            var marioFilter = f.Filter<MarioPlayer>();
-            marioFilter.UseCulling = false;
-
-            bool livesGame = f.Global->Rules.IsLivesEnabled;
-            bool oneOrNoTeamAlive = true;
-            int aliveTeam = -1;
-            while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
-                if ((livesGame && mario->Lives <= 0) || mario->Disconnected) {
-                    continue;
-                }
-
-                if (aliveTeam == -1 && mario->GetTeam(f) is byte team) {
-                    aliveTeam = team;
-                } else {
-                    oneOrNoTeamAlive = false;
-                    break;
-                }
-            }
-
-            if (oneOrNoTeamAlive) {
-                if (aliveTeam == -1) {
-                    // It's a draw
-                    EndGame(f, false, null);
-                    return;
-                } else if (f.Global->RealPlayers > 1) {
-                    // <team> wins, assuming more than 1 player
-                    // so the player doesn't insta-win in a solo game.
-                    EndGame(f, false, aliveTeam);
-                    return;
-                }
-            }
-
-            int? winningTeam = QuantumUtils.GetWinningTeam(f, out int stars);
-
-            // End Condition: team gets to enough stars
-            if (winningTeam != null && stars >= f.Global->Rules.StarsToWin) {
-                // <team> wins
-                EndGame(f, false, winningTeam.Value);
-                return;
-            }
-
-            // End Condition: timer expires
-            if (f.Global->Rules.IsTimerEnabled && f.Global->Timer <= 0) {
-                if (f.Global->Rules.DrawOnTimeUp) {
-                    // It's a draw
-                    EndGame(f, false, null);
-                    return;
-                }
-
-                // Check if one team is winning
-                if (winningTeam != null) {
-                    // <team> wins
-                    EndGame(f, false, winningTeam.Value);
-                    return;
-                }
-            }
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            gamemode.CheckForGameEnd(f);
         }
 
         public static void EndGame(Frame f, bool endedByHost, int? winningTeam) {
@@ -241,6 +197,9 @@ namespace Quantum {
             f.Events.GameStateChanged(GameState.Ended);
             f.Global->GameStartFrames = (ushort) ((endedByHost ? Constants._3_50 : 21) * f.UpdateRate);
             f.SystemDisable<StartDisabledSystemGroup>();
+
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            gamemode.DisableGamemode(f);
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
@@ -429,10 +388,6 @@ namespace Quantum {
                 var camera = f.Unsafe.GetPointer<CameraController>(entity);
                 camera->Recenter(stage, stage.GetWorldSpawnpointForPlayer(mario->SpawnpointIndex, f.Global->TotalMarios));
             }
-        }
-
-        public void OnMarioPlayerCollectedStar(Frame f, EntityRef entity) {
-            CheckForGameEnd(f);
         }
 
         public void OnReturnToRoom(Frame f) {

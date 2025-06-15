@@ -1,25 +1,35 @@
 component Coin {
-	bool IsFloating;
-	bool IsDotted;
+	CoinType CoinType;
 	ushort Lifetime;
 	byte UncollectableFrames;
 	
 	[ExcludeFromPrototype] bool IsCollected;
 	[ExcludeFromPrototype] bool IsCurrentlyDotted;
 	[ExcludeFromPrototype] byte DottedChangeFrames;
+	[ExcludeFromPrototype] byte UncollectableByTeam;
 }
 
-signal OnMarioPlayerCollectedCoin(EntityRef marioEntity, MarioPlayer* mario, FPVector2 worldLocation, bool fromBlock, bool downwards);
+[System.Flags]
+enum CoinType : Byte {
+	BakedInStage = 1,
+	Dotted = 2,
+	Objective = 4,
+}
+
+signal OnMarioPlayerCollectedCoin(EntityRef marioEntity, EntityRef coinEntity, FPVector2 worldLocation, bool fromBlock, bool downwards);
 
 synced event MarioPlayerCollectedCoin {
-	entity_ref Entity;
-	MarioPlayer Mario;
+	EntityRef Entity;
 	byte Coins;
 	bool ItemSpawned;
 
 	FPVector2 CoinLocation;
 	bool CoinFromBlock;
 	bool Downwards;
+}
+
+synced event MarioPlayerCollectedObjectiveCoin {
+	EntityRef Entity;
 }
 
 event CoinChangedType {

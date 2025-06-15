@@ -105,6 +105,7 @@ namespace NSMB.UI.Game {
             if (!f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
                 return;
             }
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
 
             stringBuilder.Clear();
 
@@ -119,7 +120,7 @@ namespace NSMB.UI.Game {
                 stringBuilder.Append(character.UiString).Append(Utils.Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
             }
 
-            stringBuilder.Append(Utils.Utils.GetSymbolString("Sx" + mario->Stars));
+            stringBuilder.Append(Utils.Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + gamemode.GetObjectiveCount(f, mario)));
 
             text.text = stringBuilder.ToString();
         }

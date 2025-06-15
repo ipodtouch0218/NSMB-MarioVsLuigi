@@ -161,7 +161,7 @@ public class ReplayListManager : Selectable {
             builder.Append("<width=100%><pos=90%><sprite name=room_stars>");
             builder.Append("<line-height=0><align=right><br>");
             builder.Append(info.Team == header.WinningTeam ? "<color=yellow>" : "<color=white>");
-            builder.Append(info.FinalStarCount);
+            builder.Append(info.FinalObjectiveCount);
 
             // Fix formatting
             builder.AppendLine("<align=left><line-height=100%>");

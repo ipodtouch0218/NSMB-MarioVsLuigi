@@ -253,8 +253,7 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Coin))]
   public unsafe partial class CoinPrototype : ComponentPrototype<Quantum.Coin> {
-    public QBoolean IsFloating;
-    public QBoolean IsDotted;
+    public Quantum.QEnum8<CoinType> CoinType;
     public UInt16 Lifetime;
     public Byte UncollectableFrames;
     partial void MaterializeUser(Frame frame, ref Quantum.Coin result, in PrototypeMaterializationContext context);
@@ -264,10 +263,19 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.Coin result, in PrototypeMaterializationContext context = default) {
-        result.IsFloating = this.IsFloating;
-        result.IsDotted = this.IsDotted;
+        result.CoinType = this.CoinType;
         result.Lifetime = this.Lifetime;
         result.UncollectableFrames = this.UncollectableFrames;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.CoinRunnersData))]
+  public unsafe partial class CoinRunnersDataPrototype : StructPrototype {
+    public Int32 ObjectiveCoins;
+    partial void MaterializeUser(Frame frame, ref Quantum.CoinRunnersData result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.CoinRunnersData result, in PrototypeMaterializationContext context = default) {
+        result.ObjectiveCoins = this.ObjectiveCoins;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -372,6 +380,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.GameRules))]
   public unsafe partial class GameRulesPrototype : StructPrototype {
     public AssetRef<Map> Stage;
+    public AssetRef<GamemodeAsset> Gamemode;
     public Int32 StarsToWin;
     public Int32 CoinsForPowerup;
     public Int32 Lives;
@@ -382,6 +391,7 @@ namespace Quantum.Prototypes {
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
+        result.Gamemode = this.Gamemode;
         result.StarsToWin = this.StarsToWin;
         result.CoinsForPowerup = this.CoinsForPowerup;
         result.Lives = this.Lives;
@@ -389,6 +399,23 @@ namespace Quantum.Prototypes {
         result.TeamsEnabled = this.TeamsEnabled;
         result.CustomPowerupsEnabled = this.CustomPowerupsEnabled;
         result.DrawOnTimeUp = this.DrawOnTimeUp;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.GamemodeSpecificData))]
+  public unsafe partial class GamemodeSpecificDataPrototype : UnionPrototype {
+    public string _field_used_;
+    public Quantum.Prototypes.StarChasersDataPrototype StarChasers;
+    public Quantum.Prototypes.CoinRunnersDataPrototype CoinRunners;
+    partial void MaterializeUser(Frame frame, ref Quantum.GamemodeSpecificData result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.GamemodeSpecificData result, in PrototypeMaterializationContext context = default) {
+        switch (_field_used_) {
+          case "STARCHASERS": this.StarChasers.Materialize(frame, ref *result.StarChasers, in context); break;
+          case "COINRUNNERS": this.CoinRunners.Materialize(frame, ref *result.CoinRunners, in context); break;
+          case "": case null: break;
+          default: PrototypeValidator.UnknownUnionField(_field_used_, in context); break;
+        }
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -831,6 +858,16 @@ namespace Quantum.Prototypes {
         result.Tile = this.Tile;
         result.Rotation = this.Rotation;
         result.Flags = this.Flags;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.StarChasersData))]
+  public unsafe partial class StarChasersDataPrototype : StructPrototype {
+    public Byte Stars;
+    partial void MaterializeUser(Frame frame, ref Quantum.StarChasersData result, in PrototypeMaterializationContext context);
+    public void Materialize(Frame frame, ref Quantum.StarChasersData result, in PrototypeMaterializationContext context = default) {
+        result.Stars = this.Stars;
         MaterializeUser(frame, ref result, in context);
     }
   }

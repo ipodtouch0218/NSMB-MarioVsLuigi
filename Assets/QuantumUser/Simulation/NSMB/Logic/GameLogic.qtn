@@ -8,6 +8,8 @@ global {
 	int TotalGamesPlayed;
 	ushort GameStartFrames;
 	ushort PlayerLoadFrames;
+	ushort AutomaticStageRefreshInterval;
+	ushort AutomaticStageRefreshTimer;
 
 	array<PlayerInformation>[MaxPlayers] PlayerInfo;
 	byte RealPlayers;
@@ -29,6 +31,7 @@ struct PlayerInformation {
 
 struct GameRules {
 	AssetRef<Map> Stage;
+	AssetRef<GamemodeAsset> Gamemode;
 
 	int StarsToWin;
 	int CoinsForPowerup;

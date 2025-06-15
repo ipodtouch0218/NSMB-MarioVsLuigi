@@ -3,6 +3,7 @@ using Quantum.Collections;
 using Quantum.Profiling;
 using System;
 using static IInteractableTile;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class MarioPlayerSystem : SystemMainThreadEntityFilter<MarioPlayer, MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>, 
@@ -1700,7 +1701,7 @@ namespace Quantum {
                 // In a ceiling crusher
                 if (mario->CrushDamageInvincibilityFrames == 0) {
                     mario->CrushDamageInvincibilityFrames = 30;
-                    mario->Powerdown(f, filter.Entity, true);
+                    mario->Powerdown(f, filter.Entity, true, false);
                 }
                 return false;
             }
@@ -1840,7 +1841,7 @@ namespace Quantum {
             if (!mario->IsDead) {
                 if (transform->Position.Y + (collider->Shape.Box.Extents.Y * 2) < stage.StageWorldMin.Y) {
                     // Death via pit
-                    mario->Death(f, entity, false);
+                    mario->Death(f, entity, false, true, mario->IsInKnockback);
                     return true;
                 } else {
                     return false;
@@ -1871,9 +1872,9 @@ namespace Quantum {
             // Death up
             if (mario->DeathAnimationFrames > 0 && QuantumUtils.Decrement(ref mario->DeathAnimationFrames)) {
                 bool doRespawn = !mario->Disconnected && (!f.Global->Rules.IsLivesEnabled || mario->Lives > 0);
-                if (!doRespawn && mario->Stars > 0) {
+                if (!doRespawn && mario->GamemodeData.StarChasers->Stars > 0) {
                     // Try to drop more stars
-                    mario->SpawnStars(f, entity, 1);
+                    f.Signals.OnMarioPlayerDropObjective(entity, 1, true);
                     mario->DeathAnimationFrames = 30;
                     mario->PreRespawnFrames = 180;
                 } else {
@@ -1896,8 +1897,9 @@ namespace Quantum {
         }
 
         public static void SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab) {
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             if (!prefab.IsValid) {
-                prefab = QuantumUtils.GetRandomItem(f, mario).Prefab;
+                prefab = gamemode.GetRandomItem(f, mario).Prefab;
             }
 
             EntityRef newEntity = f.Create(prefab);
@@ -1934,7 +1936,7 @@ namespace Quantum {
             StageTileInstance result = new StageTileInstance {
                 Tile = invisibleBlock->Tile,
             };
-            f.Signals.OnMarioPlayerCollectedCoin(marioEntity, mario, transform->Position, true, false);
+            f.Signals.OnMarioPlayerCollectedCoin(marioEntity, EntityRef.None, transform->Position, true, false);
             BreakableBrickTile.Bump(f, stage, QuantumUtils.WorldToRelativeTile(stage, transform->Position), invisibleBlock->BumpTile, result, false, marioEntity, false);
         }
 
@@ -1971,14 +1973,14 @@ namespace Quantum {
                 case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
                 case ProjectileEffectType.Fire:
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                        mario->Death(f, marioEntity, false);
+                        mario->Death(f, marioEntity, false, true, true);
                     } else {
                         didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectileEntity);
                     }
                     break;
                 case ProjectileEffectType.Freeze:
                     if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
-                        mario->Death(f, marioEntity, false);
+                        mario->Death(f, marioEntity, false, true, true);
                     } else if (dropStars) {
                         IceBlockSystem.Freeze(f, marioEntity);
                     } else {
@@ -2084,7 +2086,7 @@ namespace Quantum {
                     return;
                 } else if (marioAMega) {
                     if (dropStars) {
-                        marioB->Powerdown(f, marioBEntity, false);
+                        marioB->Powerdown(f, marioBEntity, false, true);
                     } else {
                         bool damaged = marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity);
                         if (damaged) {
@@ -2094,7 +2096,7 @@ namespace Quantum {
                     return;
                 } else if (marioBMega) {
                     if (dropStars) {
-                        marioA->Powerdown(f, marioAEntity, false);
+                        marioA->Powerdown(f, marioAEntity, false, true);
                     } else {
                         bool damaged = marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.CollisionBump, marioBEntity);
                         if (damaged) {
@@ -2121,7 +2123,7 @@ namespace Quantum {
                         marioB->FacingRight = !fromRight;
                         marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity);
                         if (dropStars) {
-                            marioB->Powerdown(f, marioBEntity, false);
+                            marioB->Powerdown(f, marioBEntity, false, true);
                         }
                         marioA->FacingRight = !marioA->FacingRight;
                         f.Events.PlayBumpSound(marioAEntity);
@@ -2133,7 +2135,7 @@ namespace Quantum {
                         marioA->FacingRight = fromRight;
                         marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.Normal, marioBEntity);
                         if (dropStars) {
-                            marioA->Powerdown(f, marioAEntity, false);
+                            marioA->Powerdown(f, marioAEntity, false, true);
                         }
                         marioB->FacingRight = !marioB->FacingRight;
                         f.Events.PlayBumpSound(marioBEntity);
@@ -2247,7 +2249,7 @@ namespace Quantum {
                 damaged = attackerMario->DoKnockback(f, defender, fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, attacker);
             } else {
                 if (dropStars) {
-                    defenderMario->Powerdown(f, defender, false);
+                    defenderMario->Powerdown(f, defender, false, true);
                 } else {
                     damaged = defenderMario->DoKnockback(f, defender, !fromRight, 0, KnockbackStrength.CollisionBump, attacker);
                 }
@@ -2304,8 +2306,8 @@ namespace Quantum {
                 }
             } else if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {
                 // We are big, groundpounding a mini opponent. squish.
-                defenderMario->Death(f, defender, false, false);
-                defenderMario->SpawnStars(f, defender, 3);
+                defenderMario->Death(f, defender, false, false, true);
+                f.Signals.OnMarioPlayerDropObjective(defender, 3, true);
                 attackerMario->DoEntityBounce = false;
             } else if (defenderMario->CurrentPowerupState == PowerupState.HammerSuit && defenderPhysicsObject->IsTouchingGround && defenderMario->IsCrouching && !groundpounded) {
                 // Bounce
@@ -2319,7 +2321,7 @@ namespace Quantum {
             } else {
                 // Normal knockbacks
                 if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {
-                    defenderMario->Powerdown(f, defender, false);
+                    defenderMario->Powerdown(f, defender, false, true);
                 } else {
                     if (!groundpounded && !dropStars) {
                         // Bounce
@@ -2360,7 +2362,7 @@ namespace Quantum {
 
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
-                mario->Powerdown(f, entity, false);
+                mario->Powerdown(f, entity, false, false);
             }
         }
 
@@ -2382,11 +2384,11 @@ namespace Quantum {
                     break;
                 case LiquidType.Lava:
                     // Kill, fire death
-                    mario->Death(f, entity, true);
+                    mario->Death(f, entity, true, true, false);
                     break;
                 case LiquidType.Poison:
                     // Kill, normal death
-                    mario->Death(f, entity, false);
+                    mario->Death(f, entity, false, true, false);
                     break;
                 }
             }
@@ -2437,9 +2439,8 @@ namespace Quantum {
                 }
 
                 mario->Disconnected = true;
-                mario->IsDead = false;
                 mario->PlayerRef = PlayerRef.None;
-                mario->Death(f, entity, false);
+                mario->Death(f, entity, false, true, false);
             }
         }
 
@@ -2458,10 +2459,10 @@ namespace Quantum {
             foreach (var contact in liquidContacts) {
                 var liquid = f.Unsafe.GetPointer<Liquid>(contact);
                 if (liquid->LiquidType == LiquidType.Poison) {
-                    mario->Death(f, entity, false);
+                    mario->Death(f, entity, false, true, true);
                     return;
                 } else if (liquid->LiquidType == LiquidType.Lava) {
-                    mario->Death(f, entity, true);
+                    mario->Death(f, entity, true, true, true);
                     return;
                 }
             }

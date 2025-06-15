@@ -125,7 +125,7 @@ namespace Quantum {
                 var boo = f.Unsafe.GetPointer<Boo>(booEntity);
                 boo->Kill(f, booEntity, marioEntity, KillReason.Special);
             } else {
-                mario->Powerdown(f, marioEntity, false);
+                mario->Powerdown(f, marioEntity, false, false);
             }
         }
 

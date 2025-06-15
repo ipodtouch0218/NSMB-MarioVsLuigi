@@ -40,7 +40,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] AssetRef<PowerupAsset> ReserveItem;
 	[ExcludeFromPrototype] RNGSession RNG;
 
-	[ExcludeFromPrototype] byte Stars;
+	[ExcludeFromPrototype] GamemodeSpecificData GamemodeData;
 	[ExcludeFromPrototype] byte Coins;
 	[ExcludeFromPrototype] byte Lives;
 
@@ -139,6 +139,19 @@ component MarioPlayer {
 	[ExcludeFromPrototype] EntityRef CurrentSpinner;
 }
 
+struct StarChasersData {
+	byte Stars;
+}
+
+struct CoinRunnersData {
+	int ObjectiveCoins;
+}
+
+union GamemodeSpecificData {
+	StarChasersData StarChasers;
+	CoinRunnersData CoinRunners;
+}
+
 enum KnockbackStrength : Byte {
 	None,
 	FireballBump,
@@ -149,6 +162,7 @@ enum KnockbackStrength : Byte {
 
 signal OnMarioPlayerDied(EntityRef entity);
 signal OnMarioPlayerBecameInvincible(EntityRef entity);
+signal OnMarioPlayerDropObjective(EntityRef entity, int amount, bool causedByOpposingPlayer);
 
 event MarioPlayerJumped {
 	EntityRef Entity;

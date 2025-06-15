@@ -341,10 +341,8 @@ MonoBehaviour:
     - rid: 1889659263039569923
       type: {class: CoinPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        IsFloating:
+        CoinType:
           Value: 1
-        IsDotted:
-          Value: 0
         Lifetime: 0
         UncollectableFrames: 0
     - rid: 1889659263039569924
@@ -550,10 +548,8 @@ MonoBehaviour:
     - rid: 2967068392109899779
       type: {class: CoinPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        IsFloating:
+        CoinType:
           Value: 1
-        IsDotted:
-          Value: 0
         Lifetime: 0
         UncollectableFrames: 0
     - rid: 2967068392109899780
@@ -626,10 +622,8 @@ MonoBehaviour:
     - rid: 3395932105807495171
       type: {class: CoinPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        IsFloating:
+        CoinType:
           Value: 1
-        IsDotted:
-          Value: 0
         Lifetime: 0
         UncollectableFrames: 0
     - rid: 3395932105807495172
@@ -702,10 +696,8 @@ MonoBehaviour:
     - rid: 4446608830146543619
       type: {class: CoinPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        IsFloating:
+        CoinType:
           Value: 1
-        IsDotted:
-          Value: 0
         Lifetime: 0
         UncollectableFrames: 0
     - rid: 4446608830146543620
@@ -778,10 +770,8 @@ MonoBehaviour:
     - rid: 4573175170545483779
       type: {class: CoinPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        IsFloating:
+        CoinType:
           Value: 1
-        IsDotted:
-          Value: 0
         Lifetime: 0
         UncollectableFrames: 0
     - rid: 4573175170545483780
@@ -987,10 +977,8 @@ MonoBehaviour:
     - rid: 6570762336053755907
       type: {class: CoinPrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
-        IsFloating:
+        CoinType:
           Value: 1
-        IsDotted:
-          Value: 0
         Lifetime: 0
         UncollectableFrames: 0
     - rid: 6570762336053755908

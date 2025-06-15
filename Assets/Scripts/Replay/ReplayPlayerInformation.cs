@@ -5,14 +5,14 @@ namespace NSMB.Replay {
 
     public struct ReplayPlayerInformation {
         public string Username;
-        public byte FinalStarCount;
+        public int FinalObjectiveCount;
         public byte Team;
         public byte Character;
         public PlayerRef PlayerRef;
 
         public void Serialize(BinaryWriter writer) {
             writer.Write(Username);
-            writer.Write(FinalStarCount);
+            writer.Write(FinalObjectiveCount);
             writer.Write(Team);
             writer.Write(Character);
             writer.Write(PlayerRef);
@@ -21,7 +21,7 @@ namespace NSMB.Replay {
         public static ReplayPlayerInformation Deserialize(BinaryReader reader) {
             return new ReplayPlayerInformation {
                 Username = reader.ReadString(),
-                FinalStarCount = reader.ReadByte(),
+                FinalObjectiveCount = reader.ReadInt32(),
                 Team = reader.ReadByte(),
                 Character = reader.ReadByte(),
                 PlayerRef = reader.ReadInt32(),

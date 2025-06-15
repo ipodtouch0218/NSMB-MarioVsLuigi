@@ -338,10 +338,16 @@ MonoBehaviour:
   IceBlockPrototype:
     Id:
       Value: 1386525317044462577
+  ObjectiveCoinPrototype:
+    Id:
+      Value: 1441489962698596482
   DefaultRules:
     Stage:
       Id:
         Value: 438935048561577377
+    Gamemode:
+      Id:
+        Value: 326486899682662279
     StarsToWin: 10
     CoinsForPowerup: 8
     Lives: 0

@@ -25,7 +25,7 @@ namespace NSMB.UI.Game.Results {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
         }
 
-        public unsafe void Initialize(Frame f, in PlayerInformation? info, int ranking, float delay, int stars = -1) {
+        public unsafe void Initialize(Frame f, GamemodeAsset gamemode, in PlayerInformation? info, int ranking, float delay, int stars = -1) {
             bool occupied = info.HasValue;
             fullSlot.SetActive(occupied);
             emptySlot.SetActive(!occupied);
@@ -42,7 +42,7 @@ namespace NSMB.UI.Game.Results {
                     starCountText.text = "<sprite name=results_out>";
                     rightHalf.color = unrankedColor;
                 } else {
-                    starCountText.text = Utils.Utils.GetSymbolString("S" + stars.ToString(), Utils.Utils.resultsSymbols);
+                    starCountText.text = Utils.Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + stars.ToString(), Utils.Utils.resultsSymbols);
                     rightHalf.color = ranking switch {
                         1 => firstPlaceColor,
                         2 => secondPlaceColor,

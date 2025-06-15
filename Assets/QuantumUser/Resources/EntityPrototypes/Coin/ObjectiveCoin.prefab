@@ -51,6 +51,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -75,8 +78,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0,
-    type: 3}
+  m_Sprite: {fileID: 595918852289861335, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -104,10 +106,10 @@ MonoBehaviour:
   frame: 0
   fps: 6
   frames:
-  - {fileID: 2620925746830137660, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
-  - {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
-  - {fileID: -2074995507315294404, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
-  - {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 595918852289861335, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 845948447533366988, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -5313328981683241401, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -8417162070665421395, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   useUnscaledDelta: 0
   sRenderer: {fileID: 388009723025345444}
   image: {fileID: 0}
@@ -161,7 +163,7 @@ GameObject:
   - component: {fileID: -2618363333227520774}
   - component: {fileID: 8142886350778680360}
   m_Layer: 19
-  m_Name: LooseCoin
+  m_Name: ObjectiveCoin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -222,12 +224,12 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
+    IsEnabled: 1
     IsTrigger: 0
     Material:
       Id:
         Value: 0
     SourceCollider: {fileID: 0}
-    IsEnabled: 1
     Shape2D:
       ShapeType: 4
       PolygonCollider:
@@ -399,6 +401,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -497,10 +500,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Prototype:
-    IsFloating:
-      Value: 0
-    IsDotted:
-      Value: 0
+    CoinType:
+      Value: 4
     Lifetime: 480
     UncollectableFrames: 30
 --- !u!114 &1173340272915162886

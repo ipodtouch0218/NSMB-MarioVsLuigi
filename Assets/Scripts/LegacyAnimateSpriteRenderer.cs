@@ -7,10 +7,10 @@ public class LegacyAnimateSpriteRenderer : MonoBehaviour {
 
     //---Public Variables
     public bool isDisplaying = true;
+    public float frame; // Must be a float because legacy animators dont support ints, apparently?
 
     //---Serialized Variables
     [SerializeField] private bool runInEditor = false;
-    [SerializeField] private float frame; // Must be a float because legacy animators dont support ints, apparently?
     [SerializeField] private float fps = 8;
     [SerializeField] public Sprite[] frames;
     [SerializeField] private bool useUnscaledDelta = false;
