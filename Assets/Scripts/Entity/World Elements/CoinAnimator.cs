@@ -14,6 +14,9 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     [SerializeField] private ParticleSystem sparkles;
     [SerializeField] private bool looseCoin;
 
+    //---Private Variables
+    private bool alreadyBounced;
+
     public void OnValidate() {
         this.SetIfNull(ref sfx);
         this.SetIfNull(ref sRenderer);
@@ -35,6 +38,7 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         defaultCoinAnimate.isDisplaying = !dotted;
         dottedCoinAnimate.isDisplaying = dotted;
         sRenderer.enabled = true;
+        alreadyBounced = false;
 
         if (looseCoin) {
             defaultCoinAnimate.frame = Random.Range(0, defaultCoinAnimate.frames.Length);
@@ -50,7 +54,7 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
             sparkles.gameObject.SetActive(true);
             sparkles.transform.position = sRenderer.transform.position;
             sparkles.Play();
-            Destroy(sparkles, 0.5f);
+            Destroy(sparkles.gameObject, 0.5f);
         }
     }
 
@@ -108,7 +112,14 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
             return;
         }
 
+        if (alreadyBounced) {
+            return;
+        }
+
+        var coin = PredictedFrame.Unsafe.GetPointer<Coin>(EntityRef);
+        sfx.volume = coin->CoinType.HasFlag(CoinType.Objective) ? 0.1f : 1f;
         sfx.PlayOneShot(SoundEffect.World_Coin_Drop);
+        alreadyBounced = true;
     }
 
     private void OnCoinChangedCollected(EventCoinChangeCollected e) {

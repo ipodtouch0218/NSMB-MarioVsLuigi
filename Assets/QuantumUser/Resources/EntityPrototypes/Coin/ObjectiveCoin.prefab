@@ -102,8 +102,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 6
   frames:
   - {fileID: 595918852289861335, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
@@ -126,8 +126,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 0
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 9
   frames:
   - {fileID: -1532177184, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
@@ -613,6 +613,24 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1821550530333385025, guid: 34b8762c3868b5d43b40a69badde238a,
+        type: 3}
+      propertyPath: UVModule.sprites.Array.data[0].sprite
+      value: 
+      objectReference: {fileID: 343471083, guid: 8f2d9605707733e43a58b050ef08ef3f,
+        type: 3}
+    - target: {fileID: 1821550530333385025, guid: 34b8762c3868b5d43b40a69badde238a,
+        type: 3}
+      propertyPath: UVModule.sprites.Array.data[1].sprite
+      value: 
+      objectReference: {fileID: -494827367, guid: 8f2d9605707733e43a58b050ef08ef3f,
+        type: 3}
+    - target: {fileID: 1821550530333385025, guid: 34b8762c3868b5d43b40a69badde238a,
+        type: 3}
+      propertyPath: UVModule.sprites.Array.data[2].sprite
+      value: 
+      objectReference: {fileID: -1791470953, guid: 8f2d9605707733e43a58b050ef08ef3f,
+        type: 3}
     - target: {fileID: 6203692344828610460, guid: 34b8762c3868b5d43b40a69badde238a,
         type: 3}
       propertyPath: m_Name

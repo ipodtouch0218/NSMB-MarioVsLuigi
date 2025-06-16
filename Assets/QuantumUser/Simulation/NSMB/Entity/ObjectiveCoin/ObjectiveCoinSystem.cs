@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Physics2D;
 
 namespace Quantum {
     public unsafe class ObjectiveCoinSystem : SystemMainThread, ISignalOnMarioPlayerDropObjective, ISignalOnMarioPlayerCollectedCoin,
@@ -6,21 +7,142 @@ namespace Quantum {
 
         public override bool StartEnabled => false;
 
-        public override void Update(Frame f) {
-
+        public struct Filter {
+            public EntityRef Entity;
+            public Transform2D* Transform;
+            public StarCoin* StarCoin;
         }
 
-        public void OnMarioPlayerDropObjective(Frame f, EntityRef entity, int amount, QBoolean causedByOpposingPlayer) {
+        public override void OnInit(Frame f) {
+            f.Context.Interactions.Register<StarCoin, MarioPlayer>(f, OnStarCoinMarioInteraction);
+        }
+
+        public override void Update(Frame f) {
+            if (!f.Exists(f.Global->MainBigStar) && QuantumUtils.Decrement(ref f.Global->BigStarSpawnTimer)) {
+                VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                HandleSpawningNewStarCoin(f, stage);
+            }
+
+            Filter filter = default;
+            var filterStruct = f.Unsafe.FilterStruct<Filter>();
+            while (filterStruct.Next(&filter)) {
+                var coin = filter.StarCoin;
+
+                if (coin->DespawnCounter > 0) {
+                    if (QuantumUtils.Decrement(ref coin->DespawnCounter)) {
+                        f.Events.CollectableDespawned(filter.Entity, filter.Transform->Position, false);
+                        f.Destroy(filter.Entity);
+                    }
+                }
+            }
+        }
+
+        private void HandleSpawningNewStarCoin(Frame f, VersusStageData stage) {
+            int spawnpoints = stage.BigStarSpawnpoints.Length;
+            ref BitSet64 usedSpawnpoints = ref f.Global->UsedStarSpawns;
+
+            bool spawnedStarCoin = false;
+            for (int i = 0; i < spawnpoints; i++) {
+                // Find a spot...
+                if (f.Global->UsedStarSpawnCount == spawnpoints) {
+                    usedSpawnpoints.ClearAll();
+                    f.Global->UsedStarSpawnCount = 0;
+                }
+
+                int count = f.RNG->Next(0, spawnpoints - f.Global->UsedStarSpawnCount);
+                int index = 0;
+                for (int j = 0; j < spawnpoints; j++) {
+                    if (!usedSpawnpoints.IsSet(j)) {
+                        if (count-- == 0) {
+                            // This is the index to use
+                            index = j;
+                            break;
+                        }
+                    }
+                }
+                usedSpawnpoints.Set(index);
+                f.Global->UsedStarSpawnCount++;
+
+                // Spawn a coin.
+                FPVector2 position = stage.BigStarSpawnpoints[index];
+                HitCollection hits = f.Physics2D.OverlapShape(position, 0, f.Context.CircleRadiusTwo, f.Context.PlayerOnlyMask);
+
+                if (hits.Count == 0) {
+                    // Hit no players
+                    EntityRef newEntity = f.Create(f.SimulationConfig.StarCoinPrototype);
+                    f.Global->MainBigStar = newEntity;
+                    var newStarCoinTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
+                    newStarCoinTransform->Position = position;
+                    spawnedStarCoin = true;
+                    break;
+                }
+            }
+
+            if (!spawnedStarCoin) {
+                f.Global->BigStarSpawnTimer = 30;
+            }
+        }
+
+        public void OnMarioPlayerDropObjective(Frame f, EntityRef entity, int amount, EntityRef attacker) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
+
+            int coinDivideFactor = 1;
+            if (f.Unsafe.TryGetPointer(attacker, out Holdable* holdableAttacker)) {
+                if (f.Has<MarioPlayer>(holdableAttacker->Holder)) {
+                    attacker = holdableAttacker->Holder;
+                } else if (f.Has<MarioPlayer>(holdableAttacker->PreviousHolder)) {
+                    attacker = holdableAttacker->PreviousHolder;
+                } else {
+                    attacker = entity;
+                }
+            } else if (f.Unsafe.TryGetPointer(attacker, out Projectile* attackerProjectile)) {
+                // Projectiles spawn less coins.
+                attacker = attackerProjectile->Owner;
+                coinDivideFactor = 2;
+            } else if (f.Has<Enemy>(attacker)) {
+                // Don't give credit for normal entity damage.
+                attacker = entity;
+            }
+
+            bool selfDamage = false;
+            if (f.Unsafe.TryGetPointer(attacker, out MarioPlayer* attackerMario)) {
+                byte? team = mario->GetTeam(f);
+                selfDamage = team != null && team == attackerMario->GetTeam(f);
+            }
+
             byte excludeTeamNumber;
-            if (causedByOpposingPlayer) {
-                excludeTeamNumber = 0;
-            } else {
+            if (selfDamage) {
                 excludeTeamNumber = (byte) ((f.Unsafe.GetPointer<MarioPlayer>(entity)->GetTeam(f) + 1) ?? 0);
+            } else {
+                excludeTeamNumber = 0;
             }
 
             // Spawn objective coins relative to the "amount" parameter
-            SpawnObjectiveCoins(f, transform->Position, 10 + 5 * (amount - 1), excludeTeamNumber);
+            SpawnObjectiveCoins(f, transform->Position, (10 + 5 * (amount - 1)) / coinDivideFactor, excludeTeamNumber);
+        }
+
+        public void OnStarCoinMarioInteraction(Frame f, EntityRef starCoinEntity, EntityRef marioEntity) {
+            if (!f.Exists(starCoinEntity) || f.DestroyPending(starCoinEntity)) {
+                return;
+            }
+
+            var starCoin = f.Unsafe.GetPointer<StarCoin>(starCoinEntity);
+            if (starCoin->DespawnCounter > 0) {
+                return;
+            }
+
+            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            if (mario->IsDead) {
+                return;
+            }
+
+            f.FindAsset<VersusStageData>(f.Map.UserAsset).ResetStage(f, false);
+            f.Global->BigStarSpawnTimer = (ushort) (624 - (f.Global->RealPlayers * 12));
+            
+            mario->GamemodeData.CoinRunners->ObjectiveCoins += 25;
+            starCoin->DespawnCounter = 105;
+            f.Events.MarioPlayerCollectedStarCoin(starCoinEntity);
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
@@ -33,6 +155,10 @@ namespace Quantum {
         }
 
         public void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam) {
+            if (amount <= 0) {
+                return;
+            }
+
             VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             for (int i = 0; i < amount; i++) {
                 EntityRef newCoin = f.Create(f.SimulationConfig.ObjectiveCoinPrototype);
@@ -54,6 +180,8 @@ namespace Quantum {
                 var coin = f.Unsafe.GetPointer<Coin>(newCoin);
                 coin->UncollectableByTeam = exludeTeam;
             }
+
+            f.Events.CoinGroupSpawned(origin, amount);
         }
 
         public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, EntityRef coinEntity, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {

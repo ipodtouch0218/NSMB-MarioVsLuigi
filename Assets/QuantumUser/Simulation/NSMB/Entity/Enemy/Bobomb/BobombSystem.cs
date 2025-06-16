@@ -192,7 +192,7 @@ namespace Quantum {
                 } else if (mario->IsDamageable) {
                     // Damage
                     var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
-                    mario->Powerdown(f, marioEntity, false, false);
+                    mario->Powerdown(f, marioEntity, false, bobombEntity);
                     bobombEnemy->ChangeFacingRight(f, bobombEntity, damageDirection.X > 0);
                 }
             } 

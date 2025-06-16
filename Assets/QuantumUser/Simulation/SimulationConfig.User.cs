@@ -11,7 +11,7 @@
         public AssetRef<TeamAsset>[] Teams;
 
         public AssetRef<EntityPrototype> FireballPrototype, IceballPrototype, HammerPrototype, BigStarPrototype,
-            BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype, ObjectiveCoinPrototype;
+            BlockBumpPrototype, LooseCoinPrototype, IceBlockPrototype, ObjectiveCoinPrototype, StarCoinPrototype;
 
         public GameRules DefaultRules;
     }

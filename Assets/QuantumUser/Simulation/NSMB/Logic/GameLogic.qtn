@@ -108,3 +108,7 @@ synced event GameEnded {
 event StartGameEndFade {
 
 }
+
+synced event StageAutoRefresh {
+
+}

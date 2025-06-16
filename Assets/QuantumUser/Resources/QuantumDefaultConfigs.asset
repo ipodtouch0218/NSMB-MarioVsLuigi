@@ -341,6 +341,9 @@ MonoBehaviour:
   ObjectiveCoinPrototype:
     Id:
       Value: 1441489962698596482
+  StarCoinPrototype:
+    Id:
+      Value: 1349860830661540207
   DefaultRules:
     Stage:
       Id:

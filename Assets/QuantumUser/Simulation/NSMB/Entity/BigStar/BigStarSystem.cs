@@ -162,7 +162,7 @@ namespace Quantum {
             f.Global->UsedStarSpawns.ClearAll();
         }
 
-        public void OnMarioPlayerDropObjective(Frame f, EntityRef entity, int amount, QBoolean causedByOpposingPlayer) {
+        public void OnMarioPlayerDropObjective(Frame f, EntityRef entity, int amount, EntityRef attacker) {
             if (f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)) {
                 mario->SpawnStars(f, entity, amount);
             }

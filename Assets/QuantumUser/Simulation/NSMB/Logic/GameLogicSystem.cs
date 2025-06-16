@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.SceneManagement;
 
 namespace Quantum {
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
@@ -130,8 +131,10 @@ namespace Quantum {
 
                 if (f.Global->AutomaticStageRefreshInterval > 0) {
                     if (QuantumUtils.Decrement(ref f.Global->AutomaticStageRefreshTimer)) {
-                        
+                        VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                        stage.ResetStage(f, false);
                         f.Global->AutomaticStageRefreshTimer = f.Global->AutomaticStageRefreshInterval;
+                        f.Events.StageAutoRefresh();
                     }
                 }
 

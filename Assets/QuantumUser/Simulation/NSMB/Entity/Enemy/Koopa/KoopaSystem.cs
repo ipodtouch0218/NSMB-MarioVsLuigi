@@ -228,7 +228,7 @@ namespace Quantum {
                     marioPhysicsObject->Velocity.X = 0;
 
                 } else if (mario->IsDamageable) {
-                    mario->Powerdown(f, marioEntity, false, false);
+                    mario->Powerdown(f, marioEntity, false, koopaEntity);
                     if (!koopa->IsInShell) {
                         koopaEnemy->ChangeFacingRight(f, koopaEntity, damageDirection.X > 0);
                     }
@@ -291,7 +291,7 @@ namespace Quantum {
                         koopa->Kill(f, koopaEntity, marioEntity, KillReason.Special);
 
                     } else if (mario->IsDamageable) {
-                        mario->Powerdown(f, marioEntity, false, false);
+                        mario->Powerdown(f, marioEntity, false, koopaEntity);
                         if (!koopa->IsInShell) {
                             koopaEnemy->ChangeFacingRight(f, koopaEntity, damageDirection.X > 0);
                         }

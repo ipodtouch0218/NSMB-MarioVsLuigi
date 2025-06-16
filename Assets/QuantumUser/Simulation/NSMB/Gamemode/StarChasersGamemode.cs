@@ -103,8 +103,8 @@ namespace Quantum {
 
             // "Losing" variable based on ln(x+1), x being the # of stars we're behind
 
-            int ourStars = GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? 0;
-            int leaderStars = GetFirstPlaceObjectiveCount(f);
+            int ourObjectiveCount = GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? 0;
+            int leaderObjectiveCount = GetFirstPlaceObjectiveCount(f);
 
             var rules = f.Global->Rules;
             int starsToWin = rules.StarsToWin;
@@ -142,7 +142,7 @@ namespace Quantum {
                     continue;
                 }
 
-                totalChance += powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
+                totalChance += GetPowerupSpawnWeight(powerup, starsToWin, leaderObjectiveCount, ourObjectiveCount);
             }
 
             FP rand = mario->RNG.Next(0, totalChance);
@@ -159,7 +159,7 @@ namespace Quantum {
                     continue;
                 }
 
-                FP chance = powerup.GetModifiedChance(starsToWin, leaderStars, ourStars);
+                FP chance = GetPowerupSpawnWeight(powerup, starsToWin, leaderObjectiveCount, ourObjectiveCount);
 
                 if (rand < chance) {
                     return powerup;
@@ -169,6 +169,12 @@ namespace Quantum {
             }
 
             return f.FindAsset(f.SimulationConfig.FallbackPowerup);
+        }
+
+        private FP GetPowerupSpawnWeight(PowerupAsset powerup, int starsToWin, int leaderStars, int ourStars) {
+            int starDifference = leaderStars - ourStars;
+            FP bonus = powerup.LosingSpawnBonus * FPMath.Log(starDifference + 1, FP.E) * (FP._1 - ((FP) (starsToWin - leaderStars) / starsToWin));
+            return FPMath.Max(0, powerup.SpawnChance + bonus);
         }
     }
 }

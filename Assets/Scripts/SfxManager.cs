@@ -22,6 +22,7 @@ public unsafe class SfxManager : QuantumSceneViewComponent {
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumEvent.Subscribe<EventTimerExpired>(this, OnTimerExpired, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventStageAutoRefresh>(this, OnStageAutoRefresh, NetworkHandler.FilterOutReplayFastForward);
     }
 
     public override void OnUpdateView() {
@@ -70,5 +71,9 @@ public unsafe class SfxManager : QuantumSceneViewComponent {
         if (Game.PlayerIsLocal(mario->PlayerRef) && !musicPlayer.IsPlaying) {
             sfx.PlayOneShot(SoundEffect.UI_StartGame);
         }
+    }
+
+    private void OnStageAutoRefresh(EventStageAutoRefresh e) {
+        sfx.PlayOneShot(SoundEffect.World_Star_CollectOthers);
     }
 }

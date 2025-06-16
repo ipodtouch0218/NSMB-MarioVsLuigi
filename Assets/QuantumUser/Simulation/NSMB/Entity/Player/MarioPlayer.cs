@@ -150,7 +150,7 @@ namespace Quantum {
             ReserveItem = newItem;
         }
 
-        public void Death(Frame f, EntityRef entity, bool fire, bool dropStars, bool causedByOpposingPlayer) {
+        public void Death(Frame f, EntityRef entity, bool fire, bool dropStars, EntityRef attacker) {
             if (IsDead) {
                 return;
             }
@@ -163,11 +163,11 @@ namespace Quantum {
             RespawnFrames = 78;
 
             if ((f.Global->Rules.IsLivesEnabled && QuantumUtils.Decrement(ref Lives)) || Disconnected) {
-                f.Signals.OnMarioPlayerDropObjective(entity, 1, causedByOpposingPlayer);
+                f.Signals.OnMarioPlayerDropObjective(entity, 1, attacker);
                 DeathAnimationFrames = (GamemodeData.StarChasers->Stars > 0) ? (byte) 30 : (byte) 36;
             } else {
                 if (dropStars) {
-                    f.Signals.OnMarioPlayerDropObjective(entity, 1, causedByOpposingPlayer);
+                    f.Signals.OnMarioPlayerDropObjective(entity, 1, attacker);
                 }
                 DeathAnimationFrames = 36;
             }
@@ -212,7 +212,7 @@ namespace Quantum {
             f.Events.MarioPlayerDied(entity, fire);
         }
 
-        public bool Powerdown(Frame f, EntityRef entity, bool ignoreInvincible, bool causedByOpposingPlayer) {
+        public bool Powerdown(Frame f, EntityRef entity, bool ignoreInvincible, EntityRef attacker) {
             if (!ignoreInvincible && !IsDamageable) {
                 return false;
             }
@@ -222,12 +222,12 @@ namespace Quantum {
             switch (CurrentPowerupState) {
             case PowerupState.MiniMushroom:
             case PowerupState.NoPowerup: {
-                Death(f, entity, false, true, causedByOpposingPlayer);
+                Death(f, entity, false, true, attacker);
                 break;
             }
             case PowerupState.Mushroom: {
                 CurrentPowerupState = PowerupState.NoPowerup;
-                f.Signals.OnMarioPlayerDropObjective(entity, 1, causedByOpposingPlayer);
+                f.Signals.OnMarioPlayerDropObjective(entity, 1, attacker);
                 break;
             }
             case PowerupState.HammerSuit:
@@ -236,7 +236,7 @@ namespace Quantum {
             case PowerupState.PropellerMushroom:
             case PowerupState.BlueShell: {
                 CurrentPowerupState = PowerupState.Mushroom;
-                f.Signals.OnMarioPlayerDropObjective(entity, 1, causedByOpposingPlayer);
+                f.Signals.OnMarioPlayerDropObjective(entity, 1, attacker);
                 break;
             }
             }
@@ -376,7 +376,7 @@ namespace Quantum {
 
             if (Disconnected) {
                 // Disconnected while respawning
-                Death(f, entity, false, true, false);
+                Death(f, entity, false, true, EntityRef.None);
             }
         }
 
@@ -400,8 +400,8 @@ namespace Quantum {
             }
 
             if (CurrentPowerupState == PowerupState.MiniMushroom && strength >= KnockbackStrength.Groundpound) {
-                f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop - 1, true);
-                Powerdown(f, entity, false, true);
+                f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop - 1, attacker);
+                Powerdown(f, entity, false, attacker);
                 return true;
             }
 
@@ -465,7 +465,7 @@ namespace Quantum {
             IsDrilling = false;
             WallslideLeft = WallslideRight = false;
 
-            f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop, true);
+            f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop, attacker);
             return true;
         }
 

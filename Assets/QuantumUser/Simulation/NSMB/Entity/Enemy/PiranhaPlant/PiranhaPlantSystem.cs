@@ -97,7 +97,7 @@ namespace Quantum {
                 piranhaPlant->Kill(f, piranhaPlantEntity, marioEntity, KillReason.Special);
 
             } else if (!mario->IsCrouchedInShell) {
-                mario->Powerdown(f, marioEntity, false, false);
+                mario->Powerdown(f, marioEntity, false, piranhaPlantEntity);
             }
         }
 

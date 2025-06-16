@@ -1,0 +1,7 @@
+component StarCoin {
+	byte DespawnCounter;
+}
+
+synced event MarioPlayerCollectedStarCoin {
+	EntityRef StarCoinEntity;
+}
