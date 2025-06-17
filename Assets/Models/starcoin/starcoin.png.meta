@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a4c09752f9c6f1041876685dce1d9e88
+guid: cac4b35773edea04c956e155a218c2ba
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6405192002085379010
-    second: starcoin_transparent_gradient_0
+      213: 5662350499395972196
+    second: starcoin_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: starcoin_transparent_gradient_0
+      name: starcoin_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 1
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e34278d6fcf2c17a0800000000000000
-      internalID: -6405192002085379010
+      spriteID: 46ca04e57c5b49e40800000000000000
+      internalID: 5662350499395972196
       vertices: []
       indices: 
       edges: []
@@ -147,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      starcoin_transparent_gradient_0: -6405192002085379010
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
