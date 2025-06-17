@@ -24,10 +24,9 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     }
 
     public void Start() {
-        QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType);
-        QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected);
-        QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced, NetworkHandler.FilterOutReplayFastForward);
-
+        QuantumEvent.Subscribe<EventCoinChangedType>(this, OnCoinChangedType, onlyIfEntityViewBound: true);
+        QuantumEvent.Subscribe<EventCoinChangeCollected>(this, OnCoinChangedCollected, onlyIfEntityViewBound: true);
+        QuantumEvent.Subscribe<EventCoinBounced>(this, OnCoinBounced, NetworkHandler.FilterOutReplayFastForward, onlyIfEntityViewBound: true);
         RenderPipelineManager.beginCameraRendering += URPOnPreRender;
     }
 
@@ -50,11 +49,10 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         sRenderer.enabled = false;
 
         if (looseCoin) {
-            sparkles.transform.SetParent(transform.parent);
-            sparkles.gameObject.SetActive(true);
-            sparkles.transform.position = sRenderer.transform.position;
-            sparkles.Play();
-            Destroy(sparkles.gameObject, 0.5f);
+            ParticleSystem newSparkles = Instantiate(sparkles, sRenderer.transform.position, Quaternion.identity);
+            newSparkles.gameObject.SetActive(true);
+            newSparkles.Play();
+            Destroy(newSparkles.gameObject, 0.5f);
         }
     }
 
@@ -80,7 +78,7 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     }
 
     private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
-        if (!PredictedFrame.Unsafe.TryGetPointer(EntityRef, out Coin* coin)) {
+        if (PredictedFrame == null || !PredictedFrame.Unsafe.TryGetPointer(EntityRef, out Coin* coin)) {
             return;
         }
 

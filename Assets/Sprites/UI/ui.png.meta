@@ -2089,7 +2089,7 @@ TextureImporter:
         width: 13
         height: 13
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -2098,6 +2098,28 @@ TextureImporter:
       bones: []
       spriteID: acd6ac46f256cf047aac4a6655ba9e91
       internalID: -1032943485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hud_starcoin
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 219
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 10199527fc4ac1d4e945565141eb93e3
+      internalID: -1029622304
       vertices: []
       indices: 
       edges: []
@@ -2141,6 +2163,7 @@ TextureImporter:
       hud_luigi: -7975249404588759376
       hud_mario: 7263181891274304025
       hud_star: 1346584908
+      hud_starcoin: -1029622304
       hudnumber_0: -56961979
       hudnumber_1: -146918758
       hudnumber_2: -1355574207

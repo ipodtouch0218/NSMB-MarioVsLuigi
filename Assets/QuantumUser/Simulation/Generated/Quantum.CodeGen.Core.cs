@@ -3103,22 +3103,24 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct StarCoin : Quantum.IComponent {
-    public const Int32 SIZE = 4;
-    public const Int32 ALIGNMENT = 1;
-    [FieldOffset(1)]
-    private fixed Byte _alignment_padding_[3];
+    public const Int32 SIZE = 16;
+    public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public Byte DespawnCounter;
+    [FieldOffset(8)]
+    public EntityRef Collector;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 17623;
         hash = hash * 31 + DespawnCounter.GetHashCode();
+        hash = hash * 31 + Collector.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (StarCoin*)ptr;
         serializer.Stream.Serialize(&p->DespawnCounter);
+        EntityRef.Serialize(&p->Collector, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]

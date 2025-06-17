@@ -873,9 +873,9 @@ namespace Quantum.Prototypes {
   }
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.StarCoin))]
-  public unsafe partial class StarCoinPrototype : ComponentPrototype<Quantum.StarCoin> {
+  public unsafe class StarCoinPrototype : ComponentPrototype<Quantum.StarCoin> {
     public Byte DespawnCounter;
-    partial void MaterializeUser(Frame frame, ref Quantum.StarCoin result, in PrototypeMaterializationContext context);
+    public MapEntityId Collector;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.StarCoin component = default;
         Materialize((Frame)f, ref component, in context);
@@ -883,7 +883,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.StarCoin result, in PrototypeMaterializationContext context = default) {
         result.DespawnCounter = this.DespawnCounter;
-        MaterializeUser(frame, ref result, in context);
+        PrototypeValidator.FindMapEntity(this.Collector, in context, out result.Collector);
     }
   }
   [System.SerializableAttribute()]

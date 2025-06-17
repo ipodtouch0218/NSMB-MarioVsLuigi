@@ -149,7 +149,8 @@ namespace Quantum {
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out Coin* coin)
                 || !f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
-                || coin->IsCollected) {
+                || coin->IsCollected
+                || coin->UncollectableFrames > 0) {
                 return;
             }
 

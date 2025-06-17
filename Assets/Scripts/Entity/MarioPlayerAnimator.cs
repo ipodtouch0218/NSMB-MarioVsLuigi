@@ -903,6 +903,14 @@ namespace NSMB.Entities.Player {
             Instantiate(starCollectParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
+        private void OnMarioPlayerCollectedStarCoin(EventMarioPlayerCollectedStarCoin e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            PlaySoundEverywhere(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
+        }
+
         private void OnMarioPlayerPropellerSpin(EventMarioPlayerPropellerSpin e) {
             if (e.Entity != EntityRef) {
                 return;

@@ -666,9 +666,10 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventMarioPlayerCollectedStarCoin MarioPlayerCollectedStarCoin(EntityRef StarCoinEntity) {
+      public EventMarioPlayerCollectedStarCoin MarioPlayerCollectedStarCoin(EntityRef Entity, EntityRef StarCoinEntity) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventMarioPlayerCollectedStarCoin>(EventMarioPlayerCollectedStarCoin.ID);
+        ev.Entity = Entity;
         ev.StarCoinEntity = StarCoinEntity;
         _f.AddEvent(ev);
         return ev;
@@ -2621,6 +2622,7 @@ namespace Quantum {
   }
   public unsafe partial class EventMarioPlayerCollectedStarCoin : EventBase {
     public new const Int32 ID = 74;
+    public EntityRef Entity;
     public EntityRef StarCoinEntity;
     protected EventMarioPlayerCollectedStarCoin(Int32 id, EventFlags flags) : 
         base(id, flags) {
@@ -2639,6 +2641,7 @@ namespace Quantum {
     public override Int32 GetHashCode() {
       unchecked {
         var hash = 443;
+        hash = hash * 31 + Entity.GetHashCode();
         hash = hash * 31 + StarCoinEntity.GetHashCode();
         return hash;
       }

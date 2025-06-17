@@ -121,6 +121,19 @@ namespace Quantum.Prototypes.Unity {
       return result;
     }
   }
+  [System.SerializableAttribute()]
+  public unsafe partial class StarCoinPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.StarCoinPrototype> {
+    public Byte DespawnCounter;
+    public Quantum.QuantumEntityPrototype Collector;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.StarCoinPrototype prototype);
+    public override Quantum.Prototypes.StarCoinPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.StarCoinPrototype();
+      converter.Convert(this.DespawnCounter, out result.DespawnCounter);
+      converter.Convert(this.Collector, out result.Collector);
+      ConvertUser(converter, ref result);
+      return result;
+    }
+  }
 }
 #pragma warning restore 0109
 #pragma warning restore 1591

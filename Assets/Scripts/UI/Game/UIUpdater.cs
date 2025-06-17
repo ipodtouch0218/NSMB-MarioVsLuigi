@@ -21,7 +21,7 @@ namespace NSMB.UI.Game {
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private CanvasGroup toggler;
-        [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate;
+        [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
@@ -52,6 +52,8 @@ namespace NSMB.UI.Game {
             MarioPlayerAnimator.MarioPlayerDestroyed += OnMarioDestroyed;
             BigStarAnimator.BigStarInitialized += OnBigStarInitialized;
             BigStarAnimator.BigStarDestroyed += OnBigStarDestroyed;
+            StarCoinAnimator.StarCoinInitialized += OnStarCoinInitialized;
+            StarCoinAnimator.StarCoinDestroyed += OnStarCoinDestroyed;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             Settings.Controls.Debug.ToggleHUD.performed += OnToggleHUD;
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -127,17 +129,12 @@ namespace NSMB.UI.Game {
                 UpdateElementVisibility(f, marioExists);
             }
 
-            if (!marioExists) {
-                previousMarioExists = false;
-                return;
-            }
-
             UpdateStoredItemUI(mario, previousTarget == Target);
             UpdateTextUI(f, mario);
             ApplyUIColor(f, mario);
 
             previousTarget = Target;
-            previousMarioExists = true;
+            previousMarioExists = marioExists;
         }
 
         private void OnMarioInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
@@ -163,7 +160,24 @@ namespace NSMB.UI.Game {
             }
         }
 
+        private void OnStarCoinInitialized(Frame f, StarCoinAnimator starCoin) {
+            entityTrackIcons[starCoin] = CreateTrackIcon(f, starCoin.EntityRef, starCoin.transform);
+        }
+
+        private void OnStarCoinDestroyed(Frame f, StarCoinAnimator starCoin) {
+            if (entityTrackIcons.TryGetValue(starCoin, out TrackIcon icon)) {
+                if (icon) {
+                    Destroy(icon.gameObject);
+                }
+                entityTrackIcons.Remove(starCoin);
+            }
+        }
+
         private void UpdateStoredItemUI(MarioPlayer* mario, bool playAnimation) {
+            if (mario == null) {
+                return;
+            }
+
             PowerupAsset powerup = QuantumUnityDB.GetGlobalAsset(mario->ReserveItem);
             if (previousPowerup == powerup) {
                 return;
@@ -245,6 +259,22 @@ namespace NSMB.UI.Game {
             bool livesEnabled = rules.IsLivesEnabled;
             bool timerEnabled = rules.TimerSeconds > 0;
 
+            // TIMER
+            if (timerEnabled) {
+                float timeRemaining = f.Global->Timer.AsFloat;
+                int secondsRemaining = Mathf.Max(Mathf.CeilToInt(timeRemaining), 0);
+
+                if (secondsRemaining != cachedTimer) {
+                    cachedTimer = secondsRemaining;
+                    uiCountdown.text = Utils.Utils.GetSymbolString("Tx" + Utils.Utils.SecondsToMinuteSeconds(secondsRemaining));
+                    timerParent.SetActive(true);
+                }
+            }
+
+            if (mario == null) {
+                return;
+            }
+
             // TEAMS
             if (teamsEnabled) {
                 if (mario->GetTeam(f) is byte teamIndex) {
@@ -261,7 +291,7 @@ namespace NSMB.UI.Game {
             // STARS
             int objective = gamemode.GetObjectiveCount(f, mario);
             if (objective != cachedObjective) {
-                cachedObjective = mario->GamemodeData.StarChasers->Stars;
+                cachedObjective = objective;
                 string objectiveString = gamemode.ObjectiveSymbolPrefix + "x" + cachedObjective;
                 if (gamemode is StarChasersGamemode && !teamsEnabled) {
                     objectiveString += "/" + rules.StarsToWin;
@@ -283,24 +313,15 @@ namespace NSMB.UI.Game {
                     uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.Utils.GetSymbolString("x" + cachedLives);
                 }
             }
-
-            // TIMER
-            if (timerEnabled) {
-                float timeRemaining = f.Global->Timer.AsFloat;
-                int secondsRemaining = Mathf.Max(Mathf.CeilToInt(timeRemaining), 0);
-
-                if (secondsRemaining != cachedTimer) {
-                    cachedTimer = secondsRemaining;
-                    uiCountdown.text = Utils.Utils.GetSymbolString("Tx" + Utils.Utils.SecondsToMinuteSeconds(secondsRemaining));
-                    timerParent.SetActive(true);
-                }
-            }
         }
 
         public TrackIcon CreateTrackIcon(Frame f, EntityRef entity, Transform target) {
             TrackIcon icon;
             if (f.Has<BigStar>(entity)) {
                 icon = Instantiate(starTrackTemplate, starTrackTemplate.transform.parent);
+            } else if (f.Has<StarCoin>(entity)) {
+                Debug.Log(starCoinTrackTemplate);
+                icon = Instantiate(starCoinTrackTemplate, starCoinTrackTemplate.transform.parent);
             } else {
                 icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
             }
@@ -329,7 +350,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = (f.Global->Rules.TeamsEnabled && mario->GetTeam(f) is byte team) ? Utils.Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
+            Color color = (f.Global->Rules.TeamsEnabled && mario != null && mario->GetTeam(f) is byte team) ? Utils.Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;

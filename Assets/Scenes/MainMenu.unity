@@ -26267,8 +26267,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 4
   frames:
   - {fileID: 704988102, guid: b74955a4d8fef234aa26fd50a4054d1d, type: 3}
@@ -33172,8 +33172,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 12
   frames:
   - {fileID: -2914503216214332612, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
@@ -48721,7 +48721,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.8156878
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -50932,8 +50932,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 6
   frames:
   - {fileID: 271864985, guid: 897f10582e84a334a8312631ebd28a8e, type: 3}
@@ -51237,8 +51237,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 8
   frames:
   - {fileID: 4379595036460376432, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
@@ -52330,8 +52330,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 8
   frames:
   - {fileID: 4379595036460376432, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
@@ -85444,8 +85444,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 12
   frames:
   - {fileID: -1345363073, guid: 87344e5139abb894cb2584819a3db248, type: 3}

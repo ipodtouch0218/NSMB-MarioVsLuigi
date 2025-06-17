@@ -3,7 +3,6 @@ using NSMB.Replay;
 using NSMB.Translation;
 using NSMB.UI.MainMenu;
 using NSMB.Utils;
-using Quantum.Profiling;
 using SFB;
 using System;
 using System.Collections;

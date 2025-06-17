@@ -21,7 +21,7 @@ namespace Quantum {
             winningObjectiveCount = 0;
             int? winningTeam = null;
             bool tie = false;
-
+            
             Span<int> teamObjectiveCounts = stackalloc int[Constants.MaxPlayers];
             GetAllTeamsObjectiveCounts(f, teamObjectiveCounts);
 

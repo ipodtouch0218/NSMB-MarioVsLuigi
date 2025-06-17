@@ -30,7 +30,7 @@ namespace Quantum {
 
                 if (coin->DespawnCounter > 0) {
                     if (QuantumUtils.Decrement(ref coin->DespawnCounter)) {
-                        f.Events.CollectableDespawned(filter.Entity, filter.Transform->Position, false);
+                        f.Events.CollectableDespawned(filter.Entity, filter.Transform->Position + (FPVector2.Down / 4), false);
                         f.Destroy(filter.Entity);
                     }
                 }
@@ -119,7 +119,8 @@ namespace Quantum {
             }
 
             // Spawn objective coins relative to the "amount" parameter
-            SpawnObjectiveCoins(f, transform->Position, (10 + 5 * (amount - 1)) / coinDivideFactor, excludeTeamNumber);
+            var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
+            SpawnObjectiveCoins(f, transform->Position + collider->Shape.Centroid + (FPVector2.Up * collider->Shape.Box.Extents.Y), (10 + 5 * (amount - 1)) / coinDivideFactor, excludeTeamNumber);
         }
 
         public void OnStarCoinMarioInteraction(Frame f, EntityRef starCoinEntity, EntityRef marioEntity) {
@@ -142,7 +143,8 @@ namespace Quantum {
             
             mario->GamemodeData.CoinRunners->ObjectiveCoins += 25;
             starCoin->DespawnCounter = 105;
-            f.Events.MarioPlayerCollectedStarCoin(starCoinEntity);
+            starCoin->Collector = marioEntity;
+            f.Events.MarioPlayerCollectedStarCoin(marioEntity, starCoinEntity);
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
