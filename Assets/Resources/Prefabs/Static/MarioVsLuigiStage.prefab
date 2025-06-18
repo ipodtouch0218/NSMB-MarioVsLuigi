@@ -738,13 +738,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3a8e2ca97a02d24789a50227980b9d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _hidePooledObjectsInHierarchy: 1
+  _hidePooledObjectsInHierarchy: 0
   _resetGameObjectScale: 0
   _precacheObjects: []
   PoolablePrefabs:
   - {fileID: 6307920351473437675, guid: 00a2ef66a322a694c837b29404f2af49, type: 3}
   - {fileID: 6307920351473437675, guid: 8d3d3c8acd39a594c9077e49f837ec4a, type: 3}
   - {fileID: 1973747262660636106, guid: d6c38f51091fae64fa27d92f9415b3ab, type: 3}
+  - {fileID: 5780648777663731097, guid: 72667665d438ddc4daa05bc414f27a9c, type: 3}
 --- !u!114 &599652891852148525
 MonoBehaviour:
   m_ObjectHideFlags: 0

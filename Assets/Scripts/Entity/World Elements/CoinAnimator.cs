@@ -115,6 +115,7 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         }
 
         var coin = PredictedFrame.Unsafe.GetPointer<Coin>(EntityRef);
+        sfx.pitch = coin->CoinType.HasFlag(CoinType.Objective) ? Random.Range(1.35f, 1.45f) : 1f;
         sfx.volume = coin->CoinType.HasFlag(CoinType.Objective) ? 0.1f : 1f;
         sfx.PlayOneShot(SoundEffect.World_Coin_Drop);
         alreadyBounced = true;

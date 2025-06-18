@@ -2,3 +2,7 @@ synced event CoinGroupSpawned {
 	FPVector2 Position;
 	int CoinCount;
 }
+
+event MarioPlayerObjectiveCoinsChanged {
+	EntityRef Entity;
+}

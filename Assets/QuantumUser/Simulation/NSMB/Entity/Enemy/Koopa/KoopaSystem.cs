@@ -266,11 +266,11 @@ namespace Quantum {
                         PowerupAsset powerupAsset = f.FindAsset(koopa->SpawnPowerupWhenStomped);
                         EntityRef newPowerup = f.Create(powerupAsset.Prefab);
                         var powerupTransform = f.Unsafe.GetPointer<Transform2D>(newPowerup);
-                        var powerup = f.Unsafe.GetPointer<Powerup>(newPowerup);
+                        var coinItem = f.Unsafe.GetPointer<CoinItem>(newPowerup);
                         var powerupPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(newPowerup);
 
                         powerupTransform->Position = koopaTransform->Position;
-                        powerup->Initialize(f, newPowerup, 15, PowerupSpawnReason.BlueKoopa);
+                        coinItem->Initialize(f, newPowerup, 15, PowerupSpawnReason.BlueKoopa);
                         powerupPhysicsObject->DisableCollision = false;
 
                         koopaEnemy->IsActive = false;

@@ -50,9 +50,8 @@ namespace NSMB.UI.Game {
 
         public void Start() {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar);
-            QuantumEvent.Subscribe<EventMarioPlayerCollectedObjectiveCoin>(this, OnMarioPlayerCollectedObjectiveCoin);
-            QuantumEvent.Subscribe<EventMarioPlayerCollectedStarCoin>(this, OnMarioPlayerCollectedStarCoin);
             QuantumEvent.Subscribe<EventMarioPlayerDroppedStar>(this, OnMarioPlayerDroppedStar);
+            QuantumEvent.Subscribe<EventMarioPlayerObjectiveCoinsChanged>(this, OnMarioPlayerObjectiveCoinsChanged);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
             QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
@@ -151,15 +150,7 @@ namespace NSMB.UI.Game {
             UpdateText(e.Game.Frames.Predicted);
         }
 
-        private void OnMarioPlayerCollectedObjectiveCoin(EventMarioPlayerCollectedObjectiveCoin e) {
-            if (e.Entity != Entity) {
-                return;
-            }
-
-            UpdateText(e.Game.Frames.Predicted);
-        }
-
-        private void OnMarioPlayerCollectedStarCoin(EventMarioPlayerCollectedStarCoin e) {
+        private void OnMarioPlayerObjectiveCoinsChanged(EventMarioPlayerObjectiveCoinsChanged e) {
             if (e.Entity != Entity) {
                 return;
             }

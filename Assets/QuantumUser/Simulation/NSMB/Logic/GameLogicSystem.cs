@@ -255,6 +255,7 @@ namespace Quantum {
             if (playerDatas.Count == 0) {
                 // First player is host
                 newData->IsRoomHost = true;
+                newData->IsReady = false;
                 f.Global->Host = player;
                 f.Events.HostChanged(player);
             }
@@ -301,6 +302,7 @@ namespace Quantum {
 
                     if (youngestPlayer != null) {
                         youngestPlayer->IsRoomHost = true;
+                        youngestPlayer->IsReady = false;
                         f.Global->Host = youngestPlayer->PlayerRef;
                         f.Events.HostChanged(youngestPlayer->PlayerRef);
                     }
@@ -410,6 +412,8 @@ namespace Quantum {
             for (int i = 0; i < f.Global->PlayerInfo.Length; i++) {
                 f.Global->PlayerInfo[i] = default;
             }
+            f.Global->UsedStarSpawns.ClearAll();
+            f.Global->UsedStarSpawnCount = 0;
 
             var playerDatas = f.Filter<PlayerData>();
             while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {

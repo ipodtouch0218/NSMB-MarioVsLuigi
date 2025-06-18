@@ -217,6 +217,12 @@ namespace Quantum {
                 return false;
             }
 
+            QBoolean doDamage = true;
+            f.Signals.OnMarioPlayerTakeDamage(entity, ref doDamage);
+            if (!doDamage) {
+                return false;
+            }
+
             PreviousPowerupState = CurrentPowerupState;
 
             switch (CurrentPowerupState) {
@@ -288,7 +294,8 @@ namespace Quantum {
                     };
                 }
 
-                EntityRef newStarEntity = f.Create(f.SimulationConfig.BigStarPrototype);
+                var gamemode = f.FindAsset(f.Global->Rules.Gamemode) as StarChasersGamemode;
+                EntityRef newStarEntity = f.Create(gamemode.BigStarPrototype);
                 var newStar = f.Unsafe.GetPointer<BigStar>(newStarEntity);
                 var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newStarEntity);
                 newStarTransform->Position = transform->Position;

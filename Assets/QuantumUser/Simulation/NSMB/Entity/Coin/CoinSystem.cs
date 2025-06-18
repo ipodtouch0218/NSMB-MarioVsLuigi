@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class CoinSystem : SystemMainThreadEntityFilter<Coin, CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin,
@@ -32,6 +33,7 @@ namespace Quantum {
                 if (QuantumUtils.Decrement(ref coin->Lifetime)
                     || (coin->UncollectableFrames == 0 && filter.Transform->Position.Y < stage.StageWorldMin.Y)) {
 
+                    Debug.Log(coin->Lifetime + " - " + coin->CoinType);
                     f.Events.CollectableDespawned(entity, filter.Transform->Position, false);
                     f.Destroy(entity);
                     return;
@@ -138,7 +140,7 @@ namespace Quantum {
             bool item = newCoins == f.Global->Rules.CoinsForPowerup;
             if (item) {
                 mario->Coins = 0;
-                MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default);
+                MarioPlayerSystem.SpawnItem(f, marioEntity, mario, default, fromBlock);
             } else {
                 mario->Coins = newCoins;
             }

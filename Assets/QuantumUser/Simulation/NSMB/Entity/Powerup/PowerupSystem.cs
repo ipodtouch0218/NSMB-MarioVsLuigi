@@ -5,13 +5,13 @@ namespace Quantum {
     public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed,
         ISignalOnStageReset {
 
-        public static readonly FP CameraYOffset = FP.FromString("1.68");
         private static readonly FP BumpForce = Constants._5_50;
 
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
             public Powerup* Powerup;
+            public CoinItem* CoinItem;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* Collider;
             public Interactable* Interactable;
@@ -24,65 +24,10 @@ namespace Quantum {
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var entity = filter.Entity;
             var powerup = filter.Powerup;
+            var coinItem = filter.CoinItem;
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
-
-            if (powerup->SpawnAnimationFrames > 0) {
-                if (f.Exists(powerup->ParentMarioPlayer)) {
-                    // Attached to a player. Don't interact, and follow the player.
-                    var marioTransform = f.Unsafe.GetPointer<Transform2D>(powerup->ParentMarioPlayer);
-                    var marioCamera = f.Unsafe.GetPointer<CameraController>(powerup->ParentMarioPlayer);
-
-                    // TODO magic value
-                    transform->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + CameraYOffset);
-
-                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                        powerup->ParentMarioPlayer = EntityRef.None;
-                        filter.Interactable->ColliderDisabled = false;
-                        physicsObject->IsFrozen = false;
-                        f.Events.PowerupBecameActive(entity);
-                    } else {
-                        return;
-                    }
-                } else if (powerup->BlockSpawn) {
-                    // Spawning from a block. Lerp between origin & destination.
-                    FP t = 1 - ((FP) powerup->SpawnAnimationFrames / (FP) powerup->BlockSpawnAnimationLength);
-                    transform->Position = FPVector2.Lerp(powerup->BlockSpawnOrigin, powerup->BlockSpawnDestination, t);
-
-                    if (powerup->SpawnAnimationFrames == 7) {
-                        filter.Interactable->ColliderDisabled = false;
-                    }
-
-                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                        if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, false, stage, entity)) {
-                            f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
-                            f.Destroy(entity);
-                            return;
-                        }
-                        powerup->BlockSpawn = false;
-                        physicsObject->IsFrozen = false;
-                        filter.Interactable->ColliderDisabled = false;
-                        f.Events.PowerupBecameActive(entity);
-                    } else {
-                        return;
-                    }
-                    return;
-                } else if (powerup->LaunchSpawn) {
-                    // Back to normal layers
-                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                        powerup->LaunchSpawn = false;
-                        physicsObject->DisableCollision = false;
-                        filter.Interactable->ColliderDisabled = false;
-                        f.Events.PowerupBecameActive(entity);
-                    }
-                } else {
-                    if (QuantumUtils.Decrement(ref powerup->SpawnAnimationFrames)) {
-                        filter.Interactable->ColliderDisabled = false;
-                    }
-                }
-            }
-
-            var asset = f.FindAsset(powerup->Scriptable);
+            var asset = (PowerupAsset) f.FindAsset(coinItem->Scriptable);
 
             if (asset.AvoidPlayers && physicsObject->IsTouchingGround) {
                 FPVector2? closestMarioPosition = null;
@@ -109,18 +54,6 @@ namespace Quantum {
                     asset.AnimationCurveY.Evaluate(FPMath.Clamp(powerup->AnimationCurveTimer, 0, asset.AnimationCurveY.EndTime - FP._0_10))
                 );
                 powerup->AnimationCurveTimer += f.DeltaTime;
-            }
-
-            if (powerup->SpawnAnimationFrames == 0 && physicsObject->DisableCollision) {
-                // Test that we're not in a wall anymore
-                if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.Collider->Shape, stage: stage)) {
-                    physicsObject->DisableCollision = false;
-                }
-            }
-
-            if (QuantumUtils.Decrement(ref powerup->Lifetime)) {
-                f.Events.CollectableDespawned(entity, transform->Position, false);
-                f.Destroy(entity);
             }
         }
 
@@ -173,9 +106,10 @@ namespace Quantum {
                 return;
             }
 
+            var coinItem = f.Unsafe.GetPointer<CoinItem>(powerupEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
-            var newScriptable = f.FindAsset(powerup->Scriptable);
+            var newScriptable = (PowerupAsset) f.FindAsset(coinItem->Scriptable);
 
             // Change the player's powerup state
             PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
@@ -269,15 +203,16 @@ namespace Quantum {
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
             if (!f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
                 || !f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
+                || !f.Unsafe.TryGetPointer(entity, out CoinItem* coinItem)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
-                || powerup->SpawnAnimationFrames > 0) {
+                || coinItem->SpawnAnimationFrames > 0) {
 
                 return;
             }
 
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
-                f.FindAsset(powerup->Scriptable).Speed * (ourPos.X > theirPos.X ? 1 : -1),
+                ((PowerupAsset) f.FindAsset(coinItem->Scriptable)).Speed * (ourPos.X > theirPos.X ? 1 : -1),
                 BumpForce
             );
             physicsObject->IsTouchingGround = false;
@@ -285,8 +220,9 @@ namespace Quantum {
         }
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
-            if (f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
-                && powerup->SpawnAnimationFrames <= 0) {
+            if (f.Has<Powerup>(entity)
+                && f.Unsafe.TryGetPointer(entity, out CoinItem* coinItem)
+                && coinItem->SpawnAnimationFrames <= 0) {
 
                 f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                 f.Destroy(entity);
@@ -295,16 +231,15 @@ namespace Quantum {
 
         public void OnStageReset(Frame f, QBoolean full) {
             VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            Filter filter = default;
-            var filterStruct = f.Unsafe.FilterStruct<Filter>();
-            while (filterStruct.Next(&filter)) {
-                if (filter.Powerup->SpawnAnimationFrames > 0 || !filter.Collider->Enabled) {
+            var filter = f.Filter<Powerup, CoinItem, Transform2D, PhysicsCollider2D>();
+            while (filter.NextUnsafe(out EntityRef entity, out _, out var coinItem, out var transform, out var collider)) {
+                if (coinItem->SpawnAnimationFrames > 0 || !collider->Enabled) {
                     continue;
                 }
                 
-                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.Collider->Shape, stage: stage, entity: filter.Entity)) {
+                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
                     // Insta-despawn. Crushed by blocks respawning.
-                    filter.Powerup->Lifetime = 1;
+                    coinItem->Lifetime = 1;
                 }
             }
         }

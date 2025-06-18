@@ -1,0 +1,18 @@
+component GoldBlockHelmet {
+	EntityRef AttachedTo;
+	byte ObjectiveCoinsRemaining;
+	byte Timer;
+}
+
+event MarioPlayerPickedUpGoldBlockHelmet {
+	EntityRef Entity;
+	EntityRef Helmet;
+}
+
+event GoldBlockHelmetGeneratedObjectiveCoin {
+	EntityRef Helmet;
+}
+
+synced event MarioPlayerLostGoldBlockHelmet {
+	EntityRef Entity;
+}

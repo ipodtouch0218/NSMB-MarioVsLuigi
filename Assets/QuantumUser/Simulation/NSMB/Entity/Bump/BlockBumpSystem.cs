@@ -55,7 +55,7 @@ namespace Quantum {
 
             if (blockBump->Powerup.IsValid) {
                 EntityRef newPowerup = f.Create(blockBump->Powerup);
-                if (f.Unsafe.TryGetPointer(newPowerup, out Powerup* powerup)) {
+                if (f.Unsafe.TryGetPointer(newPowerup, out CoinItem* coinItem)) {
                     // Launch if downwards bump and theres a (solid) block below us
                     BreakableBrickTile tile = (BreakableBrickTile) f.FindAsset(blockBump->StartTile);
                     IntVector2 below = blockBump->Tile;
@@ -63,17 +63,17 @@ namespace Quantum {
                     StageTileInstance belowTileInstance = stage.GetTileRelative(f, below);
                     bool launch = blockBump->IsDownwards && belowTileInstance.HasWorldPolygons(f);
 
-                    FP powerupHeight = f.Unsafe.GetPointer<PhysicsCollider2D>(newPowerup)->Shape.Box.Extents.Y;
+                    FP coinItemHeight = f.Unsafe.GetPointer<PhysicsCollider2D>(newPowerup)->Shape.Box.Extents.Y;
                     FPVector2 origin = filter.Transform->Position;
 
-                    var powerupScriptable = f.FindAsset(powerup->Scriptable);
-                    if (powerupScriptable.State == PowerupState.MegaMushroom) {
+                    // Jank.
+                    if (f.FindAsset(coinItem->Scriptable) is PowerupAsset pa && pa.State == PowerupState.MegaMushroom) {
                         origin.Y += (tile.BumpSize.Y / 2) - FP._0_50;
 
-                        powerup->Initialize(f, newPowerup, 90,
+                        coinItem->Initialize(f, newPowerup, 90,
                             PowerupSpawnReason.PowerupBlock,
-                            origin + FPVector2.Up * FP._0_50, 
-                            origin + FPVector2.Up * FP._0_50, 
+                            origin + FPVector2.Up * FP._0_50,
+                            origin + FPVector2.Up * FP._0_50,
                             false);
                     } else {
                         if (blockBump->IsDownwards) {
@@ -82,10 +82,10 @@ namespace Quantum {
                             origin.Y += (tile.BumpSize.Y / 2) - FP._0_50;
                         }
 
-                        powerup->Initialize(f, newPowerup, (byte) (launch ? 20 : 60),
+                        coinItem->Initialize(f, newPowerup, (byte) (launch ? 20 : 60),
                             PowerupSpawnReason.PowerupBlock,
-                            origin, 
-                            origin + (blockBump->IsDownwards ? new FPVector2(0, -FP._0_50) : new FPVector2(0, FP._0_50)), 
+                            origin,
+                            origin + (blockBump->IsDownwards ? new FPVector2(0, -FP._0_50) : new FPVector2(0, FP._0_50)),
                             launch);
                     }
                 }

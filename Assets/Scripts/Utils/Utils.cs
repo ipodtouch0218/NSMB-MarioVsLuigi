@@ -3,7 +3,6 @@ using NSMB.UI.Game;
 using Quantum;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -78,6 +77,7 @@ namespace NSMB.Utils {
             ['9'] = "hudnumber_9",
             ['x'] = "hudnumber_x",
             ['C'] = "hudnumber_coin",
+            ['c'] = "hudnumber_objectivecoin",
             ['S'] = "hudnumber_star",
             ['T'] = "hudnumber_timer",
             ['/'] = "hudnumber_slash",
@@ -120,6 +120,7 @@ namespace NSMB.Utils {
             ['9'] = "results_9",
             ['S'] = "results_star",
             ['O'] = "results_out",
+            ['c'] = "hudnumber_objectivecoin",
         };
 
         private static StringBuilder symbolStringBuilder = new();

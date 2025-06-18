@@ -526,6 +526,16 @@ MonoBehaviour:
     m_GlyphIndex: 87
     m_Scale: 1
     m_Name: copy
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 88
+    m_Scale: 1
+    m_Name: hud_starcoin
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 89
+    m_Scale: 1
+    m_Name: hudnumber_objectivecoin
   m_GlyphTable:
   - m_Index: 0
     m_Metrics:
@@ -1940,5 +1950,37 @@ MonoBehaviour:
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
     sprite: {fileID: -1032943485, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 88
+    m_Metrics:
+      m_Width: 23
+      m_Height: 23
+      m_HorizontalBearingX: -11.5
+      m_HorizontalBearingY: 11.5
+      m_HorizontalAdvance: 23
+    m_GlyphRect:
+      m_X: 206
+      m_Y: 219
+      m_Width: 23
+      m_Height: 23
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: -1029622304, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  - m_Index: 89
+    m_Metrics:
+      m_Width: 13
+      m_Height: 16
+      m_HorizontalBearingX: -2
+      m_HorizontalBearingY: 16
+      m_HorizontalAdvance: 20
+    m_GlyphRect:
+      m_X: 243
+      m_Y: 202
+      m_Width: 13
+      m_Height: 16
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: 1593277731, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []

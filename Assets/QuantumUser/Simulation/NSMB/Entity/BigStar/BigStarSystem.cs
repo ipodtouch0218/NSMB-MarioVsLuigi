@@ -31,7 +31,7 @@ namespace Quantum {
             bool spawnedStar = false;
             for (int i = 0; i < spawnpoints; i++) {
                 // Find a spot...
-                if (f.Global->UsedStarSpawnCount == spawnpoints) {
+                if (f.Global->UsedStarSpawnCount >= spawnpoints) {
                     usedSpawnpoints.ClearAll();
                     f.Global->UsedStarSpawnCount = 0;
                 }
@@ -56,7 +56,8 @@ namespace Quantum {
 
                 if (hits.Count == 0) {
                     // Hit no players
-                    EntityRef newEntity = f.Create(f.SimulationConfig.BigStarPrototype);
+                    var gamemode = f.FindAsset(f.Global->Rules.Gamemode) as StarChasersGamemode;
+                    EntityRef newEntity = f.Create(gamemode.BigStarPrototype);
                     f.Global->MainBigStar = newEntity;
                     var newStarTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
                     var newStar = f.Unsafe.GetPointer<BigStar>(newEntity);

@@ -1,21 +1,9 @@
 component Powerup {
-	AssetRef<PowerupAsset> Scriptable;
 	bool FacingRight;
-	int Lifetime;
 
 	FPVector2 AnimationCurveOrigin;
 	FP AnimationCurveTimer;
-
-	[ExcludeFromPrototype] PowerupSpawnReason SpawnReason;
-	[ExcludeFromPrototype] bool BlockSpawn;
-	[ExcludeFromPrototype] bool LaunchSpawn;
-	[ExcludeFromPrototype] FPVector2 BlockSpawnOrigin;
-	[ExcludeFromPrototype] FPVector2 BlockSpawnDestination;
-	[ExcludeFromPrototype] byte BlockSpawnAnimationLength;
-
-	[ExcludeFromPrototype] byte SpawnAnimationFrames;
 	[ExcludeFromPrototype] byte IgnorePlayerFrames;
-	[ExcludeFromPrototype] EntityRef ParentMarioPlayer;
 }
 
 enum PowerupState : Byte {
@@ -42,8 +30,4 @@ enum PowerupReserveResult : Byte {
     NoneButPlaySound,
     ReserveOldPowerup,
     ReserveNewPowerup,
-}
-
-event PowerupBecameActive {
-	EntityRef Entity;
 }

@@ -2124,6 +2124,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: hudnumber_objectivecoin
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 202
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a41e20e1dfb4654a8a15f8ebad6dd42
+      internalID: 1593277731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -2176,6 +2198,7 @@ TextureImporter:
       hudnumber_9: -140438321
       hudnumber_coin: -1972445275
       hudnumber_colon: 1420784344
+      hudnumber_objectivecoin: 1593277731
       hudnumber_slash: -688806156
       hudnumber_star: 861810113
       hudnumber_x: -1713447182

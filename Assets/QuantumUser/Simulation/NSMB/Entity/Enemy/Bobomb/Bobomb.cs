@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System.Runtime.InteropServices;
 
 namespace Quantum {
     public unsafe partial struct Bobomb {
@@ -43,11 +44,8 @@ namespace Quantum {
 
             if (reason.ShouldSpawnCoin()) {
                 // Spawn coin
-                EntityRef coinEntity = f.Create(f.SimulationConfig.LooseCoinPrototype);
-                var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
-                var coinPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(coinEntity);
-                coinTransform->Position = position;
-                coinPhysicsObject->Velocity.Y = f.RNG->Next(Constants._4_50, 5);
+                var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+                gamemode.SpawnLooseCoin(f, position);
             }
 
             // Fall off screen

@@ -357,9 +357,12 @@ public static unsafe class QuantumUtils {
     }
 
     public static PowerupAsset FindPowerupAsset(Frame f, PowerupState state) {
-        foreach (var powerupAsset in f.SimulationConfig.AllPowerups) {
-            if (f.TryFindAsset(powerupAsset, out PowerupAsset powerup)
+        var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+        foreach (var coinItemAsset in gamemode.AllCoinItems) {
+            if (f.TryFindAsset(coinItemAsset, out CoinItemAsset item)
+                && item is PowerupAsset powerup
                 && powerup.State == state) {
+
                 return powerup;
             }
         }

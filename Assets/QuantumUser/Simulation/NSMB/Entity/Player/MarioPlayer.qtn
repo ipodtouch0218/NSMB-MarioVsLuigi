@@ -163,6 +163,7 @@ enum KnockbackStrength : Byte {
 signal OnMarioPlayerDied(EntityRef entity);
 signal OnMarioPlayerBecameInvincible(EntityRef entity);
 signal OnMarioPlayerDropObjective(EntityRef entity, int amount, EntityRef attacker);
+signal OnMarioPlayerTakeDamage(EntityRef entity, ref bool keepDamage);
 
 event MarioPlayerJumped {
 	EntityRef Entity;

@@ -1153,6 +1153,8 @@ MonoBehaviour:
   HammerHelm: {fileID: 5235708944541028197}
   HammerShell: {fileID: 8818436854622393624}
   HammerTuck: {fileID: 95959038958179752}
+  smallHeadBone: {fileID: 6705087100831646770}
+  largeHeadBone: {fileID: 8653970927372177714}
   normalDrill: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
   propellerDrill: {fileID: 8300000, guid: c8ae9349c885145468011889cafc470b, type: 3}
   dustPlayer: {fileID: 8378724675999537702}
@@ -1162,6 +1164,7 @@ MonoBehaviour:
   spinnerDrillData: {fileID: 11400000, guid: 1aa16efb891dabe408c2a0c2a3ff045e, type: 2}
   propellerDrillData: {fileID: 11400000, guid: eef8bb198b37ff940a8a8de713e95481, type: 2}
   sfx: {fileID: 5377451828833222271}
+  coinSfx: {fileID: 3452636116809643534}
 --- !u!114 &8832712012989740833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1333,16 +1336,16 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 08141aacc2b968a419a9c775bdcbdf8d, type: 3}
+  m_Resource: {fileID: 8300000, guid: 08141aacc2b968a419a9c775bdcbdf8d, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
+  m_Volume: 0.33333334
+  m_Pitch: 1.4
   Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 0
+  Priority: 256
   DopplerLevel: 0
   MinDistance: 1
   MaxDistance: 7.5

@@ -44,7 +44,7 @@ namespace Quantum {
             bool spawnedStarCoin = false;
             for (int i = 0; i < spawnpoints; i++) {
                 // Find a spot...
-                if (f.Global->UsedStarSpawnCount == spawnpoints) {
+                if (f.Global->UsedStarSpawnCount >= spawnpoints) {
                     usedSpawnpoints.ClearAll();
                     f.Global->UsedStarSpawnCount = 0;
                 }
@@ -69,7 +69,8 @@ namespace Quantum {
 
                 if (hits.Count == 0) {
                     // Hit no players
-                    EntityRef newEntity = f.Create(f.SimulationConfig.StarCoinPrototype);
+                    var gamemode = f.FindAsset(f.Global->Rules.Gamemode) as CoinRunnersGamemode;
+                    EntityRef newEntity = f.Create(gamemode.StarCoinPrototype);
                     f.Global->MainBigStar = newEntity;
                     var newStarCoinTransform = f.Unsafe.GetPointer<Transform2D>(newEntity);
                     newStarCoinTransform->Position = position;
@@ -145,15 +146,17 @@ namespace Quantum {
             starCoin->DespawnCounter = 105;
             starCoin->Collector = marioEntity;
             f.Events.MarioPlayerCollectedStarCoin(marioEntity, starCoinEntity);
+            f.Events.MarioPlayerObjectiveCoinsChanged(marioEntity);
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
             // Lose half of all coins
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
-            
+
             int coinsToSpawn = mario->GamemodeData.CoinRunners->ObjectiveCoins / 2;
             mario->GamemodeData.CoinRunners->ObjectiveCoins -= coinsToSpawn;
+            f.Events.MarioPlayerObjectiveCoinsChanged(entity);
         }
 
         public void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam) {
@@ -162,8 +165,9 @@ namespace Quantum {
             }
 
             VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode) as CoinRunnersGamemode;
             for (int i = 0; i < amount; i++) {
-                EntityRef newCoin = f.Create(f.SimulationConfig.ObjectiveCoinPrototype);
+                EntityRef newCoin = f.Create(gamemode.ObjectiveCoinPrototype);
                 var transform = f.Unsafe.GetPointer<Transform2D>(newCoin);
                 var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(newCoin);
 
@@ -196,6 +200,7 @@ namespace Quantum {
             mario->GamemodeData.CoinRunners->ObjectiveCoins++;
 
             f.Events.MarioPlayerCollectedObjectiveCoin(marioEntity);
+            f.Events.MarioPlayerObjectiveCoinsChanged(marioEntity);
         }
     }
 }

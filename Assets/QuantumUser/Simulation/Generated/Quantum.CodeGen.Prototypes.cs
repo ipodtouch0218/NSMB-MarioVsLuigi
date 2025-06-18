@@ -270,6 +270,23 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.CoinItem))]
+  public unsafe partial class CoinItemPrototype : ComponentPrototype<Quantum.CoinItem> {
+    public AssetRef<CoinItemAsset> Scriptable;
+    public Int32 Lifetime;
+    partial void MaterializeUser(Frame frame, ref Quantum.CoinItem result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.CoinItem component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.CoinItem result, in PrototypeMaterializationContext context = default) {
+        result.Scriptable = this.Scriptable;
+        result.Lifetime = this.Lifetime;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.CoinRunnersData))]
   public unsafe partial class CoinRunnersDataPrototype : StructPrototype {
     public Int32 ObjectiveCoins;
@@ -434,6 +451,23 @@ namespace Quantum.Prototypes {
         result.MoverAsset = this.MoverAsset;
         result.StartOffset = this.StartOffset;
         MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.GoldBlockHelmet))]
+  public unsafe class GoldBlockHelmetPrototype : ComponentPrototype<Quantum.GoldBlockHelmet> {
+    public MapEntityId AttachedTo;
+    public Byte ObjectiveCoinsRemaining;
+    public Byte Timer;
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.GoldBlockHelmet component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.GoldBlockHelmet result, in PrototypeMaterializationContext context = default) {
+        PrototypeValidator.FindMapEntity(this.AttachedTo, in context, out result.AttachedTo);
+        result.ObjectiveCoinsRemaining = this.ObjectiveCoinsRemaining;
+        result.Timer = this.Timer;
     }
   }
   [System.SerializableAttribute()]
@@ -791,9 +825,7 @@ namespace Quantum.Prototypes {
   [System.SerializableAttribute()]
   [Quantum.Prototypes.Prototype(typeof(Quantum.Powerup))]
   public unsafe partial class PowerupPrototype : ComponentPrototype<Quantum.Powerup> {
-    public AssetRef<PowerupAsset> Scriptable;
     public QBoolean FacingRight;
-    public Int32 Lifetime;
     public FPVector2 AnimationCurveOrigin;
     public FP AnimationCurveTimer;
     partial void MaterializeUser(Frame frame, ref Quantum.Powerup result, in PrototypeMaterializationContext context);
@@ -803,9 +835,7 @@ namespace Quantum.Prototypes {
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
     public void Materialize(Frame frame, ref Quantum.Powerup result, in PrototypeMaterializationContext context = default) {
-        result.Scriptable = this.Scriptable;
         result.FacingRight = this.FacingRight;
-        result.Lifetime = this.Lifetime;
         result.AnimationCurveOrigin = this.AnimationCurveOrigin;
         result.AnimationCurveTimer = this.AnimationCurveTimer;
         MaterializeUser(frame, ref result, in context);

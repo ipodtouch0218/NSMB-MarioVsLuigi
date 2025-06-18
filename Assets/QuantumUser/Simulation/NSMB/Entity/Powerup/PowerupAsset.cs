@@ -1,17 +1,13 @@
 using Photon.Deterministic;
 using Quantum;
 
-public class PowerupAsset : AssetObject {
+public class PowerupAsset : CoinItemAsset {
 
     public PowerupType Type;
     public PowerupState State;
 
-    public AssetRef<EntityPrototype> Prefab;
     public bool SoundPlaysEverywhere;
     public SoundEffect SoundEffect = SoundEffect.Player_Sound_PowerupCollect;
-    public SoundEffect BlockSpawnSoundEffect = SoundEffect.World_Block_Powerup;
-    public FP SpawnChance = FP._0_10, LosingSpawnBonus = 0;
-    public bool BigPowerup, VerticalPowerup, CustomPowerup, LivesOnlyPowerup;
 
 #if QUANTUM_UNITY
     public UnityEngine.Sprite ReserveSprite;
@@ -27,12 +23,6 @@ public class PowerupAsset : AssetObject {
     public FPAnimationCurve AnimationCurveY;
 
     public sbyte StatePriority = -1, ItemPriority = -1;
-
-    public FP GetModifiedChance(int starsToWin, int leaderStars, int ourStars) {
-        int starDifference = leaderStars - ourStars;
-        FP bonus = LosingSpawnBonus * FPMath.Log(starDifference + 1, FP.E) * (FP._1 - ((FP) (starsToWin - leaderStars) / starsToWin));
-        return FPMath.Max(0, SpawnChance + bonus);
-    }
 }
 
 public enum PowerupType {
