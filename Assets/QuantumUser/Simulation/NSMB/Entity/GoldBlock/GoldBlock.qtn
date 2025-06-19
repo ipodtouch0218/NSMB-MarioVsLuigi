@@ -1,0 +1,27 @@
+component GoldBlock {
+	EntityRef AttachedTo;
+	byte ObjectiveCoinsRemaining;
+	byte Timer;
+	byte DespawnTimer;
+}
+
+event MarioPlayerPickedUpGoldBlock {
+	EntityRef Entity;
+	EntityRef GoldBlock;
+}
+
+event GoldBlockGeneratedObjectiveCoin {
+	EntityRef GoldBlock;
+}
+
+event GoldBlockRanOutOfCoins {
+	EntityRef GoldBlock;
+}
+
+event GoldBlockBrokenByMega {
+	EntityRef GoldBlock;
+}
+
+synced event GoldBlockLostViaDamage {
+	EntityRef GoldBlock;
+}

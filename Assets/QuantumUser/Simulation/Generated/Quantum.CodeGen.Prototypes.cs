@@ -454,20 +454,22 @@ namespace Quantum.Prototypes {
     }
   }
   [System.SerializableAttribute()]
-  [Quantum.Prototypes.Prototype(typeof(Quantum.GoldBlockHelmet))]
-  public unsafe class GoldBlockHelmetPrototype : ComponentPrototype<Quantum.GoldBlockHelmet> {
+  [Quantum.Prototypes.Prototype(typeof(Quantum.GoldBlock))]
+  public unsafe class GoldBlockPrototype : ComponentPrototype<Quantum.GoldBlock> {
     public MapEntityId AttachedTo;
     public Byte ObjectiveCoinsRemaining;
     public Byte Timer;
+    public Byte DespawnTimer;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
-        Quantum.GoldBlockHelmet component = default;
+        Quantum.GoldBlock component = default;
         Materialize((Frame)f, ref component, in context);
         return f.Set(entity, component) == SetResult.ComponentAdded;
     }
-    public void Materialize(Frame frame, ref Quantum.GoldBlockHelmet result, in PrototypeMaterializationContext context = default) {
+    public void Materialize(Frame frame, ref Quantum.GoldBlock result, in PrototypeMaterializationContext context = default) {
         PrototypeValidator.FindMapEntity(this.AttachedTo, in context, out result.AttachedTo);
         result.ObjectiveCoinsRemaining = this.ObjectiveCoinsRemaining;
         result.Timer = this.Timer;
+        result.DespawnTimer = this.DespawnTimer;
     }
   }
   [System.SerializableAttribute()]

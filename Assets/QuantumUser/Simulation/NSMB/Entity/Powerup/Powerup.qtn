@@ -6,6 +6,8 @@ component Powerup {
 	[ExcludeFromPrototype] byte IgnorePlayerFrames;
 }
 
+signal OnMarioPlayerCollectedPowerup(EntityRef mario, EntityRef powerup);
+
 enum PowerupState : Byte {
     NoPowerup,
     MiniMushroom,

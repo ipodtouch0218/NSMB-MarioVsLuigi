@@ -67,16 +67,18 @@ namespace Quantum.Prototypes.Unity {
     }
   }
   [System.SerializableAttribute()]
-  public unsafe partial class GoldBlockHelmetPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.GoldBlockHelmetPrototype> {
+  public unsafe partial class GoldBlockPrototype : Quantum.QuantumUnityPrototypeAdapter<Quantum.Prototypes.GoldBlockPrototype> {
     public Quantum.QuantumEntityPrototype AttachedTo;
     public Byte ObjectiveCoinsRemaining;
     public Byte Timer;
-    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.GoldBlockHelmetPrototype prototype);
-    public override Quantum.Prototypes.GoldBlockHelmetPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
-      var result = new Quantum.Prototypes.GoldBlockHelmetPrototype();
+    public Byte DespawnTimer;
+    partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.GoldBlockPrototype prototype);
+    public override Quantum.Prototypes.GoldBlockPrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
+      var result = new Quantum.Prototypes.GoldBlockPrototype();
       converter.Convert(this.AttachedTo, out result.AttachedTo);
       converter.Convert(this.ObjectiveCoinsRemaining, out result.ObjectiveCoinsRemaining);
       converter.Convert(this.Timer, out result.Timer);
+      converter.Convert(this.DespawnTimer, out result.DespawnTimer);
       ConvertUser(converter, ref result);
       return result;
     }

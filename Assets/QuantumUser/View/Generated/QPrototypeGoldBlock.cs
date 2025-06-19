@@ -14,18 +14,18 @@ namespace Quantum {
   using UnityEngine;
   
   [UnityEngine.DisallowMultipleComponent()]
-  public unsafe partial class QPrototypeGoldBlockHelmet : QuantumUnityComponentPrototype<Quantum.Prototypes.GoldBlockHelmetPrototype>, IQuantumUnityPrototypeWrapperForComponent<Quantum.GoldBlockHelmet> {
-    partial void CreatePrototypeUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.GoldBlockHelmetPrototype prototype);
+  public unsafe partial class QPrototypeGoldBlock : QuantumUnityComponentPrototype<Quantum.Prototypes.GoldBlockPrototype>, IQuantumUnityPrototypeWrapperForComponent<Quantum.GoldBlock> {
+    partial void CreatePrototypeUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.GoldBlockPrototype prototype);
     [DrawInline()]
     [ReadOnly(InEditMode = false)]
-    public Quantum.Prototypes.Unity.GoldBlockHelmetPrototype Prototype;
+    public Quantum.Prototypes.Unity.GoldBlockPrototype Prototype;
     public override System.Type ComponentType {
       get {
-        return typeof(Quantum.GoldBlockHelmet);
+        return typeof(Quantum.GoldBlock);
       }
     }
     public override ComponentPrototype CreatePrototype(Quantum.QuantumEntityPrototypeConverter converter) {
-      Quantum.Prototypes.GoldBlockHelmetPrototype result;
+      Quantum.Prototypes.GoldBlockPrototype result;
       converter.Convert(Prototype, out result);
       CreatePrototypeUser(converter, ref result);
       return result;

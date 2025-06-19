@@ -167,14 +167,14 @@ GameObject:
   - component: {fileID: 2204850598226927073}
   - component: {fileID: 3876649161553763364}
   - component: {fileID: 8618257050879092341}
-  - component: {fileID: 4288160669770743177}
   - component: {fileID: 5220072793021705497}
   - component: {fileID: 9100619937875845096}
   - component: {fileID: -7807392699477625452}
   - component: {fileID: 6463762602134009977}
   - component: {fileID: 6228591600208259577}
+  - component: {fileID: 8561459730482369782}
   m_Layer: 0
-  m_Name: GoldBlockHelmet
+  m_Name: GoldBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -364,7 +364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BindBehaviour: 0
-  ManualDisposal: 0
+  ManualDisposal: 1
   ViewFlags: 0
   InterpolationMode: 0
   ErrorCorrectionRateMin: 3.3
@@ -382,22 +382,6 @@ MonoBehaviour:
   OnEntityDestroyed:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4288160669770743177
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1009954173257161786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdd0eaf13b0d9974f8dd66956ce867c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prototype:
-    AttachedTo: {fileID: 0}
-    ObjectiveCoinsRemaining: 0
-    Timer: 0
 --- !u!114 &5220072793021705497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -525,6 +509,31 @@ MonoBehaviour:
     type: 3}
   helmetMeshRenderer: {fileID: 6099990347301812746}
   sfx: {fileID: 1841460531188503477}
+  lostViaDamageInitialVelocity: {x: 0, y: 6, z: -2}
+  lostViaDamageGravity: {x: 0, y: -15}
+  lostViaDamageInitialAngularVelocity: 1000
+  lostViaDamageAngularDeceleration: 1200
+  lostViaDamageDespawnTime: 0.66
+  lostViaDamageRotationOffset: {x: 0, y: 0.06, z: 0}
+  lostViaDamageVelocity: {x: 0, y: 0}
+  lostViaDamageAngularVelocity: 0
+  lostViaDamage: 0
+--- !u!114 &8561459730482369782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009954173257161786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c52a81cea4144841a636c188aa8f590, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    AttachedTo: {fileID: 0}
+    ObjectiveCoinsRemaining: 50
+    Timer: 0
 --- !u!1 &1501951331144334225
 GameObject:
   m_ObjectHideFlags: 0
@@ -1107,17 +1116,37 @@ PrefabInstance:
     - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
       propertyPath: playOnAwake
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
+        type: 3}
+      propertyPath: ShapeModule.type
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
       propertyPath: ShapeModule.m_Scale.x
-      value: 0.75
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
+        type: 3}
+      propertyPath: ShapeModule.m_Scale.y
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
       propertyPath: ShapeModule.m_Position.y
-      value: 0
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
+        type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
+        type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
@@ -1137,17 +1166,17 @@ PrefabInstance:
     - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5699999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.57
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -15
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
@@ -1216,7 +1245,7 @@ PrefabInstance:
     - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
       propertyPath: playOnAwake
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}
@@ -1227,6 +1256,11 @@ PrefabInstance:
         type: 3}
       propertyPath: ShapeModule.m_Position.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3094612392314655968, guid: d758aa65baab42b43ba031de88063bb7,
+        type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4113588847912301876, guid: d758aa65baab42b43ba031de88063bb7,
         type: 3}

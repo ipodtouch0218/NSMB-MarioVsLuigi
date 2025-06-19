@@ -314,9 +314,9 @@ MonoBehaviour:
         Value: 438935048561577377
     Gamemode:
       Id:
-        Value: 326486899682662279
+        Value: 394255533064620237
     StarsToWin: 10
-    CoinsForPowerup: 8
+    CoinsForPowerup: 1
     Lives: 0
     TimerSeconds: 0
     TeamsEnabled:

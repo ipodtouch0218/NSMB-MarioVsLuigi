@@ -159,7 +159,7 @@ namespace Quantum {
             f.Events.MarioPlayerObjectiveCoinsChanged(entity);
         }
 
-        public void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam) {
+        public static void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam) {
             if (amount <= 0) {
                 return;
             }

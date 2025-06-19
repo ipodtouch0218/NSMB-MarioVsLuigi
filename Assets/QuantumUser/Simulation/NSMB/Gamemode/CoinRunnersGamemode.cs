@@ -7,12 +7,12 @@ namespace Quantum {
 
         public override void EnableGamemode(Frame f) {
             f.SystemEnable<ObjectiveCoinSystem>();
-            f.SystemEnable<GoldBlockHelmetSystem>();
+            f.SystemEnable<GoldBlockSystem>();
         }
 
         public override void DisableGamemode(Frame f) {
             f.SystemDisable<ObjectiveCoinSystem>();
-            f.SystemDisable<GoldBlockHelmetSystem>();
+            f.SystemDisable<GoldBlockSystem>();
         }
 
         public override void CheckForGameEnd(Frame f) {

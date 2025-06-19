@@ -143,6 +143,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedPowerup>(this, OnMarioPlayerCollectedPowerup, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUsedReserveItem>(this, OnMarioPlayerUsedReserveItem, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCollectedStarCoin>(this, OnMarioPlayerCollectedStarCoin, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedObjectiveCoin>(this, OnMarioPlayerCollectedObjectiveCoin, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerWalljumped>(this, OnMarioPlayerWalljumped, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerShotProjectile>(this, OnMarioPlayerShotProjectile, NetworkHandler.FilterOutReplayFastForward);
@@ -167,7 +168,6 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerLostGoldBlockHelmet>(this, OnMarioPlayerLostGoldBlockHelmet, NetworkHandler.FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -916,7 +916,9 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            PlaySoundEverywhere(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
+            PlaySoundEverywhere(SoundEffect.World_Star_CollectOthers);
+            //if (!Utils.Utils.IsMarioLocal(e.Entity)) {
+            //}
         }
 
         private void OnMarioPlayerPropellerSpin(EventMarioPlayerPropellerSpin e) {
@@ -1192,14 +1194,6 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            sfx.PlayOneShot(SoundEffect.Powerup_HammerSuit_Bounce);
-        }
-
-        private void OnMarioPlayerLostGoldBlockHelmet(EventMarioPlayerLostGoldBlockHelmet e) {
-            if (e.Entity != EntityRef) {
-                return;
-            }
-            // TODO: correct sound
             sfx.PlayOneShot(SoundEffect.Powerup_HammerSuit_Bounce);
         }
     }

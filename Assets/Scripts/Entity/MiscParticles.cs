@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class MiscParticles : QuantumSceneViewComponent {
 
+    //---Static
+    public static MiscParticles Instance { get; private set; }
+
     //---Serialized Variables
     [SerializeField] private ParticlePair[] particles;
     
@@ -11,6 +14,7 @@ public class MiscParticles : QuantumSceneViewComponent {
         QuantumEvent.Subscribe<EventProjectileDestroyed>(this, OnProjectileDestroyed, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventCollectableDespawned>(this, OnCollectableDespawned, NetworkHandler.FilterOutReplayFastForward);
         QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, NetworkHandler.FilterOutReplayFastForward);
+        Instance = this;
     }
 
     private bool TryGetParticlePair(ParticleEffect particleEffect, out ParticlePair particlePair) {
@@ -24,15 +28,19 @@ public class MiscParticles : QuantumSceneViewComponent {
         return false;
     }
 
-    private void OnProjectileDestroyed(EventProjectileDestroyed e) {
-        if (TryGetParticlePair(e.Particle, out ParticlePair pp)) {
-            Instantiate(pp.prefab, e.Position.ToUnityVector3() + pp.offset, Quaternion.identity);
+    public void Play(ParticleEffect particle, Vector3 position) {
+        if (TryGetParticlePair(particle, out ParticlePair pp)) {
+            Instantiate(pp.prefab, position + pp.offset, Quaternion.identity);
         }
     }
 
+    private void OnProjectileDestroyed(EventProjectileDestroyed e) {
+        Play(e.Particle, e.Position.ToUnityVector3());
+    }
+
     private void OnCollectableDespawned(EventCollectableDespawned e) {
-        if (!e.Collected && TryGetParticlePair(ParticleEffect.Puff, out ParticlePair pp)) {
-            Instantiate(pp.prefab, e.Position.ToUnityVector3() + pp.offset, Quaternion.identity);
+        if (!e.Collected) {
+            Play(ParticleEffect.Puff, e.Position.ToUnityVector3());
         }
     }
 

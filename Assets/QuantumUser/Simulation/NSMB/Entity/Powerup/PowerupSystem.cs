@@ -114,6 +114,7 @@ namespace Quantum {
             // Change the player's powerup state
             PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
 
+            f.Signals.OnMarioPlayerCollectedPowerup(marioEntity, powerupEntity);
             f.Events.MarioPlayerCollectedPowerup(marioEntity, result, newScriptable);
             f.Events.CollectableDespawned(powerupEntity, f.Unsafe.GetPointer<Transform2D>(powerupEntity)->Position, true);
             f.Destroy(powerupEntity);

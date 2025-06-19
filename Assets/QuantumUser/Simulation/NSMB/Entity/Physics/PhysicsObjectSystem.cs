@@ -791,19 +791,21 @@ namespace Quantum {
             }
 
             contact = default;
+            direction = direction.Normalized;
             FPVector2 stepSize = new(
-                direction.X == 0 ? 0 : FPMath.Sqrt(1 + (direction.Y / direction.X) * (direction.Y / direction.X)),
-                direction.Y == 0 ? 0 : FPMath.Sqrt(1 + (direction.X / direction.Y) * (direction.X / direction.Y))
+                direction.X == 0 ? 0 : FPMath.Sqrt(1 + (direction.Y / direction.X) * (direction.Y / direction.X)) / 2,
+                direction.Y == 0 ? 0 : FPMath.Sqrt(1 + (direction.X / direction.Y) * (direction.X / direction.Y)) / 2
             );
+            FPVector2 startLength = default;
             FPVector2 rayLength = default;
             Vector2Int step = default;
 
             if (direction.X < 0) {
                 step.x = -1;
-                rayLength.X = (worldPos.X - FPMath.Floor(worldPos.X * 2) / 2) * stepSize.X;
+                startLength.X = rayLength.X = (worldPos.X - FPMath.Floor(worldPos.X * 2) / 2) * stepSize.X;
             } else if (direction.X > 0) {
                 step.x = 1;
-                rayLength.X = (FPMath.Floor(worldPos.X * 2 + 1) / 2 - worldPos.X) * stepSize.X;
+                startLength.X = rayLength.X = (FPMath.Floor(worldPos.X * 2 + 1) / 2 - worldPos.X) * stepSize.X;
             } else {
                 step.x = 0;
                 rayLength.X = maxDistance;
@@ -811,10 +813,10 @@ namespace Quantum {
 
             if (direction.Y < 0) {
                 step.y = -1;
-                rayLength.Y = (worldPos.Y - FPMath.Floor(worldPos.Y * 2) / 2) * stepSize.Y;
+                startLength.X = rayLength.Y = (worldPos.Y - FPMath.Floor(worldPos.Y * 2) / 2) * stepSize.Y;
             } else if (direction.Y > 0) {
                 step.y = 1;
-                rayLength.Y = (FPMath.Floor(worldPos.Y * 2 + 1) / 2 - worldPos.Y) * stepSize.Y;
+                startLength.X = rayLength.Y = (FPMath.Floor(worldPos.Y * 2 + 1) / 2 - worldPos.Y) * stepSize.Y;
             } else {
                 step.y = 0;
                 rayLength.Y = maxDistance;
@@ -826,6 +828,26 @@ namespace Quantum {
 
             IntVector2 tilePosition = QuantumUtils.WorldToRelativeTile(stage, worldPos);
             FP distance = 0;
+
+            // Check 0,0 as well.
+            StageTileInstance tile = stage.GetTileRelative((Frame) f, tilePosition);
+            if (tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition))) {
+                if (!stageTile.CollisionData.IsFullTile) {
+                    int shapeIndex = 0;
+                    int vertexIndex = 0;
+                    int shapeVertexCount;
+                    while ((shapeVertexCount = shapeVertexCountBuffer[shapeIndex++]) > 0) {
+                        Span<FPVector2> polygon = vertexBuffer[vertexIndex..(vertexIndex + shapeVertexCount)];
+                        vertexIndex += shapeVertexCount;
+
+                        if (TryRayPolygonIntersection(worldPos, direction, polygon, stageTile.IsPolygon, out contact)) {
+                            goto finish;
+                        }
+                    }
+                }
+            }
+
+            // Check later ones
             while (distance < maxDistance) {
                 bool steppedX;
                 if (rayLength.X < rayLength.Y) {
@@ -840,31 +862,37 @@ namespace Quantum {
                     steppedX = false;
                 }
 
-                StageTileInstance tile = stage.GetTileRelative((Frame) f, tilePosition);
-                if (!tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition))) {
+                tile = stage.GetTileRelative((Frame) f, tilePosition);
+                if (!tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition))) {
                     continue;
                 }
 
                 if (stageTile.CollisionData.IsFullTile) {
+                    FP trueDistance = distance;
+                    if (steppedX) {
+                        trueDistance -= startLength.X;
+                    } else {
+                        trueDistance -= startLength.Y;
+                    }
                     contact = new PhysicsContact {
-                        Position = worldPos + (direction * distance),
-                        Normal = steppedX ? new(-step.x, 0) : new(0, -step.y),
-                        Distance = distance,
+                        Position = worldPos + (direction * trueDistance),
+                        Normal = (steppedX ? new(-step.x, 0) : new(0, -step.y)),
+                        Distance = trueDistance,
                         Tile = tilePosition,
                         Frame = f.Number,
                     };
                     goto finish;
-                }
+                } else {
+                    int shapeIndex = 0;
+                    int vertexIndex = 0;
+                    int shapeVertexCount;
+                    while ((shapeVertexCount = shapeVertexCountBuffer[shapeIndex++]) > 0) {
+                        Span<FPVector2> polygon = vertexBuffer[vertexIndex..(vertexIndex + shapeVertexCount)];
+                        vertexIndex += shapeVertexCount;
 
-                int shapeIndex = 0;
-                int vertexIndex = 0;
-                int shapeVertexCount;
-                while ((shapeVertexCount = shapeVertexCountBuffer[shapeIndex++]) > 0) {
-                    Span<FPVector2> polygon = vertexBuffer[vertexIndex..(vertexIndex + shapeVertexCount)];
-                    vertexIndex += shapeVertexCount;
-
-                    if (TryRayPolygonIntersection(worldPos, direction, polygon, stageTile.IsPolygon, out contact)) {
-                        goto finish;
+                        if (TryRayPolygonIntersection(worldPos, direction, polygon, stageTile.IsPolygon, out contact)) {
+                            goto finish;
+                        }
                     }
                 }
             }
