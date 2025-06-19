@@ -11,7 +11,8 @@ public class IntroManager : MonoBehaviour {
     [SerializeField] private AudioSource sfx;
 
     public void Start() {
-        StartCoroutine(IntroSequence());
+        if (GlobalController.Instance.bootedWithReplayArg) gameObject.SetActive(false);
+        else StartCoroutine(IntroSequence());
     }
 
     private IEnumerator IntroSequence() {
