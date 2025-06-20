@@ -4,6 +4,7 @@ using Quantum;
 using Quantum.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 
 public unsafe class CoinAnimator : QuantumEntityViewComponent {
 
@@ -12,9 +13,11 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     [SerializeField] private AudioSource sfx;
     [SerializeField] private SpriteRenderer sRenderer;
     [SerializeField] private ParticleSystem sparkles;
-    [SerializeField] private bool looseCoin;
+    [SerializeField] private bool looseCoin, objectiveCoin;
+    [SerializeField] private float spinSpeed = 120, minimumSpinSpeed = 300;
 
     //---Private Variables
+    private float smoothDampVelocity;
     private bool alreadyBounced;
 
     public void OnValidate() {
@@ -74,6 +77,15 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
         } else {
             float despawnTimeRemaining = coin->Lifetime / 60f;
             sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
+
+            if (objectiveCoin && f.Unsafe.TryGetPointer(EntityRef, out PhysicsObject* physicsObject)) {
+                float xSpeed = physicsObject->Velocity.X.AsFloat;
+                if (physicsObject->IsTouchingGround) {
+                    sRenderer.transform.rotation = Quaternion.Euler(0, 0, Mathf.SmoothDampAngle(sRenderer.transform.eulerAngles.z, 0, ref smoothDampVelocity, 0.2f));
+                } else {
+                    sRenderer.transform.rotation *= Quaternion.Euler(0, 0, Mathf.Max(xSpeed * -spinSpeed, Mathf.Sign(xSpeed) * -minimumSpinSpeed) * Time.deltaTime);
+                }
+            }
         }
     }
 

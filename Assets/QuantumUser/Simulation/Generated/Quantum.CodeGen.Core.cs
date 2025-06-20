@@ -1962,27 +1962,23 @@ namespace Quantum {
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(8)]
     public EntityRef AttachedTo;
-    [FieldOffset(1)]
-    public Byte ObjectiveCoinsRemaining;
-    [FieldOffset(2)]
-    public Byte Timer;
+    [FieldOffset(4)]
+    public Int32 ObjectiveCoinsRemaining;
     [FieldOffset(0)]
-    public Byte DespawnTimer;
+    public Byte Timer;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 5399;
         hash = hash * 31 + AttachedTo.GetHashCode();
         hash = hash * 31 + ObjectiveCoinsRemaining.GetHashCode();
         hash = hash * 31 + Timer.GetHashCode();
-        hash = hash * 31 + DespawnTimer.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GoldBlock*)ptr;
-        serializer.Stream.Serialize(&p->DespawnTimer);
-        serializer.Stream.Serialize(&p->ObjectiveCoinsRemaining);
         serializer.Stream.Serialize(&p->Timer);
+        serializer.Stream.Serialize(&p->ObjectiveCoinsRemaining);
         EntityRef.Serialize(&p->AttachedTo, serializer);
     }
   }

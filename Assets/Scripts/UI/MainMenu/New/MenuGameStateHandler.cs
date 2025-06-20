@@ -12,9 +12,11 @@ public class MenuGameStateHandler : MonoBehaviour {
     private void OnGameStateChanged(EventGameStateChanged e) {
         if (e.NewState == GameState.PreGameRoom) {
             gameObject.SetActive(true);
-        } else if (gameObject.activeSelf) {
-            GlobalController.Instance.loadingCanvas.Initialize(e.Game);
-            gameObject.SetActive(false);
+        } else {
+            if (gameObject.activeSelf) {
+                GlobalController.Instance.loadingCanvas.Initialize(e.Game);
+                gameObject.SetActive(false);
+            }
         }
     }
 

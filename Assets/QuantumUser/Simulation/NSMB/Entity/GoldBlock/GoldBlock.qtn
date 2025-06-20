@@ -1,8 +1,7 @@
 component GoldBlock {
 	EntityRef AttachedTo;
-	byte ObjectiveCoinsRemaining;
+	int ObjectiveCoinsRemaining;
 	byte Timer;
-	byte DespawnTimer;
 }
 
 event MarioPlayerPickedUpGoldBlock {

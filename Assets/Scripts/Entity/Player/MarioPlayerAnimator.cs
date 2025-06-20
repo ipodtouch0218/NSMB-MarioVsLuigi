@@ -105,6 +105,7 @@ namespace NSMB.Entities.Player {
         public CharacterAsset Character => character;
         public Transform ActiveHeadBone => smallHeadBone.activeInHierarchy ? smallHeadBone.transform : largeHeadBone.transform;
         public bool SmallModelActive => smallHeadBone.activeInHierarchy;
+        public GameObject PropellerBlades => propeller;
         
         //---Private Variables
         private Enums.PlayerEyeState eyeState;

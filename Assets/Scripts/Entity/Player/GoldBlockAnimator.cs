@@ -1,5 +1,6 @@
 using NSMB.Extensions;
 using Quantum;
+using System.Collections;
 using UnityEngine;
 
 namespace NSMB.Entities.Player {
@@ -11,6 +12,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private GameObject flyingModel, helmetModel, coinPrefab;
         [SerializeField] private SkinnedMeshRenderer helmetMeshRenderer;
         [SerializeField] private AudioSource sfx;
+        [SerializeField] private GameObject helmetPropellerParent, helmetPropellerBlades;
 
         [SerializeField] private Vector3 lostViaDamageInitialVelocity = new(-4, 6, 0);
         [SerializeField] private Vector2 lostViaDamageGravity = new(0, -38f);
@@ -22,9 +24,10 @@ namespace NSMB.Entities.Player {
         private MarioPlayerAnimator marioPlayerAnimator;
         private CharacterPoseData currentCharacterPoseData;
 
-        public Vector2 lostViaDamageVelocity;
-        public float lostViaDamageAngularVelocity;
-        public bool lostViaDamage;
+        private Vector2 lostViaDamageVelocity;
+        private float lostViaDamageAngularVelocity;
+        private bool lostViaDamage;
+        private float collectTime;
 
         public void OnValidate() {
             this.SetIfNull(ref animation);
@@ -46,20 +49,15 @@ namespace NSMB.Entities.Player {
         public void OnDestroy() {
             MarioPlayerAnimator.OnStartBlink -= OnMarioStartBlink;
             EntityView.OnEntityDestroyed.RemoveListener(OnEntityDestroyed);
-            if (helmetMeshRenderer.gameObject.activeInHierarchy) {
-                MiscParticles.Instance.Play(ParticleEffect.Puff, helmetModel.transform.position);
-            }
         }
 
         public void OnEntityDestroyed(QuantumGame game) {
             if (marioPlayerAnimator) {
                 marioPlayerAnimator.DisableHeadwear = false;
             }
-
-            helmetMeshRenderer.enabled = !lostViaDamage;
-            float delay = lostViaDamage ? lostViaDamageDespawnTime: 0;
-            Destroy(gameObject, delay);
-            Destroy(helmetModel, delay);
+            if (flyingModel.activeInHierarchy) {
+                Destroy(gameObject);
+            }
         }
 
         public void LateUpdate() {
@@ -74,7 +72,18 @@ namespace NSMB.Entities.Player {
                 PoseWithScale pose = marioPlayerAnimator.SmallModelActive ? currentCharacterPoseData.SmallModelPose : currentCharacterPoseData.LargeModelPose;
                 t.SetParent(marioPlayerAnimator.ActiveHeadBone);
                 t.SetLocalPositionAndRotation(pose.Position, pose.Rotation);
-                t.localScale = pose.Scale;
+
+                float collectScaleFactor = (Time.time - collectTime) / 0.04f;
+                t.localScale = pose.Scale + (Vector3.one * Mathf.Lerp(0.4f, 0, collectScaleFactor));
+
+                if (PredictedFrame.Unsafe.TryGetPointer(marioPlayerAnimator.EntityRef, out MarioPlayer* mario)) {
+                    helmetMeshRenderer.enabled = !mario->IsCrouchedInShell;
+                    if (mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching) {
+                        t.localScale = new(t.localScale.x, t.localScale.y, t.localScale.z * 0.7f);
+                    }
+                    helmetPropellerParent.SetActive(mario->CurrentPowerupState == PowerupState.PropellerMushroom);
+                }
+                helmetPropellerBlades.transform.rotation = marioPlayerAnimator.PropellerBlades.transform.rotation;
             } else {
                 t.SetParent(transform);
             }
@@ -128,6 +137,7 @@ namespace NSMB.Entities.Player {
             }
 
             SwapParentView(e.Entity);
+            collectTime = Time.time;
             if (!NetworkHandler.IsReplayFastForwarding) {
                 marioPlayerAnimator.PlaySound(SoundEffect.World_Gold_Block_Equip);
             }
@@ -165,7 +175,16 @@ namespace NSMB.Entities.Player {
             lostViaDamageVelocity = Vector3.ProjectOnPlane(helmetModel.transform.rotation * lostViaDamageInitialVelocity, Vector3.forward);
             lostViaDamageAngularVelocity = lostViaDamageInitialAngularVelocity;
             helmetMeshRenderer.enabled = true;
+
+            IEnumerator DelayedParticlePlay() {
+                yield return new WaitForSeconds(lostViaDamageDespawnTime);
+                MiscParticles.Instance.Play(ParticleEffect.Puff, helmetModel.transform.position);
+                Destroy(gameObject);
+                Destroy(helmetModel);
+            }
+            StartCoroutine(DelayedParticlePlay());
         }
+
 
         private void OnGameResynced(CallbackGameResynced e) {
             Frame f = PredictedFrame;
@@ -187,6 +206,9 @@ namespace NSMB.Entities.Player {
 
             marioPlayerAnimator.PlaySound(SoundEffect.World_Gold_Block_Finished);
             helmetMeshRenderer.enabled = false;
+            MiscParticles.Instance.Play(ParticleEffect.Puff, helmetModel.transform.position);
+            Destroy(gameObject);
+            Destroy(helmetModel);
         }
 
         [System.Serializable]

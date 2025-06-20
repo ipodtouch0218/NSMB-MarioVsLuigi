@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System.Runtime.InteropServices;
 
 namespace Quantum {
     public unsafe class GoldBlockSystem : SystemMainThreadEntityFilter<GoldBlock, GoldBlockSystem.Filter>,
@@ -20,12 +21,6 @@ namespace Quantum {
             var goldBlock = filter.GoldBlock;
             if (f.Exists(goldBlock->AttachedTo)) {
                 // Attached to a player.
-                if (goldBlock->DespawnTimer > 0) {
-                    if (QuantumUtils.Decrement(ref goldBlock->DespawnTimer)) {
-                        f.Destroy(filter.Entity);
-                    }
-                    return;
-                }
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(goldBlock->AttachedTo);
                 
                 if (FPMath.Abs(marioPhysicsObject->Velocity.X) > 5) {
@@ -65,13 +60,13 @@ namespace Quantum {
 
                 if (closeToGround) {
                     // Go upwards
-                    targetVel = 3;
+                    targetVel = Constants._2_50;
                 } else {
                     // Float downwards
-                    targetVel = -3;
+                    targetVel = -Constants._2_50;
                 }
 
-                platform->Velocity.Y = QuantumUtils.MoveTowards(platform->Velocity.Y, targetVel, 6 * f.DeltaTime);
+                platform->Velocity.Y = QuantumUtils.MoveTowards(platform->Velocity.Y, targetVel, 7 * f.DeltaTime);
             }
         }
 
@@ -109,29 +104,33 @@ namespace Quantum {
                 return;
             }
 
-            var allGoldBlocks = f.Filter<GoldBlock>();
-            while (allGoldBlocks.NextUnsafe(out _, out var otherGoldBlock)) {
-                if (otherGoldBlock->AttachedTo == marioEntity) {
-                    // Already wearing a gold block. Don't allow multiple.
-                    return;
-                }
-            }
-
             // If we hit from below, cancel contacts and equip to player.
             if (FPVector2.Dot(contact.Normal, FPVector2.Down) >= PhysicsObjectSystem.GroundMaxAngle
                 || (mario->IsGroundpoundActive && FPVector2.Dot(contact.Normal, FPVector2.Up) >= PhysicsObjectSystem.GroundMaxAngle)) {
-
                 // Hit from below.
-                goldBlock->AttachedTo = marioEntity;
-                goldBlock->ObjectiveCoinsRemaining = 50;
-                //f.Unsafe.GetPointer<CoinItem>(helmetEntity)->Lifetime = 0;
-                f.Remove<CoinItem>(goldBlockEntity);
-                f.Remove<PhysicsCollider2D>(goldBlockEntity);
-                f.Remove<MovingPlatform>(goldBlockEntity);
 
-                //f.Unsafe.GetPointer<PhysicsObject>(marioEntity)->Velocity.X = 0;
+                bool handled = false;
+                foreach ((var otherGoldBlockEntity, var otherGoldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
+                    if (otherGoldBlock->AttachedTo == marioEntity) {
+                        // Already wearing a gold block. Refresh this one, instead.
+                        otherGoldBlock->ObjectiveCoinsRemaining += 50;
+                        f.Events.MarioPlayerPickedUpGoldBlock(marioEntity, otherGoldBlockEntity);
+                        handled = true;
+                        break;
+                    }
+                }
 
-                f.Events.MarioPlayerPickedUpGoldBlock(marioEntity, goldBlockEntity);
+                if (!handled) {
+                    goldBlock->AttachedTo = marioEntity;
+                    goldBlock->ObjectiveCoinsRemaining = 50;
+                    //f.Unsafe.GetPointer<CoinItem>(helmetEntity)->Lifetime = 0;
+                    f.Remove<CoinItem>(goldBlockEntity);
+                    f.Remove<PhysicsCollider2D>(goldBlockEntity);
+                    f.Remove<MovingPlatform>(goldBlockEntity);
+                    f.Events.MarioPlayerPickedUpGoldBlock(marioEntity, goldBlockEntity);
+                } else {
+                    f.Destroy(goldBlockEntity);
+                }
                 keepContacts = mario->IsGroundpoundActive;
             }
         }
@@ -150,7 +149,7 @@ namespace Quantum {
                     keepDamage = false;
                     f.Unsafe.GetPointer<MarioPlayer>(entity)->DamageInvincibilityFrames = 90;
                     f.Events.GoldBlockLostViaDamage(goldBlockEntity);
-                    goldBlock->DespawnTimer = 60;
+                    f.Destroy(goldBlockEntity);
                     return;
                 }
             }

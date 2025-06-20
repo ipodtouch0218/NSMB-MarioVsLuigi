@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using NSMB.Translation;
 using Quantum;
 using Quantum.Prototypes;
@@ -42,7 +43,7 @@ namespace NSMB.Replay {
             writer.Write(CustomName);
 
             // Rules
-            writer.Write(JsonUtility.ToJson(Rules));
+            writer.Write(JsonConvert.SerializeObject(Rules));
 
             // Players
             writer.Write((byte) PlayerInformation.Length);
@@ -74,7 +75,7 @@ namespace NSMB.Replay {
                 result.CustomName = reader.ReadString();
 
                 // Rules
-                result.Rules = JsonUtility.FromJson<GameRulesPrototype>(reader.ReadString());
+                result.Rules = JsonConvert.DeserializeObject<GameRulesPrototype>(reader.ReadString());
                 if (result.Rules == null) {
                     return ReplayParseResult.ParseFailure;
                 }

@@ -457,9 +457,8 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.GoldBlock))]
   public unsafe class GoldBlockPrototype : ComponentPrototype<Quantum.GoldBlock> {
     public MapEntityId AttachedTo;
-    public Byte ObjectiveCoinsRemaining;
+    public Int32 ObjectiveCoinsRemaining;
     public Byte Timer;
-    public Byte DespawnTimer;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.GoldBlock component = default;
         Materialize((Frame)f, ref component, in context);
@@ -469,7 +468,6 @@ namespace Quantum.Prototypes {
         PrototypeValidator.FindMapEntity(this.AttachedTo, in context, out result.AttachedTo);
         result.ObjectiveCoinsRemaining = this.ObjectiveCoinsRemaining;
         result.Timer = this.Timer;
-        result.DespawnTimer = this.DespawnTimer;
     }
   }
   [System.SerializableAttribute()]
