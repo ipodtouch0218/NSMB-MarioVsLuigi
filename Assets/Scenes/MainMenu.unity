@@ -15511,7 +15511,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 267831990}
   labelPrefix: <sprite name=room_powerups>
-  ruleType: 64
+  ruleType: 128
   clickToEdit: 0
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -17273,7 +17273,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 569709046}
   labelPrefix: <sprite name=room_teams>
-  ruleType: 32
+  ruleType: 64
   clickToEdit: 0
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -17744,7 +17744,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 293779670}
   labelPrefix: '<sprite name=room_lives> '
-  ruleType: 8
+  ruleType: 16
   clickToEdit: 0
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -19018,7 +19018,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 1791348378}
   labelPrefix: '<sprite name=room_lives> '
-  ruleType: 8
+  ruleType: 16
   clickToEdit: 1
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -31864,7 +31864,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 564297104}
   labelPrefix: <sprite name=room_teams>
-  ruleType: 32
+  ruleType: 64
   clickToEdit: 1
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -43157,7 +43157,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 1952673749}
   labelPrefix: <sprite name=room_powerups>
-  ruleType: 64
+  ruleType: 128
   clickToEdit: 1
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -47159,7 +47159,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 757519744}
   labelPrefix: '<sprite name=room_stars> '
-  ruleType: 2
+  ruleType: 4
   clickToEdit: 1
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -48721,7 +48721,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 791989380}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.81596214
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -49809,7 +49809,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 1488989674}
   labelPrefix: '<sprite name=room_timer> '
-  ruleType: 16
+  ruleType: 32
   clickToEdit: 1
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -84791,7 +84791,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -22.61}
-  m_SizeDelta: {x: 406.31317, y: 0}
+  m_SizeDelta: {x: 406.2305, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1532295032
 MonoBehaviour:
@@ -85734,7 +85734,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 0.000045776367}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1576260155
@@ -95972,7 +95972,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 270744735}
   labelPrefix: '<sprite name=room_timer> '
-  ruleType: 16
+  ruleType: 32
   clickToEdit: 0
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -96793,7 +96793,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 2056786606}
   labelPrefix: '<sprite name=room_coins> '
-  ruleType: 4
+  ruleType: 8
   clickToEdit: 1
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -101198,7 +101198,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 984657094}
   labelPrefix: '<sprite name=room_stars> '
-  ruleType: 2
+  ruleType: 4
   clickToEdit: 0
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}
@@ -110817,7 +110817,7 @@ MonoBehaviour:
   canvas: {fileID: 2030938839}
   label: {fileID: 1639080368}
   labelPrefix: '<sprite name=room_coins> '
-  ruleType: 4
+  ruleType: 8
   clickToEdit: 0
   dontAutosave: 0
   editingColor: {r: 1, g: 1, b: 1, a: 1}

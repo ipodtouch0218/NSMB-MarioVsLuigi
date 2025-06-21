@@ -98,8 +98,7 @@ namespace Quantum {
             if (!f.Unsafe.TryGetPointer(coinEntity, out Coin* coin)
                 || coin->IsCollected
                 || coin->UncollectableFrames > 0
-                || f.DestroyPending(coinEntity)
-                || (f.Unsafe.TryGetPointer(marioEntity, out MarioPlayer* mario) && coin->UncollectableByTeam == ((mario->GetTeam(f) + 1) ?? 0))) {
+                || f.DestroyPending(coinEntity)) {
                 return;
             }
 
@@ -108,6 +107,14 @@ namespace Quantum {
                     coin->DottedChangeFrames = 30;
                 }
                 return;
+            }
+
+            if (f.Unsafe.TryGetPointer(coinEntity, out ObjectiveCoin* objectiveCoin)) {
+                var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+                bool sameTeam = ((mario->GetTeam(f) + 1) ?? int.MinValue) == objectiveCoin->UncollectableByTeam;
+                if (mario->IsDead || (sameTeam && (!mario->CanCollectOwnTeamsObjectiveCoins || objectiveCoin->SpawnedViaSelfDamage))) {
+                    return;
+                }
             }
 
             var coinTransform = f.Unsafe.GetPointer<Transform2D>(coinEntity);
@@ -146,9 +153,9 @@ namespace Quantum {
             f.Events.MarioPlayerCollectedCoin(marioEntity, newCoins, item, worldLocation, fromBlock, downwards);
         }
 
-        public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
-            if (!f.Unsafe.TryGetPointer(entity, out Coin* coin)
-                || !f.Unsafe.TryGetPointer(entity, out Transform2D* transform)
+        public void OnEntityBumped(Frame f, EntityRef coinEntity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
+            if (!f.Unsafe.TryGetPointer(coinEntity, out Coin* coin)
+                || !f.Unsafe.TryGetPointer(coinEntity, out Transform2D* transform)
                 || coin->IsCollected
                 || coin->UncollectableFrames > 0) {
                 return;
@@ -160,13 +167,20 @@ namespace Quantum {
                 }
                 return;
             } else if (!coin->IsCollected && f.Unsafe.TryGetPointer(bumpOwner, out MarioPlayer* mario)) {
-                f.Signals.OnMarioPlayerCollectedCoin(bumpOwner, entity, transform->Position, false, false);
+                if (f.Unsafe.TryGetPointer(coinEntity, out ObjectiveCoin* objectiveCoin)) {
+                    bool sameTeam = ((mario->GetTeam(f) + 1) ?? int.MinValue) == objectiveCoin->UncollectableByTeam;
+                    if (mario->IsDead || (sameTeam && (!mario->CanCollectOwnTeamsObjectiveCoins || objectiveCoin->SpawnedViaSelfDamage))) {
+                        return;
+                    }
+                }
+
+                f.Signals.OnMarioPlayerCollectedCoin(bumpOwner, coinEntity, transform->Position, false, false);
 
                 if (coin->CoinType.HasFlag(CoinType.BakedInStage)) {
                     coin->IsCollected = true;
-                    f.Events.CoinChangeCollected(entity, *coin, true);
+                    f.Events.CoinChangeCollected(coinEntity, *coin, true);
                 } else {
-                    f.Destroy(entity);
+                    f.Destroy(coinEntity);
                 }
             }
         }

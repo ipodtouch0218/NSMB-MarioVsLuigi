@@ -67,6 +67,7 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
         QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
         QuantumCallback.Subscribe<CallbackPluginDisconnect>(this, OnPluginDisconnect);
+        QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
         QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
         QuantumEvent.Subscribe<EventRecordingStarted>(this, OnRecordingStarted);
@@ -469,7 +470,11 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
         CurrentReplay = null;
     }
 
-    private unsafe void OnRulesChanged(EventRulesChanged e) {
+    private void OnHostChanged(EventHostChanged e) {
+        UpdateRealtimeProperties();
+    }
+
+    private void OnRulesChanged(EventRulesChanged e) {
         UpdateRealtimeProperties();
     }
 

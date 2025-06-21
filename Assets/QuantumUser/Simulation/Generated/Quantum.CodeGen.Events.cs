@@ -363,10 +363,11 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventRulesChanged RulesChanged(QBoolean LevelChanged) {
+      public EventRulesChanged RulesChanged(QBoolean LevelChanged, QBoolean GamemodeChanged) {
         if (_f.IsPredicted) return null;
         var ev = _f.Context.AcquireEvent<EventRulesChanged>(EventRulesChanged.ID);
         ev.LevelChanged = LevelChanged;
+        ev.GamemodeChanged = GamemodeChanged;
         _f.AddEvent(ev);
         return ev;
       }
@@ -1539,6 +1540,7 @@ namespace Quantum {
   public unsafe partial class EventRulesChanged : EventBase {
     public new const Int32 ID = 31;
     public QBoolean LevelChanged;
+    public QBoolean GamemodeChanged;
     protected EventRulesChanged(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -1557,6 +1559,7 @@ namespace Quantum {
       unchecked {
         var hash = 191;
         hash = hash * 31 + LevelChanged.GetHashCode();
+        hash = hash * 31 + GamemodeChanged.GetHashCode();
         return hash;
       }
     }

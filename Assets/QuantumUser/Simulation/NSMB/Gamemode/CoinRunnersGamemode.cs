@@ -91,8 +91,8 @@ namespace Quantum {
         }
 
         public override FP GetItemSpawnWeight(Frame f, CoinItemAsset coinItem, int leaderCoins, int ourCoins) {
-            FP coinDifference = (leaderCoins - ourCoins) / (FP) 25;
-            FP bonus = coinItem.LosingSpawnBonus * FPMath.Log(coinDifference + 1, FP.E);
+            FP coinDifference = (leaderCoins - ourCoins) / (FP) 40;
+            FP bonus = coinItem.LosingSpawnBonus * FPMath.Log(coinDifference + 1, FP.E) /** (FP._1 - (f.Global->Timer / f.Global->Rules.TimerSeconds))*/;
             return FPMath.Max(0, coinItem.SpawnChance + bonus);
         }
     }

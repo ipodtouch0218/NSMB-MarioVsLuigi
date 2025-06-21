@@ -6,7 +6,6 @@ component Coin {
 	[ExcludeFromPrototype] bool IsCollected;
 	[ExcludeFromPrototype] bool IsCurrentlyDotted;
 	[ExcludeFromPrototype] byte DottedChangeFrames;
-	[ExcludeFromPrototype] byte UncollectableByTeam;
 }
 
 [System.Flags]

@@ -85,6 +85,7 @@ synced event HostChanged {
 
 synced event RulesChanged {
 	bool LevelChanged;
+	bool GamemodeChanged;
 }
 
 synced event PlayerLoaded {

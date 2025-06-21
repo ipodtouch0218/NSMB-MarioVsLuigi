@@ -33,7 +33,7 @@ public class StageChangeableRule : ChangeableRule {
         int newIndex = Mathf.Min(currentIndex + 1, allStages.Length - 1);
 
         if (currentIndex != newIndex) {
-            value = (AssetRef<Map>) allStages[newIndex];
+            value = allStages[newIndex];
             cursorSfx.Play();
             SendCommand();
         }
@@ -46,7 +46,7 @@ public class StageChangeableRule : ChangeableRule {
         int newIndex = Mathf.Max(currentIndex - 1, 0);
 
         if (currentIndex != newIndex) {
-            value = (AssetRef<Map>) allStages[newIndex];
+            value = allStages[newIndex];
             cursorSfx.Play();
             SendCommand();
         }

@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -572,6 +573,10 @@ namespace Quantum {
                     FP htv = maxWalkSpeed + (Constants._1_18 * (remainingTime * 2));
                     terminalVelocity = mario->PropellerSpinFrames > 0 ? physics.TerminalVelocityPropellerSpin : physics.TerminalVelocityPropeller;
                     physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -htv, htv);
+                    if (remainingTime > 0) {
+                        physicsObject->IsTouchingGround = false;
+                        physicsObject->WasTouchingGround = false;
+                    }
                 }
             } else if (mario->IsWallsliding) {
                 terminalVelocity = physics.TerminalVelocityWallslide;
@@ -2398,7 +2403,7 @@ namespace Quantum {
                 return;
             }
 
-            if (!fromBelow || mario->IsInKnockback || mario->KnockbackGetupFrames > 0) {
+            if (!fromBelow || mario->IsInKnockback || mario->KnockbackGetupFrames > 0 || mario->IsStuckInBlock) {
                 return;
             }
 
@@ -2513,24 +2518,26 @@ namespace Quantum {
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
-            VersusStageData stage = null;
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             var marios = f.Filter<MarioPlayer, Transform2D, PhysicsCollider2D>();
             while (marios.NextUnsafe(out EntityRef entity, out MarioPlayer* mario, out Transform2D* transform, out PhysicsCollider2D* physicsCollider)) {
-                if (mario->CurrentPowerupState != PowerupState.MegaMushroom) {
-                    continue;
-                }
-
-                if (stage == null) {
-                    stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-                }
-
                 Span<PhysicsObjectSystem.LocationTilePair> tiles = stackalloc PhysicsObjectSystem.LocationTilePair[64];
                 int overlappingTiles = PhysicsObjectSystem.GetTilesOverlappingHitbox(f, transform->Position, physicsCollider->Shape, tiles, stage);
 
-                for (int i = 0; i < overlappingTiles; i++) {
-                    StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);
-                    if (stageTile is IInteractableTile it) {
-                        it.Interact(f, entity, InteractionDirection.Up, tiles[i].Position, tiles[i].Tile, out _);
+                if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                    for (int i = 0; i < overlappingTiles; i++) {
+                        StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);
+                        if (stageTile is IInteractableTile it) {
+                            it.Interact(f, entity, InteractionDirection.Up, tiles[i].Position, tiles[i].Tile, out _);
+                        }
+                    }
+                } else if (mario->CurrentPowerupState >= PowerupState.Mushroom) {
+                    for (int i = 0; i < overlappingTiles; i++) {
+                        StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);
+                        if (stageTile is BreakableBrickTile bbt && bbt.BreakingRules.HasFlag(BreakableBrickTile.BreakableBy.LargeMario)) {
+                            f.Events.TileBroken(entity, tiles[i].Position, tiles[i].Tile, false);
+                            stage.SetTileRelative(f, tiles[i].Position, default);
+                        }
                     }
                 }
             }

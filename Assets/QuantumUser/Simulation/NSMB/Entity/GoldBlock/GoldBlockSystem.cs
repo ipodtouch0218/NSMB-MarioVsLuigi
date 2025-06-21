@@ -1,5 +1,5 @@
 using Photon.Deterministic;
-using System.Runtime.InteropServices;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class GoldBlockSystem : SystemMainThreadEntityFilter<GoldBlock, GoldBlockSystem.Filter>,
@@ -18,7 +18,10 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
+            var entity = filter.Entity;
             var goldBlock = filter.GoldBlock;
+            var transform = filter.Transform;
+
             if (f.Exists(goldBlock->AttachedTo)) {
                 // Attached to a player.
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(goldBlock->AttachedTo);
@@ -32,31 +35,36 @@ namespace Quantum {
                 if (goldBlock->Timer >= 40) {
                     var mario = f.Unsafe.GetPointer<MarioPlayer>(goldBlock->AttachedTo);
                     mario->GamemodeData.CoinRunners->ObjectiveCoins++;
-                    f.Events.GoldBlockGeneratedObjectiveCoin(filter.Entity);
+                    f.Events.GoldBlockGeneratedObjectiveCoin(entity);
                     f.Events.MarioPlayerObjectiveCoinsChanged(goldBlock->AttachedTo);
                     goldBlock->Timer = 0;
                     if (--goldBlock->ObjectiveCoinsRemaining == 0) {
-                        f.Events.GoldBlockRanOutOfCoins(filter.Entity);
-                        f.Destroy(filter.Entity);
+                        f.Events.GoldBlockRanOutOfCoins(entity);
+                        f.Destroy(entity);
                         return;
                     }
                 }
-                filter.Transform->Position = f.Unsafe.GetPointer<Transform2D>(goldBlock->AttachedTo)->Position + FPVector2.Up;
+                transform->Position = f.Unsafe.GetPointer<Transform2D>(goldBlock->AttachedTo)->Position + FPVector2.Up;
             } else {
                 // Slowly float downwards
-                var coinItem = f.Unsafe.GetPointer<CoinItem>(filter.Entity);
-                f.Unsafe.GetPointer<PhysicsCollider2D>(filter.Entity)->Enabled = coinItem->SpawnAnimationFrames == 0;
+                var coinItem = f.Unsafe.GetPointer<CoinItem>(entity);
+                f.Unsafe.GetPointer<PhysicsCollider2D>(entity)->Enabled = coinItem->SpawnAnimationFrames == 0;
                 if (coinItem->SpawnAnimationFrames > 0) {
                     return;
                 }
 
-                var transform = filter.Transform;
-                var platform = f.Unsafe.GetPointer<MovingPlatform>(filter.Entity);
+                var platform = f.Unsafe.GetPointer<MovingPlatform>(entity);
+                var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
                 FP targetVel;
 
-                bool closeToGround = (transform->Position.Y - stage.StageWorldMin.Y) <= 4
-                    || PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position + (FPVector2.Left / 4), FPVector2.Down, 2, out PhysicsContact x)
-                    || PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position + (FPVector2.Right / 4), FPVector2.Down, 2, out x);
+                bool closeToGround;
+                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+                    closeToGround = false;
+                } else {
+                    closeToGround = (transform->Position.Y - stage.StageWorldMin.Y) <= 4
+                        || PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position + (FPVector2.Left / 4), FPVector2.Down, 2, out _)
+                        || PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position + (FPVector2.Right / 4), FPVector2.Down, 2, out _);
+                }
 
                 if (closeToGround) {
                     // Go upwards
@@ -93,7 +101,7 @@ namespace Quantum {
             if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 // Break into 10 coins
                 var transform = f.Unsafe.GetPointer<Transform2D>(contact.Entity);
-                ObjectiveCoinSystem.SpawnObjectiveCoins(f, transform->Position, 10, 0);
+                ObjectiveCoinSystem.SpawnObjectiveCoins(f, transform->Position, 10, 0, false);
                 f.Events.GoldBlockBrokenByMega(contact.Entity);
                 f.Destroy(contact.Entity);
                 keepContacts = false;
@@ -113,7 +121,7 @@ namespace Quantum {
                 foreach ((var otherGoldBlockEntity, var otherGoldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
                     if (otherGoldBlock->AttachedTo == marioEntity) {
                         // Already wearing a gold block. Refresh this one, instead.
-                        otherGoldBlock->ObjectiveCoinsRemaining += 50;
+                        otherGoldBlock->ObjectiveCoinsRemaining += GetCoinsInGoldBlock(f, mario);
                         f.Events.MarioPlayerPickedUpGoldBlock(marioEntity, otherGoldBlockEntity);
                         handled = true;
                         break;
@@ -122,7 +130,7 @@ namespace Quantum {
 
                 if (!handled) {
                     goldBlock->AttachedTo = marioEntity;
-                    goldBlock->ObjectiveCoinsRemaining = 50;
+                    goldBlock->ObjectiveCoinsRemaining = GetCoinsInGoldBlock(f, mario);
                     //f.Unsafe.GetPointer<CoinItem>(helmetEntity)->Lifetime = 0;
                     f.Remove<CoinItem>(goldBlockEntity);
                     f.Remove<PhysicsCollider2D>(goldBlockEntity);
@@ -138,6 +146,7 @@ namespace Quantum {
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
             foreach ((EntityRef goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
                 if (goldBlock->AttachedTo == entity) {
+                    f.Events.GoldBlockLostViaDamage(goldBlockEntity);
                     f.Destroy(goldBlockEntity);
                 }
             }
@@ -168,6 +177,12 @@ namespace Quantum {
                     f.Destroy(goldBlockEntity);
                 }
             }
+        }
+
+        private static int GetCoinsInGoldBlock(Frame f, MarioPlayer* mario) {
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+            int firstPlaceCoins = gamemode.GetFirstPlaceObjectiveCount(f);
+            return 25 + (firstPlaceCoins - mario->GamemodeData.CoinRunners->ObjectiveCoins) / 3;
         }
     }
 }

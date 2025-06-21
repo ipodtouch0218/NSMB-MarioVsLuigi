@@ -78,7 +78,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: abdd6c39131d1a14da55d2fa8ae4aa89, type: 3}
+  m_Sprite: {fileID: 595918852289861335, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -96,7 +96,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 200548328367023309}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
@@ -106,7 +106,10 @@ MonoBehaviour:
   runInEditor: 0
   fps: 6
   frames:
-  - {fileID: 21300000, guid: abdd6c39131d1a14da55d2fa8ae4aa89, type: 3}
+  - {fileID: 595918852289861335, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 845948447533366988, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -5313328981683241401, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -8417162070665421395, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   useUnscaledDelta: 0
   sRenderer: {fileID: 388009723025345444}
   image: {fileID: 0}
@@ -117,7 +120,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 200548328367023309}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
   m_Name: 
@@ -159,6 +162,7 @@ GameObject:
   - component: {fileID: 2115189598253090278}
   - component: {fileID: -2618363333227520774}
   - component: {fileID: 8142886350778680360}
+  - component: {fileID: 7297185129807319192}
   m_Layer: 19
   m_Name: ObjectiveCoin
   m_TagString: Untagged
@@ -201,8 +205,9 @@ MonoBehaviour:
   sRenderer: {fileID: 388009723025345444}
   sparkles: {fileID: 7191599241214066530}
   looseCoin: 1
-  objectiveCoin: 1
+  objectiveCoin: 0
   spinSpeed: 300
+  minimumSpinSpeed: 300
 --- !u!114 &1839046130397998528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -599,6 +604,20 @@ MonoBehaviour:
         RawValue: 16384
     BroadRadius:
       RawValue: 26214
+--- !u!114 &7297185129807319192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780648777663731097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b914488d7bd4524ab3f00e132e115c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prototype:
+    _empty_prototype_dummy_field_: 0
 --- !u!1001 &8830085413490810403
 PrefabInstance:
   m_ObjectHideFlags: 0

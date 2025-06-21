@@ -12692,8 +12692,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 8
   frames:
   - {fileID: 4379595036460376432, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
@@ -13432,8 +13432,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 8
   frames:
   - {fileID: 4379595036460376432, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}

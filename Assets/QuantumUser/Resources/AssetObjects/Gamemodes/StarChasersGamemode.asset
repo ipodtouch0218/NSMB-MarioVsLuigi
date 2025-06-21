@@ -17,6 +17,7 @@ MonoBehaviour:
     Guid:
       Value: 326486899682662279
   ObjectiveSymbolPrefix: S
+  TranslationKey: 
   AllCoinItems:
   - Id:
       Value: 271390802845879304
@@ -42,6 +43,7 @@ MonoBehaviour:
   LooseCoinPrototype:
     Id:
       Value: 1464681621458001613
+  ValidRules: 65535
   BigStarPrototype:
     Id:
       Value: 1295981493910502871

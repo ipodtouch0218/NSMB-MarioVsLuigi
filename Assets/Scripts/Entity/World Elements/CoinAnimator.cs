@@ -90,30 +90,34 @@ public unsafe class CoinAnimator : QuantumEntityViewComponent {
     }
 
     private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
-        if (PredictedFrame == null || !PredictedFrame.Unsafe.TryGetPointer(EntityRef, out Coin* coin)) {
+        Frame f = PredictedFrame;
+        if (f == null || !f.Unsafe.TryGetPointer(EntityRef, out ObjectiveCoin* coin)) {
             return;
         }
 
         Color newColor = sRenderer.color;
-        if (!coin->CoinType.HasFlag(CoinType.Objective) || coin->UncollectableByTeam == 0) {
-            newColor.a = 1;
+        bool sameTeam = IsSameTeamAsCamera(coin->UncollectableByTeam - 1, camera, out MarioPlayer* mario);
+        if (mario != null && sameTeam && (!mario->CanCollectOwnTeamsObjectiveCoins || coin->SpawnedViaSelfDamage)) {
+            // Can't collect
+            newColor.a = 0.33f;
         } else {
-            newColor.a = IsSameTeamAsCamera(coin->UncollectableByTeam - 1, camera) ? 0.5f : 1f;
+            newColor.a = 1;
         }
         sRenderer.color = newColor;
     }
 
-    private bool IsSameTeamAsCamera(int team, Camera camera) {
+    private bool IsSameTeamAsCamera(int team, Camera camera, out MarioPlayer* mario) {
         Frame f = PredictedFrame;
         foreach (var playerElement in PlayerElements.AllPlayerElements) {
             if (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera) {
-                if (!f.Unsafe.TryGetPointer(playerElement.Entity, out MarioPlayer* mario)) {
+                if (!f.Unsafe.TryGetPointer(playerElement.Entity, out mario)) {
                     return false;
                 }
 
-                return (mario->GetTeam(f) ?? -1) == team;
+                return (mario->GetTeam(f) ?? int.MinValue) == team;
             }
         }
+        mario = null;
         return false;
     }
 

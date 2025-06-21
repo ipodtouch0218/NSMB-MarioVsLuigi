@@ -78,7 +78,7 @@ namespace NSMB.UI.Game.Scoreboard {
             int objective = 0;
             int lives = 0;
             if (f.Unsafe.TryGetPointer(Target, out MarioPlayer* mario)) {
-                objective = gamemode.GetObjectiveCount(f, mario);
+                objective = Mathf.Max(0, gamemode.GetObjectiveCount(f, mario));
                 lives = mario->Disconnected ? 0 : mario->Lives;
             }
 

@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Physics2D;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class ObjectiveCoinSystem : SystemMainThread, ISignalOnMarioPlayerDropObjective, ISignalOnMarioPlayerCollectedCoin,
@@ -106,22 +107,19 @@ namespace Quantum {
                 attacker = entity;
             }
 
+            byte excludeTeamNumber = (byte) ((mario->GetTeam(f) + 1) ?? 0);
             bool selfDamage = false;
             if (f.Unsafe.TryGetPointer(attacker, out MarioPlayer* attackerMario)) {
                 byte? team = mario->GetTeam(f);
                 selfDamage = team != null && team == attackerMario->GetTeam(f);
             }
 
-            byte excludeTeamNumber;
-            if (selfDamage) {
-                excludeTeamNumber = (byte) ((f.Unsafe.GetPointer<MarioPlayer>(entity)->GetTeam(f) + 1) ?? 0);
-            } else {
-                excludeTeamNumber = 0;
-            }
-
             // Spawn objective coins relative to the "amount" parameter
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
-            SpawnObjectiveCoins(f, transform->Position + collider->Shape.Centroid + (FPVector2.Up * collider->Shape.Box.Extents.Y), (10 + 5 * (amount - 1)) / coinDivideFactor, excludeTeamNumber);
+            int coinsToSpawn = (10 + 5 * (amount - 1)) / coinDivideFactor;
+            SpawnObjectiveCoins(f, transform->Position + collider->Shape.Centroid + (FPVector2.Up * collider->Shape.Box.Extents.Y), coinsToSpawn, excludeTeamNumber, selfDamage);
+            mario->GamemodeData.CoinRunners->ObjectiveCoins -= Mathf.Min(mario->GamemodeData.CoinRunners->ObjectiveCoins, coinsToSpawn) / 2;
+            f.Events.MarioPlayerObjectiveCoinsChanged(entity);
         }
 
         public void OnStarCoinMarioInteraction(Frame f, EntityRef starCoinEntity, EntityRef marioEntity) {
@@ -154,12 +152,11 @@ namespace Quantum {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
 
-            int coinsToSpawn = mario->GamemodeData.CoinRunners->ObjectiveCoins / 2;
-            mario->GamemodeData.CoinRunners->ObjectiveCoins -= coinsToSpawn;
+            mario->GamemodeData.CoinRunners->ObjectiveCoins -= mario->GamemodeData.CoinRunners->ObjectiveCoins / 5;
             f.Events.MarioPlayerObjectiveCoinsChanged(entity);
         }
 
-        public static void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam) {
+        public static void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam, bool selfDamage) {
             if (amount <= 0) {
                 return;
             }
@@ -183,15 +180,16 @@ namespace Quantum {
                     physicsObject->Velocity.Y += 7;
                 }
 
-                var coin = f.Unsafe.GetPointer<Coin>(newCoin);
+                var coin = f.Unsafe.GetPointer<ObjectiveCoin>(newCoin);
                 coin->UncollectableByTeam = exludeTeam;
+                coin->SpawnedViaSelfDamage = selfDamage;
             }
 
             f.Events.CoinGroupSpawned(origin, amount);
         }
 
         public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, EntityRef coinEntity, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
-            if (!f.Unsafe.TryGetPointer(coinEntity, out Coin* coin) || !coin->CoinType.HasFlag(CoinType.Objective)) {
+            if (!f.Unsafe.TryGetPointer(coinEntity, out ObjectiveCoin* coin)) {
                 // Powerup coin. Let the CoinSystem handle this.
                 return;
             }

@@ -141,6 +141,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * MiiBumm
 * mindnomad
 * TheCyVap
+* Vinnnnnnny
 
 ### Level Design:
 * AtwerJ

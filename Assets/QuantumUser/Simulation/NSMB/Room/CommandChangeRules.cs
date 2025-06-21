@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System;
 
 namespace Quantum {
     public class CommandChangeRules : DeterministicCommand, ILobbyCommand {
@@ -6,6 +7,7 @@ namespace Quantum {
         public Rules EnabledChanges;
 
         public AssetRef<Map> Stage;
+        public AssetRef<GamemodeAsset> Gamemode;
         public int StarsToWin;
         public int CoinsForPowerup;
         public int Lives;
@@ -20,6 +22,7 @@ namespace Quantum {
             EnabledChanges = (Rules) changes;
 
             stream.Serialize(ref Stage);
+            stream.Serialize(ref Gamemode);
             stream.Serialize(ref StarsToWin);
             stream.Serialize(ref CoinsForPowerup);
             stream.Serialize(ref Lives);
@@ -37,11 +40,16 @@ namespace Quantum {
 
             Rules rulesChanges = EnabledChanges;
             var rules = f.Global->Rules;
+            bool gamemodeChanged = false;
             bool levelChanged = false;
 
             if (rulesChanges.HasFlag(Rules.Stage)) {
                 levelChanged = rules.Stage != Stage;
                 rules.Stage = Stage;
+            }
+            if (rulesChanges.HasFlag(Rules.Gamemode)) {
+                gamemodeChanged = rules.Gamemode != Gamemode;
+                rules.Gamemode = Gamemode;
             }
             if (rulesChanges.HasFlag(Rules.StarsToWin)) {
                 rules.StarsToWin = StarsToWin;
@@ -66,23 +74,25 @@ namespace Quantum {
             }
 
             f.Global->Rules = rules;
-            f.Events.RulesChanged(levelChanged);
+            f.Events.RulesChanged(levelChanged, gamemodeChanged);
 
             if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
                 GameLogicSystem.StopCountdown(f);
             }
         }
 
+        [Flags]
         public enum Rules : ushort {
             None = 0,
             Stage = 1 << 0,
-            StarsToWin = 1 << 1,
-            CoinsForPowerup = 1 << 2,
-            Lives = 1 << 3,
-            TimerSeconds = 1 << 4,
-            TeamsEnabled = 1 << 5,
-            CustomPowerupsEnabled = 1 << 6,
-            DrawOnTimeUp = 1 << 7,
+            Gamemode = 1 << 1,
+            StarsToWin = 1 << 2,
+            CoinsForPowerup = 1 << 3,
+            Lives = 1 << 4,
+            TimerSeconds = 1 << 5,
+            TeamsEnabled = 1 << 6,
+            CustomPowerupsEnabled = 1 << 7,
+            DrawOnTimeUp = 1 << 8,
         }
     }
 }

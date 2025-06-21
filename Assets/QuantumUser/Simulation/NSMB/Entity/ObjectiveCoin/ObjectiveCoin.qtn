@@ -1,3 +1,8 @@
+component ObjectiveCoin {
+	[ExcludeFromPrototype] byte UncollectableByTeam;
+	[ExcludeFromPrototype] bool SpawnedViaSelfDamage;
+}
+
 synced event CoinGroupSpawned {
 	FPVector2 Position;
 	int CoinCount;
