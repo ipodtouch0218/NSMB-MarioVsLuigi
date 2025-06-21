@@ -63,12 +63,12 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
+    IsEnabled: 1
     IsTrigger: 0
     Material:
       Id:
         Value: 0
     SourceCollider: {fileID: 0}
-    IsEnabled: 1
     Shape2D:
       ShapeType: 4
       PolygonCollider:
@@ -213,14 +213,14 @@ MonoBehaviour:
   ManualDisposal: 0
   ViewFlags: 0
   InterpolationMode: 0
-  ErrorCorrectionRateMin: 3.3
-  ErrorCorrectionRateMax: 10
-  ErrorPositionBlendStart: 0.25
-  ErrorPositionBlendEnd: 1
+  ErrorCorrectionRateMin: 10
+  ErrorCorrectionRateMax: 30
+  ErrorPositionBlendStart: 0.2
+  ErrorPositionBlendEnd: 0.7
   ErrorRotationBlendStart: 0.1
   ErrorRotationBlendEnd: 0.5
   ErrorPositionMinCorrection: 0.025
-  ErrorPositionTeleportDistance: 2
+  ErrorPositionTeleportDistance: 1
   ErrorRotationTeleportDistance: 0.5
   OnEntityInstantiated:
     m_PersistentCalls:
@@ -258,6 +258,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -464,6 +465,8 @@ MonoBehaviour:
         RawValue: 0
     IgnoreMovement:
       Value: 1
+    CanCrushEntities:
+      Value: 0
 --- !u!114 &-1116452901013867628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -527,6 +530,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

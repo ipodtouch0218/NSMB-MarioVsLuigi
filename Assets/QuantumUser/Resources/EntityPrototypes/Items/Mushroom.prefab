@@ -55,6 +55,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aff24fad35d79d24d8d4415d4f61750b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  graphicsRoot: {fileID: 2479772350441087688}
   renderer: {fileID: 1145319354374527610}
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 0}

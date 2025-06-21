@@ -5,6 +5,7 @@ using UnityEngine;
 public unsafe class CoinItemAnimator : QuantumEntityViewComponent {
 
     //---Serialized
+    [SerializeField] private Transform graphicsRoot;
     [SerializeField] private new Renderer renderer;
     [SerializeField] private Animator childAnimator;
     [SerializeField] private Animation childAnimation;
@@ -96,7 +97,7 @@ public unsafe class CoinItemAnimator : QuantumEntityViewComponent {
         if (f.Exists(coinItem->ParentMarioPlayer) && coinItem->SpawnAnimationFrames > 0) {
             float timeRemaining = coinItem->SpawnAnimationFrames / 60f;
             float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
-            renderer.transform.localScale = Vector3.one * (1 + adjustment);
+            graphicsRoot.localScale = Vector3.one * (1 + adjustment);
 
             if (!inSpawnAnimation) {
                 mpb.SetFloat("WaveEnabled", 0);

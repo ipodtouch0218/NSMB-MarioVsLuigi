@@ -452,6 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aff24fad35d79d24d8d4415d4f61750b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  graphicsRoot: {fileID: 6142040129701411480}
   renderer: {fileID: 3522644845206703513}
   childAnimator: {fileID: 579011151076643705}
   childAnimation: {fileID: 8480178127695157793}
@@ -494,13 +495,13 @@ MonoBehaviour:
     Mesh: {fileID: -5872077933228866730, guid: 4da64203134decc4eba1d912ae31e804, type: 3}
     SmallModelPose:
       Pose:
-        position: {x: -0.0004, y: 0.0148, z: 0.0098}
+        position: {x: -0.0004, y: -0.025, z: 0.0066}
         rotation: {x: -0.70710677, y: 0, z: 0, w: 0.70710677}
       Scale: {x: 0.75, y: 0.75, z: 0.75}
     LargeModelPose:
       Pose:
-        position: {x: -0.0004, y: 0.01, z: 0.0114}
-        rotation: {x: -0.70710677, y: 0, z: 0, w: 0.70710677}
+        position: {x: -0.0004, y: 0.0022, z: 0.0068}
+        rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
       Scale: {x: 0.55, y: 0.55, z: 0.55}
   flyingModel: {fileID: 5421494208000410175}
   helmetModel: {fileID: 8073507591713077683}

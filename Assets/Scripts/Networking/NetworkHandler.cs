@@ -355,6 +355,10 @@ public class NetworkHandler : Singleton<NetworkHandler>, IMatchmakingCallbacks, 
     }
 
     private unsafe void UpdateRealtimeProperties() {
+        if (!realtimeClient.InRoom) {
+            return;
+        }
+
         Frame f = Game.Frames.Predicted;
         PlayerRef host = f.Global->Host;
         if (!Game.PlayerIsLocal(host)) {

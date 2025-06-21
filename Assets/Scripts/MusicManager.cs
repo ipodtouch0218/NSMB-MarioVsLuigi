@@ -24,8 +24,9 @@ namespace NSMB.Sound {
             LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
 
             QuantumGame game = NetworkHandler.Game;
-            if (game != null) {
-                GameState state = game.Frames.Predicted.Global->GameState;
+            Frame f;
+            if (game != null && (f = game.Frames.Predicted) != null) {
+                GameState state = f.Global->GameState;
                 if (state == GameState.Starting || state == GameState.Playing) {
                     // Already in a game
                     HandleMusic(game, true);
