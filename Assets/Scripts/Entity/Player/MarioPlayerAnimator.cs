@@ -144,7 +144,6 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedPowerup>(this, OnMarioPlayerCollectedPowerup, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUsedReserveItem>(this, OnMarioPlayerUsedReserveItem, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerCollectedStarCoin>(this, OnMarioPlayerCollectedStarCoin, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedObjectiveCoin>(this, OnMarioPlayerCollectedObjectiveCoin, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerWalljumped>(this, OnMarioPlayerWalljumped, NetworkHandler.FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerShotProjectile>(this, OnMarioPlayerShotProjectile, NetworkHandler.FilterOutReplayFastForward);
@@ -717,7 +716,6 @@ namespace NSMB.Entities.Player {
             footstepVariant = !footstepVariant;
         }
 
-
         public void PlayMegaFootstep() {
             if (NetworkHandler.IsReplayFastForwarding) {
                 return;
@@ -910,16 +908,6 @@ namespace NSMB.Entities.Player {
 
             PlaySoundEverywhere(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
             Instantiate(starCollectParticle, e.Position.ToUnityVector3(), Quaternion.identity);
-        }
-
-        private void OnMarioPlayerCollectedStarCoin(EventMarioPlayerCollectedStarCoin e) {
-            if (e.Entity != EntityRef) {
-                return;
-            }
-
-            PlaySoundEverywhere(SoundEffect.World_Star_CollectOthers);
-            //if (!Utils.Utils.IsMarioLocal(e.Entity)) {
-            //}
         }
 
         private void OnMarioPlayerPropellerSpin(EventMarioPlayerPropellerSpin e) {

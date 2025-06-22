@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill>, ISignalOnIceBlockBroken {
@@ -15,7 +16,7 @@ namespace Quantum {
             VersusStageData stage = null;
 
             var launchers = f.Filter<BulletBillLauncher, BreakableObject, PhysicsCollider2D, Transform2D>();
-            while (launchers.NextUnsafe(out EntityRef entity, out BulletBillLauncher* launcher, out BreakableObject* breakable, out PhysicsCollider2D* collider, out Transform2D* transform)) {
+            while (launchers.NextUnsafe(out EntityRef entity, out var launcher, out var breakable, out var collider, out var transform)) {
                 if (breakable->IsBroken) {
                     continue;
                 }
@@ -25,7 +26,6 @@ namespace Quantum {
 
                 FPVector2 spawnpoint = transform->Position + FPVector2.Up * (collider->Shape.Box.Extents.Y * 2) + SpawnOffset;
                 var allPlayers = f.Filter<MarioPlayer, Transform2D>();
-                FP absDistance = 0;
                 FP smallestDistance = FP.UseableMax;
                 bool tooClose = false;
                 while (allPlayers.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
@@ -42,8 +42,7 @@ namespace Quantum {
                         break;
                     }
 
-                    if (abs < smallestDistance) {
-                        absDistance = abs;
+                    if (abs < FPMath.Abs(smallestDistance)) {
                         smallestDistance = distance;
                     }
                 }
@@ -73,9 +72,7 @@ namespace Quantum {
             }
 
             var bulletBills = f.Filter<BulletBill, Transform2D, Enemy, PhysicsObject, Freezable>();
-            while (bulletBills.NextUnsafe(out EntityRef entity, out BulletBill* bulletBill, out Transform2D* transform, 
-                out Enemy* enemy, out PhysicsObject* physicsObject, out Freezable* freezable)) {
-
+            while (bulletBills.NextUnsafe(out EntityRef entity, out var bulletBill, out var transform, out var enemy, out var physicsObject, out var freezable)) {
                 if (!enemy->IsAlive) {
                     if (bulletBill->DespawnFrames == 0) {
                         bulletBill->DespawnFrames = 255;

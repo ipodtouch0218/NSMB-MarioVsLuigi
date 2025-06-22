@@ -138,7 +138,7 @@ namespace NSMB.UI.Game {
         }
 
         private void OnMarioInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
-            entityTrackIcons[mario] = CreateTrackIcon(f, mario.EntityRef, mario.transform);
+            entityTrackIcons[mario] = CreateTrackIcon(Updater, f, mario.EntityRef, mario.transform);
         }
 
         private void OnMarioDestroyed(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
@@ -148,7 +148,7 @@ namespace NSMB.UI.Game {
         }
 
         private void OnBigStarInitialized(Frame f, BigStarAnimator star) {
-            entityTrackIcons[star] = CreateTrackIcon(f, star.EntityRef, star.transform);
+            entityTrackIcons[star] = CreateTrackIcon(Updater, f, star.EntityRef, star.transform);
         }
 
         private void OnBigStarDestroyed(Frame f, BigStarAnimator star) {
@@ -161,7 +161,7 @@ namespace NSMB.UI.Game {
         }
 
         private void OnStarCoinInitialized(Frame f, StarCoinAnimator starCoin) {
-            entityTrackIcons[starCoin] = CreateTrackIcon(f, starCoin.EntityRef, starCoin.transform);
+            entityTrackIcons[starCoin] = CreateTrackIcon(Updater, f, starCoin.EntityRef, starCoin.transform);
         }
 
         private void OnStarCoinDestroyed(Frame f, StarCoinAnimator starCoin) {
@@ -315,18 +315,19 @@ namespace NSMB.UI.Game {
             }
         }
 
-        public TrackIcon CreateTrackIcon(Frame f, EntityRef entity, Transform target) {
+        public TrackIcon CreateTrackIcon(QuantumEntityViewUpdater evu, Frame f, EntityRef entity, Transform target) {
             TrackIcon icon;
-            if (f.Has<BigStar>(entity)) {
+            if (f.Has<BigStar>(entity) || f.Has<StarCoin>(entity)) {
                 icon = Instantiate(starTrackTemplate, starTrackTemplate.transform.parent);
-            } else if (f.Has<StarCoin>(entity)) {
+            } else if (false && f.Has<StarCoin>(entity)) {
                 Debug.Log(starCoinTrackTemplate);
-                icon = Instantiate(starCoinTrackTemplate, starCoinTrackTemplate.transform.parent);
+                //icon = Instantiate(starCoinTrackTemplate, starCoinTrackTemplate.transform.parent);
             } else {
                 icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
             }
 
-            icon.Initialize(playerElements, entity, target, ViewContext.Stage);
+            icon.Updater = evu;
+            icon.Initialize(playerElements, entity, target);
             icon.gameObject.SetActive(true);
             return icon;
         }
@@ -392,7 +393,7 @@ namespace NSMB.UI.Game {
         private void OnGameStateChanged(EventGameStateChanged e) {
             if (e.NewState == GameState.Starting) {
                 foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
-                    entityTrackIcons[mario] = CreateTrackIcon(e.Game.Frames.Predicted, mario.EntityRef, mario.transform);
+                    entityTrackIcons[mario] = CreateTrackIcon(Updater, PredictedFrame, mario.EntityRef, mario.transform);
                 }
             }
         }

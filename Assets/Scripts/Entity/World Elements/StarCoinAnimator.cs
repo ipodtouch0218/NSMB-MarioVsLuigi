@@ -4,6 +4,7 @@ using NSMB.Extensions;
 using System;
 using NSMB.UI.Game;
 using UnityEngine.Rendering;
+using NSMB.Utils;
 
 public class StarCoinAnimator : QuantumEntityViewComponent {
 
@@ -73,11 +74,14 @@ public class StarCoinAnimator : QuantumEntityViewComponent {
         if (e.StarCoinEntity != EntityRef) {
             return;
         }
-
+        
         animator.SetTrigger("collected");
         particles.Play();
         if (!NetworkHandler.IsReplayFastForwarding) {
             sfx.Play();
+            if (!Utils.IsMarioLocal(e.Entity)) {
+                GlobalController.Instance.sfx.PlayOneShot(SoundEffect.World_Star_CollectOthers);
+            }
         }
         StarCoinDestroyed?.Invoke(VerifiedFrame, this);
     }
