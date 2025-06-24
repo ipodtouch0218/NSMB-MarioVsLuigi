@@ -1,7 +1,11 @@
 using UnityEngine.Networking;
 
-public class MvLCertificateHandler : CertificateHandler {
+namespace NSMB.Networking {
+    public class MvLCertificateHandler : CertificateHandler {
 
-    protected override bool ValidateCertificate(byte[] certificateData) => true;
+        // Bodge to fix certificate issues around Windows 7
+        // Potentially insecure, I don't care!
+        protected override bool ValidateCertificate(byte[] certificateData) => true;
 
+    }
 }

@@ -1,4 +1,4 @@
-using NSMB.Extensions;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
 

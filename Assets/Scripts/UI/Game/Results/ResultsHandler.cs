@@ -1,6 +1,6 @@
 using JimmysUnityUtilities;
-using NSMB.Extensions;
 using NSMB.Sound;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections;
@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Game.Results {
     public class ResultsHandler : MonoBehaviour {
@@ -41,8 +42,9 @@ namespace NSMB.UI.Game.Results {
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
             parent.SetActive(false);
 
-            if (NetworkHandler.Game != null) {
-                Frame f = NetworkHandler.Game.Frames.Predicted;
+            var game = QuantumRunner.DefaultGame;
+            if (game != null) {
+                Frame f = game.Frames.Predicted;
                 if (f.Global->GameState == GameState.Ended) {
                     endingCoroutine = StartCoroutine(RunEndingSequence(f, 0));
                 }
@@ -50,8 +52,8 @@ namespace NSMB.UI.Game.Results {
         }
 
         private void OnGameEnded(EventGameEnded e) {
-            if (!e.EndedByHost || NetworkHandler.IsReplay) {
-                endingCoroutine = StartCoroutine(RunEndingSequence(e.Game.Frames.Predicted, NetworkHandler.IsReplay ? replayDelayUntilStart : delayUntilStart));
+            if (!e.EndedByHost || IsReplay) {
+                endingCoroutine = StartCoroutine(RunEndingSequence(e.Game.Frames.Predicted, IsReplay ? replayDelayUntilStart : delayUntilStart));
             }
         }
 

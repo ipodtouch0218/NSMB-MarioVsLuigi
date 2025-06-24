@@ -16,6 +16,9 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Gamemodes/CoinRunnersGamemode
     Guid:
       Value: 394255533064620237
+  NamePrefix: '<sprite name=room_coins> '
+  TranslationKey: gamemode.coinrunners
+  DescriptionTranslationKey: gamemode.coinrunners.description
   ObjectiveSymbolPrefix: c
   AllCoinItems:
   - Id:
@@ -44,6 +47,23 @@ MonoBehaviour:
   LooseCoinPrototype:
     Id:
       Value: 1464681621458001613
+  DefaultRules:
+    Stage:
+      Id:
+        Value: 438935048561577377
+    Gamemode:
+      Id:
+        Value: 394255533064620237
+    StarsToWin: 0
+    CoinsForPowerup: 8
+    Lives: 0
+    TimerSeconds: 5
+    TeamsEnabled:
+      Value: 0
+    CustomPowerupsEnabled:
+      Value: 1
+    DrawOnTimeUp:
+      Value: 0
   ObjectiveCoinPrototype:
     Id:
       Value: 1441489962698596482

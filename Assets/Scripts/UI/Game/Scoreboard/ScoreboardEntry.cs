@@ -1,4 +1,4 @@
-using NSMB.Utils;
+using NSMB.Utilities;
 using Quantum;
 using System.Text;
 using TMPro;
@@ -32,8 +32,9 @@ namespace NSMB.UI.Game.Scoreboard {
             QuantumEvent.Subscribe<EventMarioPlayerDestroyed>(this, OnMarioPlayerDestroyed);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
 
-            if (NetworkHandler.Game != null) {
-                UpdateEntry(NetworkHandler.Game.Frames.Predicted);
+            var game = QuantumRunner.DefaultGame;
+            if (game != null) {
+                UpdateEntry(game.Frames.Predicted);
             }
         }
 
@@ -64,13 +65,13 @@ namespace NSMB.UI.Game.Scoreboard {
 
             var playerData = QuantumUtils.GetPlayerData(f, info.PlayerRef);
             int ping = (!info.Disconnected && playerData != null) ? playerData->Ping : -1;
-            pingIndicator.sprite = Utils.Utils.GetPingSprite(ping);
+            pingIndicator.sprite = Utils.GetPingSprite(ping);
             if (nicknameMayHaveChanged) {
                 nicknameText.text = cachedNickname;
                 nicknameMayHaveChanged = false;
             }
 
-            Color backgroundColor = Utils.Utils.GetPlayerColor(f, info.PlayerRef, considerDisqualifications: true);
+            Color backgroundColor = Utils.GetPlayerColor(f, info.PlayerRef, considerDisqualifications: true);
             backgroundColor.a = 0.5f;
             background.color = backgroundColor;
 
@@ -84,9 +85,9 @@ namespace NSMB.UI.Game.Scoreboard {
 
             StringBuilder scoreBuilder = new();
             if (f.Global->Rules.IsLivesEnabled) {
-                scoreBuilder.Append(character.UiString).Append(Utils.Utils.GetSymbolString(lives.ToString()));
+                scoreBuilder.Append(character.UiString).Append(Utils.GetSymbolString(lives.ToString()));
             }
-            scoreBuilder.Append(Utils.Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString()));
+            scoreBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString()));
 
             scoreText.text = scoreBuilder.ToString();
             updater.RequestSorting = true;

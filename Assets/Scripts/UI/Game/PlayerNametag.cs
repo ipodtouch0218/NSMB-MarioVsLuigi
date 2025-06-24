@@ -1,6 +1,6 @@
 using NSMB.Entities.Player;
-using NSMB.Extensions;
-using NSMB.Utils;
+using NSMB.Utilities;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System.Text;
 using TMPro;
@@ -57,8 +57,9 @@ namespace NSMB.UI.Game {
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
 
-            if (NetworkHandler.Game != null) {
-                UpdateText(NetworkHandler.Game.Frames.Predicted);
+            var game = QuantumRunner.DefaultGame;
+            if (game != null) {
+                UpdateText(game.Frames.Predicted);
             }
         }
 
@@ -118,10 +119,10 @@ namespace NSMB.UI.Game {
             stringBuilder.AppendLine(cachedNickname);
 
             if (f.Global->Rules.IsLivesEnabled) {
-                stringBuilder.Append(character.UiString).Append(Utils.Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
+                stringBuilder.Append(character.UiString).Append(Utils.GetSymbolString("x" + mario->Lives)).Append(' ');
             }
 
-            stringBuilder.Append(Utils.Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + gamemode.GetObjectiveCount(f, mario)));
+            stringBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + "x" + gamemode.GetObjectiveCount(f, mario)));
 
             text.text = stringBuilder.ToString();
         }

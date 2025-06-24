@@ -1,7 +1,9 @@
-using System;
-using System.Collections.Generic;
+using NSMB.Quantum;
+using NSMB.Utilities.Components;
 using Photon.Deterministic;
 using Quantum;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace NSMB.Background {

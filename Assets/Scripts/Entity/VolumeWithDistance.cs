@@ -1,6 +1,7 @@
-using NSMB.Extensions;
+using NSMB;
 using NSMB.UI.Game;
-using NSMB.Utils;
+using NSMB.Utilities;
+using NSMB.Utilities.Extensions;
 using Photon.Deterministic;
 using Quantum;
 using UnityEngine;

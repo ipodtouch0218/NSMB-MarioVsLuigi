@@ -1,8 +1,12 @@
+using NSMB.Chat;
 using NSMB.Entities.Player;
-using NSMB.Extensions;
-using NSMB.Translation;
+using NSMB.Entities.World;
+using NSMB.Networking;
+using NSMB.Quantum;
 using NSMB.UI.Game.Track;
-using NSMB.Utils;
+using NSMB.UI.Translation;
+using NSMB.Utilities;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System.Collections;
 using System.Collections.Generic;
@@ -266,7 +270,7 @@ namespace NSMB.UI.Game {
 
                 if (secondsRemaining != cachedTimer) {
                     cachedTimer = secondsRemaining;
-                    uiCountdown.text = Utils.Utils.GetSymbolString("Tx" + Utils.Utils.SecondsToMinuteSeconds(secondsRemaining));
+                    uiCountdown.text = Utils.GetSymbolString("Tx" + Utils.SecondsToMinuteSeconds(secondsRemaining));
                     timerParent.SetActive(true);
                 }
             }
@@ -283,7 +287,7 @@ namespace NSMB.UI.Game {
                         cachedTeamObjective = teamObjective;
                         TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
                         // TODO: fix teams for coin runners.
-                        uiTeamObjective.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.Utils.GetSymbolString("x" + cachedTeamObjective + "/" + rules.StarsToWin);
+                        uiTeamObjective.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + cachedTeamObjective + "/" + rules.StarsToWin);
                     }
                 }
             }
@@ -297,20 +301,20 @@ namespace NSMB.UI.Game {
                     objectiveString += "/" + rules.StarsToWin;
                 }
 
-                uiMainObjective.text = Utils.Utils.GetSymbolString(objectiveString);
+                uiMainObjective.text = Utils.GetSymbolString(objectiveString);
             }
 
             // COINS
             if (mario->Coins != cachedCoins) {
                 cachedCoins = mario->Coins;
-                uiCoins.text = Utils.Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
+                uiCoins.text = Utils.GetSymbolString("Cx" + cachedCoins + "/" + coinRequirement);
             }
 
             // LIVES
             if (livesEnabled) {
                 if (mario->Lives != cachedLives) {
                     cachedLives = mario->Lives;
-                    uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.Utils.GetSymbolString("x" + cachedLives);
+                    uiLives.text = QuantumUnityDB.GetGlobalAsset(mario->CharacterAsset).UiString + Utils.GetSymbolString("x" + cachedLives);
                 }
             }
         }
@@ -343,7 +347,7 @@ namespace NSMB.UI.Game {
         private void UpdatePingText() {
             if (NetworkHandler.Client.InRoom) {
                 int ping = (int) NetworkHandler.Ping.Value;
-                uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.Utils.GetPingSymbol(ping) + ping;
+                uiDebug.text = "<mark=#000000b0 padding=\"16,16,10,10\"><font=\"MarioFont\">" + Utils.GetPingSymbol(ping) + ping;
                 //uiDebug.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             } else {
                 uiDebug.enabled = false;
@@ -351,7 +355,7 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = (f.Global->Rules.TeamsEnabled && mario != null && mario->GetTeam(f) is byte team) ? Utils.Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
+            Color color = (f.Global->Rules.TeamsEnabled && mario != null && mario->GetTeam(f) is byte team) ? Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
 
             foreach (Image bg in backgrounds) {
                 bg.color = color;

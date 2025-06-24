@@ -1,4 +1,5 @@
-using NSMB.Extensions;
+using NSMB.Utilities;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -170,7 +171,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 }
                 TeamAsset team = f.FindAsset(teamAssets[i]);
                 result.Append(Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal);
-                result.Append(Utils.Utils.GetSymbolString("x" + objectiveCount));
+                result.Append(Utils.GetSymbolString("x" + objectiveCount));
             }
 
             teamHeaderText.text = result.ToString();
@@ -186,7 +187,7 @@ namespace NSMB.UI.Game.Scoreboard {
             }
 
             if (spectators > 0) {
-                spectatorText.text = "<sprite name=room_spectator>" + Utils.Utils.GetSymbolString("x" + spectators.ToString());
+                spectatorText.text = "<sprite name=room_spectator>" + Utils.GetSymbolString("x" + spectators.ToString());
             } else {
                 spectatorText.text = "";
             }
@@ -277,7 +278,7 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         private void OnColorblindModeChanged() {
-            UpdateTeamHeader(NetworkHandler.Game.Frames.Predicted);
+            UpdateTeamHeader(QuantumRunner.DefaultGame.Frames.Predicted);
         }
 
         private void OnGameResynced(CallbackGameResynced e) {

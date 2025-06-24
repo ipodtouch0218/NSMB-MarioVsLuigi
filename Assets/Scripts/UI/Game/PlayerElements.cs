@@ -1,9 +1,12 @@
-﻿using NSMB.Entities.Player;
-using NSMB.Extensions;
-using NSMB.Translation;
+﻿using NSMB.Cameras;
+using NSMB.Entities.Player;
+using NSMB.Quantum;
+using NSMB.UI.Game.Replay;
 using NSMB.UI.Game.Scoreboard;
 using NSMB.UI.Pause;
-using NSMB.Utils;
+using NSMB.UI.Translation;
+using NSMB.Utilities;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -11,10 +14,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Game {
     public class PlayerElements : QuantumSceneViewComponent {
 
+        //---Static Variables
         public static HashSet<PlayerElements> AllPlayerElements = new();
         public event Action OnCameraFocusChanged;
 
@@ -142,10 +147,10 @@ namespace NSMB.UI.Game {
 
         public void StartSpectating() {
             spectating = true;
-            spectationUI.SetActive(!NetworkHandler.IsReplay);
-            if (!NetworkHandler.IsReplay) {
+            spectationUI.SetActive(!IsReplay);
+            if (!IsReplay) {
                 if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
-                    GlobalController.Instance.loadingCanvas.EndLoading(NetworkHandler.Game);
+                    GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
                 }
             }
 

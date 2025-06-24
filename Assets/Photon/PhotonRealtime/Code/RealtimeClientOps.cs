@@ -23,7 +23,8 @@ namespace Photon.Realtime
     using UnityEngine;
     using Debug = UnityEngine.Debug;
     using SupportClass = Photon.Client.SupportClass;
-    #endif
+    using System.Threading.Tasks;
+#endif
 
 
     /// <summary>

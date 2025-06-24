@@ -1,4 +1,4 @@
-using NSMB.Utils;
+using NSMB.Utilities;
 using Quantum;
 using TMPro;
 using UnityEngine;
@@ -42,7 +42,7 @@ namespace NSMB.UI.Game.Results {
                     starCountText.text = "<sprite name=results_out>";
                     rightHalf.color = unrankedColor;
                 } else {
-                    starCountText.text = Utils.Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + stars.ToString(), Utils.Utils.resultsSymbols);
+                    starCountText.text = Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + stars.ToString(), Utils.resultsSymbols);
                     rightHalf.color = ranking switch {
                         1 => firstPlaceColor,
                         2 => secondPlaceColor,
@@ -51,7 +51,7 @@ namespace NSMB.UI.Game.Results {
                     };
                 }
 
-                leftHalf.color = Utils.Utils.GetPlayerColor(f, player, s: 0.7f, considerDisqualifications: false);
+                leftHalf.color = Utils.GetPlayerColor(f, player, s: 0.7f, considerDisqualifications: false);
                 
                 var playerData = QuantumUtils.GetPlayerData(f, player);
                 readyCheckmark.SetActive(playerData != null && playerData->VotedToContinue);

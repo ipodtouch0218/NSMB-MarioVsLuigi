@@ -203,6 +203,14 @@ MonoBehaviour:
   InvisibleSolidTile:
     Id:
       Value: 282924479522535788
+  AllGamemodes:
+  - Id:
+      Value: 326486899682662279
+  - Id:
+      Value: 394255533064620237
+  DefaultGamemode:
+    Id:
+      Value: 326486899682662279
   AllStages:
   - Id:
       Value: 438935048561577377
@@ -308,23 +316,6 @@ MonoBehaviour:
   IceBlockPrototype:
     Id:
       Value: 1386525317044462577
-  DefaultRules:
-    Stage:
-      Id:
-        Value: 438935048561577377
-    Gamemode:
-      Id:
-        Value: 394255533064620237
-    StarsToWin: 10
-    CoinsForPowerup: 1
-    Lives: 0
-    TimerSeconds: 0
-    TeamsEnabled:
-      Value: 0
-    CustomPowerupsEnabled:
-      Value: 1
-    DrawOnTimeUp:
-      Value: 0
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0

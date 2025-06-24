@@ -1,6 +1,7 @@
 using Quantum;
 using System;
 using UnityEngine;
+using static NSMB.Utilities.QuantumViewUtils;
 
 public class MiscParticles : QuantumSceneViewComponent {
 
@@ -11,9 +12,9 @@ public class MiscParticles : QuantumSceneViewComponent {
     [SerializeField] private ParticlePair[] particles;
     
     public void Start() {
-        QuantumEvent.Subscribe<EventProjectileDestroyed>(this, OnProjectileDestroyed, NetworkHandler.FilterOutReplayFastForward);
-        QuantumEvent.Subscribe<EventCollectableDespawned>(this, OnCollectableDespawned, NetworkHandler.FilterOutReplayFastForward);
-        QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, NetworkHandler.FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventProjectileDestroyed>(this, OnProjectileDestroyed, FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventCollectableDespawned>(this, OnCollectableDespawned, FilterOutReplayFastForward);
+        QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
         Instance = this;
     }
 

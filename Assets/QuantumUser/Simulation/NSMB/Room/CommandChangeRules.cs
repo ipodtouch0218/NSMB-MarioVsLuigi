@@ -43,13 +43,14 @@ namespace Quantum {
             bool gamemodeChanged = false;
             bool levelChanged = false;
 
+            if (rulesChanges.HasFlag(Rules.Gamemode)) {
+                gamemodeChanged = rules.Gamemode != Gamemode;
+                f.FindAsset(Gamemode).DefaultRules.Materialize(f, ref rules);
+                rules.Gamemode = Gamemode;
+            }
             if (rulesChanges.HasFlag(Rules.Stage)) {
                 levelChanged = rules.Stage != Stage;
                 rules.Stage = Stage;
-            }
-            if (rulesChanges.HasFlag(Rules.Gamemode)) {
-                gamemodeChanged = rules.Gamemode != Gamemode;
-                rules.Gamemode = Gamemode;
             }
             if (rulesChanges.HasFlag(Rules.StarsToWin)) {
                 rules.StarsToWin = StarsToWin;

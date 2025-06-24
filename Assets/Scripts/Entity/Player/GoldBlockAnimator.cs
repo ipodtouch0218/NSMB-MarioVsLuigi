@@ -1,9 +1,11 @@
-using NSMB.Extensions;
+using NSMB.Entities.Player;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System.Collections;
 using UnityEngine;
+using static NSMB.Utilities.QuantumViewUtils;
 
-namespace NSMB.Entities.Player {
+namespace NSMB.Entities.CoinItems {
     public unsafe class GoldBlockAnimator : QuantumEntityViewComponent {
 
         //---Serialized Variables
@@ -138,7 +140,7 @@ namespace NSMB.Entities.Player {
 
             SwapParentView(e.Entity);
             collectTime = Time.time;
-            if (!NetworkHandler.IsReplayFastForwarding) {
+            if (!IsReplayFastForwarding) {
                 marioPlayerAnimator.PlaySound(SoundEffect.World_Gold_Block_Equip);
             }
         }
@@ -148,7 +150,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (!NetworkHandler.IsReplayFastForwarding) {
+            if (!IsReplayFastForwarding) {
                 sfx.pitch = Random.Range(1.35f, 1.45f);
                 sfx.Play();
             }

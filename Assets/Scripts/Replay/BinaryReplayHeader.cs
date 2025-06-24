@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using NSMB.Translation;
+using NSMB.UI.Translation;
 using Quantum;
 using Quantum.Prototypes;
 using System;

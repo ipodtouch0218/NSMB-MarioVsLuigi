@@ -1,6 +1,7 @@
 using JimmysUnityUtilities;
-using NSMB.Extensions;
-using NSMB.Translation;
+using NSMB.Chat;
+using NSMB.UI.Translation;
+using NSMB.Utilities.Extensions;
 using System;
 using TMPro;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace NSMB.UI.Game.Chat {
 
         //---Private Variables
         private float position, moveVelocity;
-        private ChatManager.ChatMessageData data;
+        private ChatMessageData data;
 
         public void OnValidate() {
             this.SetIfNull(ref rectTransform);
@@ -27,7 +28,7 @@ namespace NSMB.UI.Game.Chat {
             this.SetIfNull(ref text, UnityExtensions.GetComponentType.Children);
         }
 
-        public void Initialize(ChatManager.ChatMessageData data) {
+        public void Initialize(ChatMessageData data) {
             this.data = data;
 
             if (data.isSystemMessage) {

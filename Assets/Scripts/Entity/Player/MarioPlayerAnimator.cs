@@ -1,6 +1,10 @@
-using NSMB.Extensions;
+using NSMB.Cameras;
+using NSMB.Particles;
+using NSMB.Quantum;
 using NSMB.Sound;
 using NSMB.UI.Game;
+using NSMB.Utilities;
+using NSMB.Utilities.Extensions;
 using Photon.Deterministic;
 using Quantum;
 using Quantum.Profiling;
@@ -9,10 +13,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Scripting;
+using static NSMB.Utilities.QuantumViewUtils;
 using Input = Quantum.Input;
 
 namespace NSMB.Entities.Player {
-
     public unsafe class MarioPlayerAnimator : QuantumEntityViewComponent<StageContext> {
 
         //---Static
@@ -137,37 +142,37 @@ namespace NSMB.Entities.Player {
             RenderPipelineManager.beginCameraRendering += URPOnPreRender;
 
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
-            QuantumEvent.Subscribe<EventMarioPlayerJumped>(this, OnMarioPlayerJumped, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerGroundpounded>(this, OnMarioPlayerGroundpounded, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerGroundpoundStarted>(this, OnMarioPlayerGroundpoundStarted, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerCrouched>(this, OnMarioPlayerCrouched, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerCollectedPowerup>(this, OnMarioPlayerCollectedPowerup, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerUsedReserveItem>(this, OnMarioPlayerUsedReserveItem, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerCollectedObjectiveCoin>(this, OnMarioPlayerCollectedObjectiveCoin, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerWalljumped>(this, OnMarioPlayerWalljumped, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerShotProjectile>(this, OnMarioPlayerShotProjectile, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerUsedPropeller>(this, OnMarioPlayerUsedPropeller, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerPropellerSpin>(this, OnMarioPlayerPropellerSpin, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerJumped>(this, OnMarioPlayerJumped, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerGroundpounded>(this, OnMarioPlayerGroundpounded, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerGroundpoundStarted>(this, OnMarioPlayerGroundpoundStarted, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCrouched>(this, OnMarioPlayerCrouched, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCollectedPowerup>(this, OnMarioPlayerCollectedPowerup, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerUsedReserveItem>(this, OnMarioPlayerUsedReserveItem, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCollectedCoin>(this, OnMarioPlayerCollectedCoin, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCollectedObjectiveCoin>(this, OnMarioPlayerCollectedObjectiveCoin, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerWalljumped>(this, OnMarioPlayerWalljumped, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerShotProjectile>(this, OnMarioPlayerShotProjectile, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerUsedPropeller>(this, OnMarioPlayerUsedPropeller, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerPropellerSpin>(this, OnMarioPlayerPropellerSpin, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied);
-            QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerPreRespawned>(this, OnMarioPlayerPreRespawned, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned);
-            QuantumEvent.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerPickedUpObject>(this, OnMarioPlayerPickedUpObject, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventPlayKnockbackEffect>(this, OnPlayKnockbackEffect, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerEnteredPipe>(this, OnMarioPlayerEnteredPipe, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerStoppedSliding>(this, OnMarioPlayerStoppedSliding, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerTookDamage>(this, OnMarioPlayerTookDamage, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerPickedUpObject>(this, OnMarioPlayerPickedUpObject, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerThrewObject>(this, OnMarioPlayerThrewObject, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerMegaStart>(this, OnMarioPlayerMegaStart, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerMegaEnd>(this, OnMarioPlayerMegaEnd, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventPlayKnockbackEffect>(this, OnPlayKnockbackEffect, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerEnteredPipe>(this, OnMarioPlayerEnteredPipe, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerStoppedSliding>(this, OnMarioPlayerStoppedSliding, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerUsedSpinner>(this, OnMarioPlayerUsedSpinner, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerDeathUp>(this, OnMarioPlayerDeathUp);
-            QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, NetworkHandler.FilterOutReplayFastForward);
-            QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, NetworkHandler.FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerStompedByTeammate>(this, OnMarioPlayerStompedByTeammate, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -181,7 +186,7 @@ namespace NSMB.Entities.Player {
                 skin = paletteSet.GetPaletteForCharacter(character);
             }
 
-            GlowColor = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
+            GlowColor = Utils.GetPlayerColor(f, mario->PlayerRef);
 
             if (Game.PlayerIsLocal(mario->PlayerRef)) {
                 MasterCanvas masterCanvas = FindFirstObjectByType<MasterCanvas>();
@@ -642,7 +647,7 @@ namespace NSMB.Entities.Player {
         }
 
         public void Footstep() {
-            if (NetworkHandler.IsReplayFastForwarding) {
+            if (IsReplayFastForwarding) {
                 return;
             }
 
@@ -716,8 +721,9 @@ namespace NSMB.Entities.Player {
             footstepVariant = !footstepVariant;
         }
 
+        [Preserve]
         public void PlayMegaFootstep() {
-            if (NetworkHandler.IsReplayFastForwarding) {
+            if (IsReplayFastForwarding) {
                 return;
             }
 
@@ -751,7 +757,7 @@ namespace NSMB.Entities.Player {
             KnockbackStrength strength = e.Strength;
             PlaySound(strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
 
-            if (Utils.Utils.IsMarioLocal(e.Entity)) {
+            if (IsMarioLocal(e.Entity)) {
                 float rumbleStrength = strength switch {
                     KnockbackStrength.Groundpound => 0.9f,
                     KnockbackStrength.Normal => 0.5f,
@@ -880,8 +886,8 @@ namespace NSMB.Entities.Player {
             animator.Play("deadstart");
             animator.Play("deadstart", 3);
 
-            if (!NetworkHandler.IsReplayFastForwarding) {
-                PlaySound(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);
+            if (!IsReplayFastForwarding) {
+                PlaySound(IsMarioLocal(e.Entity) ? SoundEffect.Player_Sound_Death : SoundEffect.Player_Sound_DeathOthers);
                 
                 if (e.IsLava) {
                     PlaySound(SoundEffect.Player_Sound_LavaHiss);
@@ -896,7 +902,7 @@ namespace NSMB.Entities.Player {
 
             animator.SetTrigger("deathup");
 
-            if (e.FireDeath && !NetworkHandler.IsReplayFastForwarding) {
+            if (e.FireDeath && !IsReplayFastForwarding) {
                 PlaySound(SoundEffect.Player_Voice_LavaDeath);
             }
         }
@@ -906,7 +912,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            PlaySoundEverywhere(Utils.Utils.IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
+            PlaySoundEverywhere(IsMarioLocal(e.Entity) ? SoundEffect.World_Star_Collect : SoundEffect.World_Star_CollectOthers);
             Instantiate(starCollectParticle, e.Position.ToUnityVector3(), Quaternion.identity);
         }
 
@@ -941,7 +947,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (!NetworkHandler.IsReplayFastForwarding) {
+            if (!IsReplayFastForwarding) {
                 Vector3 particleOffset = e.HitboxExtents.ToUnityVector3() + (Vector3.back * 8);
                 Quaternion rot = Quaternion.identity;
                 if (e.WasOnRightWall) {
@@ -966,8 +972,8 @@ namespace NSMB.Entities.Player {
 
             GameObject number = Instantiate(coinNumberParticle, e.CoinLocation.ToUnityVector3(), Quaternion.identity);
             number.GetComponentInChildren<NumberParticle>().Initialize(
-                Utils.Utils.GetSymbolString(e.Coins.ToString(), Utils.Utils.numberSymbols),
-                Utils.Utils.GetPlayerColor(VerifiedFrame, mario->PlayerRef),
+                Utils.GetSymbolString(e.Coins.ToString(), Utils.numberSymbols),
+                Utils.GetPlayerColor(VerifiedFrame, mario->PlayerRef),
                 e.ItemSpawned
             );
 
@@ -999,7 +1005,7 @@ namespace NSMB.Entities.Player {
 
             if (e.Success) {
                 PlaySound(SoundEffect.Player_Sound_PowerupReserveUse);
-            } else if (Utils.Utils.IsMarioLocal(e.Entity)) {
+            } else if (IsMarioLocal(e.Entity)) {
                 PlaySound(SoundEffect.UI_Error);
             }
         }
@@ -1068,7 +1074,7 @@ namespace NSMB.Entities.Player {
                 SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), transform.position + (Vector3.back * 5));
                 CameraAnimator.TriggerScreenshake(0.35f);
 
-                if (Utils.Utils.IsMarioLocal(e.Entity)) {
+                if (IsMarioLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.8f, 0.3f, 0.5f,
                         RumbleManager.RumbleSetting.Low);
                 }
@@ -1082,7 +1088,7 @@ namespace NSMB.Entities.Player {
 
                 SpawnParticle(Enums.PrefabParticle.Player_Groundpound.GetGameObject(), transform.position + (Vector3.back * 5));
 
-                if (Utils.Utils.IsMarioLocal(e.Entity)) {
+                if (IsMarioLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.3f, 0.5f, 0.2f,
                         RumbleManager.RumbleSetting.Low);
                 }
@@ -1125,7 +1131,7 @@ namespace NSMB.Entities.Player {
                     lastStompSoundTime = Time.time;
                 }
 
-                if (Utils.Utils.IsMarioLocal(e.Entity)) {
+                if (IsMarioLocal(e.Entity)) {
                     GlobalController.Instance.rumbleManager.RumbleForSeconds(0.1f, 0.4f, 0.15f, RumbleManager.RumbleSetting.Low);
                 }
             } else {

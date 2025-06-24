@@ -1,5 +1,5 @@
-using NSMB.Extensions;
-using NSMB.Translation;
+using NSMB.UI.Translation;
+using NSMB.Utilities.Extensions;
 using UnityEngine;
 
 namespace NSMB.UI.RTL {

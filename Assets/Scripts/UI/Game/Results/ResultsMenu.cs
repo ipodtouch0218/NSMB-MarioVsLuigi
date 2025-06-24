@@ -1,5 +1,7 @@
-using NSMB.Extensions;
-using NSMB.Translation;
+using NSMB.Replay;
+using NSMB.UI.MainMenu.Submenus.Replays;
+using NSMB.UI.Translation;
+using NSMB.Utilities.Extensions;
 using Quantum;
 using System.Collections;
 using System.IO;
@@ -7,6 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Game.Results {
     public class ResultsMenu : QuantumSceneViewComponent {
@@ -23,7 +26,7 @@ namespace NSMB.UI.Game.Results {
         [SerializeField] private Color labelSelectedColor = Color.white, labelDeselectedColor = Color.gray, countdownCloseColor = Color.red;
 
         //---Properties
-        private bool CanSaveReplay => !NetworkHandler.IsReplay && NetworkHandler.SavedRecordingPath != null;
+        private bool CanSaveReplay => !IsReplay && ActiveReplayManager.Instance.SavedRecordingPath != null;
 
         //---Private Variables
         private int cursor;
@@ -44,9 +47,9 @@ namespace NSMB.UI.Game.Results {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             RefreshAll();
 
-            countdown.gameObject.SetActive(!NetworkHandler.IsReplay);
-            checkmark.gameObject.SetActive(!NetworkHandler.IsReplay);
-            checkbox.gameObject.SetActive(!NetworkHandler.IsReplay);
+            countdown.gameObject.SetActive(!IsReplay);
+            checkmark.gameObject.SetActive(!IsReplay);
+            checkbox.gameObject.SetActive(!IsReplay);
         }
 
         public override void OnDisable() {
@@ -58,19 +61,19 @@ namespace NSMB.UI.Game.Results {
 
             if (saveReplay) {
                 string destination = ReplayListManager.ReplayDirectory;
-                string path = NetworkHandler.SavedRecordingPath[destination.Length..];
+                string path = ActiveReplayManager.Instance.SavedRecordingPath[destination.Length..];
                 int nextSlash = path.IndexOf(Path.DirectorySeparatorChar, 1);
                 if (nextSlash != -1) {
                     path = path[(nextSlash + 1)..];
                 }
                 destination = Path.Combine(destination, "saved", path);
-                File.Move(NetworkHandler.SavedRecordingPath, destination);
-                Debug.Log($"[Replay] Made temporary replay '{NetworkHandler.SavedRecordingPath}' permanent: '{destination}'");
+                File.Move(ActiveReplayManager.Instance.SavedRecordingPath, destination);
+                Debug.Log($"[Replay] Made temporary replay '{ActiveReplayManager.Instance.SavedRecordingPath}' permanent: '{destination}'");
             }
         }
 
         public override unsafe void OnUpdateView() {
-            if (!NetworkHandler.IsReplay) {
+            if (!IsReplay) {
                 int currentCountdownTime = PredictedFrame.Global->GameStartFrames / PredictedFrame.UpdateRate;
 
                 if (currentCountdownTime != previousCountdownTime) {
@@ -84,7 +87,7 @@ namespace NSMB.UI.Game.Results {
         private void OnNavigate(InputAction.CallbackContext context) {
             Vector2 input = context.ReadValue<Vector2>();
 
-            if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !NetworkHandler.IsReplay)) {
+            if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !IsReplay)) {
                 inputted = false;
                 return;
             }
@@ -99,7 +102,7 @@ namespace NSMB.UI.Game.Results {
 
         private void OnSubmit(InputAction.CallbackContext context) {
 
-            if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !NetworkHandler.IsReplay)) {
+            if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !IsReplay)) {
                 return;
             }
 
@@ -127,7 +130,7 @@ namespace NSMB.UI.Game.Results {
             string text;
             switch (index) {
             case 0:
-                if (NetworkHandler.IsReplay) {
+                if (IsReplay) {
                     text = tm.GetTranslation("ui.game.results.nextreplay");
                 } else {
                     text = tm.GetTranslation(votedToContinue ? "ui.game.results.votedtocontinue" : "ui.pause.continue");
@@ -135,7 +138,7 @@ namespace NSMB.UI.Game.Results {
                 labels[0].text = text;
                 break;
             case 1:
-                if (NetworkHandler.IsReplay) {
+                if (IsReplay) {
                     text = tm.GetTranslation("ui.game.results.restartreplay");
                 } else {
                     text = tm.GetTranslation(CanSaveReplay ? "ui.game.results.savereplay" : "ui.game.results.replayunavailable"); ;
@@ -165,12 +168,12 @@ namespace NSMB.UI.Game.Results {
 
             switch (index) {
             case 0:
-                if (NetworkHandler.IsReplay) {
+                if (IsReplay) {
                     ReplayListManager replayManager = ReplayListManager.Instance;
-                    int replayIndex = replayManager.Replays.IndexOf(rle => rle.ReplayFile == NetworkHandler.CurrentReplay);
+                    int replayIndex = replayManager.Replays.IndexOf(rle => rle.ReplayFile == ActiveReplayManager.Instance.CurrentReplay);
 
-                    var newReplay = replayManager.Replays[(replayIndex + 1) % replayManager.Replays.Count];
-                    if (replayIndex + 1 >= replayManager.Replays.Count || newReplay.ReplayFile == NetworkHandler.CurrentReplay) {
+                    BinaryReplayFile newReplay = replayManager.Replays[(replayIndex + 1) % replayManager.Replays.Count].ReplayFile;
+                    if (replayIndex + 1 >= replayManager.Replays.Count || newReplay == ActiveReplayManager.Instance.CurrentReplay) {
                         labels[0].text = "» " + GlobalController.Instance.translationManager.GetTranslation("ui.game.results.nextreplay.nomore");
                         sfx.PlayOneShot(SoundEffect.UI_Error);
                         if (noReplaysCoroutine != null) {
@@ -178,7 +181,7 @@ namespace NSMB.UI.Game.Results {
                         }
                         noReplaysCoroutine = StartCoroutine(ResetTextAfterTime(0, 0.5f));
                     } else {
-                        NetworkHandler.StartReplay(newReplay.ReplayFile);
+                        ActiveReplayManager.Instance.StartReplay(newReplay);
                     }
                 } else {
                     // Vote to continue
@@ -193,8 +196,8 @@ namespace NSMB.UI.Game.Results {
                 }
                 break;
             case 1:
-                if (NetworkHandler.IsReplay) {
-                    FindFirstObjectByType<ReplayUI>().ResetReplay();
+                if (IsReplay) {
+                    playerElements.ReplayUi.ResetReplay();
                     sfx.PlayOneShot(SoundEffect.UI_Decide);
                 } else {
                     if (CanSaveReplay) {
@@ -208,7 +211,7 @@ namespace NSMB.UI.Game.Results {
                 break;
             case 2:
                 if (exitPrompt) {
-                    NetworkHandler.Runner.Shutdown();
+                    QuantumRunner.Default.Shutdown();
                 } else {
                     exitPrompt = true;
                     labels[2].text = "» " + GlobalController.Instance.translationManager.GetTranslation(exitPrompt ? "ui.generic.confirmation" : "ui.game.results.quittomainmenu");

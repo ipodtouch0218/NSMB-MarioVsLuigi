@@ -1,3 +1,4 @@
+using NSMB.Utilities;
 using Quantum;
 using System.Collections;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace NSMB.UI.Game.Track {
             image.enabled = true;
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(targetEntity);
-            image.color = Utils.Utils.GetPlayerColor(f, mario->PlayerRef);
+            image.color = Utils.GetPlayerColor(f, mario->PlayerRef);
             if (f.Global->Rules.TeamsEnabled && mario->GetTeam(f) is byte teamIndex) {
                 var teams = f.SimulationConfig.Teams;
                 teamIcon.sprite = f.FindAsset(teams[teamIndex % teams.Length]).spriteColorblind;

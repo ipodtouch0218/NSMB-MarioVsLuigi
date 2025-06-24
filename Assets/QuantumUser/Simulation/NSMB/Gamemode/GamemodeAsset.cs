@@ -1,14 +1,17 @@
 using Photon.Deterministic;
+using Quantum.Prototypes;
 using System;
 
 namespace Quantum {
     public abstract unsafe class GamemodeAsset : AssetObject {
 
-        public string ObjectiveSymbolPrefix, TranslationKey;
+        public string NamePrefix, TranslationKey, DescriptionTranslationKey;
+        public string ObjectiveSymbolPrefix;
         public AssetRef<CoinItemAsset>[] AllCoinItems;
         public AssetRef<CoinItemAsset> FallbackCoinItem;
         public AssetRef<EntityPrototype> LooseCoinPrototype;
-        public CommandChangeRules.Rules ValidRules;
+
+        public GameRulesPrototype DefaultRules;
 
         public abstract void EnableGamemode(Frame f);
 

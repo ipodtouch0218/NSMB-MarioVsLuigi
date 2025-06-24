@@ -16,8 +16,10 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Gamemodes/StarChasersGamemode
     Guid:
       Value: 326486899682662279
+  NamePrefix: '<sprite name=room_stars> '
+  TranslationKey: gamemode.starchasers
+  DescriptionTranslationKey: gamemode.starchasers.description
   ObjectiveSymbolPrefix: S
-  TranslationKey: 
   AllCoinItems:
   - Id:
       Value: 271390802845879304
@@ -43,7 +45,23 @@ MonoBehaviour:
   LooseCoinPrototype:
     Id:
       Value: 1464681621458001613
-  ValidRules: 65535
+  DefaultRules:
+    Stage:
+      Id:
+        Value: 438935048561577377
+    Gamemode:
+      Id:
+        Value: 326486899682662279
+    StarsToWin: 10
+    CoinsForPowerup: 8
+    Lives: 0
+    TimerSeconds: 0
+    TeamsEnabled:
+      Value: 0
+    CustomPowerupsEnabled:
+      Value: 1
+    DrawOnTimeUp:
+      Value: 0
   BigStarPrototype:
     Id:
       Value: 1295981493910502871

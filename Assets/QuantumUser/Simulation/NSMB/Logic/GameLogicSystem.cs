@@ -9,7 +9,8 @@ namespace Quantum {
 
         public override void OnInit(Frame f) {
             var config = f.RuntimeConfig;
-            f.Global->Rules = f.SimulationConfig.DefaultRules;
+            var gamemode = f.FindAsset(f.SimulationConfig.DefaultGamemode);
+            gamemode.DefaultRules.Materialize(f, ref f.Global->Rules);
 
             // Support booting in the editor.
             if (!config.IsRealGame) {

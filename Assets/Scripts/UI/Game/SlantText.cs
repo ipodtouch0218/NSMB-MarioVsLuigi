@@ -1,6 +1,6 @@
-using UnityEngine;
+using NSMB.Utilities.Extensions;
 using TMPro;
-using NSMB.Extensions;
+using UnityEngine;
 
 namespace NSMB.UI.Game {
     [RequireComponent(typeof(TMP_Text))]

@@ -1,4 +1,5 @@
 using JimmysUnityUtilities;
+using NSMB.Chat;
 using Quantum;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,8 +23,9 @@ namespace NSMB.UI.Game.Chat {
             ChatManager.OnChatMessage -= OnChatMessage;
         }
 
-        private void OnChatMessage(ChatManager.ChatMessageData data) {
-            if (NetworkHandler.Game == null || !NetworkHandler.Game.Frames.Predicted.RuntimeConfig.IsRealGame) {
+        private void OnChatMessage(ChatMessageData data) {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            if (game == null || !game.Frames.Predicted.RuntimeConfig.IsRealGame) {
                 return;
             }
 

@@ -776,7 +776,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 477164996403345691}
   loader: {fileID: 2314177952360504216}
@@ -1084,7 +1083,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 2854362670106673604}
   loader: {fileID: 8751663358892774471}
@@ -1344,7 +1342,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -3591,7 +3588,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 3769236327009016106}
   loader: {fileID: 8841007137352119365}
@@ -3705,7 +3701,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 6665303881276298535}
   loader: {fileID: 4410170517669796135}
@@ -3814,7 +3809,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -3874,7 +3868,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 5266820172401772044}
   loader: {fileID: 3952199267475005390}
@@ -4509,7 +4502,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a6d43f70885c4443be35bb21a0fc1bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 6903786808568151408}
   loader: {fileID: 0}
@@ -5686,7 +5678,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 2438984834093221787}
   loader: {fileID: 4490365596843480531}
@@ -6916,7 +6907,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -7055,7 +7045,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396ba8eaeed1ce44ba291e8083cfd8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 5065141228603792754}
   loader: {fileID: 7814395035281750596}
@@ -7175,7 +7164,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 4073635237350841782}
   loader: {fileID: 1740347979620977501}
@@ -7289,7 +7277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 4167182705104125171}
   loader: {fileID: 2610282656382858534}
@@ -8840,8 +8827,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 12
   frames:
   - {fileID: -2914503216214332612, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
@@ -8984,7 +8971,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d9e2e565874d6b45b7e152b1fad8d3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 7764539880371558287}
   loader: {fileID: 8819078071993391702}
@@ -9849,7 +9835,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 7432286286390296877}
   loader: {fileID: 7955323758081961898}
@@ -10122,7 +10107,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d9e2e565874d6b45b7e152b1fad8d3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 1675516410296283443}
   loader: {fileID: 7705628617011719491}
@@ -10464,7 +10448,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 9017098743447331792}
   loader: {fileID: 878693496233802982}
@@ -11075,13 +11058,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6650708626366051462}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionMenuManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.PauseOptionMenuManager, Assembly-CSharp
         m_MethodName: SetTab
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 4769946290432467271}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionTab,
-            Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.PauseOptionTab, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -11175,7 +11157,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -11235,7 +11216,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 2837699460520540088}
   loader: {fileID: 1395197880157877607}
@@ -11584,7 +11564,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1149, y: 645}
+  m_SizeDelta: {x: 1149, y: 644.50244}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &3136341348935244609
 CanvasRenderer:
@@ -11841,7 +11821,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 1677353137423461482}
   loader: {fileID: 870306446464978663}
@@ -12534,7 +12513,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396ba8eaeed1ce44ba291e8083cfd8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 8600866584688421577}
   loader: {fileID: 0}
@@ -12803,7 +12781,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 4111729199207235676}
   loader: {fileID: 2913759720679568161}
@@ -13213,7 +13190,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 2138112962046559320}
   loader: {fileID: 7154108546214831567}
@@ -14113,7 +14089,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e472fd0ed61c5e94fb0bd61b5f09b498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 4907239523798132651}
   loader: {fileID: 41225811998873750}
@@ -14352,7 +14327,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 1943437610887408651}
   loader: {fileID: 5951049215630880110}
@@ -15117,7 +15091,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 2747553247273938412}
   loader: {fileID: 935223361676143714}
@@ -16253,7 +16226,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 2840435925734747025}
   loader: {fileID: 0}
@@ -16354,7 +16326,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d9e2e565874d6b45b7e152b1fad8d3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 8554982295241852191}
   loader: {fileID: 0}
@@ -16991,7 +16962,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e472fd0ed61c5e94fb0bd61b5f09b498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 8514311222530523968}
   loader: {fileID: 8361582068813420802}
@@ -17105,7 +17075,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 1877821585295378914}
   loader: {fileID: 4643779860294446769}
@@ -17320,13 +17289,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6650708626366051462}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionMenuManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.PauseOptionMenuManager, Assembly-CSharp
         m_MethodName: SetTab
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 6581680903842625568}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionTab,
-            Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.PauseOptionTab, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -18017,7 +17985,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396ba8eaeed1ce44ba291e8083cfd8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 6572780239847114436}
   loader: {fileID: 4837220919333108810}
@@ -18711,7 +18678,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac6186698a4a82b45b5b69e18910388e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 7039200737256128014}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 4159516142553233683}
   loader: {fileID: 0}
@@ -18857,6 +18823,7 @@ GameObject:
   - component: {fileID: 4506347848550621655}
   - component: {fileID: 9067110928999375944}
   - component: {fileID: 6841901076153067735}
+  - component: {fileID: 1545507795942949340}
   - component: {fileID: 7634937552315031300}
   - component: {fileID: 5858149666679547523}
   m_Layer: 0
@@ -19141,7 +19108,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c4220a57fb14b7478ef8c716bc64eb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerList: {fileID: 0}
 --- !u!114 &6841901076153067735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19152,6 +19118,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0698a7e52086b6a439d448874dcfc1bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1545507795942949340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4938254683282774592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df8b66ee24059924d898dd34aa1d9cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7634937552315031300
@@ -19331,13 +19309,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6650708626366051462}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionMenuManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.PauseOptionMenuManager, Assembly-CSharp
         m_MethodName: SetTab
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 2763629576861982048}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionTab,
-            Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.PauseOptionTab, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -21463,7 +21440,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 8412351093984029151}
   loader: {fileID: 705448569458512699}
@@ -21789,7 +21765,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e472fd0ed61c5e94fb0bd61b5f09b498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 6915601204684880835}
   loader: {fileID: 8964575719138949871}
@@ -22568,7 +22543,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 8272550991733963377}
   loader: {fileID: 4149813781888557449}
@@ -24113,7 +24087,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -24574,7 +24547,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -24634,7 +24606,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396ba8eaeed1ce44ba291e8083cfd8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 8063503089134395682}
   loader: {fileID: 6795552349807102519}
@@ -25232,13 +25203,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6650708626366051462}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionMenuManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.PauseOptionMenuManager, Assembly-CSharp
         m_MethodName: SetTab
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 4137524787012724653}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.PauseOptionTab,
-            Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.PauseOptionTab, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -25489,7 +25459,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 6704798698138824049}
   loader: {fileID: 4644873867817108014}
@@ -25603,7 +25572,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396ba8eaeed1ce44ba291e8083cfd8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 5779430200362615621}
   loader: {fileID: 3820801714338452840}
@@ -26823,7 +26791,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396ba8eaeed1ce44ba291e8083cfd8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 1108613248260971949}
   loader: {fileID: 1777701460448660764}
@@ -27388,7 +27355,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -29669,7 +29635,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 4327781615176751620}
   loader: {fileID: 0}
@@ -30533,8 +30498,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 12
   frames:
   - {fileID: -2914503216214332612, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
@@ -31342,7 +31307,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61682a4bcd698cf4b86162873a2e9b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 6817138825769804165}
   loader: {fileID: 8139391568417793121}
@@ -31451,7 +31415,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -31511,7 +31474,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac6186698a4a82b45b5b69e18910388e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 4059681681770681747}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 2954740906220611341}
   loader: {fileID: 0}
@@ -31964,7 +31926,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.1
+  m_fontSize: 22.6
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -32852,8 +32814,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1189, y: -322.5}
-  m_SizeDelta: {x: 32, y: 645}
+  m_AnchoredPosition: {x: 1189, y: -322.25122}
+  m_SizeDelta: {x: 32, y: 644.50244}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1604476751582959607
 MonoBehaviour:
@@ -32923,7 +32885,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04ad6da735527b648ab7d43836aaca4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 0}
   loader: {fileID: 0}
@@ -35917,7 +35878,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e472fd0ed61c5e94fb0bd61b5f09b498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
   manager: {fileID: 6650708626366051462}
   label: {fileID: 9075146830149933667}
   loader: {fileID: 0}

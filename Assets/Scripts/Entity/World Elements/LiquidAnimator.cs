@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum;
 using UnityEngine;
+using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Entities.World {
     public unsafe class LiquidAnimator : MonoBehaviour {
@@ -42,7 +43,7 @@ namespace NSMB.Entities.World {
             if (!entity) {
                 Initialize(Mathf.RoundToInt(spriteRenderer.size.x * 2), Mathf.RoundToInt(spriteRenderer.size.y * 2) - 1);
             } else {
-                QuantumEvent.Subscribe<EventLiquidSplashed>(this, OnLiquidSplashed, NetworkHandler.FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
+                QuantumEvent.Subscribe<EventLiquidSplashed>(this, OnLiquidSplashed, FilterOutReplayFastForward, onlyIfActiveAndEnabled: true, onlyIfEntityViewBound: true);
             }
         }
 
