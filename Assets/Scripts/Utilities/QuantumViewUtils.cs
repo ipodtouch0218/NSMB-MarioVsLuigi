@@ -1,4 +1,3 @@
-using NSMB.Networking;
 using NSMB.Replay;
 using NSMB.UI.Game;
 using Photon.Deterministic;
@@ -9,7 +8,7 @@ using UnityEngine;
 namespace NSMB.Utilities {
     public class QuantumViewUtils : MonoBehaviour {
 
-        public static bool IsReplay => NetworkHandler.Runner?.Session.IsReplay ?? false;
+        public static bool IsReplay => QuantumRunner.Default?.Session.IsReplay ?? false;
         public static bool IsReplayFastForwarding => ActiveReplayManager.Instance.IsReplayFastForwarding;
 
         public static bool FilterOutReplayFastForward(IDeterministicGame game) {

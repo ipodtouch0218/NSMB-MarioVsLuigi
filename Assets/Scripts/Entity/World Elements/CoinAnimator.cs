@@ -101,7 +101,7 @@ namespace NSMB.Entities.World {
             bool sameTeam = IsSameTeamAsCamera(coin->UncollectableByTeam - 1, camera, out MarioPlayer* mario);
             if (mario != null && sameTeam && (!mario->CanCollectOwnTeamsObjectiveCoins || coin->SpawnedViaSelfDamage)) {
                 // Can't collect
-                newColor.a = 0.33f;
+                //newColor.a = 0.33f;
             } else {
                 newColor.a = 1;
             }
