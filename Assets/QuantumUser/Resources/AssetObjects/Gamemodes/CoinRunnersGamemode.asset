@@ -19,6 +19,7 @@ MonoBehaviour:
   NamePrefix: '<sprite name=room_coins> '
   TranslationKey: gamemode.coinrunners
   DescriptionTranslationKey: gamemode.coinrunners.description
+  DiscordRpcKey: gamemode-coinrunners
   ObjectiveSymbolPrefix: c
   AllCoinItems:
   - Id:
@@ -57,7 +58,7 @@ MonoBehaviour:
     StarsToWin: 0
     CoinsForPowerup: 8
     Lives: 0
-    TimerSeconds: 5
+    TimerMinutes: 5
     TeamsEnabled:
       Value: 0
     CustomPowerupsEnabled:

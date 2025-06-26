@@ -798,7 +798,7 @@ namespace Quantum {
     [FieldOffset(4)]
     public Int32 Lives;
     [FieldOffset(12)]
-    public Int32 TimerSeconds;
+    public Int32 TimerMinutes;
     [FieldOffset(24)]
     public QBoolean TeamsEnabled;
     [FieldOffset(16)]
@@ -813,7 +813,7 @@ namespace Quantum {
         hash = hash * 31 + StarsToWin.GetHashCode();
         hash = hash * 31 + CoinsForPowerup.GetHashCode();
         hash = hash * 31 + Lives.GetHashCode();
-        hash = hash * 31 + TimerSeconds.GetHashCode();
+        hash = hash * 31 + TimerMinutes.GetHashCode();
         hash = hash * 31 + TeamsEnabled.GetHashCode();
         hash = hash * 31 + CustomPowerupsEnabled.GetHashCode();
         hash = hash * 31 + DrawOnTimeUp.GetHashCode();
@@ -825,7 +825,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->CoinsForPowerup);
         serializer.Stream.Serialize(&p->Lives);
         serializer.Stream.Serialize(&p->StarsToWin);
-        serializer.Stream.Serialize(&p->TimerSeconds);
+        serializer.Stream.Serialize(&p->TimerMinutes);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);

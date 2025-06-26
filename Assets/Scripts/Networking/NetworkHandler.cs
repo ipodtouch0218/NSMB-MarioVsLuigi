@@ -184,12 +184,7 @@ namespace NSMB.Networking {
             args.RoomOptions.PublishUserId = true;
             args.RoomOptions.CustomRoomProperties = DefaultRoomProperties;
             args.RoomOptions.CustomRoomProperties[Enums.NetRoomProperties.HostName] = Settings.Instance.generalNickname;
-            args.RoomOptions.CustomRoomPropertiesForLobby = new object[] {
-                Enums.NetRoomProperties.HostName,
-                Enums.NetRoomProperties.IntProperties,
-                Enums.NetRoomProperties.BoolProperties,
-                Enums.NetRoomProperties.StageGuid,
-            };
+            args.RoomOptions.CustomRoomPropertiesForLobby = DefaultRoomProperties.Keys.ToArray();
 
             Debug.Log($"[Network] Creating a game in {Region} with the ID {idBuilder}");
             return await Client.CreateAndJoinRoomAsync(args, false);
@@ -230,7 +225,7 @@ namespace NSMB.Networking {
                 StarRequirement = rules.StarsToWin,
                 CoinRequirement = rules.CoinsForPowerup,
                 Lives = rules.Lives,
-                Timer = rules.TimerSeconds,
+                Timer = rules.TimerMinutes,
             };
             BooleanProperties boolProperties = new BooleanProperties {
                 GameStarted = f.Global->GameState != GameState.PreGameRoom,
@@ -243,8 +238,9 @@ namespace NSMB.Networking {
             Client.CurrentRoom.SetCustomProperties(new Photon.Client.PhotonHashtable {
                 [Enums.NetRoomProperties.IntProperties] = (int) intProperties,
                 [Enums.NetRoomProperties.BoolProperties] = (int) boolProperties,
-                [Enums.NetRoomProperties.HostName] = (string) hostData.PlayerNickname,
+                [Enums.NetRoomProperties.HostName] = hostData?.PlayerNickname ?? "noname",
                 [Enums.NetRoomProperties.StageGuid] = rules.Stage.Id.ToString(),
+                [Enums.NetRoomProperties.GamemodeGuid] = rules.Gamemode.Id.ToString(),
             });
         }
 

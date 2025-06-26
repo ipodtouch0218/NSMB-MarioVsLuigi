@@ -8,6 +8,7 @@ using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace NSMB.UI.Game {
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
         [SerializeField] private CanvasGroup toggler;
-        [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate;
+        [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate, objectiveCoinTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown;
         [SerializeField] private Image itemReserve, itemColor, deathFade;
@@ -36,8 +37,9 @@ namespace NSMB.UI.Game {
         [SerializeField] private Animator winTextAnimator;
         //[SerializeField] private RectTransform[] player
 
-        //---Private Variables
+        //---Private 
         private readonly Dictionary<MonoBehaviour, TrackIcon> entityTrackIcons = new();
+        private readonly Dictionary<Type, List<TrackIcon>> availablePooledTrackIcons = new();
         private readonly List<Image> backgrounds = new();
         private GameObject teamsParent, starsParent, coinsParent, livesParent, timerParent;
         private Material timerMaterial;
@@ -58,6 +60,8 @@ namespace NSMB.UI.Game {
             BigStarAnimator.BigStarDestroyed += OnBigStarDestroyed;
             StarCoinAnimator.StarCoinInitialized += OnStarCoinInitialized;
             StarCoinAnimator.StarCoinDestroyed += OnStarCoinDestroyed;
+            CoinAnimator.ObjectiveCoinInitialized += OnObjectiveCoinInitialized;
+            CoinAnimator.ObjectiveCoinDestroyed += OnObjectiveCoinDestroyed;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             Settings.Controls.Debug.ToggleHUD.performed += OnToggleHUD;
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -69,6 +73,10 @@ namespace NSMB.UI.Game {
             MarioPlayerAnimator.MarioPlayerDestroyed -= OnMarioDestroyed;
             BigStarAnimator.BigStarInitialized -= OnBigStarInitialized;
             BigStarAnimator.BigStarDestroyed -= OnBigStarDestroyed;
+            StarCoinAnimator.StarCoinInitialized -= OnStarCoinInitialized;
+            StarCoinAnimator.StarCoinDestroyed -= OnStarCoinDestroyed;
+            CoinAnimator.ObjectiveCoinInitialized -= OnObjectiveCoinInitialized;
+            CoinAnimator.ObjectiveCoinDestroyed -= OnObjectiveCoinDestroyed;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
             Settings.Controls.Debug.ToggleHUD.performed -= OnToggleHUD;
         }
@@ -146,9 +154,7 @@ namespace NSMB.UI.Game {
         }
 
         private void OnMarioDestroyed(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
-            if (entityTrackIcons.TryGetValue(mario, out TrackIcon icon)) {
-                Destroy(icon.gameObject);
-            }
+            DestroyTrackIcon(mario);
         }
 
         private void OnBigStarInitialized(Frame f, BigStarAnimator star) {
@@ -156,12 +162,7 @@ namespace NSMB.UI.Game {
         }
 
         private void OnBigStarDestroyed(Frame f, BigStarAnimator star) {
-            if (entityTrackIcons.TryGetValue(star, out TrackIcon icon)) {
-                if (icon) {
-                    Destroy(icon.gameObject);
-                }
-                entityTrackIcons.Remove(star);
-            }
+            DestroyTrackIcon(star);
         }
 
         private void OnStarCoinInitialized(Frame f, StarCoinAnimator starCoin) {
@@ -169,12 +170,15 @@ namespace NSMB.UI.Game {
         }
 
         private void OnStarCoinDestroyed(Frame f, StarCoinAnimator starCoin) {
-            if (entityTrackIcons.TryGetValue(starCoin, out TrackIcon icon)) {
-                if (icon) {
-                    Destroy(icon.gameObject);
-                }
-                entityTrackIcons.Remove(starCoin);
-            }
+            DestroyTrackIcon(starCoin);
+        }
+
+        private void OnObjectiveCoinInitialized(Frame f, CoinAnimator objectiveCoin) {
+            entityTrackIcons[objectiveCoin] = CreateTrackIcon(Updater, f, objectiveCoin.EntityRef, objectiveCoin.transform);
+        }
+
+        private void OnObjectiveCoinDestroyed(CoinAnimator objectiveCoin) {
+            DestroyTrackIcon(objectiveCoin);
         }
 
         private void UpdateStoredItemUI(MarioPlayer* mario, bool playAnimation) {
@@ -261,7 +265,7 @@ namespace NSMB.UI.Game {
             int coinRequirement = rules.CoinsForPowerup;
             bool teamsEnabled = rules.TeamsEnabled;
             bool livesEnabled = rules.IsLivesEnabled;
-            bool timerEnabled = rules.TimerSeconds > 0;
+            bool timerEnabled = rules.TimerMinutes > 0;
 
             // TIMER
             if (timerEnabled) {
@@ -321,19 +325,44 @@ namespace NSMB.UI.Game {
 
         public TrackIcon CreateTrackIcon(QuantumEntityViewUpdater evu, Frame f, EntityRef entity, Transform target) {
             TrackIcon icon;
-            if (f.Has<BigStar>(entity) || f.Has<StarCoin>(entity)) {
+            if (f.Has<BigStar>(entity)) {
                 icon = Instantiate(starTrackTemplate, starTrackTemplate.transform.parent);
-            } else if (false && f.Has<StarCoin>(entity)) {
-                Debug.Log(starCoinTrackTemplate);
-                //icon = Instantiate(starCoinTrackTemplate, starCoinTrackTemplate.transform.parent);
-            } else {
+            } else if (f.Has<StarCoin>(entity)) {
+                icon = Instantiate(starCoinTrackTemplate, starCoinTrackTemplate.transform.parent);
+            } else if (f.Has<ObjectiveCoin>(entity)) {
+                if (availablePooledTrackIcons.TryGetValue(typeof(CoinAnimator), out var pool) && pool.Count > 0) {
+                    icon = pool[0];
+                    pool.RemoveAt(0);
+                } else {
+                    icon = Instantiate(objectiveCoinTrackTemplate, objectiveCoinTrackTemplate.transform.parent);
+                }
+            } else if (f.Has<MarioPlayer>(entity)) {
                 icon = Instantiate(playerTrackTemplate, playerTrackTemplate.transform.parent);
+            } else {
+                return null;
             }
 
             icon.Updater = evu;
             icon.Initialize(playerElements, entity, target);
             icon.gameObject.SetActive(true);
             return icon;
+        }
+
+        public void DestroyTrackIcon(MonoBehaviour animator) {
+            if (entityTrackIcons.TryGetValue(animator, out TrackIcon icon)) {
+                if (animator is CoinAnimator) {
+                    // Pool.
+                    icon.gameObject.SetActive(false);
+                    if (!availablePooledTrackIcons.TryGetValue(animator.GetType(), out List<TrackIcon> pool)) {
+                        availablePooledTrackIcons[animator.GetType()] = (pool = new());
+                    }
+                    pool.Add(icon);
+                } else {
+                    // Don't pool
+                    Destroy(icon.gameObject);
+                    entityTrackIcons.Remove(animator);
+                }
+            }
         }
 
         private static readonly WaitForSeconds PingSampleRate = new(0.5f);

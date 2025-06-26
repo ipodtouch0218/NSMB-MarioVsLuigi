@@ -39,6 +39,7 @@ public static class Enums {
     }
 
     #endregion
+
     #region NETWORKING
     // Networking Enums
     public static class NetRoomProperties {
@@ -46,10 +47,10 @@ public static class Enums {
         public const string BoolProperties = "B";
         public const string HostName = "H";
         public const string StageGuid = "S";
+        public const string GamemodeGuid = "G";
     }
     #endregion
 }
-
 
 public class PrefabParticleData : Attribute {
     public string Path { get; }

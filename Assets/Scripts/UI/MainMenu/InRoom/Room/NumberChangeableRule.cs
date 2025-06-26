@@ -48,7 +48,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             case CommandChangeRules.Rules.Lives:
                 cmd.Lives = (int) value;
                 break;
-            case CommandChangeRules.Rules.TimerSeconds:
+            case CommandChangeRules.Rules.TimerMinutes:
                 cmd.TimerMinutes = (int) value;
                 break;
             }

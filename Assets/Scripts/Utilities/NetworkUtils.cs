@@ -7,9 +7,11 @@ namespace NSMB.Utilities {
     public static class NetworkUtils {
 
         public static PhotonHashtable DefaultRoomProperties => new() {
+            [Enums.NetRoomProperties.HostName] = "noname",
             [Enums.NetRoomProperties.IntProperties] = (int) IntegerProperties.Default,
             [Enums.NetRoomProperties.BoolProperties] = (int) BooleanProperties.Default,
             [Enums.NetRoomProperties.StageGuid] = QuantumUnityDB.GetGlobalAsset(GlobalController.Instance.config.DefaultGamemode).DefaultRules.Stage.Id.ToString(),
+            [Enums.NetRoomProperties.GamemodeGuid] = GlobalController.Instance.config.DefaultGamemode.Id.ToString(),
         };
 
         public static Dictionary<short, string> RealtimeErrorCodes = new() {

@@ -10,10 +10,13 @@ namespace NSMB.Utilities.Components {
         public bool isDisplaying = true;
         public float frame; // Must be a float because legacy animators dont support ints, apparently?
 
+        //---Properties
+        public Sprite[] ActiveFrames => (Settings.Instance && Settings.Instance.GraphicsColorblind && colorblindModeFrames != null && colorblindModeFrames.Length != 0) ? colorblindModeFrames : frames;
+
         //---Serialized Variables
         [SerializeField] private bool runInEditor = false;
         [SerializeField] private float fps = 8;
-        [SerializeField] public Sprite[] frames;
+        [SerializeField] public Sprite[] frames, colorblindModeFrames;
         [SerializeField] private bool useUnscaledDelta = false;
 
         //---Components
@@ -33,7 +36,9 @@ namespace NSMB.Utilities.Components {
                 return;
             }
 
-            if (frames == null || frames.Length == 0 || (!sRenderer && !image) || !enabled) {
+            Sprite[] activeFrames = ActiveFrames;
+
+            if (activeFrames == null || activeFrames.Length == 0 || (!sRenderer && !image) || !enabled) {
                 return;
             }
 
@@ -42,19 +47,20 @@ namespace NSMB.Utilities.Components {
         }
 
         private void SetSprite() {
-            if (!isDisplaying || frames == null || frames.Length == 0) {
+            Sprite[] activeFrames = ActiveFrames;
+            if (!isDisplaying || activeFrames == null || activeFrames.Length == 0) {
                 return;
             }
 
-            frame = Mathf.Repeat(frame, frames.Length);
+            frame = Mathf.Repeat(frame, activeFrames.Length);
             int currentFrame = Mathf.FloorToInt(frame);
-            Sprite currentSprite = frames[currentFrame];
+            Sprite currentSprite = activeFrames[currentFrame];
 
-            if (sRenderer && currentSprite != sRenderer.sprite) {
+            if (sRenderer /*&& currentSprite != sRenderer.sprite*/) {
                 sRenderer.sprite = currentSprite;
             }
 
-            if (image && currentSprite != image.sprite) {
+            if (image /*&& currentSprite != image.sprite*/) {
                 image.sprite = currentSprite;
             }
         }

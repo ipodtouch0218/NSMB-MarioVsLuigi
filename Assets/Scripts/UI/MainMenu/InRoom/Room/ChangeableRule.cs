@@ -187,7 +187,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 CommandChangeRules.Rules.StarsToWin => rules.StarsToWin,
                 CommandChangeRules.Rules.CoinsForPowerup => rules.CoinsForPowerup,
                 CommandChangeRules.Rules.Lives => rules.Lives,
-                CommandChangeRules.Rules.TimerSeconds => rules.TimerSeconds,
+                CommandChangeRules.Rules.TimerMinutes => rules.TimerMinutes,
                 CommandChangeRules.Rules.DrawOnTimeUp => rules.DrawOnTimeUp,
                 CommandChangeRules.Rules.CustomPowerupsEnabled => (bool) rules.CustomPowerupsEnabled,
                 CommandChangeRules.Rules.TeamsEnabled => (bool) rules.TeamsEnabled,

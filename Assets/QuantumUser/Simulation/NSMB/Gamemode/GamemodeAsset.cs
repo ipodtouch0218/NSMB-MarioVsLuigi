@@ -5,7 +5,7 @@ using System;
 namespace Quantum {
     public abstract unsafe class GamemodeAsset : AssetObject {
 
-        public string NamePrefix, TranslationKey, DescriptionTranslationKey;
+        public string NamePrefix, TranslationKey, DescriptionTranslationKey, DiscordRpcKey;
         public string ObjectiveSymbolPrefix;
         public AssetRef<CoinItemAsset>[] AllCoinItems;
         public AssetRef<CoinItemAsset> FallbackCoinItem;

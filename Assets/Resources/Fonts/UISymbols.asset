@@ -1968,15 +1968,15 @@ MonoBehaviour:
     sprite: {fileID: -1029622304, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   - m_Index: 89
     m_Metrics:
-      m_Width: 13
-      m_Height: 16
+      m_Width: 15
+      m_Height: 15
       m_HorizontalBearingX: -2
       m_HorizontalBearingY: 16
       m_HorizontalAdvance: 20
     m_GlyphRect:
-      m_X: 243
-      m_Y: 202
-      m_Width: 13
+      m_X: 229
+      m_Y: 219
+      m_Width: 15
       m_Height: 16
     m_Scale: 1
     m_AtlasIndex: 0

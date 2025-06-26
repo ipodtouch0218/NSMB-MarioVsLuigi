@@ -5,7 +5,7 @@ namespace Quantum {
     public unsafe partial struct GameRules {
 
         public bool IsLivesEnabled => Lives > 0;
-        public bool IsTimerEnabled => TimerSeconds > 0;
+        public bool IsTimerEnabled => TimerMinutes > 0;
 
     }
 }

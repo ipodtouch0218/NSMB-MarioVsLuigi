@@ -36,7 +36,7 @@ struct GameRules {
 	int StarsToWin;
 	int CoinsForPowerup;
 	int Lives;
-	int TimerSeconds;
+	int TimerMinutes;
 	bool TeamsEnabled;
 	bool CustomPowerupsEnabled;
 	bool DrawOnTimeUp;

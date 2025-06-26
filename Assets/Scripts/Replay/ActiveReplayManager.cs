@@ -141,7 +141,7 @@ namespace NSMB.Replay {
                     StarsToWin = rules.StarsToWin,
                     CoinsForPowerup = rules.CoinsForPowerup,
                     Lives = rules.Lives,
-                    TimerSeconds = rules.TimerSeconds,
+                    TimerMinutes = rules.TimerMinutes,
                     CustomPowerupsEnabled = rules.CustomPowerupsEnabled,
                     TeamsEnabled = rules.TeamsEnabled,
                 },

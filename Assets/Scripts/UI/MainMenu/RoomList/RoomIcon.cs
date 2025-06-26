@@ -1,13 +1,13 @@
 ﻿using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
-using static NSMB.Utilities.NetworkUtils;
 using Photon.Realtime;
 using Quantum;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static NSMB.Utilities.NetworkUtils;
 
 namespace NSMB.UI.MainMenu.Submenus.RoomList {
     public class RoomIcon : MonoBehaviour {
@@ -15,9 +15,8 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         //---Properties
         public bool HasGameStarted {
             get {
-                GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
-                BooleanProperties boolProperties = (BooleanProperties) packedBoolProperties;
-
+                GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int boolPropertiesPacked);
+                BooleanProperties boolProperties = boolPropertiesPacked;
                 return boolProperties.GameStarted;
             }
         }
@@ -41,12 +40,13 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.HostName, out string hostname);
             nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername(null, PlayerRef.None, false));
 
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.GamemodeGuid, out string gamemodeAssetGuid);
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.StageGuid, out string stageAssetGuid);
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int packedIntProperties);
-            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int packedBoolProperties);
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.IntProperties, out int intPropertiesPacked);
+            GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.BoolProperties, out int boolPropertiesPacked);
 
-            IntegerProperties intProperties = (IntegerProperties) packedIntProperties;
-            BooleanProperties boolProperties = (BooleanProperties) packedBoolProperties;
+            IntegerProperties intProperties = intPropertiesPacked;
+            BooleanProperties boolProperties = boolPropertiesPacked;
 
             playersText.text = $"{room.PlayerCount}/{room.MaxPlayers}";
             inProgressText.text = boolProperties.GameStarted ? tm.GetTranslation("ui.rooms.listing.status.started") : tm.GetTranslation("ui.rooms.listing.status.notstarted");
@@ -69,20 +69,40 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
                 symbols.Append("<sprite name=room_lives>").Append(Utils.GetSymbolString(intProperties.Lives.ToString(), Utils.smallSymbols));
             }
 
-            symbols.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(intProperties.StarRequirement.ToString(), Utils.smallSymbols));
+            if (intProperties.StarRequirement > 0) {
+                symbols.Append("<sprite name=room_stars>").Append(Utils.GetSymbolString(intProperties.StarRequirement.ToString(), Utils.smallSymbols));
+            }
+
             symbols.Append("<sprite name=room_coins>").Append(Utils.GetSymbolString(intProperties.CoinRequirement.ToString(), Utils.smallSymbols));
             symbolsText.text = symbols.ToString();
 
-            string stageName;
-            if (stageAssetGuid != null && AssetGuid.TryParse(stageAssetGuid, out AssetGuid guid, true)
+
+            StringBuilder gamemodeAndStage = new();
+            AssetGuid guid;
+
+            if (gamemodeAssetGuid != null
+                && AssetGuid.TryParse(gamemodeAssetGuid, out guid, true)
+                && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<GamemodeAsset>(guid), out GamemodeAsset gamemode)) {
+
+                gamemodeAndStage.Append(gamemode.NamePrefix).Append(tm.GetTranslation(gamemode.TranslationKey));
+            } else {
+                gamemodeAndStage.Append("???");
+            }
+
+            gamemodeAndStage.Append(" - ");
+
+            if (stageAssetGuid != null
+                && AssetGuid.TryParse(stageAssetGuid, out guid, true)
                 && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<Map>(guid), out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
 
-                stageName = tm.GetTranslation(stage.TranslationKey);
+                gamemodeAndStage.Append(tm.GetTranslation(stage.TranslationKey));
             } else {
-                stageName = "???";
+                gamemodeAndStage.Append("???");
             }
-            mapText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.map", "map", stageName);
+
+
+            mapText.text = gamemodeAndStage.ToString();
         }
     }
 }

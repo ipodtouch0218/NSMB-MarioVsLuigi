@@ -3,6 +3,7 @@ using NSMB.Utilities.Components;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using Quantum.Profiling;
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static NSMB.Utilities.QuantumViewUtils;
@@ -10,16 +11,18 @@ using static NSMB.Utilities.QuantumViewUtils;
 namespace NSMB.Entities.World {
     public unsafe class CoinAnimator : QuantumEntityViewComponent {
 
+        //---Static
+        public static event Action<Frame, CoinAnimator> ObjectiveCoinInitialized;
+        public static event Action<CoinAnimator> ObjectiveCoinDestroyed;
+
         //---Serialized Variables
         [SerializeField] private LegacyAnimateSpriteRenderer defaultCoinAnimate, dottedCoinAnimate;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private SpriteRenderer sRenderer;
         [SerializeField] private ParticleSystem sparkles;
         [SerializeField] private bool looseCoin, objectiveCoin;
-        [SerializeField] private float spinSpeed = 120, minimumSpinSpeed = 300;
 
         //---Private Variables
-        private float smoothDampVelocity;
         private bool alreadyBounced;
 
         public void OnValidate() {
@@ -45,8 +48,11 @@ namespace NSMB.Entities.World {
             alreadyBounced = false;
 
             if (looseCoin) {
-                defaultCoinAnimate.frame = Random.Range(0, defaultCoinAnimate.frames.Length);
-                dottedCoinAnimate.frame = Random.Range(0, dottedCoinAnimate.frames.Length);
+                defaultCoinAnimate.frame = UnityEngine.Random.Range(0, defaultCoinAnimate.frames.Length);
+                dottedCoinAnimate.frame = UnityEngine.Random.Range(0, dottedCoinAnimate.frames.Length);
+            }
+            if (objectiveCoin) {
+                ObjectiveCoinInitialized?.Invoke(f, this);
             }
         }
 
@@ -58,6 +64,9 @@ namespace NSMB.Entities.World {
                 newSparkles.gameObject.SetActive(true);
                 newSparkles.Play();
                 Destroy(newSparkles.gameObject, 0.5f);
+            }
+            if (objectiveCoin) {
+                ObjectiveCoinDestroyed?.Invoke(this);
             }
         }
 
@@ -79,15 +88,6 @@ namespace NSMB.Entities.World {
             } else {
                 float despawnTimeRemaining = coin->Lifetime / 60f;
                 sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
-
-                if (objectiveCoin && f.Unsafe.TryGetPointer(EntityRef, out PhysicsObject* physicsObject)) {
-                    float xSpeed = physicsObject->Velocity.X.AsFloat;
-                    if (physicsObject->IsTouchingGround) {
-                        sRenderer.transform.rotation = Quaternion.Euler(0, 0, Mathf.SmoothDampAngle(sRenderer.transform.eulerAngles.z, 0, ref smoothDampVelocity, 0.2f));
-                    } else {
-                        sRenderer.transform.rotation *= Quaternion.Euler(0, 0, Mathf.Max(xSpeed * -spinSpeed, Mathf.Sign(xSpeed) * -minimumSpinSpeed) * Time.deltaTime);
-                    }
-                }
             }
         }
 
@@ -101,7 +101,7 @@ namespace NSMB.Entities.World {
             bool sameTeam = IsSameTeamAsCamera(coin->UncollectableByTeam - 1, camera, out MarioPlayer* mario);
             if (mario != null && sameTeam && (!mario->CanCollectOwnTeamsObjectiveCoins || coin->SpawnedViaSelfDamage)) {
                 // Can't collect
-                //newColor.a = 0.33f;
+                newColor.a = 0.33f;
             } else {
                 newColor.a = 1;
             }
@@ -133,7 +133,7 @@ namespace NSMB.Entities.World {
             }
 
             var coin = PredictedFrame.Unsafe.GetPointer<Coin>(EntityRef);
-            sfx.pitch = coin->CoinType.HasFlag(CoinType.Objective) ? Random.Range(1.35f, 1.45f) : 1f;
+            sfx.pitch = coin->CoinType.HasFlag(CoinType.Objective) ? UnityEngine.Random.Range(1.35f, 1.45f) : 1f;
             sfx.volume = coin->CoinType.HasFlag(CoinType.Objective) ? 0.1f : 1f;
             sfx.PlayOneShot(SoundEffect.World_Coin_Drop);
             alreadyBounced = true;

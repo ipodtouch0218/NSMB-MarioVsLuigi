@@ -19,6 +19,7 @@ MonoBehaviour:
   NamePrefix: '<sprite name=room_stars> '
   TranslationKey: gamemode.starchasers
   DescriptionTranslationKey: gamemode.starchasers.description
+  DiscordRpcKey: gamemode-starchasers
   ObjectiveSymbolPrefix: S
   AllCoinItems:
   - Id:

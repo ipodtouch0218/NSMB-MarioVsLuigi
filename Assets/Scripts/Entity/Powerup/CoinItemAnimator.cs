@@ -32,11 +32,13 @@ namespace NSMB.Entities.CoinItems {
         }
 
         public override void OnActivate(Frame f) {
+            if (!f.Unsafe.TryGetPointer(EntityRef, out CoinItem* coinItem)) {
+                return;
+            }
+            var scriptable = QuantumUnityDB.GetGlobalAsset(coinItem->Scriptable);
+
             originalSortingOrder = renderer.sortingOrder;
             renderer.GetPropertyBlock(mpb = new());
-
-            var coinItem = f.Unsafe.GetPointer<CoinItem>(EntityRef);
-            var scriptable = QuantumUnityDB.GetGlobalAsset(coinItem->Scriptable);
 
             if (coinItem->SpawnReason == PowerupSpawnReason.BlueKoopa && koopaSpawnParticles) {
                 koopaSpawnParticles.Play();

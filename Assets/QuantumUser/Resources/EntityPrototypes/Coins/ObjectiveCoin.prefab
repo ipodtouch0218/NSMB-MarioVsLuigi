@@ -110,6 +110,11 @@ MonoBehaviour:
   - {fileID: 845948447533366988, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -5313328981683241401, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -8417162070665421395, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  colorblindModeFrames:
+  - {fileID: -2128285509, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 579779561, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -667571031, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -1028925186, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   useUnscaledDelta: 0
   sRenderer: {fileID: 388009723025345444}
   image: {fileID: 0}
@@ -140,6 +145,7 @@ MonoBehaviour:
   - {fileID: -2147016090, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
   - {fileID: -1407919888, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
   - {fileID: 1590919697, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 388009723025345444}
   image: {fileID: 0}
@@ -205,7 +211,7 @@ MonoBehaviour:
   sRenderer: {fileID: 388009723025345444}
   sparkles: {fileID: 7191599241214066530}
   looseCoin: 1
-  objectiveCoin: 0
+  objectiveCoin: 1
   spinSpeed: 300
   minimumSpinSpeed: 300
 --- !u!114 &1839046130397998528
@@ -252,7 +258,7 @@ MonoBehaviour:
         X:
           RawValue: 14336
         Y:
-          RawValue: 16384
+          RawValue: 14336
       PositionOffset:
         X:
           RawValue: 0

@@ -423,7 +423,7 @@ namespace Quantum {
                             }
                         }
 
-                        FP distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.Y) - (RaycastSkin + (2 * Skin));
+                        FP distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.Y) - RaycastSkin;
                         if (distance > -(RaycastSkin + Skin)) {
                             potentialContacts[potentialContactCount++] = new PhysicsContact {
                                 Distance = distance,
@@ -650,8 +650,8 @@ namespace Quantum {
                             }
                         }
 
-                        FP distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.X) - (RaycastSkin + (2 * Skin));
-                        if (distance > -(RaycastSkin + Skin)) {
+                        FP distance = FPMath.Abs(hit.CastDistanceNormalized * raycastTranslation.X) - RaycastSkin;
+                        if (distance > -(RaycastSkin - Skin)) {
                             potentialContacts[potentialContactCount++] = new PhysicsContact {
                                 Distance = distance,
                                 Normal = hit.Normal,
@@ -719,7 +719,7 @@ namespace Quantum {
                     // Readjust the remaining velocity
                     FPVector2 newVelocity = new(0, velocity.Y);
                     if (FPMath.Abs(FPVector2.Dot(avgNormal, FPVector2.Up)) > GroundMaxAngle
-                        && FPVector2.Dot(avgNormal, velocity.Normalized) <= 0) {
+                        /*&& FPVector2.Dot(avgNormal, velocity.Normalized) <= 0*/) {
                         // Slope/ground/ceiling
                         FPVector2 newDirection = new(avgNormal.Y, -avgNormal.X);
                         if ((avgNormal.X > 0) ^ (avgNormal.Y < 0)) {
@@ -731,9 +731,11 @@ namespace Quantum {
                             projected -= physicsObject->Gravity * f.DeltaTime;
                         }
 
+                        Debug.Log($"normal: {avgNormal}, new direction: {newDirection}, speed: {speed}, projected: {projected}");
                         newVelocity = projected;
                     }
                     hitObject = true;
+                    
                     return newVelocity;
                 }
             }

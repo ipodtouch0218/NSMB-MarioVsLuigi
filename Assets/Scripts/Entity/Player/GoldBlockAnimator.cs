@@ -28,7 +28,7 @@ namespace NSMB.Entities.CoinItems {
 
         private Vector2 lostViaDamageVelocity;
         private float lostViaDamageAngularVelocity;
-        private bool lostViaDamage;
+        private bool lostViaDamage, resyncedThisFrame;
         private float collectTime;
 
         public void OnValidate() {
@@ -57,13 +57,19 @@ namespace NSMB.Entities.CoinItems {
             if (marioPlayerAnimator) {
                 marioPlayerAnimator.DisableHeadwear = false;
             }
-            if (flyingModel.activeInHierarchy) {
+            if (resyncedThisFrame || flyingModel.activeInHierarchy) {
                 Destroy(gameObject);
+                Destroy(helmetModel);
             }
         }
 
         public void LateUpdate() {
             Transform t = helmetModel.transform;
+
+            if (!marioPlayerAnimator && PredictedFrame.Unsafe.TryGetPointer(EntityRef, out GoldBlock* goldBlock)) {
+                SwapParentView(goldBlock->AttachedTo);
+            }
+
             if (lostViaDamage) {
                 lostViaDamageAngularVelocity = Mathf.MoveTowards(lostViaDamageAngularVelocity, 0, lostViaDamageAngularDeceleration * Time.deltaTime);
                 lostViaDamageVelocity += lostViaDamageGravity * Time.deltaTime;
@@ -89,6 +95,8 @@ namespace NSMB.Entities.CoinItems {
             } else {
                 t.SetParent(transform);
             }
+
+            resyncedThisFrame = false;
         }
 
         public void SwapParentView(EntityRef entity) {
@@ -187,7 +195,6 @@ namespace NSMB.Entities.CoinItems {
             StartCoroutine(DelayedParticlePlay());
         }
 
-
         private void OnGameResynced(CallbackGameResynced e) {
             Frame f = PredictedFrame;
             if (EntityView) {
@@ -199,6 +206,7 @@ namespace NSMB.Entities.CoinItems {
                 Destroy(gameObject);
                 Destroy(helmetModel);
             }
+            resyncedThisFrame = true;
         }
 
         private void OnGoldBlockRanOutOfCoins(EventGoldBlockRanOutOfCoins e) {

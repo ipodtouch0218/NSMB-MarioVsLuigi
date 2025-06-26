@@ -2128,9 +2128,9 @@ TextureImporter:
       name: hudnumber_objectivecoin
       rect:
         serializedVersion: 2
-        x: 243
-        y: 202
-        width: 13
+        x: 229
+        y: 219
+        width: 15
         height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
