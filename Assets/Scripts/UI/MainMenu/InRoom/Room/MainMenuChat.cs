@@ -27,6 +27,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         public void Initialize() {
             ChatManager.OnChatMessage += OnChatMessage;
+            ChatManager.OnChatMessageRemoved += OnChatMessageRemoved;
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             PlayerListEntry.PlayerMuteStateChanged += OnPlayerMuteStateChanged;
@@ -42,6 +43,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         public void OnDestroy() {
             ChatManager.OnChatMessage -= OnChatMessage;
+            ChatManager.OnChatMessageRemoved -= OnChatMessageRemoved;
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
             PlayerListEntry.PlayerMuteStateChanged -= OnPlayerMuteStateChanged;
@@ -100,7 +102,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         //---Callbacks
-        public void OnChatMessage(ChatMessageData data) {
+        private void OnChatMessage(ChatMessageData data) {
             ChatMessage chat = Instantiate(messagePrefab, chatWindow.transform);
 
             bool active;
@@ -120,7 +122,17 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             chatMessages.Add(chat);
         }
 
-        public void OnDisableChatChanged() {
+        private void OnChatMessageRemoved(ChatMessageData data) {
+            int index = chatMessages.IndexOf(cm => cm.data == data);
+            if (index == -1) {
+                return;
+            }
+
+            Destroy(chatMessages[index].gameObject);
+            chatMessages.RemoveAt(index);
+        }
+
+        private void OnDisableChatChanged() {
             foreach (ChatMessage msg in chatMessages) {
                 msg.UpdateVisibleState();
             }
@@ -140,14 +152,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
         }
 
-        public void OnLanguageChanged(TranslationManager tm) {
-            string key;
-
-            if (Settings.Instance.GeneralDisableChat) {
-                key = "ui.inroom.chat.disabled";
-            } else {
-                key = "ui.inroom.chat.prompt";
-            }
+        private void OnLanguageChanged(TranslationManager tm) {
+            string key = Settings.Instance.GeneralDisableChat ? "ui.inroom.chat.disabled" : "ui.inroom.chat.prompt";
 
             chatPrompt.text = tm.GetTranslation(key);
             chatPrompt.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;

@@ -13,19 +13,31 @@ using UnityEngine;
 namespace NSMB.Replay {
     public class ActiveReplayManager : Singleton<ActiveReplayManager> {
 
+        //---Static
+        public static event Action<ActiveReplayManager> OnReplayFastForwardEnded;
+
         //---Properties
         public BinaryReplayFile CurrentReplay { get; private set; }
         public bool IsReplay => CurrentReplay != null;
         public int ReplayStart => CurrentReplay?.Header.InitialFrameNumber ?? -1;
         public int ReplayLength => CurrentReplay?.Header.ReplayLengthInFrames ?? -1;
         public int ReplayEnd => ReplayStart + ReplayLength;
-        public bool IsReplayFastForwarding { get; set; }
+        public bool IsReplayFastForwarding {
+            get => _isReplayFastForwarding;
+            set {
+                if (_isReplayFastForwarding && !value) {
+                    OnReplayFastForwardEnded?.Invoke(this);
+                }
+                _isReplayFastForwarding = value;
+            }
+        }
         public string SavedRecordingPath { get; set; }
 
         //---Public Variables
         public readonly List<byte[]> ReplayFrameCache = new();
 
         //---Private Variables
+        private bool _isReplayFastForwarding;
         private QuantumGame currentlyRecordingGame;
         private int initialFrame;
         private byte[] initialFrameData;
@@ -45,10 +57,17 @@ namespace NSMB.Replay {
             Settings.OnReplaysEnabledChanged -= OnReplaysEnabledChanged;
         }
 
-        public unsafe void SaveReplay(QuantumGame game, sbyte winner) {
+        public unsafe void SaveReplay(sbyte winner) {
 #if !UNITY_STANDALONE
         return;
 #endif
+            QuantumGame game = currentlyRecordingGame;
+
+            if (currentlyRecordingGame == null || currentlyRecordingGame.RecordInputStream == null) {
+                SavedRecordingPath = null;
+                return;
+            }
+
             if (IsReplay || game.RecordInputStream == null) {
                 SavedRecordingPath = null;
                 return;
@@ -175,6 +194,7 @@ namespace NSMB.Replay {
             game.StartRecordingInput(f.Number);
             initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
             initialFrame = f.Number;
+            currentlyRecordingGame = game;
 
             Debug.Log("[Replay] Started recording a new replay.");
         }
@@ -243,7 +263,9 @@ namespace NSMB.Replay {
         }
 
         private void OnGameDestroyed(CallbackGameDestroyed e) {
-            SaveReplay(e.Game, -1);
+            if (e.Game == currentlyRecordingGame) {
+                SaveReplay(-1);
+            }
             CurrentReplay = null;
         }
 
@@ -263,7 +285,9 @@ namespace NSMB.Replay {
         }
 
         private void OnGameEnded(EventGameEnded e) {
-            SaveReplay(e.Game, (sbyte) e.WinningTeam);
+            if (e.Game == currentlyRecordingGame) {
+                SaveReplay((sbyte) e.WinningTeam);
+            }
         }
 
         private unsafe void OnReplaysEnabledChanged(bool enable) {

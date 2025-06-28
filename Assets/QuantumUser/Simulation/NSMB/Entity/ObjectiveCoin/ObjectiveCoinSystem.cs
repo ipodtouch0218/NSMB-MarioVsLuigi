@@ -27,10 +27,10 @@ namespace Quantum {
             Filter filter = default;
             var filterStruct = f.Unsafe.FilterStruct<Filter>();
             while (filterStruct.Next(&filter)) {
-                var coin = filter.StarCoin;
+                var starCoin = filter.StarCoin;
 
-                if (coin->DespawnCounter > 0) {
-                    if (QuantumUtils.Decrement(ref coin->DespawnCounter)) {
+                if (starCoin->DespawnCounter > 0) {
+                    if (QuantumUtils.Decrement(ref starCoin->DespawnCounter)) {
                         f.Events.CollectableDespawned(filter.Entity, filter.Transform->Position + (FPVector2.Down / 4), false);
                         f.Destroy(filter.Entity);
                     }

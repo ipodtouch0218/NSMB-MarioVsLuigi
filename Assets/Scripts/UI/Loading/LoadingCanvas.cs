@@ -9,7 +9,7 @@ using UnityEngine.UI;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Loading {
-    public class LoadingCanvas : MonoBehaviour {
+    public unsafe class LoadingCanvas : MonoBehaviour {
 
         public static event Action<bool> OnLoadingEnded;
 
@@ -36,7 +36,7 @@ namespace NSMB.UI.Loading {
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged, onlyIfActiveAndEnabled: true);
         }
 
-        public unsafe void Initialize(QuantumGame game) {
+        public void Initialize(QuantumGame game) {
             if (running) {
                 return;
             }
@@ -96,23 +96,23 @@ namespace NSMB.UI.Loading {
             }
         }
 
-        public unsafe void EndLoading(QuantumGame game) {
+        public void EndLoading(QuantumGame game) {
             if (running && endCoroutine == null) {
-                endCoroutine = StartCoroutine(EndLoadingRoutine(game));
+                endCoroutine = StartCoroutine(EndLoadingRoutine(game, game.Frames.Predicted.Global->GameState));
             }
         } 
 
-        public IEnumerator EndLoadingRoutine(QuantumGame game) {
+        public IEnumerator EndLoadingRoutine(QuantumGame game, GameState state) {
             if (!IsReplay) {
                 yield return new WaitForSeconds(1);
             }
 
             Frame f = game.Frames.Predicted;
 
-            bool validPlayer = game.GetLocalPlayers().Any(p => !(QuantumUtils.GetPlayerDataSafe(f, p)?.IsSpectator ?? true));
+            bool longIntro = !IsReplay && (state <= GameState.Starting || game.GetLocalPlayers().Any(p => !(QuantumUtils.GetPlayerDataSafe(f, p)?.IsSpectator ?? true)));
             
             readyGroup.gameObject.SetActive(true);
-            animator.SetTrigger(validPlayer ? "loaded" : "spectating");
+            animator.SetTrigger(longIntro  ? "loaded" : "spectating");
 
             if (fadeVolumeCoroutine != null) {
                 StopCoroutine(fadeVolumeCoroutine);
@@ -121,7 +121,7 @@ namespace NSMB.UI.Loading {
             fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             //audioListener.enabled = false;
 
-            OnLoadingEnded?.Invoke(validPlayer);
+            OnLoadingEnded?.Invoke(longIntro);
             running = false;
             endCoroutine = null;
         }

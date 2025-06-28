@@ -132,9 +132,8 @@ namespace NSMB.Entities.World {
                 return;
             }
 
-            var coin = PredictedFrame.Unsafe.GetPointer<Coin>(EntityRef);
-            sfx.pitch = coin->CoinType.HasFlag(CoinType.Objective) ? UnityEngine.Random.Range(1.35f, 1.45f) : 1f;
-            sfx.volume = coin->CoinType.HasFlag(CoinType.Objective) ? 0.1f : 1f;
+            sfx.pitch = objectiveCoin ? UnityEngine.Random.Range(1.35f, 1.45f) : 1f;
+            sfx.volume = objectiveCoin ? 0.1f : 1f;
             sfx.PlayOneShot(SoundEffect.World_Coin_Drop);
             alreadyBounced = true;
         }

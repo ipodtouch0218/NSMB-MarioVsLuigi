@@ -1,7 +1,8 @@
 ﻿using NSMB.Networking;
-using NSMB.UI.Translation;
+using NSMB.Quantum;
 using NSMB.UI.Loading;
 using NSMB.UI.Options;
+using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;

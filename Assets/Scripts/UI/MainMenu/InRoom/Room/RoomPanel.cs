@@ -74,7 +74,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             Frame f = e.Game.Frames.Verified;
             ref GameRules rules = ref f.Global->Rules;
 
-            if (e.LevelChanged) {
+            if (e.MapChanged) {
                 ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(rules.Stage).UserAsset));
             }
         }

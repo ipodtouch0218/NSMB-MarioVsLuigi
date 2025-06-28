@@ -84,8 +84,12 @@ synced event HostChanged {
 }
 
 synced event RulesChanged {
-	bool LevelChanged;
 	bool GamemodeChanged;
+	bool MapChanged;
+}
+
+synced event HostCloseRulesPanel {
+
 }
 
 synced event PlayerLoaded {

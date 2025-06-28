@@ -1,14 +1,14 @@
 using NSMB.Quantum;
+using NSMB.Replay;
 using NSMB.UI.Game;
 using NSMB.UI.Loading;
-using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Sound {
-    public class MusicManager : QuantumSceneViewComponent<StageContext> {
+    public unsafe class MusicManager : QuantumSceneViewComponent<StageContext> {
 
         //---Serialized Variables
         [SerializeField] private LoopingMusicPlayer musicPlayer;
@@ -24,6 +24,7 @@ namespace NSMB.Sound {
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
 
+            ActiveReplayManager.OnReplayFastForwardEnded += OnReplayFastForwardEnded;
             LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
 
             var game = QuantumRunner.DefaultGame;
@@ -38,22 +39,17 @@ namespace NSMB.Sound {
         }
 
         public void OnDestroy() {
+            ActiveReplayManager.OnReplayFastForwardEnded -= OnReplayFastForwardEnded;
             LoadingCanvas.OnLoadingEnded -= OnLoadingEnded;
         }
 
-        public unsafe void OnUpdateView(CallbackUpdateView e) {
+        public void OnUpdateView(CallbackUpdateView e) {
             if (e.Game.Frames.Predicted.Global->GameState == GameState.Playing) {
                 HandleMusic(e.Game, false);
             }
         }
 
-        private void OnLoadingEnded(bool validPlayer) {
-            if (!validPlayer) {
-                HandleMusic(Game, true);
-            }
-        }
-
-        private unsafe void HandleMusic(QuantumGame game, bool force) {
+        public void HandleMusic(QuantumGame game, bool force) {
             Frame f = game.Frames.Predicted;
             var rules = f.Global->Rules;
 
@@ -135,9 +131,21 @@ namespace NSMB.Sound {
             }
         }
 
-        private unsafe void OnGameResynced(CallbackGameResynced e) {
+        private void OnGameResynced(CallbackGameResynced e) {
             if (e.Game.Frames.Predicted.Global->GameState == GameState.Playing) {
                 HandleMusic(e.Game, true);
+            }
+        }
+
+        private void OnReplayFastForwardEnded(ActiveReplayManager arm) {
+            if (Game.Frames.Predicted.Global->GameState == GameState.Playing) {
+                HandleMusic(Game, true);
+            }
+        }
+
+        private void OnLoadingEnded(bool longIntro) {
+            if (!longIntro) {
+                HandleMusic(Game, true);
             }
         }
     }

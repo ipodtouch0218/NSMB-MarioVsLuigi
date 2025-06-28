@@ -31,7 +31,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             if (game != null) {
                 OnRulesChanged(new EventRulesChanged {
                     Game = game,
-                    LevelChanged = false,
                     Tick = game.Frames.Predicted.Number,
                 });
             }

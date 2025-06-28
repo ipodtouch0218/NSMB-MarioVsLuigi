@@ -1,3 +1,4 @@
+using NSMB.UI.Translation;
 using NSMB.Utilities;
 using Quantum;
 using System;
@@ -6,7 +7,7 @@ using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Chat {
-    public class ChatManager : MonoBehaviour {
+    public unsafe class ChatManager : MonoBehaviour {
 
         //---Static Variables
         public static readonly Color32 Red = new Color32(219, 107, 107, 255);
@@ -14,10 +15,16 @@ namespace NSMB.Chat {
 
         public static ChatManager Instance { get; private set; }
         public static event Action<ChatMessageData> OnChatMessage;
+        public static event Action<ChatMessageData> OnChatMessageRemoved;
 
         //---Public Variables
         public readonly List<ChatMessageData> chatHistory = new();
         public readonly HashSet<string> mutedPlayers = new();
+
+        //---Private Variables
+        private AssetRef<Map> currentMap;
+        private AssetRef<GamemodeAsset> currentGamemode;
+        private ChatMessageData changeMapMessage, changeGamemodeMessage;
 
         public void Awake() {
             Instance = this;
@@ -33,6 +40,7 @@ namespace NSMB.Chat {
 
         public void Start() {
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
+            QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
             QuantumEvent.Subscribe<EventPlayerSentChatMessage>(this, OnPlayerSentChatMessage);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded, FilterOutReplay);
@@ -42,7 +50,37 @@ namespace NSMB.Chat {
             QuantumEvent.Subscribe<EventPlayerUnbanned>(this, OnPlayerUnbanned, FilterOutReplay);
         }
 
-        public void AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
+        private void OnUpdateView(CallbackUpdateView e) {
+            Frame f = e.Game.Frames.Predicted;
+            ref var rules = ref f.Global->Rules;
+
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            if (rules.Gamemode != currentGamemode) {
+                RemoveChatMessage(changeGamemodeMessage);
+                string gamemodeName;
+                if (f.TryFindAsset(rules.Gamemode, out GamemodeAsset gamemode)) {
+                    gamemodeName = tm.GetTranslation(gamemode.TranslationKey);
+                } else {
+                    gamemodeName = "???";
+                }
+                changeGamemodeMessage = AddSystemMessage("ui.inroom.chat.server.gamemode", Red, "gamemode", gamemodeName);
+                currentGamemode = rules.Gamemode;
+            }
+            if (rules.Stage != currentMap) {
+                RemoveChatMessage(changeMapMessage);
+                string stageName;
+                if (f.TryFindAsset(rules.Stage, out Map map)
+                    && f.TryFindAsset(map.UserAsset, out VersusStageData stageData)) {
+                    stageName = tm.GetTranslation(stageData.TranslationKey);
+                } else {
+                    stageName = "???";
+                }
+                changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
+                currentMap = rules.Stage;
+            }
+        }
+
+        public ChatMessageData AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
             if (filter) {
                 message = message.Filter();
             }
@@ -55,10 +93,11 @@ namespace NSMB.Chat {
                 message = message,
             };
             OnChatMessage?.Invoke(data);
+            return data;
         }
 
         private static readonly Color SystemMessageColor = new(0x55/255f, 0x55/255f, 0x55/255f, 1);
-        public void AddSystemMessage(string key, Color? color = null, params string[] replacements) {
+        public ChatMessageData AddSystemMessage(string key, Color? color = null, params string[] replacements) {
             ChatMessageData data = new() {
                 isSystemMessage = true,
                 color = color ?? SystemMessageColor,
@@ -66,6 +105,7 @@ namespace NSMB.Chat {
                 replacements = replacements,
             };
             OnChatMessage?.Invoke(data);
+            return data;
         }
 
         public void SendChatMessage(string text) {
@@ -74,21 +114,35 @@ namespace NSMB.Chat {
             });
         }
 
-        //---Callbacks
-        private void OnGameStarted(CallbackGameStarted e) {
-            mutedPlayers.Clear();
-        }
-
-        private void OnChatMessageCallback(ChatMessageData data) {
-            if (IsReplay) {
+        public void RemoveChatMessage(ChatMessageData data) {
+            int index = chatHistory.IndexOf(data);
+            if (index == -1) {
                 return;
             }
 
-            if (data.isSystemMessage) {
-                Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
-            } else {
-                RuntimePlayer runtimeData = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(data.player);
-                Debug.Log($"[Chat] ({runtimeData.UserId}) {data.message}");
+            OnChatMessageRemoved?.Invoke(data);
+            chatHistory.RemoveAt(index);
+        }
+
+        //---Callbacks
+        private void OnGameStarted(CallbackGameStarted e) {
+            chatHistory.Clear();
+            mutedPlayers.Clear();
+            ref var rules = ref e.Game.Frames.Predicted.Global->Rules;
+            currentGamemode = rules.Gamemode;
+            currentMap = rules.Stage;
+        }
+
+        private void OnChatMessageCallback(ChatMessageData data) {
+            chatHistory.Add(data);
+
+            if (!IsReplay) {
+                if (data.isSystemMessage) {
+                    Debug.Log($"[Chat] {GlobalController.Instance.translationManager.GetTranslationWithReplacements(data.message, data.replacements)}");
+                } else {
+                    RuntimePlayer runtimeData = QuantumRunner.DefaultGame.Frames.Predicted.GetPlayerData(data.player);
+                    Debug.Log($"[Chat] ({runtimeData.UserId}) {data.message}");
+                }
             }
         }
 

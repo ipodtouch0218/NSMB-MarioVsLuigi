@@ -1,6 +1,7 @@
 ﻿using NSMB.Cameras;
 using NSMB.Entities.Player;
 using NSMB.Quantum;
+using NSMB.Sound;
 using NSMB.UI.Game.Replay;
 using NSMB.UI.Game.Scoreboard;
 using NSMB.UI.Pause;
@@ -151,6 +152,8 @@ namespace NSMB.UI.Game {
             if (!IsReplay) {
                 if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
                     GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
+                } else {
+                    FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
                 }
             }
 

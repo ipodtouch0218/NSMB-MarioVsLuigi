@@ -35,7 +35,7 @@ namespace NSMB.Networking {
             Utils.BitSet(ref args, 0, !Settings.Instance.generalUseNicknameColor);
             requestUrl += "&args=" + args;
 
-            UnityWebRequest webRequest = UnityWebRequest.Get(requestUrl);
+            using UnityWebRequest webRequest = UnityWebRequest.Get(requestUrl);
             webRequest.certificateHandler = new MvLCertificateHandler();
             webRequest.disposeCertificateHandlerOnDispose = true;
             webRequest.disposeDownloadHandlerOnDispose = true;
@@ -83,8 +83,6 @@ namespace NSMB.Networking {
                 UserId = userid,
             };
             values.AddAuthParameter("data", result);
-
-            webRequest.Dispose();
 
             IsAuthenticating = false;
             return values;

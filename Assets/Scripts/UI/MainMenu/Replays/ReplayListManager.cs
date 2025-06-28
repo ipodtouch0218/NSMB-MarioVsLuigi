@@ -135,10 +135,18 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             }
             TranslationManager tm = GlobalController.Instance.translationManager;
 
+            BinaryReplayHeader header = replay.ReplayFile.Header;
+            ref var rules = ref header.Rules;
+            string gamemodeName;
+            if (QuantumUnityDB.TryGetGlobalAsset(rules.Gamemode, out var gamemode)) {
+                gamemodeName = gamemode.NamePrefix + tm.GetTranslation(gamemode.TranslationKey);
+            } else {
+                gamemodeName = "<sprite name=room_customlevel> ???";
+            }
+
             // TODO: possibly parse from initial frame instead of storing as separate members
             // Playerlist
             StringBuilder builder = new();
-            BinaryReplayHeader header = replay.ReplayFile.Header;
             for (int i = 0; i < header.PlayerInformation.Length; i++) {
                 ref ReplayPlayerInformation info = ref header.PlayerInformation[i];
 
@@ -159,10 +167,10 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 builder.Append("</nobr>");
 
                 // Stars
-                builder.Append("<width=100%><pos=90%><sprite name=room_stars>");
-                builder.Append("<line-height=0><align=right><br>");
+                builder.Append("<width=100%><line-height=0><align=right><br>");
+                builder.Append(gamemode ? Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix) : "");
                 builder.Append(info.Team == header.WinningTeam ? "<color=yellow>" : "<color=white>");
-                builder.Append(info.FinalObjectiveCount);
+                builder.Append(Mathf.Max(0, info.FinalObjectiveCount));
 
                 // Fix formatting
                 builder.AppendLine("<align=left><line-height=100%>");
@@ -174,24 +182,23 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             string on = tm.GetTranslation("ui.generic.on");
 
             builder.Append("<align=center><color=white>");
-            var rules = header.Rules;
-            if (tm.RightToLeft) {
-                builder.Append(rules.TeamsEnabled ? on : off).Append(" <sprite name=room_teams>").Append("    ");
-                builder.Append(rules.CustomPowerupsEnabled ? on : off).Append(" <sprite name=room_powerups>").Append("    ");
-                builder.Append(rules.TimerMinutes > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerMinutes * 60) : off).Append(" <sprite name=room_timer>").Append("    ");
-                builder.Append(rules.Lives > 0 ? rules.Lives : off).Append(" <sprite name=room_lives>").Append("    ");
-                builder.Append(rules.CoinsForPowerup).Append(" <sprite name=room_coins>").Append("    ");
-                builder.Append(rules.StarsToWin).AppendLine(" <sprite name=room_stars> ");
+            builder.AppendLine(gamemodeName);
+
+            if (gamemode is CoinRunnersGamemode) {
+                builder.Append("<sprite name=room_timer> ").Append(Utils.SecondsToMinuteSeconds(rules.TimerMinutes * 60)).Append("    ");
+                builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
+                builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
+                builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
+                builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
             } else {
+                // Default to star chasers
                 builder.Append("<sprite name=room_stars> ").Append(rules.StarsToWin).Append("    ");
                 builder.Append("<sprite name=room_coins> ").Append(rules.CoinsForPowerup).Append("    ");
                 builder.Append("<sprite name=room_lives> ").Append(rules.Lives > 0 ? rules.Lives : off).Append("    ");
                 builder.Append("<sprite name=room_timer> ").Append(rules.TimerMinutes > 0 ? Utils.SecondsToMinuteSeconds(rules.TimerMinutes * 60) : off).Append("    ");
                 builder.Append("<sprite name=room_powerups>").Append(rules.CustomPowerupsEnabled ? on : off).Append("    ");
                 builder.Append("<sprite name=room_teams>").AppendLine(rules.TeamsEnabled ? on : off);
-            }
-
-            // Add date
+            } 
             builder.Append("<color=#aaa>").Append(DateTimeToLocalizedString(DateTime.UnixEpoch.AddSeconds(header.UnixTimestamp), false, false)).Append(" - ");
             builder.Append(Utils.SecondsToMinuteSeconds(header.ReplayLengthInFrames / 60)).Append(" - ").Append(Utils.BytesToString(replay.ReplayFile.FileSize));
 
@@ -226,6 +233,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void RemoveReplay(ReplayListEntry replay) {
+            replays.Remove(replay);
+            bool wasTemporary = temporaryReplays.Remove(replay);
+            
             if (replay) {
                 Destroy(replay.gameObject);
                 if (replays.Count == 0) {
@@ -233,8 +243,13 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 }
             }
             int? index = isActiveAndEnabled ? replays.IndexOf(replay) : null;
-            replays.Remove(replay);
             SortReplays(index);
+            
+            if (wasTemporary && Settings.Instance.generalMaxTempReplays != 0) {
+                foreach (var tempReplay in temporaryReplays.Skip(Settings.Instance.generalMaxTempReplays - 5).Take(5)) {
+                    tempReplay.UpdateText();
+                }
+            }
         }
 
         public void FindReplays() {
@@ -595,6 +610,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public class ReplayDateComparer : IComparer<ReplayListEntry> {
             public int Compare(ReplayListEntry x, ReplayListEntry y) {
+                if (x.ReplayFile.Header.UnixTimestamp == y.ReplayFile.Header.UnixTimestamp) {
+                    return 0;
+                }
                 return x.ReplayFile.Header.UnixTimestamp < y.ReplayFile.Header.UnixTimestamp ? 1 : -1;
             }
         }

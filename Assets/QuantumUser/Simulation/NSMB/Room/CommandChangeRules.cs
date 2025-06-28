@@ -45,8 +45,12 @@ namespace Quantum {
 
             if (rulesChanges.HasFlag(Rules.Gamemode)) {
                 gamemodeChanged = rules.Gamemode != Gamemode;
-                f.FindAsset(Gamemode).DefaultRules.Materialize(f, ref rules);
-                rules.Gamemode = Gamemode;
+
+                GameRules tempRules = default;
+                f.FindAsset(Gamemode).DefaultRules.Materialize(f, ref tempRules);
+                tempRules.Stage = rules.Stage;
+
+                rules = tempRules;
             }
             if (rulesChanges.HasFlag(Rules.Stage)) {
                 levelChanged = rules.Stage != Stage;
@@ -75,7 +79,7 @@ namespace Quantum {
             }
 
             f.Global->Rules = rules;
-            f.Events.RulesChanged(levelChanged, gamemodeChanged);
+            f.Events.RulesChanged(gamemodeChanged, levelChanged);
 
             if (f.Global->GameStartFrames > 0 && !QuantumUtils.IsGameStartable(f)) {
                 GameLogicSystem.StopCountdown(f);

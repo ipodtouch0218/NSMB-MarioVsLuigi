@@ -37,10 +37,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         public void ClickConfirm() {
+            manager.RemoveReplay(target);
             try {
                 File.Delete(target.ReplayFile.FilePath);
             } catch { }
-            manager.RemoveReplay(target);
             target = null;
             success = true;
             Canvas.GoBack();
