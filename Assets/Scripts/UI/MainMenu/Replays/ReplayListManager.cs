@@ -163,7 +163,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 }
 
                 // Username
-                builder.Append(info.Username);
+                builder.Append(string.IsNullOrWhiteSpace(info.Nickname) ? "noname" : info.Nickname);
                 builder.Append("</nobr>");
 
                 // Stars
@@ -464,7 +464,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     // Check player usernames
                     bool found = false;
                     foreach (var playerInfo in replay.ReplayFile.Header.PlayerInformation) {
-                        if (playerInfo.Username.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (playerInfo.Nickname.Contains(searchField.text, StringComparison.InvariantCultureIgnoreCase)) {
                             found = true;
                             break;
                         }

@@ -80,7 +80,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         }
 
         public void JoinRoom(RoomIcon room) {
-            if (!Settings.Instance.generalNickname.IsValidUsername()) {
+            if (!Settings.Instance.generalNickname.IsValidNickname()) {
                 submenu.InvalidUsername();
                 return;
             }

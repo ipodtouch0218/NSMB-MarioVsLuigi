@@ -118628,6 +118628,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eventSystem: {fileID: 566761500}
   startingSubmenu: {fileID: 1926543288}
+  inRoomSubmenuStack:
+  - {fileID: 1829954940}
+  - {fileID: 1271645321}
+  - {fileID: 252585805}
   mainPanel: {fileID: 772175513}
   sfx: {fileID: 2030938840}
   errorSubmenu: {fileID: 1105073577}

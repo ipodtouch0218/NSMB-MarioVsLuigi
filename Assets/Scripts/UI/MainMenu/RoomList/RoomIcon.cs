@@ -38,7 +38,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             TranslationManager tm = GlobalController.Instance.translationManager;
 
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.HostName, out string hostname);
-            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidUsername(null, PlayerRef.None, false));
+            nameText.text = tm.GetTranslationWithReplacements("ui.rooms.listing.name", "playername", hostname.ToValidNickname(null, PlayerRef.None, false));
 
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.GamemodeGuid, out string gamemodeAssetGuid);
             GetCustomProperty(room.CustomProperties, Enums.NetRoomProperties.StageGuid, out string stageAssetGuid);

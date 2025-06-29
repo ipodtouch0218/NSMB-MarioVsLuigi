@@ -155,7 +155,7 @@ namespace NSMB.Chat {
             // Add username
             Frame f = e.Game.Frames.Verified;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            message = runtimeData.PlayerNickname.ToValidUsername(f, e.Player) + ": " + message.Filter();
+            message = runtimeData.PlayerNickname.ToValidNickname(f, e.Player) + ": " + message.Filter();
 
             AddChatMessage(message, e.Player, f);
         }
@@ -169,24 +169,24 @@ namespace NSMB.Chat {
         private void OnPlayerAdded(EventPlayerAdded e) {
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(f, e.Player));
+            AddSystemMessage("ui.inroom.chat.player.joined", Blue, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(f, e.Player));
+            AddSystemMessage("ui.inroom.chat.player.quit", Blue, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
         }
 
         private void OnPlayerKickedFromRoom(EventPlayerKickedFromRoom e) {
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimeData = f.GetPlayerData(e.Player);
-            AddSystemMessage(e.Banned ? "ui.inroom.chat.player.banned" : "ui.inroom.chat.player.kicked", Blue, "playername", runtimeData.PlayerNickname.ToValidUsername(f, e.Player));
+            AddSystemMessage(e.Banned ? "ui.inroom.chat.player.banned" : "ui.inroom.chat.player.kicked", Blue, "playername", runtimeData.PlayerNickname.ToValidNickname(f, e.Player));
         }
 
         private void OnPlayerUnbanned(EventPlayerUnbanned e) {
             Frame f = e.Game.Frames.Predicted;
-            AddSystemMessage("ui.inroom.chat.player.unbanned", Blue, "playername", e.PlayerInfo.Nickname.ToString().ToValidUsername(f, default));
+            AddSystemMessage("ui.inroom.chat.player.unbanned", Blue, "playername", e.PlayerInfo.Nickname.ToString().ToValidNickname(f, default));
         }
 
         private void OnHostChanged(EventHostChanged e) {

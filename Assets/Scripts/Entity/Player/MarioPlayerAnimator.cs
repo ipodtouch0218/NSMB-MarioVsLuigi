@@ -28,7 +28,8 @@ namespace NSMB.Entities.Player {
 
         //---Static Variables
         private static readonly WaitForSeconds BlinkDelay = new(0.1f);
-        #region Animator Hashes
+
+        #region Animator & Shader Hashes
         private static readonly int ParamRainbowEnabled = Shader.PropertyToID("RainbowEnabled");
         private static readonly int ParamPowerupState = Shader.PropertyToID("PowerupState");
         private static readonly int ParamEyeState = Shader.PropertyToID("EyeState");
@@ -38,6 +39,12 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamShirtColor = Shader.PropertyToID("ShirtColor");
         private static readonly int ParamHatUsesOverallsColor = Shader.PropertyToID("HatUsesOverallsColor");
         private static readonly int ParamGlowColor = Shader.PropertyToID("GlowColor");
+
+        private static readonly int StateMegaIdle = Animator.StringToHash("mega-idle");
+        private static readonly int StateMegaScale = Animator.StringToHash("mega-scale");
+        private static readonly int StateMegaCancel = Animator.StringToHash("mega-cancel");
+        private static readonly int StateJumplanding = Animator.StringToHash("jumplanding");
+
         private static readonly int ParamVelocityX = Animator.StringToHash("velocityX");
         private static readonly int ParamVelocityY = Animator.StringToHash("velocityY");
         private static readonly int ParamVelocityMagnitude = Animator.StringToHash("velocityMagnitude");
@@ -75,7 +82,6 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamKnockforwards = Animator.StringToHash("knockforwards");
         private static readonly int ParamPushing = Animator.StringToHash("pushing");
         private static readonly int ParamFrozen = Animator.StringToHash("frozen");
-
         private static readonly int ParamPaddle = Animator.StringToHash("paddle");
         private static readonly int ParamThrow = Animator.StringToHash("throw");
         private static readonly int ParamHeadPickup = Animator.StringToHash("head-pickup");
@@ -776,7 +782,7 @@ namespace NSMB.Entities.Player {
             }
 
             if (e.Cancelled) {
-                animator.Play("mega-cancel", 0, 1f - (e.EndingFrames / 90f));
+                animator.Play(StateMegaCancel, 0, 1f - (e.EndingFrames / 90f));
             } else {
                 PlaySound(SoundEffect.Powerup_MegaMushroom_End);
             }
@@ -1031,7 +1037,8 @@ namespace NSMB.Entities.Player {
                 PlaySound(powerup.SoundEffect);
 
                 if (powerup.State == PowerupState.MegaMushroom) {
-                    animator.Play("mega-scale");
+                    var mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(EntityRef);
+                    animator.Play(StateMegaScale, 0, 1f - (mario->MegaMushroomStartFrames / 90f));
                     Vector3 spawnPosition = transform.position;
                     spawnPosition.z = -4f;
                     SpawnParticle(Enums.PrefabParticle.Player_MegaMushroom.GetGameObject(), spawnPosition);
@@ -1174,6 +1181,20 @@ namespace NSMB.Entities.Player {
             if (activeRespawnParticle) {
                 Destroy(activeRespawnParticle);
             }
+
+            Frame f = PredictedFrame;
+            if (f.Unsafe.TryGetPointer(EntityRef, out MarioPlayer* mario)) {
+                if (mario->MegaMushroomStartFrames > 0) {
+                    // Growing animation
+                    animator.Play(StateMegaScale, 0, 1f - (mario->MegaMushroomStartFrames / 90f));
+                } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                    // Mega
+                    animator.Play(StateMegaIdle);
+                } else if (mario->MegaMushroomEndFrames > 0 && mario->MegaMushroomStationaryEnd) {
+                    // Shrinking animation
+                    animator.Play(StateMegaCancel, 0, 1f - (mario->MegaMushroomEndFrames / 90f));
+                }
+            }
         }
 
         private void OnMarioPlayerLandedWithAnimation(EventMarioPlayerLandedWithAnimation e) {
@@ -1181,7 +1202,7 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            animator.Play("jumplanding");
+            animator.Play(StateJumplanding);
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

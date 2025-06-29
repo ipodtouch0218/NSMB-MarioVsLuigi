@@ -1,6 +1,7 @@
 ﻿using NSMB.Networking;
 using NSMB.Quantum;
 using NSMB.UI.Loading;
+using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.Options;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
@@ -96,23 +97,27 @@ namespace NSMB {
                 Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
             }
 
-            //if (Debug.isDebugBuild) {
-            if (UnityEngine.Input.GetKeyDown(KeyCode.F9)) {
-                if (Profiler.enabled) {
-                    Profiler.enabled = false;
-                    PlaySound(SoundEffect.Player_Sound_Powerdown);
-                } else {
-                    Profiler.maxUsedMemory = 256 * 1024 * 1024;
-                    Profiler.logFile = "profile-" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    Profiler.enableBinaryLog = true;
-                    Profiler.enabled = true;
-                    PlaySound(SoundEffect.Player_Sound_PowerupCollect);
+            if (Debug.isDebugBuild) {
+                if (UnityEngine.Input.GetKeyDown(KeyCode.F9)) {
+                    if (Profiler.enabled) {
+                        Profiler.enabled = false;
+                        PlaySound(SoundEffect.Player_Sound_Powerdown);
+                    } else {
+                        Profiler.maxUsedMemory = 256 * 1024 * 1024;
+                        Profiler.logFile = "profile-" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                        Profiler.enableBinaryLog = true;
+                        Profiler.enabled = true;
+                        PlaySound(SoundEffect.Player_Sound_PowerupCollect);
+                    }
                 }
             }
-            //}
 
             if (UnityEngine.Input.GetKeyDown(KeyCode.F6)) {
                 System.Diagnostics.Process.Start(Application.consoleLogPath);
+            }
+
+            if (UnityEngine.Input.GetKeyDown(KeyCode.F7)) {
+                System.Diagnostics.Process.Start(ReplayListManager.ReplayDirectory);
             }
 #endif
 

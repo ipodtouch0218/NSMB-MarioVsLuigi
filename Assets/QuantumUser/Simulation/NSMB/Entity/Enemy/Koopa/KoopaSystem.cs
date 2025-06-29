@@ -30,7 +30,6 @@ namespace Quantum {
             f.Context.Interactions.Register<Koopa, Projectile>(f, OnKoopaProjectileInteraction);
             f.Context.Interactions.Register<Koopa, Coin>(f, OnKoopaCoinInteraction);
             f.Context.Interactions.Register<Koopa, IceBlock>(f, OnKoopaIceBlockInteraction);
-            f.Context.Interactions.Register<Koopa, IceBlock>(f, OnKoopaIceBlockInteractionStationary);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -314,25 +313,6 @@ namespace Quantum {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
-            if (iceBlock->IsSliding && upDot < PhysicsObjectSystem.GroundMaxAngle) {
-                koopa->Kill(f, koopaEntity, iceBlockEntity, KillReason.Special);
-            }
-
-            if (koopa->IsInShell && koopa->IsKicked) {
-                IceBlockSystem.Destroy(f, iceBlockEntity, IceBlockBreakReason.Other);
-            }
-        }
-
-        public static void OnKoopaIceBlockInteractionStationary(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity) {
-            var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
-            var koopaTransform = f.Unsafe.GetPointer<Transform2D>(koopaEntity);
-            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
-            var iceBlockTransform = f.Unsafe.GetPointer<Transform2D>(iceBlockEntity);
-
-            QuantumUtils.UnwrapWorldLocations(f, koopaTransform->Position, iceBlockTransform->Position, out FPVector2 koopaPos, out FPVector2 iceBlockPos);
-            FPVector2 normal = (iceBlockPos - koopaPos).Normalized;
-
-            FP upDot = FPVector2.Dot(normal, FPVector2.Up);
             if (iceBlock->IsSliding && upDot < PhysicsObjectSystem.GroundMaxAngle) {
                 koopa->Kill(f, koopaEntity, iceBlockEntity, KillReason.Special);
             }

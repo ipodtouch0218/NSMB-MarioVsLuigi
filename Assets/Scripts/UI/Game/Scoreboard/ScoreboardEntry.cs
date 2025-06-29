@@ -44,7 +44,7 @@ namespace NSMB.UI.Game.Scoreboard {
 
             informationIndex = index;
             ref PlayerInformation info = ref f.Global->PlayerInfo[index];
-            cachedNickname = info.Nickname.ToString().ToValidUsername(f, info.PlayerRef);
+            cachedNickname = info.Nickname.ToString().ToValidNickname(f, info.PlayerRef);
             nicknameColor = NicknameColor.Parse(info.NicknameColor.ToString());
             nicknameText.color = nicknameColor.Sample();
             nicknameMayHaveChanged = true;
@@ -148,7 +148,7 @@ namespace NSMB.UI.Game.Scoreboard {
         private unsafe void OnPlayerRemoved(EventPlayerRemoved e) {
             Frame f = e.Game.Frames.Verified;
             ref PlayerInformation info = ref f.Global->PlayerInfo[informationIndex];
-            cachedNickname = info.Nickname.ToString().ToValidUsername(f, info.PlayerRef);
+            cachedNickname = info.Nickname.ToString().ToValidNickname(f, info.PlayerRef);
             nicknameMayHaveChanged = true;
 
             UpdateEntry(f);

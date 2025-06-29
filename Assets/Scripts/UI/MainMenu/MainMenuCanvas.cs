@@ -2,6 +2,7 @@ using NSMB.Networking;
 using NSMB.UI.MainMenu.Submenus.Prompts;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
+using Quantum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private MainMenuSubmenu startingSubmenu;
+        [SerializeField] private MainMenuSubmenu[] inRoomSubmenuStack;
         [SerializeField] private GameObject mainPanel;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private ErrorPromptSubmenu errorSubmenu;
@@ -73,6 +75,14 @@ namespace NSMB.UI.MainMenu {
             NetworkHandler.OnError += OnError;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             OpenMenu(startingSubmenu);
+            // Bodge for opening the room list if we somehow unloaded the main menu...
+            // Usually happens when we start the game in the editor and end the game.
+            var runner = QuantumRunner.Default;
+            if (runner != null && !runner.Session.IsReplay) {
+                foreach (var submenu in inRoomSubmenuStack) {
+                    OpenMenu(submenu, null, false);
+                }
+            }
         }
 
         public void OnDestroy() {
@@ -131,9 +141,9 @@ namespace NSMB.UI.MainMenu {
             OpenMenu(menu, menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
         }
 
-        public void OpenMenu(MainMenuSubmenu menu, SoundEffect? sound) {
-            bool first = true;
-            if (submenuStack.Contains(menu)) {
+        public void OpenMenu(MainMenuSubmenu menu, SoundEffect? sound, bool first = true) {
+            bool wasPresent = submenuStack.Contains(menu);
+            if (wasPresent) {
                 // Close menus on top of this menu
                 while (submenuStack[^1] != menu) {
                     GoBack(true);
@@ -148,7 +158,7 @@ namespace NSMB.UI.MainMenu {
                 }
             }
 
-            if (first) {
+            if (!wasPresent) {
                 submenuStack.Add(menu);
             }
 

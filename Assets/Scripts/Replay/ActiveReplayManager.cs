@@ -58,9 +58,9 @@ namespace NSMB.Replay {
         }
 
         public unsafe void SaveReplay(sbyte winner) {
-#if !UNITY_STANDALONE
-        return;
-#endif
+//#if !UNITY_STANDALONE
+//        return;
+//#endif
             QuantumGame game = currentlyRecordingGame;
 
             if (currentlyRecordingGame == null || currentlyRecordingGame.RecordInputStream == null) {
@@ -113,7 +113,7 @@ namespace NSMB.Replay {
 
             for (int i = 0; i < players; i++) {
                 ref PlayerInformation inGamePlayerInformation = ref f.Global->PlayerInfo[i];
-                playerInformation[i].Username = inGamePlayerInformation.Nickname;
+                playerInformation[i].Nickname = inGamePlayerInformation.Nickname;
                 playerInformation[i].Character = inGamePlayerInformation.Character;
                 playerInformation[i].Team = inGamePlayerInformation.Team;
                 playerInformation[i].PlayerRef = inGamePlayerInformation.PlayerRef;

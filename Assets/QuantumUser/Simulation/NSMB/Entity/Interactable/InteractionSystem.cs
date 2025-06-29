@@ -142,12 +142,12 @@ namespace Quantum {
                 // Collide with hitboxes
                 if (f.Physics2D.TryGetQueryHits(initiator->OverlapQueryRef, out HitCollection hits)) {
                     for (int i = 0; i < hits.Count; i++) {
-                        TryCollideWithEntity(fts, entity, hits[i].Entity);
+                        TryCollideWithTriggerEntity(fts, entity, hits[i].Entity);
                     }
                 }
                 if (f.Physics2D.TryGetQueryHits(initiator->OverlapLevelSeamQueryRef, out hits)) {
                     for (int i = 0; i < hits.Count; i++) {
-                        TryCollideWithEntity(fts, entity, hits[i].Entity);
+                        TryCollideWithTriggerEntity(fts, entity, hits[i].Entity);
                     }
                 }
 
@@ -160,7 +160,7 @@ namespace Quantum {
                             continue;
                         }
 
-                        TryCollideWithEntity(fts, entity, contact.Entity, contact);
+                        TryCollideWithSolidEntity(fts, entity, contact.Entity, contact);
                     }
                 }
             }
@@ -169,8 +169,8 @@ namespace Quantum {
         }
 #endif
 
-        private void TryCollideWithEntity(FrameThreadSafe f, EntityRef entityA, EntityRef entityB) {
-            using var profileScope = HostProfiler.Start("InteractionSystem.TryCollideWithEntity.Hitbox");
+        private void TryCollideWithTriggerEntity(FrameThreadSafe f, EntityRef entityA, EntityRef entityB) {
+            using var profileScope = HostProfiler.Start("InteractionSystem.TryCollideWithTriggerEntity");
             if (entityA == entityB) {
                 return;
             }
@@ -192,8 +192,8 @@ namespace Quantum {
             }
         }
 
-        private void TryCollideWithEntity(FrameThreadSafe f, EntityRef entityA, EntityRef entityB, in PhysicsContact contact) {
-            using var profileScope = HostProfiler.Start("InteractionSystem.TryCollideWithEntity.Platform");
+        private void TryCollideWithSolidEntity(FrameThreadSafe f, EntityRef entityA, EntityRef entityB, in PhysicsContact contact) {
+            using var profileScope = HostProfiler.Start("InteractionSystem.TryCollideWithSolidEntity");
             if (entityA == entityB) {
                 return;
             }

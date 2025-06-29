@@ -111,7 +111,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         }
 
         public void ChangeUsername() {
-            usernameField.targetGraphic.color = usernameField.text.IsValidUsername() ? defaultUsernameColor : invalidUsernameColor;
+            usernameField.targetGraphic.color = usernameField.text.IsValidNickname() ? defaultUsernameColor : invalidUsernameColor;
             Settings.Instance.generalNickname = usernameField.text;
             Settings.Instance.SaveSettings();
         }
@@ -131,7 +131,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         }
 
         public void OpenMenuIfUsernameIsValid(MainMenuSubmenu submenu) {
-            if (!Settings.Instance.generalNickname.IsValidUsername()) {
+            if (!Settings.Instance.generalNickname.IsValidNickname()) {
                 InvalidUsername();
                 return;
             }

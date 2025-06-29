@@ -49,6 +49,7 @@ namespace NSMB.UI.Game {
         private PowerupAsset previousPowerup;
         private EntityRef previousTarget;
         private bool previousMarioExists;
+        private bool justResynced;
 
         private Coroutine endGameSequenceCoroutine, reserveSummonCoroutine;
 
@@ -141,12 +142,13 @@ namespace NSMB.UI.Game {
                 UpdateElementVisibility(f, marioExists);
             }
 
-            UpdateStoredItemUI(mario, previousTarget == Target);
+            UpdateStoredItemUI(mario, previousTarget == Target && !justResynced);
             UpdateTextUI(f, mario);
             ApplyUIColor(f, mario);
 
             previousTarget = Target;
             previousMarioExists = marioExists;
+            justResynced = false;
         }
 
         private void OnMarioInitialized(QuantumGame game, Frame f, MarioPlayerAnimator mario) {
@@ -421,6 +423,8 @@ namespace NSMB.UI.Game {
                 timerColor = Color.red;
             }
             timerMaterial.SetColor("_Color", timerColor);
+
+            justResynced = true;
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
@@ -458,7 +462,7 @@ namespace NSMB.UI.Game {
                     while (allPlayers.NextUnsafe(out _, out PlayerData* data)) {
                         if (data->RealTeam == e.WinningTeam) {
                             RuntimePlayer runtimePlayer = f.GetPlayerData(data->PlayerRef);
-                            winner = runtimePlayer?.PlayerNickname.ToValidUsername(f, data->PlayerRef);
+                            winner = runtimePlayer?.PlayerNickname.ToValidNickname(f, data->PlayerRef);
                         }
                     }
                     resultText = tm.GetTranslationWithReplacements("ui.result.playerwin", "playername", winner);

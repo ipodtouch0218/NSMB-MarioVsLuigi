@@ -33,7 +33,7 @@ namespace NSMB.UI.Game.Results {
             if (occupied) {
                 player = info.Value.PlayerRef;
 
-                usernameText.text = info.Value.Nickname.ToString().ToValidUsername(f, player);
+                usernameText.text = info.Value.Nickname.ToString().ToValidNickname(f, player);
                 nicknameColor = NicknameColor.Parse(info.Value.NicknameColor.ToString());
                 usernameText.color = nicknameColor.Sample();
                 characterIcon.sprite = f.FindAsset(f.SimulationConfig.CharacterDatas[info.Value.Character]).ReadySprite;

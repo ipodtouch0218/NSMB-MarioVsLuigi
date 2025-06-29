@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum;
-using System.Linq;
 using UnityEngine;
 
 namespace NSMB.UI.Game {
@@ -8,6 +7,9 @@ namespace NSMB.UI.Game {
 
         //---Serialize Variables
         [SerializeField] public PlayerElements playerElementsPrefab;
+
+        //---Private Variables
+        private PlayerElements spectatorUI;
 
         public override unsafe void OnActivate(Frame f) {
             if (f.Global->GameState > GameState.WaitingForPlayers) {
@@ -39,13 +41,19 @@ namespace NSMB.UI.Game {
         }
 
         public unsafe void CheckForSpectatorUI(Frame f) {
-            if (PlayerElements.AllPlayerElements.Any(pe => pe)) {
+            if (spectatorUI) {
                 return;
             }
 
+            foreach ((_, var playerData) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
+                if (!playerData->IsSpectator && Game.PlayerIsLocal(playerData->PlayerRef)) {
+                    return;
+                }
+            }
+
             // Create a new spectator-only PlayerElement
-            PlayerElements newPlayerElements = Instantiate(playerElementsPrefab, transform);
-            newPlayerElements.Initialize(Game, f, EntityRef.None, PlayerRef.None);
+            spectatorUI = Instantiate(playerElementsPrefab, transform);
+            spectatorUI.Initialize(Game, f, EntityRef.None, PlayerRef.None);
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {

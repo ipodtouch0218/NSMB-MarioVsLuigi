@@ -37,7 +37,7 @@ namespace Quantum {
                 FP alpha = 1 - QuantumUtils.EaseOut(1 - time);
                 return new FPVector2(
                     0,
-                    (marioShape.Box.Extents.Y * 2 * alpha) + holdableYOffset
+                    (marioShape.Box.Extents.Y * (2 - FP._0_05) * alpha) + holdableYOffset
                 );
             } else {
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);

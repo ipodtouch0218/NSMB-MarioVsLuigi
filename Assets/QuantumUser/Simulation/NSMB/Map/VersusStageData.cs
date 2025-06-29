@@ -8,6 +8,7 @@ public unsafe class VersusStageData : AssetObject {
     //---Properties
     public FPVector2 StageWorldMin => new FPVector2(TileOrigin.X, TileOrigin.Y) / 2 + TilemapWorldPosition;
     public FPVector2 StageWorldMax => new FPVector2(TileOrigin.X + TileDimensions.X, TileOrigin.Y + TileDimensions.Y) / 2 + TilemapWorldPosition;
+    public FPVector2 StageWorldMidpoint => (StageWorldMin + StageWorldMax) / 2;
 
     //---Serialized
     [Header("-- Information")]

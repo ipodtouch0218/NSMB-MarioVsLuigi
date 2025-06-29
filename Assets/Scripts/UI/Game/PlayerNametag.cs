@@ -130,7 +130,7 @@ namespace NSMB.UI.Game {
         public unsafe void UpdateCachedNickname(Frame f, MarioPlayer* mario) {
             RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
             if (runtimePlayer != null) {
-                cachedNickname = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
+                cachedNickname = runtimePlayer.PlayerNickname.ToValidNickname(f, mario->PlayerRef);
                 nicknameColor = NicknameColor.Parse(runtimePlayer.NicknameColor);
             }
         }

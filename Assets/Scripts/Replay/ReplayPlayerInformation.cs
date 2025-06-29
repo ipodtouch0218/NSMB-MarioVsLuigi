@@ -1,17 +1,16 @@
 using Quantum;
 using System.IO;
 
-namespace NSMB.Replay { 
-
+namespace NSMB.Replay {
     public struct ReplayPlayerInformation {
-        public string Username;
+        public string Nickname;
         public int FinalObjectiveCount;
         public byte Team;
         public byte Character;
         public PlayerRef PlayerRef;
 
         public void Serialize(BinaryWriter writer) {
-            writer.Write(Username);
+            writer.Write(Nickname);
             writer.Write(FinalObjectiveCount);
             writer.Write(Team);
             writer.Write(Character);
@@ -20,7 +19,7 @@ namespace NSMB.Replay {
 
         public static ReplayPlayerInformation Deserialize(BinaryReader reader) {
             return new ReplayPlayerInformation {
-                Username = reader.ReadString(),
+                Nickname = reader.ReadString(),
                 FinalObjectiveCount = reader.ReadInt32(),
                 Team = reader.ReadByte(),
                 Character = reader.ReadByte(),

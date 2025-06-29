@@ -134,7 +134,7 @@ namespace Quantum {
                 if ((iceBlock->IsSliding && iceBlock->FacingRight == rightContact) || mario->IsInShell) {
                     var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
                     bool dropStars = !f.Unsafe.TryGetPointer(holdable->PreviousHolder, out MarioPlayer* holderMario) || mario->GetTeam(f) != holderMario->GetTeam(f);
-                    bool damaged = mario->DoKnockback(f, marioEntity, contact.Normal.X > 0, dropStars ? 1 : 0, KnockbackStrength.Normal, iceBlockEntity);
+                    bool damaged = mario->DoKnockback(f, marioEntity, contact.Normal.X < 0, dropStars ? 1 : 0, KnockbackStrength.Normal, iceBlockEntity);
                     if (damaged) {
                         FPVector2 particlePos = (f.Unsafe.GetPointer<Transform2D>(marioEntity)->Position + f.Unsafe.GetPointer<Transform2D>(iceBlockEntity)->Position) / 2;
                         f.Events.PlayKnockbackEffect(marioEntity, iceBlockEntity, KnockbackStrength.Normal, particlePos);

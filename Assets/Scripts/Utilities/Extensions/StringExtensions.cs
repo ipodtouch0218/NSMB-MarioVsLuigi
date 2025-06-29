@@ -15,16 +15,16 @@ namespace NSMB.Utilities {
             return input;
         }
 
-        private static readonly string UsernameRegex = $"^[\\w]{{{NicknameMin},{NicknameMax}}}";
-        public static bool IsValidUsername(this string input) {
+        private static readonly string NicknameRegex = $"^[\\w]{{{NicknameMin},{NicknameMax}}}";
+        public static bool IsValidNickname(this string input) {
             if (input == null) {
                 return false;
             }
 
-            return Regex.IsMatch(input, UsernameRegex);
+            return Regex.IsMatch(input, NicknameRegex);
         }
 
-        public static unsafe string ToValidUsername(this string input, Frame f, PlayerRef player, bool discrim = true) {
+        public static unsafe string ToValidNickname(this string input, Frame f, PlayerRef player, bool discrim = true) {
             input ??= "";
 
             // Valid characters

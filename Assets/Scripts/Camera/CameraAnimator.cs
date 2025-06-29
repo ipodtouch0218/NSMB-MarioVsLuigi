@@ -152,7 +152,7 @@ namespace NSMB.Cameras {
             // Screenshake (ignores clamping)
             if (screenshakeTimer > 0) {
                 newPosition += new Vector3((UnityEngine.Random.value - 0.5f) * screenshakeTimer, (UnityEngine.Random.value - 0.5f) * screenshakeTimer);
-                screenshakeTimer -= Time.deltaTime;
+                screenshakeTimer -= Time.unscaledDeltaTime;
             }
 
             ourCamera.transform.position = newPosition;

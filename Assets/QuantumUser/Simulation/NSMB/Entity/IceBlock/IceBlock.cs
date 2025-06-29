@@ -31,8 +31,8 @@ namespace Quantum {
             }
 
             // Set location
-            ChildOffset = new FPVector2(0, childPhysicsCollider->Shape.Centroid.Y - childPhysicsCollider->Shape.Box.Extents.Y - FP._0_05);
-            transform->Position = childTransform->Position + ChildOffset + child->Offset + (FPVector2.Up * FP._0_05);
+            ChildOffset = new FPVector2(0, childPhysicsCollider->Shape.Centroid.Y - childPhysicsCollider->Shape.Box.Extents.Y - FP._0_05) + child->Offset;
+            transform->Position = childTransform->Position + ChildOffset - child->Offset + (FPVector2.Up * FP._0_05);
 
             // Set size
             FPVector2 extents = child->IceBlockSize / 2;

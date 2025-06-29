@@ -137,7 +137,7 @@ namespace NSMB.UI.Game {
             Frame f = PredictedFrame;
             if (f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
                 RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-                string username = runtimePlayer.PlayerNickname.ToValidUsername(f, mario->PlayerRef);
+                string username = runtimePlayer.PlayerNickname.ToValidNickname(f, mario->PlayerRef);
 
                 TranslationManager tm = GlobalController.Instance.translationManager;
                 spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);

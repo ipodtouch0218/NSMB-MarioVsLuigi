@@ -238,3 +238,23 @@ MonoBehaviour:
   PropellerLaunchVelocity:
     RawValue: 393216
   PropellerLaunchFrames: 60
+  IceBlockSmallSize:
+    X:
+      RawValue: 42598
+    Y:
+      RawValue: 45548
+  IceBlockBigSize:
+    X:
+      RawValue: 42598
+    Y:
+      RawValue: 78643
+  IceBlockSmallOffset:
+    X:
+      RawValue: 2294
+    Y:
+      RawValue: -3473
+  IceBlockBigOffset:
+    X:
+      RawValue: 0
+    Y:
+      RawValue: 0

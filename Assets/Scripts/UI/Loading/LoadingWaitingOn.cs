@@ -82,7 +82,7 @@ namespace NSMB.UI.Loading {
                         continue;
                     }
 
-                    loadingListBuilder.AppendLine(runtimePlayer.PlayerNickname.ToValidUsername(f, otherPlayerData->PlayerRef));
+                    loadingListBuilder.AppendLine(runtimePlayer.PlayerNickname.ToValidNickname(f, otherPlayerData->PlayerRef));
                 }
                 playerListParent.SetActive(true);
                 playerList.text = loadingListBuilder.ToString();
