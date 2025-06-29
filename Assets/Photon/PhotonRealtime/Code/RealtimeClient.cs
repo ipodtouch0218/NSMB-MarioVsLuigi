@@ -714,11 +714,8 @@ namespace Photon.Realtime
         private void CheckConnectSetupWebGl()
         {
             #if UNITY_WEBGL
-            if (this.RealtimePeer.TransportProtocol != ConnectionProtocol.WebSocket && this.RealtimePeer.TransportProtocol != ConnectionProtocol.WebSocketSecure)
-            {
                 Log.Warn("WebGL requires WebSockets. Switching TransportProtocol to WebSocketSecure.", this.LogLevel, this.LogPrefix);
                 this.AppSettings.Protocol = ConnectionProtocol.WebSocketSecure;
-            }
 
             this.AppSettings.EnableProtocolFallback = false; // no fallback on WebGL
             #endif
