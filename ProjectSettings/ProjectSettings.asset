@@ -55,7 +55,7 @@ PlayerSettings:
   mipStripping: 0
   numberOfMipsStripped: 0
   numberOfMipsStrippedPerMipmapLimitGroup: {}
-  m_StackTraceTypes: 010000000100000001000000010000000100000001000000
+  m_StackTraceTypes: 020000000200000001000000010000000200000001000000
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
   iosUseCustomAppBackgroundBehavior: 0
@@ -537,7 +537,8 @@ PlayerSettings:
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
-  m_TemplateCustomTags: {}
+  m_TemplateCustomTags:
+    PRODUCT_DESCRIPTION: 
   mobileMTRendering:
     Android: 1
     iPhone: 1
@@ -838,7 +839,7 @@ PlayerSettings:
     Stadia: QUANTUM_XY
     Standalone: QUANTUM_DISABLE_AI;QUANTUM_DISABLE_PHYSICS3D;QUANTUM_XY;QUANTUM_LOGLEVEL_WARN;QUANTUM_ENABLE_REMOTE_PROFILER
     VisionOS: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
-    WebGL: FUSION_WEAVER;FUSION2;QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
+    WebGL: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
     Windows Store Apps: FUSION_WEAVER;QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
     XboxOne: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN
     iPhone: QUANTUM_XY;QUANTUM_LOGLEVEL_WARN

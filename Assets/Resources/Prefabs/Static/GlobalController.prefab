@@ -8839,6 +8839,7 @@ MonoBehaviour:
   - {fileID: -6469537607060608100, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -6746097347225962745, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -176354558837914207, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 0}
   image: {fileID: 5474131616444625048}
@@ -30510,6 +30511,7 @@ MonoBehaviour:
   - {fileID: -6469537607060608100, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -6746097347225962745, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
   - {fileID: -176354558837914207, guid: f5b6861228aacd340a8f85e2b9fd2a61, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 0}
   image: {fileID: 7117306549404952500}
@@ -31478,7 +31480,7 @@ MonoBehaviour:
   label: {fileID: 2954740906220611341}
   loader: {fileID: 0}
   translationKey: ui.options.general.refreshnicknamecolor
-  hideOnWebGL: 1
+  hideOnWebGL: 0
   requireReconnect: 0
   button: {fileID: 2280346598116100141}
   backgroundImage: {fileID: 6749701896148542339}

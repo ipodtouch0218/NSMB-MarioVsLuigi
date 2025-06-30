@@ -9,10 +9,16 @@ using System.IO;
 using TMPro;
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Scripting;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.Replays {
     public class ReplayListEntry : MonoBehaviour {
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        public static extern void DownloadFile(string gameObjectName, string methodName, string filename, byte[] byteArray, int byteArraySize);
+#endif
 
         //---Properties
         public BinaryReplayFile ReplayFile { get; private set; }
@@ -172,8 +178,20 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void OnExportClick() {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            using MemoryStream stream = new();
+            Debug.Log("A");
+            long replaySize = ReplayFile.WriteToStream(stream);
+            Debug.Log("B " + replaySize);
+            byte[] byteArray = new byte[replaySize];
+            Debug.Log("C");
+            stream.Read(byteArray, 0, (int) replaySize);
+            Debug.Log("D");
+            DownloadFile(name, nameof(FileDownloadedCallback), ReplayFile.Header.GetDisplayName() + ".mvlreplay", byteArray, (int) replaySize);
+            Debug.Log("E");
+#else
             TranslationManager tm = GlobalController.Instance.translationManager;
-            StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, ReplayFile.Header.GetDisplayName(), "mvlreplay", (file) => {
+            StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, ReplayFile.Header.GetDisplayName(), ".mvlreplay", (file) => {
                 if (string.IsNullOrWhiteSpace(file)) {
                     return;
                 }
@@ -183,6 +201,12 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     ReplayFile.WriteToStream(stream);
                 }
             });
+#endif
+        }
+
+        [Preserve]        
+        private void FileDownloadedCallback() {
+
         }
 
         public void OnDeleteClick() {

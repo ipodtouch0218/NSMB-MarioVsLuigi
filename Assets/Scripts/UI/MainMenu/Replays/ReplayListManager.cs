@@ -22,6 +22,12 @@ using UnityEngine.UI;
 namespace NSMB.UI.MainMenu.Submenus.Replays {
     public class ReplayListManager : Selectable {
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        public static extern void UploadFile(string gameObjectName, string methodName, string filter, bool multiple);
+#endif
+
+        //---Static Variables
         public static ReplayListManager Instance { get; private set; }
         public static string ReplayDirectory => Path.Combine(Application.persistentDataPath, "replays");
         public static string TempDirectory => Path.Combine(ReplayDirectory, "temp");
@@ -350,32 +356,41 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnImportClicked() {
             TranslationManager tm = GlobalController.Instance.translationManager;
-            string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
 
-            foreach (var filepath in selected) {
-                ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromFile(filepath, true, out BinaryReplayFile parsedReplay);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            UploadFile(name, nameof(ImportFile), ".mvlreplay", false);
+#else
+            string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", ".mvlreplay", false);
+            if (selected != null && selected.Length > 0) {
+                ImportFile(selected[0]);
+            }
+#endif
+        }
 
-                if (parseResult == ReplayParseResult.Success) {
-                    // Move into the replays folder
-                    string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.Header.UnixTimestamp + ".mvlreplay");
-                    File.Copy(filepath, newPath, false);
+        public void ImportFile(string filepath) {
+            UnityEngine.Debug.Log(filepath);
+            ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromFile(filepath, true, out BinaryReplayFile parsedReplay);
 
-                    ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
-                    newReplayEntry.Initialize(this, parsedReplay);
-                    newReplayEntry.name = Path.GetFileName(filepath);
+            if (parseResult == ReplayParseResult.Success) {
+                // Move into the replays folder
+                string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.Header.UnixTimestamp + ".mvlreplay");
+                File.Copy(filepath, newPath, false);
 
-                    replays.Add(newReplayEntry);
-                    newReplayEntry.UpdateText();
-                    newReplayEntry.gameObject.SetActive(true);
-                    SortReplays();
+                ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
+                newReplayEntry.Initialize(this, parsedReplay);
+                newReplayEntry.name = Path.GetFileName(filepath);
 
-                    canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
+                replays.Add(newReplayEntry);
+                newReplayEntry.UpdateText();
+                newReplayEntry.gameObject.SetActive(true);
+                SortReplays();
 
-                    noReplaysText.text = "";
-                } else {
-                    GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
-                    UnityEngine.Debug.LogWarning($"[Replay] Failed to parse {filepath} as a replay: {parseResult}");
-                }
+                canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
+
+                noReplaysText.text = "";
+            } else {
+                GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
+                UnityEngine.Debug.LogWarning($"[Replay] Failed to parse {filepath} as a replay: {parseResult}");
             }
         }
 
