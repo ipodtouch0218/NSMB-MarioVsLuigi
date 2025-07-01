@@ -472,7 +472,7 @@ namespace Quantum {
             IsSliding = false;
             IsDrilling = false;
             WallslideLeft = WallslideRight = false;
-
+            
             f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop, attacker);
             return true;
         }
@@ -480,7 +480,8 @@ namespace Quantum {
         private static bool IsImmuneFromKnockbackStrength(KnockbackStrength currentStrength, KnockbackStrength newStrength) {
             return currentStrength == newStrength
                 || (currentStrength == KnockbackStrength.Groundpound && newStrength == KnockbackStrength.Normal)
-                || (currentStrength == KnockbackStrength.Normal && newStrength == KnockbackStrength.Groundpound);
+                || (currentStrength == KnockbackStrength.Normal && newStrength == KnockbackStrength.Groundpound)
+                || (currentStrength == KnockbackStrength.FireballBump && newStrength == KnockbackStrength.CollisionBump);
         }
 
         public void ResetKnockback(Frame f, EntityRef entity) {

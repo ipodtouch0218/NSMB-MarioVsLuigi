@@ -191,7 +191,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             Debug.Log("E");
 #else
             TranslationManager tm = GlobalController.Instance.translationManager;
-            StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, ReplayFile.Header.GetDisplayName(), ".mvlreplay", (file) => {
+            StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, ReplayFile.Header.GetDisplayName(), "mvlreplay", (file) => {
                 if (string.IsNullOrWhiteSpace(file)) {
                     return;
                 }

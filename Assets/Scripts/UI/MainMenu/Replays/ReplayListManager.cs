@@ -360,7 +360,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #if UNITY_WEBGL && !UNITY_EDITOR
             UploadFile(name, nameof(ImportFile), ".mvlreplay", false);
 #else
-            string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", ".mvlreplay", false);
+            string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
             if (selected != null && selected.Length > 0) {
                 ImportFile(selected[0]);
             }

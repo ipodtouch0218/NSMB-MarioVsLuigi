@@ -109,7 +109,7 @@ namespace NSMB.Sound {
             } else if (invincible) {
                 musicPlayer.Play(f.FindAsset(stage.InvincibleMusic));
             } else {
-                musicPlayer.Play(f.FindAsset(stage.MainMusic[f.Global->TotalGamesPlayed % stage.MainMusic.Length]));
+                musicPlayer.Play(f.FindAsset(stage.GetCurrentMusic(f)));
             }
 
             musicPlayer.FastMusic = speedup;

@@ -100,7 +100,6 @@ namespace NSMB.Sound {
             } else {
                 audioSource.clip = song.clip;
             }
-            audioSource.time = 0;
             audioSource.Play();
         }
     }

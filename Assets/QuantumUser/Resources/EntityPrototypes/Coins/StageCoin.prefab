@@ -111,6 +111,7 @@ MonoBehaviour:
   - {fileID: -3961342211389282260, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -2074995507315294404, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
   - {fileID: -6910632858783443427, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 388009723025345444}
   image: {fileID: 0}
@@ -141,6 +142,7 @@ MonoBehaviour:
   - {fileID: -2147016090, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
   - {fileID: -1407919888, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
   - {fileID: 1590919697, guid: 3b74d79c93c18cc458cbaa066afa628d, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 388009723025345444}
   image: {fileID: 0}
@@ -212,7 +214,7 @@ MonoBehaviour:
         Value: 0
     SourceCollider: {fileID: 0}
     Shape2D:
-      ShapeType: 4
+      ShapeType: 16
       PolygonCollider:
         Id:
           Value: 0
@@ -239,7 +241,88 @@ MonoBehaviour:
         RawValue: 0
       UserTag: 0
       IsPersistent: 1
-      CompoundShapes: []
+      CompoundShapes:
+      - ShapeType: 4
+        PolygonCollider:
+          Id:
+            Value: 0
+        CircleRadius:
+          RawValue: 0
+        CapsuleSize:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        EdgeExtent:
+          RawValue: 0
+        BoxExtents:
+          X:
+            RawValue: 14336
+          Y:
+            RawValue: 16384
+        PositionOffset:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 16384
+        RotationOffset:
+          RawValue: 0
+        UserTag: 123
+        IsSetFromSourceCollider: 0
+      - ShapeType: 4
+        PolygonCollider:
+          Id:
+            Value: 0
+        CircleRadius:
+          RawValue: 0
+        CapsuleSize:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        EdgeExtent:
+          RawValue: 0
+        BoxExtents:
+          X:
+            RawValue: 14336
+          Y:
+            RawValue: 16384
+        PositionOffset:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 16384
+        RotationOffset:
+          RawValue: 0
+        UserTag: 456
+        IsSetFromSourceCollider: 0
+      - ShapeType: 4
+        PolygonCollider:
+          Id:
+            Value: 0
+        CircleRadius:
+          RawValue: 0
+        CapsuleSize:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 0
+        EdgeExtent:
+          RawValue: 0
+        BoxExtents:
+          X:
+            RawValue: 14336
+          Y:
+            RawValue: 16384
+        PositionOffset:
+          X:
+            RawValue: 0
+          Y:
+            RawValue: 16384
+        RotationOffset:
+          RawValue: 0
+        UserTag: 78
+        IsSetFromSourceCollider: 0
     Shape3D:
       ShapeType: 0
       SphereRadius:
@@ -388,6 +471,7 @@ MonoBehaviour:
   sRenderer: {fileID: 388009723025345444}
   sparkles: {fileID: 3211784090180930644}
   looseCoin: 0
+  objectiveCoin: 0
 --- !u!82 &6321124393289553252
 AudioSource:
   m_ObjectHideFlags: 0

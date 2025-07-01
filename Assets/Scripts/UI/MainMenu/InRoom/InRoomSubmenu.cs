@@ -32,7 +32,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 }
 
                 Random.InitState(hostname.GetHashCode() + rngSeed);
-                return Random.ColorHSV(0f, 1f, 0.5f, 1f, 0f, 1f);
+                return Random.ColorHSV(0f, 1f, 0.5f, 1f, 0.8f, 1f);
             }
         }
         public unsafe override string Header {

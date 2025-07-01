@@ -143,9 +143,7 @@ namespace Quantum {
             if (koopa->IsKicked || beingHeld) {
                 // Destroy them
                 goomba->Kill(f, goombaEntity, koopaEntity, KillReason.Special);
-                if (beingHeld) {
-                    koopa->Kill(f, koopaEntity, goombaEntity, KillReason.Special);
-                }
+                koopa->Kill(f, koopaEntity, goombaEntity, KillReason.Special);
             } else {
                 EnemySystem.EnemyBumpTurnaround(f, koopaEntity, goombaEntity);
             }
@@ -158,6 +156,7 @@ namespace Quantum {
             bool eitherBeingHeld = f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityA)->Holder) || f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityB)->Holder);
             if (eitherBeingHeld || koopaA->IsKicked || koopaB->IsKicked) {
                 // Destroy them
+                koopaA->Kill(f, koopaEntityA, koopaEntityB, KillReason.Special);
                 koopaB->Kill(f, koopaEntityB, koopaEntityA, KillReason.Special);
             } else {
                 EnemySystem.EnemyBumpTurnaround(f, koopaEntityA, koopaEntityB);

@@ -46,6 +46,7 @@ namespace NSMB {
 
         //---Private Variables
         private Coroutine fadeMusicRoutine, fadeSfxRoutine, totalFadeRoutine;
+        private int previousVsyncCount, previousFrameRate;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void CreateInstance() {
@@ -133,26 +134,14 @@ namespace NSMB {
             }
         }
 
-#if UNITY_WEBGL
-    int previousVsyncCount;
-    int previousFrameRate;
-#endif
-
         public void OnApplicationFocus(bool focus) {
             if (focus) {
                 Settings.Instance.ApplyVolumeSettings();
                 this.StopCoroutineNullable(ref fadeMusicRoutine);
                 this.StopCoroutineNullable(ref fadeSfxRoutine);
 
-#if UNITY_WEBGL
-            // Lock framerate when losing focus to (hopefully) disable browsers slowing the game
-            previousVsyncCount = QualitySettings.vSyncCount;
-            previousFrameRate = Application.targetFrameRate;
-
-            QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = 30;
-#endif
-
+                QualitySettings.vSyncCount = previousVsyncCount;
+                Application.targetFrameRate = previousFrameRate;
             } else {
                 if (Settings.Instance.audioMuteMusicOnUnfocus) {
                     fadeMusicRoutine ??= StartCoroutine(FadeVolume("MusicVolume"));
@@ -162,10 +151,12 @@ namespace NSMB {
                     fadeSfxRoutine ??= StartCoroutine(FadeVolume("SoundVolume"));
                 }
 
-#if UNITY_WEBGL
-            QualitySettings.vSyncCount = previousVsyncCount;
-            Application.targetFrameRate = previousFrameRate;
-#endif
+                // Lock framerate when losing focus to (hopefully) disable browsers slowing the game
+                previousVsyncCount = QualitySettings.vSyncCount;
+                previousFrameRate = Application.targetFrameRate;
+
+                QualitySettings.vSyncCount = 0;
+                Application.targetFrameRate = 30;
             }
         }
 
