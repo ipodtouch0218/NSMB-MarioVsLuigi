@@ -731,7 +731,6 @@ namespace Quantum {
                             projected -= physicsObject->Gravity * f.DeltaTime;
                         }
 
-                        Debug.Log($"normal: {avgNormal}, new direction: {newDirection}, speed: {speed}, projected: {projected}");
                         newVelocity = projected;
                     }
                     hitObject = true;

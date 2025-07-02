@@ -214,7 +214,7 @@ MonoBehaviour:
         Value: 0
     SourceCollider: {fileID: 0}
     Shape2D:
-      ShapeType: 16
+      ShapeType: 4
       PolygonCollider:
         Id:
           Value: 0
@@ -268,60 +268,6 @@ MonoBehaviour:
         RotationOffset:
           RawValue: 0
         UserTag: 123
-        IsSetFromSourceCollider: 0
-      - ShapeType: 4
-        PolygonCollider:
-          Id:
-            Value: 0
-        CircleRadius:
-          RawValue: 0
-        CapsuleSize:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        EdgeExtent:
-          RawValue: 0
-        BoxExtents:
-          X:
-            RawValue: 14336
-          Y:
-            RawValue: 16384
-        PositionOffset:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 16384
-        RotationOffset:
-          RawValue: 0
-        UserTag: 456
-        IsSetFromSourceCollider: 0
-      - ShapeType: 4
-        PolygonCollider:
-          Id:
-            Value: 0
-        CircleRadius:
-          RawValue: 0
-        CapsuleSize:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 0
-        EdgeExtent:
-          RawValue: 0
-        BoxExtents:
-          X:
-            RawValue: 14336
-          Y:
-            RawValue: 16384
-        PositionOffset:
-          X:
-            RawValue: 0
-          Y:
-            RawValue: 16384
-        RotationOffset:
-          RawValue: 0
-        UserTag: 78
         IsSetFromSourceCollider: 0
     Shape3D:
       ShapeType: 0

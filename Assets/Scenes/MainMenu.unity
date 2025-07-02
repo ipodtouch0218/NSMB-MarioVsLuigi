@@ -32594,6 +32594,7 @@ GameObject:
   - component: {fileID: 659657645}
   - component: {fileID: 659657647}
   - component: {fileID: 659657646}
+  - component: {fileID: 659657648}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -32722,6 +32723,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 659657644}
   m_CullTransparentMesh: 1
+--- !u!114 &659657648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659657644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 932d6270c0b33c04591eac659f466f01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 659657646}
 --- !u!1 &666116848
 GameObject:
   m_ObjectHideFlags: 0
@@ -52917,12 +52931,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 501548763}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1086314065}
-          m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamButton,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -62883,12 +62898,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 501548763}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1342071687}
-          m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamButton,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -66321,12 +66337,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 501548763}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1439874741}
-          m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamButton,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -105117,12 +105134,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 501548763}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1789109366}
-          m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamButton,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -117518,7 +117536,7 @@ GameObject:
   - component: {fileID: 1977461212}
   - component: {fileID: 1977461211}
   m_Layer: 5
-  m_Name: Icon
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -120910,12 +120928,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 501548763}
-        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.TeamChooser, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamChooser, Assembly-CSharp
         m_MethodName: SelectTeam
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 2060928080}
-          m_ObjectArgumentAssemblyTypeName: TeamButton, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.MainMenu.Submenus.InRoom.TeamButton,
+            Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

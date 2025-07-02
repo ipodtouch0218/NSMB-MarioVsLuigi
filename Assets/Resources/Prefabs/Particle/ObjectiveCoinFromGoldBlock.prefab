@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4355208377236206565}
   - component: {fileID: 4355208377236206567}
   - component: {fileID: 4355208377236206564}
+  - component: {fileID: 1076229932442046675}
   m_Layer: 17
   m_Name: Graphics
   m_TagString: Untagged
@@ -82,7 +83,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.875, y: 1}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -110,6 +111,35 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1076229932442046675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4355208377236206570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDisplaying: 1
+  frame: 0
+  runInEditor: 0
+  fps: 24
+  frames:
+  - {fileID: 595918852289861335, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 845948447533366988, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -5313328981683241401, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -8417162070665421395, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  colorblindModeFrames:
+  - {fileID: -2128285509, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: 579779561, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -667571031, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  - {fileID: -1028925186, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
+  useUnscaledDelta: 0
+  sRenderer: {fileID: 4355208377236206567}
+  image: {fileID: 0}
 --- !u!1 &4355208377719065490
 GameObject:
   m_ObjectHideFlags: 0
