@@ -1,10 +1,13 @@
-<a href="https://ipodtouch0218.itch.io/nsmb-mariovsluigi">
-  <p align="center">
-    <img src="https://raw.githubusercontent.com/ipodtouch0218/NSMB-MarioVsLuigi/master/Assets/Sprites/UI/Menu/Title.png?raw=true" alt="NSMB-MarioVsLuigi Logo" width="350px">
-  </p>
-</a>
+<p align="center">
+  <a href="https://ipodtouch0218.itch.io/nsmb-mariovsluigi">
+    <img src="https://raw.githubusercontent.com/ipodtouch0218/NSMB-MarioVsLuigi/refs/heads/nightly/Assets/Sprites/UI/Menu/title-vector.svg?raw=true" alt="Mario vs Luigi Online Logo" width="650px">
+  </a>
+</p>
+<p align="center"><sub><sup><i>Mario vs Luigi Online Logo by zomblebobble, BluCorDev. INFENEK GAMES Logo by TheBluePixeling</i></sup></sub></p>
 
-A unity-standalone 2-10 player remake of the Mario vs. Luigi gamemode from the New Super Mario Bros DS download game. 
+---
+
+A Unity-standalone 2-10 player remake of the Mario vs. Luigi gamemode from the New Super Mario Bros DS download game. 
 
 Includes the 5 default levels (Grassland, Bricks, Castle, Pipes, and Ice), along with a handful of custom levels to battle on! 
 All power-ups are included and remain faithful to their original counterparts, along with the new addition of the Propeller Suit, Ice Flower, and Hammer Suit!
@@ -180,3 +183,10 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * xFrostyCake123 (Sound)
 
 </details>
+
+---
+<p align="center">
+  <a href="https://twitter.com/ipodtouch0218">
+    <img src="https://raw.githubusercontent.com/ipodtouch0218/NSMB-MarioVsLuigi/refs/heads/nightly/Assets/Sprites/UI/Menu/logo.png" alt="INFENEK GAMES Logo" width="240px">
+  </a>
+</p>
