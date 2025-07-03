@@ -99,8 +99,12 @@ namespace NSMB.Utilities.Extensions {
         }
 
         //easy sound clips
-        public static void PlayOneShot(this AudioSource source, SoundEffect clip, CharacterAsset character = null, byte variant = 0, float volume = 1f) {
+        public static void PlayOneShot(this AudioSource source, SoundEffect clip, CharacterAsset character = null, int variant = 0, float volume = 1f) {
             source.PlayOneShot(clip.GetClip(character, variant), volume);
+        }
+
+        public static void PlayOneShot(this AudioSource source, SoundEffectDataAttribute data, CharacterAsset character = null, int variant = 0, float volume = 1f) {
+            source.PlayOneShot(data.GetClip(character, variant), volume);
         }
 
         public static void SetLossyScale(this Transform transform, Vector3 lossyScale) {

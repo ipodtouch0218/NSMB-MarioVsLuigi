@@ -148,7 +148,15 @@ public static partial class AttributeExtensions {
     private static readonly Dictionary<string, AudioClip> CachedClips = new();
 
     public static AudioClip GetClip(this SoundEffect soundEffect, CharacterAsset player = null, int variant = 0) {
-        string name = "Sound/" + GetClipString(soundEffect) + (variant > 0 ? "_" + variant : "");
+        if (!CachedDatas.TryGetValue(soundEffect, out SoundEffectDataAttribute data)) {
+            data = CachedDatas[soundEffect] = soundEffect.GetSoundData();
+        }
+
+        return data.GetClip(player, variant);
+    }
+
+    public static AudioClip GetClip(this SoundEffectDataAttribute data, CharacterAsset player = null, int variant = 0) {
+        string name = "Sound/" + data.Sound + (variant > 0 ? "_" + variant : "");
 
         if (player != null) {
             name = name.Replace("{char}", player.SoundFolder);
@@ -166,13 +174,5 @@ public static partial class AttributeExtensions {
     public static SoundEffectDataAttribute GetSoundData(this SoundEffect soundEffect) {
         // Dirty reflection to get data out of an attribute
         return soundEffect.GetType().GetMember(soundEffect.ToString())[0].GetCustomAttribute<SoundEffectDataAttribute>();
-    }
-
-    private static string GetClipString(SoundEffect soundEffect) {
-        if (!CachedDatas.TryGetValue(soundEffect, out SoundEffectDataAttribute data)) {
-            data = CachedDatas[soundEffect] = soundEffect.GetSoundData();
-        }
-
-        return data.Sound;
     }
 }
