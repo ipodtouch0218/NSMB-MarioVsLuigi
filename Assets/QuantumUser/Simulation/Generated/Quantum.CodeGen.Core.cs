@@ -3273,6 +3273,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnMarioPlayerTakeDamage : ISignal {
     void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage);
   }
+  public unsafe partial interface ISignalOnMarioPlayerGroundpoundedSolid : ISignal {
+    void OnMarioPlayerGroundpoundedSolid(Frame f, EntityRef mario, PhysicsContact contact, ref QBoolean continueGroundpound);
+  }
   public unsafe partial interface ISignalOnEntityChangeUnderwaterState : ISignal {
     void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater);
   }
@@ -3553,6 +3556,7 @@ namespace Quantum {
     private ISignalOnMarioPlayerBecameInvincible[] _ISignalOnMarioPlayerBecameInvincibleSystems;
     private ISignalOnMarioPlayerDropObjective[] _ISignalOnMarioPlayerDropObjectiveSystems;
     private ISignalOnMarioPlayerTakeDamage[] _ISignalOnMarioPlayerTakeDamageSystems;
+    private ISignalOnMarioPlayerGroundpoundedSolid[] _ISignalOnMarioPlayerGroundpoundedSolidSystems;
     private ISignalOnEntityChangeUnderwaterState[] _ISignalOnEntityChangeUnderwaterStateSystems;
     private ISignalOnEntityCrushed[] _ISignalOnEntityCrushedSystems;
     private ISignalOnMarioPlayerCollectedPowerup[] _ISignalOnMarioPlayerCollectedPowerupSystems;
@@ -3595,6 +3599,7 @@ namespace Quantum {
       _ISignalOnMarioPlayerBecameInvincibleSystems = BuildSignalsArray<ISignalOnMarioPlayerBecameInvincible>();
       _ISignalOnMarioPlayerDropObjectiveSystems = BuildSignalsArray<ISignalOnMarioPlayerDropObjective>();
       _ISignalOnMarioPlayerTakeDamageSystems = BuildSignalsArray<ISignalOnMarioPlayerTakeDamage>();
+      _ISignalOnMarioPlayerGroundpoundedSolidSystems = BuildSignalsArray<ISignalOnMarioPlayerGroundpoundedSolid>();
       _ISignalOnEntityChangeUnderwaterStateSystems = BuildSignalsArray<ISignalOnEntityChangeUnderwaterState>();
       _ISignalOnEntityCrushedSystems = BuildSignalsArray<ISignalOnEntityCrushed>();
       _ISignalOnMarioPlayerCollectedPowerupSystems = BuildSignalsArray<ISignalOnMarioPlayerCollectedPowerup>();
@@ -3967,6 +3972,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnMarioPlayerTakeDamage(_f, entity, ref keepDamage);
+          }
+        }
+      }
+      public void OnMarioPlayerGroundpoundedSolid(EntityRef mario, PhysicsContact contact, ref QBoolean continueGroundpound) {
+        var array = _f._ISignalOnMarioPlayerGroundpoundedSolidSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnMarioPlayerGroundpoundedSolid(_f, mario, contact, ref continueGroundpound);
           }
         }
       }

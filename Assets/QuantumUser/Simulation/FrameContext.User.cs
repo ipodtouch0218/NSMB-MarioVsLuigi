@@ -30,7 +30,7 @@ namespace Quantum {
         public class InteractionContext {
 
             public delegate void HitboxInteractor(Frame f, EntityRef firstEntity, EntityRef secondEntity);
-            public delegate void PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
+            public delegate bool PlatformInteractor(Frame f, EntityRef entity, EntityRef platformEntity, PhysicsContact contact);
 
             public readonly List<(int, int)> hitboxInteractorMap = new();
             public readonly List<HitboxInteractor> hitboxInteractors = new();

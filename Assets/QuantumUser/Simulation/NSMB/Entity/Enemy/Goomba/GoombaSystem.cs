@@ -101,7 +101,7 @@ namespace Quantum {
             }
         }
 
-        public static void OnGoombaIceBlockInteraction(Frame f, EntityRef goombaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static bool OnGoombaIceBlockInteraction(Frame f, EntityRef goombaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -111,6 +111,7 @@ namespace Quantum {
 
                 goomba->Kill(f, goombaEntity, iceBlockEntity, KillReason.Special);
             }
+            return false;
         }
 
         public static void OnGoombaProjectileInteraction(Frame f, EntityRef goombaEntity, EntityRef projectileEntity) {

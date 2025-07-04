@@ -307,7 +307,7 @@ namespace Quantum {
             }
         }
         
-        public static void OnKoopaIceBlockInteraction(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static bool OnKoopaIceBlockInteraction(Frame f, EntityRef koopaEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -319,6 +319,7 @@ namespace Quantum {
             if (koopa->IsInShell && koopa->IsKicked) {
                 IceBlockSystem.Destroy(f, iceBlockEntity, IceBlockBreakReason.Other);
             }
+            return false;
         }
 
         public static void OnKoopaCoinInteraction(Frame f, EntityRef koopaEntity, EntityRef coinEntity) {
