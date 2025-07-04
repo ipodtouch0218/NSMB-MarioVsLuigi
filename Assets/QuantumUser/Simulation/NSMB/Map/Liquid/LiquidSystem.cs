@@ -5,48 +5,54 @@ namespace Quantum {
     public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnTriggerEnter2D, ISignalOnTrigger2D, ISignalOnTriggerExit2D {
 
         public void OnTriggerEnter2D(Frame f, TriggerInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
-                || !f.Unsafe.TryGetPointer(info.Other, out Transform2D* liquidTransform)
-                || !f.Unsafe.TryGetPointer(info.Entity, out Transform2D* entityTransform)
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsCollider2D* entityCollider)
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* entityPhysicsObject)) {
+            EntityRef physicsObjectEntity = info.Entity;
+            EntityRef liquidEntity = info.Other;
+
+            if (!f.Unsafe.TryGetPointer(liquidEntity, out Liquid* liquid)
+                || !f.Unsafe.TryGetPointer(liquidEntity, out Transform2D* liquidTransform)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out Transform2D* entityTransform)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out PhysicsCollider2D* entityCollider)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out PhysicsObject* entityPhysicsObject)) {
                 return;
             }
 
             bool callSignals = true;
-            if (f.Unsafe.TryGetPointer(info.Entity, out Interactable* interactable)
+            if (f.Unsafe.TryGetPointer(physicsObjectEntity, out Interactable* interactable)
                 && interactable->ColliderDisabled) {
                 callSignals = false;
             } 
 
             FP surface = liquid->GetSurfaceHeight(liquidTransform);
-            FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y - entityPhysicsObject->Velocity.Y;
+            FP checkHeight = entityTransform->Position.Y + entityCollider->Shape.Centroid.Y - (entityPhysicsObject->Velocity.Y * f.DeltaTime);
             bool isEntityUnderwater = checkHeight <= surface;
 
             QHashSet<EntityRef> splashed = f.ResolveHashSet(liquid->SplashedEntities);
-            if (!splashed.Contains(info.Entity)) {
+            if (!splashed.Contains(physicsObjectEntity)) {
                 // Enter splash
-                splashed.Add(info.Entity);
+                splashed.Add(physicsObjectEntity);
 
                 var colliders = f.ResolveHashSet(entityPhysicsObject->LiquidContacts);
-                colliders.Add(info.Other);
+                colliders.Add(liquidEntity);
 
                 if (callSignals) {
                     bool doSplash = !isEntityUnderwater;
-                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, false, &doSplash);
+                    f.Signals.OnTryLiquidSplash(physicsObjectEntity, liquidEntity, false, &doSplash);
                     if (doSplash) {
-                        f.Events.LiquidSplashed(info.Other, info.Entity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), false);
+                        f.Events.LiquidSplashed(liquidEntity, physicsObjectEntity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), false);
                     }
                 }
             }
         }
 
         public void OnTrigger2D(Frame f, TriggerInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
-                || !f.Unsafe.TryGetPointer(info.Other, out Transform2D* liquidTransform)
-                || !f.Unsafe.TryGetPointer(info.Entity, out Transform2D* entityTransform)
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsCollider2D* entityCollider)
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* entityPhysicsObject)) {
+            EntityRef physicsObjectEntity = info.Entity;
+            EntityRef liquidEntity = info.Other;
+
+            if (!f.Unsafe.TryGetPointer(liquidEntity, out Liquid* liquid)
+                || !f.Unsafe.TryGetPointer(liquidEntity, out Transform2D* liquidTransform)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out Transform2D* entityTransform)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out PhysicsCollider2D* entityCollider)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out PhysicsObject* entityPhysicsObject)) {
                 return;
             }
 
@@ -55,23 +61,26 @@ namespace Quantum {
             bool isEntityUnderwater = checkHeight <= surface;
 
             QHashSet<EntityRef> underwater = f.ResolveHashSet(liquid->UnderwaterEntities);
-            if (isEntityUnderwater && !underwater.Contains(info.Entity)) {
+            if (isEntityUnderwater && !underwater.Contains(physicsObjectEntity)) {
                 // Enter state
-                underwater.Add(info.Entity);
-                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, true);
-            } else if (!isEntityUnderwater && underwater.Contains(info.Entity)) {
+                underwater.Add(physicsObjectEntity);
+                f.Signals.OnEntityEnterExitLiquid(physicsObjectEntity, liquidEntity, true);
+            } else if (!isEntityUnderwater && underwater.Contains(physicsObjectEntity)) {
                 // Exit state
-                underwater.Remove(info.Entity);
-                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
+                underwater.Remove(physicsObjectEntity);
+                f.Signals.OnEntityEnterExitLiquid(physicsObjectEntity, liquidEntity, false);
             }
         }
 
         public void OnTriggerExit2D(Frame f, ExitInfo2D info) {
-            if (!f.Unsafe.TryGetPointer(info.Other, out Liquid* liquid)
-                || !f.Unsafe.TryGetPointer(info.Other, out Transform2D* liquidTransform)
-                || !f.Unsafe.TryGetPointer(info.Entity, out Transform2D* entityTransform)
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsCollider2D* entityCollider)
-                || !f.Unsafe.TryGetPointer(info.Entity, out PhysicsObject* entityPhysicsObject)) {
+            EntityRef physicsObjectEntity = info.Entity;
+            EntityRef liquidEntity = info.Other;
+
+            if (!f.Unsafe.TryGetPointer(liquidEntity, out Liquid* liquid)
+                || !f.Unsafe.TryGetPointer(liquidEntity, out Transform2D* liquidTransform)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out Transform2D* entityTransform)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out PhysicsCollider2D* entityCollider)
+                || !f.Unsafe.TryGetPointer(physicsObjectEntity, out PhysicsObject* entityPhysicsObject)) {
                 return;
             }
 
@@ -81,7 +90,7 @@ namespace Quantum {
 
 
             bool callSignals = true;
-            if (f.Unsafe.TryGetPointer(info.Entity, out Interactable* interactable)
+            if (f.Unsafe.TryGetPointer(physicsObjectEntity, out Interactable* interactable)
                 && interactable->ColliderDisabled) {
                 callSignals = false;
             }
@@ -89,26 +98,26 @@ namespace Quantum {
             QHashSet<EntityRef> splashed = f.ResolveHashSet(liquid->SplashedEntities);
             QHashSet<EntityRef> underwater = f.ResolveHashSet(liquid->UnderwaterEntities);
 
-            if (splashed.Remove(info.Entity)) {
+            if (splashed.Remove(physicsObjectEntity)) {
                 // Exit splash
                 // "checkHeight - surface < 1" prevents teleportation splashes
 
                 var colliders = f.ResolveHashSet(entityPhysicsObject->LiquidContacts);
-                colliders.Remove(info.Other);
+                colliders.Remove(liquidEntity);
 
                 if (callSignals) {
                     bool doSplash = !isEntityUnderwater && (f.Number - entityTransform->PositionTeleportFrame) > 3;
-                    f.Signals.OnTryLiquidSplash(info.Entity, info.Other, true, &doSplash);
+                    f.Signals.OnTryLiquidSplash(physicsObjectEntity, liquidEntity, true, &doSplash);
 
                     if (doSplash) {
-                        f.Events.LiquidSplashed(info.Other, info.Entity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
+                        f.Events.LiquidSplashed(liquidEntity, physicsObjectEntity, FPMath.Abs(entityPhysicsObject->Velocity.Y), new FPVector2(entityTransform->Position.X, surface), true);
                     }
                 }
             }
 
-            if (underwater.Remove(info.Entity)) {
+            if (underwater.Remove(physicsObjectEntity)) {
                 // Exit state
-                f.Signals.OnEntityEnterExitLiquid(info.Entity, info.Other, false);
+                f.Signals.OnEntityEnterExitLiquid(physicsObjectEntity, liquidEntity, false);
             }
         }
     }
