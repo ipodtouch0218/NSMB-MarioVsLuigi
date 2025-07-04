@@ -360,12 +360,12 @@ namespace NSMB.Entities.Player {
                 if (mario->IsInKnockback && (physicsObject->IsUnderwater || mario->IsInWeakKnockback)) {
                     right = mario->KnockbackWasOriginallyFacingRight;
                 }
-                modelRotationTarget = Quaternion.Euler(0, right ? 110 : 250, 0);
+                modelRotationTarget = Quaternion.Euler(0, right ? 108 : 252, 0);
                 modelRotateInstantly = true;
 
             } else if (mario->IsDead) {
                 if (mario->FireDeath && mario->DeathAnimationFrames == 0) {
-                    modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 110 : 250, 0);
+                    modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 108 : 252, 0);
                 } else {
                     modelRotationTarget = Quaternion.Euler(0, 180, 0);
                 }
@@ -379,7 +379,7 @@ namespace NSMB.Entities.Player {
 
             } else if (wasTurnaround || mario->IsSkidding || mario->IsTurnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
                 bool flip = mario->FacingRight ^ (animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround") || mario->IsSkidding);
-                modelRotationTarget = Quaternion.Euler(0, flip ? 250 : 110, 0);
+                modelRotationTarget = Quaternion.Euler(0, flip ? 252 : 108, 0);
                 modelRotateInstantly = true;
 
             } else if (f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* spinner)
@@ -395,9 +395,9 @@ namespace NSMB.Entities.Player {
                 modelRotateInstantly = true;
 
             } else if (mario->IsWallsliding) {
-                modelRotationTarget = Quaternion.Euler(0, mario->WallslideRight ? 110 : 250, 0);
+                modelRotationTarget = Quaternion.Euler(0, mario->WallslideRight ? 108 : 252, 0);
             } else {
-                modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 110 : 250, 0);
+                modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? 108 : 252, 0);
             }
 
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((mario->IsSpinnerFlying || mario->IsPropellerFlying || mario->UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
