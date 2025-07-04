@@ -17,6 +17,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.Replays {
@@ -300,7 +301,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
                     newReplayEntry.Initialize(this, replay);
                     newReplayEntry.UpdateText();
-                    newReplayEntry.name = Path.GetFileName(filepath);
+                    newReplayEntry.name = newReplayEntry.ReplayFile.Header.GetDisplayName();
                     newReplayEntry.gameObject.SetActive(true);
                     replays.Add(newReplayEntry);
 
@@ -362,23 +363,39 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #else
             string[] selected = StandaloneFileBrowser.OpenFilePanel(tm.GetTranslation("ui.extras.replays.actions.import"), "", "mvlreplay", false);
             if (selected != null && selected.Length > 0) {
-                ImportFile(selected[0]);
+                StartCoroutine(ImportFile(selected[0]));
             }
 #endif
         }
 
-        public void ImportFile(string filepath) {
-            UnityEngine.Debug.Log(filepath);
-            ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromFile(filepath, true, out BinaryReplayFile parsedReplay);
+        private IEnumerator ImportFile(string filepath) {
+#if UNITY_WEBGL
+            using UnityWebRequest downloadRequest = new(filepath, "GET");
+            downloadRequest.downloadHandler = new DownloadHandlerBuffer();
+            yield return downloadRequest.SendWebRequest();
+            while (!downloadRequest.downloadHandler.isDone) {
+                yield return null;
+            }
+            byte[] replay = ((DownloadHandlerBuffer) downloadRequest.downloadHandler).data;
+            using MemoryStream memStream = new MemoryStream(replay);
 
+            ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromStream(memStream, true, out BinaryReplayFile parsedReplay);
+#else
+            ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromFile(filepath, true, out BinaryReplayFile parsedReplay);
+#endif
             if (parseResult == ReplayParseResult.Success) {
                 // Move into the replays folder
                 string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.Header.UnixTimestamp + ".mvlreplay");
+#if UNITY_WEBGL && !UNITY_EDITOR
+                File.WriteAllBytes(newPath, replay);
+#else
                 File.Copy(filepath, newPath, false);
+#endif
+                parsedReplay.FilePath = newPath;
 
                 ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
                 newReplayEntry.Initialize(this, parsedReplay);
-                newReplayEntry.name = Path.GetFileName(filepath);
+                newReplayEntry.name = newReplayEntry.ReplayFile.Header.GetDisplayName();
 
                 replays.Add(newReplayEntry);
                 newReplayEntry.UpdateText();
@@ -392,6 +409,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 GlobalController.Instance.sfx.PlayOneShot(SoundEffect.UI_Error);
                 UnityEngine.Debug.LogWarning($"[Replay] Failed to parse {filepath} as a replay: {parseResult}");
             }
+            yield return null;
         }
 
         public void UpdateReplayNavigation(int? selectIndex = null) {

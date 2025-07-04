@@ -60,7 +60,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [AprilShade](https://github.com/AprilShade)
 * [ArianLust](https://github.com/ArianLust)
 * [AtwerJ](https://github.com/AtwerJ)
-* [Ave](https://github.com/AutumnLeafy)
+* [Ave](https://github.com/AutumnLeafDev)
 * [BluCorDev](https://github.com/BluCorDev)
 * [Cubby Crazes](https://github.com/CubbyCrazes)
 * [davart154](https://github.com/davart154)
@@ -70,7 +70,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [Jeffjewett27](https://github.com/Jeffjewett27)
 * [KingKittyTurnip](https://github.com/KingKittyTurnip)
 * [kittenchilly](https://github.com/kittenchilly)
-* [Kraken](https://github.com/KrakHub)
+* [Kraken](https://github.com/McKrak)
 * [MiiBumm](https://github.com/MiiBumm)
 * [mindnomad](https://github.com/mindnomad)
 * [Pordrack](https://github.com/Pordrack)
@@ -136,6 +136,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 
 ### QA Testing:
 * AprilShade
+* ArianLust
 * Ave
 * CreativeGhost
 * Cubby Crazes

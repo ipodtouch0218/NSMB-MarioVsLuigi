@@ -44,7 +44,7 @@ namespace Quantum {
                     if (FPMath.Abs(FPVector2.Dot(contact.Normal, FPVector2.Up)) < PhysicsObjectSystem.GroundMaxAngle) {
                         // Wall touch
                         invertX = true;
-                    } else {
+                    } else if (FPVector2.Dot(contact.Normal, FPVector2.Up) >= PhysicsObjectSystem.GroundMaxAngle) {
                         // Ground touch
                         applyFriction = true;
                         if (physicsObject->PreviousFrameVelocity.Y < -BounceThreshold) {

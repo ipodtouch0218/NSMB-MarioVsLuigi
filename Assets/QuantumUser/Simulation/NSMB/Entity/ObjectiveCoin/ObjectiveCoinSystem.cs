@@ -85,6 +85,39 @@ namespace Quantum {
             }
         }
 
+        public static void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam, bool selfDamage) {
+            if (amount <= 0) {
+                return;
+            }
+
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var gamemode = f.FindAsset(f.Global->Rules.Gamemode) as CoinRunnersGamemode;
+            for (int i = 0; i < amount; i++) {
+                EntityRef newCoin = f.Create(gamemode.ObjectiveCoinPrototype);
+                var transform = f.Unsafe.GetPointer<Transform2D>(newCoin);
+                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(newCoin);
+
+                transform->Position = origin;
+
+                FP range = 100;
+                FP angle = f.RNG->Next(0, range / 2) - f.RNG->Next(0, range / 2) + 90;
+                physicsObject->Velocity = FPVector2.Rotate(FPVector2.Right, angle * FP.Deg2Rad);
+                FP dot = FPVector2.Dot(physicsObject->Velocity, FPVector2.Up);
+                physicsObject->Velocity *= dot * 7;
+
+                if (origin.Y < stage.StageWorldMin.Y) {
+                    physicsObject->Velocity.Y += 7;
+                }
+
+                var coin = f.Unsafe.GetPointer<ObjectiveCoin>(newCoin);
+                coin->UncollectableByTeam = exludeTeam;
+                coin->SpawnedViaSelfDamage = selfDamage;
+            }
+
+            f.Events.CoinGroupSpawned(origin, amount);
+        }
+
+
         public void OnMarioPlayerDropObjective(Frame f, EntityRef entity, int amount, EntityRef attacker) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
@@ -145,6 +178,7 @@ namespace Quantum {
             starCoin->Collector = marioEntity;
             f.Events.MarioPlayerCollectedStarCoin(marioEntity, starCoinEntity);
             f.Events.MarioPlayerObjectiveCoinsChanged(marioEntity);
+            GameLogicSystem.CheckForGameEnd(f);
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
@@ -154,38 +188,6 @@ namespace Quantum {
 
             mario->GamemodeData.CoinRunners->ObjectiveCoins -= mario->GamemodeData.CoinRunners->ObjectiveCoins / 5;
             f.Events.MarioPlayerObjectiveCoinsChanged(entity);
-        }
-
-        public static void SpawnObjectiveCoins(Frame f, FPVector2 origin, int amount, byte exludeTeam, bool selfDamage) {
-            if (amount <= 0) {
-                return;
-            }
-
-            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            var gamemode = f.FindAsset(f.Global->Rules.Gamemode) as CoinRunnersGamemode;
-            for (int i = 0; i < amount; i++) {
-                EntityRef newCoin = f.Create(gamemode.ObjectiveCoinPrototype);
-                var transform = f.Unsafe.GetPointer<Transform2D>(newCoin);
-                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(newCoin);
-
-                transform->Position = origin;
-
-                FP range = 100;
-                FP angle = f.RNG->Next(0, range / 2) - f.RNG->Next(0, range / 2) + 90;
-                physicsObject->Velocity = FPVector2.Rotate(FPVector2.Right, angle * FP.Deg2Rad);
-                FP dot = FPVector2.Dot(physicsObject->Velocity, FPVector2.Up);
-                physicsObject->Velocity *= dot * 7;
-
-                if (origin.Y < stage.StageWorldMin.Y) {
-                    physicsObject->Velocity.Y += 7;
-                }
-
-                var coin = f.Unsafe.GetPointer<ObjectiveCoin>(newCoin);
-                coin->UncollectableByTeam = exludeTeam;
-                coin->SpawnedViaSelfDamage = selfDamage;
-            }
-
-            f.Events.CoinGroupSpawned(origin, amount);
         }
 
         public void OnMarioPlayerCollectedCoin(Frame f, EntityRef marioEntity, EntityRef coinEntity, FPVector2 worldLocation, QBoolean fromBlock, QBoolean downwards) {
@@ -199,6 +201,7 @@ namespace Quantum {
 
             f.Events.MarioPlayerCollectedObjectiveCoin(marioEntity);
             f.Events.MarioPlayerObjectiveCoinsChanged(marioEntity);
+            GameLogicSystem.CheckForGameEnd(f);
         }
     }
 }

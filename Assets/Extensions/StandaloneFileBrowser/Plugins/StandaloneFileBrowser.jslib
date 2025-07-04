@@ -9,9 +9,9 @@ var StandaloneFileBrowserWebGLPlugin = {
     //     Custom: ".plist, .xml, .yaml"
     // multiselect: Allows multiple file selection
     UploadFile: function(gameObjectNamePtr, methodNamePtr, filterPtr, multiselect) {
-        gameObjectName = Pointer_stringify(gameObjectNamePtr);
-        methodName = Pointer_stringify(methodNamePtr);
-        filter = Pointer_stringify(filterPtr);
+        gameObjectName = UTF8ToString(gameObjectNamePtr);
+        methodName = UTF8ToString(methodNamePtr);
+        filter = UTF8ToString(filterPtr);
 
         // Delete if element exist
         var fileInput = document.getElementById(gameObjectName)
@@ -22,8 +22,7 @@ var StandaloneFileBrowserWebGLPlugin = {
         fileInput = document.createElement('input');
         fileInput.setAttribute('id', gameObjectName);
         fileInput.setAttribute('type', 'file');
-        fileInput.setAttribute('style','display:none;');
-        fileInput.setAttribute('style','visibility:hidden;');
+        fileInput.setAttribute('style','display:none; visibility:hidden;');
         if (multiselect) {
             fileInput.setAttribute('multiple', '');
         }
@@ -48,10 +47,13 @@ var StandaloneFileBrowserWebGLPlugin = {
         }
         document.body.appendChild(fileInput);
 
-        document.onmouseup = function() {
+		fileInput.click();
+        /*
+		document.onmouseup = function() {
             fileInput.click();
             document.onmouseup = null;
         }
+		*/
     },
 
     // Save file
@@ -62,9 +64,9 @@ var StandaloneFileBrowserWebGLPlugin = {
     // byteArray: byte[]
     // byteArraySize: byte[].Length
     DownloadFile: function(gameObjectNamePtr, methodNamePtr, filenamePtr, byteArray, byteArraySize) {
-        gameObjectName = Pointer_stringify(gameObjectNamePtr);
-        methodName = Pointer_stringify(methodNamePtr);
-        filename = Pointer_stringify(filenamePtr);
+        gameObjectName = UTF8ToString(gameObjectNamePtr);
+        methodName = UTF8ToString(methodNamePtr);
+        filename = UTF8ToString(filenamePtr);
 
         var bytes = new Uint8Array(byteArraySize);
         for (var i = 0; i < byteArraySize; i++) {
@@ -73,17 +75,16 @@ var StandaloneFileBrowserWebGLPlugin = {
 
         var downloader = window.document.createElement('a');
         downloader.setAttribute('id', gameObjectName);
+        downloader.setAttribute('style','display:none; visibility:hidden;');
         downloader.href = window.URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
         downloader.download = filename;
         document.body.appendChild(downloader);
 
-        document.onmouseup = function() {
-            downloader.click();
-            document.body.removeChild(downloader);
-        	document.onmouseup = null;
+		downloader.click();
+		document.body.removeChild(downloader);
+		document.onmouseup = null;
 
-            SendMessage(gameObjectName, methodName);
-        }
+		SendMessage(gameObjectName, methodName);
     }
 };
 

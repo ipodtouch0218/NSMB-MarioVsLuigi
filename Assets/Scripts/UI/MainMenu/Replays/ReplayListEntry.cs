@@ -179,16 +179,11 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnExportClick() {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            using MemoryStream stream = new();
-            Debug.Log("A");
-            long replaySize = ReplayFile.WriteToStream(stream);
-            Debug.Log("B " + replaySize);
-            byte[] byteArray = new byte[replaySize];
-            Debug.Log("C");
-            stream.Read(byteArray, 0, (int) replaySize);
-            Debug.Log("D");
-            DownloadFile(name, nameof(FileDownloadedCallback), ReplayFile.Header.GetDisplayName() + ".mvlreplay", byteArray, (int) replaySize);
-            Debug.Log("E");
+            if (ReplayFile.LoadAllIfNeeded() == ReplayParseResult.Success) {
+                using MemoryStream stream = new((int) ReplayFile.FileSize);
+                long replaySize = ReplayFile.WriteToStream(stream);
+                DownloadFile(name, nameof(FileDownloadedCallback), ReplayFile.Header.GetDisplayName() + ".mvlreplay", stream.ToArray(), (int) replaySize);
+            }
 #else
             TranslationManager tm = GlobalController.Instance.translationManager;
             StandaloneFileBrowser.SaveFilePanelAsync(tm.GetTranslation("ui.extras.replays.actions.export.prompt"), null, ReplayFile.Header.GetDisplayName(), "mvlreplay", (file) => {

@@ -17080,7 +17080,7 @@ MonoBehaviour:
   label: {fileID: 1877821585295378914}
   loader: {fileID: 4643779860294446769}
   translationKey: ui.options.audio.directionalaudio
-  hideOnWebGL: 0
+  hideOnWebGL: 1
   requireReconnect: 0
   toggle: {fileID: 3428723494803301586}
 --- !u!114 &4643779860294446769
@@ -31941,7 +31941,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22.6
+  m_fontSize: 21.7
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

@@ -81,6 +81,8 @@ Windows10V <color=#AAAAAA>(pt-br)</color>
 vlco_o <color=#AAAAAA>(es-es, ro-ro)</color>
 
 <color=yellow>{ui.about.credits.qa}</color>
+AprilShade
+ArianLust
 Ave
 CreativeGhost
 Cubby Crazes
@@ -88,7 +90,6 @@ Fawndue
 Grape
 MiiBumm
 mindnomad
-Shadow_Walker13
 TheCyVap
 Vinnnnnnny
 
