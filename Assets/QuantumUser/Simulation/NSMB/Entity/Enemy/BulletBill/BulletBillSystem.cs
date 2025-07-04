@@ -147,7 +147,7 @@ namespace Quantum {
             }
         }
 
-        public static void OnBulletBillIceBlockInteraction(Frame f, EntityRef bulletBillEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static bool OnBulletBillIceBlockInteraction(Frame f, EntityRef bulletBillEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -157,6 +157,7 @@ namespace Quantum {
 
                 bulletBill->Kill(f, bulletBillEntity, iceBlockEntity, KillReason.Special);
             }
+            return false;
         }
 
         public static void OnBulletBillProjectileInteraction(Frame f, EntityRef bulletBillEntity, EntityRef projectileEntity) {

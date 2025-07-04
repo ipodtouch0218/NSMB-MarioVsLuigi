@@ -10,7 +10,7 @@ namespace Quantum {
 #if MULTITHREADED
     public unsafe class InteractionSystem : SystemArrayFilter<InteractionSystem.Filter> {
 #else
-    public unsafe class InteractionSystem : SystemMainThread {
+    public unsafe class InteractionSystem : SystemMainThread, ISignalOnMarioPlayerGroundpoundedSolid {
 #endif
         private List<PendingInteraction> pendingInteractions = new(16);
         private HashSet<EntityRefPair> alreadyInteracted = new(16);
@@ -214,6 +214,24 @@ namespace Quantum {
             }
         }
 
+        public void OnMarioPlayerGroundpoundedSolid(Frame f, EntityRef entityA, PhysicsContact contact, ref QBoolean continueGroundpound) {
+            EntityRef entityB = contact.Entity;
+            PendingInteraction interaction = f.Context.Interactions.FindPlatformInteractor(entityA, f.GetComponentSet(entityA), entityB, f.GetComponentSet(entityB), contact);
+            if (interaction.InteractorIndex != -1) {
+                bool continueInteraction = true;
+                f.Signals.OnBeforeInteraction(entityA, &continueInteraction);
+                f.Signals.OnBeforeInteraction(entityB, &continueInteraction);
+
+                if (!continueInteraction) {
+                    continueGroundpound = false;
+                    return;
+                }
+
+                continueGroundpound = f.Context.Interactions.platformInteractors[interaction.InteractorIndex].Invoke(f, entityA, entityB, interaction.Contact);
+            } else {
+                continueGroundpound = false;
+            }
+        }
 
         public struct PendingInteraction {
             public EntityRef EntityA, EntityB;

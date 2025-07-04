@@ -84,8 +84,9 @@ namespace Quantum {
             TryInteraction(f, breakableObjectEntity, marioEntity);
         }
 
-        private static void OnBreakableObjectMarioPlatformInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
+        private static bool OnBreakableObjectMarioPlatformInteraction(Frame f, EntityRef breakableObjectEntity, EntityRef marioEntity, PhysicsContact contact) {
             TryInteraction(f, breakableObjectEntity, marioEntity, contact);
+            return false;
         }
 
         private static void OnMarioBreakableObjectPreContact(Frame f, VersusStageData stage, EntityRef entity, PhysicsContact contact, ref bool keepContacts) {

@@ -164,6 +164,7 @@ signal OnMarioPlayerDied(EntityRef entity);
 signal OnMarioPlayerBecameInvincible(EntityRef entity);
 signal OnMarioPlayerDropObjective(EntityRef entity, int amount, EntityRef attacker);
 signal OnMarioPlayerTakeDamage(EntityRef entity, ref bool keepDamage);
+signal OnMarioPlayerGroundpoundedSolid(EntityRef mario, PhysicsContact contact, ref bool continueGroundpound);
 
 event MarioPlayerJumped {
 	EntityRef Entity;

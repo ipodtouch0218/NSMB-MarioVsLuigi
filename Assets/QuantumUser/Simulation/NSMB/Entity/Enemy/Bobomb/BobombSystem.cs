@@ -224,7 +224,7 @@ namespace Quantum {
             f.Signals.OnProjectileHitEntity(f, projectileEntity, bobombEntity);
         }
 
-        public static void OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
+        public static bool OnBobombIceBlockInteraction(Frame f, EntityRef bobombEntity, EntityRef iceBlockEntity, PhysicsContact contact) {
             var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
@@ -234,6 +234,7 @@ namespace Quantum {
 
                 bobomb->Kill(f, bobombEntity, iceBlockEntity, KillReason.Special);
             }
+            return false;
         }
         #endregion
 

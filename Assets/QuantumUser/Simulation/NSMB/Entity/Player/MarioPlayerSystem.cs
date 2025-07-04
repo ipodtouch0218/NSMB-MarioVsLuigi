@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using UnityEngine;
 using static IInteractableTile;
 
 namespace Quantum {
@@ -79,6 +78,7 @@ namespace Quantum {
                 filter.Inputs = default;
             }
 
+            bool wasGroundpoundActive = mario->IsGroundpounding;
             HandlePowerups(f, ref filter, physics, stage);
             HandleBreakingBlocks(f, ref filter, physics, stage);
             HandleCrouching(f, ref filter, physics);
@@ -86,7 +86,7 @@ namespace Quantum {
             HandleSliding(f, ref filter, physics);
             HandleWalkingRunning(f, ref filter, physics);
             HandleSpinners(f, ref filter, stage);
-            HandleJumping(f, ref filter, physics);
+            HandleJumping(f, ref filter, physics, wasGroundpoundActive);
             HandleSwimming(f, ref filter, physics);
             HandleBlueShell(f, ref filter, physics, stage);
             HandleWallslide(f, ref filter, physics);
@@ -339,7 +339,7 @@ namespace Quantum {
             return Constants.WeirdSlopeConstant * floorAngle;
         }
 
-        private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
+        private void HandleJumping(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, bool wasGroundpoundActive) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleJumping");
             ref var inputs = ref filter.Inputs;
             var mario = filter.MarioPlayer;
@@ -360,10 +360,12 @@ namespace Quantum {
                 mario->LandedFrame = f.Number;
                 if (mario->JumpState == JumpState.TripleJump && (!inputs.Left.IsDown && !inputs.Right.IsDown)) {
                     physicsObject->Velocity.X = 0;
-                    f.Events.MarioPlayerLandedWithAnimation(filter.Entity);
                 }
                 if (mario->PreviousJumpState != JumpState.None && mario->PreviousJumpState == mario->JumpState) {
                     mario->JumpState = JumpState.None;
+                }
+                if (FPMath.Abs(physicsObject->Velocity.X) < FP._0_05 && !wasGroundpoundActive) {
+                    f.Events.MarioPlayerLandedWithAnimation(filter.Entity);
                 }
                 mario->PreviousJumpState = mario->JumpState;
             }
@@ -965,13 +967,14 @@ namespace Quantum {
                     continue;
                 }
 
-                // Floor tiles.
-                if (f.Exists(contact.Entity)) {
-                    // Manual Fix: allow ice block groundpound continues
-                    bool ice = f.Has<IceBlock>(contact.Entity);
-                    continueGroundpound &= ice;
-                    interactedAny |= ice;
+                if (f.Unsafe.TryGetPointer(contact.Entity, out Interactable* interactable)) {
+                    // Entity
+                    QBoolean continueTemp = true;
+                    f.Signals.OnMarioPlayerGroundpoundedSolid(filter.Entity, contact, ref continueTemp);
+                    continueGroundpound &= continueTemp;
+                    interactedAny = true;
                 } else {
+                    // Floor tiles.
                     var tileInstance = stage.GetTileRelative(f, contact.Tile);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
@@ -1916,14 +1919,14 @@ namespace Quantum {
         }
 
         #region Interactions
-        public static void OnMarioInvisibleBlockInteraction(Frame f, EntityRef marioEntity, EntityRef invisibleBlockEntity, PhysicsContact contact) {
+        public static bool OnMarioInvisibleBlockInteraction(Frame f, EntityRef marioEntity, EntityRef invisibleBlockEntity, PhysicsContact contact) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var invisibleBlock = f.Unsafe.GetPointer<InvisibleBlock>(invisibleBlockEntity);
             var transform = f.Unsafe.GetPointer<Transform2D>(invisibleBlockEntity);
 
             VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             if (stage.GetTileWorld(f, transform->Position).Tile != default) {
-                return;
+                return false;
             }
 
             StageTileInstance result = new StageTileInstance {
@@ -1931,6 +1934,7 @@ namespace Quantum {
             };
             f.Signals.OnMarioPlayerCollectedCoin(marioEntity, EntityRef.None, transform->Position, true, false);
             BreakableBrickTile.Bump(f, stage, QuantumUtils.WorldToRelativeTile(stage, transform->Position), invisibleBlock->BumpTile, result, false, marioEntity, false);
+            return false;
         }
 
         public static void OnMarioCoinInteraction(Frame f, EntityRef marioEntity, EntityRef coinEntity) {
