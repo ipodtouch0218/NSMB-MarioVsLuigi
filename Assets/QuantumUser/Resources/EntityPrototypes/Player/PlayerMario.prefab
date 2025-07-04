@@ -746,7 +746,7 @@ MonoBehaviour:
   waterSkiddingParticle: {fileID: 3878221348697021963}
   smallModel: {fileID: 7762643025404982223}
   largeModel: {fileID: 2209300530651413591}
-  largeShellExclude: {fileID: 0}
+  largeShellExclude: {fileID: 3909441804163237101}
   blueShell: {fileID: 3629787967981286811}
   propellerHelmet: {fileID: 8712194458326895251}
   propeller: {fileID: 8626919663303982960}
@@ -7159,6 +7159,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
+    - target: {fileID: 2605695682307442155, guid: 024ceb223bceebd488dbc425555f4df0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3126473955037510232, guid: 024ceb223bceebd488dbc425555f4df0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7698,6 +7703,12 @@ Transform:
 --- !u!1 &2209300530651413591 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 024ceb223bceebd488dbc425555f4df0,
+    type: 3}
+  m_PrefabInstance: {fileID: 1326427675585282310}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3909441804163237101 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2605695682307442155, guid: 024ceb223bceebd488dbc425555f4df0,
     type: 3}
   m_PrefabInstance: {fileID: 1326427675585282310}
   m_PrefabAsset: {fileID: 0}
