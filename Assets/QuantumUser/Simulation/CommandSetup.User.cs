@@ -8,6 +8,9 @@ namespace Quantum {
             factories.Add(new CommandSpawnReserveItem());
             factories.Add(new CommandHostEndGame());
             factories.Add(new CommandEndGameContinue());
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            factories.Add(new CommandMvLDebugCmd());
+#endif
 
             // --- In room
             // Start Game

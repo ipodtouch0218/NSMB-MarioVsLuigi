@@ -67,6 +67,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [DonKaiStorm](https://github.com/DonKaiStorm)
 * [GithubSPerez](https://github.com/GithubSPerez)
 * GradedWarrior
+* [HyperC@T](https://github.com/SuperSonic392)
 * [Jeffjewett27](https://github.com/Jeffjewett27)
 * [KingKittyTurnip](https://github.com/KingKittyTurnip)
 * [kittenchilly](https://github.com/kittenchilly)

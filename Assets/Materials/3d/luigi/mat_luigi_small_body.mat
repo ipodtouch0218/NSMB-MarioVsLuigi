@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: mat_eye
+  m_Name: mat_luigi_small_body
   m_Shader: {fileID: -6465566751694194690, guid: cc5645667770c9c44af52a452d76a115,
     type: 3}
   m_Parent: {fileID: 0}
@@ -26,11 +26,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - EyeTextures:
-        m_Texture: {fileID: 18700000, guid: 2c010d7564aa4d94db0d110f73e3eb80, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - FireFlowerTexture:
-        m_Texture: {fileID: 2800000, guid: c4c89f548192a084bb03306933978cf9, type: 3}
+        m_Texture: {fileID: 2800000, guid: a13da4655a7223d438c8268b546b43e5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -58,7 +58,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c4c89f548192a084bb03306933978cf9, type: 3}
+        m_Texture: {fileID: 2800000, guid: c7e8c29289149d6459ed42c6232637a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -77,6 +77,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _StarmanTexture:
+        m_Texture: {fileID: 2800000, guid: 105cfc27e1a17204dab596b2e30098c5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TextureRecolorerWithMask_6bbf880355714ebfbae89779016b832b_Texture_3193008599:
         m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -90,7 +94,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Textures:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 18700000, guid: c7e8c29289149d6459ed42c6232637a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -108,7 +112,7 @@ Material:
     m_Ints: []
     m_Floats:
     - HatUsesOverallsColor: 0
-    - IsEyeTexture: 1
+    - IsEyeTexture: 0
     - OutlineSize: 0.01
     - PowerupState: 0
     - RainbowEnabled: 0
@@ -145,15 +149,15 @@ Material:
     m_Colors:
     - MultiplyColor: {r: 1, g: 1, b: 1, a: 0}
     - OutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - OverallsColor: {r: 1, g: 1, b: 1, a: 1}
-    - ShirtColor: {r: 0, g: 0, b: 0, a: 0}
+    - OverallsColor: {r: 1, g: 1, b: 1, a: 0}
+    - ShirtColor: {r: 1, g: 1, b: 1, a: 0}
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
     - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &1429163885029324730
+--- !u!114 &5601543482814287287
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

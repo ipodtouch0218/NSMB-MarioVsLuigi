@@ -1,3 +1,5 @@
+using JimmysUnityUtilities;
+using NaughtyAttributes.Test;
 using NSMB.Cameras;
 using NSMB.Particles;
 using NSMB.Quantum;
@@ -30,7 +32,6 @@ namespace NSMB.Entities.Player {
         private static readonly WaitForSeconds BlinkDelay = new(0.1f);
 
         #region Animator & Shader Hashes
-        private static readonly int ParamRainbowEnabled = Shader.PropertyToID("RainbowEnabled");
         private static readonly int ParamPowerupState = Shader.PropertyToID("PowerupState");
         private static readonly int ParamEyeState = Shader.PropertyToID("EyeState");
         private static readonly int ParamModelScale = Shader.PropertyToID("ModelScale");
@@ -98,6 +99,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
+        [SerializeField] private Shader normalShader, rainbowShader;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller, HammerHelm, HammerShell, HammerTuck;
         [SerializeField] private GameObject smallHeadBone, largeHeadBone;
@@ -109,6 +111,7 @@ namespace NSMB.Entities.Player {
 
         //---Components
         private readonly List<Renderer> renderers = new();
+        private readonly Dictionary<Renderer, List<Material>> materials = new();
 
         //---Properties
         public Color GlowColor { get; private set; }
@@ -140,6 +143,17 @@ namespace NSMB.Entities.Player {
         public void Start() {
             renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
             renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
+            foreach (Renderer r in renderers) {
+                // Get a copy of all materials.
+                // This looks jank as hell, but it works, because
+                // assigning to Renderer.material creates a COPY.
+                List<Material> matList = new();
+                r.GetSharedMaterials(matList);
+                r.SetMaterials(matList);
+                matList.Clear();
+                r.GetMaterials(matList);
+                materials[r] = matList;
+            }
 
             modelRotationTarget = models.transform.rotation;
 
@@ -526,7 +540,6 @@ namespace NSMB.Entities.Player {
 
             // Shader effects
             TryCreateMaterialBlock();
-            materialBlock.SetFloat(ParamRainbowEnabled, mario->IsStarmanInvincible ? 1f : 0f);
             int ps = mario->CurrentPowerupState switch {
                 PowerupState.FireFlower => 1,
                 PowerupState.PropellerMushroom => 2,
@@ -549,6 +562,9 @@ namespace NSMB.Entities.Player {
 
             foreach (Renderer r in renderers) {
                 r.SetPropertyBlock(materialBlock);
+                foreach (var m in materials[r]) {
+                    m.shader = mario->IsStarmanInvincible ? rainbowShader : normalShader;
+                }
             }
 
             // Hit flash

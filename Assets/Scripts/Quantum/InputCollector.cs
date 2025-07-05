@@ -1,6 +1,8 @@
 using NSMB.UI.Game;
 using Photon.Deterministic;
 using Quantum;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Input = Quantum.Input;
@@ -12,6 +14,9 @@ namespace NSMB.Quantum {
         public bool IsPaused { get; set; }
 
         //---Serialized Variables
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        [SerializeField] private List<DebugSpawnCommand> debugSpawnCommands = new();
+#endif
         [SerializeField] private PlayerElements playerElements;
 
         public void Start() {
@@ -22,6 +27,36 @@ namespace NSMB.Quantum {
         public void OnDestroy() {
             Settings.Controls.Player.ReserveItem.performed -= OnPowerupAction;
         }
+
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public void Update() {
+            foreach (var debug in debugSpawnCommands) {
+                if (UnityEngine.Input.GetKeyDown(debug.KeyCode)) {
+                    QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd { 
+                        CommandId = CommandMvLDebugCmd.DebugCommand.SpawnEntity,
+                        SpawnData = debug.Entity,
+                    });
+                }
+            }
+            if (UnityEngine.Input.GetKeyDown(KeyCode.P)) {
+                QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd {
+                    CommandId = CommandMvLDebugCmd.DebugCommand.KillSelf,
+                });
+            }
+            if (UnityEngine.Input.GetKeyDown(KeyCode.O)) {
+                QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd {
+                    CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
+                });
+            }
+        }
+
+        [Serializable]
+        public class DebugSpawnCommand {
+            public KeyCode KeyCode;
+            public AssetRef<EntityPrototype> Entity;
+        }
+#endif
 
         public void OnPowerupAction(InputAction.CallbackContext context) {
             if (!playerElements.IsSpectating) {

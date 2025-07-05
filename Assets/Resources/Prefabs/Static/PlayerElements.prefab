@@ -13829,6 +13829,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf0e493508cdc2428819484b6e5c099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugSpawnCommands:
+  - KeyCode: 257
+    Entity:
+      Id:
+        Value: 1268531089014898302
+  - KeyCode: 258
+    Entity:
+      Id:
+        Value: 1349070666859566638
+  - KeyCode: 259
+    Entity:
+      Id:
+        Value: 1466930856010351358
+  - KeyCode: 260
+    Entity:
+      Id:
+        Value: 1414434856952255942
+  - KeyCode: 261
+    Entity:
+      Id:
+        Value: 1300211052819551813
+  - KeyCode: 262
+    Entity:
+      Id:
+        Value: 1502268950446962426
+  - KeyCode: 263
+    Entity:
+      Id:
+        Value: 1286010981056643553
+  - KeyCode: 264
+    Entity:
+      Id:
+        Value: 1524544283524633813
+  - KeyCode: 265
+    Entity:
+      Id:
+        Value: 1472665878288241371
+  - KeyCode: 49
+    Entity:
+      Id:
+        Value: 1487534197368722732
+  - KeyCode: 50
+    Entity:
+      Id:
+        Value: 1379843889611026990
+  - KeyCode: 51
+    Entity:
+      Id:
+        Value: 1284729198758392799
+  - KeyCode: 52
+    Entity:
+      Id:
+        Value: 1402622061657310969
+  - KeyCode: 53
+    Entity:
+      Id:
+        Value: 1416226096290300185
+  - KeyCode: 54
+    Entity:
+      Id:
+        Value: 1440373003412769203
+  - KeyCode: 55
+    Entity:
+      Id:
+        Value: 1456347000984408041
+  - KeyCode: 56
+    Entity:
+      Id:
+        Value: 1304675416483732058
   playerElements: {fileID: 2058053739306675502}
 --- !u!114 &8557534404386945108
 MonoBehaviour:

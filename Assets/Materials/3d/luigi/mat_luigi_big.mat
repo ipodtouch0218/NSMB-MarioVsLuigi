@@ -90,6 +90,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _StarmanTexture:
+        m_Texture: {fileID: 2800000, guid: 33b7d186ea02eca4bb6150115991798e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TextureRecolorerWithMask_6bbf880355714ebfbae89779016b832b_Texture_3193008599:
         m_Texture: {fileID: 2800000, guid: fd1684127f4f8264183691353ad282fd, type: 3}
         m_Scale: {x: 1, y: 1}

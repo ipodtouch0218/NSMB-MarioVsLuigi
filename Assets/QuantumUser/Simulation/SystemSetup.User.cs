@@ -1,6 +1,5 @@
 ﻿using Quantum.Core;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Quantum {
     public static partial class DeterministicSystemSetup {
@@ -15,9 +14,11 @@ namespace Quantum {
             systems.Add(new PlayerConnectedSystem());
             systems.Add(new MvLCullingSystem());
             systems.Add(new GameLogicSystem());
-
             systems.Add(
                 new StartDisabledSystemGroup("gameplay",
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    new MvLDebugSystem(),
+#endif
                     new PrePhysicsObjectSystem(),
                     new InteractionPhysicsQuerySystem(),
                     new GenericMoverSystem(),

@@ -61,6 +61,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _StarmanTexture:
+        m_Texture: {fileID: 2800000, guid: cf2f07e1e0d369c4fbd2d42caf15f52f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Textures:
         m_Texture: {fileID: 18700000, guid: 9f735b63cc2f9bf468b89203e1245ffd, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -80,6 +84,7 @@ Material:
     m_Ints: []
     m_Floats:
     - FireFlower: 0
+    - HatUsesOverallsColor: 0
     - IsEyeTexture: 0
     - OutlineSize: 0.01
     - PowerupState: 0

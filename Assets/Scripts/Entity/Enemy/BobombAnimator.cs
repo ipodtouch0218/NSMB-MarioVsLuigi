@@ -32,8 +32,6 @@ namespace NSMB.Entities.Enemies {
             QuantumEvent.Subscribe<EventEntityBlockBumped>(this, OnEntityBlockBumped, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
-
-            sRenderer.GetPropertyBlock(mpb = new());
         }
 
         public override void OnUpdateView() {
@@ -63,6 +61,9 @@ namespace NSMB.Entities.Enemies {
             bool lit = bobomb->CurrentDetonationFrames > 0;
             animator.SetBool(ParamLit, lit);
 
+            if (mpb == null) {
+                sRenderer.GetPropertyBlock(mpb = new());
+            }
             if (!lit) {
                 mpb.SetFloat(ParamFlashAmount, 0);
             } else {
