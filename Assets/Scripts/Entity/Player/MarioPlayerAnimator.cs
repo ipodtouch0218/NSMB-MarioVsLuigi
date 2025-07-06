@@ -367,9 +367,8 @@ namespace NSMB.Entities.Player {
             float delta = Time.deltaTime;
 
             float angleR = 108, angleL = 252; //Default angles, we can override them later. 
-
-            if(mario->CurrentPowerupState == PowerupState.BlueShell || mario->CurrentPowerupState == PowerupState.MegaMushroom) //Hacky override that feels like something I'd put in one of my mods - HyperCat
-            {
+            if (mario->CurrentPowerupState is PowerupState.BlueShell or PowerupState.MegaMushroom) {
+                //Hacky override that feels like something I'd put in one of my mods - HyperCat
                 angleR = 90;
                 angleL = 270;
             }
@@ -423,7 +422,6 @@ namespace NSMB.Entities.Player {
             }
 
             propellerVelocity = Mathf.Clamp(propellerVelocity + (1200 * ((mario->IsSpinnerFlying || mario->IsPropellerFlying || mario->UsedPropellerThisJump) ? -1 : 1) * delta), -2500, -300);
-
             wasTurnaround = mario->IsTurnaround;
         }
 
@@ -1226,6 +1224,11 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
+            var mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (mario->IsCrouching || mario->IsInShell || mario->IsSpinnerFlying || mario->IsPropellerFlying
+                || mario->IsDrilling || mario->IsInKnockback || mario->IsWallsliding) {
+                return;
+            }
             animator.Play(StateJumplanding);
         }
 
