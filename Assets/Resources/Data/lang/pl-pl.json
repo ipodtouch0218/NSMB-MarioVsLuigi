@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "Ustawienia Gry",
   "ui.inroom.settings.game.map": "Mapa",
   "ui.inroom.settings.game.map.description": "Poziom, na którym gra jest rozgrywana. Rozważ wybór mapy podczas zmiany innych zasad, ponieważ charakterystyka mapy może wpłynąć na przeznaczenie zasad tej gry (np. licznik czasu powinien być włączony w Zamku).",
+  "ui.inroom.settings.game.gamemode": "Tryb gry:",
   "ui.inroom.settings.game.stars": "Gwiazdy do Wygranej",
   "ui.inroom.settings.game.stars.description": "Główny cel gry. Gracze wygrają grę jeśli zbiorą oni określoną ilość gwiazd.",
   "ui.inroom.settings.game.coins": "Monety za Przedmiot",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "Drużyny",
   "ui.inroom.settings.game.teams.description": "Umożliwia graczom wybranie od 1 do 5 drużyn. Gracze po tej samej drużynie kooperują dla tego samego celu, atakowanie członka drużyny sprawi że atakowany nie utraci gwiazd (chyba że Ogień Przyjacielski jest włączony).",
   "ui.inroom.settings.game.friendlyfire": "Ogień Przyjacielski",
-  "ui.inroom.settings.game.teamattack.description": "Umożliwia graczom w tej samej drużynie atakowanie siebie samych, co pozwala na tracenie gwiazd. Zalicza się również ataki bezpośrednie (np. uderzenie Grzybem Śmigiełkiem) jak i również ataki pociskami (np. Ognistym Kwiatkiem).",
+  "ui.inroom.settings.game.friendlyfire.description": "Umożliwia graczom w tej samej drużynie atakowanie siebie samych, co pozwala na tracenie gwiazd. Zalicza się również ataki bezpośrednie (np. uderzenie Grzybem Śmigiełkiem) jak i również ataki pociskami (np. Ognistym Kwiatkiem).",
   "ui.inroom.settings.game.powerups": "Własne Wzmocnienia",
   "ui.inroom.settings.game.powerups.description": "Umożliwia przywoływanie wzmocnień które nie są oryginalne dla tej gry, np. Grzyb Śmigiełko/Lodowy Kwiatek.",
   "ui.inroom.settings.map.header": "Wybór Mapy",
@@ -263,6 +264,7 @@
   "ui.inroom.chat.hostreminder": "Jesteś hostem pokoju! Kliknij na nazwę gracza aby zarządzać swoim pokojem.",
   "ui.inroom.chat.command": "Komendy czatu zostały usunięte. Zamiast tego kliknij na nazwę gracza aby zarządzać swoim pokojem!",
   "ui.inroom.chat.server.map": "Mapa ustawiona na: {map}",
+  "ui.inroom.chat.server.gamemode": "Bieżący tryb gry: {gamemode}",
   "ui.inroom.chat.server.starting": "Start gry za {countdown} sekund...",
   "ui.inroom.chat.server.startcancelled": "Start gry anulowany.",
   "ui.inroom.chat.server.started": "Gra została rozpoczęta!",
@@ -374,5 +376,9 @@
   "region.uae": "ZEA",
   "region.us": "USA, Zachodnia",
   "region.usw": "USA, Wschodnia",
-  "region.ussc": "USA, Centrum"
+  "region.ussc": "USA, Centrum",
+  "gamemode.starchasers": "Gwiazdkobranie (klasyczny)",
+  "gamemode.starchasers.description": "Oryginalny tryb Mario vs Luigi z oryginalnej gry na DS! Zbieraj losowo stawiane Gwiazdy aby wygrać, zbieraj monety aby uzyskać ulepszenia oraz atakuj innych graczy, aby ukraść zbierane przez nich Gwiazdy!",
+  "gamemode.coinrunners": "Zbieracze Monet",
+  "gamemode.coinrunners.description": "Atakuj innych graczy, aby ukraść zebrane przez nich fioletowe monety, bądź graczem z ich największą ilością przed końcem czasu aby wygrać! Gwiezdne Monety są warte 25 fioletowych monet, śmierć jest przyczyną utraty 20% twoich fioletowych monet. Jeżeli jesteś daleko w tyle, zebranie wystarczającej ilości żółtych monet może wywołać pojawienie się Złotego Bloku, dzięki któremu uzyskasz mnóstwo fioletowych monet! "
 }

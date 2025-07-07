@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "Configurações do Jogo",
   "ui.inroom.settings.game.map": "Mapa",
   "ui.inroom.settings.game.map.description": "Cuidado ao considerar diferentes mapas ao mudar outras regras! Características de diferentes mapas podem influenciar quais regras de jogo devem ser. (EX.: Tempo limitado é recomendado ser ativado em Fortaleza.)",
+  "ui.inroom.settings.game.gamemode": "Modo de jogo",
   "ui.inroom.settings.game.stars": "Estrelas para ganhar",
   "ui.inroom.settings.game.stars.description": "O principal objetivo do jogo. Jogadores ganham o jogo quando coletam a quantidade específica de estrelas.",
   "ui.inroom.settings.game.coins": "Moedas por Item",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "Times",
   "ui.inroom.settings.game.teams.description": "Permite jogadores escolherem entre 1 de 5 diferente times para trabalharem juntos em caminho ao objetivo. Atacar um de seus companheiros não irá causar perda de estrelas (A não ser que Fogo Amigo esteja ativado).",
   "ui.inroom.settings.game.friendlyfire": "Fogo Amigo",
-  "ui.inroom.settings.game.teamattack.description": "Permite jogadores do mesmo time atacar uns aos outros, derrubando estrelas no processo. Inclue ataques diretos como pisos e furacôes, e também projéteis de powerups como Bolas de Fogo.",
+  "ui.inroom.settings.game.friendlyfire.description": "Permite jogadores do mesmo time atacar uns aos outros, derrubando estrelas no processo. Inclue ataques diretos como pisos e furacôes, e também projéteis de powerups como Bolas de Fogo.",
   "ui.inroom.settings.game.powerups": "Powerups Customizados",
   "ui.inroom.settings.game.powerups.description": "Ativa poderes não nativos de New Super Mario Bros. DS, como Flor de Gelo e Cogumelo Hélice.",
   "ui.inroom.settings.map.header": "Seleção de Mapa",
@@ -263,6 +264,7 @@
   "ui.inroom.chat.hostreminder": "Você é o líder da sala! Clique no nome de um jogador para moderar sua sala.",
   "ui.inroom.chat.command": "Comandos de Chat foram removidos. Clique no nome de um jogador para moderar sua sala!",
   "ui.inroom.chat.server.map": "Mapa alterado para: {map}",
+  "ui.inroom.chat.server.gamemode": "Modo de jogo alterado para: {gamemode}",
   "ui.inroom.chat.server.starting": "Partida iniciando em {countdown} segundos....",
   "ui.inroom.chat.server.startcancelled": "Partida cancelada.",
   "ui.inroom.chat.server.started": "Partida iniciada!",
@@ -374,5 +376,9 @@
   "region.uae": "EAU",
   "region.us": "EUA, Leste",
   "region.usw": "EUA, Oeste",
-  "region.ussc": "EUA, Central"
+  "region.ussc": "EUA, Central",
+  "gamemode.starchasers": "Caça-Estrela (Clássico)",
+  "gamemode.starchasers.description": "O modo original de Mario vs Luigi do DS! Colete Grandes Estrelas surgindo aleatoriamente para ganhar, colete moedas para Power-Ups, e ataque outros jogadores para roubar suas Grandes Estrelas.",
+  "gamemode.coinrunners": "Caça-Moeda",
+  "gamemode.coinrunners.description": "Tenha a maior quantidade de moedas roxas para ganhar! Ataque outros jogadores para roubar suas moedas. Moedas Grandes valem 25 moedas, você irá perder 20% de todas suas moedas se morrer. Caso estiver perdendo, coletar moedas amarelas suficientes irá surgir um Bloco Dourado que lhe dará muitas moedas roxas!"
 }

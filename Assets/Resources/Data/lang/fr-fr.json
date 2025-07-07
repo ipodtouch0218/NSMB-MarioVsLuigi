@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "Paramètres du match",
   "ui.inroom.settings.game.map": "Niveau",
   "ui.inroom.settings.game.map.description": "Le niveau sur lequel la partie sera jouée. N'oubliez pas de prendre en compte les caractéristiques des niveaux en changeant les règles du jeu, il serait judicieux d'ajouter une limite de temps sur le niveau Forteresse par exemple.",
+  "ui.inroom.settings.game.gamemode": "Mode de jeu",
   "ui.inroom.settings.game.stars": "Étoiles pour gagner",
   "ui.inroom.settings.game.stars.description": "L'objectif principal du jeu. Les joueurs gagnent une fois le nombre d'étoiles sélectionné atteint.",
   "ui.inroom.settings.game.coins": "Pièces pour objet",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "Équipes",
   "ui.inroom.settings.game.teams.description": "Permet aux joueurs de choisir entre 1 à 5 équipes différentes. Les joueurs d'une même équipe coopèrent pour le même objectif, et attaquer un coéquipier ne leur fera pas perdre d'étoiles, à moins que le tir ami soit activé.",
   "ui.inroom.settings.game.friendlyfire": "Tir ami",
-  "ui.inroom.settings.game.teamattack.description": "Autorise les joueurs d'une même équipe à s'attaquer entre eux, leur faisant perdre des étoiles. Cela inclut les attaques directes (sauter sur un allié ou vriller avec le Champignon Hélice), ainsi que les projectiles comme ceux de la Fleur de feu.",
+  "ui.inroom.settings.game.friendlyfire.description": "Autorise les joueurs d'une même équipe à s'attaquer entre eux, leur faisant perdre des étoiles. Cela inclut les attaques directes (sauter sur un allié ou vriller avec le Champignon Hélice), ainsi que les projectiles comme ceux de la Fleur de feu.",
   "ui.inroom.settings.game.powerups": "Objets personnalisés",
   "ui.inroom.settings.game.powerups.description": "Permet de faire apparaître des objets qui ne viennent pas de New Super Mario Bros. (DS), comme la Fleur de glace ou le Champignon Hélice.",
   "ui.inroom.settings.map.header": "Sélection de niveau",
@@ -263,6 +264,7 @@
   "ui.inroom.chat.hostreminder": "Vous êtes l'hôte du salon !\nCliquez sur le pseudonyme d'un joueur pour modérer votre salon.",
   "ui.inroom.chat.command": "Les commandes de chat ont été supprimées. Cliquez plutôt sur le pseudonyme d'un joueur pour modérer votre salon !",
   "ui.inroom.chat.server.map": "Niveau choisi : {map}",
+  "ui.inroom.chat.server.gamemode": "Mode de jeu sélectionné : {gamemode}",
   "ui.inroom.chat.server.starting": "Lancement dans {countdown} secondes...",
   "ui.inroom.chat.server.startcancelled": "Lancement interrompu.",
   "ui.inroom.chat.server.started": "La partie a commencé !",
@@ -374,5 +376,9 @@
   "region.uae": "Émirats",
   "region.us": "États-Unis, Est",
   "region.usw": "États-Unis, Ouest",
-  "region.ussc": "États-Unis, Central"
+  "region.ussc": "États-Unis, Central",
+  "gamemode.starchasers": "Chasse à l'étoile (Classique)",
+  "gamemode.starchasers.description": "Le mode de jeu original de Mario vs Luigi sur la DS ! Collectez les étoiles qui apparaissent aléatoirement sur la carte pour gagner, récupérez des pièces pour gagner des objets et attaquez les joueurs ennemis pour leur faire perdre leurs étoiles.",
+  "gamemode.coinrunners": "Course aux pièces",
+  "gamemode.coinrunners.description": "Soyez celui qui a le plus de pièces violettes à la fin du temps imparti pour gagner ! Attaquez les joueurs ennemis pour leur faire perdre leurs pièces violettes, les pièces étoiles valent 25 pièces violettes et mourir vous fera perdre 20% de vos pièces violettes. Si vous êtes dans les derniers, récupérer assez de pièces jaunes peut faire apparaître un bloc doré qui vous donnera de nombreuses pièces violettes !"
 }

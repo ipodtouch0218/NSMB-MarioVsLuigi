@@ -30,7 +30,7 @@ MonoBehaviour:
     m_SuperscriptSize: 0.5
     m_SubscriptOffset: -1.9995116
     m_SubscriptSize: 0.5
-    m_UnderlineOffset: 0
+    m_UnderlineOffset: -1
     m_UnderlineThickness: 0
     m_StrikethroughOffset: 3.2
     m_StrikethroughThickness: 0

@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "Setări Meciului",
   "ui.inroom.settings.game.map": "Nivel",
   "ui.inroom.settings.game.map.description": "Locul în care se va juca meciul. Ia în considerare nivelul când alegi regurile, deoarece caracteristicile nivelului pot influența acestea (de exemplu, Timpul Limit ar trebui fi pornit în Fort.",
+  "ui.inroom.settings.game.gamemode": "Mod de Joc",
   "ui.inroom.settings.game.stars": "Stele pentru a Câștiga",
   "ui.inroom.settings.game.stars.description": "Obiectivul principal al jocului. Juc*torii câ*tig* meciul dup* ce ajunge la acest num*r de stele.",
   "ui.inroom.settings.game.coins": "Monezi pentru Powerup",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "Echipe",
   "ui.inroom.settings.game.teams.description": "Lasă jucătorii să aleagă o echipa dintre 5 posibilități. Jucătorii care sunt in aceași echipă joacă împreună să ajungă la obiectivul comun. Atacând un coechipier nu-l face să lase stele.",
   "ui.inroom.settings.game.friendlyfire": "Foc prietenesc",
-  "ui.inroom.settings.game.teamattack.description": "Lasă jucătorii din aceeași echipă să se atace unul pe altul, pierzând stele. Asta include ataci direcți (călcând pe cineva sau forând cu Ciuperca Elice), ca și cum proiectile din Florile de Foc sau de Ghiața.",
+  "ui.inroom.settings.game.friendlyfire.description": "Lasă jucătorii din aceeași echipă să se atace unul pe altul, pierzând stele. Asta include ataci direcți (călcând pe cineva sau forând cu Ciuperca Elice), ca și cum proiectile din Florile de Foc sau de Ghiața.",
   "ui.inroom.settings.game.powerups": "Powerup-uri Personalizate",
   "ui.inroom.settings.game.powerups.description": "Activează apariția a Powerup-uri care nu sunt din New Super Mario Bros. (DS), ca Ciupera Elice si Floarea de Ghiață ",
   "ui.inroom.settings.map.header": "Alegerea Nivelului",
@@ -263,6 +264,7 @@
   "ui.inroom.chat.hostreminder": "Ești gazda salei! Apasă pe numele jucătorilor să controlezi sala ta.",
   "ui.inroom.chat.command": "Comenzile în chat au fost eliminate. Apasă pe numele a unui jucător să controlezi sala ta!",
   "ui.inroom.chat.server.map": "Nivelul e acum: {map}",
+  "ui.inroom.chat.server.gamemode": "Modul de joc e acum: {gamemode}",
   "ui.inroom.chat.server.starting": "Jocul începe în {countdown} secunde...",
   "ui.inroom.chat.server.startcancelled": "Începutul jocului amânat.",
   "ui.inroom.chat.server.started": "Jocul a început!",
@@ -374,5 +376,9 @@
   "region.uae": "EAU",
   "region.us": "Estul S.U.A.",
   "region.usw": "Vestul S.U.A.",
-  "region.ussc": "Centrul S.U.A."
+  "region.ussc": "Centrul S.U.A.",
+  "gamemode.starchasers": "Prinde Stelele (Clasic)",
+  "gamemode.starchasers.description": "Modul de joc Mario vs Luigi original! Obține Stelele care apar la întâmplare ca să câștigi, ia monezi pentru a genera powerup-uri, și atacă alți jucători să-i faci să piardă Stelele lor.",
+  "gamemode.coinrunners": "Aleargă după Monezi",
+  "gamemode.coinrunners.description": "Atacă alți jucători să obții monezi mov; fi cel care are mai multe la sfârșitul timpului limit și vei câștiga! Stelele Monedă îți dau 25 de monezi mov, iar dacă mori o să pierzi 20% din cele care le ai. Dacă ești prea înapoi, prinde monezi galbene ca să obții un bloc de aur, ceea ce o să-ți dea o sumă de monezi mov!"
 }

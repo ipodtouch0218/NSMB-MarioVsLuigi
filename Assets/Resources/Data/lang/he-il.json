@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "הגדרות משחק",
   "ui.inroom.settings.game.map": "מפה",
   "ui.inroom.settings.game.map.description": "המפה בה מתרחש המשחק. יש לקחת בחשבון את המפה כאשר משנים חוקים אחרים, כי מאפיינים של מפה מסויימת יכולים להשפיע על מה החוקים אמורים להיות (למשל, מומלץ להפעיל מגבלת זמו במפה \"טירה\").",
+  "ui.inroom.settings.game.gamemode": "מצב משחק",
   "ui.inroom.settings.game.stars": "כמות כוככבים לניצחון",
   "ui.inroom.settings.game.stars.description": "המטרה המכרזית של המשחק. שחקנים מנצחים בכך שאוספים את הכמות הנדרשת של כוכבים.",
   "ui.inroom.settings.game.coins": "מטבעות לפריט",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "קבוצות",
   "ui.inroom.settings.game.teams.description": "מאפשר לשחקנים לבחור בין 5 קבוצות. שחקנים השייכים לאותה קבוצה עובדים למען אותה מטרה ואינם יכולים לפגוע אחד בשני (אלא אם תקיפה ידידותית הופעלה).",
   "ui.inroom.settings.game.friendlyfire": "תקיפה ידידותית",
-  "ui.inroom.settings.game.teamattack.description": "מאפשר לשחקנים מאותה קבוצה לפגוע אחד בשני. ולהפיל כוכבים בתהליך. זה כולל פגיעות ישרות (כמו קפיצות והמקדחה של חליפת הפרופלור) וכדורים מפוואר-אפים כמו פרח האש.",
+  "ui.inroom.settings.game.friendlyfire.description": "מאפשר לשחקנים מאותה קבוצה לפגוע אחד בשני. ולהפיל כוכבים בתהליך. זה כולל פגיעות ישרות (כמו קפיצות והמקדחה של חליפת הפרופלור) וכדורים מפוואר-אפים כמו פרח האש.",
   "ui.inroom.settings.game.powerups": "פוואר-אפים מותאמים",
   "ui.inroom.settings.game.powerups.description": "מאפשר הופעה של פאוור-אפים שלא מופיעים במשחק המקורי, כמו פרח הקרח ופטריית הפרופלור.",
   "ui.inroom.settings.map.header": "בחירת מפה",
@@ -263,6 +264,7 @@
   "ui.inroom.chat.hostreminder": "אתם מארחים את החדר! לחץ על שם משתמש של שחקן כדי לנהל את חדרך.",
   "ui.inroom.chat.command": "פקודות צ'אט הוסרו. לחץ על שם משתמש של שחקן גדי לנהל את חדרך במקום!",
   "ui.inroom.chat.server.map": "מפה שונתה ל: {map}",
+  "ui.inroom.chat.server.gamemode": "מצב המשחק הוא: {gamemode}",
   "ui.inroom.chat.server.starting": "המשחק מתחיל תוך {countdown} שניות...",
   "ui.inroom.chat.server.startcancelled": "התחלת המשחק בוטלה.",
   "ui.inroom.chat.server.started": "המשחק התחיל!",
@@ -374,5 +376,9 @@
   "region.uae": "איחוד האמיריות הערביות",
   "region.us": "ארה\"ב, מזרח",
   "region.usw": "ארה\"ב מערב",
-  "region.ussc": "ארה\"ב, מרכז"
+  "region.ussc": "ארה\"ב, מרכז",
+  "gamemode.starchasers": "רודפי כוכבים (קלאסי)",
+  "gamemode.starchasers.description": "משחק המריו נגד לויג'י המקורי מתקופת הDS! אסוף את הכוכבים הגדולים שמופיעים באקראיות כדי לנצח, אסוף מטבעות כדי להשיג פוואר-אפים ותקוף שחקנים אחרים כדי לגרום להם להפיל את הכוכבים שהם אספו.",
+  "gamemode.coinrunners": "אוספי מטבעות",
+  "gamemode.coinrunners.description": "תקוף שחקנים אחרים כדי לגרום להם להפיל מטבעות סגולים; תהיה השחקן בעל הכי הרבה מטבעות בסוף המשחק כדי לנצח! מטבעות כוכב שווים 25 מטבעות סגולים, ופסילה תגרום לך לאבד 20% מהמטבעות הסגולים שאספתם. אם אתה רחוק מאחורה, אסוף מספיק מטבעות זהובים כדי לגרום לבלוק זהב להופיע שיביא מלא מטבעות סגולים!"
 }

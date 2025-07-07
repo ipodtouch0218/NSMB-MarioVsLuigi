@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "Configuración del Juego",
   "ui.inroom.settings.game.map": "Mapa",
   "ui.inroom.settings.game.map.description": "El nivel en el que se jugará la partida. Ojo al elegir el mapa, ya que sus características influencian las reglas óptimas (por ejemplo, el Límite de Tiempo debería activarse en Fortaleza).",
+  "ui.inroom.settings.game.gamemode": "Modo de Juego",
   "ui.inroom.settings.game.stars": "Estrellas para ganar",
   "ui.inroom.settings.game.stars.description": "Este es el objetivo principal del juego. Un jugador gana la partida cuando alcance el número de estrellas especificado.",
   "ui.inroom.settings.game.coins": "Monedas para Ítem",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "Equipos",
   "ui.inroom.settings.game.teams.description": "Permite a los jugadores asignarse a cualquiera de cinco equipos. Aquellos que estén en un mismo equipo trabajarán juntos hacia un objetivo común, y un compañero atacando a otro no hará que éste pierda estrellas (a menos que el Fuego Amigo esté activado).",
   "ui.inroom.settings.game.friendlyfire": "Fuego Amigo",
-  "ui.inroom.settings.game.teamattack.description": "Permite a los jugadores del mismo equipo atacarse los unos a los otros, perdiendo estrellas en el proceso. Esto incluye ataques directos (como pisoteos), y proyectiles de los distintos ítems.",
+  "ui.inroom.settings.game.friendlyfire.description": "Permite a los jugadores del mismo equipo atacarse los unos a los otros, perdiendo estrellas en el proceso. Esto incluye ataques directos (como pisoteos), y proyectiles de los distintos ítems.",
   "ui.inroom.settings.game.powerups": "Mejoras Personalizadas",
   "ui.inroom.settings.game.powerups.description": "Habilita la aparición de mejoras que no son originales a New Super Mario Bros. (DS), como el Champicóptero o la Flor de Hielo.",
   "ui.inroom.settings.map.header": "Selección de Mapa",
@@ -262,7 +263,8 @@
   "ui.inroom.chat.player.unbanned": "{playername} ha sido desbloqueado de la sala por el anfitrión ",
   "ui.inroom.chat.hostreminder": "¡Eres el anfitrión de la sala! ¡Haz clic en los nombres de los jugadores para controlar tu sala!",
   "ui.inroom.chat.command": "Los comandos de chat ya no están en uso. ¡Haz clic en el nombre de un usuario para moderar tu sala!",
-  "ui.inroom.chat.server.map": "Se ha cambiado el mapa a: {map}",
+  "ui.inroom.chat.server.map": "Mapa cambiado a: {map}",
+  "ui.inroom.chat.server.gamemode": "Modo cambiado a: {gamemode}",
   "ui.inroom.chat.server.starting": "La partida va a comenzar en {countdown}s...",
   "ui.inroom.chat.server.startcancelled": "Inicio cancelado.",
   "ui.inroom.chat.server.started": "¡La partida ha comenzado!",
@@ -374,5 +376,9 @@
   "region.uae": "EAU",
   "region.us": "Este de los EE. UU.",
   "region.usw": "Oeste de los EE. UU.",
-  "region.ussc": "Centro de los EE. UU."
+  "region.ussc": "Centro de los EE. UU.",
+  "gamemode.starchasers": "Pilla la Estrella (Clásico)",
+  "gamemode.starchasers.description": "¡El modo de juego de Mario vs Luigi de la DS de toda la vida! Recoge las Estrellas que aparecen aleatoriamente para ganar, recoge monedas para conseguir potenciadores, y ataca a otros jugadores para hacerles perder sus Estrellas.",
+  "gamemode.coinrunners": "Corre a por Monedas",
+  "gamemode.coinrunners.description": "Ataca a otros jugadores para hacer que suelten moneditas moradas; sé el que más monedas tiene tras un tiempo determinado, ¡y ganarás! Las Estrellas Moneda valen lo mismo que 25 moneditas moradas, y si mueres perderás el 20% de tu recolecta. Si estás perdiendo por mucho, recoge monedas de oro para conseguir un Bloque Dorado que te dará un montón de moneditas moradas."
 }

@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "Impostazioni della Partita",
   "ui.inroom.settings.game.map": "Mappa",
   "ui.inroom.settings.game.map.description": "Il livello in cui si gioca. Tieni conto della mappa quando cambi le regole, essendo che le regole dovrebbero essere scelte considerando le caratteristiche della mappa (per esempio, il Timer è consigliato per la Fortezza).",
+  "ui.inroom.settings.game.gamemode": "Modalità di gioco",
   "ui.inroom.settings.game.stars": "Stelle per vincere",
   "ui.inroom.settings.game.stars.description": "È l'obiettivo principale del gioco. Si vince collezionando la quantità specificata di stelle.",
   "ui.inroom.settings.game.coins": "Monete per un powerup",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "Squadre",
   "ui.inroom.settings.game.teams.description": "Permette ai giocatori di scegliere tra 1 o 5 squadre diverse. I giocatori della stessa squadra lavorano tutti assieme per lo stesso obiettivo, e attaccare un compagno di squadra non gli farà cadere nessuna stella (a meno che non sia attivo il fuoco amico).",
   "ui.inroom.settings.game.friendlyfire": "Fuoco amico",
-  "ui.inroom.settings.game.teamattack.description": "Permette ai giocatori della stessa squadra di attaccarsi a vicenda, facendo cadere le stelle altrui. Sono inclusi attacchi diretti (come lo schianto a terra o la trivella del Fungo Elica), assieme ai proiettili dei powerup come il Fiore di Fuoco.",
+  "ui.inroom.settings.game.friendlyfire.description": "Permette ai giocatori della stessa squadra di attaccarsi a vicenda, facendo cadere le stelle altrui. Sono inclusi attacchi diretti (come lo schianto a terra o la discesa elica del Fungo Elica), assieme ai proiettili dei powerup come il Fiore di Fuoco.",
   "ui.inroom.settings.game.powerups": "Powerup personalizzati",
   "ui.inroom.settings.game.powerups.description": "Permette l'apparizione di powerup non presenti in New Super Mario Bros. (DS), come il Fiore di Ghiaccio e il Fungo Elica.",
   "ui.inroom.settings.map.header": "Selezione Mappe",
@@ -263,6 +264,7 @@
   "ui.inroom.chat.hostreminder": "Sei l'host della stanza! Puoi cliccare sui nomi dei giocatori per moderare la tua stanza.",
   "ui.inroom.chat.command": "I comandi della chat sono stati rimossi. Puoi cliccare cui nomi dei giocatori per moderare la tua stanza!",
   "ui.inroom.chat.server.map": "Mappa selezionata: {map}",
+  "ui.inroom.chat.server.gamemode": "Modalità di gioco impostata a: {gamemode}",
   "ui.inroom.chat.server.starting": "La partita inizierà tra {countdown} secondi...",
   "ui.inroom.chat.server.startcancelled": "Avvio della partita annullato.",
   "ui.inroom.chat.server.started": "Partita iniziata!",
@@ -374,5 +376,9 @@
   "region.uae": "Emirati Arabi",
   "region.us": "USA, Est",
   "region.usw": "USA, Ovest",
-  "region.ussc": "USA, Centrale"
+  "region.ussc": "USA, Centrale",
+  "gamemode.starchasers": "Cacciatori di Stelle (Classica)",
+  "gamemode.starchasers.description": "La modalità di gioco originale di Mario vs. Luigi dall'era del DS! Colleziona le Mega Stelle che appaiono casualmente per vincere, raccogli monete per far apparire powerup, e attacca gli altri giocatori per far cadere le loro Mega Stelle.",
+  "gamemode.coinrunners": "Corsa per le Monete",
+  "gamemode.coinrunners.description": "Attacca gli altri giocatori per fargli cadere monete viola; diventa il giocatore con più monete allo scadere del tempo per vincere! Le Monete Stella valgono 25 monete viola, morendo perderai il 20% delle tuo monete viola. Se sei rimasto indietro, collezionando abbastanza monete gialle può far apparire un Blocco Dorato che ti darà tantissime monete viola."
 }

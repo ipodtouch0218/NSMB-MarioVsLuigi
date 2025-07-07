@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using static NSMB.Utilities.QuantumViewUtils;
 
@@ -144,6 +143,7 @@ namespace NSMB.UI.Game {
             }
 
             OnCameraFocusChanged?.Invoke();
+            FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
         }
 
         public void StartSpectating() {
@@ -152,8 +152,6 @@ namespace NSMB.UI.Game {
             if (!IsReplay) {
                 if (GlobalController.Instance.loadingCanvas.isActiveAndEnabled) {
                     GlobalController.Instance.loadingCanvas.EndLoading(QuantumRunner.DefaultGame);
-                } else {
-                    FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
                 }
             }
 

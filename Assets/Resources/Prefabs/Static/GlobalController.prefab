@@ -7049,7 +7049,7 @@ MonoBehaviour:
   label: {fileID: 5065141228603792754}
   loader: {fileID: 7814395035281750596}
   translationKey: ui.options.graphics.fullscreenresolution
-  hideOnWebGL: 0
+  hideOnWebGL: 1
   requireReconnect: 0
   value: 0
   options: []
@@ -17990,7 +17990,7 @@ MonoBehaviour:
   label: {fileID: 6572780239847114436}
   loader: {fileID: 4837220919333108810}
   translationKey: ui.options.graphics.windowmode
-  hideOnWebGL: 0
+  hideOnWebGL: 1
   requireReconnect: 0
   value: 0
   options:
@@ -23189,7 +23189,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9075883407659129217
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31941,7 +31941,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.7
+  m_fontSize: 21.45
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

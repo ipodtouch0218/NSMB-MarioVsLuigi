@@ -215,6 +215,7 @@
   "ui.inroom.settings.game.header": "ゲームの設定",
   "ui.inroom.settings.game.map": "コース",
   "ui.inroom.settings.game.map.description": "ゲームに使うコース。コースによってはルールセットに影響を与える可能性があるため、マップとルールの相性を考慮しよう。(例えば、とりでコースでは制限時間をセットすることが推奨される)",
+  "ui.inroom.settings.game.gamemode": "ゲームモード",
   "ui.inroom.settings.game.stars": "ビッグスター",
   "ui.inroom.settings.game.stars.description": "ゲームのメイン目標。プレイヤーはこの数のビッグスターをゲットすることで勝利となる。",
   "ui.inroom.settings.game.coins": "アイテム出現までのコイン数",
@@ -226,7 +227,7 @@
   "ui.inroom.settings.game.teams": "チーム",
   "ui.inroom.settings.game.teams.description": "5つまでのチーム選択を可能にする。同じチームのプレイヤーは目標を共有し、仲間からビッグスターを奪うことはできない。(フレンドリーファイアON時は可能)",
   "ui.inroom.settings.game.friendlyfire": "フレンドリーファイア",
-  "ui.inroom.settings.game.teamattack.description": "同じチームでも、お互いに攻撃してスターを奪うことができるようにする。これには、プロペラスーツのドリル落下のような直接攻撃と、ファイアフラワーのような飛び道具での攻撃の双方が含まれる。",
+  "ui.inroom.settings.game.friendlyfire.description": "同じチームでも、お互いに攻撃してスターを奪うことができるようにする。これには、プロペラスーツのドリル落下のような直接攻撃と、ファイアフラワーのような飛び道具での攻撃の双方が含まれる。",
   "ui.inroom.settings.game.powerups": "新しいパワーアップ",
   "ui.inroom.settings.game.powerups.description": "アイスフラワーやプロペラキノコといった、原作では使用できなかったアイテムを有効にする。",
   "ui.inroom.settings.map.header": "コース選択",
@@ -263,6 +264,7 @@
   "ui.inroom.chat.hostreminder": "あなたがルームのホストです!プレイヤー名をクリックすることで、あなたのルームを管理できます。",
   "ui.inroom.chat.command": "チャットコマンドは削除されました。代わりにプレイヤー名をクリックしてルームを管理してください。",
   "ui.inroom.chat.server.map": "コースが{map}に変更されました",
+  "ui.inroom.chat.server.gamemode": "ゲームモードが{gamemode}に変更されました",
   "ui.inroom.chat.server.starting": "ゲームはあと{countdown}秒で開始します...",
   "ui.inroom.chat.server.startcancelled": "ゲーム開始が中断されました。",
   "ui.inroom.chat.server.started": "ゲーム開始!",
@@ -374,5 +376,9 @@
   "region.uae": "アラブ首長国連邦",
   "region.us": "東アメリカ",
   "region.usw": "西アメリカ",
-  "region.ussc": "中部アメリカ"
+  "region.ussc": "中部アメリカ",
+  "gamemode.starchasers": "ビッグスター(クラシック)",
+  "gamemode.starchasers.description": "DS時代のオーソドックスなマリオVSルイージのゲームモード!ランダムに発生するビッグスターをゲットして勝利しよう。コインを集めてアイテムを手に入れ、ほかのプレイヤーを攻撃してスターを奪おう。",
+  "gamemode.coinrunners": "コインバトル",
+  "gamemode.coinrunners.description": "他のプレイヤーを攻撃してパープルコインをドロップさせよう。時間切れで一番多くのコインを持っていたものが勝者となる!スターコインはパープルコイン25枚分の価値がある。ミスすると所持パープルコインの20%を失うぞ。負けが込んでいるなら、黄色のコインを集めることでパープルコインを大量にゲットできるゴールドブロックを得られるかも!"
 }

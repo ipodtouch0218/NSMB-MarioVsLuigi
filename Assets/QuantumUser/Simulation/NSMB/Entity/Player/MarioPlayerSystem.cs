@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
+using Quantum.Prototypes;
 using System;
 using static IInteractableTile;
 
@@ -383,7 +384,7 @@ namespace Quantum {
             }
 
             if (!mario->DoEntityBounce
-                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* Spinner) && Spinner->ArmPosition <= FP._0_75
+                && f.Unsafe.TryGetPointer(mario->CurrentSpinner, out Spinner* Spinner) && mario->ProjectileDelayFrames == 0
                 && !f.Exists(mario->HeldEntity) && !mario->IsInShell) {
                 // Jump of spinner
                 physicsObject->Velocity.Y = physics.SpinnerLaunchVelocity;
