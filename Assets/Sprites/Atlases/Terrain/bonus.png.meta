@@ -57,7 +57,7 @@ TextureImporter:
       213: -6450420347727313635
     second: clown_17
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -79,7 +79,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -119,6 +119,7 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -604,7 +605,7 @@ TextureImporter:
       name: bonus_1
       rect:
         serializedVersion: 2
-        x: 15
+        x: 16
         y: 64
         width: 16
         height: 16
@@ -1113,7 +1114,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -1136,54 +1137,54 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      clown_11: 7133476376080681217
-      bonus_7: -1107212481
-      bonus_28: 1850814868
-      clown_2: 4994258414075552032
-      clown_13: 6865342142685912013
-      bonus_14: -937223238
-      bonus_17: -69304690
-      clown_14: -2610124089118400910
-      bonus_16: -2017251207
-      bonus_5: 63873621
-      bonus_12: -1728517974
-      bonus_24: 775316621
-      bonus_21: -1848089947
-      bonus_2: -1647841331
-      clown_16: -7488802388398291836
-      clown_8: 3661830941288844219
-      bonus_18: 605119561
-      clown_3: 1433433934713897156
-      bonus_26: 1345986596
-      bonus_3: 120059877
-      bonus_8: -723277319
-      clown_0: 6594603699599502552
-      bonus_19: -731808
-      clown_6: -2832822836231408507
-      bonus_11: 1911295945
-      bonus_4: 963225843
-      bonus_27: 1044801654
       bonus_0: -671801442
-      clown_5: -2940530314470319842
-      bonus_20: -2103662274
       bonus_1: -1394567960
-      clown_17: -6450420347727313635
-      bonus_22: 1038974077
-      clown_15: -7962056515094391696
-      bonus_13: 1684036044
-      clown_4: 3036753812775530641
-      bonus_23: 1669150104
-      clown_9: -1082198178173625565
-      bonus_9: -1958766692
-      bonus_15: 1767055595
-      bonus_25: -1228109020
-      bonus_6: 486768647
-      clown_10: 4006730704514478162
-      clown_12: -9110447509335122878
-      clown_7: -5033442435760880955
       bonus_10: -766508114
+      bonus_11: 1911295945
+      bonus_12: -1728517974
+      bonus_13: 1684036044
+      bonus_14: -937223238
+      bonus_15: 1767055595
+      bonus_16: -2017251207
+      bonus_17: -69304690
+      bonus_18: 605119561
+      bonus_19: -731808
+      bonus_2: -1647841331
+      bonus_20: -2103662274
+      bonus_21: -1848089947
+      bonus_22: 1038974077
+      bonus_23: 1669150104
+      bonus_24: 775316621
+      bonus_25: -1228109020
+      bonus_26: 1345986596
+      bonus_27: 1044801654
+      bonus_28: 1850814868
+      bonus_3: 120059877
+      bonus_4: 963225843
+      bonus_5: 63873621
+      bonus_6: 486768647
+      bonus_7: -1107212481
+      bonus_8: -723277319
+      bonus_9: -1958766692
+      clown_0: 6594603699599502552
       clown_1: 2763954904775634219
-  spritePackingTag: 
+      clown_10: 4006730704514478162
+      clown_11: 7133476376080681217
+      clown_12: -9110447509335122878
+      clown_13: 6865342142685912013
+      clown_14: -2610124089118400910
+      clown_15: -7962056515094391696
+      clown_16: -7488802388398291836
+      clown_17: -6450420347727313635
+      clown_2: 4994258414075552032
+      clown_3: 1433433934713897156
+      clown_4: 3036753812775530641
+      clown_5: -2940530314470319842
+      clown_6: -2832822836231408507
+      clown_7: -5033442435760880955
+      clown_8: 3661830941288844219
+      clown_9: -1082198178173625565
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
   assetBundleName: 

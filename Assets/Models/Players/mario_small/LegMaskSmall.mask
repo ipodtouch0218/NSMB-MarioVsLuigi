@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: LegMaskSmall
+  m_Mask: 00000000000000000000000001000000010000000000000000000000000000000000000000000000000000000000000000000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: small_model
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_l1
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_l1/leg_l2
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1/ankle_l1_end
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_r1
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_r1/leg_r2
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1/ankle_r1_end
+    m_Weight: 1
+  - m_Path: small_model/mario_all_root/skl_root/spin
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_l1
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_l1/arm_l2
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1/wrist_l1_end
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_r1
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_r1/arm_r2
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1/wrist_r1_end
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/head
+    m_Weight: 0
+  - m_Path: small_model/mario_all_root/skl_root/spin/head/head_end
+    m_Weight: 0
+  - m_Path: small_model.001
+    m_Weight: 1

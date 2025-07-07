@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 11535680862545e45ac6e9fdbfeee088
 ModelImporter:
-  serializedVersion: 21202
+  serializedVersion: 22200
   internalIDToNameTable:
   - first:
       74: -623603649343465320
@@ -19,8 +19,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 1
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -38,11 +36,12 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 0.01
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -70,6 +69,7 @@ ModelImporter:
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -83,7 +83,123 @@ ModelImporter:
   humanDescription:
     serializedVersion: 3
     human: []
-    skeleton: []
+    skeleton:
+    - name: smallmario(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: small_model
+      parentName: smallmario(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
+    - name: mario_all_root
+      parentName: small_model
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0.7071068, y: -0.0000000053561764, z: -0.0000000053561773, w: 0.7071067}
+      scale: {x: 1, y: 1, z: 1}
+    - name: skl_root
+      parentName: mario_all_root
+      position: {x: 4.0466588e-13, y: 0.0005410998, z: -0.00012399911}
+      rotation: {x: -0, y: -0.0000000073263813, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: leg_l1
+      parentName: skl_root
+      position: {x: -0.00014438477, y: 0.000010327134, z: 0.000030712898}
+      rotation: {x: 0.000000055646524, y: -1.2197317e-16, z: 1, w: 0.0000000029103884}
+      scale: {x: 0.9999998, y: 0.99999994, z: 0.9999999}
+    - name: leg_l2
+      parentName: leg_l1
+      position: {x: -1.9371508e-11, y: 0.0002871585, z: -1.2665987e-11}
+      rotation: {x: 0.000000005820774, y: -1, z: -1.8228189e-16, w: 0.000000075669966}
+      scale: {x: 1.0000001, y: 0.9999997, z: 1}
+    - name: ankle_l1
+      parentName: leg_l2
+      position: {x: -6.2864275e-12, y: 0.0002008302, z: 2.9057262e-11}
+      rotation: {x: -0.7071069, y: -0.00000005968059, z: 0.0000000102897495, w: 0.70710665}
+      scale: {x: 0.99999994, y: 0.99999994, z: 1.0000001}
+    - name: ankle_l1_end
+      parentName: ankle_l1
+      position: {x: -0, y: 0.00020083007, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: leg_r1
+      parentName: skl_root
+      position: {x: 0.00014438477, y: 0.000010327134, z: 0.00003071289}
+      rotation: {x: 0.00000007310882, y: -1.5576436e-16, z: 1, w: 0.0000000058207714}
+      scale: {x: 1, y: 1, z: 0.9999999}
+    - name: leg_r2
+      parentName: leg_r1
+      position: {x: 1.490116e-11, y: 0.0002871584, z: 5.9604643e-12}
+      rotation: {x: 7.1054274e-15, y: -1, z: 1.8101586e-16, w: 0.000000072759576}
+      scale: {x: 1, y: 1.0000001, z: 1.0000004}
+    - name: ankle_r1
+      parentName: leg_r2
+      position: {x: -1.3411044e-11, y: 0.00020083023, z: -5.9604643e-12}
+      rotation: {x: -0.7071069, y: -0.00000004321698, z: 0.0000000061738574, w: 0.70710665}
+      scale: {x: 1.0000001, y: 1.0000001, z: 1.0000001}
+    - name: ankle_r1_end
+      parentName: ankle_r1
+      position: {x: -0, y: 0.00020083007, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: spin
+      parentName: skl_root
+      position: {x: -3.3521768e-19, y: 0.00009724119, z: -8.465451e-12}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 0.9999999, z: 0.9999999}
+    - name: arm_l1
+      parentName: spin
+      position: {x: -0.00022624516, y: 0.00029499514, z: -0.0000032714254}
+      rotation: {x: 0.7071068, y: -0.70710677, z: 0.000000054424113, w: 0.000000070141354}
+      scale: {x: 0.99999976, y: 0.9999997, z: 1.0000002}
+    - name: arm_l2
+      parentName: arm_l1
+      position: {x: 1.5832484e-10, y: 0.000195874, z: -4.7683715e-11}
+      rotation: {x: 0.000000029802322, y: 1, z: 0.0000000018936959, w: -0.00000004025316}
+      scale: {x: 1.0000002, y: 1.0000002, z: 1.0000001}
+    - name: wrist_l1
+      parentName: arm_l2
+      position: {x: 1.1920928e-10, y: 0.00018750012, z: 4.470348e-11}
+      rotation: {x: -0, y: -0, z: -0, w: 1}
+      scale: {x: 0.9999999, y: 0.9999999, z: 0.9999998}
+    - name: wrist_l1_end
+      parentName: wrist_l1
+      position: {x: -0, y: 0.00018749994, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: arm_r1
+      parentName: spin
+      position: {x: 0.00022624513, y: 0.00029499523, z: -0.0000032714715}
+      rotation: {x: 0.7071068, y: 0.70710677, z: 0.00000002462179, w: -0.00000001053671}
+      scale: {x: 1, y: 0.99999976, z: 1.0000002}
+    - name: arm_r2
+      parentName: arm_r1
+      position: {x: -1.08522365e-10, y: 0.00019587416, z: 1.6391277e-11}
+      rotation: {x: 0.000000029802322, y: -1, z: -0.00000006132657, w: -0.000000107260824}
+      scale: {x: 1.0000001, y: 0.9999999, z: 1}
+    - name: wrist_r1
+      parentName: arm_r2
+      position: {x: 1.2814998e-10, y: 0.0001875001, z: 0}
+      rotation: {x: 0.00000002107342, y: -0.000000021073435, z: 0.000000029802319,
+        w: 1}
+      scale: {x: 1.0000004, y: 1.0000001, z: 1.0000004}
+    - name: wrist_r1_end
+      parentName: wrist_r1
+      position: {x: -0, y: 0.00018749994, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: small_model.001
+      parentName: smallmario(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
+    - name: mario_head_cap.001
+      parentName: smallmario(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
     armTwist: 0.5
     foreArmTwist: 0.5
     upperLegTwist: 0.5
@@ -91,17 +207,20 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
-    rootMotionBoneName: 
+    globalScale: 0.01
+    rootMotionBoneName: mario_all_root
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: e0d3ef6bcff32414dbd34fc6ac031292,
+    type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 0
+  avatarSetup: 2
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

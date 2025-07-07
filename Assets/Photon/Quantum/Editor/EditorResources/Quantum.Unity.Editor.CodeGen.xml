@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Quantum.Unity.Editor.CodeGen</name>
+    </assembly>
+    <members>
+        <member name="T:Quantum.Editor.QuantumQtnAsset">
+            <summary>
+            A text asset that stores Quantum DSL (domain specific language) code. Quantum requires components and other runtime game state
+            data types to be declared within.
+            Upon any of these assets changing, <see cref="M:Quantum.Editor.QuantumCodeGenQtn.Run"/> is called. To disable this behavior, define <code>QUANTUM_DISABLE_AUTO_CODEGEN</code>.
+            </summary>
+        </member>
+        <member name="T:Quantum.Editor.QuantumCodeGenSettings">
+            <summary>
+            Settings for the Quantum code generation. Extend this class with a partial implementation to customize the settings.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumCodeGenSettings.DefaultCodeGenQtnFolderPath">
+            <summary>
+            The default folder path for the Simulation generated code.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumCodeGenSettings.DefaultCodeGenUnityRuntimeFolderPath">
+            <summary>
+            The default folder path for the Unity runtime generated code.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumCodeGenSettings.DefaultOptions">
+            <summary>
+            The default code generation options. If <code>QUANTUM_ENABLE_MIGRATION</code> is defined,
+            <see cref="F:Quantum.CodeGen.GeneratorLegacyOptions.DefaultMigrationFlags"/> are used for <see cref="P:Quantum.CodeGen.GeneratorOptions.LegacyCodeGenOptions"/>.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumCodeGenSettings.Options">
+            <summary>
+            Creates a new instance of <see cref="T:Quantum.CodeGen.GeneratorOptions"/> with the default options. Uses <see cref="P:Quantum.Editor.QuantumCodeGenSettings.DefaultOptions"/> and
+            calls <see cref="M:Quantum.Editor.QuantumCodeGenSettings.GetOptionsUser(Quantum.CodeGen.GeneratorOptions@)"/> to customize the options.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumCodeGenSettings.CodeGenQtnFolderPath">
+            <summary>
+            Returns the folder path for the Simulation generated code. Uses <see cref="F:Quantum.Editor.QuantumCodeGenSettings.DefaultCodeGenQtnFolderPath"/> and
+            calls <see cref="M:Quantum.Editor.QuantumCodeGenSettings.GetCodeGenFolderPathUser(System.String@)"/> to customize the path.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumCodeGenSettings.CodeGenUnityRuntimeFolderPath">
+            <summary>
+            Returns the folder path for the Unity runtime generated code. Uses <see cref="F:Quantum.Editor.QuantumCodeGenSettings.DefaultCodeGenUnityRuntimeFolderPath"/> and
+            calls <see cref="M:Quantum.Editor.QuantumCodeGenSettings.GetCodeGenUnityRuntimeFolderPathUser(System.String@)"/> to customize the path.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenSettings.GetOptionsUser(Quantum.CodeGen.GeneratorOptions@)">
+            <summary>
+            Implement this method to customize the code generation options.
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenSettings.GetCodeGenFolderPathUser(System.String@)">
+            <summary>
+            Implement this method to customize the code generation Simulation folder path.
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenSettings.GetCodeGenUnityRuntimeFolderPathUser(System.String@)">
+            <summary>
+            Implement this method to customize the code generation View folder path.
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="T:Quantum.Editor.QuantumCodeGenQtn">
+            <summary>
+            Quantum CodeGen for Qtn files. This type is placed in a standalone asmdef to make sure it can be compiled and run even in
+            case of compile errors in other parts of the project.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumCodeGenQtn.VersionFilepath">
+            <summary>
+            The Quantum CodeGen version that the SDK expects. This is used to show a hint to restart UnityEditor during upgrading for example.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenQtn.Run">
+            <summary>
+            Runs the Quantum CodeGen for all <see cref="T:Quantum.Editor.QuantumQtnAsset"/> in the project with default settings. Can be invoked with
+            command line argument (-executeMethod Quantum.Editor.QuantumCodeGenQtn.Run).
+            </summary>
+            <seealso cref="P:Quantum.Editor.QuantumCodeGenSettings.DefaultOptions"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenQtn.Run(System.String[],System.Boolean)">
+            <summary>
+            Runs the Quantum CodeGen for specific Qtn files with default settings.
+            </summary>
+            <param name="qtnFiles">Qtn files to be analyzed</param>
+            <param name="verbose">Log verbose output</param>
+            <seealso cref="P:Quantum.Editor.QuantumCodeGenSettings.DefaultOptions"/>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenQtn.Run(System.String[],System.Boolean,Quantum.CodeGen.GeneratorOptions)">
+            <summary>
+            Runs the Quantum CodeGen for specific Qtn files with custom settings.
+            </summary>
+            <param name="qtnFiles">Qtn files to be analyzed</param>
+            <param name="verbose">Log verbose output</param>
+            <param name="options">CodeGen options</param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenQtn.Run(System.Boolean,Quantum.CodeGen.GeneratorOptions)">
+            <summary>
+            Runs the Quantum CodeGen for all <see cref="T:Quantum.Editor.QuantumQtnAsset"/> in the project with custom settings.
+            </summary>
+            <param name="verbose">Log verbose output</param>
+            <param name="options">CodeGen options</param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumCodeGenQtn.Run(System.Boolean)">
+            <summary>
+            Runs the Quantum CodeGen for all <see cref="T:Quantum.Editor.QuantumQtnAsset"/> in the project with default settings.
+            </summary>
+            <param name="verbose">Log verbose output</param>
+            <seealso cref="P:Quantum.Editor.QuantumCodeGenSettings.DefaultOptions"/>
+        </member>
+        <member name="T:Quantum.Editor.QuantumQtnAssetImporter">
+            <summary>
+            Importer for <see cref="T:Quantum.Editor.QuantumQtnAsset"/>. Handles files with the <see cref="F:Quantum.Editor.QuantumQtnAssetImporter.Extension"/> extension.
+            </summary>
+        </member>
+        <member name="F:Quantum.Editor.QuantumQtnAssetImporter.Extension">
+            <summary>
+            The extension of the Quantum Qtn asset.
+            </summary>
+        </member>
+        <member name="M:Quantum.Editor.QuantumQtnAssetImporter.OnImportAsset(UnityEditor.AssetImporters.AssetImportContext)">
+            <summary>
+            Creates a new instance of <see cref="T:Quantum.Editor.QuantumQtnAsset"/> and sets it as the main object.
+            </summary>
+            <param name="ctx"></param>
+        </member>
+    </members>
+</doc>

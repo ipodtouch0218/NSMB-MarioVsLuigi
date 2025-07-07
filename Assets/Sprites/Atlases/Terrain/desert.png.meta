@@ -3,7 +3,7 @@ guid: a775520159383d847b8ce31256b06b01
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -25,7 +25,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -65,6 +65,7 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -76,6 +77,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -88,6 +90,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -100,6 +103,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
@@ -112,6 +116,7 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
@@ -932,7 +937,6 @@ TextureImporter:
       outline: []
       physicsShape:
       - - {x: -8, y: -8}
-        - {x: 0, y: -4}
         - {x: 8, y: 0}
         - {x: 8, y: -8}
       tessellationDetail: 0
@@ -1936,92 +1940,92 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      desert_33: 1002680184
-      desert_24: -292536865
-      desert_26: 1857606614
-      desert_60: 1454976885
-      desert_2: -1865454657
-      desert_8: 754620218
-      desert_84: -1736474760
-      desert_16: -1010629504
-      desert_67: -877903067
-      desert_39: 2134309147
-      desert_31: 1638483274
       desert_0: -994861787
-      desert_63: 943989676
-      desert_22: 1421545054
-      desert_20: 176390410
-      desert_41: 48086323
-      desert_72: 2107724373
-      desert_76: -87299856
-      desert_73: -41003522
-      desert_6: -115817472
-      desert_79: -1850959329
-      desert_32: -926725186
-      desert_74: -1119995061
-      desert_28: -1084836676
-      desert_64: -1218515958
-      desert_52: -1202639933
-      desert_50: 994197244
-      desert_54: 1083755575
-      desert_18: 431552594
-      desert_44: 312875860
-      desert_21: -16866423
-      desert_4: 221852533
-      desert_17: 490208862
-      desert_51: 1734321218
-      desert_25: -415282038
-      desert_71: 465821994
-      desert_23: 862969814
-      desert_77: -2057253053
-      desert_29: -433027913
-      desert_37: -1177774494
-      desert_55: -1237480425
-      desert_47: 2041552297
-      desert_68: 10594861
-      desert_83: 374128110
-      desert_15: -1103189478
-      desert_58: -2129717144
-      desert_46: 382555762
-      desert_75: -1028822622
-      desert_61: -1704101845
-      desert_70: -78060562
-      desert_38: 1752078815
-      desert_78: -1898954453
-      desert_49: -1528514775
-      desert_40: -913105563
-      desert_3: -1617570398
-      desert_10: -1075547500
-      desert_7: 1108782803
-      desert_14: 1726169780
-      desert_5: -889049313
       desert_1: 1315291416
-      desert_42: -139595554
-      desert_9: -71096601
-      desert_43: -615803972
-      desert_45: -1511281441
+      desert_10: -1075547500
+      desert_11: 1377980844
+      desert_12: -1035965002
+      desert_13: -1033949338
+      desert_14: 1726169780
+      desert_15: -1103189478
+      desert_16: -1010629504
+      desert_17: 490208862
+      desert_18: 431552594
       desert_19: 426475238
+      desert_2: -1865454657
+      desert_20: 176390410
+      desert_21: -16866423
+      desert_22: 1421545054
+      desert_23: 862969814
+      desert_24: -292536865
+      desert_25: -415282038
+      desert_26: 1857606614
+      desert_27: -1933302858
+      desert_28: -1084836676
+      desert_29: -433027913
+      desert_3: -1617570398
       desert_30: 449126502
+      desert_31: 1638483274
+      desert_32: -926725186
+      desert_33: 1002680184
       desert_34: 1511521929
-      desert_66: 1316185387
       desert_35: -1863633262
+      desert_36: 1502316526
+      desert_37: -1177774494
+      desert_38: 1752078815
+      desert_39: 2134309147
+      desert_4: 221852533
+      desert_40: -913105563
+      desert_41: 48086323
+      desert_42: -139595554
+      desert_43: -615803972
+      desert_44: 312875860
+      desert_45: -1511281441
+      desert_46: 382555762
+      desert_47: 2041552297
+      desert_48: 1818551064
+      desert_49: -1528514775
+      desert_5: -889049313
+      desert_50: 994197244
+      desert_51: 1734321218
+      desert_52: -1202639933
+      desert_53: 263402577
+      desert_54: 1083755575
+      desert_55: -1237480425
+      desert_56: -1803950491
+      desert_57: -284738345
+      desert_58: -2129717144
       desert_59: -916478446
+      desert_6: -115817472
+      desert_60: 1454976885
+      desert_61: -1704101845
+      desert_62: 1135130235
+      desert_63: 943989676
+      desert_64: -1218515958
+      desert_65: -761246879
+      desert_66: 1316185387
+      desert_67: -877903067
+      desert_68: 10594861
+      desert_69: -1200193817
+      desert_7: 1108782803
+      desert_70: -78060562
+      desert_71: 465821994
+      desert_72: 2107724373
+      desert_73: -41003522
+      desert_74: -1119995061
+      desert_75: -1028822622
+      desert_76: -87299856
+      desert_77: -2057253053
+      desert_78: -1898954453
+      desert_79: -1850959329
+      desert_8: 754620218
+      desert_80: -1126882676
       desert_81: 1861833765
       desert_82: -1788497326
-      desert_48: 1818551064
-      desert_12: -1035965002
-      desert_36: 1502316526
-      desert_62: 1135130235
-      desert_80: -1126882676
-      desert_11: 1377980844
-      desert_69: -1200193817
-      desert_27: -1933302858
-      desert_57: -284738345
-      desert_53: 263402577
-      desert_56: -1803950491
-      desert_65: -761246879
-      desert_13: -1033949338
-  spritePackingTag: 
+      desert_83: 374128110
+      desert_84: -1736474760
+      desert_9: -71096601
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
   assetBundleName: 

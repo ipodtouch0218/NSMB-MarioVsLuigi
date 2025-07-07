@@ -1,0 +1,13 @@
+<Project>
+  <!--Properties-->
+  <PropertyGroup>
+    <QuantumCodeGenOutput>..\..\Assets\QuantumUser\Simulation\Generated</QuantumCodeGenOutput>
+  </PropertyGroup>
+  <!--Includes-->
+  <ItemGroup>
+    <Compile Include="../../Assets/QuantumUser/Simulation/**/*.cs" LinkBase="QuantumUser/Simulation" />
+    <None Include="../../Assets/QuantumUser/Simulation/**/*.qtn" LinkBase="QuantumUser/Simulation" />
+    <Compile Include="../../Assets/Photon/Quantum/Simulation/**/*.cs" LinkBase="Photon/Quantum/Simulation" />
+    <None Include="../../Assets/Photon/Quantum/Simulation/**/*.qtn" LinkBase="Photon/Quantum/Simulation" />
+  </ItemGroup>
+</Project>

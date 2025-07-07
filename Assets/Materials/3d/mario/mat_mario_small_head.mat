@@ -19,7 +19,8 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 2000
   stringTagMap: {}
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -60,6 +61,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _StarmanTexture:
+        m_Texture: {fileID: 2800000, guid: cf2f07e1e0d369c4fbd2d42caf15f52f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Textures:
         m_Texture: {fileID: 18700000, guid: 9f735b63cc2f9bf468b89203e1245ffd, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -79,9 +84,11 @@ Material:
     m_Ints: []
     m_Floats:
     - FireFlower: 0
+    - HatUsesOverallsColor: 0
     - IsEyeTexture: 0
     - OutlineSize: 0.01
     - PowerupState: 0
+    - RainbowEnabled: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -93,6 +100,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
+    - _MultiPowerupMaterial: 0
     - _OcclusionStrength: 1
     - _QueueControl: 1
     - _QueueOffset: 0
@@ -107,12 +115,16 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - MultiplyColor: {r: 1, g: 1, b: 1, a: 0}
     - OutlineColor: {r: 0, g: 0, b: 0, a: 0}
+    - OverallsColor: {r: 0, g: 0, b: 0, a: 0}
+    - ShirtColor: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &3376538259669455030
 MonoBehaviour:
   m_ObjectHideFlags: 11
@@ -125,4 +137,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 6
+  version: 9

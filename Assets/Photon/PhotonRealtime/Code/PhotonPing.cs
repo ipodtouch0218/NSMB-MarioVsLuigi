@@ -1,6 +1,6 @@
-﻿// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // <copyright file="PhotonPing.cs" company="Exit Games GmbH">
-//   PhotonNetwork Framework for Unity - Copyright (C) 2018 Exit Games GmbH
+// Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
 // <summary>
 // This file includes various PhotonPing implementations for different APIs,
@@ -11,6 +11,10 @@
 // <author>developer@exitgames.com</author>
 // ----------------------------------------------------------------------------
 
+#if UNITY_2017_4_OR_NEWER
+#define SUPPORTED_UNITY
+#endif
+
 
 namespace Photon.Realtime
 {
@@ -18,23 +22,15 @@ namespace Photon.Realtime
     using System.Collections;
     using System.Threading;
 
-    #if NETFX_CORE
-    using System.Diagnostics;
-    using Windows.Foundation;
-    using Windows.Networking;
-    using Windows.Networking.Sockets;
-    using Windows.Storage.Streams;
-    #endif
-
-    #if !NO_SOCKET && !NETFX_CORE
+    #if !NO_SOCKET
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Net.Sockets;
     #endif
 
     #if UNITY_WEBGL
-    // import WWW class
-    using UnityEngine;
+    // import UnityWebRequest
+    using UnityEngine.Networking;
     #endif
 
     /// <summary>
@@ -42,35 +38,36 @@ namespace Photon.Realtime
     /// </summary>
     public abstract class PhotonPing : IDisposable
     {
+        /// <summary>Caches the last exception/error message, if any.</summary>
         public string DebugString = "";
-        
+
+        /// <summary>True of the ping was successful.</summary>
         public bool Successful;
 
+        /// <summary>True if there was any result.</summary>
         protected internal bool GotResult;
 
+        /// <summary>Length of a ping.</summary>
         protected internal int PingLength = 13;
 
+        /// <summary>Bytes to send in a (Photon UDP) ping.</summary>
         protected internal byte[] PingBytes = new byte[] { 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x7d, 0x00 };
 
+        /// <summary>Randomized number to identify a ping.</summary>
         protected internal byte PingId;
 
         private static readonly System.Random RandomIdProvider = new System.Random();
 
-        public virtual bool StartPing(string ip)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>Begins sending a ping.</summary>
+        public abstract bool StartPing(string ip);
 
-        public virtual bool Done()
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>Check if done.</summary>
+        public abstract bool Done();
 
-        public virtual void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>Dispose of this ping.</summary>
+        public abstract void Dispose();
 
+        /// <summary>Initialize this ping (GotResult, Successful, PingId).</summary>
         protected internal void Init()
         {
             this.GotResult = false;
@@ -80,7 +77,7 @@ namespace Photon.Realtime
     }
 
 
-    #if !NETFX_CORE && !NO_SOCKET
+    #if !NO_SOCKET
     /// <summary>Uses C# Socket class from System.Net.Sockets (as Unity usually does).</summary>
     /// <remarks>Incompatible with Windows 8 Store/Phone API.</remarks>
     public class PingMono : PhotonPing
@@ -110,8 +107,7 @@ namespace Photon.Realtime
                     }
 
                     this.sock.ReceiveTimeout = 5000;
-                    int port = (RegionHandler.PortToPingOverride != 0) ? RegionHandler.PortToPingOverride : 5055;
-                    this.sock.Connect(ip, port);
+                    this.sock.Connect(ip, RegionHandler.UdpPortToPing);
                 }
 
 
@@ -122,12 +118,16 @@ namespace Photon.Realtime
             catch (Exception e)
             {
                 this.sock = null;
-                Console.WriteLine(e);
+                System.Diagnostics.Debug.WriteLine(e.ToString());
+
+                // bubble up
+                throw;
             }
 
             return false;
         }
 
+        /// <summary>Check if done.</summary>
         public override bool Done()
         {
             if (this.GotResult || this.sock == null)
@@ -168,8 +168,11 @@ namespace Photon.Realtime
             return true;
         }
 
+        /// <summary>Dispose of this ping.</summary>
         public override void Dispose()
         {
+            if (this.sock == null) { return; }
+
             try
             {
                 this.sock.Close();
@@ -185,127 +188,29 @@ namespace Photon.Realtime
     #endif
 
 
-    #if NETFX_CORE
-    /// <summary>Windows store API implementation of PhotonPing, based on DatagramSocket for UDP.</summary>
-    public class PingWindowsStore : PhotonPing
+    #if NATIVE_SOCKETS
+    /// <summary>Abstract base class to provide proper resource management for the below native ping implementations</summary>
+    public abstract class PingNative : PhotonPing
     {
-        private DatagramSocket sock;
-        private readonly object syncer = new object();
-
-        public override bool StartPing(string host)
+        // Native socket states - according to EnetConnect.h state definitions
+        protected enum NativeSocketState : byte
         {
-            lock (this.syncer)
-            {
-                this.Init();
-
-                int port = (RegionHandler.PortToPingOverride != 0) ? RegionHandler.PortToPingOverride : 5055;
-                EndpointPair endPoint = new EndpointPair(null, string.Empty, new HostName(host), port.ToString());
-                this.sock = new DatagramSocket();
-                this.sock.MessageReceived += this.OnMessageReceived;
-
-                IAsyncAction result = this.sock.ConnectAsync(endPoint);
-                result.Completed = this.OnConnected;
-                this.DebugString += " End StartPing";
-                return true;
-            }
+            Disconnected = 0,
+            Connecting = 1,
+            Connected = 2,
+            ConnectionError = 3,
+            SendError = 4,
+            ReceiveError = 5,
+            Disconnecting = 6
         }
 
-        public override bool Done()
+        protected IntPtr pConnectionHandler = IntPtr.Zero;
+
+        ~PingNative()
         {
-            lock (this.syncer)
-            {
-                return this.GotResult || this.sock == null; // this just indicates the ping is no longer waiting. this.Successful value defines if the roundtrip completed
-            }
-        }
-
-        public override void Dispose()
-        {
-            lock (this.syncer)
-            {
-                this.sock = null;
-            }
-        }
-
-        private void OnConnected(IAsyncAction asyncinfo, AsyncStatus asyncstatus)
-        {
-            lock (this.syncer)
-            {
-                if (asyncinfo.AsTask().IsCompleted && !asyncinfo.AsTask().IsFaulted && this.sock != null && this.sock.Information.RemoteAddress != null)
-                {
-                    this.PingBytes[this.PingBytes.Length - 1] = this.PingId;
-
-                    DataWriter writer;
-                    writer = new DataWriter(this.sock.OutputStream);
-                    writer.WriteBytes(this.PingBytes);
-                    DataWriterStoreOperation res = writer.StoreAsync();
-                    res.AsTask().Wait(100);
-
-                    this.PingBytes[this.PingBytes.Length - 1] = (byte)(this.PingId + 1); // this buffer is re-used for the result/receive. invalidate the result now.
-
-                    writer.DetachStream();
-                    writer.Dispose();
-                }
-                else
-                {
-                    this.sock = null; // will cause Done() to return true but this.Successful defines if the roundtrip completed
-                }
-            }
-        }
-
-        private void OnMessageReceived(DatagramSocket sender, DatagramSocketMessageReceivedEventArgs args)
-        {
-            lock (this.syncer)
-            {
-                DataReader reader = null;
-                try
-                {
-                    reader = args.GetDataReader();
-                    uint receivedByteCount = reader.UnconsumedBufferLength;
-                    if (receivedByteCount > 0)
-                    {
-                        byte[] resultBytes = new byte[receivedByteCount];
-                        reader.ReadBytes(resultBytes);
-
-                        //TODO: check result bytes!
-
-
-                        this.Successful = receivedByteCount == this.PingLength && resultBytes[resultBytes.Length - 1] == this.PingId;
-                        this.GotResult = true;
-                    }
-                }
-                catch
-                {
-                    // TODO: handle error
-                }
-            }
+            Dispose();
         }
     }
-    #endif
-
-
-    #if NATIVE_SOCKETS
-	/// <summary>Abstract base class to provide proper resource management for the below native ping implementations</summary>
-	public abstract class PingNative : PhotonPing
-	{
-		// Native socket states - according to EnetConnect.h state definitions
-		protected enum NativeSocketState : byte
-		{
-			Disconnected = 0,
-			Connecting = 1,
-			Connected = 2,
-			ConnectionError = 3,
-			SendError = 4,
-			ReceiveError = 5,
-			Disconnecting = 6
-		}
-
-		protected IntPtr pConnectionHandler = IntPtr.Zero;
-
-		~PingNative()
-		{
-			Dispose();
-		}
-	}
 
     /// <summary>Uses dynamic linked native Photon socket library via DllImport("PhotonSocketPlugin") attribute (as done by Unity Android and Unity PS3).</summary>
     public class PingNativeDynamic : PingNative
@@ -316,17 +221,17 @@ namespace Photon.Realtime
             {
                 base.Init();
 
-				if(pConnectionHandler == IntPtr.Zero)
-				{
-					pConnectionHandler = SocketUdpNativeDynamic.egconnect(ip);
-					SocketUdpNativeDynamic.egservice(pConnectionHandler);
-					byte state = SocketUdpNativeDynamic.eggetState(pConnectionHandler);
-					while (state == (byte) NativeSocketState.Connecting)
-					{
-						SocketUdpNativeDynamic.egservice(pConnectionHandler);
-						state = SocketUdpNativeDynamic.eggetState(pConnectionHandler);
-					}
-				}
+                if(pConnectionHandler == IntPtr.Zero)
+                {
+                    pConnectionHandler = SocketUdpNativeDynamic.egconnect(ip);
+                    SocketUdpNativeDynamic.egservice(pConnectionHandler);
+                    byte state = SocketUdpNativeDynamic.eggetState(pConnectionHandler);
+                    while (state == (byte) NativeSocketState.Connecting)
+                    {
+                        SocketUdpNativeDynamic.egservice(pConnectionHandler);
+                        state = SocketUdpNativeDynamic.eggetState(pConnectionHandler);
+                    }
+                }
 
                 PingBytes[PingBytes.Length - 1] = PingId;
                 SocketUdpNativeDynamic.egsend(pConnectionHandler, PingBytes, PingBytes.Length);
@@ -378,24 +283,24 @@ namespace Photon.Realtime
     /// <summary>Uses static linked native Photon socket library via DllImport("__Internal") attribute (as done by Unity iOS and Unity Switch).</summary>
     public class PingNativeStatic : PingNative
     {
-		public override bool StartPing(string ip)
+        public override bool StartPing(string ip)
         {
             base.Init();
 
             lock (SocketUdpNativeStatic.syncer)
-			{
-				if(pConnectionHandler == IntPtr.Zero)
-				{
-					pConnectionHandler = SocketUdpNativeStatic.egconnect(ip);
-					SocketUdpNativeStatic.egservice(pConnectionHandler);
-					byte state = SocketUdpNativeStatic.eggetState(pConnectionHandler);
-					while (state == (byte) NativeSocketState.Connecting)
-					{
-						SocketUdpNativeStatic.egservice(pConnectionHandler);
-						state = SocketUdpNativeStatic.eggetState(pConnectionHandler);
-						Thread.Sleep(0); // suspending execution for a moment is critical on Switch for the OS to update the socket
-					}
-				}
+            {
+                if(pConnectionHandler == IntPtr.Zero)
+                {
+                    pConnectionHandler = SocketUdpNativeStatic.egconnect(ip);
+                    SocketUdpNativeStatic.egservice(pConnectionHandler);
+                    byte state = SocketUdpNativeStatic.eggetState(pConnectionHandler);
+                    while (state == (byte) NativeSocketState.Connecting)
+                    {
+                        SocketUdpNativeStatic.egservice(pConnectionHandler);
+                        state = SocketUdpNativeStatic.eggetState(pConnectionHandler);
+                        Thread.Sleep(0); // suspending execution for a moment is critical on Switch for the OS to update the socket
+                    }
+                }
 
                 PingBytes[PingBytes.Length - 1] = PingId;
                 SocketUdpNativeStatic.egsend(pConnectionHandler, PingBytes, PingBytes.Length);
@@ -449,14 +354,18 @@ namespace Photon.Realtime
     #if UNITY_WEBGL
     public class PingHttp : PhotonPing
     {
-        private WWW webRequest;
+        private UnityWebRequest webRequest;
 
         public override bool StartPing(string address)
         {
             base.Init();
 
-            address = "https://" + address + "/photon/m/?ping&r=" + UnityEngine.Random.Range(0, 10000);
-            this.webRequest = new WWW(address);
+            // to work around an issue with UnityWebRequest in Editor (2021 at least), use http to ping in-Editor
+            string scheme = UnityEngine.Application.isEditor ? "http://" : "https://";
+            address = $"{scheme}{address}/photon/m/?ping&r={UnityEngine.Random.Range(0, 10000)}";
+
+            this.webRequest = UnityWebRequest.Get(address);
+            this.webRequest.SendWebRequest();
             return true;
         }
 

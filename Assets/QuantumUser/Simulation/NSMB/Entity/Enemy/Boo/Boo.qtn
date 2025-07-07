@@ -1,0 +1,9 @@
+component Boo {
+	FP MaxRange;
+	[ExcludeFromPrototype] EntityRef CurrentTarget;
+	[ExcludeFromPrototype] byte UnscaredFrames;
+}
+
+event BooBecomeActive {
+	EntityRef Entity;
+}

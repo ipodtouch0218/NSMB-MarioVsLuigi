@@ -1,0 +1,13 @@
+component Freezable {
+	FPVector2 IceBlockSize;
+	byte AutoBreakFrames;
+	byte AutoBreakGrabAdditionalFrames;
+	bool AutoBreakWhileHeld;
+	FPVector2 Offset;
+	bool IsCarryable;
+	bool IsFlying;
+
+	[ExcludeFromPrototype] EntityRef FrozenCubeEntity;
+}
+
+signal OnEntityFreeze(EntityRef entity, EntityRef iceBlock);

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e514f466ccbd40b8a6cfb54fa62bd2d2, type: 3}
+  m_Name: QuantumLookupTables
+  m_EditorClassIdentifier: 
+  TableSinCos: {fileID: 4900000, guid: 957e874da6f980e47ba1b834471301ce, type: 3}
+  TableTan: {fileID: 4900000, guid: 794c9b9f73b140340899f43d5f7dd28e, type: 3}
+  TableAsin: {fileID: 4900000, guid: f191f1cbd1535994facad2b5403dff75, type: 3}
+  TableAcos: {fileID: 4900000, guid: 156ece8b25f320d4db9e59ea3be2dab1, type: 3}
+  TableAtan: {fileID: 4900000, guid: af1ed011e3558e74b98a67eaac497930, type: 3}
+  TableSqrt: {fileID: 4900000, guid: b555f92ed5573da42a2a05b62fa48234, type: 3}

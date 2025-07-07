@@ -51,7 +51,7 @@ TextureImporter:
       213: 814370457303910616
     second: dust_15
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -68,11 +68,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -111,13 +112,15 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -535,24 +538,23 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       dust_0: -1595736872862477925
-      dust_12: 1851757496178759658
-      dust_4: 1051091026966099959
-      dust_15: 814370457303910616
-      dust_7: -4390563669279041178
-      dust_5: -3246277489707905420
-      dust_11: 4978575293975812359
-      dust_14: -1125901921347072054
-      dust_2: -3900193300909595132
-      dust_10: -7737183391038755057
-      dust_3: 7302673073982842297
-      dust_9: -3946273261508121640
       dust_1: 2220361516922240005
-      dust_8: -7137576525838783544
+      dust_10: -7737183391038755057
+      dust_11: 4978575293975812359
+      dust_12: 1851757496178759658
       dust_13: -7035434229779757533
+      dust_14: -1125901921347072054
+      dust_15: 814370457303910616
+      dust_2: -3900193300909595132
+      dust_3: 7302673073982842297
+      dust_4: 1051091026966099959
+      dust_5: -3246277489707905420
       dust_6: 5145894643363775658
-  spritePackingTag: 
+      dust_7: -4390563669279041178
+      dust_8: -7137576525838783544
+      dust_9: -3946273261508121640
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

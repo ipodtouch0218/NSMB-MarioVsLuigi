@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Product>Quantum Runner Dotnet</Product>
+    <AssemblyName>Quantum.Runner</AssemblyName>
+    <RootNamespace>Quantum</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="[UnityProjectPath]/Assets/Photon/Quantum/Editor/Dotnet/QuantumConsoleRunner.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Quantum.Simulation.Dotnet/Quantum.Simulation.Dotnet.csproj">
+      <IncludeAssets>all</IncludeAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Quantum.Log">
+      <HintPath>../Lib/Release/Quantum.Log.dll</HintPath>
+    </Reference>
+    <Reference Include="Quantum.Deterministic">
+      <HintPath>../Lib/$(Configuration)/Quantum.Deterministic.dll</HintPath>
+    </Reference>
+    <Reference Include="Quantum.Engine">
+      <HintPath>../Lib/$(Configuration)/Quantum.Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Quantum.Json">
+      <HintPath>../Lib/$(Configuration)/Quantum.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+component Spinner {
+	FP ArmMoveSpeed;
+	FP ArmMoveDistance;
+	FP ArmPosition; // Not [Exclude]'d because we can't set a default value, and the signal doesn't work cuz the system is disabled.
+	[ExcludeFromPrototype] FP PlatformHeight;
+	[ExcludeFromPrototype] byte PlatformWaitFrames;
+	[ExcludeFromPrototype, AllocateOnComponentAdded, FreeOnComponentRemoved] hash_set<EntityRef> MariosOnPlatform;
+
+	[ExcludeFromPrototype] FP Rotation;
+	[ExcludeFromPrototype] FP AngularVelocity;
+	[ExcludeFromPrototype] byte RotationWaitFrames;
+}

@@ -1,0 +1,645 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Quantum.Log</name>
+    </assembly>
+    <members>
+        <member name="T:Quantum.AssertException">
+            <summary>
+            An exception that is thrown when an assertion fails.
+            </summary>
+        </member>
+        <member name="M:Quantum.AssertException.#ctor">
+            <summary>
+            Creates a new instance of the exception.
+            </summary>
+        </member>
+        <member name="M:Quantum.AssertException.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the exception with a message.
+            </summary>
+            <param name="msg">A message</param>
+        </member>
+        <member name="T:Quantum.Assert">
+            <summary>
+            Provides methods for asserting conditions. Throws an AssertException when a condition is not met. Methods are only invoked in DEBUG builds unless otherwise specified.
+            </summary>
+        </member>
+        <member name="M:Quantum.Assert.Fail">
+            <summary>
+            Always throws an AssertException.
+            </summary>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Fail(System.String)">
+            <summary>
+            Always throws an AssertException with a message.
+            </summary>
+            <param name="error">An error message</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Fail``1(System.String,``0)">
+            <summary>
+            Always throws an AssertException with a message.
+            </summary>
+            <typeparam name="T0"></typeparam>
+            <param name="format">An error message format</param>
+            <param name="arg0"></param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Fail``2(System.String,``0,``1)">
+            <summary>
+            Always throws an AssertException with a message.
+            </summary>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Fail``3(System.String,``0,``1,``2)">
+            <summary>
+            Always throws an AssertException with a message.
+            </summary>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Fail``4(System.String,``0,``1,``2,``3)">
+            <summary>
+            Always throws an AssertException with a message.
+            </summary>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check(System.Object)">
+            <summary>
+            Throws an AssertException if the <paramref name="condition"/> is <c>null</c>
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check(System.Void*)">
+            <summary>
+            Throws an AssertException if the <paramref name="condition"/> is <c>null</c>
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check(System.Boolean)">
+            <summary>
+            Throws an AssertException if the <paramref name="condition"/> is <see langword="false"/>
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check(System.Boolean,System.String)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="error">An error message</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``1(System.Boolean,System.String,``0)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``2(System.Boolean,System.String,``0,``1)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``3(System.Boolean,System.String,``0,``1,``2)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``4(System.Boolean,System.String,``0,``1,``2,``3)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``1(System.Boolean,``0)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>. The message is composed from additional arguments.
+            </summary>
+            <typeparam name="T0"></typeparam>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``2(System.Boolean,``0,``1)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``3(System.Boolean,``0,``1,``2)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``4(System.Boolean,``0,``1,``2,``3)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Check``5(System.Boolean,``0,``1,``2,``3,``4)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.AlwaysFail">
+            <summary>
+            Throws an AssertException, even in non-DEBUG builds.
+            </summary>
+        </member>
+        <member name="M:Quantum.Assert.AlwaysFail(System.String)">
+            <summary>
+            Throws an AssertException with a message, even in non-DEBUG builds.
+            </summary>
+            <param name="error">An error message</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.AlwaysFail(System.Object)">
+            <summary>
+            Throws an AssertException with a message, even in non-DEBUG builds.
+            </summary>
+            <param name="error">An error message</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.AlwaysFail``1(``0)">
+            <summary>
+            Throws an AssertException with a message, even in non-DEBUG builds.
+            </summary>
+            <param name="error">An error message</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always(System.Boolean)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always(System.Boolean,System.String)">
+            <summary>
+            Throws an AssertException with a message if <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="error">An error message</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``1(System.Boolean,System.String,``0)">
+            <summary>
+            Throws an AssertException with a message if <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``2(System.Boolean,System.String,``0,``1)">
+            <summary>
+            Throws an AssertException with a message if <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``3(System.Boolean,System.String,``0,``1,``2)">
+            <summary>
+            Throws an AssertException with a message if <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``4(System.Boolean,System.String,``0,``1,``2,``3)">
+            <summary>
+            Throws an AssertException with a message if <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds.
+            </summary>
+            <param name="condition">Value to check</param>
+            <param name="format">An error message format</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``1(System.Boolean,``0)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``2(System.Boolean,``0,``1)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``3(System.Boolean,``0,``1,``2)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="M:Quantum.Assert.Always``4(System.Boolean,``0,``1,``2,``3)">
+            <summary>
+            Throws an AssertException with a message if the <paramref name="condition"/> is <see langword="false"/>, even in non-DEBUG builds. The message is composed from additional arguments.
+            </summary>
+            <param name="condition">Value to check</param>
+            <exception cref="T:Quantum.AssertException"></exception>
+        </member>
+        <member name="T:Quantum.ConsoleLogger">
+            <summary>
+            A logger that writes logs to the console.
+            </summary>
+        </member>
+        <member name="M:Quantum.ConsoleLogger.#ctor">
+            <summary>
+            Creates a new console logger.
+            </summary>
+        </member>
+        <member name="M:Quantum.ConsoleLogger.Log(Quantum.LogType,System.String,Quantum.LogContext@)">
+            <summary>
+            Logs a message to the console.
+            </summary>
+            <param name="logType"></param>
+            <param name="message"></param>
+            <param name="logContext"></param>
+        </member>
+        <member name="M:Quantum.ConsoleLogger.LogException(System.Exception,Quantum.LogContext@)">
+            <summary>
+            Logs an exception to the console.
+            </summary>
+            <param name="ex"></param>
+            <param name="logContext"></param>
+        </member>
+        <member name="T:Quantum.LogType">
+            <summary>
+            Log type.
+            </summary>
+        </member>
+        <member name="F:Quantum.LogType.Error">
+            <summary>
+            Error log type.
+            </summary>
+        </member>
+        <member name="F:Quantum.LogType.Warn">
+            <summary>
+            Warning log type.
+            </summary>
+        </member>
+        <member name="F:Quantum.LogType.Info">
+            <summary>
+            Information log type.
+            </summary>
+        </member>
+        <member name="F:Quantum.LogType.Debug">
+            <summary>
+            Debug log type.
+            </summary>
+        </member>
+        <member name="F:Quantum.LogType.Trace">
+            <summary>
+            Trace log type.
+            </summary>
+        </member>
+        <member name="T:Quantum.ILogger">
+            <summary>
+            Represents a logger.
+            </summary>
+        </member>
+        <member name="M:Quantum.ILogger.Log(Quantum.LogType,System.String,Quantum.LogContext@)">
+            <summary>
+            Logs a message.
+            </summary>
+            <param name="logType">Log type</param>
+            <param name="message">Message</param>
+            <param name="logContext">Additional info about the log context</param>
+        </member>
+        <member name="M:Quantum.ILogger.LogException(System.Exception,Quantum.LogContext@)">
+            <summary>
+            Logs an exception.
+            </summary>
+            <param name="ex">An exception</param>
+            <param name="logContext">Additional info about the log context</param>
+        </member>
+        <member name="T:Quantum.Log">
+            <summary>
+            Quantum's logging system.
+            </summary>
+        </member>
+        <member name="F:Quantum.Log.LogLevel">
+            <summary>
+            Set the Log Level based on the severity of the Log.
+            
+            Default: <see cref="F:Quantum.LogType.Debug"/>
+            </summary>
+        </member>
+        <member name="M:Quantum.Log.InitForConsole">
+            <summary>
+            Initialize the Log class with a Console Logger implementation.
+            </summary>
+        </member>
+        <member name="M:Quantum.Log.Init(Quantum.ILogger,Quantum.LogType)">
+            <summary>
+            Initialize the Log class with a Custom Logger implementation.
+            It will change the current <see cref="F:Quantum.Log.LogLevel"/> to <see cref="F:Quantum.LogType.Debug"/> by default when called.
+            </summary>
+            <param name="logger">Custom Logger Implementation</param>
+            <param name="LogLevel">New LogLevel</param>
+        </member>
+        <member name="M:Quantum.Log.Init(System.Action{System.String},System.Action{System.String},System.Action{System.String},System.Action{System.Exception})">
+            <summary>
+            Initialize the Log class with a set of delegates.
+            </summary>
+            <param name="info"></param>
+            <param name="warn"></param>
+            <param name="error"></param>
+            <param name="exn"></param>
+        </member>
+        <member name="P:Quantum.Log.Initialized">
+            <summary>
+            Has the Log class been initialized?
+            </summary>
+        </member>
+        <member name="M:Quantum.Log.Exception(System.Exception)">
+            <summary>
+            Logs an exception.
+            </summary>
+            <param name="exn">The exception to be logged</param>
+        </member>
+        <member name="M:Quantum.Log.Exception(System.String,System.Exception)">
+            <summary>
+            Logs an exception.
+            </summary>
+            <param name="message">A custom exception message</param>
+            <param name="exn">The exception to be logged</param>
+        </member>
+        <member name="M:Quantum.Log.Trace(System.Object)">
+            <summary>Logs a message if TRACE is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.TraceWarn(System.Object)">
+            <summary>Logs a warning if TRACE is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.TraceError(System.Object)">
+            <summary>Logs an error if TRACE is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.Debug(System.Object)">
+            <summary>Logs a message if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugWarn(System.Object)">
+            <summary>Logs a warning if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugError(System.Object)">
+            <summary>Logs an error if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.TracePhysics2D(System.Object)">
+            <summary>Logs a message to the stream "Physics2D" if QUANTUM_TRACE_PHYSICS2D is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugPhysics2D(System.Object)">
+            <summary>Logs a message to the stream "Physics2D" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugWarnPhysics2D(System.Object)">
+            <summary>Logs a warning to the stream "Physics2D" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugErrorPhysics2D(System.Object)">
+            <summary>Logs an error to the stream "Physics2D" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.InfoPhysics2D(System.Object)">
+            <summary>Logs a message to the stream "Physics2D".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.WarnPhysics2D(System.Object)">
+            <summary>Logs a warning to the stream "Physics2D".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.ErrorPhysics2D(System.Object)">
+            <summary>Logs an error to the stream "Physics2D".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.TracePhysics3D(System.Object)">
+            <summary>Logs a message to the stream "Physics3D" if QUANTUM_TRACE_PHYSICS3D is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugPhysics3D(System.Object)">
+            <summary>Logs a message to the stream "Physics3D" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugWarnPhysics3D(System.Object)">
+            <summary>Logs a warning to the stream "Physics3D" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugErrorPhysics3D(System.Object)">
+            <summary>Logs an error to the stream "Physics3D" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.InfoPhysics3D(System.Object)">
+            <summary>Logs a message to the stream "Physics3D".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.WarnPhysics3D(System.Object)">
+            <summary>Logs a warning to the stream "Physics3D".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.ErrorPhysics3D(System.Object)">
+            <summary>Logs an error to the stream "Physics3D".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.TraceNavigation(System.Object)">
+            <summary>Logs a message to the stream "Navigation" if QUANTUM_TRACE_NAVIGATION is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugNavigation(System.Object)">
+            <summary>Logs a message to the stream "Navigation" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugWarnNavigation(System.Object)">
+            <summary>Logs a warning to the stream "Navigation" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugErrorNavigation(System.Object)">
+            <summary>Logs an error to the stream "Navigation" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.InfoNavigation(System.Object)">
+            <summary>Logs a message to the stream "Navigation".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.WarnNavigation(System.Object)">
+            <summary>Logs a warning to the stream "Navigation".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.ErrorNavigation(System.Object)">
+            <summary>Logs an error to the stream "Navigation".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.TraceAssets(System.Object)">
+            <summary>Logs a message to the stream "Assets" if QUANTUM_TRACE_ASSETS is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugAssets(System.Object)">
+            <summary>Logs a message to the stream "Assets" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugWarnAssets(System.Object)">
+            <summary>Logs a warning to the stream "Assets" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.DebugErrorAssets(System.Object)">
+            <summary>Logs an error to the stream "Assets" if DEBUG is defined.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.InfoAssets(System.Object)">
+            <summary>Logs a message to the stream "Assets".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.WarnAssets(System.Object)">
+            <summary>Logs a warning to the stream "Assets".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.ErrorAssets(System.Object)">
+            <summary>Logs an error to the stream "Assets".</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.Info(System.Object)">
+            <summary>Logs a message of Info type.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.Warn(System.Object)">
+            <summary>Logs a message of Warn type.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="M:Quantum.Log.Error(System.Object)">
+            <summary>Logs a message of Error type.</summary>
+            <param name="msg">The message to log.</param>
+        </member>
+        <member name="T:Quantum.LogContext">
+            <summary>
+            Additional info about the log context.
+            </summary>
+        </member>
+        <member name="F:Quantum.LogContext.Prefix">
+            <summary>
+            A prefix for the log message.
+            </summary>
+        </member>
+        <member name="F:Quantum.LogContext.Source">
+            <summary>
+            An object that is the source of the log message.
+            </summary>
+        </member>
+        <member name="M:Quantum.LogContext.#ctor(System.String,System.Object)">
+            <summary>
+            Creates a new log context.
+            </summary>
+            <param name="prefix">Log message prefix</param>
+            <param name="source">An object that is the source of the log message</param>
+        </member>
+        <member name="T:Quantum.TextWriterLogger">
+            <summary>
+            A simple logger that writes logs to a text writer.
+            </summary>
+        </member>
+        <member name="M:Quantum.TextWriterLogger.#ctor(System.IO.TextWriter,System.Boolean)">
+            <summary>
+            Creates a new text writer logger.
+            </summary>
+            <param name="writer"></param>
+            <param name="disposeWriter"></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Quantum.TextWriterLogger.Dispose">
+            <summary>
+            Disposes the internal text writer if disposeWriter is <see langword="true"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.TextWriterLogger.Log(Quantum.LogType,System.String,Quantum.LogContext@)">
+            <summary>
+            Implements the logging logic.
+            </summary>
+            <param name="logType"></param>
+            <param name="message"></param>
+            <param name="logContext"></param>
+        </member>
+        <member name="M:Quantum.TextWriterLogger.LogException(System.Exception,Quantum.LogContext@)">
+            <summary>
+            Implements the exception logging logic.
+            </summary>
+            <param name="ex"></param>
+            <param name="logContext"></param>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with a field or property member.</summary>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>Initializes the attribute with the list of field and property members.</summary>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values when returning with the specified return value condition.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>Initializes the attribute with the specified return value condition and a field or property member.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="member">
+            The field or property member that is promised to be not-null.
+            </param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>Initializes the attribute with the specified return value condition and list of field and property members.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+            <param name="members">
+            The list of field and property members that are promised to be not-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>Gets field or property member names.</summary>
+        </member>
+    </members>
+</doc>

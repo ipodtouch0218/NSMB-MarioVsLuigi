@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <Product>Quantum Simulation Dotnet</Product>
+    <AssemblyName>Quantum.Simulation</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Quantum</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Configurations>Debug;Release</Configurations>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <TargetPlatform Condition="$(TargetPlatform)==''">Windows</TargetPlatform>
+    <CopyOutput>false</CopyOutput>
+    <CopyOutputDir>false</CopyOutputDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Company>Photon Engine</Company>
+    <Copyright>Copyright (c) Exit Games GmbH 2024</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('Release'))">
+    <Optimize>true</Optimize>
+    <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Quantum.Log">
+      <HintPath>../Lib/Release/Quantum.Log.dll</HintPath>
+    </Reference>
+    <Reference Include="Quantum.Deterministic">
+      <HintPath>../Lib/$(Configuration)/Quantum.Deterministic.dll</HintPath>
+    </Reference>
+    <Reference Include="Quantum.Engine">
+      <HintPath>../Lib/$(Configuration)/Quantum.Engine.dll</HintPath>
+    </Reference>
+    <Content Include="../Lib/$(Configuration)/Quantum.Json.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Import Condition="Exists('Quantum.Simulation.Dotnet.csproj.include')" Project="Quantum.Simulation.Dotnet.csproj.include" />
+  
+  <Import Condition="Exists('Quantum.Simulation.Dotnet.csproj.user')" Project="Quantum.Simulation.Dotnet.csproj.user" />
+
+  <Target Name="CopyOutput" AfterTargets="Build" Condition="'$(TargetFramework)'!='' AND $(CopyOutput) AND '$(CopyOutputDir)'!=''">
+    <ItemGroup>
+      <QuantumFiles Include="$(TargetDir)\*.*" />
+    </ItemGroup>
+    <Message Importance="High" Text="Copying output to $(CopyOutputDir): @(QuantumFiles)" />
+    <Copy SourceFiles="@(QuantumFiles)" DestinationFolder="$(CopyOutputDir)" />
+  </Target>
+
+</Project>

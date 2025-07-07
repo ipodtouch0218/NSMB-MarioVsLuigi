@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29518fadcd4a704abe29d73e5159d3f, type: 3}
+  m_Name: LuigiCharacter
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Characters/LuigiCharacter
+    Guid:
+      Value: 485289843648077326
+  Prototype:
+    Id:
+      Value: 1479918679323180618
+  SoundFolder: luigi
+  UiString: <sprite name=hud_luigi>
+  TranslationString: character.luigi
+  LoadingSmallSprite: {fileID: -3599161207798135845, guid: a7245cae141f3ee449147539ebd2a2c9,
+    type: 3}
+  LoadingLargeSprite: {fileID: -309644342959843524, guid: a7245cae141f3ee449147539ebd2a2c9,
+    type: 3}
+  ReadySprite: {fileID: -7975249404588759376, guid: 70672da71d9d71a4daaf5f3fc58531e6,
+    type: 3}
+  SmallOverrides: {fileID: 22100000, guid: a1854453357bb034e89ec419b0f57906, type: 2}
+  LargeOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e, type: 2}

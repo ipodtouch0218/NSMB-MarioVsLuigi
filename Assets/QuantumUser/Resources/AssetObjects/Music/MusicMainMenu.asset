@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 075af0e881e112348abe562216ddc298, type: 3}
+  m_Name: MusicMainMenu
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Music/MusicMainMenu
+    Guid:
+      Value: 412412404095479684
+  clip: {fileID: 8300000, guid: c9850c9bc8b015b4eb42ff8acd836e8b, type: 3}
+  loopStartSeconds: 39.272
+  loopEndSeconds: 78.558
+  fastClip: {fileID: 0}
+  speedupFactor: 1

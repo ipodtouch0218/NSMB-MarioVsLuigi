@@ -1,0 +1,24 @@
+{
+    "name": "Quantum.Unity.Editor.CodeGen",
+    "rootNamespace": "Quantum.Editor",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Quantum.Engine.dll",
+        "Quantum.CodeGen.Qtn.dll",
+        "Quantum.CodeGen.Unity.dll",
+        "FSharp.Core.dll",
+        "System.CodeDom.dll",
+        "Quantum.Log.dll",
+        "Quantum.Deterministic.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

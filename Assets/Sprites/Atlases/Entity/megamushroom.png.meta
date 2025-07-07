@@ -54,7 +54,7 @@ TextureImporter:
       213: -3752053547170821965
     second: bigboi_16
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -76,7 +76,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -99,7 +99,7 @@ TextureImporter:
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -116,6 +116,7 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -305,8 +306,8 @@ TextureImporter:
         y: 88
         width: 31
         height: 36
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.027777778}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -326,8 +327,8 @@ TextureImporter:
         y: 87
         width: 33
         height: 37
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.027027028}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -347,8 +348,8 @@ TextureImporter:
         y: 86
         width: 33
         height: 38
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05263158}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -368,8 +369,8 @@ TextureImporter:
         y: 87
         width: 33
         height: 38
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05263158}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -389,8 +390,8 @@ TextureImporter:
         y: 84
         width: 34
         height: 40
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -410,8 +411,8 @@ TextureImporter:
         y: 40
         width: 35
         height: 41
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.07317073}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -431,8 +432,8 @@ TextureImporter:
         y: 41
         width: 37
         height: 40
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.05}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -452,8 +453,8 @@ TextureImporter:
         y: 44
         width: 37
         height: 37
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.054054055}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -473,8 +474,8 @@ TextureImporter:
         y: 46
         width: 38
         height: 35
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.028571429}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -560,24 +561,24 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      megamushroom_12: 222936063
-      megamushroom_7: -1656757205
-      megamushroom_4: 462894262
-      megamushroom_16: -142270678
-      megamushroom_11: -327889744
-      megamushroom_9: -204546133
       megamushroom_0: 946899095
-      megamushroom_2: -126000455
-      megamushroom_14: -399741618
-      megamushroom_3: -1750250691
-      megamushroom_10: -1439950783
-      megamushroom_8: -278838182
-      megamushroom_13: 861247388
-      megamushroom_6: 1938320342
       megamushroom_1: 155123260
-      megamushroom_5: -1512215229
+      megamushroom_10: -1439950783
+      megamushroom_11: -327889744
+      megamushroom_12: 222936063
+      megamushroom_13: 861247388
+      megamushroom_14: -399741618
       megamushroom_15: 592006526
-  spritePackingTag: 
+      megamushroom_16: -142270678
+      megamushroom_2: -126000455
+      megamushroom_3: -1750250691
+      megamushroom_4: 462894262
+      megamushroom_5: -1512215229
+      megamushroom_6: 1938320342
+      megamushroom_7: -1656757205
+      megamushroom_8: -278838182
+      megamushroom_9: -204546133
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
   assetBundleName: 

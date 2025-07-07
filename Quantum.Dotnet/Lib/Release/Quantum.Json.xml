@@ -1,0 +1,294 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Quantum.Json</name>
+    </assembly>
+    <members>
+        <member name="T:Quantum.QuantumJsonSerializer">
+            <summary>
+            A serializer that is able to deserialize JSON produced by QuantumUnityJsonSerializer. 
+            Handles SerializeReference, Unity-style byte[] serialization and fixed-size buffers.
+            Uses <see cref="T:Quantum.Json.UnityJsonUtilityConvert"/> under the hood.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.FromJson``1(System.String)">
+            <summary>
+            Converts a JSON string to an object.
+            </summary>
+            <typeparam name="T">The type of the object to convert to.</typeparam>
+            <param name="json">The JSON string to convert.</param>
+            <returns>The converted object.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.FromJson(System.String,System.Type)">
+            <summary>
+            Converts a JSON string to an object.
+            </summary>
+            <param name="json">The JSON string to convert.</param>
+            <param name="type">The type of the object to convert to.</param>
+            <returns>The converted object.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.FromJson``1(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Converts a JSON object to an object.
+            </summary>
+            <typeparam name="T">The type of the object to convert to.</typeparam>
+            <param name="json">The JSON object to convert.</param>
+            <returns>The converted object.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.ToJson``1(``0)">
+            <summary>
+            Converts an object to a JSON string.
+            </summary>
+            <typeparam name="T">The type of the object to convert.</typeparam>
+            <param name="obj">The object to convert.</param>
+            <returns>The JSON string representation of the object.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.SerializeConfig(System.IO.Stream,Quantum.IRuntimeConfig)">
+            <summary>
+            Serializes the runtime configuration to a stream.
+            </summary>
+            <param name="stream">The stream to serialize to.</param>
+            <param name="config">The runtime configuration to serialize.</param>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.SerializePlayer(System.IO.Stream,Quantum.IRuntimePlayer)">
+            <summary>
+            Serializes the runtime player to a stream.
+            </summary>
+            <param name="stream">The stream to serialize to.</param>
+            <param name="player">The runtime player to serialize.</param>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.SerializeAssets(System.IO.Stream,Quantum.AssetObject[])">
+            <summary>
+            Serializes the assets to a stream.
+            </summary>
+            <param name="stream">The stream to serialize to.</param>
+            <param name="assets">The assets to serialize.</param>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.DeserializeConfig(System.IO.Stream)">
+            <summary>
+            Deserializes the runtime configuration from a stream.
+            </summary>
+            <param name="stream">The stream to deserialize from.</param>
+            <returns>The deserialized runtime configuration.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.DeserializePlayer(System.IO.Stream)">
+            <summary>
+            Deserializes the runtime player from a stream.
+            </summary>
+            <param name="stream">The stream to deserialize from.</param>
+            <returns>The deserialized runtime player.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.SerializeResult(System.IO.Stream,Quantum.IGameResult)">
+            <summary>
+            Serializes the game result to a stream.
+            </summary>
+            <param name="stream">The stream to serialize to.</param>
+            <param name="result">The game result to serialize.</param>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.DeserializeResult(System.IO.Stream)">
+            <summary>
+            Deserializes the game result from a stream.
+            </summary>
+            <param name="stream">The stream to deserialize from.</param>
+            <returns>The deserialized game result.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.DeserializeAssets(System.IO.Stream)">
+            <summary>
+            Deserializes the assets from a stream.
+            </summary>
+            <param name="stream">The stream to deserialize from.</param>
+            <returns>The deserialized assets.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.PrintObject(System.Object)">
+            <summary>
+            Prints the object as a JSON string.
+            </summary>
+            <param name="obj">The object to print.</param>
+            <returns>The JSON string representation of the object.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.CreateReader(System.IO.Stream)">
+            <summary>
+            Creates a text reader for the given stream.
+            </summary>
+            <param name="stream">The stream to create the reader for.</param>
+            <returns>The created text reader.</returns>
+        </member>
+        <member name="M:Quantum.QuantumJsonSerializer.CreateWriter(System.IO.Stream)">
+            <summary>
+            Creates a text writer for the given stream.
+            </summary>
+            <param name="stream">The stream to create the writer for.</param>
+            <returns>The created text writer.</returns>
+        </member>
+        <member name="T:Quantum.Json.ByteArrayConverter">
+            <summary>
+            Converts byte arrays to and from JSON in a way compatible with the Unity's built-in JSON utility.
+            </summary>
+        </member>
+        <member name="M:Quantum.Json.ByteArrayConverter.CanConvert(System.Type)">
+            <summary>
+            Determines whether this converter can convert the specified object type.
+            </summary>
+            <param name="objectType">The type of the object to convert.</param>
+            <returns><see langword="true"/> if the converter can convert the specified object type; otherwise, <see langword="false"/>.</returns>
+        </member>
+        <member name="M:Quantum.Json.ByteArrayConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Reads the JSON representation of the object.
+            </summary>
+            <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader"/> to read from.</param>
+            <param name="objectType">The type of the object to convert.</param>
+            <param name="existingValue">The existing value of object being read.</param>
+            <param name="serializer">The calling serializer.</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:Quantum.Json.ByteArrayConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <summary>
+            Writes the JSON representation of the object.
+            </summary>
+            <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter"/> to write to.</param>
+            <param name="value">The value to write.</param>
+            <param name="serializer">The calling serializer.</param>
+        </member>
+        <member name="T:Quantum.Json.FixedSizeBufferConverter">
+            <summary>
+            Converts fixed-size buffers to and from JSON in a way compatible with the Unity's built-in JSON utility.
+            </summary>
+        </member>
+        <member name="M:Quantum.Json.FixedSizeBufferConverter.CanConvert(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.FixedSizeBufferConverter.GetFixedBufferElementType(System.Type,System.Int32@)">
+            <summary>
+            Gets the element type of the fixed-size buffer and the total size of the buffer.
+            </summary>
+            <param name="fixedBufferType">The type of the fixed-size buffer.</param>
+            <param name="totalSize">The total size of the buffer.</param>
+            <returns>The element type of the fixed-size buffer.</returns>
+        </member>
+        <member name="M:Quantum.Json.FixedSizeBufferConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.FixedSizeBufferConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.FixedSizeBufferConverter.WriteJsonArray``1(Newtonsoft.Json.JsonWriter,System.IntPtr,System.Int32)">
+            <summary>
+            Writes a fixed-size buffer as a JSON array.
+            </summary>
+            <typeparam name="T">The type of the elements in the buffer.</typeparam>
+            <param name="writer">The JSON writer.</param>
+            <param name="ptr">The pointer to the buffer.</param>
+            <param name="totalSize">The total size of the buffer.</param>
+        </member>
+        <member name="M:Quantum.Json.FixedSizeBufferConverter.ReadJsonArray``1(Newtonsoft.Json.JsonReader,System.IntPtr,System.Int32)">
+            <summary>
+            Reads a JSON array into a fixed-size buffer.
+            </summary>
+            <typeparam name="T">The type of the elements in the buffer.</typeparam>
+            <param name="reader">The JSON reader.</param>
+            <param name="ptr">The pointer to the buffer.</param>
+            <param name="totalSize">The total size of the buffer.</param>
+        </member>
+        <member name="T:Quantum.Json.UnityContractResolver">
+            <summary>
+            Custom contract resolver for Unity objects. The main purpose is to support Unity's SerializeReference attribute.
+            </summary>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.#ctor(System.Collections.Generic.Dictionary{System.Int32,System.Object})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Quantum.Json.UnityContractResolver"/> class.
+            </summary>
+            <param name="ridToObject">The dictionary mapping resource IDs to objects.</param>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.CreateProperty(System.Reflection.MemberInfo,Newtonsoft.Json.MemberSerialization)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.GetSerializableMembers(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.CreateProperties(System.Type,Newtonsoft.Json.MemberSerialization)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.CreateContract(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.CreateArrayContract(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.CreateObjectContract(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Quantum.Json.UnityContractResolver.UnitySerializeReferenceConverter">
+            <summary>
+            Converter for Unity serialize reference.
+            </summary>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.UnitySerializeReferenceConverter.#ctor(Quantum.Json.UnityContractResolver)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Quantum.Json.UnityContractResolver.UnitySerializeReferenceConverter"/> class.
+            </summary>
+            <param name="resolver">The Unity contract resolver.</param>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.UnitySerializeReferenceConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.UnitySerializeReferenceConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Quantum.Json.UnityContractResolver.UnitySerializeReferenceConverter.CanConvert(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Quantum.Json.UnityJsonUtilityConvert">
+            <summary>
+            Utility methods to convert JSON data serialized by Unity's built-in JSON utility to .NET objects with Newtonsoft.Json.
+            </summary>
+        </member>
+        <member name="M:Quantum.Json.UnityJsonUtilityConvert.DeserializeObject(Newtonsoft.Json.Linq.JObject,System.Type,Newtonsoft.Json.JsonSerializerSettings)">
+            <summary>
+            Deserializes the specified JSON object to the specified type using the provided JsonSerializerSettings.
+            Settings must have ContractResolver set to <see langword="null"/>.
+            </summary>
+            <param name="root">The JSON object to deserialize.</param>
+            <param name="type">The type to deserialize the JSON object to.</param>
+            <param name="settings">The JsonSerializerSettings to use for deserialization. (optional)</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:Quantum.Json.UnityJsonUtilityConvert.DeserializeObject(System.String,System.Type,Newtonsoft.Json.JsonSerializerSettings)">
+            <summary>
+            Deserializes the specified JSON string to the specified type using the provided JsonSerializerSettings.
+            </summary>
+            <param name="json">The JSON string to deserialize.</param>
+            <param name="type">The type to deserialize the JSON string to.</param>
+            <param name="settings">The JsonSerializerSettings to use for deserialization. (optional)</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:Quantum.Json.UnityJsonUtilityConvert.DeserializeObject``1(Newtonsoft.Json.Linq.JObject,Newtonsoft.Json.JsonSerializerSettings)">
+            <summary>
+            Deserializes the specified JSON object to the specified type using the provided JsonSerializerSettings.
+            </summary>
+            <typeparam name="T">The type to deserialize the JSON object to.</typeparam>
+            <param name="root">The JSON object to deserialize.</param>
+            <param name="settings">The JsonSerializerSettings to use for deserialization. (optional)</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:Quantum.Json.UnityJsonUtilityConvert.DeserializeObject``1(System.String,Newtonsoft.Json.JsonSerializerSettings)">
+            <summary>
+            Deserializes the specified JSON string to the specified type using the provided JsonSerializerSettings.
+            </summary>
+            <typeparam name="T">The type to deserialize the JSON string to.</typeparam>
+            <param name="json">The JSON string to deserialize.</param>
+            <param name="settings">The JsonSerializerSettings to use for deserialization. (optional)</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:Quantum.Json.UnityJsonUtilityConvert.SerializeObject(System.Object,System.Type,Newtonsoft.Json.JsonSerializerSettings)">
+            <summary>
+            Serializes the specified object to a JSON string using the provided JsonSerializerSettings.
+            </summary>
+            <param name="value">The object to serialize.</param>
+            <param name="rootType">The root type of the object. (optional)</param>
+            <param name="settings">The JsonSerializerSettings to use for serialization. (optional)</param>
+            <returns>The serialized JSON string.</returns>
+        </member>
+    </members>
+</doc>

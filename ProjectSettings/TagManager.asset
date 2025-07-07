@@ -2,36 +2,28 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags:
-  - goomba
-  - koopa
-  - Bullet
-  - Powerup
-  - coin
-  - bigstar
   - StarSpawn
-  - MainStar
-  - Fireball
-  - bobomb
   - MovingPlatform
-  - piranhaplant
   - pipe
   - LoadingCanvas
-  - loosecoin
   - wintext
-  - bulletbill
   - spinner
   - platform
   - poison
   - uicamera
   - CanvasMask
   - Backgrounds
-  - DestructablePipe
   - FadeUI
   - lava
   - MarioBrosPlatform
   - frozencube
+  - Squishy
+  - Powerup
+  - water
+  - MainTilemap
+  - MasterCanvas
   layers:
   - Default
   - TransparentFX
@@ -39,7 +31,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Player
   - PlayerPassthrough
   - Ground
   - Entity
@@ -47,14 +39,14 @@ TagManager:
   - HitsNothing
   - Semisolids
   - PassthroughInvalid
-  - IceBlock
-  - LooseCoin
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - GroundEntity
+  - EntityNoGroundEntity
+  - UINoCursor
+  - RenderLayerParticle
+  - RenderLayerPlayer
+  - RenderLayerObject
+  - RenderLayerMap
+  - RenderLayerBackground
   - 
   - 
   - 
@@ -78,3 +70,6 @@ TagManager:
   - name: NametagLayer
     uniqueID: 3589790019
     locked: 0
+  m_RenderingLayers:
+  - Default
+  - Bubble Mask Layer

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 6
+  version: 9
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -67,14 +67,15 @@ Material:
     - Points: 256
     - PointsPerTile: 4
     - TextureIndex: 0
-    - WaveHeight: 0.3
+    - WaveHeight: 0.2
     - WaveSpeed: 1.2
     - WaveWidth: 1
-    - WidthTiles: 64
+    - WidthTiles: 36
     - _BUILTIN_QueueControl: -1
     - _BUILTIN_QueueOffset: 0
+    - _GlowPower: 3
     - _Points: 160
-    - _RandomizeOffset: 1
+    - _RandomizeOffset: 0
     - _TextureIndex: 0
     - _WaveWidth: 2.5
     m_Colors:
@@ -82,8 +83,9 @@ Material:
     - FoamColor: {r: 1, g: 0.96761364, b: 0.36226404, a: 1}
     - RippleColor: {r: 1, g: 0.630872, b: 0, a: 1}
     - TopColor: {r: 1, g: 0.14068651, b: 0, a: 1}
-    - _Glow: {r: 1, g: 0.48083812, b: 0, a: 1}
+    - _Glow: {r: 1, g: 0.480838, b: 0, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &7893850056676362737
 MonoBehaviour:
   m_ObjectHideFlags: 11

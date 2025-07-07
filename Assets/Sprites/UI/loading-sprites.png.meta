@@ -30,7 +30,7 @@ TextureImporter:
       213: -3599161207798135845
     second: loading-sprites_8
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -47,11 +47,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -90,6 +91,8 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -191,7 +194,7 @@ TextureImporter:
       name: loading-sprites_1
       rect:
         serializedVersion: 2
-        x: 16
+        x: 17
         y: 0
         width: 16
         height: 32
@@ -212,7 +215,7 @@ TextureImporter:
       name: loading-sprites_2
       rect:
         serializedVersion: 2
-        x: 32
+        x: 34
         y: 0
         width: 16
         height: 24
@@ -233,7 +236,7 @@ TextureImporter:
       name: loading-sprites_3
       rect:
         serializedVersion: 2
-        x: 48
+        x: 51
         y: 0
         width: 16
         height: 16
@@ -254,7 +257,7 @@ TextureImporter:
       name: loading-sprites_4
       rect:
         serializedVersion: 2
-        x: 64
+        x: 68
         y: 0
         width: 16
         height: 16
@@ -275,7 +278,7 @@ TextureImporter:
       name: loading-sprites_5
       rect:
         serializedVersion: 2
-        x: 80
+        x: 85
         y: 0
         width: 16
         height: 16
@@ -296,7 +299,7 @@ TextureImporter:
       name: loading-sprites_6
       rect:
         serializedVersion: 2
-        x: 96
+        x: 102
         y: 0
         width: 16
         height: 16
@@ -317,7 +320,7 @@ TextureImporter:
       name: loading-sprites_7
       rect:
         serializedVersion: 2
-        x: 112
+        x: 119
         y: 0
         width: 16
         height: 32
@@ -338,7 +341,7 @@ TextureImporter:
       name: loading-sprites_8
       rect:
         serializedVersion: 2
-        x: 128
+        x: 136
         y: 0
         width: 16
         height: 32
@@ -355,48 +358,6 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: loading-sprites_10
-      rect:
-        serializedVersion: 2
-        x: 176
-        y: 0
-        width: 16
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 586d9152c39c72d46a7c071838b5e3d4
-      internalID: -1248723344
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: loading-sprites_9
-      rect:
-        serializedVersion: 2
-        x: 157
-        y: 0
-        width: 19
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 00dec329a385be646bb00e3c03e2a865
-      internalID: 1395420228
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -408,20 +369,19 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      loading-sprites_4: -3109149775861551868
-      loading-sprites_7: -309644342959843524
-      loading-sprites_3: 4770881905158911435
-      loading-sprites_8: -3599161207798135845
       loading-sprites_0: -1751142936083476856
-      loading-sprites_2: 2095781106538291052
-      loading-sprites_6: -6007733143233958344
-      loading-sprites_9: 1395420228
-      loading-sprites_10: -1248723344
-      loading-sprites_5: 1543982676415069192
       loading-sprites_1: 1040450253486601905
-  spritePackingTag: 
+      loading-sprites_10: -1248723344
+      loading-sprites_2: 2095781106538291052
+      loading-sprites_3: 4770881905158911435
+      loading-sprites_4: -3109149775861551868
+      loading-sprites_5: 1543982676415069192
+      loading-sprites_6: -6007733143233958344
+      loading-sprites_7: -309644342959843524
+      loading-sprites_8: -3599161207798135845
+      loading-sprites_9: 1395420228
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

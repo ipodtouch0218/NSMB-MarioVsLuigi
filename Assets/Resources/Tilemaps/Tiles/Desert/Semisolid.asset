@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ffb1820c005ca6489850e83a844726b, type: 3}
+  m_Script: {fileID: 11500000, guid: 46e46a8425517b044a7157fe94384767, type: 3}
   m_Name: Semisolid
   m_EditorClassIdentifier: 
   m_DefaultSprite: {fileID: -1119995061, guid: a775520159383d847b8ce31256b06b01, type: 3}
@@ -170,7 +170,3 @@ MonoBehaviour:
     - {x: 1, y: 0, z: 0}
     m_RuleTransform: 0
   siblings: []
-  isBackgroundTile: 0
-  iceSkidding: 0
-  footstepSound: 31
-  frictionFactor: 1

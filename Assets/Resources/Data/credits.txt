@@ -1,0 +1,142 @@
+<color=yellow>{ui.about.credits.gameby}</color>
+ipodtouch0218
+
+<color=yellow>{ui.about.credits.github}</color>
+Amy54Desu
+AprilShade
+ArianLust
+AtwerJ
+Ave
+BluCorDev
+Cubby Crazes
+davart154
+DonKaiStorm
+GithubSPerez
+GradedWarrior
+HyperC@T
+Jeffjewett27
+KingKittyTurnip
+kittenchilly
+Kraken
+MiiBumm
+mindnomad
+Pordrack
+skarph
+Skillz
+TheMoogle
+Tombuntu
+xFrostyCake123
+VLC
+Zest
+_ZombleBobble
+
+<color=yellow>{ui.about.credits.music}</color>
+Cubby Crazes
+RENREN
+LiamNayru
+vincells
+
+<color=yellow>{ui.about.credits.translation}</color>
+3UP <color=#AAAAAA>(ja-jp)</color>
+6Alexis8 <color=#AAAAAA>(fr-fr)</color>
+Akselai <color=#AAAAAA>(zh-cn, zh-tw)</color>
+Aktan <color=#AAAAAA>(de-de)</color>
+AprilShade <color=#AAAAAA>(en-gb)</color>
+ArianLust <color=#AAAAAA>(de-de)</color>
+Atwer <color=#AAAAAA>(fr-FR)</color>
+Bilhal <color=#AAAAAA>(el-gr)</color>
+Cecilia <color=#AAAAAA>(es-es)</color>
+Davodio <color=#AAAAAA>(de-de)</color>
+Filipianosol <color=#AAAAAA>(pl-pl)</color>
+Floofdoge <color=#AAAAAA>(ar-eg)</color>
+Foxyyy <color=#AAAAAA>(es-la)</color>
+Freeze <color=#AAAAAA>(es-la)</color>
+HatsuneMiku <color=#AAAAAA>(pl-pl)</color>
+haywireghost <color=#AAAAAA>(es-la)</color>
+HD Erick Games <color=#AAAAAA>(pt-br)</color>
+Hyruyoshi <color=#AAAAAA>(fr-fr)</color>
+ibroekmahphone <color=#AAAAAA>(ru-ru)</color>
+Iketarou <color=#AAAAAA>(ja-jp)</color>
+IvythePoS <color=#AAAAAA>(es-la)</color>
+Kate Karui <color=#AAAAAA>(sv-sv)</color>
+Lyroy The Toad <color=#AAAAAA>(it-it)</color>
+Maestrike <color=#AAAAAA>(it-it)</color>
+marbo <color=#AAAAAA>(pt-br)</color>
+Mark19 <color=#AAAAAA>(es-es)</color>
+MasterMindo <color=#AAAAAA>(it-it)</color>
+Med Animations <color=#AAAAAA>(ar-eg)</color>
+Meddourk95 <color=#AAAAAA>(ar-eg)</color>
+Moddimation <color=#AAAAAA>(de-de)</color>
+miyavmeow <color=#AAAAAA>(tr-tr)</color>
+Mr-STF <color=#AAAAAA>(es-la)</color>
+MUI_Noam <color=#AAAAAA>(he-il)</color>
+notossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
+ossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
+pixelated <color=#AAAAAA>(he-il)</color>
+SadenceZinzap <color=#AAAAAA>(tr-tr)</color>
+SLG64 <color=#AAAAAA>(es-la)</color>
+Snayp <color=#AAAAAA>(fr-fr)</color>
+Thebababois369 <color=#AAAAAA>(id-id)</color>
+Tombuntu <color=#AAAAAA>(ja-jp)</color>
+Windows10V <color=#AAAAAA>(pt-br)</color>
+vlco_o <color=#AAAAAA>(es-es, ro-ro)</color>
+
+<color=yellow>{ui.about.credits.qa}</color>
+AprilShade
+ArianLust
+Ave
+CreativeGhost
+Cubby Crazes
+Fawndue
+Grape
+MiiBumm
+mindnomad
+TheCyVap
+Vinnnnnnny
+
+<color=yellow>{ui.about.credits.leveldesign}</color>
+AtwerJ
+Ave
+mindnomad
+Skarph
+TheCyVap
+VentureSonic
+
+<color=yellow>{ui.about.credits.original}</color>
+New Super Mario Bros.
+New Super Mario Bros. Wii
+New Super Mario Bros. 2
+Super Mario Maker 2
+(c) Nintendo
+
+<color=yellow>{ui.about.credits.assets}</color>
+A Refracted Swindler (UI)
+ArianLust (Sound)
+Clougo (Tiles)
+Cubby Crazes (Sound)
+Demon2Warrior (Background)
+Double S (Models)
+Guywah (Fonts)
+Hiccup (Tiles)
+Jouv (Tiles)
+KartMakerBrosU (Models)
+Keira (Background)
+Luke Hackett (Sound)
+LukeWarnut (Sound)
+MiiBumm (Models/Sound)
+mindnomad (Tiles/Sound)
+Mr. C (Enemies)
+Mr-STF (Tiles)
+Ohthatguy (Background)
+Poudink (Tiles)
+Ragey (Enemies)
+Skarph (Models/Sound)
+Someone (Tiles)
+Symbolcom (Tiles/Enemies)
+Techokami (Enemies)
+TeridaxXD001 (Models)
+Treeki (UI)
+VentureSonic (Background)
+vlco_o (Sound)
+xFrostyCake123 (Sound)
+

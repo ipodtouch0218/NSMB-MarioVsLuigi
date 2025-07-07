@@ -1,22 +1,21 @@
 // ----------------------------------------------------------------------------
-// <copyright file="CustomTypes.cs" company="Exit Games GmbH">
-//   PhotonNetwork Framework for Unity - Copyright (C) 2018 Exit Games GmbH
+// <copyright file="CustomTypesUnity.cs" company="Exit Games GmbH">
+// Photon Realtime API - Copyright (C) 2022 Exit Games GmbH
 // </copyright>
-// <summary>
-// Sets up support for Unity-specific types. Can be a blueprint how to register your own Custom Types for sending.
-// </summary>
+// <summary>Sets up support for Unity-specific types.</summary>
 // <author>developer@exitgames.com</author>
 // ----------------------------------------------------------------------------
 
-#if UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER
+#if UNITY_2017_4_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
+
 
 #if SUPPORTED_UNITY
 namespace Photon.Realtime
 {
     using Photon.Realtime;
-    using ExitGames.Client.Photon;
+    using Photon.Client;
     using UnityEngine;
     using Debug = UnityEngine.Debug;
 
@@ -53,9 +52,9 @@ namespace Photon.Realtime
             lock (memVector3)
             {
                 byte[] bytes = memVector3;
-                Protocol.Serialize(vo.x, bytes, ref index);
-                Protocol.Serialize(vo.y, bytes, ref index);
-                Protocol.Serialize(vo.z, bytes, ref index);
+                MessageProtocol.Serialize(vo.x, bytes, ref index);
+                MessageProtocol.Serialize(vo.y, bytes, ref index);
+                MessageProtocol.Serialize(vo.z, bytes, ref index);
                 outStream.Write(bytes, 0, SizeV3);
             }
 
@@ -74,9 +73,9 @@ namespace Photon.Realtime
             {
                 inStream.Read(memVector3, 0, SizeV3);
                 int index = 0;
-                Protocol.Deserialize(out vo.x, memVector3, ref index);
-                Protocol.Deserialize(out vo.y, memVector3, ref index);
-                Protocol.Deserialize(out vo.z, memVector3, ref index);
+                MessageProtocol.Deserialize(out vo.x, memVector3, ref index);
+                MessageProtocol.Deserialize(out vo.y, memVector3, ref index);
+                MessageProtocol.Deserialize(out vo.z, memVector3, ref index);
             }
 
             return vo;
@@ -92,8 +91,8 @@ namespace Photon.Realtime
             {
                 byte[] bytes = memVector2;
                 int index = 0;
-                Protocol.Serialize(vo.x, bytes, ref index);
-                Protocol.Serialize(vo.y, bytes, ref index);
+                MessageProtocol.Serialize(vo.x, bytes, ref index);
+                MessageProtocol.Serialize(vo.y, bytes, ref index);
                 outStream.Write(bytes, 0, SizeV2);
             }
 
@@ -112,8 +111,8 @@ namespace Photon.Realtime
             {
                 inStream.Read(memVector2, 0, SizeV2);
                 int index = 0;
-                Protocol.Deserialize(out vo.x, memVector2, ref index);
-                Protocol.Deserialize(out vo.y, memVector2, ref index);
+                MessageProtocol.Deserialize(out vo.x, memVector2, ref index);
+                MessageProtocol.Deserialize(out vo.y, memVector2, ref index);
             }
 
             return vo;
@@ -130,10 +129,10 @@ namespace Photon.Realtime
             {
                 byte[] bytes = memQuarternion;
                 int index = 0;
-                Protocol.Serialize(o.w, bytes, ref index);
-                Protocol.Serialize(o.x, bytes, ref index);
-                Protocol.Serialize(o.y, bytes, ref index);
-                Protocol.Serialize(o.z, bytes, ref index);
+                MessageProtocol.Serialize(o.w, bytes, ref index);
+                MessageProtocol.Serialize(o.x, bytes, ref index);
+                MessageProtocol.Serialize(o.y, bytes, ref index);
+                MessageProtocol.Serialize(o.z, bytes, ref index);
                 outStream.Write(bytes, 0, SizeQuat);
             }
 
@@ -152,10 +151,10 @@ namespace Photon.Realtime
             {
                 inStream.Read(memQuarternion, 0, SizeQuat);
                 int index = 0;
-                Protocol.Deserialize(out o.w, memQuarternion, ref index);
-                Protocol.Deserialize(out o.x, memQuarternion, ref index);
-                Protocol.Deserialize(out o.y, memQuarternion, ref index);
-                Protocol.Deserialize(out o.z, memQuarternion, ref index);
+                MessageProtocol.Deserialize(out o.w, memQuarternion, ref index);
+                MessageProtocol.Deserialize(out o.x, memQuarternion, ref index);
+                MessageProtocol.Deserialize(out o.y, memQuarternion, ref index);
+                MessageProtocol.Deserialize(out o.z, memQuarternion, ref index);
             }
 
             return o;

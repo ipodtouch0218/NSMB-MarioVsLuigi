@@ -445,8 +445,8 @@
     ],
     "m_VertexContext": {
         "m_Position": {
-            "x": 193.99998474121095,
-            "y": 1.000004529953003
+            "x": 363.0000305175781,
+            "y": 156.0
         },
         "m_Blocks": [
             {
@@ -462,8 +462,8 @@
     },
     "m_FragmentContext": {
         "m_Position": {
-            "x": 193.99998474121095,
-            "y": 201.0
+            "x": 363.0000305175781,
+            "y": 353.9999694824219
         },
         "m_Blocks": [
             {
@@ -487,6 +487,7 @@
     "m_OutputNode": {
         "m_Id": ""
     },
+    "m_SubDatas": [],
     "m_ActiveTargets": [
         {
             "m_Id": "4aef118bb34241cdaaa90bf238aae6ca"
@@ -506,10 +507,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -56.99995803833008,
-            "y": 199.00003051757813,
-            "width": 182.99993896484376,
-            "height": 250.99996948242188
+            "x": -90.0,
+            "y": 199.0,
+            "width": 183.0,
+            "height": 249.0
         }
     },
     "m_Slots": [
@@ -548,7 +549,8 @@
     },
     "m_TextureType": 0,
     "m_NormalMapSpace": 0,
-    "m_EnableGlobalMipBias": true
+    "m_EnableGlobalMipBias": true,
+    "m_MipSamplingMode": 0
 }
 
 {
@@ -772,9 +774,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -207.0,
+            "x": -240.0,
             "y": 258.0,
-            "width": 127.99996948242188,
+            "width": 128.0,
             "height": 101.0
         }
     },
@@ -948,7 +950,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -1146,7 +1148,8 @@
     },
     "m_TextureType": 0,
     "m_NormalMapSpace": 0,
-    "m_EnableGlobalMipBias": true
+    "m_EnableGlobalMipBias": true,
+    "m_MipSamplingMode": 0
 }
 
 {
@@ -1198,8 +1201,8 @@
         "y": 1.0
     },
     "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0
+        "x": -1.0,
+        "y": 1.0
     },
     "m_Labels": []
 }
@@ -1353,7 +1356,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Texture2DMaterialSlot",
     "m_ObjectId": "381a9dacaa23490abdfa81da74b9f1c8",
     "m_Id": 0,
-    "m_DisplayName": "_MainTex",
+    "m_DisplayName": "MainTex",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -1487,6 +1490,7 @@
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalTarget",
     "m_ObjectId": "4aef118bb34241cdaaa90bf238aae6ca",
+    "m_Datas": [],
     "m_ActiveSubTarget": {
         "m_Id": "6b110d97d6cd48c5940b670bf80eaf1e"
     },
@@ -1499,6 +1503,10 @@
     "m_AlphaClip": false,
     "m_CastShadows": true,
     "m_ReceiveShadows": true,
+    "m_DisableTint": false,
+    "m_AdditionalMotionVectorMode": 0,
+    "m_AlembicMotionVectors": false,
+    "m_SupportsLODCrossFade": false,
     "m_CustomEditorGUI": "",
     "m_SupportVFX": false
 }
@@ -1903,9 +1911,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -207.0,
-            "y": 216.00001525878907,
-            "width": 124.00003051757813,
+            "x": -240.0,
+            "y": 216.0,
+            "width": 124.0,
             "height": 34.0
         }
     },
@@ -2332,7 +2340,7 @@
     },
     "m_DefaultValue": {
         "x": 0.0,
-        "y": 0.0
+        "y": 1.0
     },
     "m_Labels": []
 }
@@ -2443,7 +2451,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -2833,18 +2841,18 @@
     "m_Guid": {
         "m_GuidSerialized": "79e71813-acce-499e-9b0a-31e0af109019"
     },
-    "m_Name": "_MainTex",
+    "m_Name": "MainTex",
     "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "_MainTex",
+    "m_RefNameGeneratedByDisplayName": "MainTex",
     "m_DefaultReferenceName": "_MainTex",
     "m_OverrideReferenceName": "",
-    "m_GeneratePropertyBlock": false,
+    "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
     "m_DismissedVersion": 0,
     "m_Precision": 0,
-    "overrideHLSLDeclaration": false,
-    "hlslDeclarationOverride": 0,
+    "overrideHLSLDeclaration": true,
+    "hlslDeclarationOverride": 2,
     "m_Hidden": false,
     "m_Value": {
         "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"48318f0151500cc4c97ba5e37b7e2946\",\"type\":3}}",
@@ -3047,7 +3055,7 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"cfc37b091ba17764487af58c40cd2a16\",\"type\":3}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,

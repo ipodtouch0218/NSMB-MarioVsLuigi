@@ -1,0 +1,68 @@
+{
+  "runtimeTarget": {
+    "name": ".NETStandard,Version=v2.1/",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETStandard,Version=v2.1": {},
+    ".NETStandard,Version=v2.1/": {
+      "Quantum.Simulation/1.0.0": {
+        "dependencies": {
+          "Quantum.Deterministic": "3.0.0.1548",
+          "Quantum.Engine": "3.0.0.1548",
+          "Quantum.Log": "3.0.0.1548"
+        },
+        "runtime": {
+          "Quantum.Simulation.dll": {}
+        }
+      },
+      "Quantum.Deterministic/3.0.0.1548": {
+        "runtime": {
+          "Quantum.Deterministic.dll": {
+            "assemblyVersion": "3.0.0.1548",
+            "fileVersion": "3.0.0.1548"
+          }
+        }
+      },
+      "Quantum.Engine/3.0.0.1548": {
+        "runtime": {
+          "Quantum.Engine.dll": {
+            "assemblyVersion": "3.0.0.1548",
+            "fileVersion": "3.0.0.1548"
+          }
+        }
+      },
+      "Quantum.Log/3.0.0.1548": {
+        "runtime": {
+          "Quantum.Log.dll": {
+            "assemblyVersion": "3.0.0.1548",
+            "fileVersion": "3.0.0.1548"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Quantum.Simulation/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Quantum.Deterministic/3.0.0.1548": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Quantum.Engine/3.0.0.1548": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Quantum.Log/3.0.0.1548": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

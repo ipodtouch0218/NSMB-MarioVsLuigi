@@ -9,7 +9,19 @@ SocketCreate: function(url, protocols)
         socket: new WebSocket(str, [prot]),
         buffer: new Uint8Array(0),
         error: null,
-        messages: []
+        messages: [],
+        send: typeof(SharedArrayBuffer) == "function" ? // SharedArrayBuffer is available
+    		function (socketInstance, ptr, length) {
+                const socket = webSocketInstances[socketInstance];
+                // depending on the caller, HEAPU8.buffer can be SharedArrayBuffer or ArrayBuffer in the same app
+                const b = HEAPU8.buffer instanceof SharedArrayBuffer ? new Uint8Array(HEAPU8.slice(ptr, ptr + length)).buffer : new Uint8Array(HEAPU8.buffer, ptr, length);
+                socket.socket.send(b);
+            }
+            :
+            function (socketInstance, ptr, length) { // SharedArrayBuffer is not defined, ptr type is always ArrayBuffer
+                const socket = webSocketInstances[socketInstance];
+                socket.socket.send(new Uint8Array(HEAPU8.buffer, ptr, length));
+            }
     }
     socket.socket.binaryType = 'arraybuffer';
     socket.socket.onmessage = function (e) {
@@ -76,15 +88,14 @@ SocketError: function (socketInstance, ptr, bufsize)
  	var socket = webSocketInstances[socketInstance];
  	if (socket.error == null)
  		return 0;
-    var str = socket.error.slice(0, Math.max(0, bufsize - 1));
-    writeStringToMemory(str, ptr, false);
+    stringToUTF8(socket.error, ptr, bufsize);
     return 1;
 },
 
-SocketSend: function (socketInstance, ptr, length)
+SocketSend: function (socketInstance, ptr, bufsize)
 {
     var socket = webSocketInstances[socketInstance];
-    socket.socket.send (HEAPU8.buffer.slice(ptr, ptr+length));
+    socket.send(socketInstance, ptr, bufsize);
 },
 
 SocketRecvLength: function(socketInstance)

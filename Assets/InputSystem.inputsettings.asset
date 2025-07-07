@@ -18,7 +18,7 @@ MonoBehaviour:
   m_MaxQueuedEventsPerUpdate: 1000
   m_CompensateForScreenOrientation: 1
   m_BackgroundBehavior: 2
-  m_EditorInputBehaviorInPlayMode: 2
+  m_EditorInputBehaviorInPlayMode: 0
   m_DefaultDeadzoneMin: 0.125
   m_DefaultDeadzoneMax: 0.925
   m_DefaultButtonPressPoint: 0.5
@@ -29,6 +29,7 @@ MonoBehaviour:
   m_TapRadius: 5
   m_MultiTapDelayTime: 0.75
   m_DisableRedundantEventsMerging: 0
+  m_ShortcutKeysConsumeInputs: 0
   m_iOSSettings:
     m_MotionUsage:
       m_Enabled: 0

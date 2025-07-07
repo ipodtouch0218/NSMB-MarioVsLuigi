@@ -1,130 +1,180 @@
-using System;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
-using Photon.Pun;
-using Photon.Realtime;
 using Discord;
+using NSMB.Networking;
+using NSMB.UI.Translation;
+using Photon.Realtime;
+using Quantum;
+using System;
+using System.IO;
+using UnityEngine;
 
-public class DiscordController : MonoBehaviour {
+namespace NSMB {
+    public unsafe class DiscordController : MonoBehaviour {
+#pragma warning disable IDE0079
+#pragma warning disable CS0162
 
-    public Discord.Discord discord;
-    public ActivityManager activityManager;
+        //---Static Variables
+        private static readonly long DiscordAppId = 962073502469459999;
 
-    public void Awake() {
-#if UNITY_WEBGL
-        return;
-#endif
+        //---Private Variables
+        private Discord.Discord discord;
+        private ActivityManager activityManager;
+        private float lastInitializeTime;
 
-        discord = new Discord.Discord(962073502469459999, (ulong) CreateFlags.NoRequireDiscord);
-        activityManager = discord.GetActivityManager();
-        activityManager.OnActivityJoinRequest += AskToJoin;
-        activityManager.OnActivityJoin += TryJoinGame;
-
-//#if UNITY_STANDALONE_WIN
-        try {
-            string filename = AppDomain.CurrentDomain.ToString();
-            filename = string.Join(" ", filename.Split(" ")[..^2]);
-            string dir = AppDomain.CurrentDomain.BaseDirectory + "\\" + filename;
-            activityManager.RegisterCommand(dir);
-            Debug.Log($"[DISCORD] Set launch path to \"{dir}\"");
-        } catch {
-            Debug.Log($"[DISCORD] Failed to set launch path (on {Application.platform})");
+        public void OnEnable() {
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
-//#endif
-    }
 
-    public void TryJoinGame(string secret) {
-        if (SceneManager.GetActiveScene().buildIndex != 0)
-            return;
+        public void OnDisable() {
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            discord?.Dispose();
+        }
 
-        Debug.Log($"[DISCORD] Attempting to join game with secret \"{secret}\"");
-        string[] split = secret.Split("-");
-        string region = split[0];
-        string room = split[1];
-
-        MainMenuManager.lastRegion = region;
-        MainMenuManager.Instance.connectThroughSecret = room;
-        PhotonNetwork.Disconnect();
-    }
-
-    //TODO this doesn't work???
-    public void AskToJoin(ref User user) {
-        //activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
-        //    Debug.Log($"[DISCORD] Ask to Join response: {res}");
-        //});
-    }
-
-    public void Update() {
-#if UNITY_WEBGL
-        return;
+        public void Start() {
+#if UNITY_WEBGL || UNITY_WSA
+        enabled = false;
 #endif
-        try {
-            discord.RunCallbacks();
-        } catch { }
-    }
 
-    public void OnDisable() {
-        discord?.Dispose();
-    }
+            Initialize();
+        }
 
-    public void UpdateActivity() {
-#if UNITY_WEBGL
-        return;
+
+        private bool Initialize() {
+#if UNITY_WEBGL || UNITY_WSA
+        enabled = false;
+        return false;
 #endif
-        if (discord == null || activityManager == null || !Application.isPlaying)
-            return;
 
-        Activity activity = new();
+            lastInitializeTime = Time.time;
+            try {
+                discord = new Discord.Discord(DiscordAppId, (ulong) CreateFlags.NoRequireDiscord);
+            } catch {
+                return false;
+            }
+            activityManager = discord.GetActivityManager();
+            //activityManager.OnActivityJoinRequest += AskToJoin;
+            activityManager.OnActivityJoin += TryJoinGame;
 
-        if (GameManager.Instance) {
-            //in a level
-            GameManager gm = GameManager.Instance;
-            Room room = PhotonNetwork.CurrentRoom;
-
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Game" : "In a Private Game";
-            activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
-
-            ActivityAssets assets = new();
-            if (gm.richPresenceId != "")
-                assets.LargeImage = $"level-{gm.richPresenceId}";
-            else
-                assets.LargeImage = "mainmenu";
-            assets.LargeText = gm.levelName;
-
-            activity.Assets = assets;
-
-            if (gm.timedGameDuration == -1) {
-                activity.Timestamps = new() { Start = gm.startRealTime / 1000 };
-            } else {
-                activity.Timestamps = new() { End = gm.endRealTime / 1000 };
+            try {
+                string filename = AppDomain.CurrentDomain.ToString();
+                filename = string.Join(" ", filename.Split(" ")[..^2]);
+                string dir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + filename;
+                activityManager.RegisterCommand(dir);
+                Debug.Log($"[Discord] Set launch path to \"{dir}\"");
+            } catch {
+                Debug.LogError($"[Discord] Failed to set launch path (on {Application.platform})");
             }
 
-        } else if (PhotonNetwork.InRoom) {
-            //in a room
-            Room room = PhotonNetwork.CurrentRoom;
-
-            activity.Details = PhotonNetwork.OfflineMode ? "Playing Offline" : "Playing Online";
-            activity.Party = new() { Size = new() { CurrentSize = room.PlayerCount, MaxSize = room.MaxPlayers }, Id = PhotonNetwork.CurrentRoom.Name };
-            activity.State = room.IsVisible ? "In a Public Lobby" : "In a Private Lobby";
-            activity.Secrets = new() { Join = PhotonNetwork.CloudRegion + "-" + room.Name };
-
-            activity.Assets = new() { LargeImage = "mainmenu" };
-
-        } else {
-            //in the main menu, not in a room
-
-            activity.Details = "Browsing the Main Menu...";
-            activity.Assets = new() { LargeImage = "mainmenu" };
-
+            return true;
         }
 
+        public void Update() {
+            if (discord == null) {
+                if (Time.time - lastInitializeTime > 10) {
+                    // Try to recreate every 10 seconds
+                    Initialize();
+                }
+                return;
+            }
 
-        activityManager.UpdateActivity(activity, (res) => {
-            //head empty.
-            Debug.Log($"[DISCORD] Rich Presence Update: {res}");
-        });
+            try {
+                discord.RunCallbacks();
+            } catch {
+                // Ignored
+            }
+        }
+
+        public unsafe void UpdateActivity() {
+#if UNITY_WEBGL || UNITY_WSA
+        return;
+#endif
+            if (!Application.isPlaying || discord == null) {
+                return;
+            }
+
+            if (!Settings.Instance.GeneralDiscordIntegration) {
+                activityManager.ClearActivity(res => { });
+                return;
+            }
+
+            TranslationManager tm = GlobalController.Instance.translationManager;
+            QuantumRunner runner = QuantumRunner.Default;
+            QuantumGame game = QuantumRunner.DefaultGame;
+
+            Room realtimeRoom = null;
+            if (runner && runner.NetworkClient != null) {
+                realtimeRoom = runner.NetworkClient.CurrentRoom;
+            }
+
+            Activity activity = new();
+            if (realtimeRoom != null) {
+                activity.Party = new() {
+                    Size = new() {
+                        CurrentSize = realtimeRoom.PlayerCount,
+                        MaxSize = realtimeRoom.MaxPlayers,
+                    },
+                    Id = realtimeRoom.Name + "1",
+                };
+                activity.State = realtimeRoom.IsVisible ? tm.GetTranslation("discord.public") : tm.GetTranslation("discord.private");
+                activity.Details = tm.GetTranslation("discord.online");
+                activity.Secrets = new() { Join = realtimeRoom.Name };
+            }
+            if (game != null) {
+                Frame f = game.Frames.Predicted;
+
+                if (f != null && f.Global->GameState >= GameState.Playing) {
+                    // In a level
+                    if (activity.Details == null) {
+                        if (runner.Session.IsReplay) {
+                            activity.Details = tm.GetTranslation("discord.replay");
+                        } else {
+                            activity.Details = tm.GetTranslation("discord.offline");
+                        }
+                    }
+                    var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                    var gamemode = f.FindAsset<GamemodeAsset>(f.Global->Rules.Gamemode);
+
+                    activity.Assets = new ActivityAssets {
+                        LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
+                        LargeText = tm.GetTranslation(stage.TranslationKey),
+                        SmallImage = gamemode.DiscordRpcKey,
+                        SmallText = tm.GetTranslation(gamemode.TranslationKey),
+                    };
+
+                    long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    if (f.Global->Rules.TimerMinutes > 0) {
+                        activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
+                    } else {
+                        activity.Timestamps = new() { Start = now - ((f.Number - f.Global->StartFrame) * f.DeltaTime * 1000).AsLong };
+                    }
+                }
+            } else {
+                // In the main menu, not in a room
+                activity.Details = tm.GetTranslation("discord.mainmenu");
+                activity.Assets = new() { LargeImage = "mainmenu" };
+            }
+
+            activityManager.UpdateActivity(activity, (res) => { });
+        }
+
+        private void OnLanguageChanged(TranslationManager tm) {
+            UpdateActivity();
+        }
+
+        public void TryJoinGame(string secret) {
+            // TODO: test
+            Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
+            _ = NetworkHandler.JoinRoom(new EnterRoomArgs {
+                RoomName = secret,
+            });
+        }
+
+        //TODO this doesn't work???
+        public void AskToJoin(ref User user) {
+            //activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
+            //    Debug.Log($"[Discord] Ask to Join response: {res}");
+            //});
+        }
+#pragma warning restore CS0162
+#pragma warning restore IDE0079
     }
 }

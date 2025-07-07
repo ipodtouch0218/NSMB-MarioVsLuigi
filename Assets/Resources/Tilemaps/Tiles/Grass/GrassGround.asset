@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ffb1820c005ca6489850e83a844726b, type: 3}
+  m_Script: {fileID: 11500000, guid: 46e46a8425517b044a7157fe94384767, type: 3}
   m_Name: GrassGround
   m_EditorClassIdentifier: 
   m_DefaultSprite: {fileID: -1238084574743955201, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae,
@@ -77,7 +77,7 @@ MonoBehaviour:
     m_MaxAnimationSpeed: 1
     m_PerlinScale: 0.5
     m_Output: 0
-    m_ColliderType: 1
+    m_ColliderType: 2
     m_RandomTransform: 0
     m_Neighbors: 020000000200000001000000
     m_NeighborPositions:
@@ -153,14 +153,4 @@ MonoBehaviour:
     - {x: 1, y: 0, z: 0}
     - {x: 0, y: -1, z: 0}
     m_RuleTransform: 0
-  siblings:
-  - {fileID: 11400000, guid: 04c674c504bd1ad4db89f5270522951c, type: 2}
-  - {fileID: 11400000, guid: de9f9c0e6414c1f41a9823860afd9724, type: 2}
-  - {fileID: 11400000, guid: fa62d5e19cd6de5488c0052ef91a6569, type: 2}
-  - {fileID: 11400000, guid: b2110ed2d78b13b4aa6d29d183c365fa, type: 2}
-  - {fileID: 11400000, guid: c3e47b452b13fa44b863363f9cb23987, type: 2}
-  - {fileID: 11400000, guid: 37b12b99b00090c469bd7f86c35b5f3f, type: 2}
-  isBackgroundTile: 0
-  iceSkidding: 0
-  footstepSound: 31
-  frictionFactor: 1
+  siblings: []
