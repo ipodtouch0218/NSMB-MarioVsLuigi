@@ -114,6 +114,9 @@ namespace NSMB.Networking {
             if (Client == null) {
                 return false;
             }
+            if (Runner != null && Runner.IsRunning) {
+                await Runner.ShutdownAsync();
+            }
 
             StateChanged?.Invoke(ClientState.Disconnected, ClientState.Authenticating);
             region ??= Instance.lastRegion;

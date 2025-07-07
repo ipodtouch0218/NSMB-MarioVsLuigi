@@ -29,9 +29,9 @@ namespace Quantum {
                 return;
             }
             
-            queryList.Add(f.Physics2D.AddOverlapShapeQuery(transform, shape, ~f.Context.ExcludeEntityAndPlayerMask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo));
+            queryList.Add(f.Physics2D.AddOverlapShapeQuery(transform, shape, options: QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo));
             transform.Position.X += stage.TileDimensions.X * FP._0_50 * (transform.Position.X < stage.StageWorldMidpoint.X ? 1 : -1);
-            queryList.Add(f.Physics2D.AddOverlapShapeQuery(transform, shape, ~f.Context.ExcludeEntityAndPlayerMask, QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo));
+            queryList.Add(f.Physics2D.AddOverlapShapeQuery(transform, shape, options: QueryOptions.HitKinematics | QueryOptions.ComputeDetailedInfo));
         }
     }
 }

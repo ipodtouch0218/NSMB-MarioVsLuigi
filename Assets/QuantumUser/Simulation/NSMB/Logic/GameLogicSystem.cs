@@ -161,6 +161,9 @@ namespace Quantum {
                     f.Global->GameState = GameState.PreGameRoom;
                     f.Events.GameStateChanged(GameState.PreGameRoom);
                     f.SystemDisable<StartDisabledSystemGroup>();
+
+                    var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
+                    gamemode.DisableGamemode(f);
                 }
                 break;
             }

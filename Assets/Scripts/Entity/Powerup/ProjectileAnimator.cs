@@ -23,11 +23,6 @@ namespace NSMB.Entities.Player {
             this.SetIfNull(ref legacySpriteAnimator, UnityExtensions.GetComponentType.Children);
         }
 
-        public void Start() {
-            QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
-            QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
-        }
-
         public override unsafe void OnActivate(Frame f) {
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
             var projectile = f.Unsafe.GetPointer<Projectile>(EntityRef);
@@ -41,6 +36,15 @@ namespace NSMB.Entities.Player {
                 if (animator) {
                     animator.Play("Left");
                 }
+            }
+        }
+
+        public override unsafe void OnUpdateView() {
+            if (animator) {
+                animator.enabled = PredictedFrame.Global->GameState == GameState.Playing;
+            }
+            if (legacySpriteAnimator) {
+                legacySpriteAnimator.enabled = PredictedFrame.Global->GameState == GameState.Playing;
             }
         }
 
@@ -63,7 +67,9 @@ namespace NSMB.Entities.Player {
                   at UnityEngine.Rendering.RenderPipelineManager.DoRenderLoop_Internal (UnityEngine.Rendering.RenderPipelineAsset pipe, System.IntPtr loopPtr, UnityEngine.Object renderRequest) [0x00046] in <935634f5cc14479dbaa30641d55600a9>:0 
             */
             try {
-                sRenderer.color = IsCameraTeamFocus(camera) ? sameTeamColor : differentTeamColor;
+                if (sRenderer) {
+                    sRenderer.color = IsCameraTeamFocus(camera) ? sameTeamColor : differentTeamColor;
+                }
             } catch {
                 // Debug.LogWarning("The bug happened");
             }
@@ -85,24 +91,6 @@ namespace NSMB.Entities.Player {
                 }
             }
             return false;
-        }
-
-        private void OnGameResynced(CallbackGameResynced e) {
-            if (animator) {
-                animator.enabled = true;
-            }
-            if (legacySpriteAnimator) {
-                legacySpriteAnimator.enabled = true;
-            }
-        }
-
-        private void OnGameEnded(EventGameEnded e) {
-            if (animator) {
-                animator.enabled = false;
-            }
-            if (legacySpriteAnimator) {
-                legacySpriteAnimator.enabled = false;
-            }
         }
     }
 }

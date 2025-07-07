@@ -292,8 +292,11 @@ namespace NSMB.UI.Game {
                     if (cachedTeamObjective != teamObjective) {
                         cachedTeamObjective = teamObjective;
                         TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
-                        // TODO: fix teams for coin runners.
-                        uiTeamObjective.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString("x" + cachedTeamObjective + "/" + rules.StarsToWin);
+                        string objectiveString = "x" + cachedTeamObjective;
+                        if (gamemode is StarChasersGamemode) {
+                            objectiveString += "/" + rules.StarsToWin;
+                        }
+                        uiTeamObjective.text = (Settings.Instance.GraphicsColorblind ? team.textSpriteColorblind : team.textSpriteNormal) + Utils.GetSymbolString(objectiveString);
                     }
                 }
             }

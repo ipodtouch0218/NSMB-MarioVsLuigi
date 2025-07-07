@@ -41,6 +41,7 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamHatUsesOverallsColor = Shader.PropertyToID("HatUsesOverallsColor");
         private static readonly int ParamGlowColor = Shader.PropertyToID("GlowColor");
 
+        private static readonly int StateFalling = Animator.StringToHash("falling");
         private static readonly int StateMegaIdle = Animator.StringToHash("mega-idle");
         private static readonly int StateMegaScale = Animator.StringToHash("mega-scale");
         private static readonly int StateMegaCancel = Animator.StringToHash("mega-cancel");
@@ -555,7 +556,7 @@ namespace NSMB.Entities.Player {
             };
             materialBlock.SetFloat(ParamPowerupState, ps);
             materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead || mario->IsInKnockback ? Enums.PlayerEyeState.Death : eyeState));
-            materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x);
+            materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x * (smallModel.activeInHierarchy ? 0.5f : 1f));
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = mario->MegaMushroomFrames / 60f;
@@ -1224,12 +1225,9 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            var mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
-            if (mario->IsCrouching || mario->IsInShell || mario->IsSpinnerFlying || mario->IsPropellerFlying
-                || mario->IsDrilling || mario->IsInKnockback || mario->IsWallsliding) {
-                return;
+            if (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == StateFalling) {
+                animator.Play(StateJumplanding);
             }
-            animator.Play(StateJumplanding);
         }
 
         private void OnEnemyKicked(EventEnemyKicked e) {

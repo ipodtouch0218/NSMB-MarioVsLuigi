@@ -105,11 +105,13 @@ VentureSonic
 <color=yellow>{ui.about.credits.original}</color>
 New Super Mario Bros.
 New Super Mario Bros. Wii
+New Super Mario Bros. 2
 Super Mario Maker 2
 (c) Nintendo
 
 <color=yellow>{ui.about.credits.assets}</color>
 A Refracted Swindler (UI)
+ArianLust (Sound)
 Clougo (Tiles)
 Cubby Crazes (Sound)
 Demon2Warrior (Background)
@@ -121,6 +123,7 @@ KartMakerBrosU (Models)
 Keira (Background)
 Luke Hackett (Sound)
 LukeWarnut (Sound)
+MiiBumm (Models/Sound)
 mindnomad (Tiles/Sound)
 Mr. C (Enemies)
 Mr-STF (Tiles)
@@ -134,5 +137,6 @@ Techokami (Enemies)
 TeridaxXD001 (Models)
 Treeki (UI)
 VentureSonic (Background)
+vlco_o (Sound)
 xFrostyCake123 (Sound)
 

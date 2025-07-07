@@ -12,6 +12,7 @@ namespace Quantum {
             public MovingPlatform* Platform;
             public PhysicsCollider2D* Collider;
         }
+
         private ComponentGetter<PhysicsObjectSystem.Filter> PhysicsObjectSystemFilterGetter;
 
         public override void OnInit(Frame f) {
@@ -48,6 +49,11 @@ namespace Quantum {
                 ProcessHit(f, ref filter, shape, hits[i], stage);
             }
 
+            if (!f.DestroyPending(filter.Entity) || !f.Exists(filter.Entity)) {
+                // Destroyed in movement callback
+                return;
+            }
+
             // level wrap seam
             var hits2 = f.Physics2D.GetQueryHits(queries[index + 1]);
             for (int i = 0; i < hits2.Count; i++) {
@@ -74,7 +80,8 @@ namespace Quantum {
             bool movingAway = FPVector2.Dot(physicsObject->Velocity.Normalized, velocity.Normalized) >= 0;
             if (shape->Type == Shape2DType.Edge) {
                 // Semisolid logic
-                bool below = physicsSystemFilter.Transform->Position.Y < (hit.Point.Y - (platform->Velocity.Y * 2 * f.DeltaTime));
+                FP lowerEdge = physicsSystemFilter.Transform->Position.Y + physicsSystemFilter.Collider->Shape.Centroid.Y - physicsSystemFilter.Collider->Shape.Box.Extents.Y;
+                bool below = lowerEdge < (hit.Point.Y - (platform->Velocity.Y * 2 * f.DeltaTime));
                 if (movingAway || below) {
                     return;
                 } else {

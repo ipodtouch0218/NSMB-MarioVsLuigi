@@ -13830,6 +13830,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugSpawnCommands:
+  - KeyCode: 256
+    Entity:
+      Id:
+        Value: 1302927369648075827
   - KeyCode: 257
     Entity:
       Id:

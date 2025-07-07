@@ -69,9 +69,10 @@ namespace NSMB.UI.Loading {
 
         public void Initialize(CharacterAsset character) {
             this.character = character;
+            transform.localScale = Vector3.one;
+            image.sprite = character.LoadingSmallSprite;
             Scale = 0;
             previousScale = 0;
-            image.sprite = character.LoadingSmallSprite;
 
             if (flashRoutine != null) {
                 StopCoroutine(flashRoutine);

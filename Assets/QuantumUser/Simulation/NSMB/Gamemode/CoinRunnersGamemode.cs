@@ -87,7 +87,10 @@ namespace Quantum {
                 return -1;
             }
 
-            return mario->GamemodeData.CoinRunners->ObjectiveCoins;
+            // Make a copy to not modify the `type` variable
+            // Which can cause desyncs.
+            GamemodeSpecificData gamemodeDataCopy = mario->GamemodeData;
+            return gamemodeDataCopy.CoinRunners->ObjectiveCoins;
         }
 
         public override FP GetItemSpawnWeight(Frame f, CoinItemAsset coinItem, int leaderCoins, int ourCoins) {

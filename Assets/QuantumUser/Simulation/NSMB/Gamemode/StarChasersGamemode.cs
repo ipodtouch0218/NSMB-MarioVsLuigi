@@ -96,7 +96,10 @@ namespace Quantum {
                 return -1;
             }
 
-            return mario->GamemodeData.StarChasers->Stars;
+            // Make a copy to not modify the `type` variable
+            // Which can cause desyncs.
+            GamemodeSpecificData gamemodeDataCopy = mario->GamemodeData;
+            return gamemodeDataCopy.StarChasers->Stars;
         }
 
         public override FP GetItemSpawnWeight(Frame f, CoinItemAsset item, int leaderStars, int ourStars) {

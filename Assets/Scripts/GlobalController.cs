@@ -151,12 +151,14 @@ namespace NSMB {
                     fadeSfxRoutine ??= StartCoroutine(FadeVolume("SoundVolume"));
                 }
 
+#if IDLE_LOCK_30FPS
                 // Lock framerate when losing focus to (hopefully) disable browsers slowing the game
                 previousVsyncCount = QualitySettings.vSyncCount;
                 previousFrameRate = Application.targetFrameRate;
 
                 QualitySettings.vSyncCount = 0;
                 Application.targetFrameRate = 30;
+#endif
             }
         }
 

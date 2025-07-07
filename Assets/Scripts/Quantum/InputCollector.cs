@@ -14,7 +14,7 @@ namespace NSMB.Quantum {
         public bool IsPaused { get; set; }
 
         //---Serialized Variables
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || MVL_DEBUG
         [SerializeField] private List<DebugSpawnCommand> debugSpawnCommands = new();
 #endif
         [SerializeField] private PlayerElements playerElements;
@@ -29,7 +29,7 @@ namespace NSMB.Quantum {
         }
 
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || MVL_DEBUG
         public void Update() {
             foreach (var debug in debugSpawnCommands) {
                 if (UnityEngine.Input.GetKeyDown(debug.KeyCode)) {

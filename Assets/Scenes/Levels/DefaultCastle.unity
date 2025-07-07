@@ -12704,6 +12704,7 @@ MonoBehaviour:
   - {fileID: -2417683260803652521, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
   - {fileID: -6336038048024439437, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
   - {fileID: -5352280537273735800, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 1162543255}
   image: {fileID: 0}
@@ -13444,6 +13445,7 @@ MonoBehaviour:
   - {fileID: -2417683260803652521, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
   - {fileID: -6336038048024439437, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
   - {fileID: -5352280537273735800, guid: cebc70ca27e3a2f468d5923a9556d369, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 1982682302}
   image: {fileID: 0}

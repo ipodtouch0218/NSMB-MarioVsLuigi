@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Quantum {
     public unsafe class GoldBlockSystem : SystemMainThreadEntityFilter<GoldBlock, GoldBlockSystem.Filter>,
@@ -114,7 +113,7 @@ namespace Quantum {
 
             // If we hit from below, cancel contacts and equip to player.
             if (FPVector2.Dot(contact.Normal, FPVector2.Down) >= PhysicsObjectSystem.GroundMaxAngle
-                || (mario->IsGroundpoundActive && FPVector2.Dot(contact.Normal, FPVector2.Up) >= PhysicsObjectSystem.GroundMaxAngle)) {
+                || ((mario->IsGroundpoundActive || mario->IsDrilling) && FPVector2.Dot(contact.Normal, FPVector2.Up) >= PhysicsObjectSystem.GroundMaxAngle)) {
                 // Hit from below.
 
                 bool handled = false;
@@ -139,6 +138,8 @@ namespace Quantum {
                 } else {
                     f.Destroy(goldBlockEntity);
                 }
+
+                mario->DamageInvincibilityFrames += 30;
                 keepContacts = mario->IsGroundpoundActive;
             }
         }

@@ -66,6 +66,10 @@ namespace NSMB.Entities.CoinItems {
         public void LateUpdate() {
             Transform t = helmetModel.transform;
 
+            if (PredictedFrame == null) {
+                return;
+            }
+
             if (!marioPlayerAnimator && PredictedFrame.Unsafe.TryGetPointer(EntityRef, out GoldBlock* goldBlock)) {
                 SwapParentView(goldBlock->AttachedTo);
             }
@@ -129,6 +133,12 @@ namespace NSMB.Entities.CoinItems {
                 flyingModel.SetActive(true);
                 helmetModel.SetActive(false);
                 currentCharacterPoseData = null;
+            }
+
+            foreach (var renderer in helmetMeshRenderer.GetComponentsInChildren<Renderer>(true)) {
+                MaterialPropertyBlock mpb = new();
+                mpb.SetColor("GlowColor", marioPlayerAnimator ? marioPlayerAnimator.GlowColor : Color.clear);
+                renderer.SetPropertyBlock(mpb);
             }
         }
 

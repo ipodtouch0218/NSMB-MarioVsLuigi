@@ -16,7 +16,7 @@ namespace Quantum {
             systems.Add(new GameLogicSystem());
             systems.Add(
                 new StartDisabledSystemGroup("gameplay",
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || MVL_DEBUG
                     new MvLDebugSystem(),
 #endif
                     new PrePhysicsObjectSystem(),

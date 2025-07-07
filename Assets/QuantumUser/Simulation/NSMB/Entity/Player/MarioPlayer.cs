@@ -6,7 +6,7 @@ namespace Quantum {
 
         public bool IsStarmanInvincible => InvincibilityFrames > 0;
         public bool IsWallsliding => WallslideLeft || WallslideRight;
-        public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && IsCrouching && !IsInShell;
+        public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || (IsGroundpounding && GroundpoundStartFrames == 0)) && !IsInShell;
         public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
         public bool CanCollectOwnTeamsObjectiveCoins => !IsInKnockback && DamageInvincibilityFrames == 0;
@@ -80,14 +80,14 @@ namespace Quantum {
         }
 
         public bool CanPickupItem(Frame f, EntityRef mario, EntityRef item) {
-            return !f.Exists(HeldEntity) && CanHoldItem(f, mario, item);
+            return !f.Exists(HeldEntity) && CanHoldItem(f, mario, item) && ForceJumpTimer <= 5;
         }
 
         public bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {
             return CurrentPowerupState == PowerupState.MegaMushroom
                 || IsStarmanInvincible
                 || IsInShell
-                || (includeSliding && (IsSliding || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
+                || (((includeSliding && IsSliding) || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
         }
 
         public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {

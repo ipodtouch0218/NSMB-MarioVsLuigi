@@ -221,7 +221,7 @@ namespace NSMB.UI.Game {
         }
 
         private void OnNavigate(InputAction.CallbackContext context) {
-            if (!spectating || EventSystem.current != spectationUI) {
+            if (!spectating) {
                 return;
             }
 

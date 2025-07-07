@@ -49,12 +49,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 </details>
 <details>
   <summary><h2>Credits</h2></summary>
-
-### Original Content:
-* New Super Mario Bros.
-* New Super Mario Bros. Wii
-* Super Mario Maker 2
-
+  
 ### Contributors:
 * [Amy54Desu](https://github.com/Amy54Desu)
 * [AprilShade](https://github.com/AprilShade)
@@ -156,8 +151,15 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * TheCyVap
 * VentureSonic
  
+### Original Content:
+* New Super Mario Bros.
+* New Super Mario Bros. Wii
+* New Super Mario Bros. 2
+* Super Mario Maker 2
+
 ### Asset Rips:
 * A Refracted Swindler (UI)
+* ArianLust (Sound)
 * Clougo (Tiles)
 * Cubby Crazes (Sound)
 * Demon2Warrior (Background)
@@ -169,6 +171,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Keira (Background)
 * Luke Hackett (Sound)
 * LukeWarnut (Sound)
+* MiiBumm (Models/Sound)
 * mindnomad (Tiles/Sound)
 * Mr. C (Enemies)
 * Mr-SUGOI (Tiles)
@@ -182,6 +185,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * TeridaxXD001 (Models)
 * Treeki (UI)
 * VentureSonic (Background)
+* vlco_o (Sound)
 * xFrostyCake123 (Sound)
 
 </details>

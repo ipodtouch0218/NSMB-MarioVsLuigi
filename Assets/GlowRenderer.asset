@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Active: 1
   settings:
     passTag: RenderGlows
-    Event: 500
+    Event: 1000
     filterSettings:
       RenderQueueType: 0
       LayerMask:
@@ -81,7 +81,7 @@ MonoBehaviour:
     overrideShaderPassIndex: 0
     overrideMode: 1
     overrideDepthState: 0
-    depthCompareFunction: 0
+    depthCompareFunction: 2
     enableWrite: 0
     stencilSettings:
       overrideStencilState: 0
@@ -93,5 +93,5 @@ MonoBehaviour:
     cameraSettings:
       overrideCamera: 0
       restoreCamera: 0
-      offset: {x: 0.69, y: 3.34, z: 0, w: 1}
-      cameraFieldOfView: 35.1
+      offset: {x: 0, y: 0, z: 0, w: 0}
+      cameraFieldOfView: 60

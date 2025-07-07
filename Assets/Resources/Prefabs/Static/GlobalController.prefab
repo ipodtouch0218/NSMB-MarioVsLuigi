@@ -3277,12 +3277,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 476381856839727576}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOption, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.RebindPauseOption, Assembly-CSharp
         m_MethodName: OnButtonClick
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1830971421620107890}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.RebindPauseOptionButton,
             Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -5310,12 +5310,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 476381856839727576}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOption, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.RebindPauseOption, Assembly-CSharp
         m_MethodName: OnButtonClick
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 4627543800174353087}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.RebindPauseOptionButton,
             Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -21162,12 +21162,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 476381856839727576}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOption, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.RebindPauseOption, Assembly-CSharp
         m_MethodName: OnButtonClick
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 3106904366517044819}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.RebindPauseOptionButton,
             Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -32553,12 +32553,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 476381856839727576}
-        m_TargetAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOption, Assembly-CSharp
+        m_TargetAssemblyTypeName: NSMB.UI.Options.RebindPauseOption, Assembly-CSharp
         m_MethodName: OnButtonClick
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 631626271962457503}
-          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Pause.Options.RebindPauseOptionButton,
+          m_ObjectArgumentAssemblyTypeName: NSMB.UI.Options.RebindPauseOptionButton,
             Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0

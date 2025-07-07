@@ -303,7 +303,7 @@ namespace NSMB.Cameras {
                 || !f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
                 || physicsObject->IsTouchingGround) {
 
-                screenshakeTimer += screenshake;
+                screenshakeTimer = screenshake;
             }
         }
 
