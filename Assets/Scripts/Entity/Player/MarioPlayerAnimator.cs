@@ -368,11 +368,13 @@ namespace NSMB.Entities.Player {
             float delta = Time.deltaTime;
 
             float angleR = 108, angleL = 252; //Default angles, we can override them later. 
-            if (mario->CurrentPowerupState is PowerupState.BlueShell or PowerupState.MegaMushroom) {
+            /*
+            if (mario->CurrentPowerupState is PowerupState.BlueShell) {
                 //Hacky override that feels like something I'd put in one of my mods - HyperCat
                 angleR = 90;
                 angleL = 270;
             }
+            */
 
             modelRotateInstantly = false;
             var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
@@ -472,7 +474,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamCrouching, mario->IsCrouching);
             animator.SetBool(ParamGroundpound, mario->IsGroundpounding);
             animator.SetBool(ParamSliding, mario->IsSliding);
-            animator.SetBool(ParamKnockback, mario->IsInKnockback);
+            animator.SetBool(ParamKnockback, mario->IsInKnockback && mario->KnockbackGetupFrames == 0);
             animator.SetBool(ParamFacingRight, (left ^ right) ? right : mario->FacingRight);
             animator.SetBool(ParamFlying, mario->IsSpinnerFlying);
             animator.SetBool(ParamDrill, mario->IsDrilling);
@@ -556,7 +558,7 @@ namespace NSMB.Entities.Player {
             };
             materialBlock.SetFloat(ParamPowerupState, ps);
             materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead || mario->IsInKnockback ? Enums.PlayerEyeState.Death : eyeState));
-            materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x * (smallModel.activeInHierarchy ? 0.5f : 1f));
+            materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x * (mario->CurrentPowerupState >= PowerupState.Mushroom ? 1f : 0.5f));
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = mario->MegaMushroomFrames / 60f;
@@ -584,9 +586,9 @@ namespace NSMB.Entities.Player {
             smallModel.SetActive(!large);
             blueShell.SetActive(mario->CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(!DisableHeadwear && mario->CurrentPowerupState == PowerupState.PropellerMushroom);
-            HammerHelm.SetActive(!DisableHeadwear && mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
-            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
-            HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching);
+            HammerHelm.SetActive(!DisableHeadwear && mario->CurrentPowerupState == PowerupState.HammerSuit && (!mario->IsCrouching || f.Exists(mario->CurrentPipe)));
+            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && (!mario->IsCrouching || f.Exists(mario->CurrentPipe)));
+            HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching && !f.Exists(mario->CurrentPipe));
 
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;
             bool changedAvatar = animator.avatar != targetAvatar;

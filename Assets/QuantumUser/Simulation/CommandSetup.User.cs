@@ -8,9 +8,6 @@ namespace Quantum {
             factories.Add(new CommandSpawnReserveItem());
             factories.Add(new CommandHostEndGame());
             factories.Add(new CommandEndGameContinue());
-#if UNITY_EDITOR || MVL_DEBUG
-            factories.Add(new CommandMvLDebugCmd());
-#endif
 
             // --- In room
             // Start Game
@@ -33,6 +30,10 @@ namespace Quantum {
             factories.Add(new CommandBanPlayer());
             factories.Add(new CommandKickPlayer());
             factories.Add(new CommandUnbanPlayer());
+
+#if UNITY_EDITOR || MVL_DEBUG
+            factories.Add(new CommandMvLDebugCmd());
+#endif
         }
     }
 }

@@ -140,8 +140,10 @@ namespace NSMB {
                 this.StopCoroutineNullable(ref fadeMusicRoutine);
                 this.StopCoroutineNullable(ref fadeSfxRoutine);
 
+#if IDLE_LOCK_30FPS
                 QualitySettings.vSyncCount = previousVsyncCount;
                 Application.targetFrameRate = previousFrameRate;
+#endif
             } else {
                 if (Settings.Instance.audioMuteMusicOnUnfocus) {
                     fadeMusicRoutine ??= StartCoroutine(FadeVolume("MusicVolume"));

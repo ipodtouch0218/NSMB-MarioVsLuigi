@@ -91,7 +91,7 @@ namespace NSMB.UI.Loading {
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
-            if (e.NewState > GameState.WaitingForPlayers) {
+            if (e.NewState is GameState.WaitingForPlayers or GameState.Playing) {
                 EndLoading(e.Game);
             }
         }

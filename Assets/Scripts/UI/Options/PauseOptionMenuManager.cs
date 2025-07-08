@@ -1,3 +1,4 @@
+using NSMB.Networking;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
@@ -144,6 +145,10 @@ namespace NSMB.UI.Options {
                     SetCurrentOption(newOptionIndex, true);
                     downHoldStart = Time.unscaledTime + 0.125f;
                 }
+            }
+
+            if (EventSystem.current) {
+                EventSystem.current.SetSelectedGameObject(gameObject);
             }
         }
 

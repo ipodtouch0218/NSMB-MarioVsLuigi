@@ -16,9 +16,6 @@ namespace Quantum {
             systems.Add(new GameLogicSystem());
             systems.Add(
                 new StartDisabledSystemGroup("gameplay",
-#if UNITY_EDITOR || MVL_DEBUG
-                    new MvLDebugSystem(),
-#endif
                     new PrePhysicsObjectSystem(),
                     new InteractionPhysicsQuerySystem(),
                     new GenericMoverSystem(),
@@ -57,6 +54,11 @@ namespace Quantum {
                 )
             );
             systems.Add(new StageSystem());
+
+#if UNITY_EDITOR || MVL_DEBUG
+            // This HAS to be the last system otherwise it breaks replays.
+            systems.Add(new MvLDebugSystem());
+#endif
         }
     }
 }

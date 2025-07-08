@@ -14,7 +14,7 @@ namespace Quantum {
         public override void DisableGamemode(Frame f) {
             f.SystemDisable<ObjectiveCoinSystem>();
             f.SystemDisable<GoldBlockSystem>();
-        }
+       }
 
         public override void CheckForGameEnd(Frame f) {
             // End Condition: only one team alive

@@ -85,6 +85,7 @@ namespace NSMB.Sound {
                     continue;
                 }
 
+                speedup |= rules.IsLivesEnabled && mario->Lives == 1;
                 mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && mario->MegaMushroomFrames > 0;
                 invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && mario->IsStarmanInvincible;
             }

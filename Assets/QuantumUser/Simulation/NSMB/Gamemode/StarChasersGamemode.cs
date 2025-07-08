@@ -1,4 +1,3 @@
-
 using Photon.Deterministic;
 using System;
 
@@ -10,6 +9,7 @@ namespace Quantum {
         public override void EnableGamemode(Frame f) {
             f.SystemEnable<BigStarSystem>();
             f.Global->AutomaticStageRefreshTimer = f.Global->AutomaticStageRefreshInterval = 0;
+
         }
 
         public override void DisableGamemode(Frame f) {

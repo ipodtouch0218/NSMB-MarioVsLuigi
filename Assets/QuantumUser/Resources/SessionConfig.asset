@@ -20,7 +20,7 @@ MonoBehaviour:
     UpdateFPS: 60
     ChecksumInterval: 0
     RollbackWindow: 60
-    InputHardTolerance: 6
+    InputHardTolerance: 9
     InputRedundancy: 1
     InputRepeatMaxDistance: 10
     SessionStartTimeout: 0

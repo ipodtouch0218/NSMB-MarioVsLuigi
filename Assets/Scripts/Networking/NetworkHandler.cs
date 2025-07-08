@@ -1,4 +1,5 @@
 using NSMB.Networking;
+using NSMB.Replay;
 using Photon.Deterministic;
 using Photon.Realtime;
 using Quantum;
@@ -341,14 +342,24 @@ namespace NSMB.Networking {
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {
+            if (ActiveReplayManager.Instance.IsReplay) {
+                return;
+            }
+            
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
+
             Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) joined the game.");
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
+            if (ActiveReplayManager.Instance.IsReplay) {
+                return;
+            }
+
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
+
             Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) left the game.");
         }
 

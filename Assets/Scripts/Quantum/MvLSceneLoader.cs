@@ -30,7 +30,7 @@ namespace NSMB.Quantum {
             QuantumGame game = e.Game;
             Frame f = game.Frames.Predicted;
 
-            if (f.Map != currentMap) {
+            if (game.Session.GameMode == Photon.Deterministic.DeterministicGameMode.Replay || game.GetLocalPlayers().Count > 0 && f.Map != currentMap) {
                 Map newMap = f.Map;
                 Map oldMap = currentMap;
 

@@ -108,6 +108,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Iketarou *(ja-jp)*
 * IvythePoS *(es-la)*
 * Kate Karui *(sv-sv)*
+* Laxan3000 *(it-it)*
 * Lyroy The Toad *(it-it)*
 * Maestrike *(it-it)*
 * marbo *(pt-br)*
@@ -121,12 +122,15 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * MUI_Noam *(he-il)*
 * notossdekasaihassei *(ja-jp)*
 * ossdekasaihassei *(ja-jp)*
+* Pedro Lunar *(es-la)*
 * pixelated *(he-il)*
-* SadenceZinzap *(tr-tr)*
+* SadeceZinzap *(tr-tr)*
+* SlavaWOW *(ru-ru)*
 * SLG64 *(es-la)*
 * Snayp *(fr-fr)*
 * Thebababois369 *(id-id)*
 * Tombuntu *(ja-jp)*
+* Watercats *(pl-pl)*
 * Windows10V *(pt-br)*
 * vlco_o *(es-es, ro-ro)*
 
