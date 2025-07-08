@@ -1027,7 +1027,7 @@ namespace Quantum {
                 int framesInKnockback = f.Number - mario->KnockbackTick;
                 if (mario->DoEntityBounce
                     || (swimming && framesInKnockback > 60)
-                    || (!swimming && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) < FP._0_33 && framesInKnockback > 45)
+                    || (!swimming && !mario->IsInWeakKnockback && physicsObject->IsTouchingGround && FPMath.Abs(physicsObject->Velocity.X) < FP._0_33 && framesInKnockback > 25)
                     || (!swimming && physicsObject->IsTouchingGround && framesInKnockback > 120)
                     || (!swimming && mario->IsInWeakKnockback && framesInKnockback > 45)) {
 
@@ -2188,13 +2188,13 @@ namespace Quantum {
                         || FPMath.Abs(marioBPhysics->Velocity.X) > marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.WalkSpeedStage]) {
                         // Bump
                         bool damaged = false;
-                        if (marioAPhysics->IsTouchingGround) {
+                        if (marioAPhysics->IsTouchingGround && !marioAPhysics->IsUnderwater) {
                             damaged = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, marioBEntity, bypassDamageInvincibility: true);
                         } else {
                             marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
                         }
 
-                        if (marioBPhysics->IsTouchingGround) {
+                        if (marioBPhysics->IsTouchingGround && !marioAPhysics->IsUnderwater) {
                             damaged = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, marioAEntity, bypassDamageInvincibility: true);
                         } else {
                             marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);

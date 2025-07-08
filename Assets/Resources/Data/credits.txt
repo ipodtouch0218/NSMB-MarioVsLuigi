@@ -5,7 +5,7 @@ ipodtouch0218
 Amy54Desu
 AprilShade
 ArianLust
-AtwerJ
+Atwer
 Ave
 BluCorDev
 Cubby Crazes
@@ -95,7 +95,7 @@ TheCyVap
 Vinnnnnnny
 
 <color=yellow>{ui.about.credits.leveldesign}</color>
-AtwerJ
+Atwer
 Ave
 mindnomad
 Skarph

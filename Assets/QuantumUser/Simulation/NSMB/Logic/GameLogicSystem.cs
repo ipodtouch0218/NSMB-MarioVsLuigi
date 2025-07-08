@@ -112,6 +112,10 @@ namespace Quantum {
                     f.Global->StartFrame = f.Number;
                     f.SystemEnable<StartDisabledSystemGroup>();
 
+                    foreach (var otherGamemodes in f.SimulationConfig.AllGamemodes) {
+                        f.FindAsset(otherGamemodes).DisableGamemode(f);
+                    }
+
                     var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
                     gamemode.EnableGamemode(f);
 

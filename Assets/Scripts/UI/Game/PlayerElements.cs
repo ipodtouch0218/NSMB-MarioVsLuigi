@@ -67,6 +67,7 @@ namespace NSMB.UI.Game {
         public override void OnActivate(Frame f) {
             AllPlayerElements.Add(this);
             Settings.Controls.UI.Navigate.performed += OnNavigate;
+            Settings.Controls.UI.Navigate.canceled += OnNavigate;
             Settings.Controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
             Settings.Controls.UI.Next.performed += SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed += SpectatePreviousPlayer;
@@ -76,6 +77,7 @@ namespace NSMB.UI.Game {
         public override void OnDeactivate() {
             AllPlayerElements.Remove(this);
             Settings.Controls.UI.Navigate.performed -= OnNavigate;
+            Settings.Controls.UI.Navigate.canceled -= OnNavigate;
             Settings.Controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
             Settings.Controls.UI.Next.performed -= SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed -= SpectatePreviousPlayer;

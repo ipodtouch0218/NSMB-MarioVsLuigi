@@ -54,7 +54,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [Amy54Desu](https://github.com/Amy54Desu)
 * [AprilShade](https://github.com/AprilShade)
 * [ArianLust](https://github.com/ArianLust)
-* [AtwerJ](https://github.com/AtwerJ)
+* [Atwer](https://github.com/AtwerJ)
 * [Ave](https://github.com/AutumnLeafDev)
 * [BluCorDev](https://github.com/BluCorDev)
 * [Cubby Crazes](https://github.com/CubbyCrazes)
@@ -144,7 +144,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Vinnnnnnny
 
 ### Level Design:
-* AtwerJ
+* Atwer
 * Ave
 * mindnomad
 * Skarph

@@ -169,7 +169,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             Room currentRoom = NetworkHandler.Client.CurrentRoom;
             maxPlayerSlider.value = currentRoom.MaxPlayers;
             MaxPlayerSliderChanged();
-            privateToggle.isOn = !currentRoom.IsVisible;
+            privateToggle.SetIsOnWithoutNotify(!currentRoom.IsVisible);
             RoomIdVisible = false;
             NetworkHandler.Client.AddCallbackTarget(this);
 
@@ -241,7 +241,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             PlayerRef host = game.Frames.Predicted.Global->Host;
             if (!game.PlayerIsLocal(host)) {
                 Canvas.PlaySound(SoundEffect.UI_Error);
-                privateToggle.isOn = !currentRoom.IsVisible;
+                privateToggle.SetIsOnWithoutNotify(!currentRoom.IsVisible);
                 return;
             }
 

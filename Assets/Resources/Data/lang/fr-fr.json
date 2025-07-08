@@ -182,7 +182,7 @@
   "ui.rooms.filters": "Filtres de salon",
   "ui.rooms.filters.notstarted": "Cacher les salons en jeu",
   "ui.rooms.filters.notfull": "Cacher les salons complets",
-  "ui.rooms.hidden": "{room} salons supplémentaires ont été cachés par les filtres.",
+  "ui.rooms.hidden": "{rooms} salons supplémentaires ont été cachés par les filtres.",
   "ui.rooms.buttons.joinprivate": "Rejoindre un salon via ID",
   "ui.rooms.buttons.create": "Créer un salon",
   "ui.rooms.buttons.reconnect": "Se reconnecter au serveur",

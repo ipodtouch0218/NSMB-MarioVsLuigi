@@ -61,9 +61,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             sliderValue.text = ((int) maxPlayerSlider.value).ToString();
         }
 
-        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
+        private unsafe void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
             if (success && e.PlayerSlot == 0) {
-                NetworkHandler.Client.CurrentRoom.IsVisible = visible;
+                PlayerRef host = e.Game.Frames.Predicted.Global->Host;
+                if (e.Game.PlayerIsLocal(host)) {
+                    NetworkHandler.Client.CurrentRoom.IsVisible = visible;
+                }
             }
         }
     }
