@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
         ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 

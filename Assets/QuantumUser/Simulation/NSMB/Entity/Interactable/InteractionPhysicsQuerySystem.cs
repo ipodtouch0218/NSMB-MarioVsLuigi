@@ -2,6 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 #if OLD
+    [UnityEngine.Scripting.Preserve]
     public unsafe class InteractionPhysicsQuerySystem : SystemMainThreadFilterStage<InteractionSystem.Filter> {
         public override void Update(Frame f, ref InteractionSystem.Filter filter, VersusStageData stage) {
             var interactable = filter.Interactable;
@@ -31,6 +32,7 @@ namespace Quantum {
         }
     }
 #else
+    [UnityEngine.Scripting.Preserve]
     public unsafe class InteractionPhysicsQuerySystem : SystemMainThread {
 
         public struct Filter {

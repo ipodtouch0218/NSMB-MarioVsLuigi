@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class BlockBumpSystem : SystemMainThreadEntityFilter<BlockBump, BlockBumpSystem.Filter> {
 
         private static readonly FPVector2 BumpOffset = new FPVector2(0, -FP._0_25);

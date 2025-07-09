@@ -5,8 +5,10 @@ using Quantum.Task;
 
 namespace Quantum {
 #if MULTITHREADED
+    [UnityEngine.Scripting.Preserve]
     public unsafe class CameraSystem : SystemArrayFilter<CameraSystem.Filter> {
 #else
+    [UnityEngine.Scripting.Preserve]
     public unsafe class CameraSystem : SystemMainThreadFilterStage<CameraSystem.Filter> {
 #endif
         public struct Filter {

@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class ProjectileSystem : SystemMainThreadEntityFilter<Projectile, ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
         public struct Filter {
             public EntityRef Entity;

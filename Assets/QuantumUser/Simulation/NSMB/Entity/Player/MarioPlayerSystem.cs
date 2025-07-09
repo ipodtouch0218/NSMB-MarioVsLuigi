@@ -5,6 +5,7 @@ using System;
 using static IInteractableTile;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class MarioPlayerSystem : SystemMainThreadEntityFilter<MarioPlayer, MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>,
         ISignalOnGameStarting, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
         ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
@@ -2166,17 +2167,17 @@ namespace Quantum {
                 }
 
                 // Normal stomps
-                bool marioAMini = marioA->CurrentPowerupState == PowerupState.MiniMushroom;
-                bool marioBMini = marioB->CurrentPowerupState == PowerupState.MiniMushroom;
-                if (marioAAbove && !marioBMini && (marioAPhysics->Velocity.Y <= 0 || marioBPhysics->Velocity.Y > 0)) {
+                if (marioAAbove && (marioAPhysics->Velocity.Y <= 0 || marioBPhysics->Velocity.Y > 0)) {
                     MarioMarioStomp(f, marioAEntity, marioBEntity, fromRight, dropStars);
                     return;
-                } else if (marioBAbove && !marioAMini && (marioBPhysics->Velocity.Y <= 0 || marioAPhysics->Velocity.Y > 0)) {
+                } else if (marioBAbove && (marioBPhysics->Velocity.Y <= 0 || marioAPhysics->Velocity.Y > 0)) {
                     MarioMarioStomp(f, marioBEntity, marioAEntity, !fromRight, dropStars);
                     return;
                 }
 
                 // Collided with them
+                bool marioAMini = marioA->CurrentPowerupState == PowerupState.MiniMushroom;
+                bool marioBMini = marioB->CurrentPowerupState == PowerupState.MiniMushroom;
                 if (!marioA->IsInKnockback && !marioB->IsInKnockback && marioAMini ^ marioBMini) {
                     // Minis
                     bool damaged = false;
@@ -2306,7 +2307,7 @@ namespace Quantum {
             var defenderPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(defender);
 
             // Hit them from above
-            attackerMario->DoEntityBounce = !attackerMario->IsGroundpounding && !attackerMario->IsDrilling;
+            attackerMario->DoEntityBounce = defenderMario->CurrentPowerupState != PowerupState.MiniMushroom && !attackerMario->IsGroundpounding && !attackerMario->IsDrilling;
             bool groundpounded = attackerMario->IsGroundpoundActive || attackerMario->IsDrilling;
 
             if (attackerMario->CurrentPowerupState == PowerupState.MiniMushroom && defenderMario->CurrentPowerupState != PowerupState.MiniMushroom) {

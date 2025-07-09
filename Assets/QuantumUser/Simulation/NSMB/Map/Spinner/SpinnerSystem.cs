@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class SpinnerSystem : SystemMainThreadEntityFilter<Spinner, SpinnerSystem.Filter> {
 
         public struct Filter {

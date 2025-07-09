@@ -6,8 +6,10 @@ using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
+    [UnityEngine.Scripting.Preserve]
     public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnEntityEnterExitLiquid {
 #else
+    [UnityEngine.Scripting.Preserve]
     public unsafe class PhysicsObjectSystem : SystemMainThread, ISignalOnEntityEnterExitLiquid {
 #endif
 
@@ -464,12 +466,12 @@ namespace Quantum {
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
                         }
-                        
+
                         bool keepContact = true;
                         foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
                             callback?.Invoke((Frame) f, stage, filter.Entity, contact, ref keepContact);
                         }
-                        
+
                         if (keepContact) {
                             contacts.Value.Add(contact);
                             min ??= contact.Distance;

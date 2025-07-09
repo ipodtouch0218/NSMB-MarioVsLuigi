@@ -3,6 +3,7 @@ using static Quantum.CommandMvLDebugCmd;
 
 namespace Quantum {
 
+    [UnityEngine.Scripting.Preserve]
     public unsafe class MvLDebugSystem : SystemMainThread {
         public override void Update(Frame f) {
             for (int i = 0; i < f.PlayerCount; i++) {

@@ -131,6 +131,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             if (Selected) {
                 Selected.OnSelect(open);
             }
+            LayoutRebuilder.MarkLayoutForRebuild((RectTransform) headerTemplate.transform.parent);
             UpdateInformation(replay);
         }
 

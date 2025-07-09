@@ -1,5 +1,3 @@
-using JimmysUnityUtilities;
-using NaughtyAttributes.Test;
 using NSMB.Cameras;
 using NSMB.Particles;
 using NSMB.Quantum;
@@ -367,19 +365,21 @@ namespace NSMB.Entities.Player {
             using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.SetFacingDirection");
             float delta = Time.deltaTime;
 
-            float angleR = 108, angleL = 252; //Default angles, we can override them later. 
-            /*
-            if (mario->CurrentPowerupState is PowerupState.BlueShell) {
-                //Hacky override that feels like something I'd put in one of my mods - HyperCat
-                angleR = 90;
-                angleL = 270;
-            }
-            */
+            float angle = mario->CurrentPowerupState switch {
+                PowerupState.BlueShell => 90f,
+                PowerupState.MegaMushroom => 78.75f,
+                _ => 67.5f,
+            };
+            float angleR = 180 - angle;
+            float angleL = 180 + angle;
 
             modelRotateInstantly = false;
             var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
 
-            if (mario->IsInKnockback || freezable->IsFrozen(f)) {
+            if (f.Exists(mario->CurrentPipe)) {
+                modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? angleR : angleL, 0);
+                modelRotateInstantly = true;
+            } if (mario->IsInKnockback || freezable->IsFrozen(f)) {
                 bool right = mario->FacingRight;
                 if (mario->IsInKnockback && (physicsObject->IsUnderwater || mario->IsInWeakKnockback)) {
                     right = mario->KnockbackWasOriginallyFacingRight;

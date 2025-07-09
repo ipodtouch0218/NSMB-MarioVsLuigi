@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class GoldBlockSystem : SystemMainThreadEntityFilter<GoldBlock, GoldBlockSystem.Filter>,
         ISignalOnStageReset, ISignalOnMarioPlayerDied, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerCollectedPowerup {
 

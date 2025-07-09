@@ -3,6 +3,7 @@ using NSMB.Replay;
 using Photon.Deterministic;
 using Photon.Realtime;
 using Quantum;
+using Quantum.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -373,8 +374,10 @@ namespace NSMB.Networking {
             props.GameStarted = e.NewState != GameState.PreGameRoom;
 
             Client.CurrentRoom.SetCustomProperties(new Photon.Client.PhotonHashtable {
-            { Enums.NetRoomProperties.BoolProperties, (int) props }
-        });
+                { Enums.NetRoomProperties.BoolProperties, (int) props }
+            });
+
+            Runner.Session.MaxVerifiedTicksPerUpdate = e.NewState == GameState.Playing ? 3 : int.MaxValue;
         }
 
         private unsafe void OnGameStarted(CallbackGameStarted e) {

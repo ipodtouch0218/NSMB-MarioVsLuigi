@@ -2,7 +2,8 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    public unsafe class MovingPlatformPhysicsQuerySystem : SystemMainThreadFilterStage<MovingPlatformSystem.Filter> {
+    [UnityEngine.Scripting.Preserve]
+    public unsafe class MovingPlatformPhysicsQuerySystem : SystemMainThreadEntityFilter<MovingPlatform, MovingPlatformSystem.Filter> {
         public override void Update(Frame f, ref MovingPlatformSystem.Filter filter, VersusStageData stage) {
             var platform = filter.Platform;
             if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {

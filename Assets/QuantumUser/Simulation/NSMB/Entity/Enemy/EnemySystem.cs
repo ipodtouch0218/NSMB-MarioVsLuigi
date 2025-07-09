@@ -1,5 +1,6 @@
 namespace Quantum {
 
+    [UnityEngine.Scripting.Preserve]
     public unsafe class EnemySystem : SystemMainThreadEntityFilter<Enemy, EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction,
         ISignalOnEnemyDespawned, ISignalOnEnemyRespawned {
         public struct Filter {

@@ -1,9 +1,8 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-
-    public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed,
-        ISignalOnStageReset {
+    [UnityEngine.Scripting.Preserve]
+    public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
 
         private static readonly FP BumpForce = Constants._5_50;
 
@@ -227,21 +226,6 @@ namespace Quantum {
 
                 f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                 f.Destroy(entity);
-            }
-        }
-
-        public void OnStageReset(Frame f, QBoolean full) {
-            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            var filter = f.Filter<Powerup, CoinItem, Transform2D, PhysicsCollider2D>();
-            while (filter.NextUnsafe(out EntityRef entity, out _, out var coinItem, out var transform, out var collider)) {
-                if (coinItem->SpawnAnimationFrames > 0 || !collider->Enabled) {
-                    continue;
-                }
-                
-                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
-                    // Insta-despawn. Crushed by blocks respawning.
-                    coinItem->Lifetime = 1;
-                }
             }
         }
     }

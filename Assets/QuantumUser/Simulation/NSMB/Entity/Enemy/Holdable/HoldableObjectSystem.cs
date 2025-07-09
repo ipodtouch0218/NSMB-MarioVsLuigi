@@ -1,7 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-
+    [UnityEngine.Scripting.Preserve]
     public unsafe class HoldableObjectSystem : SystemMainThreadEntityFilter<Holdable, HoldableObjectSystem.Filter>, ISignalOnComponentRemoved<Holdable>,
         ISignalOnTryLiquidSplash, ISignalOnEntityFreeze {
         

@@ -1,9 +1,9 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Physics2D;
-using UnityEngine;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class MovingPlatformSystem : SystemMainThreadEntityFilter<MovingPlatform, MovingPlatformSystem.Filter> {
 
         public struct Filter {
@@ -97,6 +97,7 @@ namespace Quantum {
                 Frame = f.Number,
                 Tile = new(-1, -1)
             };
+
             bool keepContact = true;
             foreach (var callback in f.Context.PreContactCallbacks) {
                 callback?.Invoke(f, stage, hit.Entity, newContact, ref keepContact);

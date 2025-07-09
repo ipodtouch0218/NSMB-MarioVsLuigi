@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Physics2D;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class BigStarSystem : SystemMainThread, ISignalOnReturnToRoom, ISignalOnMarioPlayerDropObjective {
 
         public override bool StartEnabled => false;

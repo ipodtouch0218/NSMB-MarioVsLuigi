@@ -56,7 +56,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                     IsVisible = false,
                 }
             });
-            Debug.Log(response);
             createdSuccessfully = (response == 0);
         }
 

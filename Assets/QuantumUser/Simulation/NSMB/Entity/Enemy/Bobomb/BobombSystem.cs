@@ -2,6 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
+    [UnityEngine.Scripting.Preserve]
     public unsafe class BobombSystem : SystemMainThreadEntityFilter<Bobomb, BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
         ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnMarioPlayerBecameInvincible {
         
