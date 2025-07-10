@@ -173,7 +173,7 @@ MonoBehaviour:
     m_FamilyName: Nintendo DS BIOS
     m_StyleName: Regular
     m_PointSize: 16
-    m_Scale: 1
+    m_Scale: 1.35
     m_UnitsPerEM: 1024
     m_LineHeight: 12
     m_AscentLine: 11

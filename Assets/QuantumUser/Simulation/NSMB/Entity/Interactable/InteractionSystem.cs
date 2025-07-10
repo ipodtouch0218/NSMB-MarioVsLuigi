@@ -47,22 +47,21 @@ namespace Quantum {
                 EntityRef entityA = interaction.EntityA;
                 EntityRef entityB = interaction.EntityB;
 
-                {
-                    using var profilerScope2 = HostProfiler.Start("InteractionSystem.Contains");
-
-                    EntityRefPair pair = new EntityRefPair { 
+                using (var profilerScope2 = HostProfiler.Start("InteractionSystem.Contains")) {
+                    EntityRefPair pair = new EntityRefPair {
                         EntityA = entityA,
                         EntityB = entityB,
                     };
-                    
-                    if (alreadyInteracted.Contains(pair)) {
+
+                    if (!f.Exists(entityA)
+                        || !f.Exists(entityB)
+                        || alreadyInteracted.Contains(pair)) {
                         continue;
                     }
                     alreadyInteracted.Add(pair);
                 }
 
-                {
-                    using var profilerScope5 = HostProfiler.Start("InteractionSystem.BeforeInteractionSignals");
+                using (var profilerScope5 = HostProfiler.Start("InteractionSystem.BeforeInteractionSignals")) {
 
                     bool continueInteraction = true;
                     f.Signals.OnBeforeInteraction(entityA, &continueInteraction);
@@ -73,8 +72,7 @@ namespace Quantum {
                     }
                 }
 
-                {
-                    using var profilerScope3 = HostProfiler.Start("InteractionSystem.ExecuteInteractors");
+                using (var profilerScope3 = HostProfiler.Start("InteractionSystem.ExecuteInteractors")) {
                     if (interaction.IsPlatformInteraction) {
                         f.Context.Interactions.platformInteractors[interaction.InteractorIndex].Invoke(f, entityA, entityB, interaction.Contact);
                     } else {
@@ -83,9 +81,10 @@ namespace Quantum {
                 }
             }
 
-            using var profilerScope4 = HostProfiler.Start("InteractionSystem.Clear");
-            pendingInteractions.Clear();
-            alreadyInteracted.Clear();
+            using (var profilerScope4 = HostProfiler.Start("InteractionSystem.Clear")) {
+                pendingInteractions.Clear();
+                alreadyInteracted.Clear();
+            }
         }
 
 #if MULTITHREADED

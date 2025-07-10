@@ -390,7 +390,11 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #else
             ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromFile(filepath, true, out BinaryReplayFile parsedReplay);
 #endif
+
             if (parseResult == ReplayParseResult.Success) {
+                // Change to today
+                parsedReplay.Header.UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+
                 // Move into the replays folder
                 string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.Header.UnixTimestamp + ".mvlreplay");
 #if UNITY_WEBGL && !UNITY_EDITOR
