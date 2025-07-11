@@ -859,6 +859,11 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
+            var mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                PlayMegaFootstep();
+            }
+
             var physicsObject = PredictedFrame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
             if (physicsObject->IsUnderwater && physicsObject->PreviousFrameVelocity.Y < -1) {
                 SpawnParticle(Enums.PrefabParticle.Player_WaterDust.GetGameObject(), transform.position + Vector3.back * 5);

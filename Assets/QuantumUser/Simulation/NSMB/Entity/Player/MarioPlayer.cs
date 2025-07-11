@@ -4,14 +4,14 @@ using System;
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
 
-        public bool IsStarmanInvincible => InvincibilityFrames > 0;
-        public bool IsWallsliding => WallslideLeft || WallslideRight;
-        public bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || (IsGroundpounding && GroundpoundStartFrames == 0)) && !IsInShell;
-        public bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
-        public bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
-        public bool CanCollectOwnTeamsObjectiveCoins => !IsInKnockback && DamageInvincibilityFrames == 0;
+        public readonly bool IsStarmanInvincible => InvincibilityFrames > 0;
+        public readonly bool IsWallsliding => WallslideLeft || WallslideRight;
+        public readonly bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || (IsGroundpounding && GroundpoundStartFrames == 0)) && !IsInShell;
+        public readonly bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
+        public readonly bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
+        public readonly bool CanCollectOwnTeamsObjectiveCoins => !IsInKnockback && DamageInvincibilityFrames == 0;
 
-        public byte? GetTeam(Frame f) {
+        public readonly byte? GetTeam(Frame f) {
             var data = QuantumUtils.GetPlayerData(f, PlayerRef);
             if (data == null) {
                 return null;
@@ -20,7 +20,7 @@ namespace Quantum {
             }
         }
 
-        public FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
+        public readonly FPVector2 GetHeldItemOffset(Frame f, EntityRef marioEntity) {
             if (!f.Exists(HeldEntity)) {
                 return default;
             }
@@ -55,7 +55,7 @@ namespace Quantum {
             }
         }
 
-        public bool CanHoldItem(Frame f, EntityRef entity, EntityRef item) {
+        public readonly bool CanHoldItem(Frame f, EntityRef entity, EntityRef item) {
             Input input = default;
             if (PlayerRef.IsValid) {
                 input = *f.GetPlayerInput(PlayerRef);
@@ -79,18 +79,18 @@ namespace Quantum {
                 && !(aboveHead && physicsObject->IsUnderwater);
         }
 
-        public bool CanPickupItem(Frame f, EntityRef mario, EntityRef item) {
+        public readonly bool CanPickupItem(Frame f, EntityRef mario, EntityRef item) {
             return !f.Exists(HeldEntity) && CanHoldItem(f, mario, item) && ForceJumpTimer <= 5;
         }
 
-        public bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {
+        public readonly bool InstakillsEnemies(PhysicsObject* physicsObject, bool includeSliding) {
             return CurrentPowerupState == PowerupState.MegaMushroom
                 || IsStarmanInvincible
                 || IsInShell
                 || (((includeSliding && IsSliding) || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
         }
 
-        public int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
+        public readonly int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP xVel = FPMath.Abs(physicsObject->Velocity.X) - FP._0_01;
             FP[] arr;
             if (physicsObject->IsUnderwater) {
@@ -113,7 +113,7 @@ namespace Quantum {
             return arr.Length - 1;
         }
 
-        public int GetGravityStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
+        public readonly int GetGravityStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
             FP yVel = physicsObject->Velocity.Y;
             FP[] maxArray = physicsObject->IsUnderwater ? physicsInfo.GravitySwimmingVelocity : (CurrentPowerupState == PowerupState.MegaMushroom ? physicsInfo.GravityMegaVelocity : (CurrentPowerupState == PowerupState.MiniMushroom ? physicsInfo.GravityMiniVelocity : physicsInfo.GravityVelocity));
             for (int i = 0; i < maxArray.Length; i++) {
@@ -448,7 +448,7 @@ namespace Quantum {
                 strength = KnockbackStrength.FireballBump;
                 forceWeak = true;
             } else if (strength == KnockbackStrength.FireballBump && !physicsObject->IsTouchingGround) {
-                FacingRight = fromRight;
+                // FacingRight = fromRight;
                 knockbackVelocity.X *= FP._0_75;
             }
 

@@ -395,13 +395,11 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 // Change to today
                 parsedReplay.Header.UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
 
-                // Move into the replays folder
+                // Write into the replays folder (not copy, since we changed the timestamp in the header...)
                 string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.Header.UnixTimestamp + ".mvlreplay");
-#if UNITY_WEBGL && !UNITY_EDITOR
-                File.WriteAllBytes(newPath, replay);
-#else
-                File.Copy(filepath, newPath, false);
-#endif
+                using (FileStream fs = new FileStream(newPath, FileMode.Create)) {
+                    parsedReplay.WriteToStream(fs);
+                }
                 parsedReplay.FilePath = newPath;
 
                 ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);

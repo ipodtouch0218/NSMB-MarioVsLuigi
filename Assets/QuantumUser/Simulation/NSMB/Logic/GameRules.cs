@@ -4,8 +4,8 @@ namespace Quantum {
     [Serializable]
     public unsafe partial struct GameRules {
 
-        public bool IsLivesEnabled => Lives > 0;
-        public bool IsTimerEnabled => TimerMinutes > 0;
+        public readonly bool IsLivesEnabled => Lives > 0;
+        public readonly bool IsTimerEnabled => TimerMinutes > 0;
 
     }
 }

@@ -1,5 +1,4 @@
 using Photon.Deterministic;
-using System.Runtime.InteropServices;
 
 namespace Quantum {
     public unsafe partial struct Bobomb {
@@ -15,7 +14,7 @@ namespace Quantum {
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
         }
 
-        public void Kick(Frame f, EntityRef entity, EntityRef initiator, FP speed) {
+        public readonly void Kick(Frame f, EntityRef entity, EntityRef initiator, FP speed) {
             var enemy = f.Unsafe.GetPointer<Enemy>(entity);
             var initiatorTransform = f.Unsafe.GetPointer<Transform2D>(initiator);
             var bobombTransform = f.Unsafe.GetPointer<Transform2D>(entity);
@@ -35,7 +34,7 @@ namespace Quantum {
             f.Events.PlayComboSound(entity, 0);
         }
 
-        public void Kill(Frame f, EntityRef bobombEntity, EntityRef killerEntity, KillReason reason) {
+        public readonly void Kill(Frame f, EntityRef bobombEntity, EntityRef killerEntity, KillReason reason) {
             var enemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(bobombEntity);
             var bobombTransform = f.Unsafe.GetPointer<Transform2D>(bobombEntity);

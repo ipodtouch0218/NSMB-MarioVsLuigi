@@ -368,6 +368,10 @@ namespace Quantum {
                 if (FPMath.Abs(physicsObject->Velocity.X) < FP._0_05 && !wasGroundpoundActive) {
                     f.Events.MarioPlayerLandedWithAnimation(filter.Entity);
                 }
+                if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                    mario->MegaMushroomFootstepFrames = physics.MegaMushroomStepInterval;
+                    f.Signals.OnMarioPlayerMegaMushroomFootstep();
+                }
                 mario->PreviousJumpState = mario->JumpState;
             }
 
@@ -950,6 +954,7 @@ namespace Quantum {
 
         private void HandleGroundpoundBlockCollision(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleGroundpoundBlockCollision");
+            var entity = filter.Entity;
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
@@ -973,7 +978,7 @@ namespace Quantum {
                 if (f.Unsafe.TryGetPointer(contact.Entity, out Interactable* interactable)) {
                     // Entity
                     QBoolean continueTemp = true;
-                    f.Signals.OnMarioPlayerGroundpoundedSolid(filter.Entity, contact, ref continueTemp);
+                    f.Signals.OnMarioPlayerGroundpoundedSolid(entity, contact, ref continueTemp);
                     continueGroundpound &= continueTemp;
                     interactedAny = true;
                 } else {
@@ -981,7 +986,7 @@ namespace Quantum {
                     var tileInstance = stage.GetTileRelative(f, contact.Tile);
                     StageTile tile = f.FindAsset(tileInstance.Tile);
                     if (tile is IInteractableTile it) {
-                        continueGroundpound &= it.Interact(f, filter.Entity, InteractionDirection.Down,
+                        continueGroundpound &= it.Interact(f, entity, InteractionDirection.Down,
                             contact.Tile, tileInstance, out bool tempPlayBumpSound);
                         interactedAny = true;
 
@@ -991,7 +996,7 @@ namespace Quantum {
             }
 
             if (playBumpSound ?? false) {
-                f.Events.PlayBumpSound(filter.Entity);
+                f.Events.PlayBumpSound(entity);
             }
 
             continueGroundpound &= interactedAny;
@@ -999,6 +1004,9 @@ namespace Quantum {
             if (!mario->IsDrilling && !filter.Inputs.Down.IsDown) {
                 mario->IsGroundpounding = false;
                 continueGroundpound = false;
+            }
+            if (continueGroundpound && !mario->IsDrilling) {
+                f.Signals.OnMarioPlayerGroundpoundEnded(entity);
             }
             mario->IsGroundpoundActive &= continueGroundpound;
 
@@ -1289,6 +1297,14 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref mario->ProjectileVolleyFrames)) {
                 mario->CurrentVolley = 0;
             }
+            if (mario->CurrentPowerupState == PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && physicsObject->IsTouchingGround) {
+                if (QuantumUtils.Decrement(ref mario->MegaMushroomFootstepFrames)) {
+                    mario->MegaMushroomFootstepFrames = physics.MegaMushroomStepInterval;
+                    f.Signals.OnMarioPlayerMegaMushroomFootstep();
+                }
+            } else {
+                mario->MegaMushroomFootstepFrames = physics.MegaMushroomStepInterval;
+            }
 
             physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15 && (!mario->IsInKnockback || mario->IsInWeakKnockback);
             if (physicsObject->IsWaterSolid && !physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
@@ -1460,7 +1476,7 @@ namespace Quantum {
                 mario->StationaryFrames++;
             }
 
-            if (!physicsObject->IsUnderwater) {
+            if (!physicsObject->IsUnderwater || f.Exists(mario->CurrentPipe)) {
                 return;
             }
 
@@ -2564,6 +2580,7 @@ namespace Quantum {
 
         public void OnEntityChangeUnderwaterState(Frame f, EntityRef entity, EntityRef liquid, QBoolean underwater) {
             if (!f.Unsafe.TryGetPointer(entity, out MarioPlayer* mario)
+                || f.Exists(mario->CurrentPipe)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
                 return;
             }

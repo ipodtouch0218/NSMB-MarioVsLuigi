@@ -3,11 +3,11 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe partial struct Goomba {
 
-        public void Respawn(Frame f, EntityRef entity) {
+        public readonly void Respawn(Frame f, EntityRef entity) {
             f.Unsafe.GetPointer<Interactable>(entity)->ColliderDisabled = false;
         }
 
-        public void Kill(Frame f, EntityRef goombaEntity, EntityRef killerEntity, KillReason reason) {
+        public readonly void Kill(Frame f, EntityRef goombaEntity, EntityRef killerEntity, KillReason reason) {
             var enemy = f.Unsafe.GetPointer<Enemy>(goombaEntity);
             var goomba = f.Unsafe.GetPointer<Goomba>(goombaEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(goombaEntity);

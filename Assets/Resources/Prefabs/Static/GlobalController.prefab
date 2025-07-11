@@ -1926,6 +1926,7 @@ GameObject:
   - component: {fileID: 4375985701316404795}
   - component: {fileID: 6954482788331982423}
   - component: {fileID: 807324232880933055}
+  - component: {fileID: 673847569814015156}
   m_Layer: 5
   m_Name: WaitingOnText
   m_TagString: Untagged
@@ -1949,7 +1950,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 68.005005, y: -11.005}
+  m_AnchoredPosition: {x: 175.005, y: -11.005}
   m_SizeDelta: {x: 136.01, y: 22.01}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6954482788331982423
@@ -2052,6 +2053,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &673847569814015156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518565352008158123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1982709ee1930a4f8172712607593b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: ui.loading.waitingon
+  text: {fileID: 807324232880933055}
 --- !u!1 &525617971143531074
 GameObject:
   m_ObjectHideFlags: 0
@@ -6950,7 +6965,7 @@ RectTransform:
   m_AnchorMin: {x: -0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -28}
-  m_SizeDelta: {x: -663.99, y: 66.02}
+  m_SizeDelta: {x: -449.99, y: 66.02}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &3192065014860799145
 MonoBehaviour:
@@ -17828,8 +17843,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 68.005005, y: -22.01}
-  m_SizeDelta: {x: 94.01, y: 44.01}
+  m_AnchoredPosition: {x: 175.005, y: -22.01}
+  m_SizeDelta: {x: 350.01, y: 44.01}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5284790210557710926
 CanvasRenderer:
@@ -17861,7 +17876,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: '- abc
 
-    - defgh'
+    - defghijklmnopqrstuvwxyz'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
   m_sharedMaterial: {fileID: 6015020410494396785, guid: d42c556520644b148ada62f0b573e1a5,

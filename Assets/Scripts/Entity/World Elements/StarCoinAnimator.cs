@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Entities.World {
-    public class StarCoinAnimator : QuantumEntityViewComponent {
+    public unsafe class StarCoinAnimator : QuantumEntityViewComponent {
 
         //---Static
         public static event Action<Frame, StarCoinAnimator> StarCoinInitialized;
@@ -46,6 +46,10 @@ namespace NSMB.Entities.World {
         public void OnDestroy() {
             EntityView.OnEntityDestroyed.RemoveListener(OnEntityDestroyed);
             RenderPipelineManager.beginCameraRendering -= URPOnPreRender;
+        }
+
+        public override void OnUpdateView() {
+            animator.enabled = PredictedFrame.Global->GameState < GameState.Ended;
         }
 
         public void OnEntityDestroyed(QuantumGame game) {

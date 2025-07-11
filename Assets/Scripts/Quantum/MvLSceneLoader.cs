@@ -53,7 +53,9 @@ namespace NSMB.Quantum {
 
             // Load new map
             AsyncOperation loadingOp;
-            QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneLoadBegin(game));
+            QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneLoadBegin(game) {
+                SceneName = newMap ? newMap.Scene : null
+            });
             if (newMap == null) {
                 if (SceneManager.GetSceneByBuildIndex(1).isLoaded) {
                     goto alreadyLoaded;
@@ -78,11 +80,15 @@ namespace NSMB.Quantum {
             } else {
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(newMap.Scene));
             }
-            QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneLoadDone(game));
+            QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneLoadDone(game) {
+                SceneName = newMap ? newMap.Scene : null
+            });
 
             // Unload old map
             if (oldMap != null) {
-                QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneUnloadBegin(game));
+                QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneUnloadBegin(game) {
+                    SceneName = oldMap.Scene
+                });
                 loadingOp = SceneManager.UnloadSceneAsync(oldMap.Scene);
 #if UNITY_EDITOR
                 if (loadingOp == null) {
@@ -93,7 +99,9 @@ namespace NSMB.Quantum {
                 while (!loadingOp.isDone) {
                     yield return null;
                 }
-                QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneUnloadDone(game));
+                QuantumCallback.Dispatcher.Publish(new CallbackUnitySceneUnloadDone(game) {
+                    SceneName = oldMap.Scene
+                });
             }
 
             loadingCoroutine = null;

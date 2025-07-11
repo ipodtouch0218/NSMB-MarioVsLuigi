@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe partial struct Enemy {
-        public bool IsAlive => !IsDead && IsActive;
+        public readonly bool IsAlive => !IsDead && IsActive;
 
         public void Respawn(Frame f, EntityRef entity) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);

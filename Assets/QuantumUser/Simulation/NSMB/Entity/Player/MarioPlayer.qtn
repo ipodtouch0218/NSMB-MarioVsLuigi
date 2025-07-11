@@ -112,6 +112,7 @@ component MarioPlayer {
 	[ExcludeFromPrototype] ushort MegaMushroomFrames;
 	[ExcludeFromPrototype] byte MegaMushroomEndFrames;
 	[ExcludeFromPrototype] bool MegaMushroomStationaryEnd;
+	[ExcludeFromPrototype] byte MegaMushroomFootstepFrames;
 
 	[ExcludeFromPrototype] byte ProjectileDelayFrames;
 	[ExcludeFromPrototype] byte ProjectileVolleyFrames;
@@ -166,6 +167,8 @@ signal OnMarioPlayerBecameInvincible(EntityRef entity);
 signal OnMarioPlayerDropObjective(EntityRef entity, int amount, EntityRef attacker);
 signal OnMarioPlayerTakeDamage(EntityRef entity, ref bool keepDamage);
 signal OnMarioPlayerGroundpoundedSolid(EntityRef mario, PhysicsContact contact, ref bool continueGroundpound);
+signal OnMarioPlayerGroundpoundEnded(EntityRef mario);
+signal OnMarioPlayerMegaMushroomFootstep();
 
 event MarioPlayerJumped {
 	EntityRef Entity;

@@ -257,15 +257,15 @@ namespace Quantum {
             public EntityRef EntityA, EntityB;
 
 
-            public bool Equals(EntityRefPair other) {
+            public readonly bool Equals(EntityRefPair other) {
                 return (EntityA == other.EntityA && EntityB == other.EntityB) || (EntityA == other.EntityB && EntityB == other.EntityA);
             }
 
-            public bool Equals(EntityRefPair x, EntityRefPair y) {
+            public readonly bool Equals(EntityRefPair x, EntityRefPair y) {
                 return x.Equals(y);
             }
 
-            public int GetHashCode(EntityRefPair obj) {
+            public readonly int GetHashCode(EntityRefPair obj) {
                 return (obj.EntityA.GetHashCode() * 37) + (obj.EntityB.GetHashCode() * 37);
             }
 

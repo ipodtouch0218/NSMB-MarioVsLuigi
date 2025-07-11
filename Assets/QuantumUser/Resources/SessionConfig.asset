@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Config:
     PlayerCount: 0
-    ChecksumCrossPlatformDeterminism: 0
+    ChecksumCrossPlatformDeterminism: 1
     LockstepSimulation: 0
     InputDeltaCompression: 1
     UpdateFPS: 60
-    ChecksumInterval: 0
+    ChecksumInterval: 1
     RollbackWindow: 60
     InputHardTolerance: 12
     InputRedundancy: 1

@@ -40,13 +40,14 @@ namespace NSMB {
         [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
         [NonSerialized] public int windowWidth = 1280, windowHeight = 720;
 
-
         //---Serialized Variables
         [SerializeField] private AudioMixer mixer;
 
         //---Private Variables
         private Coroutine fadeMusicRoutine, fadeSfxRoutine, totalFadeRoutine;
+#if IDLE_LOCK_30FPS
         private int previousVsyncCount, previousFrameRate;
+#endif
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void CreateInstance() {
@@ -80,6 +81,7 @@ namespace NSMB {
             Settings.Controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
             QuantumEvent.Subscribe<EventStartGameEndFade>(this, OnStartGameEndFade);
             QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
+            loadingCanvas.Startup();
         }
 
         public void OnDestroy() {

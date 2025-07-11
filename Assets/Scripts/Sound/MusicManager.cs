@@ -145,7 +145,7 @@ namespace NSMB.Sound {
         }
 
         private void OnLoadingEnded(bool longIntro) {
-            if (!longIntro) {
+            if (!longIntro && Game != null) {
                 HandleMusic(Game, true);
             }
         }

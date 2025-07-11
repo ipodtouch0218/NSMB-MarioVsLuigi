@@ -170,7 +170,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void OnWatchClick() {
-            ActiveReplayManager.Instance.StartReplay(ReplayFile);
+            ActiveReplayManager.Instance.StartReplayPlayback(ReplayFile);
         }
 
         public void OnRenameClick() {
