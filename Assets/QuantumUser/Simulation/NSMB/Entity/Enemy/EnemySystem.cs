@@ -135,8 +135,8 @@ namespace Quantum {
                     || !physicsObject->IsTouchingGround) {
                     continue;
                 }
-
-                physicsObject->Velocity.Y = FP.FromString("4.32");
+                
+                physicsObject->Velocity.Y = Constants._3_50;
                 physicsObject->IsTouchingGround = false;
             }
         }

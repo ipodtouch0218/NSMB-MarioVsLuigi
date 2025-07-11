@@ -35,6 +35,7 @@ namespace NSMB.UI.Loading {
             QuantumCallback.Subscribe<CallbackUnitySceneLoadBegin>(this, OnUnitySceneLoadBegin);
             QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
@@ -115,7 +116,11 @@ namespace NSMB.UI.Loading {
             if (running && endCoroutine == null) {
                 endCoroutine = StartCoroutine(EndLoadingRoutine(game, game.Frames.Predicted.Global->GameState));
             }
-        } 
+        }
+
+        private void OnGameDestroyed(CallbackGameDestroyed callback) {
+            gameObject.SetActive(false);
+        }
 
         public IEnumerator EndLoadingRoutine(QuantumGame game, GameState state) {
             if (!IsReplay) {

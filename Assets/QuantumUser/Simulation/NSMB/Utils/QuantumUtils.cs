@@ -124,6 +124,22 @@ public static unsafe class QuantumUtils {
         return RelativeTileToWorld(stage, relativeTile) + FPVector2.One * FP._0_25;
     }
 
+    public static IntVector2 WrapRelativeTile(VersusStageData stage, IntVector2 relativeTile, out WrapDirection wrapDirection) {
+        if (relativeTile.X < 0) {
+            relativeTile.X += stage.TileDimensions.X;
+            wrapDirection = WrapDirection.Left;
+
+        } else if (relativeTile.X >= stage.TileDimensions.X) {
+            relativeTile.X -= stage.TileDimensions.X;
+            wrapDirection = WrapDirection.Right;
+
+        } else {
+            wrapDirection = WrapDirection.NoWrap;
+        }
+
+        return relativeTile;
+    }
+
     public static FPVector2 WrapUnityTile(Frame f, FPVector2 unityTile, out WrapDirection wrapDirection) {
         return WrapUnityTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), unityTile, out wrapDirection);
     }

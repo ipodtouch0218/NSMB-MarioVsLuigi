@@ -1120,7 +1120,7 @@ namespace Quantum {
                 IntVector2 location = tiles[i].Position;
 
                 while (stageTile is TileInteractionRelocator tir) {
-                    location += tir.RelocateTo;
+                    location = tir.RelocateTo;
                     tile = stage.GetTileRelative((Frame) f, location);
                     stageTile = f.FindAsset(tile.Tile);
                 }
@@ -1181,6 +1181,8 @@ namespace Quantum {
             for (int x = min.X; x <= max.X; x++) {
                 for (int y = min.Y; y <= max.Y; y++) {
                     IntVector2 pos = new IntVector2(x, y);
+                    pos = QuantumUtils.WrapRelativeTile(stage, pos, out _);
+
                     buffer[count++] = new LocationTilePair {
                         Position = pos,
                         Tile = stage.GetTileRelative(f, pos)

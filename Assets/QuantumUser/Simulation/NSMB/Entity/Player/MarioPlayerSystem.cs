@@ -1297,13 +1297,13 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref mario->ProjectileVolleyFrames)) {
                 mario->CurrentVolley = 0;
             }
-            if (mario->CurrentPowerupState == PowerupState.MegaMushroom && FPMath.Abs(physicsObject->Velocity.X) > FP._0_05 && physicsObject->IsTouchingGround) {
+            if (mario->CurrentPowerupState == PowerupState.MegaMushroom && (filter.Inputs.Left || filter.Inputs.Right) && !mario->IsInKnockback && physicsObject->IsTouchingGround) {
                 if (QuantumUtils.Decrement(ref mario->MegaMushroomFootstepFrames)) {
                     mario->MegaMushroomFootstepFrames = physics.MegaMushroomStepInterval;
                     f.Signals.OnMarioPlayerMegaMushroomFootstep();
                 }
             } else {
-                mario->MegaMushroomFootstepFrames = physics.MegaMushroomStepInterval;
+                mario->MegaMushroomFootstepFrames = (byte) (physics.MegaMushroomStepInterval / 2);
             }
 
             physicsObject->IsWaterSolid = mario->CurrentPowerupState == PowerupState.MiniMushroom && !mario->IsGroundpounding && mario->StationaryFrames < 15 && (!mario->IsInKnockback || mario->IsInWeakKnockback);
@@ -2081,8 +2081,8 @@ namespace Quantum {
                         marioB->IsDrilling = false;
                     } else {
                         bool damaged = false;
-                        damaged |= marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.CollisionBump, marioBEntity);
-                        damaged |= marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity);
+                        damaged |= marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.CollisionBump, marioBEntity, true);
+                        damaged |= marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity, true);
 
                         if (damaged) {
                             f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
@@ -2092,7 +2092,7 @@ namespace Quantum {
                     if (dropStars) {
                         marioB->Powerdown(f, marioBEntity, false, marioAEntity);
                     } else {
-                        bool damaged = marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity);
+                        bool damaged = marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.CollisionBump, marioAEntity, true);
                         if (damaged) {
                             f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, KnockbackStrength.CollisionBump, avgPosition);
                         }
@@ -2102,7 +2102,7 @@ namespace Quantum {
                     if (dropStars) {
                         marioA->Powerdown(f, marioAEntity, false, marioBEntity);
                     } else {
-                        bool damaged = marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.CollisionBump, marioBEntity);
+                        bool damaged = marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.CollisionBump, marioBEntity, true);
                         if (damaged) {
                             f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, KnockbackStrength.CollisionBump, avgPosition);
                         }
