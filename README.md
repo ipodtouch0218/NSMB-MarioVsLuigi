@@ -109,7 +109,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * IvythePoS *(es-la)*
 * Kate Karui *(sv-sv)*
 * Laxan3000 *(it-it)*
-* Lyroy The Toad *(it-it)*
+* LyroyTheToad *(it-it)*
 * Maestrike *(it-it)*
 * marbo *(pt-br)*
 * Mark19 *(es-es)*

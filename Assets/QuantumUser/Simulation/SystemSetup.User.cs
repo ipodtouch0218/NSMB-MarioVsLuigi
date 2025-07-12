@@ -55,7 +55,7 @@ namespace Quantum {
             );
             systems.Add(new StageSystem());
 
-#if UNITY_EDITOR || MVL_DEBUG
+#if MVL_DEBUG
             // This HAS to be the last system otherwise it breaks replays.
             systems.Add(new MvLDebugSystem());
 #endif
