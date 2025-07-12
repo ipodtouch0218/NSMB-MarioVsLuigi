@@ -1,15 +1,18 @@
 using NSMB.Networking;
+using NSMB.Replay;
 using Photon.Deterministic;
 using Photon.Realtime;
 using Quantum;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 using static NSMB.Utilities.NetworkUtils;
 
 namespace NSMB.Networking {
@@ -52,6 +55,7 @@ namespace NSMB.Networking {
 
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackPluginDisconnect>(this, OnPluginDisconnect);
+            QuantumCallback.Subscribe<CallbackChecksumError>(this, OnChecksumError);
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
@@ -270,7 +274,7 @@ namespace NSMB.Networking {
                 RuntimeConfig = new RuntimeConfig {
                     SimulationConfig = GlobalController.Instance.config,
                     Map = null,
-                    Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+                   // Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
                     IsRealGame = true,
                 },
                 SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
@@ -316,6 +320,36 @@ namespace NSMB.Networking {
             }
         }
 
+        private void OnChecksumError(CallbackChecksumError e) {
+            Debug.LogError($"[[ CHECKSUM ERROR DETECTED ON TICK {e.Error.Tick}!!! ]]\nChecksums per client:\n{string.Join('\n', e.Error.Checksums.Select(ce => ce.Client + ": " + ce.Checksum))}");
+            StringBuilder sb = new();
+            sb.Append($"Checksums per client:\n{string.Join('\n', e.Error.Checksums.Select(ce => ce.Client + ": " + ce.Checksum))}");
+            sb.AppendLine();
+            for (int i = 0; i < e.FrameCount; i++) {
+                sb.Append("Frame info ").Append(i + 1).AppendLine(":");
+                sb.AppendLine(e.Frames[i].DumpFrame());
+                sb.AppendLine();
+                sb.AppendLine(Convert.ToBase64String(e.Frames[i].Serialize(DeterministicFrameSerializeMode.Serialize)));
+                sb.AppendLine();
+                sb.AppendLine("-----");
+            }
+
+            string result = sb.ToString();
+            string path = Path.Combine(Application.persistentDataPath, "dumps", DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + ".framedump");
+            Directory.CreateDirectory(path);
+            File.WriteAllText(path, result);
+
+            UnityWebRequest.Post($"https://mariovsluigi.azurewebsites.net/desync?roomId={Client.CurrentRoom.Name}&actorId={Client.LocalPlayer.ActorNumber}", result, "application/text");
+
+            StartCoroutine(AutoDisconnectAfterSeconds(10f));
+        }
+
+        private IEnumerator AutoDisconnectAfterSeconds(float seconds) {
+            yield return new WaitForSecondsRealtime(seconds);
+            Runner.Shutdown(ShutdownCause.SessionError);
+            ThrowError("A desync was detected in the previous game. The game was automatically aborted.\nPlease send your player.log file in the #technical-support channel within the Mario vs Luigi Online Discord and ping @ipodtouch0218.", false);
+        }
+
         private void OnPluginDisconnect(CallbackPluginDisconnect e) {
             Debug.Log($"[Network] Disconnected via server plugin: {e.Reason}");
 
@@ -341,14 +375,24 @@ namespace NSMB.Networking {
         }
 
         private void OnPlayerAdded(EventPlayerAdded e) {
+            if (ActiveReplayManager.Instance.IsReplay) {
+                return;
+            }
+            
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
+
             Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) joined the game.");
         }
 
         private void OnPlayerRemoved(EventPlayerRemoved e) {
+            if (ActiveReplayManager.Instance.IsReplay) {
+                return;
+            }
+
             Frame f = e.Game.Frames.Predicted;
             RuntimePlayer runtimePlayer = f.GetPlayerData(e.Player);
+
             Debug.Log($"[Network] {runtimePlayer.PlayerNickname} ({runtimePlayer.UserId}) left the game.");
         }
 
@@ -362,8 +406,10 @@ namespace NSMB.Networking {
             props.GameStarted = e.NewState != GameState.PreGameRoom;
 
             Client.CurrentRoom.SetCustomProperties(new Photon.Client.PhotonHashtable {
-            { Enums.NetRoomProperties.BoolProperties, (int) props }
-        });
+                { Enums.NetRoomProperties.BoolProperties, (int) props }
+            });
+
+            QuantumRunner.Default.Session.MaxVerifiedTicksPerUpdate = e.NewState == GameState.Playing ? 3 : int.MaxValue;
         }
 
         private unsafe void OnGameStarted(CallbackGameStarted e) {

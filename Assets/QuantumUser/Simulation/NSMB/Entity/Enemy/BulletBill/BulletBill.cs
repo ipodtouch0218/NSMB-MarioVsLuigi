@@ -11,7 +11,7 @@ namespace Quantum {
             Owner = owner;
         }
 
-        public void Kill(Frame f, EntityRef bulletBillEntity, EntityRef killerEntity, KillReason reason) {
+        public readonly void Kill(Frame f, EntityRef bulletBillEntity, EntityRef killerEntity, KillReason reason) {
             var enemy = f.Unsafe.GetPointer<Enemy>(bulletBillEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(bulletBillEntity);
 

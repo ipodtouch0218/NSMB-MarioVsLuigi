@@ -9,7 +9,7 @@ namespace Quantum {
             return Tile != default && HasWorldPolygons(f.FindAsset(Tile));
         }
         
-        public bool HasWorldPolygons(StageTile stageTile) {
+        public readonly bool HasWorldPolygons(StageTile stageTile) {
             return Tile != default && stageTile != null && ((stageTile.CollisionData.Shapes != null && stageTile.CollisionData.Shapes.Length > 0) || stageTile.CollisionData.IsFullTile);
         }
         
@@ -25,7 +25,7 @@ namespace Quantum {
             return GetWorldPolygons(f, stage, tile = f.FindAsset(Tile), vertexBuffer, shapeVertexCountBuffer, worldPos ?? FPVector2.Zero);
         }
 
-        public bool GetWorldPolygons(FrameThreadSafe f, VersusStageData stage, StageTile stageTile, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, FPVector2? worldPos = null) {
+        public readonly bool GetWorldPolygons(FrameThreadSafe f, VersusStageData stage, StageTile stageTile, Span<FPVector2> vertexBuffer, Span<int> shapeVertexCountBuffer, FPVector2? worldPos = null) {
             if (stageTile == null) {
                 shapeVertexCountBuffer[0] = 0;
                 return false;
@@ -93,7 +93,7 @@ namespace Quantum {
             );
         }
 
-        public bool Equals(StageTileInstance other) {
+        public readonly bool Equals(StageTileInstance other) {
             return Tile == other.Tile && Flags == other.Flags;
         }
     }

@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Physics2D;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class BigStarSystem : SystemMainThread, ISignalOnReturnToRoom, ISignalOnMarioPlayerDropObjective {
 
         public override bool StartEnabled => false;
@@ -104,17 +105,14 @@ namespace Quantum {
                 if (transform->Position.X - shape.Centroid.X - shape.Box.Extents.X <= stage.StageWorldMin.X) {
                     // Hit left wall
                     bigStar->FacingRight = true;
-                    physicsObject->Velocity.X = bigStar->Speed;
                 } else if (transform->Position.X + shape.Centroid.X + shape.Box.Extents.X >= stage.StageWorldMax.X) {
                     // Hit right wall
                     bigStar->FacingRight = false;
-                    physicsObject->Velocity.X = -bigStar->Speed;
                 }
             }
 
             if (physicsObject->IsTouchingLeftWall || physicsObject->IsTouchingRightWall) {
                 bigStar->FacingRight = physicsObject->IsTouchingLeftWall;
-                physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
             }
 
             if (physicsObject->DisableCollision && QuantumUtils.Decrement(ref bigStar->UncollectableFrames) && transform->Position.Y < FPMath.Max(stage.StageWorldMin.Y + 7, stage.StageWorldMax.Y)) {
@@ -123,6 +121,8 @@ namespace Quantum {
                     physicsObject->DisableCollision = false;
                 }
             }
+
+            physicsObject->Velocity.X = bigStar->Speed * (bigStar->FacingRight ? 1 : -1);
         }
 
         public void OnBigStarMarioInteraction(Frame f, EntityRef starEntity, EntityRef marioEntity) {

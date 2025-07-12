@@ -131,16 +131,22 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             if (Selected) {
                 Selected.OnSelect(open);
             }
+            LayoutRebuilder.MarkLayoutForRebuild((RectTransform) headerTemplate.transform.parent);
             UpdateInformation(replay);
         }
 
         public void UpdateInformation(ReplayListEntry replay) {
+            TranslationManager tm = GlobalController.Instance.translationManager;
             if (replay == null) {
-                replayInformation.text = GlobalController.Instance.translationManager.GetTranslation("ui.extras.replays.information.none");
+                replayInformation.text = tm.GetTranslation("ui.extras.replays.information.none");
                 replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Center;
                 return;
             }
-            TranslationManager tm = GlobalController.Instance.translationManager;
+            if (!replay.ReplayFile.Header.IsCompatible) {
+                replayInformation.text = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", replay.ReplayFile.Header.Version.ToStringIgnoreHotfix() + ".X");
+                replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Center;
+                return;
+            }
 
             BinaryReplayHeader header = replay.ReplayFile.Header;
             ref var rules = ref header.Rules;
@@ -154,7 +160,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             // TODO: possibly parse from initial frame instead of storing as separate members
             // Playerlist
             StringBuilder builder = new();
-            for (int i = 0; i < header.PlayerInformation.Length; i++) {
+            foreach (int i in Enumerable.Range(0, header.PlayerInformation.Length).OrderByDescending(idx => header.PlayerInformation[idx].FinalObjectiveCount)) {
                 ref ReplayPlayerInformation info = ref header.PlayerInformation[i];
 
                 // Color and width
@@ -213,8 +219,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             replayInformation.horizontalAlignment = HorizontalAlignmentOptions.Left;
         }
 
-        public static string DateTimeToLocalizedString(in DateTime dt, bool shortDisplay, bool dateOnly) {
+        public static string DateTimeToLocalizedString(DateTime dt, bool shortDisplay, bool dateOnly) {
             TranslationManager tm = GlobalController.Instance.translationManager;
+            dt = dt.ToLocalTime();
             try {
                 CultureInfo culture = new(tm.CurrentLocale);
                 if (dateOnly) {
@@ -383,14 +390,16 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #else
             ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromFile(filepath, true, out BinaryReplayFile parsedReplay);
 #endif
+
             if (parseResult == ReplayParseResult.Success) {
-                // Move into the replays folder
+                // Change to today
+                parsedReplay.Header.UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+                // Write into the replays folder (not copy, since we changed the timestamp in the header...)
                 string newPath = Path.Combine(ReplayDirectory, "saved", parsedReplay.Header.UnixTimestamp + ".mvlreplay");
-#if UNITY_WEBGL && !UNITY_EDITOR
-                File.WriteAllBytes(newPath, replay);
-#else
-                File.Copy(filepath, newPath, false);
-#endif
+                using (FileStream fs = new FileStream(newPath, FileMode.Create)) {
+                    parsedReplay.WriteToStream(fs);
+                }
                 parsedReplay.FilePath = newPath;
 
                 ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);

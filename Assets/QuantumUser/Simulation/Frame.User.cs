@@ -10,6 +10,9 @@ namespace Quantum {
         }
 
         partial void SerializeUser(FrameSerializer serializer) {
+            // Possible desync fix?
+            StageTiles ??= Array.Empty<StageTileInstance>();
+
             serializer.Stream.SerializeArrayLength(ref StageTiles);
             for (int i = 0; i < StageTiles.Length; i++) {
                 ref StageTileInstance tile = ref StageTiles[i];

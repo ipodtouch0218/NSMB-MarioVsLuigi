@@ -297,14 +297,17 @@ namespace NSMB.Cameras {
         }
 
         private void OnScreenshakeCallback(float screenshake) {
+            screenshakeTimer = screenshake;
+            
+            /*
             Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
 
             if (!f.Exists(Target)
                 || !f.Unsafe.TryGetPointer(Target, out PhysicsObject* physicsObject)
                 || physicsObject->IsTouchingGround) {
-
                 screenshakeTimer = screenshake;
             }
+            */
         }
 
         public enum CameraMode {

@@ -6,8 +6,10 @@ using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
+    [UnityEngine.Scripting.Preserve]
     public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnEntityEnterExitLiquid {
 #else
+    [UnityEngine.Scripting.Preserve]
     public unsafe class PhysicsObjectSystem : SystemMainThread, ISignalOnEntityEnterExitLiquid {
 #endif
 
@@ -464,12 +466,12 @@ namespace Quantum {
                             /* || FPVector2.Dot(contact.Normal, directionVector) > 0 */) {
                             continue;
                         }
-                        
+
                         bool keepContact = true;
                         foreach (var callback in ((Frame) f).Context.PreContactCallbacks) {
                             callback?.Invoke((Frame) f, stage, filter.Entity, contact, ref keepContact);
                         }
-                        
+
                         if (keepContact) {
                             contacts.Value.Add(contact);
                             min ??= contact.Distance;
@@ -1118,7 +1120,7 @@ namespace Quantum {
                 IntVector2 location = tiles[i].Position;
 
                 while (stageTile is TileInteractionRelocator tir) {
-                    location += tir.RelocateTo;
+                    location = tir.RelocateTo;
                     tile = stage.GetTileRelative((Frame) f, location);
                     stageTile = f.FindAsset(tile.Tile);
                 }
@@ -1179,6 +1181,8 @@ namespace Quantum {
             for (int x = min.X; x <= max.X; x++) {
                 for (int y = min.Y; y <= max.Y; y++) {
                     IntVector2 pos = new IntVector2(x, y);
+                    pos = QuantumUtils.WrapRelativeTile(stage, pos, out _);
+
                     buffer[count++] = new LocationTilePair {
                         Position = pos,
                         Tile = stage.GetTileRelative(f, pos)

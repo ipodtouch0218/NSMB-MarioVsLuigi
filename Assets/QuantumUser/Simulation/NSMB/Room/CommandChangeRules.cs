@@ -17,9 +17,11 @@ namespace Quantum {
         public bool DrawOnTimeUp;
 
         public override void Serialize(BitStream stream) {
-            ushort changes = (ushort) EnabledChanges;
-            stream.Serialize(ref changes);
-            EnabledChanges = (Rules) changes;
+            if (stream.Writing) {
+                stream.WriteUShort((ushort) EnabledChanges);
+            } else {
+                EnabledChanges = (Rules) stream.ReadUShort();
+            }
 
             stream.Serialize(ref Stage);
             stream.Serialize(ref Gamemode);

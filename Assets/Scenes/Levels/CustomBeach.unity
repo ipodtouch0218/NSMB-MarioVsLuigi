@@ -1450,6 +1450,11 @@ PrefabInstance:
       propertyPath: LocalPlayers.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8642252342915534796, guid: dcdc633a29f212843ae9cbdf4be58fb2,
+        type: 3}
+      propertyPath: LocalPlayers.Array.data[0].Character
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12656,7 +12661,7 @@ PrefabInstance:
     - target: {fileID: 1060841653561283886, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}
       propertyPath: m_Size.y
-      value: 3.1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3150085164645429832, guid: 9d1829544a867764ea85ac4428593208,
         type: 3}

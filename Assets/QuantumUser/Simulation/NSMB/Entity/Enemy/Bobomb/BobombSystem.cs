@@ -2,6 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
 
+    [UnityEngine.Scripting.Preserve]
     public unsafe class BobombSystem : SystemMainThreadEntityFilter<Bobomb, BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
         ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnMarioPlayerBecameInvincible {
         
@@ -17,9 +18,9 @@ namespace Quantum {
         }
 
         public override void OnInit(Frame f) {
-            f.Context.Interactions.Register<Bobomb, Bobomb>(f, EnemySystem.EnemyBumpTurnaround);
-            f.Context.Interactions.Register<Bobomb, Goomba>(f, EnemySystem.EnemyBumpTurnaround);
-            f.Context.Interactions.Register<Bobomb, PiranhaPlant>(f, EnemySystem.EnemyBumpTurnaroundOnlyFirst);
+            f.Context.Interactions.Register<Bobomb, Bobomb>(f, OnBobombBobombInteraction);
+            f.Context.Interactions.Register<Bobomb, Goomba>(f, EnemySystem.EnemyBumpTurnaround); // Not fully implemented, can't happen on current maps.
+            f.Context.Interactions.Register<Bobomb, PiranhaPlant>(f, EnemySystem.EnemyBumpTurnaroundOnlyFirst); // Not fully implemented, can't happen on current maps.
             f.Context.Interactions.Register<Bobomb, MarioPlayer>(f, OnBobombMarioInteraction);
             f.Context.Interactions.Register<Bobomb, Projectile>(f, OnBobombProjectileInteraction);
             f.Context.Interactions.Register<Bobomb, IceBlock>(f, OnBobombIceBlockInteraction);
@@ -130,6 +131,33 @@ namespace Quantum {
         }
 
         #region Interactions
+        public void OnBobombBobombInteraction(Frame f, EntityRef bobombAEntity, EntityRef bobombBEntity) {
+            var bobombA = f.Unsafe.GetPointer<Bobomb>(bobombAEntity);
+            var bobombB = f.Unsafe.GetPointer<Bobomb>(bobombBEntity);
+            var bobombHoldableA = f.Unsafe.GetPointer<Holdable>(bobombAEntity);
+            var bobombHoldableB = f.Unsafe.GetPointer<Holdable>(bobombBEntity);
+            var bobombPhysicsObjectA = f.Unsafe.GetPointer<PhysicsObject>(bobombAEntity);
+            var bobombPhysicsObjectB = f.Unsafe.GetPointer<PhysicsObject>(bobombBEntity);
+
+            bool kickedA = bobombA->CurrentDetonationFrames > 0 && bobombPhysicsObjectA->Velocity.Magnitude > FP._0_33;
+            bool kickedB = bobombB->CurrentDetonationFrames > 0 && bobombPhysicsObjectB->Velocity.Magnitude > FP._0_33;
+            bool eitherHeld = f.Exists(bobombHoldableA->Holder) || f.Exists(bobombHoldableB->Holder);
+
+            bool anyDamaged = false;
+            if (kickedA || eitherHeld) {
+                bobombB->Kill(f, bobombBEntity, bobombAEntity, KillReason.Special);
+                anyDamaged = true;
+            }
+            if (kickedB || eitherHeld) {
+                bobombA->Kill(f, bobombAEntity, bobombBEntity, KillReason.Special);
+                anyDamaged = true;
+            }
+
+            if (!anyDamaged) {
+                EnemySystem.EnemyBumpTurnaround(f, bobombAEntity, bobombBEntity);
+            }
+        }
+
         public static void OnBobombMarioInteraction(Frame f, EntityRef bobombEntity, EntityRef marioEntity) {
             var bobombHoldable = f.Unsafe.GetPointer<Holdable>(bobombEntity);
             var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);

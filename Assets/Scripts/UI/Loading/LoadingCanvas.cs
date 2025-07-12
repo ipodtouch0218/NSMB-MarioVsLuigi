@@ -31,12 +31,15 @@ namespace NSMB.UI.Loading {
             this.SetIfNull(ref mario, UnityExtensions.GetComponentType.Children);
         }
 
-        public void Awake() {
-            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted, onlyIfActiveAndEnabled: true);
-            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged, onlyIfActiveAndEnabled: true);
+        public void Startup() {
+            QuantumCallback.Subscribe<CallbackUnitySceneLoadBegin>(this, OnUnitySceneLoadBegin);
+            QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
+            QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
+            QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
-        public void Initialize(QuantumGame game) {
+        private void Initialize(QuantumGame game) {
             if (running) {
                 return;
             }
@@ -84,6 +87,19 @@ namespace NSMB.UI.Loading {
             running = true;
         }
 
+        private void OnUnitySceneLoadBegin(CallbackUnitySceneLoadBegin e) {
+            if (e.SceneName != null) {
+                // Loading a map.
+                Initialize(e.Game);
+            }
+        }
+
+        private void OnUnitySceneLoadDone(CallbackUnitySceneLoadDone e) {
+            if (IsReplay || e.Game.Frames.Predicted.Global->GameState is GameState.Starting or GameState.Playing) {
+                EndLoading(e.Game);
+            }
+        }
+
         private void OnGameStarted(CallbackGameStarted e) {
             if (!IsReplay) {
                 EndLoading(e.Game);
@@ -91,7 +107,7 @@ namespace NSMB.UI.Loading {
         }
 
         private void OnGameStateChanged(EventGameStateChanged e) {
-            if (e.NewState > GameState.WaitingForPlayers) {
+            if (e.NewState is GameState.Starting or GameState.Playing) {
                 EndLoading(e.Game);
             }
         }
@@ -100,7 +116,11 @@ namespace NSMB.UI.Loading {
             if (running && endCoroutine == null) {
                 endCoroutine = StartCoroutine(EndLoadingRoutine(game, game.Frames.Predicted.Global->GameState));
             }
-        } 
+        }
+
+        private void OnGameDestroyed(CallbackGameDestroyed callback) {
+            gameObject.SetActive(false);
+        }
 
         public IEnumerator EndLoadingRoutine(QuantumGame game, GameState state) {
             if (!IsReplay) {

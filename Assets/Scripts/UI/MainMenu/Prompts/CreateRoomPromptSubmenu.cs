@@ -14,7 +14,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         [SerializeField] private Toggle privateToggle;
 
         //---Private Variables
-        private bool success;
+        private bool creating, createdSuccessfully;
         private bool visible = true;
 
         public override void Initialize() {
@@ -31,11 +31,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 MaxPlayerSliderChanged();
                 privateToggle.isOn = false;
             }
-            success = false;
+            creating = false;
+            createdSuccessfully = false;
         }
 
         public override bool TryGoBack(out bool playSound) {
-            if (success) {
+            if (creating) {
                 playSound = false;
                 return true;
             }
@@ -44,27 +45,30 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         [Preserve]
-        public void ConfirmClicked() {
-            success = true;
+        public async void ConfirmClicked() {
+            creating = true;
             Canvas.PlayConfirmSound();
             visible = !privateToggle.isOn;
-            _ = NetworkHandler.CreateRoom(new Photon.Realtime.EnterRoomArgs {
+            Canvas.GoBack();
+            short response = await NetworkHandler.CreateRoom(new Photon.Realtime.EnterRoomArgs {
                 RoomOptions = new Photon.Realtime.RoomOptions {
                     MaxPlayers = (int) maxPlayerSlider.value,
                     IsVisible = false,
                 }
             });
-            Canvas.GoBack();
+            createdSuccessfully = (response == 0);
         }
 
         public void MaxPlayerSliderChanged() {
             sliderValue.text = ((int) maxPlayerSlider.value).ToString();
         }
 
-        private void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
-            if (success && e.PlayerSlot == 0) {
+        private unsafe void OnLocalPlayerAddConfirmed(CallbackLocalPlayerAddConfirmed e) {
+            if (createdSuccessfully) {
                 NetworkHandler.Client.CurrentRoom.IsVisible = visible;
             }
+            creating = false;
+            createdSuccessfully = false;
         }
     }
 }

@@ -3,7 +3,7 @@ using Quantum.Collections;
 using static IInteractableTile;
 
 namespace Quantum {
-
+    [UnityEngine.Scripting.Preserve]
     public unsafe class KoopaSystem : SystemMainThreadEntityFilter<Koopa, KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
         ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEnemyTurnaround, ISignalOnEntityCrushed,
         ISignalOnMarioPlayerBecameInvincible {
@@ -158,16 +158,16 @@ namespace Quantum {
             bool koopaABeingHeld = f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityA)->Holder);
             bool koopaBBeingHeld = f.Exists(f.Unsafe.GetPointer<Holdable>(koopaEntityB)->Holder);
             bool anyDamaged = false;
-            if (koopaABeingHeld || koopaA->IsKicked) {
-                // Destroy them
+            if (koopaABeingHeld || koopaBBeingHeld || koopaA->IsKicked) {
+                // Destroy B
                 koopaB->Kill(f, koopaEntityB, koopaEntityA, KillReason.Special);
                 anyDamaged = true;
             }
-            if (koopaBBeingHeld || koopaB->IsKicked) {
-                // Destroy them
+            if (koopaABeingHeld || koopaBBeingHeld || koopaB->IsKicked) {
+                // Destroy A
                 koopaA->Kill(f, koopaEntityA, koopaEntityB, KillReason.Special);
                 anyDamaged = true;
-            } 
+            }
             
             if (!anyDamaged) {
                 EnemySystem.EnemyBumpTurnaround(f, koopaEntityA, koopaEntityB);
@@ -182,12 +182,12 @@ namespace Quantum {
             bool bobombBeingHeld = f.Exists(f.Unsafe.GetPointer<Holdable>(bobombEntity)->Holder);
 
             bool anyDamaged = false;
-            if (koopaBeingHeld || koopa->IsKicked) {
+            if (koopaBeingHeld || bobombBeingHeld || koopa->IsKicked) {
                 // Destroy them
                 bobomb->Kill(f, bobombEntity, koopaEntity, KillReason.Special);
                 anyDamaged = true;
             }
-            if (bobombBeingHeld || (bobomb->CurrentDetonationFrames > 0 && f.Unsafe.GetPointer<PhysicsObject>(bobombEntity)->Velocity.Magnitude > FP._0_05)) {
+            if (koopaBeingHeld || bobombBeingHeld || (bobomb->CurrentDetonationFrames > 0 && f.Unsafe.GetPointer<PhysicsObject>(bobombEntity)->Velocity.Magnitude > FP._0_05)) {
                 // Destroy them
                 koopa->Kill(f, koopaEntity, bobombEntity, KillReason.Special);
                 anyDamaged = true;
@@ -365,10 +365,15 @@ namespace Quantum {
             var koopa = f.Unsafe.GetPointer<Koopa>(koopaEntity);
             var holdable = f.Unsafe.GetPointer<Holdable>(koopaEntity);
 
-            if (koopa->IsKicked) {
+            bool beingHeld = f.Exists(holdable->Holder);
+            if (beingHeld || koopa->IsKicked) {
                 // Kill boo
                 var boo = f.Unsafe.GetPointer<Boo>(booEntity);
                 boo->Kill(f, booEntity, koopaEntity, KillReason.Special);
+            }
+            if (beingHeld) {
+                // Also kill ourselves
+                koopa->Kill(f, koopaEntity, booEntity, KillReason.Special);
             }
         }
 
@@ -405,6 +410,9 @@ namespace Quantum {
                 // Kill bullet bill
                 var bulletBill = f.Unsafe.GetPointer<BulletBill>(bulletBillEntity);
                 bulletBill->Kill(f, bulletBillEntity, koopaEntity, KillReason.Normal); // yes, this is the correct kill reason.
+            }
+            if (beingHeld) {
+                koopa->Kill(f, koopaEntity, bulletBillEntity, KillReason.Special);
             }
         }
         #endregion

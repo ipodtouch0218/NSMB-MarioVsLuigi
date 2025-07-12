@@ -5,7 +5,7 @@ ipodtouch0218
 Amy54Desu
 AprilShade
 ArianLust
-AtwerJ
+Atwer
 Ave
 BluCorDev
 Cubby Crazes
@@ -59,7 +59,8 @@ ibroekmahphone <color=#AAAAAA>(ru-ru)</color>
 Iketarou <color=#AAAAAA>(ja-jp)</color>
 IvythePoS <color=#AAAAAA>(es-la)</color>
 Kate Karui <color=#AAAAAA>(sv-sv)</color>
-Lyroy The Toad <color=#AAAAAA>(it-it)</color>
+Laxan3000 <color=#AAAAAA>(it-it)</color>
+LyroyTheToad <color=#AAAAAA>(it-it)</color>
 Maestrike <color=#AAAAAA>(it-it)</color>
 marbo <color=#AAAAAA>(pt-br)</color>
 Mark19 <color=#AAAAAA>(es-es)</color>
@@ -72,12 +73,15 @@ Mr-STF <color=#AAAAAA>(es-la)</color>
 MUI_Noam <color=#AAAAAA>(he-il)</color>
 notossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
 ossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
+Pedro Lunar <color=#AAAAAA>(es-la)</color>
 pixelated <color=#AAAAAA>(he-il)</color>
-SadenceZinzap <color=#AAAAAA>(tr-tr)</color>
+SadeceZinzap <color=#AAAAAA>(tr-tr)</color>
+SlavaWOW <color=#AAAAAA>(ru-ru)</color>
 SLG64 <color=#AAAAAA>(es-la)</color>
 Snayp <color=#AAAAAA>(fr-fr)</color>
 Thebababois369 <color=#AAAAAA>(id-id)</color>
 Tombuntu <color=#AAAAAA>(ja-jp)</color>
+Watercats <color=#AAAAAA>(pl-pl)</color>
 Windows10V <color=#AAAAAA>(pt-br)</color>
 vlco_o <color=#AAAAAA>(es-es, ro-ro)</color>
 
@@ -95,7 +99,7 @@ TheCyVap
 Vinnnnnnny
 
 <color=yellow>{ui.about.credits.leveldesign}</color>
-AtwerJ
+Atwer
 Ave
 mindnomad
 Skarph

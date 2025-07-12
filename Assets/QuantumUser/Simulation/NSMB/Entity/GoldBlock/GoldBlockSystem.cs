@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class GoldBlockSystem : SystemMainThreadEntityFilter<GoldBlock, GoldBlockSystem.Filter>,
         ISignalOnStageReset, ISignalOnMarioPlayerDied, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerCollectedPowerup {
 
@@ -25,10 +26,12 @@ namespace Quantum {
                 // Attached to a player.
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(goldBlock->AttachedTo);
                 
-                if (FPMath.Abs(marioPhysicsObject->Velocity.X) > 5) {
-                    goldBlock->Timer += 10;
-                } else if (marioPhysicsObject->Velocity.SqrMagnitude > FP._0_05) {
-                    goldBlock->Timer++;
+                if (!marioPhysicsObject->IsFrozen) {
+                    if (FPMath.Abs(marioPhysicsObject->Velocity.X) > 5) {
+                        goldBlock->Timer += 10;
+                    } else if (marioPhysicsObject->Velocity.SqrMagnitude > FP._0_05) {
+                        goldBlock->Timer++;
+                    }
                 }
 
                 if (goldBlock->Timer >= 40) {
@@ -183,7 +186,7 @@ namespace Quantum {
         private static int GetCoinsInGoldBlock(Frame f, MarioPlayer* mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             int firstPlaceCoins = gamemode.GetFirstPlaceObjectiveCount(f);
-            return 25 + (firstPlaceCoins - mario->GamemodeData.CoinRunners->ObjectiveCoins) / 3;
+            return FPMath.CeilToInt(25 + (firstPlaceCoins - mario->GamemodeData.CoinRunners->ObjectiveCoins) / Constants._2_50);
         }
     }
 }

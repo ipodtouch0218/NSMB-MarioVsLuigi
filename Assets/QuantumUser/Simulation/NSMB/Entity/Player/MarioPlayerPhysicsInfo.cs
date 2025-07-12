@@ -136,6 +136,8 @@ public class MarioPlayerPhysicsInfo : AssetObject {
     public FPVector2 IceBlockSmallOffset = FPVector2.Zero;
     public FPVector2 IceBlockBigOffset = FPVector2.Zero;
 
+    public byte MegaMushroomStepInterval = 20;
+
     private static FP FF(float x) {
         return FP.FromFloat_UNSAFE(x);
     }

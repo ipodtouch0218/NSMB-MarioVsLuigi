@@ -2,7 +2,9 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnTriggerEnter2D, ISignalOnTrigger2D, ISignalOnTriggerExit2D {
+    [UnityEngine.Scripting.Preserve]
+    public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnTriggerEnter2D, ISignalOnTrigger2D, ISignalOnTriggerExit2D,
+        ISignalOnComponentRemoved<Transform2D> {
 
         public void OnTriggerEnter2D(Frame f, TriggerInfo2D info) {
             EntityRef physicsObjectEntity = info.Entity;
@@ -118,6 +120,14 @@ namespace Quantum {
             if (underwater.Remove(physicsObjectEntity)) {
                 // Exit state
                 f.Signals.OnEntityEnterExitLiquid(physicsObjectEntity, liquidEntity, false);
+            }
+        }
+
+        public unsafe void OnRemoved(Frame f, EntityRef entity, Transform2D* component) {
+            // Do your part to prevent waste! (fixes an out of memory error...)
+            foreach ((var _, var liquidPtr) in f.Unsafe.GetComponentBlockIterator<Liquid>()) {
+                f.ResolveHashSet(liquidPtr->SplashedEntities).Remove(entity);
+                f.ResolveHashSet(liquidPtr->UnderwaterEntities).Remove(entity);
             }
         }
     }

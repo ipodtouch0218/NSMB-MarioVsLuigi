@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class MarioBrosPlatformSystem : SystemSignalsOnly {
         public override void OnInit(Frame f) {
             f.Context.Interactions.Register<MarioPlayer, MarioBrosPlatform>(f, OnMarioBrosPlatformMarioPlayerInteraction);

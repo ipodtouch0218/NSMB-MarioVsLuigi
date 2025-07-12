@@ -57,10 +57,21 @@ namespace NSMB.Replay {
             Settings.OnReplaysEnabledChanged -= OnReplaysEnabledChanged;
         }
 
+        public void StartRecordingReplay(QuantumGame game) {
+            if (!Settings.Instance.GeneralReplaysEnabled) {
+                return;
+            }
+
+            Frame f = game.Frames.Verified;
+            game.StartRecordingInput(f.Number);
+            initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+            initialFrame = f.Number;
+            currentlyRecordingGame = game;
+
+            Debug.Log("[Replay] Started recording a new replay.");
+        }
+
         public unsafe void SaveReplay(sbyte winner) {
-//#if !UNITY_STANDALONE
-//        return;
-//#endif
             QuantumGame game = currentlyRecordingGame;
 
             if (currentlyRecordingGame == null || currentlyRecordingGame.RecordInputStream == null) {
@@ -117,20 +128,7 @@ namespace NSMB.Replay {
                 playerInformation[i].Character = inGamePlayerInformation.Character;
                 playerInformation[i].Team = inGamePlayerInformation.Team;
                 playerInformation[i].PlayerRef = inGamePlayerInformation.PlayerRef;
-
-                var filter = f.Filter<MarioPlayer>();
-                filter.UseCulling = false;
-                while (filter.NextUnsafe(out _, out MarioPlayer* mario)) {
-                    if (mario->PlayerRef != playerInformation[i].PlayerRef) {
-                        continue;
-                    }
-
-                    // Found him :)
-                    if (mario->Lives > 0 || !f.Global->Rules.IsLivesEnabled) {
-                        playerInformation[i].FinalObjectiveCount = gamemode.GetObjectiveCount(f, mario);
-                    }
-                    break;
-                }
+                playerInformation[i].FinalObjectiveCount = gamemode.GetObjectiveCount(f, inGamePlayerInformation.PlayerRef);
             }
 
             // Write binary replay
@@ -186,20 +184,7 @@ namespace NSMB.Replay {
             }
         }
 
-        public unsafe void RecordReplay(QuantumGame game, Frame f) {
-            if (!Settings.Instance.GeneralReplaysEnabled) {
-                return;
-            }
-
-            game.StartRecordingInput(f.Number);
-            initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
-            initialFrame = f.Number;
-            currentlyRecordingGame = game;
-
-            Debug.Log("[Replay] Started recording a new replay.");
-        }
-
-        public async void StartReplay(BinaryReplayFile replay) {
+        public async void StartReplayPlayback(BinaryReplayFile replay) {
             if (NetworkHandler.Client.IsConnected) {
                 await NetworkHandler.Client.DisconnectAsync();
             }
@@ -240,7 +225,6 @@ namespace NSMB.Replay {
                 DeltaTimeType = SimulationUpdateTime.EngineDeltaTime,
             };
 
-            GlobalController.Instance.loadingCanvas.Initialize(null);
             ReplayFrameCache.Clear();
             ReplayFrameCache.Add(arguments.FrameData);
             
@@ -276,12 +260,12 @@ namespace NSMB.Replay {
 
             Frame f = e.Game.Frames.Verified;
             if (f.Global->GameState == GameState.Playing) {
-                RecordReplay(e.Game, f);
+                StartRecordingReplay(e.Game);
             }
         }
 
         private void OnRecordingStarted(EventRecordingStarted e) {
-            RecordReplay(e.Game, e.Game.Frames.Verified);
+            StartRecordingReplay(e.Game);
         }
 
         private void OnGameEnded(EventGameEnded e) {
@@ -296,10 +280,10 @@ namespace NSMB.Replay {
                 return;
             }
 
-            Frame f = game.Frames.Predicted;
+            Frame f = game.Frames.Verified;
             if (enable) {
                 if (f.Global->GameState >= GameState.Starting && f.Global->GameState < GameState.Ended) {
-                    RecordReplay(game, f);
+                    StartRecordingReplay(game);
                 }
             } else {
                 // Disable
