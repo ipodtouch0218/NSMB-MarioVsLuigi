@@ -1,6 +1,7 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NSMB.UI.Game.Track {
     public unsafe class StarTrackIcon : TrackIcon {
