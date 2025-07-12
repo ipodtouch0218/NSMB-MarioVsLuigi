@@ -335,11 +335,15 @@ namespace NSMB.Networking {
             }
 
             string result = sb.ToString();
-            string path = Path.Combine(Application.persistentDataPath, "dumps", DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + ".framedump");
-            Directory.CreateDirectory(path);
-            File.WriteAllText(path, result);
-
             UnityWebRequest.Post($"https://mariovsluigi.azurewebsites.net/desync?roomId={Client.CurrentRoom.Name}&actorId={Client.LocalPlayer.ActorNumber}", result, "application/text");
+
+            try {
+                string path = Path.Combine(Application.persistentDataPath, "dumps", DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + ".framedump");
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                File.WriteAllText(path, result);
+            } catch {
+                Debug.LogError(e);
+            }
 
             StartCoroutine(AutoDisconnectAfterSeconds(10f));
         }

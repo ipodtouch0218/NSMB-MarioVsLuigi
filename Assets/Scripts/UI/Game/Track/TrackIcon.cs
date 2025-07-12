@@ -1,4 +1,3 @@
-using NSMB.Quantum;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
@@ -9,8 +8,7 @@ namespace NSMB.UI.Game.Track {
 
         //---Serialized Variables
         [SerializeField] private float trackMinX, trackMaxX;
-        [SerializeField] protected Image image;
-        [SerializeField] private Image upArrow, downArrow;
+        [SerializeField] protected Image image, upArrow, downArrow;
 
         //---Private Variables
         protected EntityRef targetEntity;

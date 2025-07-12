@@ -3456,6 +3456,30 @@ namespace Quantum {
         return result;
       }
     }
+    /// <summary>0.05</summary>
+    public static FP PhysicsRaycastSkin {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 3277;
+        return result;
+      }
+    }
+    /// <summary>0.005</summary>
+    public static FP PhysicsSkin {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 328;
+        return result;
+      }
+    }
+    /// <summary>0.07613</summary>
+    public static FP PhysicsGroundMaxAngleCos {
+      [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
+        FP result;
+        result.RawValue = 4989;
+        return result;
+      }
+    }
     /// <summary>1.875</summary>
     public static FP OnePixelPerFrame {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 
@@ -3534,6 +3558,12 @@ namespace Quantum {
       public const Int64 _0_66 = 43690;
       /// <summary>0.075</summary>
       public const Int64 _0_075 = 4915;
+      /// <summary>0.05</summary>
+      public const Int64 PhysicsRaycastSkin = 3277;
+      /// <summary>0.005</summary>
+      public const Int64 PhysicsSkin = 328;
+      /// <summary>0.07613</summary>
+      public const Int64 PhysicsGroundMaxAngleCos = 4989;
       /// <summary>1.875</summary>
       public const Int64 OnePixelPerFrame = 122880;
       /// <summary>1.1</summary>

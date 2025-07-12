@@ -31,7 +31,7 @@ namespace Quantum {
             var childFreezable = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
             var physicsObject = filter.PhysicsObject;
 
-            if ((f.Number + entity.Index) % 2 == 0 && PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, filter.PhysicsCollider->Shape, true, stage, entity)) {
+            if ((f.Number + entity.Index) % 2 == 0 && PhysicsObjectSystem.BoxInGround(f, transform->Position, filter.PhysicsCollider->Shape, true, stage, entity)) {
                 Destroy(f, entity, IceBlockBreakReason.HitWall);
                 return;
             }
@@ -118,13 +118,13 @@ namespace Quantum {
             }
 
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
-            if (upDot >= PhysicsObjectSystem.GroundMaxAngle) {
+            if (upDot >= Constants.PhysicsGroundMaxAngleCos) {
                 // Top
                 if (mario->IsGroundpoundActive) {
                     Destroy(f, iceBlockEntity, IceBlockBreakReason.Groundpounded);
                     return true;
                 }
-            } else if (upDot <= -PhysicsObjectSystem.GroundMaxAngle) {
+            } else if (upDot <= -Constants.PhysicsGroundMaxAngleCos) {
                 // Bottom
                 Destroy(f, iceBlockEntity, IceBlockBreakReason.BlockBump);
                 return false;

@@ -107,13 +107,13 @@ namespace Quantum {
 
             if (koopa->DontWalkOfLedges && !koopa->IsInShell && physicsObject->IsTouchingGround) {
                 FPVector2 checkPosition = transform->Position + filter.Collider->Shape.Centroid + (FPVector2.Right * FP._0_05 * (enemy->FacingRight ? 1 : -1));
-                if (!PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, checkPosition, FPVector2.Down, FP._0_33, out var hit)) {
+                if (!PhysicsObjectSystem.Raycast(f, stage, checkPosition, FPVector2.Down, FP._0_33, out var hit)) {
                     // Failed to hit a raycast, but check to make sure we don't have a contact point instead.
 
                     bool turnaround = true;
                     QList<PhysicsContact> contacts = f.ResolveList(physicsObject->Contacts);
                     foreach (var contact in contacts) {
-                        if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+                        if (FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
                             // Not on the ground
                             continue;
                         }
@@ -321,7 +321,7 @@ namespace Quantum {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
-            if (iceBlock->IsSliding && upDot < PhysicsObjectSystem.GroundMaxAngle) {
+            if (iceBlock->IsSliding && upDot < Constants.PhysicsGroundMaxAngleCos) {
                 koopa->Kill(f, koopaEntity, iceBlockEntity, KillReason.Special);
             }
 
@@ -430,7 +430,7 @@ namespace Quantum {
                 return;
             }
 
-            if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, entity: entity)) {
+            if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
                 koopa->Kill(f, entity, marioEntity, KillReason.InWall);
                 return;
             }
