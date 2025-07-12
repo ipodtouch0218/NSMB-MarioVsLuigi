@@ -8,9 +8,11 @@ namespace Quantum {
         private TaskDelegateHandle updateTaskHandle;
 
         protected override TaskHandle Schedule(Frame f, TaskHandle taskHandle) {
+            /*
             if (f.IsVerified || f.ComponentCount<Cullable>() == 0 || f.Context.CullingCameraPositions.Count <= 0 || f.Map == null) {
                 return taskHandle;
             }
+            */
 
             if (!updateTaskHandle.IsValid) {
                 f.Context.TaskContext.RegisterDelegate(UpdateTask, $"{GetType().Name}.UpdateTask", ref updateTaskHandle);
@@ -21,6 +23,11 @@ namespace Quantum {
 
         public void UpdateTask(FrameThreadSafe fts, int off, int count, void* args) {
             Frame f = (Frame) fts;
+
+            if (f.IsVerified) {
+                f.ClearCulledState();
+                return;
+            }
 
             VersusStageData stage = stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             if (stage == null) {

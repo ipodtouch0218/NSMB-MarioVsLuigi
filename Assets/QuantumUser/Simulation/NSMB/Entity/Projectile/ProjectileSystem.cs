@@ -26,7 +26,7 @@ namespace Quantum {
 
             // Check to instant-despawn if spawned inside a wall
             if (!physicsObject->DisableCollision && !projectile->CheckedCollision) {
-                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape)) {
+                if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape)) {
                     Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                     return;
                 }
@@ -51,7 +51,7 @@ namespace Quantum {
                 || physicsObject->IsTouchingRightWall
                 || physicsObject->IsTouchingCeiling
                 || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
-                || PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, filter.Transform->Position, filter.PhysicsCollider->Shape)) && !physicsObject->DisableCollision) {
+                || PhysicsObjectSystem.BoxInGround(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) && !physicsObject->DisableCollision) {
 
                 Destroy(f, filter.Entity, asset.DestroyParticleEffect);
                 return;

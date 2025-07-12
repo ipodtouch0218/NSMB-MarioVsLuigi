@@ -722,7 +722,7 @@ namespace NSMB.Entities.Player {
                 footstepSoundEffect = SoundEffect.Player_Walk_Water;
             } else {
                 foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
                         continue;
                     }
 

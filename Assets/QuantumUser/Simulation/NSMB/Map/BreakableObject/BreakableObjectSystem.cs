@@ -30,7 +30,7 @@ namespace Quantum {
             }
 
             FP dot = FPVector2.Dot(effectiveNormal, breakableUp);
-            if (dot > PhysicsObjectSystem.GroundMaxAngle) {
+            if (dot > Constants.PhysicsGroundMaxAngleCos) {
                 // Hit the top of a pipe
                 // Shrink by 1, if we can.
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
@@ -40,7 +40,7 @@ namespace Quantum {
                 }
 
                 return true;
-            } else if (dot > -PhysicsObjectSystem.GroundMaxAngle) {
+            } else if (dot > -Constants.PhysicsGroundMaxAngleCos) {
                 // Hit the side of a pipe
                 if (breakable->IsDestroyed || breakable->CurrentHeight <= breakable->MinimumHeight) {
                     return false;

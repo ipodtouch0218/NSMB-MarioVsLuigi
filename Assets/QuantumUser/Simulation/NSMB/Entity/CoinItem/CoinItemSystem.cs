@@ -52,7 +52,7 @@ namespace Quantum {
                     }
 
                     if (QuantumUtils.Decrement(ref coinItem->SpawnAnimationFrames)) {
-                        if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, false, stage, entity)) {
+                        if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, false, stage, entity)) {
                             f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                             f.Destroy(entity);
                             return;
@@ -91,7 +91,7 @@ namespace Quantum {
 
             if (physicsObject != null && coinItem->SpawnAnimationFrames == 0 && physicsObject->DisableCollision) {
                 // Test that we're not in a wall anymore
-                if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage)) {
+                if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, stage: stage)) {
                     physicsObject->DisableCollision = false;
                 }
             }
@@ -111,7 +111,7 @@ namespace Quantum {
                     continue;
                 }
 
-                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+                if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
                     // Insta-despawn. Crushed by blocks respawning.
                     coinItem->Lifetime = 1;
                 }

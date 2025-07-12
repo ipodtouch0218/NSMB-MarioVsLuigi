@@ -1,7 +1,6 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace NSMB.UI.Game.Track {
     public unsafe class StarTrackIcon : TrackIcon {
@@ -31,6 +30,8 @@ namespace NSMB.UI.Game.Track {
                 image.enabled = true;
             } else {
                 image.enabled = false;
+                upArrow.enabled = false;
+                downArrow.enabled = false;
             }
         }
     }

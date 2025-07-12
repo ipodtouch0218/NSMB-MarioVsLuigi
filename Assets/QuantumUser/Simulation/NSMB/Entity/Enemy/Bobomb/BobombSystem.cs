@@ -258,7 +258,7 @@ namespace Quantum {
 
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
             if (iceBlock->IsSliding
-                && upDot < PhysicsObjectSystem.GroundMaxAngle) {
+                && upDot < Constants.PhysicsGroundMaxAngleCos) {
 
                 bobomb->Kill(f, bobombEntity, iceBlockEntity, KillReason.Special);
             }
@@ -308,7 +308,7 @@ namespace Quantum {
                 return;
             }
 
-            if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, entity: entity)) {
+            if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
                 bobomb->Kill(f, entity, marioEntity, KillReason.Special);
                 return;
             }
