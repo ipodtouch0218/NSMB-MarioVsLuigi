@@ -89,6 +89,8 @@ namespace NSMB.Cameras {
             Frame f = game.Frames.Predicted;
             Frame fp = game.Frames.PredictedPrevious;
 
+            zoomSfx.enabled = false;
+
             if (!Target.IsValid || !f.Exists(Target) || !fp.Exists(Target)) {
                 return;
             }
@@ -161,6 +163,7 @@ namespace NSMB.Cameras {
         private void UpdateCameraFreecamMode(CallbackUpdateView e) {
             if (e.Game.Frames.Predicted.Global->GameState >= GameState.Ended
                 || playerElements.PauseMenu.IsPaused) {
+                zoomSfx.enabled = false;
                 return;
             }
 

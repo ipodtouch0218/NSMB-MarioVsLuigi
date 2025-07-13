@@ -6823,6 +6823,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.000000073617905
       objectReference: {fileID: 0}
+    - target: {fileID: -6362496265158331621, guid: 024ceb223bceebd488dbc425555f4df0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
     - target: {fileID: -6311553853212023899, guid: 024ceb223bceebd488dbc425555f4df0,
         type: 3}
       propertyPath: m_LocalScale.x
