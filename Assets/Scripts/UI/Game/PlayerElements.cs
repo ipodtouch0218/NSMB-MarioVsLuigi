@@ -11,6 +11,7 @@ using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -122,7 +123,7 @@ namespace NSMB.UI.Game {
             if (!f.Exists(Entity) && f.Global->GameState >= GameState.Starting && CameraAnimator.Mode == CameraAnimator.CameraMode.FollowPlayer) {
                 if (spectating) {
                     // Find a new player to spectate
-                    SpectateNextPlayer();
+                    SpectateNextPlayer(0, allowFreecam: false);
                 } else {
                     // Spectating
                     StartSpectating();
@@ -138,10 +139,15 @@ namespace NSMB.UI.Game {
             TranslationManager tm = GlobalController.Instance.translationManager;
             Frame f = PredictedFrame;
             if (f.Unsafe.TryGetPointer(Entity, out MarioPlayer* mario)) {
-                RuntimePlayer runtimePlayer = f.GetPlayerData(mario->PlayerRef);
-                string username = runtimePlayer.PlayerNickname.ToValidNickname(f, mario->PlayerRef);
+                string nickname = "noname";
+                for (int i = 0; i < f.Global->RealPlayers; i++) {
+                    if (f.Global->PlayerInfo[i].PlayerRef == mario->PlayerRef) {
+                        nickname = f.Global->PlayerInfo[i].Nickname.ToString().ToValidNickname(f, mario->PlayerRef);
+                        break;
+                    }
+                }
 
-                spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", username);
+                spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", nickname);
             } else {
                 spectatingText.text = tm.GetTranslation("ui.replay.camera.freecam");
             }
@@ -159,7 +165,7 @@ namespace NSMB.UI.Game {
                 }
             }
 
-            SpectateNextPlayer();
+            SpectateNextPlayer(0, allowFreecam: false);
         }
 
         public void SpectateNextPlayer(InputAction.CallbackContext context) {
@@ -167,10 +173,14 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            SpectateNextPlayer();
+            SpectateNextPlayer(1);
+        }
+        
+        public void SpectateNextPlayer(int increment) {
+            SpectateNextPlayer(increment, true);
         }
 
-        public unsafe void SpectateNextPlayer() {
+        public unsafe void SpectateNextPlayer(int increment, bool allowFreecam) {
             Frame f = PredictedFrame;
 
             int marioCount = f.ComponentCount<MarioPlayer>();
@@ -178,17 +188,32 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            List<EntityRef> marios = new(marioCount);
+            List<EntityRef> marios = new();
             var marioFilter = f.Filter<MarioPlayer>();
             marioFilter.UseCulling = false;
-            while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
+            while (marioFilter.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
                 marios.Add(entity);
             }
             marios.Sort((a, b) => {
-                return a.Index - b.Index;
+                int indexA = int.MaxValue;
+                int indexB = int.MaxValue;
+                var marioA = f.Unsafe.GetPointer<MarioPlayer>(a);
+                var marioB = f.Unsafe.GetPointer<MarioPlayer>(b);
+
+                for (int i = 0; i < f.Global->RealPlayers; i++) {
+                    PlayerRef player = f.Global->PlayerInfo[i].PlayerRef;
+                    if (player == marioA->PlayerRef) {
+                        indexA = i;
+                    } else if (player == marioB->PlayerRef) {
+                        indexB = i;
+                    }
+                }
+                return indexA - indexB;
             });
+            
             int currentIndex = marios.IndexOf(Entity);
-            int nextIndex = (int) Mathf.Repeat(currentIndex - 1, marioCount + 1);
+            if (currentIndex < 0) currentIndex = 0;
+            int nextIndex = (int) Mathf.Repeat(currentIndex + increment, marioCount + (allowFreecam ? 1 : 0)) + (allowFreecam ? 0 : 1);
             if (nextIndex == marioCount) {
                 // Freecam
                 CameraAnimator.Mode = CameraAnimator.CameraMode.Freecam;
@@ -207,39 +232,7 @@ namespace NSMB.UI.Game {
                 return;
             }
 
-            SpectatePreviousPlayer();
-        }
-
-        public unsafe void SpectatePreviousPlayer() {
-            Frame f = PredictedFrame;
-
-            int marioCount = f.ComponentCount<MarioPlayer>();
-            if (marioCount <= 0) {
-                return;
-            }
-
-            List<EntityRef> marios = new(marioCount);
-            var marioFilter = f.Filter<MarioPlayer>();
-            marioFilter.UseCulling = false;
-            while (marioFilter.NextUnsafe(out EntityRef entity, out _)) {
-                marios.Add(entity);
-            }
-            marios.Sort((a, b) => {
-                return a.Index - b.Index;
-            });
-            int currentIndex = marios.IndexOf(Entity);
-            int nextIndex = (int) Mathf.Repeat(currentIndex - 1, marioCount + 1);
-            if (nextIndex == marioCount) {
-                // Freecam
-                CameraAnimator.Mode = CameraAnimator.CameraMode.Freecam;
-                Entity = EntityRef.None;
-            } else {
-                // Follow Player
-                CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
-                Entity = marios[nextIndex];
-            }
-
-            UpdateSpectateUI();
+            SpectateNextPlayer(-1);
         }
 
         private void OnNavigate(InputAction.CallbackContext context) {

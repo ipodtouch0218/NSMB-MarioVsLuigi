@@ -61,12 +61,12 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _Blend: 0
-    - _Brightness: 0.891
+    - _Brightness: 0
     - _BumpScale: 1
     - _ColorMask: 15
     - _Cull: 2
     - _Cutoff: 0.5
-    - _Distance: 0.0015
+    - _Distance: 0.005
     - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
@@ -74,7 +74,7 @@ Material:
     - _GlossyReflections: 0
     - _IsAlphaMasked: 1
     - _IsSpriteVisible: 1
-    - _Iterations: 6
+    - _Iterations: 1
     - _Jump: 0.1
     - _Metallic: 0
     - _OcclusionStrength: 1
@@ -103,6 +103,7 @@ Material:
     - _OverlayColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &8721236103415159839
 MonoBehaviour:
   m_ObjectHideFlags: 11

@@ -1,6 +1,7 @@
 ﻿using NSMB.Networking;
 using NSMB.Quantum;
 using NSMB.UI.Loading;
+using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.Options;
 using NSMB.UI.Translation;
@@ -113,6 +114,15 @@ namespace NSMB {
                         PlaySound(SoundEffect.Player_Sound_PowerupCollect);
                     }
                 }
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha9)) {
+                    var canvas = FindFirstObjectByType<MainMenuCanvas>();
+                    if (canvas) {
+                        var blur = canvas.transform.Find("MainMenu").Find("Blur").gameObject;
+                        blur.SetActive(!blur.activeSelf);
+                    }
+                }
+
             }
 
             if (UnityEngine.Input.GetKeyDown(KeyCode.F6)) {

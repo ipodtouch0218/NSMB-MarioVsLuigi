@@ -101,41 +101,48 @@ namespace NSMB.UI.Game.Scoreboard {
 
         public unsafe void SortScoreboard(Frame f) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
-            entries.Sort((se1, se2) => {
-                if (f.Exists(se1.Target) && !f.Exists(se2.Target)) {
+            entries.Sort((a, b) => {
+                f.Unsafe.TryGetPointer(a.Target, out MarioPlayer* marioA);
+                f.Unsafe.TryGetPointer(b.Target, out MarioPlayer* marioB);
+
+                if (marioA != null && marioB == null) {
                     return -1;
-                } else if (f.Exists(se2.Target) && !f.Exists(se1.Target)) {
+                } else if (marioA == null && marioB != null) {
                     return 1;
-                } else if (!f.Exists(se1.Target) && !f.Exists(se2.Target)) {
-                    return 0;
+                } else if (marioA == null && marioB == null) {
+                    goto indexBasedSorting;
                 }
 
-                var mario1 = f.Unsafe.GetPointer<MarioPlayer>(se1.Target);
-                var mario2 = f.Unsafe.GetPointer<MarioPlayer>(se2.Target);
-
-                if (mario1->Disconnected ^ mario2->Disconnected) {
-                    if (mario1->Disconnected) {
+                if (marioA->Disconnected ^ marioB->Disconnected) {
+                    if (marioA->Disconnected) {
                         return 1;
                     } else {
                         return -1;
                     }
                 }
 
-                if (f.Global->Rules.IsLivesEnabled && ((mario1->Lives == 0) ^ (mario2->Lives == 0))) {
-                    return mario2->Lives - mario1->Lives;
+                if (f.Global->Rules.IsLivesEnabled && ((marioA->Lives == 0) ^ (marioB->Lives == 0))) {
+                    return marioB->Lives - marioA->Lives;
                 }
 
-                int starDiff = gamemode.GetObjectiveCount(f, mario2) - gamemode.GetObjectiveCount(f, mario1);
+                int starDiff = gamemode.GetObjectiveCount(f, marioB) - gamemode.GetObjectiveCount(f, marioA);
                 if (starDiff != 0) {
                     return starDiff;
                 }
 
-                var playerDataOne = QuantumUtils.GetPlayerData(f, mario1->PlayerRef);
-                var playerDataTwo = QuantumUtils.GetPlayerData(f, mario2->PlayerRef);
-                if (playerDataOne == null || playerDataTwo == null) {
-                    return 0;
+            indexBasedSorting:
+                int indexA = int.MaxValue;
+                int indexB = int.MaxValue;
+                for (int i = 0; i < f.Global->RealPlayers; i++) {
+                    PlayerRef player = f.Global->PlayerInfo[i].PlayerRef;
+                    if (player == marioA->PlayerRef) {
+                        indexA = i;
+                    } else if (player == marioB->PlayerRef) {
+                        indexB = i;
+                    }
                 }
-                return playerDataOne->JoinTick - playerDataTwo->JoinTick;
+
+                return indexA - indexB;
             });
 
             foreach (var entry in entries) {
