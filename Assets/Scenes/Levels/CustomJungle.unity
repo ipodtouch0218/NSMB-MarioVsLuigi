@@ -1790,6 +1790,21 @@ PrefabInstance:
       propertyPath: Prototype.IsMiniOnly.Value
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 964303446233613965, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 964303446233613965, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 964303446233613965, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 1553203041153522363, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
         type: 3}
       propertyPath: PhysicsCollider.Shape2D.BoxExtents.X.RawValue
@@ -12308,7 +12323,7 @@ PrefabInstance:
     - target: {fileID: 781690564328931067, guid: f0fedafdb23ab6044bba0ac1de9e2d3a,
         type: 3}
       propertyPath: m_Size.y
-      value: 2
+      value: 2.1
       objectReference: {fileID: 0}
     - target: {fileID: 2430942710556662978, guid: f0fedafdb23ab6044bba0ac1de9e2d3a,
         type: 3}
@@ -17687,6 +17702,21 @@ PrefabInstance:
         type: 3}
       propertyPath: Prototype.IsMiniOnly.Value
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 964303446233613965, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 964303446233613965, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 964303446233613965, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.3
       objectReference: {fileID: 0}
     - target: {fileID: 1553203041153522363, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
         type: 3}

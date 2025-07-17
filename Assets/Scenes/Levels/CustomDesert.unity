@@ -920,11 +920,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2736979299832079342, guid: acafae0748a6d984ca08e285f836acaf,
-        type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5327661004347306627, guid: acafae0748a6d984ca08e285f836acaf,
         type: 3}
       propertyPath: Prototype.Spawnpoint.X.RawValue

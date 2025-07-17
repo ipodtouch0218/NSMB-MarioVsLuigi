@@ -1,7 +1,10 @@
 fileFormatVersion: 2
-guid: 897f10582e84a334a8312631ebd28a8e
+guid: 4d77a4400dffb874cba4d8cc29f74c38
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: -8733171477477291806
+    second: bonus-styles_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,18 +40,18 @@ TextureImporter:
     filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 2
-    wrapV: 0
+    wrapU: 1
+    wrapV: 1
     wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 8
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -94,7 +97,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Server
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -106,162 +109,39 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ghosthouse-flame_0
+      name: bonus-styles_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 384
-        height: 487
+        y: 64
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: af52aec64fade474ba0149918f78b7de
-      internalID: 271864985
+      spriteID: 2e88462cfca8dc680800000000000000
+      internalID: -8733171477477291806
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghosthouse-bg_1
+      name: bonus-styles_1
       rect:
         serializedVersion: 2
-        x: 400
-        y: 0
-        width: 504
-        height: 488
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c9c3bc4f612a0a74280532ec16c2c203
-      internalID: -940887023
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghosthouse-flame_1
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 496
-        width: 384
-        height: 487
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0f0fe341fe337d8468bafb49470aeb7e
-      internalID: 249546405
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghosthouse-flame_2
-      rect:
-        serializedVersion: 2
-        x: 384
-        y: 496
-        width: 384
-        height: 487
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ae3b368edfc7b244dbb9fae4b4b4c4e8
-      internalID: 88292509
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghosthouse-flame_3
-      rect:
-        serializedVersion: 2
-        x: 768
-        y: 496
-        width: 384
-        height: 487
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 64904bbc06a75b24a9625364bad19b4d
-      internalID: 1240976055
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghostclouds_0
-      rect:
-        serializedVersion: 2
-        x: 912
-        y: 8
-        width: 256
-        height: 256
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8b5298282ed85da42bdcfd006a8a60e4
-      internalID: 1345958758
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghostclouds_1
-      rect:
-        serializedVersion: 2
-        x: 1184
-        y: 8
-        width: 256
-        height: 256
+        x: 64
+        y: 64
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -270,8 +150,52 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b304bf03e8735b04baad522246984442
-      internalID: -896395142
+      spriteID: f0521cd0ef64462488e5df3a9b454fbd
+      internalID: -704961180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus-styles_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6fac9f5eaed84342a6970a59e6858f0
+      internalID: -1138550053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bonus-styles_3
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6780304aa325c544595f548243708dc6
+      internalID: -429622439
       vertices: []
       indices: 
       edges: []
@@ -280,7 +204,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 4fad3af41ac2b2e4cb5b80409ee1d794
     internalID: 0
     vertices: []
     indices: 
@@ -290,13 +214,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ghostclouds_0: 1345958758
-      ghostclouds_1: -896395142
-      ghosthouse-bg_1: 271864985
-      ghosthouse-flame_0: 271864985
-      ghosthouse-flame_1: 249546405
-      ghosthouse-flame_2: 88292509
-      ghosthouse-flame_3: 1240976055
+      bonus-styles_0: -8733171477477291806
+      bonus-styles_1: -704961180
+      bonus-styles_2: -1138550053
+      bonus-styles_3: -429622439
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

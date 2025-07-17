@@ -28,6 +28,7 @@ namespace NSMB.Cameras {
         [SerializeField] private AudioSource zoomSfx;
 
         //---Private Variables
+        private Vector3 truePosition;
         private VersusStageData stage;
         private float screenshakeTimer;
         private Vector2 previousPointer;
@@ -151,6 +152,8 @@ namespace NSMB.Cameras {
             float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + Mathf.Max(7, orthoSize * 2), stage.CameraMaxPosition.Y.AsFloat) - orthoSize;
             newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
 
+            truePosition = newPosition;
+
             // Screenshake (ignores clamping)
             if (screenshakeTimer > 0) {
                 newPosition += new Vector3((UnityEngine.Random.value - 0.5f) * screenshakeTimer, (UnityEngine.Random.value - 0.5f) * screenshakeTimer);
@@ -206,9 +209,11 @@ namespace NSMB.Cameras {
                 }
             }
 
-            Vector3 newPosition = ourCamera.transform.position + (Vector3) (movement);
+            Vector3 newPosition = truePosition + (Vector3) movement;
             newPosition = QuantumUtils.WrapWorld(stage, newPosition.ToFPVector2(), out _).ToUnityVector3();
             newPosition.z = -10;
+
+            truePosition = newPosition;
 
             // Screenshake
             if ((screenshakeTimer -= Time.unscaledDeltaTime) > 0) {

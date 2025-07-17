@@ -274,7 +274,7 @@ namespace NSMB.Networking {
                 RuntimeConfig = new RuntimeConfig {
                     SimulationConfig = GlobalController.Instance.config,
                     Map = null,
-                   // Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+                    // Seed = unchecked((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
                     IsRealGame = true,
                 },
                 SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig,
