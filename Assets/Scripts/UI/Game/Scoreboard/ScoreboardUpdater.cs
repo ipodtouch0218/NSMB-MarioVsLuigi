@@ -21,7 +21,6 @@ namespace NSMB.UI.Game.Scoreboard {
         [SerializeField] private GameObject teamHeader;
         [SerializeField] private TMP_Text spectatorText, teamHeaderText;
         [SerializeField] private Animator animator;
-        [SerializeField] private InputActionReference toggleScoreboardAction;
 
         //---Private Variables
         private readonly List<ScoreboardEntry> entries = new();
@@ -36,13 +35,12 @@ namespace NSMB.UI.Game.Scoreboard {
         }
 
         public void OnEnable() {
-            toggleScoreboardAction.action.performed += OnToggleScoreboard;
-            toggleScoreboardAction.action.actionMap.Enable();
+            Settings.Controls.UI.Scoreboard.performed += OnToggleScoreboard;
             Settings.OnColorblindModeChanged += OnColorblindModeChanged;
         }
 
         public void OnDisable() {
-            toggleScoreboardAction.action.performed -= OnToggleScoreboard;
+            Settings.Controls.UI.Scoreboard.performed -= OnToggleScoreboard;
             Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
         }
 
