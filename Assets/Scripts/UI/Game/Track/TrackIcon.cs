@@ -49,18 +49,19 @@ namespace NSMB.UI.Game.Track {
             transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
 
             if (upArrow && downArrow) {
-                float stageHeight = (stage.CameraMaxPosition.Y - stage.CameraMinPosition.Y).AsFloat;
+                float minCameraMaxHeight = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat);
+                float stageHeight = minCameraMaxHeight - stage.CameraMinPosition.Y.AsFloat;
                 if (stageHeight > 18) {
                     // Thirds
-                    upArrow.enabled = targetTransform.position.y > (stage.CameraMaxPosition.Y.AsFloat) - (stageHeight / 3f);
+                    upArrow.enabled = targetTransform.position.y > minCameraMaxHeight - (stageHeight / 3f);
                     downArrow.enabled = targetTransform.position.y < (stage.CameraMinPosition.Y.AsFloat) + (stageHeight / 3f);
                 } else if (stageHeight > 12) {
                     // Halves
-                    upArrow.enabled = targetTransform.position.y > ((stage.CameraMaxPosition.Y + stage.CameraMinPosition.Y).AsFloat / 2f);
+                    upArrow.enabled = targetTransform.position.y > (minCameraMaxHeight + stage.CameraMinPosition.Y.AsFloat / 2f);
                     downArrow.enabled = !upArrow.enabled;
                 } else {
                     // Screen bounds
-                    upArrow.enabled = targetTransform.position.y > stage.CameraMaxPosition.Y.AsFloat;
+                    upArrow.enabled = targetTransform.position.y > minCameraMaxHeight;
                     downArrow.enabled = targetTransform.position.y < stage.CameraMinPosition.Y.AsFloat;
                 }
             }

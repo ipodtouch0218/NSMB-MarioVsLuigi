@@ -23,6 +23,7 @@ namespace NSMB.Sound {
             QuantumEvent.Subscribe<EventMarioPlayerDied>(this, OnMarioPlayerDied, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerRespawned>(this, OnMarioPlayerRespawned, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+            QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
 
             ActiveReplayManager.OnReplayFastForwardEnded += OnReplayFastForwardEnded;
             LoadingCanvas.OnLoadingEnded += OnLoadingEnded;
@@ -146,6 +147,12 @@ namespace NSMB.Sound {
 
         private void OnLoadingEnded(bool longIntro) {
             if (!longIntro && Game != null) {
+                HandleMusic(Game, true);
+            }
+        }
+
+        private void OnGameStateChanged(EventGameStateChanged e) {
+            if (Game.Frames.Predicted.Global->GameState == GameState.Playing) {
                 HandleMusic(Game, true);
             }
         }

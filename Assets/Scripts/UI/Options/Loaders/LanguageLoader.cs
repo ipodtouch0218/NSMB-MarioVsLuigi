@@ -14,7 +14,7 @@ namespace NSMB.UI.Options.Loaders {
             }
 
             spo.options.Clear();
-            locales = GlobalController.Instance.translationManager.GetLocaleData();
+            locales = GlobalController.Instance.translationManager.GetAvailableLocales();
             spo.options.AddRange(locales.Select(ld => {
                 return ld.RTL ? ArabicSupport.ArabicFixer.Fix(ld.Name, false) : ld.Name;
             }));

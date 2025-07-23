@@ -2520,8 +2520,7 @@ namespace Quantum {
         }
 
         public void OnPlayerDisconnected(Frame f, PlayerRef player) {
-            var marios = f.Filter<MarioPlayer>();
-            while (marios.NextUnsafe(out EntityRef entity, out MarioPlayer* mario)) {
+            foreach ((var entity, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
                 if (mario->PlayerRef != player) {
                     continue;
                 }

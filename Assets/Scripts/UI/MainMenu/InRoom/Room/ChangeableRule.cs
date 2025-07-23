@@ -46,6 +46,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
         }
 
+        protected override void OnDisable() {
+            base.OnDisable();
+            OnDeselect(null);
+        }
+
         protected override void OnDestroy() {
             base.OnDestroy();
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
