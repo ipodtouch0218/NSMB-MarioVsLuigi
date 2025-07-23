@@ -19,12 +19,14 @@ public class CharacterAsset : AssetObject {
     public RuntimeAnimatorController LargeOverrides;
 #endif 
 
-#if QUANTUM_UNITY
+//#if QUANTUM_UNITY
     public StageThemeOverride[] SpriteList;
+    public CharacterStateAnimation DefaultSprite;
     public CharacterStateAnimation GetAnimData(StageTheme gameStyle, CharacterState animState, PowerupState itemState) {
-        return SpriteList.First(sto => sto.Theme == gameStyle).States.First(csa => csa.State == animState && csa.Item == itemState);
+        var ReturnSprite = SpriteList.FirstOrDefault(sto => sto.Theme == gameStyle)?.States.FirstOrDefault(csa => csa.State == animState && csa.Item == itemState) ?? DefaultSprite;
+        return ReturnSprite;
     }
-#endif
+//#endif
 }
 
 public enum StageTheme {
@@ -92,6 +94,7 @@ public enum CharacterState {
     HOLDSWIM, //
     DIEWATER, //
     PIPEENTER, //
+    SLIDE, 
 }
 
 [System.Serializable]

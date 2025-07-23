@@ -97,6 +97,9 @@ namespace NSMB.Entities.Player {
         public GameObject models;
         public LegacyAnimateSpriteRenderer playerSpriteRenderer;
         public LegacyAnimateSpriteRenderer capeSpriteRenderer;
+        public SpriteRenderer playerSpriteDisplay;
+        public SpriteRenderer capeSpriteDisplay;
+        private PowerupState previousPowerup;
 
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
@@ -1254,6 +1257,17 @@ namespace NSMB.Entities.Player {
         }
 
         private void SetAnimation(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable, ref Input inputs) {
+            var gameStyle = ViewContext.Stage.stageStyle;
+            if (gameStyle == StageTheme.NSMB) {
+                playerSpriteRenderer.isDisplaying = false;
+                capeSpriteRenderer.isDisplaying = false;
+                models.SetActive(!mario->IsRespawning);
+            } else {
+                playerSpriteRenderer.isDisplaying = !mario->IsRespawning;
+                capeSpriteRenderer.isDisplaying = !mario->IsRespawning;
+                models.SetActive(false);
+            }
+
             CharacterState previousAnimationState = currentAnimationState;
 
             bool right = inputs.Right.IsDown;
@@ -1439,11 +1453,22 @@ namespace NSMB.Entities.Player {
                         currentAnimationState = CharacterState.DRILL;
                     }
                 }
+                if (AnimOnLeft || AnimOnRight) {
+                    //Wallslide
+                    currentAnimationState = CharacterState.WALLSLIDE;
+                }
             }
             //Not in OnGround or !OnGround
+            if (AnimSliding) {
+                //Sliding
+                currentAnimationState = CharacterState.SLIDE;
+            }
             if (AnimPipe) {
                 //Pipe enter
                 currentAnimationState = CharacterState.PIPEENTER;
+            } else if (AnimCrouching) {
+                //Crouching
+                currentAnimationState = CharacterState.CROUCH;
             } else if (AnimGroundpoundStart) {
                 //Groundpound start
                 currentAnimationState = CharacterState.GROUNDPOUNDSTART;
@@ -1518,16 +1543,23 @@ namespace NSMB.Entities.Player {
                 }
             }
 
-            var gameStyle = ViewContext.Stage.stageStyle;
             var animData = character.GetAnimData(gameStyle, currentAnimationState, AnimPowerupState);
             float FpsStick = animData.Fps;
 
-            if (previousAnimationState != currentAnimationState) {
+            if ((previousAnimationState != currentAnimationState) || (previousPowerup != AnimPowerupState)) {
                 playerSpriteRenderer.frames = animData.Sprites;
                 playerSpriteRenderer.frame = 0;
             }
             playerSpriteRenderer.fps = FpsStick * FpsMultiplier;
+            if (AnimFacingRight) {
+                playerSpriteDisplay.flipX = false;
+                capeSpriteDisplay.flipX = false;
+            } else {
+                playerSpriteDisplay.flipX = true;
+                capeSpriteDisplay.flipX = true;
+            }
 
+            previousPowerup = AnimPowerupState;
             JumpLandTimer -= Math.Sign(JumpLandTimer);
             PaddleTimer -= Math.Sign(PaddleTimer);
             FireballTimer -= Math.Sign(FireballTimer);

@@ -1529,8 +1529,8 @@ TextureImporter:
         y: 624
         width: 16
         height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -1551,8 +1551,8 @@ TextureImporter:
         y: 624
         width: 16
         height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -2036,7 +2036,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -2071,6 +2071,776 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Default_Sprite
+      rect:
+        serializedVersion: 2
+        x: 1053
+        y: 603
+        width: 19
+        height: 37
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8da1e02128928ef4f93bd362e93d25fd
+      internalID: -762262825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Idle_0
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d767cf73d01682469e7b0b86acaf858
+      internalID: 1555382992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Walk_0
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36f9bff76c8a52b4984b9c5fbe27d0e0
+      internalID: 448354207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Walk_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed59268a6cf414146a645b70f1e16ab3
+      internalID: 501521137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Walk_2
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 319dbbd7f1195f644b2e0d165efe25a1
+      internalID: -340199639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Jump_0
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 756c6c55104e9f340b15caed508cc900
+      internalID: -750844369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Skid_0
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 320a0ccffc3c20d428b4a13bf827f05b
+      internalID: -354197779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Wallslide_0
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee19db2a13d65794ba5322d87946b6bf
+      internalID: -25500665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Crouch_0
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6860bc3838ae05429ae5f185d46c88f
+      internalID: -2040169738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Shoot_0
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8af707a1092280840abef599033a4d2e
+      internalID: -376125560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Groundpound_0
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 424bfc5cfc0c4ed4692a48a568a76b86
+      internalID: 970844595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Groundpound_1
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 576
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f24d84fb48071a44844bacd33c3cdf6
+      internalID: -1433854009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Groundpound_2
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6e007dcad0c02a49b0d3146a221cff5
+      internalID: 1332838342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Groundpound_3
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 576
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9f24eae8e9658f49aa4047496d82df9
+      internalID: -731332717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Knockback_0
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df331ea14a9a64c41abbb548e6736868
+      internalID: 1351282422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_SpinFly_0
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 576
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ec9310f8fde17f488ce7447823569e8
+      internalID: 114311269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_SpinFly_1
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f23d1f3c2fb95a14daffbb9aef31e264
+      internalID: -769785138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_SpinFly_2
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 576
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e8ecc9011f630b408e2cccf04dc6baf
+      internalID: -2117481948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_SpinFly_3
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 21c27b3a2fdac2d4d9f5ec1a73e819f6
+      internalID: -1399428650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Spin_0
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c36dba1518e430a4b957e7f418c984ef
+      internalID: 1394142987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Spin_1
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1099851bff7103488aad2710ebca02a
+      internalID: -167515353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Spin_2
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4371773ab7e2e704088bbb147c888500
+      internalID: 1604641392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Spin_3
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed70ff213b008594eb99f0bd0fcc63a0
+      internalID: 758334835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Swim_0
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 454e57fa8e79cd64c8cb1b5dc60e63b7
+      internalID: -1223386852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Swim_1
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 131eb307aa111b34da28077272d187bc
+      internalID: -1557484375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Swim_2
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4676be3dc2c68849a610b3f851956b0
+      internalID: 730837382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_Swim_3
+      rect:
+        serializedVersion: 2
+        x: 496
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 284cb38f1f63dee46bcdfc72cd869301
+      internalID: 2146974425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldIdle_0
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 576
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3dc9c696e58c28d468097b675d8c917f
+      internalID: -1114802846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldWalk_0
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 576
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a0e76b42d41cf54da8bb90c61e77278
+      internalID: -280191064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldWalk_1
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 576
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d62487cb973e76747bb8030e95086d37
+      internalID: -973776766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldWalk_2
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 576
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd02d08924e35874a8733ea8d2401199
+      internalID: 1994714780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldUpIdle_0
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ada0c1e646f1d4b49adde3e332922c2a
+      internalID: -468396088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldUpWalk_0
+      rect:
+        serializedVersion: 2
+        x: 656
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae55a1dd98b669e4f81973597d026df3
+      internalID: -1018673097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldUpWalk_1
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 313b210db6a61ca4589defbedb6b67c3
+      internalID: 1743996904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Big_HoldUpWalk_2
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 576
+        width: 16
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fef12be9517f96a44900d66e11c1967a
+      internalID: 1472825267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -2085,6 +2855,41 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
+      Default_Sprite: -762262825
+      SMBDX_Mario_Big_Crouch_0: -2040169738
+      SMBDX_Mario_Big_Groundpound_0: 970844595
+      SMBDX_Mario_Big_Groundpound_1: -1433854009
+      SMBDX_Mario_Big_Groundpound_2: 1332838342
+      SMBDX_Mario_Big_Groundpound_3: -731332717
+      SMBDX_Mario_Big_HoldIdle_0: -1114802846
+      SMBDX_Mario_Big_HoldUpIdle_0: -468396088
+      SMBDX_Mario_Big_HoldUpWalk_0: -1018673097
+      SMBDX_Mario_Big_HoldUpWalk_1: 1743996904
+      SMBDX_Mario_Big_HoldUpWalk_2: 1472825267
+      SMBDX_Mario_Big_HoldWalk_0: -280191064
+      SMBDX_Mario_Big_HoldWalk_1: -973776766
+      SMBDX_Mario_Big_HoldWalk_2: 1994714780
+      SMBDX_Mario_Big_Idle_0: 1555382992
+      SMBDX_Mario_Big_Jump_0: -750844369
+      SMBDX_Mario_Big_Knockback_0: 1351282422
+      SMBDX_Mario_Big_Shoot_0: -376125560
+      SMBDX_Mario_Big_Skid_0: -354197779
+      SMBDX_Mario_Big_SpinFly_0: 114311269
+      SMBDX_Mario_Big_SpinFly_1: -769785138
+      SMBDX_Mario_Big_SpinFly_2: -2117481948
+      SMBDX_Mario_Big_SpinFly_3: -1399428650
+      SMBDX_Mario_Big_Spin_0: 1394142987
+      SMBDX_Mario_Big_Spin_1: -167515353
+      SMBDX_Mario_Big_Spin_2: 1604641392
+      SMBDX_Mario_Big_Spin_3: 758334835
+      SMBDX_Mario_Big_Swim_0: -1223386852
+      SMBDX_Mario_Big_Swim_1: -1557484375
+      SMBDX_Mario_Big_Swim_2: 730837382
+      SMBDX_Mario_Big_Swim_3: 2146974425
+      SMBDX_Mario_Big_Walk_0: 448354207
+      SMBDX_Mario_Big_Walk_1: 501521137
+      SMBDX_Mario_Big_Walk_2: -340199639
+      SMBDX_Mario_Big_Wallslide_0: -25500665
       SMBDX_Mario_Small_Crouch_0: 1880198622
       SMBDX_Mario_Small_Die_0: -1586580355
       SMBDX_Mario_Small_Groundpound_0: -1429047422

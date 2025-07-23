@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Grass/DefaultGrassStageData
     Guid:
       Value: 274863242883854470
+  stageStyle: 1
   ShowAuthorAndComposer: 0
   StageAuthor: Nintendo
   MusicComposer: Nintendo
@@ -721,8 +722,8 @@ MonoBehaviour:
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation: 0
-    Flags: 0
+    Rotation: 65534
+    Flags: 1
   - Tile:
       Id:
         Value: 508553503855572043
@@ -1356,8 +1357,8 @@ MonoBehaviour:
   - Tile:
       Id:
         Value: 508553503855572043
-    Rotation: 0
-    Flags: 0
+    Rotation: 65534
+    Flags: 1
   - Tile:
       Id:
         Value: 0
