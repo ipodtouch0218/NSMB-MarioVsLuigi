@@ -147,6 +147,7 @@ namespace NSMB.Entities.Player {
         private float FpsMultiplier = 1f;
         private int JumpLandTimer = 0;
         private int FireballTimer = 0;
+        private int ThrowTimer = 0;
         private int PaddleTimer = 0;
         private bool Walljumped = false;
 
@@ -840,6 +841,7 @@ namespace NSMB.Entities.Player {
 
             PlaySound(SoundEffect.Player_Voice_WallJump, variant: 2);
             animator.SetTrigger(ParamThrow);
+            ThrowTimer = 30;
         }
 
         private void OnMarioPlayerPickedUpObject(EventMarioPlayerPickedUpObject e) {
@@ -854,6 +856,8 @@ namespace NSMB.Entities.Player {
                 animator.Play(ParamHeadPickup);
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);
             }
+            FireballTimer = 0;
+            ThrowTimer = 0;
         }
 
         private void OnMarioPlayerStompedByTeammate(EventMarioPlayerStompedByTeammate e) {
@@ -875,7 +879,7 @@ namespace NSMB.Entities.Player {
             if (physicsObject->IsUnderwater && physicsObject->PreviousFrameVelocity.Y < -1) {
                 SpawnParticle(Enums.PrefabParticle.Player_WaterDust.GetGameObject(), transform.position + Vector3.back * 5);
             }
-            JumpLandTimer = 5;
+            JumpLandTimer = 20;
         }
 
         private void OnPlayBumpSound(EventPlayBumpSound e) {
@@ -984,7 +988,7 @@ namespace NSMB.Entities.Player {
             animator.SetTrigger("fireball");
             ProjectileAsset projectile = e.Game.Frames.Predicted.FindAsset(e.Projectile.Asset);
             PlaySound(projectile.ShootSound);
-            JumpLandTimer = 12;
+            FireballTimer = 30;
         }
 
         private void OnMarioPlayerWalljumped(EventMarioPlayerWalljumped e) {
@@ -1157,7 +1161,7 @@ namespace NSMB.Entities.Player {
                 } else { 
                     PlaySound(SoundEffect.Player_Sound_Swim);
                     animator.SetTrigger(ParamPaddle);
-                    PaddleTimer = 20;
+                    PaddleTimer = 60;
                 }
                 return;
             }
@@ -1301,7 +1305,7 @@ namespace NSMB.Entities.Player {
             bool AnimHolding = f.Exists(mario->HeldEntity);
             bool AnimHeadCarry = heldObject != null && heldObject->HoldAboveHead;
             bool AnimCarryStart = heldObject != null && heldObject->HoldAboveHead && (f.Number - mario->HoldStartFrame) < 27;
-            bool AnimThrow = false;
+            bool AnimThrow = ThrowTimer > 0;
             bool AnimPipe = f.Exists(mario->CurrentPipe);
             PowerupState AnimPowerupState = mario->CurrentPowerupState;
             bool AnimInShell = mario->IsInShell || (mario->CurrentPowerupState == PowerupState.BlueShell && (mario->IsCrouching || mario->IsGroundpounding || mario->IsSliding) && mario->GroundpoundStartFrames <= 9);
@@ -1328,6 +1332,9 @@ namespace NSMB.Entities.Player {
             // Animation script
             if (AnimOnGround) {
                 Walljumped = false;
+                AnimSingleJump = false;
+                AnimDoubleJump = false;
+                AnimTripleJump = false;
                 if (FPMath.Abs(physicsObject->Velocity.X) < FP._0_05) {
                     //Idle
                     currentAnimationState = CharacterState.IDLE;
@@ -1390,6 +1397,7 @@ namespace NSMB.Entities.Player {
                 }
                 if (AnimPushing) {
                     currentAnimationState = CharacterState.PUSH;
+                    FpsMultiplier = 1f;
                 }
                 if (AnimShoot) {
                     //Shot at me
@@ -1563,6 +1571,7 @@ namespace NSMB.Entities.Player {
             JumpLandTimer -= Math.Sign(JumpLandTimer);
             PaddleTimer -= Math.Sign(PaddleTimer);
             FireballTimer -= Math.Sign(FireballTimer);
+            ThrowTimer -= Math.Sign(ThrowTimer);
         }
     }
 }
