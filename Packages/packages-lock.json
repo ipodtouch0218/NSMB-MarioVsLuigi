@@ -12,7 +12,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "58dbcbac0b2783f611a1198f01744639ceca24c5"
+      "hash": "d7fbedf14ba5e2c6b0a121e64e81aaad47f2ca4f"
     },
     "com.jimmycushnie.noisynodes": {
       "version": "https://github.com/JimmyCushnie/Noisy-Nodes.git",
@@ -21,7 +21,7 @@
       "dependencies": {
         "com.unity.shadergraph": "7.1.8"
       },
-      "hash": "2dae176e2f55626785e1dbcedd20a8b4e208acf7"
+      "hash": "38d18b868ba4550aab2f76b2817882474300e75c"
     },
     "com.unity.2d.animation": {
       "version": "10.1.4",
@@ -134,7 +134,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.14.0",
+      "version": "1.14.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {

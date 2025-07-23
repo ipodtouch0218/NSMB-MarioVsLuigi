@@ -1,0 +1,2126 @@
+fileFormatVersion: 2
+guid: 66283b3b4576e0a4f9764772ef3b841d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5810064073091896394
+    second: SMBDX Mario_0
+  - first:
+      213: -3904325954203830475
+    second: SMBDX Mario_1
+  - first:
+      213: -6329020352208973699
+    second: SMBDX Mario_2
+  - first:
+      213: -7143100731918209989
+    second: SMBDX Mario_3
+  - first:
+      213: 5151263124687923144
+    second: SMBDX Mario_4
+  - first:
+      213: -5487299533726356724
+    second: SMBDX Mario_5
+  - first:
+      213: -6095810223425471824
+    second: SMBDX Mario_6
+  - first:
+      213: -497064909399225069
+    second: SMBDX Mario_7
+  - first:
+      213: -1642089352735118463
+    second: SMBDX Mario_8
+  - first:
+      213: -4398084736649303933
+    second: SMBDX Mario_9
+  - first:
+      213: 800437648378655666
+    second: SMBDX Mario_10
+  - first:
+      213: -6840567891683775678
+    second: SMBDX Mario_11
+  - first:
+      213: 5374502830458130191
+    second: SMBDX Mario_12
+  - first:
+      213: -8190232607100502068
+    second: SMBDX Mario_13
+  - first:
+      213: -7313704997338490521
+    second: SMBDX Mario_14
+  - first:
+      213: -7336899164559401795
+    second: SMBDX Mario_15
+  - first:
+      213: -6903318776125974960
+    second: SMBDX Mario_16
+  - first:
+      213: 8365690396827180063
+    second: SMBDX Mario_17
+  - first:
+      213: 7359548530055217894
+    second: SMBDX Mario_18
+  - first:
+      213: -7956854659025295179
+    second: SMBDX Mario_19
+  - first:
+      213: 677899282723924013
+    second: SMBDX Mario_20
+  - first:
+      213: -8793868214308393718
+    second: SMBDX Mario_21
+  - first:
+      213: 7158680683506979907
+    second: SMBDX Mario_22
+  - first:
+      213: -4789141207847577929
+    second: SMBDX Mario_23
+  - first:
+      213: 1601376075548910288
+    second: SMBDX Mario_24
+  - first:
+      213: 6964819119633697312
+    second: SMBDX Mario_25
+  - first:
+      213: -5715929771805715417
+    second: SMBDX Mario_26
+  - first:
+      213: -7740464915657264424
+    second: SMBDX Mario_27
+  - first:
+      213: -3137666513168131109
+    second: SMBDX Mario_28
+  - first:
+      213: 2810126530506876676
+    second: SMBDX Mario_29
+  - first:
+      213: 6396370938340845922
+    second: SMBDX Mario_30
+  - first:
+      213: -2289177924050490452
+    second: SMBDX Mario_31
+  - first:
+      213: -8280427323562675756
+    second: SMBDX Mario_32
+  - first:
+      213: 8798827487159350471
+    second: SMBDX Mario_33
+  - first:
+      213: 2110161533234874925
+    second: SMBDX Mario_34
+  - first:
+      213: -7050377757674428100
+    second: SMBDX Mario_35
+  - first:
+      213: 8114960639887549815
+    second: SMBDX Mario_36
+  - first:
+      213: -767446839616377550
+    second: SMBDX Mario_37
+  - first:
+      213: 3615062413876319449
+    second: SMBDX Mario_38
+  - first:
+      213: -166638696689561587
+    second: SMBDX Mario_39
+  - first:
+      213: 2492168221763325529
+    second: SMBDX Mario_40
+  - first:
+      213: -801813463947021854
+    second: SMBDX Mario_41
+  - first:
+      213: 2479908900922685883
+    second: SMBDX Mario_42
+  - first:
+      213: 6082924588362302261
+    second: SMBDX Mario_43
+  - first:
+      213: -9170894871483131549
+    second: SMBDX Mario_44
+  - first:
+      213: -3448923817054176220
+    second: SMBDX Mario_45
+  - first:
+      213: -2748352005535592108
+    second: SMBDX Mario_46
+  - first:
+      213: 5780910078683657848
+    second: SMBDX Mario_47
+  - first:
+      213: 8934137177553796498
+    second: SMBDX Mario_48
+  - first:
+      213: 2474126854933475363
+    second: SMBDX Mario_49
+  - first:
+      213: -1707304726810506472
+    second: SMBDX Mario_50
+  - first:
+      213: 2948604233471240324
+    second: SMBDX Mario_51
+  - first:
+      213: 1069637471766716087
+    second: SMBDX Mario_52
+  - first:
+      213: 4977192253515555590
+    second: SMBDX Mario_53
+  - first:
+      213: -407014281778325006
+    second: SMBDX Mario_54
+  - first:
+      213: 8218167653302360064
+    second: SMBDX Mario_55
+  - first:
+      213: 6990788835221375796
+    second: SMBDX Mario_56
+  - first:
+      213: 3920135705019889496
+    second: SMBDX Mario_57
+  - first:
+      213: 4824596174347445917
+    second: SMBDX Mario_58
+  - first:
+      213: -1725519690181729790
+    second: SMBDX Mario_59
+  - first:
+      213: 8604450146188911098
+    second: SMBDX Mario_60
+  - first:
+      213: 3688972616242317119
+    second: SMBDX Mario_61
+  - first:
+      213: -3439548195745282225
+    second: SMBDX Mario_62
+  - first:
+      213: 9048315467737348716
+    second: SMBDX Mario_63
+  - first:
+      213: 1060184691868357339
+    second: SMBDX Mario_64
+  - first:
+      213: 2153185960198572974
+    second: SMBDX Mario_65
+  - first:
+      213: 3014166917273200632
+    second: SMBDX Mario_66
+  - first:
+      213: 1744471105297730029
+    second: SMBDX Mario_67
+  - first:
+      213: 3193882078009828376
+    second: SMBDX Mario_68
+  - first:
+      213: -2223143148763280144
+    second: SMBDX Mario_69
+  - first:
+      213: 9156048162596171694
+    second: SMBDX Mario_70
+  - first:
+      213: -4993850980104920563
+    second: SMBDX Mario_71
+  - first:
+      213: -8606453086241843839
+    second: SMBDX Mario_72
+  - first:
+      213: 6245874160115576396
+    second: SMBDX Mario_73
+  - first:
+      213: -377700938364729128
+    second: SMBDX Mario_74
+  - first:
+      213: 4364748625187851215
+    second: SMBDX Mario_75
+  - first:
+      213: 1086362461339293141
+    second: SMBDX Mario_76
+  - first:
+      213: -7129432261276040327
+    second: SMBDX Mario_77
+  - first:
+      213: 2849897953047709950
+    second: SMBDX Mario_78
+  - first:
+      213: -2419549957724858515
+    second: SMBDX Mario_79
+  - first:
+      213: -3816767599483108229
+    second: SMBDX Mario_80
+  - first:
+      213: 7302007827950712426
+    second: SMBDX Mario_81
+  - first:
+      213: 3699006914049523730
+    second: SMBDX Mario_82
+  - first:
+      213: -3322719801911692913
+    second: SMBDX Mario_83
+  - first:
+      213: 869836945279658925
+    second: SMBDX Mario_84
+  - first:
+      213: -4126535094317234994
+    second: SMBDX Mario_85
+  - first:
+      213: -6729324072494015547
+    second: SMBDX Mario_86
+  - first:
+      213: -6828970175259078229
+    second: SMBDX Mario_87
+  - first:
+      213: -4219837086836643794
+    second: SMBDX Mario_88
+  - first:
+      213: -7757456553633422281
+    second: SMBDX Mario_89
+  - first:
+      213: -6774131551310330420
+    second: SMBDX Mario_90
+  - first:
+      213: 2872539508153200468
+    second: SMBDX Mario_91
+  - first:
+      213: 8019744907801732082
+    second: SMBDX Mario_92
+  - first:
+      213: -4543343357478218497
+    second: SMBDX Mario_93
+  - first:
+      213: -513900982958552525
+    second: SMBDX Mario_94
+  - first:
+      213: -6000870423558451237
+    second: SMBDX Mario_95
+  - first:
+      213: 2126180589462434926
+    second: SMBDX Mario_96
+  - first:
+      213: -2273967604487419442
+    second: SMBDX Mario_97
+  - first:
+      213: 3282027997754292293
+    second: SMBDX Mario_98
+  - first:
+      213: 9047790405966203000
+    second: SMBDX Mario_99
+  - first:
+      213: -2787271796976748894
+    second: SMBDX Mario_100
+  - first:
+      213: 1509695474481510648
+    second: SMBDX Mario_101
+  - first:
+      213: -832060406388882004
+    second: SMBDX Mario_102
+  - first:
+      213: 3650315835929061855
+    second: SMBDX Mario_103
+  - first:
+      213: -746336502065613513
+    second: SMBDX Mario_104
+  - first:
+      213: 8615341431556316401
+    second: SMBDX Mario_105
+  - first:
+      213: -8165432751343210720
+    second: SMBDX Mario_106
+  - first:
+      213: -7482137741243280329
+    second: SMBDX Mario_107
+  - first:
+      213: -872838798059990768
+    second: SMBDX Mario_108
+  - first:
+      213: 3491854905862758914
+    second: SMBDX Mario_109
+  - first:
+      213: -3588920256874755961
+    second: SMBDX Mario_110
+  - first:
+      213: 1694534708524444031
+    second: SMBDX Mario_111
+  - first:
+      213: 6858567339135302306
+    second: SMBDX Mario_112
+  - first:
+      213: -5348644247132985709
+    second: SMBDX Mario_113
+  - first:
+      213: 2072033959731260683
+    second: SMBDX Mario_114
+  - first:
+      213: -3504620360014622777
+    second: SMBDX Mario_115
+  - first:
+      213: -4249782185268582912
+    second: SMBDX Mario_116
+  - first:
+      213: 2441784936406490606
+    second: SMBDX Mario_117
+  - first:
+      213: 5069710859143809819
+    second: SMBDX Mario_118
+  - first:
+      213: 8056766914395855323
+    second: SMBDX Mario_119
+  - first:
+      213: -1748954459113688735
+    second: SMBDX Mario_120
+  - first:
+      213: 3774183118194410765
+    second: SMBDX Mario_121
+  - first:
+      213: 8563375034127744982
+    second: SMBDX Mario_122
+  - first:
+      213: 936438830252205982
+    second: SMBDX Mario_123
+  - first:
+      213: 3657167007511930411
+    second: SMBDX Mario_124
+  - first:
+      213: 2639258823553221187
+    second: SMBDX Mario_125
+  - first:
+      213: 2508890774018374532
+    second: SMBDX Mario_126
+  - first:
+      213: 4166888369696396461
+    second: SMBDX Mario_127
+  - first:
+      213: -1664756657830937858
+    second: SMBDX Mario_128
+  - first:
+      213: -7898218063203374838
+    second: SMBDX Mario_129
+  - first:
+      213: 7740447416972329914
+    second: SMBDX Mario_130
+  - first:
+      213: 6378207226452818563
+    second: SMBDX Mario_131
+  - first:
+      213: -5623338116747637023
+    second: SMBDX Mario_132
+  - first:
+      213: 9111921300493453901
+    second: SMBDX Mario_133
+  - first:
+      213: -3367036039553662768
+    second: SMBDX Mario_134
+  - first:
+      213: -2632931585946888143
+    second: SMBDX Mario_135
+  - first:
+      213: -5314856820475333743
+    second: SMBDX Mario_136
+  - first:
+      213: -89990102421517196
+    second: SMBDX Mario_137
+  - first:
+      213: -4239088051229797610
+    second: SMBDX Mario_138
+  - first:
+      213: -1450294738933868100
+    second: SMBDX Mario_139
+  - first:
+      213: -6779384326793156875
+    second: SMBDX Mario_140
+  - first:
+      213: -2831769242404446649
+    second: SMBDX Mario_141
+  - first:
+      213: 6844498304366923795
+    second: SMBDX Mario_142
+  - first:
+      213: -7654361259214350449
+    second: SMBDX Mario_143
+  - first:
+      213: 4667434915485407825
+    second: SMBDX Mario_144
+  - first:
+      213: 5076687809198740474
+    second: SMBDX Mario_145
+  - first:
+      213: -8654302246848620766
+    second: SMBDX Mario_146
+  - first:
+      213: -3338837931571613087
+    second: SMBDX Mario_147
+  - first:
+      213: -2253500464753081800
+    second: SMBDX Mario_148
+  - first:
+      213: -299108199583711725
+    second: SMBDX Mario_149
+  - first:
+      213: 4265283158585223047
+    second: SMBDX Mario_150
+  - first:
+      213: -2734721580596547801
+    second: SMBDX Mario_151
+  - first:
+      213: 8467610173211186593
+    second: SMBDX Mario_152
+  - first:
+      213: -6796114075106944702
+    second: SMBDX Mario_153
+  - first:
+      213: -3422316309300028756
+    second: SMBDX Mario_154
+  - first:
+      213: -8112205514711609272
+    second: SMBDX Mario_155
+  - first:
+      213: -6308623004100274711
+    second: SMBDX Mario_156
+  - first:
+      213: 6411751253496842122
+    second: SMBDX Mario_157
+  - first:
+      213: 990721338623362192
+    second: SMBDX Mario_158
+  - first:
+      213: 2125918735024079323
+    second: SMBDX Mario_159
+  - first:
+      213: 7161213499440346556
+    second: SMBDX Mario_160
+  - first:
+      213: 4279385033478729556
+    second: SMBDX Mario_161
+  - first:
+      213: 769031595900780399
+    second: SMBDX Mario_162
+  - first:
+      213: 5612664375351893671
+    second: SMBDX Mario_163
+  - first:
+      213: 6962433808475903791
+    second: SMBDX Mario_164
+  - first:
+      213: -6371686436907153637
+    second: SMBDX Mario_165
+  - first:
+      213: 3891124133144850617
+    second: SMBDX Mario_166
+  - first:
+      213: 5411914097783519251
+    second: SMBDX Mario_167
+  - first:
+      213: 917728943519188068
+    second: SMBDX Mario_168
+  - first:
+      213: 7272829706127292630
+    second: SMBDX Mario_169
+  - first:
+      213: 5952206408296701966
+    second: SMBDX Mario_170
+  - first:
+      213: -1720860507463186841
+    second: SMBDX Mario_171
+  - first:
+      213: 5626553491889806584
+    second: SMBDX Mario_172
+  - first:
+      213: 6176427862418618654
+    second: SMBDX Mario_173
+  - first:
+      213: 6766092934611254362
+    second: SMBDX Mario_174
+  - first:
+      213: 6034785006821589563
+    second: SMBDX Mario_175
+  - first:
+      213: -8613728997118686520
+    second: SMBDX Mario_176
+  - first:
+      213: 6621032057001962676
+    second: SMBDX Mario_177
+  - first:
+      213: -6952855545295229625
+    second: SMBDX Mario_178
+  - first:
+      213: 3763851189213708642
+    second: SMBDX Mario_179
+  - first:
+      213: 1687975342721185558
+    second: SMBDX Mario_180
+  - first:
+      213: -6818326465563180775
+    second: SMBDX Mario_181
+  - first:
+      213: -4642029417907893272
+    second: SMBDX Mario_182
+  - first:
+      213: 6855996034040475997
+    second: SMBDX Mario_183
+  - first:
+      213: -7621957876300070045
+    second: SMBDX Mario_184
+  - first:
+      213: 6039114584146665698
+    second: SMBDX Mario_185
+  - first:
+      213: 2014335891294956821
+    second: SMBDX Mario_186
+  - first:
+      213: -2599440203865062284
+    second: SMBDX Mario_187
+  - first:
+      213: -8153957546551594077
+    second: SMBDX Mario_188
+  - first:
+      213: 2351998889921366586
+    second: SMBDX Mario_189
+  - first:
+      213: 3727420479094036375
+    second: SMBDX Mario_190
+  - first:
+      213: -8539254898182937319
+    second: SMBDX Mario_191
+  - first:
+      213: 2390992188350988911
+    second: SMBDX Mario_192
+  - first:
+      213: 8746778114872689455
+    second: SMBDX Mario_193
+  - first:
+      213: 3009060924778132585
+    second: SMBDX Mario_194
+  - first:
+      213: 4696664886033691923
+    second: SMBDX Mario_195
+  - first:
+      213: 7287217302126020828
+    second: SMBDX Mario_196
+  - first:
+      213: 7523083137163310562
+    second: SMBDX Mario_197
+  - first:
+      213: -859720582458904297
+    second: SMBDX Mario_198
+  - first:
+      213: 3424899053337689162
+    second: SMBDX Mario_199
+  - first:
+      213: 7424952642314876623
+    second: SMBDX Mario_200
+  - first:
+      213: 7917340993932408363
+    second: SMBDX Mario_201
+  - first:
+      213: -7318953890260936511
+    second: SMBDX Mario_202
+  - first:
+      213: 8060213987278038901
+    second: SMBDX Mario_203
+  - first:
+      213: -5516150112505515010
+    second: SMBDX Mario_204
+  - first:
+      213: -8531634437921428319
+    second: SMBDX Mario_205
+  - first:
+      213: -5551466970719064656
+    second: SMBDX Mario_206
+  - first:
+      213: -2675452562613206856
+    second: SMBDX Mario_207
+  - first:
+      213: -6135105476488176417
+    second: SMBDX Mario_208
+  - first:
+      213: -3245614675910375220
+    second: SMBDX Mario_209
+  - first:
+      213: 2144354252809788031
+    second: SMBDX Mario_210
+  - first:
+      213: -1928728278126484924
+    second: SMBDX Mario_211
+  - first:
+      213: -7531667811222694969
+    second: SMBDX Mario_212
+  - first:
+      213: -4699224692361279647
+    second: SMBDX Mario_213
+  - first:
+      213: 4562397969447513672
+    second: SMBDX Mario_214
+  - first:
+      213: -6530883084314835866
+    second: SMBDX Mario_215
+  - first:
+      213: 8638663193972568725
+    second: SMBDX Mario_216
+  - first:
+      213: 1668176407155543076
+    second: SMBDX Mario_217
+  - first:
+      213: -2469570323750621853
+    second: SMBDX Mario_218
+  - first:
+      213: 8187240713180807796
+    second: SMBDX Mario_219
+  - first:
+      213: -3310173084670084528
+    second: SMBDX Mario_220
+  - first:
+      213: -4206990579973032027
+    second: SMBDX Mario_221
+  - first:
+      213: -2032705804989060142
+    second: SMBDX Mario_222
+  - first:
+      213: 5017583791757399146
+    second: SMBDX Mario_223
+  - first:
+      213: -4897603850896829194
+    second: SMBDX Mario_224
+  - first:
+      213: 5449182190392709794
+    second: SMBDX Mario_225
+  - first:
+      213: -5704516273446188711
+    second: SMBDX Mario_226
+  - first:
+      213: 352860703093878310
+    second: SMBDX Mario_227
+  - first:
+      213: 8233500354902845463
+    second: SMBDX Mario_228
+  - first:
+      213: 6043604745296923554
+    second: SMBDX Mario_229
+  - first:
+      213: 5153938871622524728
+    second: SMBDX Mario_230
+  - first:
+      213: -9120992847691737885
+    second: SMBDX Mario_231
+  - first:
+      213: 4876479625856527497
+    second: SMBDX Mario_232
+  - first:
+      213: 4446694863409074645
+    second: SMBDX Mario_233
+  - first:
+      213: -8499223544880376481
+    second: SMBDX Mario_234
+  - first:
+      213: -867425565100665423
+    second: SMBDX Mario_235
+  - first:
+      213: 2310480618961367977
+    second: SMBDX Mario_236
+  - first:
+      213: -7997774289314769104
+    second: SMBDX Mario_237
+  - first:
+      213: 8412957497879910308
+    second: SMBDX Mario_238
+  - first:
+      213: 453080062263265393
+    second: SMBDX Mario_239
+  - first:
+      213: -2284294848435447619
+    second: SMBDX Mario_240
+  - first:
+      213: 5565130265793383902
+    second: SMBDX Mario_241
+  - first:
+      213: 2507490924611650996
+    second: SMBDX Mario_242
+  - first:
+      213: -934383655261815233
+    second: SMBDX Mario_243
+  - first:
+      213: -6906726023280296136
+    second: SMBDX Mario_244
+  - first:
+      213: -2455200704157567979
+    second: SMBDX Mario_245
+  - first:
+      213: -3968667744779576791
+    second: SMBDX Mario_246
+  - first:
+      213: 4398948568535302043
+    second: SMBDX Mario_247
+  - first:
+      213: 6234453652934857474
+    second: SMBDX Mario_248
+  - first:
+      213: -5046861302840010365
+    second: SMBDX Mario_249
+  - first:
+      213: -2818980821678600707
+    second: SMBDX Mario_250
+  - first:
+      213: -5393895451057349077
+    second: SMBDX Mario_251
+  - first:
+      213: 3174601145744438941
+    second: SMBDX Mario_252
+  - first:
+      213: 5171620696349649327
+    second: SMBDX Mario_253
+  - first:
+      213: -802708074762619057
+    second: SMBDX Mario_254
+  - first:
+      213: -8853980689068136181
+    second: SMBDX Mario_255
+  - first:
+      213: 7393425078939614037
+    second: SMBDX Mario_256
+  - first:
+      213: -5695345583285268999
+    second: SMBDX Mario_257
+  - first:
+      213: -6155222707233791772
+    second: SMBDX Mario_258
+  - first:
+      213: 4203942654185011207
+    second: SMBDX Mario_259
+  - first:
+      213: -5423952851237795432
+    second: SMBDX Mario_260
+  - first:
+      213: 1430345744790301262
+    second: SMBDX Mario_261
+  - first:
+      213: 2660220713462704605
+    second: SMBDX Mario_262
+  - first:
+      213: -860427674280380706
+    second: SMBDX Mario_263
+  - first:
+      213: -4031211882208583668
+    second: SMBDX Mario_264
+  - first:
+      213: 6603780180419705383
+    second: SMBDX Mario_265
+  - first:
+      213: 1738950276666020281
+    second: SMBDX Mario_266
+  - first:
+      213: 6161415777703866764
+    second: SMBDX Mario_267
+  - first:
+      213: 763013882017348849
+    second: SMBDX Mario_268
+  - first:
+      213: -2796268974478603406
+    second: SMBDX Mario_269
+  - first:
+      213: -2716737027617221147
+    second: SMBDX Mario_270
+  - first:
+      213: 5587306150718706002
+    second: SMBDX Mario_271
+  - first:
+      213: 4473307897690310365
+    second: SMBDX Mario_272
+  - first:
+      213: 6647025997744403258
+    second: SMBDX Mario_273
+  - first:
+      213: -105582270692262096
+    second: SMBDX Mario_274
+  - first:
+      213: -3425933734029680886
+    second: SMBDX Mario_275
+  - first:
+      213: 678885321949395724
+    second: SMBDX Mario_276
+  - first:
+      213: -7464447732085320151
+    second: SMBDX Mario_277
+  - first:
+      213: 8557021200229281960
+    second: SMBDX Mario_278
+  - first:
+      213: -1257684241748385953
+    second: SMBDX Mario_279
+  - first:
+      213: 8826318020126621169
+    second: SMBDX Mario_280
+  - first:
+      213: 4305500936205136444
+    second: SMBDX Mario_281
+  - first:
+      213: -4385544829777271447
+    second: SMBDX Mario_282
+  - first:
+      213: 3955245170524096112
+    second: SMBDX Mario_283
+  - first:
+      213: 8740290114590048444
+    second: SMBDX Mario_284
+  - first:
+      213: 6791408965301616002
+    second: SMBDX Mario_285
+  - first:
+      213: 7499765077422284115
+    second: SMBDX Mario_286
+  - first:
+      213: -5380246591706202593
+    second: SMBDX Mario_287
+  - first:
+      213: 3896584399056040215
+    second: SMBDX Mario_288
+  - first:
+      213: -2470445753051804361
+    second: SMBDX Mario_289
+  - first:
+      213: -4291858523443752049
+    second: SMBDX Mario_290
+  - first:
+      213: 3918292698841657514
+    second: SMBDX Mario_291
+  - first:
+      213: 5628375390438903725
+    second: SMBDX Mario_292
+  - first:
+      213: -7879077933003643758
+    second: SMBDX Mario_293
+  - first:
+      213: -4531225971351346780
+    second: SMBDX Mario_294
+  - first:
+      213: -6268751745377408
+    second: SMBDX Mario_295
+  - first:
+      213: 1081887000936200077
+    second: SMBDX Mario_296
+  - first:
+      213: 204238834279342558
+    second: SMBDX Mario_297
+  - first:
+      213: -5020310561271177478
+    second: SMBDX Mario_298
+  - first:
+      213: -8369297096428745398
+    second: SMBDX Mario_299
+  - first:
+      213: 3628460366164247728
+    second: SMBDX Mario_300
+  - first:
+      213: 8527778854636813477
+    second: SMBDX Mario_301
+  - first:
+      213: -2935718279418293676
+    second: SMBDX Mario_302
+  - first:
+      213: -1740024040246373262
+    second: SMBDX Mario_303
+  - first:
+      213: -3563413159627880770
+    second: SMBDX Mario_304
+  - first:
+      213: -7504994331631575472
+    second: SMBDX Mario_305
+  - first:
+      213: -1209374543997217747
+    second: SMBDX Mario_306
+  - first:
+      213: -7155039006616716534
+    second: SMBDX Mario_307
+  - first:
+      213: -8295850070645456773
+    second: SMBDX Mario_308
+  - first:
+      213: 6940804530374800074
+    second: SMBDX Mario_309
+  - first:
+      213: 8242815364461175038
+    second: SMBDX Mario_310
+  - first:
+      213: -7223603583992789386
+    second: SMBDX Mario_311
+  - first:
+      213: -9184049312246722880
+    second: SMBDX Mario_312
+  - first:
+      213: 1020687666504412531
+    second: SMBDX Mario_313
+  - first:
+      213: 6402530647350724793
+    second: SMBDX Mario_314
+  - first:
+      213: 5876803850164999159
+    second: SMBDX Mario_315
+  - first:
+      213: 5135583683207356692
+    second: SMBDX Mario_316
+  - first:
+      213: -6293401542195788645
+    second: SMBDX Mario_317
+  - first:
+      213: -6177792208651670146
+    second: SMBDX Mario_318
+  - first:
+      213: 5893725911798577524
+    second: SMBDX Mario_319
+  - first:
+      213: 666699030591051415
+    second: SMBDX Mario_320
+  - first:
+      213: 8634484255029340604
+    second: SMBDX Mario_321
+  - first:
+      213: -7571084273185906473
+    second: SMBDX Mario_322
+  - first:
+      213: -2193136124162291332
+    second: SMBDX Mario_323
+  - first:
+      213: 416996922566842099
+    second: SMBDX Mario_324
+  - first:
+      213: 5972969251697184195
+    second: SMBDX Mario_325
+  - first:
+      213: -4791721282507263691
+    second: SMBDX Mario_326
+  - first:
+      213: -5308804578834972042
+    second: SMBDX Mario_327
+  - first:
+      213: 103134661457858490
+    second: SMBDX Mario_328
+  - first:
+      213: 8630161868821646114
+    second: SMBDX Mario_329
+  - first:
+      213: 4032274206515389782
+    second: SMBDX Mario_330
+  - first:
+      213: 7633104267809939329
+    second: SMBDX Mario_331
+  - first:
+      213: -9112190535561169520
+    second: SMBDX Mario_332
+  - first:
+      213: 114345687805396675
+    second: SMBDX Mario_333
+  - first:
+      213: -1183684729542122978
+    second: SMBDX Mario_334
+  - first:
+      213: -4284420297441531679
+    second: SMBDX Mario_335
+  - first:
+      213: 7210088297268188444
+    second: SMBDX Mario_336
+  - first:
+      213: 2254038942331935059
+    second: SMBDX Mario_337
+  - first:
+      213: -2221567271390004288
+    second: SMBDX Mario_338
+  - first:
+      213: 2840564758412686523
+    second: SMBDX Mario_339
+  - first:
+      213: -7499690071463716236
+    second: SMBDX Mario_340
+  - first:
+      213: -7492993599157408901
+    second: SMBDX Mario_341
+  - first:
+      213: -5203075937782806571
+    second: SMBDX Mario_342
+  - first:
+      213: 2722886090658600125
+    second: SMBDX Mario_343
+  - first:
+      213: 2724622516941299343
+    second: SMBDX Mario_344
+  - first:
+      213: -4286992251429816840
+    second: SMBDX Mario_345
+  - first:
+      213: -4893558421687094317
+    second: SMBDX Mario_346
+  - first:
+      213: 5494749480133725284
+    second: SMBDX Mario_347
+  - first:
+      213: 6882813792515938475
+    second: SMBDX Mario_348
+  - first:
+      213: -5404912793422032294
+    second: SMBDX Mario_349
+  - first:
+      213: -5744960271634294914
+    second: SMBDX Mario_350
+  - first:
+      213: -7341523515907082113
+    second: SMBDX Mario_351
+  - first:
+      213: 6841181565912886472
+    second: SMBDX Mario_352
+  - first:
+      213: -7818728517933347039
+    second: SMBDX Mario_353
+  - first:
+      213: -9183422833199436691
+    second: SMBDX Mario_354
+  - first:
+      213: -1386272396782073195
+    second: SMBDX Mario_355
+  - first:
+      213: -9169233257836664468
+    second: SMBDX Mario_356
+  - first:
+      213: 693985969449170758
+    second: SMBDX Mario_357
+  - first:
+      213: -1281985619125908216
+    second: SMBDX Mario_358
+  - first:
+      213: -6693297107336859976
+    second: SMBDX Mario_359
+  - first:
+      213: 7500245368063439705
+    second: SMBDX Mario_360
+  - first:
+      213: -2068240365515394334
+    second: SMBDX Mario_361
+  - first:
+      213: 4960904241749977774
+    second: SMBDX Mario_362
+  - first:
+      213: -8111824480697115393
+    second: SMBDX Mario_363
+  - first:
+      213: 7012951846885764390
+    second: SMBDX Mario_364
+  - first:
+      213: 1141591793618723318
+    second: SMBDX Mario_365
+  - first:
+      213: 306170788129562412
+    second: SMBDX Mario_366
+  - first:
+      213: -3530771352697292239
+    second: SMBDX Mario_367
+  - first:
+      213: 4179082846420683350
+    second: SMBDX Mario_368
+  - first:
+      213: -4040485971075632974
+    second: SMBDX Mario_369
+  - first:
+      213: -8681223559404591279
+    second: SMBDX Mario_370
+  - first:
+      213: 9102507150025400074
+    second: SMBDX Mario_371
+  - first:
+      213: -414234171326787822
+    second: SMBDX Mario_372
+  - first:
+      213: 7976834388582174987
+    second: SMBDX Mario_373
+  - first:
+      213: 1083441273978785740
+    second: SMBDX Mario_374
+  - first:
+      213: 4855093205073138494
+    second: SMBDX Mario_375
+  - first:
+      213: -8215830949350968011
+    second: SMBDX Mario_376
+  - first:
+      213: -2204699343532265364
+    second: SMBDX Mario_377
+  - first:
+      213: -1080748759527175608
+    second: SMBDX Mario_378
+  - first:
+      213: -5248988496572423912
+    second: SMBDX Mario_379
+  - first:
+      213: -3538329037573692225
+    second: SMBDX Mario_380
+  - first:
+      213: 1907932377175799415
+    second: SMBDX Mario_381
+  - first:
+      213: -8297638287204712843
+    second: SMBDX Mario_382
+  - first:
+      213: -8251912092059746095
+    second: SMBDX Mario_383
+  - first:
+      213: -7112802262031466436
+    second: SMBDX Mario_384
+  - first:
+      213: 3112320659182200655
+    second: SMBDX Mario_385
+  - first:
+      213: -4452886654885873877
+    second: SMBDX Mario_386
+  - first:
+      213: 8993750630204219695
+    second: SMBDX Mario_387
+  - first:
+      213: -2406758384529968970
+    second: SMBDX Mario_388
+  - first:
+      213: 6383908866302616738
+    second: SMBDX Mario_389
+  - first:
+      213: -8700497475573593663
+    second: SMBDX Mario_390
+  - first:
+      213: -4266981036083766423
+    second: SMBDX Mario_391
+  - first:
+      213: -464421522958070353
+    second: SMBDX Mario_392
+  - first:
+      213: 8541078033711204537
+    second: SMBDX Mario_393
+  - first:
+      213: -440684039865277056
+    second: SMBDX Mario_394
+  - first:
+      213: -4901014448888511784
+    second: SMBDX Mario_395
+  - first:
+      213: -54709335197488429
+    second: SMBDX Mario_396
+  - first:
+      213: -2674586519565426841
+    second: SMBDX Mario_397
+  - first:
+      213: 6609957942649440429
+    second: SMBDX Mario_398
+  - first:
+      213: -1974292217332471403
+    second: SMBDX Mario_399
+  - first:
+      213: 5330559142295339154
+    second: SMBDX Mario_400
+  - first:
+      213: 5382558290739378491
+    second: SMBDX Mario_401
+  - first:
+      213: -704668761828163531
+    second: SMBDX Mario_402
+  - first:
+      213: -4287592756578125398
+    second: SMBDX Mario_403
+  - first:
+      213: -9208088325126899749
+    second: SMBDX Mario_404
+  - first:
+      213: 2487883976085751573
+    second: SMBDX Mario_405
+  - first:
+      213: -4096329312326374610
+    second: SMBDX Mario_406
+  - first:
+      213: -3023069797125973840
+    second: SMBDX Mario_407
+  - first:
+      213: -4998655035003418231
+    second: SMBDX Mario_408
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Idle_0
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bb291132818e5fa0800000000000000
+      internalID: -5810064073091896394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Walk_0
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 932a925ebf98a814c9f9054258f18e13
+      internalID: 1901666903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Walk_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5cfcf0a90097fe43a46c00926489b8a
+      internalID: 789162399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Walk_2
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0aadfdcfde5124644812e81371397ab4
+      internalID: -338070242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Jump_0
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad9c4b38ba710de4a96d176d256e5e33
+      internalID: 1359706785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Skid_0
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6fde7cc0d624804099c96a7021b7ac8
+      internalID: -1719630308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Wallslide_0
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8bf04ae31785c32428be36d43bf76c8c
+      internalID: -1971548136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Crouch_0
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4137853536fabc8429190500b4d7fb9c
+      internalID: 1880198622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Shoot_0
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dbeec924f66c0bb4fb4c63207356d66d
+      internalID: 926766842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Groundpound_0
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 624
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 39d541d75e92de846af5704de5b94f5a
+      internalID: -1429047422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Groundpound_1
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 624
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa8775abf41a726418a76c96688ea30a
+      internalID: 716818414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Groundpound_2
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c9c1dafff28ec04093a3a49c01aba65
+      internalID: 638737841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Groundpound_3
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc806d916ca92244295c52b9140e5121
+      internalID: -1738394244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Die_0
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 502b58db2d86fab488810b0be0922663
+      internalID: -1586580355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Spin_0
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 11862eee8e6e19646b3028ef0e16cadb
+      internalID: 1376152635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Spin_1
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a59f5e2eae99100408fb5d0bc2f4258d
+      internalID: 1435128980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Spin_2
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: caf86b16e8a3ecf4aa12f855e6e47815
+      internalID: -1666279218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Spin_3
+      rect:
+        serializedVersion: 2
+        x: 304
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f189aa15bd8b9c42ba21aedf472c316
+      internalID: -148267112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_SpinFly_0
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7fab8a34c62f874e85349b925f73db6
+      internalID: 1733436770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_SpinFly_1
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 226ee1119c8a3ed44a1684502873ece1
+      internalID: -385073579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_SpinFly_2
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d2bfd01610245c45b8d62fbfdde6449
+      internalID: -1136401911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_SpinFly_3
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 921b0a25bc9401f4f964d8cf26985fc7
+      internalID: 1708848999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Swim_0
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aec9cad1d3fbffe4884515b5169fa60e
+      internalID: -1202076034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Swim_1
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01a064f26c89d004788a28ed57fe1cf2
+      internalID: 1052941872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Swim_2
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: edb8d1d431bca494e8dc436322a48084
+      internalID: -1814816911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_Swim_3
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 714734ba95242804c8562cb85cd2bf80
+      internalID: 922616267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldIdle_0
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58c3e5ec9025b0d4da43f47f195611a3
+      internalID: 873261904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldWalk_0
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a9add66d1da4f9d40846c9d15dda2481
+      internalID: 1841224622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldWalk_1
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7f64825ba6c46c4db32e347d33ecde5
+      internalID: -490472539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldWalk_2
+      rect:
+        serializedVersion: 2
+        x: 496
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00fda5a3ac515954e98b33dbca864696
+      internalID: -2067423104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldUpIdle_0
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4588c9160c847334cbe8f1f57462e11c
+      internalID: 574116399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldUpWalk_0
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d47a77da6d9baf54ab27e4edfe82160c
+      internalID: -200458854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldUpWalk_1
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 624
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 863c14019fb932b49b94ac86ef260dd1
+      internalID: 620629258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Mario_Small_HoldUpWalk_2
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 624
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4e47b69bd0354e43b726e040d27bc2a
+      internalID: -761099294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: f933234247b4ccc48a276c8963757edc
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SMBDX_Mario_Small_Crouch_0: 1880198622
+      SMBDX_Mario_Small_Die_0: -1586580355
+      SMBDX_Mario_Small_Groundpound_0: -1429047422
+      SMBDX_Mario_Small_Groundpound_1: 716818414
+      SMBDX_Mario_Small_Groundpound_2: 638737841
+      SMBDX_Mario_Small_Groundpound_3: -1738394244
+      SMBDX_Mario_Small_HoldIdle_0: 873261904
+      SMBDX_Mario_Small_HoldUpIdle_0: 574116399
+      SMBDX_Mario_Small_HoldUpWalk_0: -200458854
+      SMBDX_Mario_Small_HoldUpWalk_1: 620629258
+      SMBDX_Mario_Small_HoldUpWalk_2: -761099294
+      SMBDX_Mario_Small_HoldWalk_0: 1841224622
+      SMBDX_Mario_Small_HoldWalk_1: -490472539
+      SMBDX_Mario_Small_HoldWalk_2: -2067423104
+      SMBDX_Mario_Small_Idle_0: -5810064073091896394
+      SMBDX_Mario_Small_Jump_0: 1359706785
+      SMBDX_Mario_Small_Shoot_0: 926766842
+      SMBDX_Mario_Small_Skid_0: -1719630308
+      SMBDX_Mario_Small_SpinFly_0: 1733436770
+      SMBDX_Mario_Small_SpinFly_1: -385073579
+      SMBDX_Mario_Small_SpinFly_2: -1136401911
+      SMBDX_Mario_Small_SpinFly_3: 1708848999
+      SMBDX_Mario_Small_Spin_0: 1376152635
+      SMBDX_Mario_Small_Spin_1: 1435128980
+      SMBDX_Mario_Small_Spin_2: -1666279218
+      SMBDX_Mario_Small_Spin_3: -148267112
+      SMBDX_Mario_Small_Swim_0: -1202076034
+      SMBDX_Mario_Small_Swim_1: 1052941872
+      SMBDX_Mario_Small_Swim_2: -1814816911
+      SMBDX_Mario_Small_Swim_3: 922616267
+      SMBDX_Mario_Small_Walk_0: 1901666903
+      SMBDX_Mario_Small_Walk_1: 789162399
+      SMBDX_Mario_Small_Walk_2: -338070242
+      SMBDX_Mario_Small_Wallslide_0: -1971548136
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

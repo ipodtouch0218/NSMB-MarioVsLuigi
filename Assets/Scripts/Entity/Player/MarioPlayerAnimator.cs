@@ -7,6 +7,7 @@ using NSMB.Sound;
 using NSMB.UI.Game;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
+using NSMB.Utilities.Components;
 using Photon.Deterministic;
 using Quantum;
 using Quantum.Profiling;
@@ -18,6 +19,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Scripting;
 using static NSMB.Utilities.QuantumViewUtils;
 using Input = Quantum.Input;
+using NUnit.Framework.Constraints;
 
 namespace NSMB.Entities.Player {
     public unsafe class MarioPlayerAnimator : QuantumEntityViewComponent<StageContext> {
@@ -93,6 +95,8 @@ namespace NSMB.Entities.Player {
         //---Public Variables
         public bool wasTurnaround;
         public GameObject models;
+        public LegacyAnimateSpriteRenderer playerSpriteRenderer;
+        public LegacyAnimateSpriteRenderer capeSpriteRenderer;
 
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
@@ -136,6 +140,12 @@ namespace NSMB.Entities.Player {
         private Vector3 previousPosition;
         private bool forceUpdate;
         private GameObject activeRespawnParticle;
+        private CharacterState currentAnimationState;
+        private float FpsMultiplier = 1f;
+        private int JumpLandTimer = 0;
+        private int FireballTimer = 0;
+        private int PaddleTimer = 0;
+        private bool Walljumped = false;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -276,6 +286,7 @@ namespace NSMB.Entities.Player {
             SetFacingDirection(f, mario, physicsObject);
             InterpolateFacingDirection(mario);
             UpdateAnimatorVariables(f, mario, physicsObject, freezable, ref inputs);
+            SetAnimation(f, mario, physicsObject, freezable, ref inputs);
 
             previousPosition = transform.position;
             forceUpdate = false;
@@ -367,11 +378,11 @@ namespace NSMB.Entities.Player {
             using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.SetFacingDirection");
             float delta = Time.deltaTime;
 
-            float angleR = 108, angleL = 252; //Default angles, we can override them later. 
+            float angleR = 125, angleL = 235; //Default angles, we can override them later. 
             if (mario->CurrentPowerupState is PowerupState.BlueShell or PowerupState.MegaMushroom) {
                 //Hacky override that feels like something I'd put in one of my mods - HyperCat
-                angleR = 90;
-                angleL = 270;
+                angleR = 110;
+                angleL = 250;
             }
 
             modelRotateInstantly = false;
@@ -861,6 +872,7 @@ namespace NSMB.Entities.Player {
             if (physicsObject->IsUnderwater && physicsObject->PreviousFrameVelocity.Y < -1) {
                 SpawnParticle(Enums.PrefabParticle.Player_WaterDust.GetGameObject(), transform.position + Vector3.back * 5);
             }
+            JumpLandTimer = 5;
         }
 
         private void OnPlayBumpSound(EventPlayBumpSound e) {
@@ -969,6 +981,7 @@ namespace NSMB.Entities.Player {
             animator.SetTrigger("fireball");
             ProjectileAsset projectile = e.Game.Frames.Predicted.FindAsset(e.Projectile.Asset);
             PlaySound(projectile.ShootSound);
+            JumpLandTimer = 12;
         }
 
         private void OnMarioPlayerWalljumped(EventMarioPlayerWalljumped e) {
@@ -990,6 +1003,7 @@ namespace NSMB.Entities.Player {
                 PlaySound(SoundEffect.Player_Voice_WallJump, variant: (byte) UnityEngine.Random.Range(1, 3));
             }
             animator.SetTrigger("walljump");
+            Walljumped = true;
         }
 
         private void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e) {
@@ -1140,6 +1154,7 @@ namespace NSMB.Entities.Player {
                 } else { 
                     PlaySound(SoundEffect.Player_Sound_Swim);
                     animator.SetTrigger(ParamPaddle);
+                    PaddleTimer = 20;
                 }
                 return;
             }
@@ -1236,6 +1251,286 @@ namespace NSMB.Entities.Player {
             }
 
             sfx.PlayOneShot(SoundEffect.Powerup_HammerSuit_Bounce);
+        }
+
+        private void SetAnimation(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable, ref Input inputs) {
+            CharacterState previousAnimationState = currentAnimationState;
+
+            bool right = inputs.Right.IsDown;
+            bool left = inputs.Left.IsDown;
+
+            f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* heldObject);
+
+            bool AnimDead = mario->IsDead;
+            bool AnimOnLeft = mario->WallslideLeft;
+            bool AnimOnRight = mario->WallslideRight;
+            bool AnimWalljumped = Walljumped;
+            bool AnimOnGround = physicsObject->IsTouchingGround || mario->IsStuckInBlock || mario->CoyoteTimeFrames > 0;
+            bool AnimInvincible = mario->IsStarmanInvincible;
+            bool AnimSkidding = mario->IsSkidding;
+            bool AnimPropeller = mario->IsPropellerFlying;
+            bool AnimPropellerSpin = mario->IsPropellerFlying && mario->PropellerSpinFrames > 0;
+            bool AnimPropellerStart = mario->IsPropellerFlying && mario->PropellerLaunchFrames > 0;
+            bool AnimCrouching = mario->IsCrouching;
+            bool AnimGroundpoundStart = mario->GroundpoundStartFrames > 0;
+            bool AnimGroundpound = mario->IsGroundpounding;
+            bool AnimSliding = mario->IsSliding;
+            bool AnimFacingRight = (left ^ right) ? right : mario->FacingRight;
+            bool AnimSpin = f.Exists(mario->CurrentSpinner);
+            bool AnimFlying = mario->IsSpinnerFlying;
+            bool AnimDrill = mario->IsDrilling;
+            bool AnimSingleJump = mario->JumpState == JumpState.SingleJump;
+            bool AnimDoubleJump = mario->JumpState == JumpState.DoubleJump;
+            bool AnimTripleJump = mario->JumpState == JumpState.TripleJump;
+            bool AnimLand = JumpLandTimer > 0;
+            bool AnimShoot = FireballTimer > 0;
+            bool AnimHolding = f.Exists(mario->HeldEntity);
+            bool AnimHeadCarry = heldObject != null && heldObject->HoldAboveHead;
+            bool AnimCarryStart = heldObject != null && heldObject->HoldAboveHead && (f.Number - mario->HoldStartFrame) < 27;
+            bool AnimThrow = false;
+            bool AnimPipe = f.Exists(mario->CurrentPipe);
+            PowerupState AnimPowerupState = mario->CurrentPowerupState;
+            bool AnimInShell = mario->IsInShell || (mario->CurrentPowerupState == PowerupState.BlueShell && (mario->IsCrouching || mario->IsGroundpounding || mario->IsSliding) && mario->GroundpoundStartFrames <= 9);
+            bool AnimTurnaround = mario->IsTurnaround;
+            bool AnimSwimming = physicsObject->IsUnderwater && !mario->IsGroundpounding && !mario->IsDrilling && !freezable->IsFrozen(f);
+            bool AnimAHeld = inputs.Jump.IsDown;
+            bool AnimSwimKick = AnimSwimming && AnimAHeld && physicsObject->Velocity.Y < 0;
+            bool AnimSwimPaddle = PaddleTimer > 0;
+            bool AnimFireballKnockback = mario->IsInWeakKnockback;
+            bool AnimFireDeath = mario->FireDeath;
+            bool AnimPushing = mario->LastPushingFrame + 5 >= f.Number;
+            bool AnimFrozen = freezable->IsFrozen(f);
+            bool AnimKnockback = mario->IsInKnockback;
+            bool AnimKnockforwards = mario->KnockForwards;
+            bool AnimKnockbackWeak = mario->IsInWeakKnockback;
+            bool AnimMegaGrow = mario->MegaMushroomStartFrames > 0;
+            bool AnimMegaShrink = mario->MegaMushroomStationaryEnd;
+            var physics = f.FindAsset(mario->PhysicsAsset);
+            int AnimRunState = mario->GetSpeedStage(physicsObject, physics);
+            
+            FpsMultiplier = 1f;
+            currentAnimationState = CharacterState.IDLE;
+
+            // Animation script
+            if (AnimOnGround) {
+                Walljumped = false;
+                if (FPMath.Abs(physicsObject->Velocity.X) < FP._0_05) {
+                    //Idle
+                    currentAnimationState = CharacterState.IDLE;
+                    if (AnimHolding) {
+                        currentAnimationState = CharacterState.HOLDIDLE;
+                    }
+                    if (AnimHeadCarry) {
+                        currentAnimationState = CharacterState.HOLDUPIDLE;
+                    }
+                    if (AnimLand) {
+                        //Jump land
+                        currentAnimationState = CharacterState.JUMPLAND;
+                    }
+                    if (AnimSpin) {
+                        //Speen or something
+                        currentAnimationState = CharacterState.SPIN;
+                    }
+                } else if (AnimRunState <= physics.WalkSpeedStage) {
+                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
+                    //Walk
+                    currentAnimationState = CharacterState.WALK;
+                    if (AnimHolding) {
+                        currentAnimationState = CharacterState.HOLDWALK;
+                    }
+                    if (AnimHeadCarry) {
+                        currentAnimationState = CharacterState.HOLDUPWALK;
+                    }
+                } else if (AnimRunState <= physics.RunSpeedStage) {
+                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
+                    //Run
+                    currentAnimationState = CharacterState.RUN;
+                    if (AnimHolding) {
+                        currentAnimationState = CharacterState.HOLDRUN;
+                    }
+                    if (AnimHeadCarry) {
+                        currentAnimationState = CharacterState.HOLDUPRUN;
+                    }
+                } else if (AnimRunState <= physics.RunSpeedStage) {
+                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
+                    //Fast run
+                    currentAnimationState = CharacterState.FASTRUN;
+                    if (AnimHolding) {
+                        currentAnimationState = CharacterState.HOLDFASTRUN;
+                    }
+                    if (AnimHeadCarry) {
+                        currentAnimationState = CharacterState.HOLDUPFASTRUN;
+                    }
+                } else {
+                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
+                    currentAnimationState = CharacterState.MACH4;
+                    if (AnimHolding) {
+                        currentAnimationState = CharacterState.HOLDMACH4;
+                    }
+                    if (AnimHeadCarry) {
+                        currentAnimationState = CharacterState.HOLDUPMACH4;
+                    }
+                }
+                if (AnimSkidding) {
+                    currentAnimationState = CharacterState.SKID;
+                }
+                if (AnimPushing) {
+                    currentAnimationState = CharacterState.PUSH;
+                }
+                if (AnimShoot) {
+                    //Shot at me
+                    currentAnimationState = CharacterState.SHOOT;
+                }
+            } else {
+                if (AnimWalljumped) {
+                    //Jumping wall
+                    currentAnimationState = CharacterState.WALLJUMPFALL;
+                    if (physicsObject->Velocity.Y >= 0) {
+                        currentAnimationState = CharacterState.WALLJUMPRISE;
+                    }
+                } else {
+                    //Fall
+                    currentAnimationState = CharacterState.FALL;
+                    if (AnimHolding) {
+                        currentAnimationState = CharacterState.HOLDFALL;
+                    }
+                    if (AnimHeadCarry) {
+                        currentAnimationState = CharacterState.HOLDUPFALL;
+                    }
+                    if (AnimSingleJump) {
+                        //Jumping single
+                        currentAnimationState = CharacterState.JUMPFALL;
+                        if (AnimHolding) {
+                            currentAnimationState = CharacterState.HOLDJUMPFALL;
+                        }
+                        if (AnimHeadCarry) {
+                            currentAnimationState = CharacterState.HOLDUPJUMPFALL;
+                        }
+                        if (physicsObject->Velocity.Y >= 0) {
+                            currentAnimationState = CharacterState.JUMPRISE;
+                            if (AnimHolding) {
+                                currentAnimationState = CharacterState.HOLDJUMPRISE;
+                            }
+                            if (AnimHeadCarry) {
+                                currentAnimationState = CharacterState.HOLDUPJUMPRISE;
+                            }
+                        }
+                    } else if (AnimDoubleJump) {
+                        //Jumping double
+                        currentAnimationState = CharacterState.DOUBLEJUMP;
+                    } else if (AnimTripleJump) {
+                        //Jumping triple
+                        currentAnimationState = CharacterState.TRIPLEJUMP;
+                    }
+                    if (AnimPropeller) {
+                        //Propelling
+                        currentAnimationState = CharacterState.PROPELLERFLY;
+                    }
+                    if (AnimPropellerStart || AnimPropellerSpin) {
+                        //Propelling 2
+                        currentAnimationState = CharacterState.PROPELLERTWIRL;
+                    }
+                    if (AnimFlying) {
+                        //Launched
+                        currentAnimationState = CharacterState.SPINFLY;
+                    }
+                    if (AnimDrill) {
+                        //Drill
+                        currentAnimationState = CharacterState.DRILL;
+                    }
+                }
+            }
+            //Not in OnGround or !OnGround
+            if (AnimPipe) {
+                //Pipe enter
+                currentAnimationState = CharacterState.PIPEENTER;
+            } else if (AnimGroundpoundStart) {
+                //Groundpound start
+                currentAnimationState = CharacterState.GROUNDPOUNDSTART;
+            } else if (AnimGroundpound) {
+                //Groundpound
+                currentAnimationState = CharacterState.GROUNDPOUND;
+            }
+            if (AnimThrow) {
+                //Throwing held object
+                currentAnimationState = CharacterState.THROW;
+            }
+            if (AnimCarryStart) {
+                //Picking up an object
+                currentAnimationState = CharacterState.CARRYSTART;
+            }
+            if (AnimDead) {
+                //Die
+                if (AnimSwimming) {
+                    currentAnimationState = CharacterState.DIEWATER;
+                } else {
+                    currentAnimationState = CharacterState.DIE;
+                }
+            }
+            if (AnimInShell) {
+                FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
+                //Blue shell
+                currentAnimationState = CharacterState.SHELLSPIN;
+            }
+            if (AnimSwimming) {
+                //Swimming
+                currentAnimationState = CharacterState.SWIM;
+                if (AnimHolding) {
+                    //Hold swim
+                    currentAnimationState = CharacterState.HOLDSWIM;
+                } else if (AnimSwimPaddle) {
+                    //Press A
+                    currentAnimationState = CharacterState.SWIMPADDLE;
+                } else if (AnimSwimKick) {
+                    //Swim with A held
+                    currentAnimationState = CharacterState.SWIMKICK;
+                }
+            }
+            if (AnimMegaGrow) {
+                //Mega grow
+                currentAnimationState = CharacterState.MEGAGROW;
+            }
+            if (AnimMegaShrink) {
+                //Mega shrink
+                currentAnimationState = CharacterState.MEGACANCEL;
+            }
+            if (AnimKnockback) {
+                if (AnimKnockbackWeak) {
+                    if (AnimKnockforwards) {
+                        //Weak knockfowards
+                        currentAnimationState = CharacterState.WEAKKNOCKFORWARD;
+                    } else {
+                        //Week knockback
+                        currentAnimationState = CharacterState.WEAKKNOCKBACK;
+                    }
+                } else {
+                    if (AnimKnockforwards) {
+                        //Strong knockforwards
+                        currentAnimationState = CharacterState.STRONGKNOCKFORWARD;
+                    } else {
+                        //Strong knockback
+                        currentAnimationState = CharacterState.STRONGKNOCKBACK;
+                    }
+                }
+                if (AnimSwimming) {
+                    //Water knockback
+                    currentAnimationState = CharacterState.WATERKNOCKBACK;
+                }
+            }
+
+            var gameStyle = ViewContext.Stage.stageStyle;
+            var animData = character.GetAnimData(gameStyle, currentAnimationState, AnimPowerupState);
+            float FpsStick = animData.Fps;
+
+            if (previousAnimationState != currentAnimationState) {
+                playerSpriteRenderer.frames = animData.Sprites;
+                playerSpriteRenderer.frame = 0;
+            }
+            playerSpriteRenderer.fps = FpsStick * FpsMultiplier;
+
+            JumpLandTimer -= Math.Sign(JumpLandTimer);
+            PaddleTimer -= Math.Sign(PaddleTimer);
+            FireballTimer -= Math.Sign(FireballTimer);
         }
     }
 }

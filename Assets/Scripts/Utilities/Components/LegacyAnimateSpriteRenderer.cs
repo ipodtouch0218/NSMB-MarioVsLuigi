@@ -15,7 +15,7 @@ namespace NSMB.Utilities.Components {
 
         //---Serialized Variables
         [SerializeField] private bool runInEditor = false;
-        [SerializeField] private float fps = 8;
+        [SerializeField] public float fps = 8;
         [SerializeField] public Sprite[] frames, colorblindModeFrames;
         [SerializeField] private bool useUnscaledDelta = false;
 

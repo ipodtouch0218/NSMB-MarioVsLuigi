@@ -127,6 +127,59 @@ Transform:
   - {fileID: 5366649511482547951}
   m_Father: {fileID: 4824223341387914440}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &807487591277816165
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 595615261482743526}
+  - component: {fileID: 2219787101863340902}
+  m_Layer: 18
+  m_Name: CapeSprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &595615261482743526
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 807487591277816165}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3165972214463023050}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2219787101863340902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 807487591277816165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDisplaying: 1
+  frame: 0
+  runInEditor: 0
+  fps: 8
+  frames: []
+  colorblindModeFrames: []
+  useUnscaledDelta: 0
+  sRenderer: {fileID: 0}
+  image: {fileID: 0}
 --- !u!1 &880582643022226802
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,6 +603,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3165972214463023050}
   - {fileID: 8279152070748857899}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -721,6 +775,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wasTurnaround: 0
   models: {fileID: 8422425992379838812}
+  playerSpriteRenderer: {fileID: 2213521210880143271}
+  capeSpriteRenderer: {fileID: 2219787101863340902}
   character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   playerElementsPrefab: {fileID: 2058053739306675502, guid: 18c3a33796560c4448895ccfbe44362c,
     type: 3}
@@ -6480,6 +6536,60 @@ Transform:
   - {fileID: 1933478114614969444}
   m_Father: {fileID: 4179535912005182115}
   m_LocalEulerAnglesHint: {x: -104.589, y: 0, z: 0}
+--- !u!1 &8765774680359933606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3165972214463023050}
+  - component: {fileID: 2213521210880143271}
+  m_Layer: 18
+  m_Name: PlayerSprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3165972214463023050
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8765774680359933606}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 595615261482743526}
+  m_Father: {fileID: 4824223341387914440}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2213521210880143271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8765774680359933606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDisplaying: 1
+  frame: 0
+  runInEditor: 0
+  fps: 8
+  frames: []
+  colorblindModeFrames: []
+  useUnscaledDelta: 0
+  sRenderer: {fileID: 0}
+  image: {fileID: 0}
 --- !u!1001 &500651139988642812
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using Quantum;
 using UnityEngine;
+using System.Linq;
 
 public class CharacterAsset : AssetObject {
 
@@ -17,4 +18,92 @@ public class CharacterAsset : AssetObject {
     public RuntimeAnimatorController SmallOverrides;
     public RuntimeAnimatorController LargeOverrides;
 #endif 
+
+#if QUANTUM_UNITY
+    public StageThemeOverride[] SpriteList;
+    public CharacterStateAnimation GetAnimData(StageTheme gameStyle, CharacterState animState, PowerupState itemState) {
+        return SpriteList.First(sto => sto.Theme == gameStyle).States.First(csa => csa.State == animState && csa.Item == itemState);
+    }
+#endif
+}
+
+public enum StageTheme {
+    NSMB,
+    SMBDX,
+    //More later
+}
+
+public enum CharacterState {
+    IDLE, //
+    WALK, //
+    RUN, //
+    FASTRUN, //
+    MACH4, //
+    PUSH, //
+    SKID, //
+    JUMPRISE, //
+    JUMPFALL, //
+    FALL, //
+    DOUBLEJUMP, //
+    TRIPLEJUMP, //
+    WALLSLIDE, //
+    WALLJUMPRISE, //
+    WALLJUMPFALL, //
+    JUMPLAND, //
+    CROUCH, //
+    GROUNDPOUNDSTART, //
+    GROUNDPOUND, //
+    WEAKKNOCKBACK, //
+    WEAKKNOCKFORWARD, //
+    STRONGKNOCKBACK, //
+    STRONGKNOCKFORWARD, //
+    WATERKNOCKBACK, //
+    DIE,//
+    SHOOT, //
+    SHELLSPIN, //
+    MEGAGROW, //
+    MEGACANCEL, //
+    SPIN, //
+    SPINFLY, //
+    PROPELLERFLY, //
+    PROPELLERTWIRL, //
+    DRILL, //
+    HOLDIDLE, //
+    HOLDWALK, //
+    HOLDRUN, //
+    HOLDFASTRUN, //
+    HOLDMACH4, //
+    HOLDJUMPRISE, //
+    HOLDJUMPFALL, //
+    HOLDFALL, //
+    HOLDUPIDLE, //
+    HOLDUPWALK, //
+    HOLDUPRUN, //
+    HOLDUPFASTRUN, //
+    HOLDUPMACH4, //
+    HOLDUPJUMPRISE, //
+    HOLDUPJUMPFALL, //
+    HOLDUPFALL, //
+    CARRYSTART, //
+    THROW, //
+    SWIM, //
+    SWIMPADDLE, //
+    SWIMKICK, //
+    HOLDSWIM, //
+    DIEWATER, //
+    PIPEENTER, //
+}
+
+[System.Serializable]
+public class StageThemeOverride {
+    public StageTheme Theme;
+    public CharacterStateAnimation[] States;
+}
+
+[System.Serializable]
+public class CharacterStateAnimation {
+    public CharacterState State;
+    public PowerupState Item;
+    public Sprite[] Sprites;
+    public float Fps;
 }
