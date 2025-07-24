@@ -1272,7 +1272,10 @@ namespace NSMB.Entities.Player {
                 models.SetActive(false);
             }
 
+            PowerupState AnimPowerupState = mario->CurrentPowerupState;
+
             CharacterState previousAnimationState = currentAnimationState;
+            var previousAnimData = character.GetAnimData(gameStyle, currentAnimationState, previousPowerup);
 
             bool right = inputs.Right.IsDown;
             bool left = inputs.Left.IsDown;
@@ -1307,7 +1310,6 @@ namespace NSMB.Entities.Player {
             bool AnimCarryStart = heldObject != null && heldObject->HoldAboveHead && (f.Number - mario->HoldStartFrame) < 27;
             bool AnimThrow = ThrowTimer > 0;
             bool AnimPipe = f.Exists(mario->CurrentPipe);
-            PowerupState AnimPowerupState = mario->CurrentPowerupState;
             bool AnimInShell = mario->IsInShell || (mario->CurrentPowerupState == PowerupState.BlueShell && (mario->IsCrouching || mario->IsGroundpounding || mario->IsSliding) && mario->GroundpoundStartFrames <= 9);
             bool AnimTurnaround = mario->IsTurnaround;
             bool AnimSwimming = physicsObject->IsUnderwater && !mario->IsGroundpounding && !mario->IsDrilling && !freezable->IsFrozen(f);
@@ -1555,8 +1557,10 @@ namespace NSMB.Entities.Player {
             float FpsStick = animData.Fps;
 
             if ((previousAnimationState != currentAnimationState) || (previousPowerup != AnimPowerupState)) {
-                playerSpriteRenderer.frames = animData.Sprites;
-                playerSpriteRenderer.frame = 0;
+                if(previousAnimData.Sprites != animData.Sprites) {
+                    playerSpriteRenderer.frame = 0;
+                    playerSpriteRenderer.frames = animData.Sprites;
+                }
             }
             playerSpriteRenderer.fps = FpsStick * FpsMultiplier;
             if (AnimFacingRight) {
