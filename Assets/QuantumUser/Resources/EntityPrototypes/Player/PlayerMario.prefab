@@ -835,6 +835,12 @@ MonoBehaviour:
   capeSpriteRenderer: {fileID: 2219787101863340902}
   playerSpriteDisplay: {fileID: 6978768172568304507}
   capeSpriteDisplay: {fileID: 2039319454029643673}
+  playerSpriteObject: {fileID: 8765774680359933606}
+  capeSpriteObject: {fileID: 807487591277816165}
+  spriteScale:
+  - 0
+  - 3
+  megaSpriteScale: []
   character: {fileID: 11400000, guid: 5832ac6f6c9afdb4aa8697141cc3a330, type: 2}
   playerElementsPrefab: {fileID: 2058053739306675502, guid: 18c3a33796560c4448895ccfbe44362c,
     type: 3}

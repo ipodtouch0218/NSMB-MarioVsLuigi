@@ -201,13 +201,14 @@ namespace NSMB.UI.Game {
             if (playAnimation) {
                 if (powerup) {
                     reserveAnimation.Play("reserve-in");
-                    itemReserve.sprite = powerup.ReserveSprite;
+                    
+                    itemReserve.sprite = powerup.ReserveSprite[(int)ViewContext.Stage.stageStyle];
                 } else {
                     reserveAnimation.Play("reserve-out");
                     reserveSummonCoroutine = StartCoroutine(ReserveSummonCoroutine());
                 }
             } else {
-                itemReserve.sprite = (powerup && powerup.ReserveSprite) ? powerup.ReserveSprite : storedItemNull;
+                itemReserve.sprite = (powerup && powerup.ReserveSprite[(int)ViewContext.Stage.stageStyle]) ? powerup.ReserveSprite[(int)ViewContext.Stage.stageStyle] : storedItemNull;
                 reserveAnimation.Play();
             }
             previousPowerup = powerup;

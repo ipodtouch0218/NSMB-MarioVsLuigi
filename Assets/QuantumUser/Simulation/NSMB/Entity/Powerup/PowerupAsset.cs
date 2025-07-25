@@ -10,7 +10,7 @@ public class PowerupAsset : CoinItemAsset {
     public SoundEffect SoundEffect = SoundEffect.Player_Sound_PowerupCollect;
 
 #if QUANTUM_UNITY
-    public UnityEngine.Sprite ReserveSprite;
+    public UnityEngine.Sprite[] ReserveSprite;
 #endif
 
     public bool AvoidPlayers;
@@ -29,4 +29,5 @@ public enum PowerupType {
     Basic,
     Starman,
     ExtraLife,
+    ColdBrew,
 }

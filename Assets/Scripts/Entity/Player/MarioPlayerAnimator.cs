@@ -99,7 +99,11 @@ namespace NSMB.Entities.Player {
         public LegacyAnimateSpriteRenderer capeSpriteRenderer;
         public SpriteRenderer playerSpriteDisplay;
         public SpriteRenderer capeSpriteDisplay;
+        public GameObject playerSpriteObject, capeSpriteObject;
         private PowerupState previousPowerup;
+        private bool activeModels = false;
+        public float[] spriteScale;
+        public float[] megaSpriteScale;
 
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
@@ -260,7 +264,7 @@ namespace NSMB.Entities.Player {
 
             if (VerifiedFrame.Global->GameState >= GameState.Ended && !forceUpdate) {
                 animator.speed = 0;
-                models.SetActive(!mario->IsRespawning);
+                activeModels = (!mario->IsRespawning);
                 SetParticleEmission(drillParticle, false);
                 SetParticleEmission(sparkles, false);
                 SetParticleEmission(iceSkiddingParticle, false);
@@ -591,7 +595,7 @@ namespace NSMB.Entities.Player {
 
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
-            models.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
+            activeModels = (f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;
@@ -1265,10 +1269,16 @@ namespace NSMB.Entities.Player {
             if (gameStyle == StageTheme.NSMB) {
                 playerSpriteRenderer.isDisplaying = false;
                 capeSpriteRenderer.isDisplaying = false;
-                models.SetActive(!mario->IsRespawning);
+                playerSpriteObject.SetActive(false);
+                capeSpriteObject.SetActive(false);
+                activeModels = (!mario->IsRespawning);
+                models.SetActive(activeModels);
             } else {
                 playerSpriteRenderer.isDisplaying = !mario->IsRespawning;
                 capeSpriteRenderer.isDisplaying = !mario->IsRespawning;
+                playerSpriteObject.SetActive(!mario->IsRespawning);
+                capeSpriteObject.SetActive(!mario->IsRespawning);
+                activeModels = (false);
                 models.SetActive(false);
             }
 
@@ -1449,18 +1459,24 @@ namespace NSMB.Entities.Player {
                     if (AnimPropeller) {
                         //Propelling
                         currentAnimationState = CharacterState.PROPELLERFLY;
+                        AnimFacingRight = true;
                     }
                     if (AnimPropellerStart || AnimPropellerSpin) {
                         //Propelling 2
                         currentAnimationState = CharacterState.PROPELLERTWIRL;
+                        FpsMultiplier = 1.5f;
+                        AnimFacingRight = true;
                     }
                     if (AnimFlying) {
                         //Launched
                         currentAnimationState = CharacterState.SPINFLY;
+                        AnimFacingRight = true;
                     }
                     if (AnimDrill) {
                         //Drill
                         currentAnimationState = CharacterState.DRILL;
+                        FpsMultiplier = 2f;
+                        AnimFacingRight = true;
                     }
                 }
                 if (AnimOnLeft || AnimOnRight) {
@@ -1570,6 +1586,34 @@ namespace NSMB.Entities.Player {
                 playerSpriteDisplay.flipX = true;
                 capeSpriteDisplay.flipX = true;
             }
+
+            //Mega scale
+            Vector3 scale;
+            if (mario->MegaMushroomEndFrames > 0) {
+                float endTimer = mario->MegaMushroomEndFrames / 60f;
+                if (!mario->MegaMushroomStationaryEnd) {
+                    endTimer *= 2;
+                }
+
+                scale = Vector3.one + (Vector3.one * (Mathf.Min(1, endTimer / 1.5f) * 2.6f));
+            } else {
+                float startTimer = mario->MegaMushroomStartFrames / 60f;
+
+                scale = mario->CurrentPowerupState switch {
+                    PowerupState.MiniMushroom => Vector3.one * 0.5f,
+                    PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (startTimer / 1.5f)) * 2.6f)),
+                    _ => Vector3.one,
+                };
+            }
+
+            teammateStompTimer -= Time.deltaTime;
+            if (teammateStompTimer < 0) {
+                teammateStompTimer = 0;
+            }
+
+            scale.y -= Mathf.Sin(teammateStompTimer * Mathf.PI / 0.15f) * 0.2f;
+            playerSpriteDisplay.transform.localScale = scale * spriteScale[(int) gameStyle];
+            capeSpriteDisplay.transform.localScale = scale;
 
             previousPowerup = AnimPowerupState;
             JumpLandTimer -= Math.Sign(JumpLandTimer);

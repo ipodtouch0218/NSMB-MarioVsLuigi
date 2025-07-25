@@ -18,21 +18,24 @@ MonoBehaviour:
       Value: 421291512996345105
   Prefab:
     Id:
-      Value: 0
+      Value: 1365421339623582075
   SpawnChance:
     RawValue: 0
   LosingSpawnBonus:
     RawValue: 0
+  BlockSpawnSoundEffect: 69
   BigPowerup: 0
   VerticalPowerup: 0
   CustomPowerup: 1
   LivesOnlyPowerup: 1
-  Type: 0
+  CanSpawnFromBlock: 1
+  OnlyOneCanExist: 0
+  Type: 2
   State: 0
   SoundPlaysEverywhere: 0
   SoundEffect: 78
-  BlockSpawnSoundEffect: 69
-  ReserveSprite: {fileID: 0}
+  ReserveSprite:
+  - {fileID: -5047517436719655688, guid: 5f97a3adca3c1c04e9b3eb9c5bc49eae, type: 3}
   AvoidPlayers: 0
   Speed:
     RawValue: 0

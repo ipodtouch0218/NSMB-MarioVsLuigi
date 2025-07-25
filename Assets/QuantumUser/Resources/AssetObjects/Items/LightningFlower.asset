@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a77651c98eb177748a49241e377f4457, type: 3}
-  m_Name: BlueShell
+  m_Name: LightningFlower
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Items/BlueShell
+    Path: QuantumUser/Resources/AssetObjects/Items/LightningFlower
     Guid:
-      Value: 279725308049324760
+      Value: 322899661718601242
   Prefab:
     Id:
-      Value: 1466930856010351358
+      Value: 1268531089014898302
   SpawnChance:
-    RawValue: 98304
+    RawValue: 524288
   LosingSpawnBonus:
-    RawValue: -16384
+    RawValue: -786432
   BlockSpawnSoundEffect: 69
   BigPowerup: 0
   VerticalPowerup: 0
@@ -31,14 +31,14 @@ MonoBehaviour:
   CanSpawnFromBlock: 1
   OnlyOneCanExist: 0
   Type: 0
-  State: 6
+  State: 2
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   ReserveSprite:
-  - {fileID: 2664608197882872095, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
+  - {fileID: 0}
   AvoidPlayers: 0
   Speed:
-    RawValue: 0
+    RawValue: 131072
   BounceStrength:
     RawValue: 0
   TerminalVelocity:
@@ -68,5 +68,5 @@ MonoBehaviour:
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
-  StatePriority: 2
-  ItemPriority: 2
+  StatePriority: 1
+  ItemPriority: 1

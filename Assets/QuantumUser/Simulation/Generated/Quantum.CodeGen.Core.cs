@@ -103,6 +103,12 @@ namespace Quantum {
     BlueShell,
     HammerSuit,
     MegaMushroom,
+    LightningFlower,
+    MagmaFlower,
+    LiquidNitrogenFlower,
+    CubbyLandHat,
+    Cape,
+    Bombermario,
   }
   public enum StageTileFlags : byte {
     MirrorX = 1,
