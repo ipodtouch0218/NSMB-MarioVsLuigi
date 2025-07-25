@@ -10,35 +10,35 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a77651c98eb177748a49241e377f4457, type: 3}
-  m_Name: LightningFlower
+  m_Name: MagmaFlower
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Items/LightningFlower
+    Path: QuantumUser/Resources/AssetObjects/Items/MagmaFlower
     Guid:
-      Value: 322899661718601242
+      Value: 285548178290137776
   Prefab:
     Id:
-      Value: 1516436466268157279
+      Value: 1524544283524633813
   SpawnChance:
-    RawValue: 524288
+    RawValue: 32768
   LosingSpawnBonus:
-    RawValue: -786432
+    RawValue: 98304
   BlockSpawnSoundEffect: 69
   BigPowerup: 0
   VerticalPowerup: 0
-  CustomPowerup: 0
+  CustomPowerup: 1
   LivesOnlyPowerup: 0
   CanSpawnFromBlock: 1
   OnlyOneCanExist: 0
   Type: 0
-  State: 9
+  State: 10
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   ReserveSprite:
-  - {fileID: 0}
+  - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   AvoidPlayers: 0
   Speed:
-    RawValue: 131072
+    RawValue: 0
   BounceStrength:
     RawValue: 0
   TerminalVelocity:
@@ -68,5 +68,5 @@ MonoBehaviour:
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
-  StatePriority: 1
-  ItemPriority: 1
+  StatePriority: 2
+  ItemPriority: 2

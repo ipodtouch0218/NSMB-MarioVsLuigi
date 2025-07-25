@@ -1,0 +1,282 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a77651c98eb177748a49241e377f4457, type: 3}
+  m_Name: CapeFeather
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Items/CapeFeather
+    Guid:
+      Value: 396168740877459959
+  Prefab:
+    Id:
+      Value: 1524544283524633813
+  SpawnChance:
+    RawValue: 32768
+  LosingSpawnBonus:
+    RawValue: 98304
+  BlockSpawnSoundEffect: 69
+  BigPowerup: 0
+  VerticalPowerup: 0
+  CustomPowerup: 1
+  LivesOnlyPowerup: 0
+  CanSpawnFromBlock: 1
+  OnlyOneCanExist: 0
+  Type: 0
+  State: 13
+  SoundPlaysEverywhere: 0
+  SoundEffect: 16
+  ReserveSprite:
+  - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
+  AvoidPlayers: 0
+  Speed:
+    RawValue: 0
+  BounceStrength:
+    RawValue: 0
+  TerminalVelocity:
+    RawValue: -524288
+  FollowAnimationCurve: 1
+  AnimationCurveX:
+    Samples:
+    - RawValue: 0
+    - RawValue: 15869
+    - RawValue: 31852
+    - RawValue: 45039
+    - RawValue: 54167
+    - RawValue: 59909
+    - RawValue: 63268
+    - RawValue: 64984
+    - RawValue: 65536
+    - RawValue: 64931
+    - RawValue: 63155
+    - RawValue: 59849
+    - RawValue: 54483
+    - RawValue: 46292
+    - RawValue: 34326
+    - RawValue: 18204
+    - RawValue: 0
+    - RawValue: -19164
+    - RawValue: -34316
+    - RawValue: -45866
+    - RawValue: -54249
+    - RawValue: -59926
+    - RawValue: -63372
+    - RawValue: -65077
+    - RawValue: -65536
+    - RawValue: -64339
+    - RawValue: -61255
+    - RawValue: -56229
+    - RawValue: -49204
+    - RawValue: -40125
+    - RawValue: -28935
+    - RawValue: -15579
+    - RawValue: 0
+    PreWrapMode: 1
+    PostWrapMode: 1
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 2
+    OriginalPostWrapMode: 2
+    Keys:
+    - Time:
+        RawValue: 0
+      Value:
+        RawValue: 0
+      InTangent:
+        RawValue: 0
+      OutTangent:
+        RawValue: 482377
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 2
+    - Time:
+        RawValue: 16384
+      Value:
+        RawValue: 65536
+      InTangent:
+        RawValue: 2680
+      OutTangent:
+        RawValue: -3528
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 3
+    - Time:
+        RawValue: 32768
+      Value:
+        RawValue: 0
+      InTangent:
+        RawValue: -571283
+      OutTangent:
+        RawValue: -681570
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 3
+    - Time:
+        RawValue: 49152
+      Value:
+        RawValue: -65536
+      InTangent:
+        RawValue: 0
+      OutTangent:
+        RawValue: 8704
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+    - Time:
+        RawValue: 65536
+      Value:
+        RawValue: 0
+      InTangent:
+        RawValue: 534686
+      OutTangent:
+        RawValue: 0
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+  AnimationCurveY:
+    Samples:
+    - RawValue: 0
+    - RawValue: 593
+    - RawValue: 2619
+    - RawValue: 6447
+    - RawValue: 12446
+    - RawValue: 20985
+    - RawValue: 32433
+    - RawValue: 47161
+    - RawValue: 65536
+    - RawValue: 46236
+    - RawValue: 26842
+    - RawValue: 9730
+    - RawValue: -4847
+    - RawValue: -16639
+    - RawValue: -25392
+    - RawValue: -30852
+    - RawValue: -32768
+    - RawValue: -32869
+    - RawValue: -32588
+    - RawValue: -31224
+    - RawValue: -28076
+    - RawValue: -22442
+    - RawValue: -13621
+    - RawValue: -913
+    - RawValue: 16384
+    - RawValue: -3311
+    - RawValue: -24925
+    - RawValue: -40879
+    - RawValue: -52024
+    - RawValue: -59212
+    - RawValue: -63292
+    - RawValue: -65116
+    - RawValue: 0
+    PreWrapMode: 1
+    PostWrapMode: 1
+    StartTime:
+      RawValue: 0
+    EndTime:
+      RawValue: 65536
+    Resolution: 32
+    OriginalPreWrapMode: 2
+    OriginalPostWrapMode: 2
+    Keys:
+    - Time:
+        RawValue: 0
+      Value:
+        RawValue: 0
+      InTangent:
+        RawValue: 0
+      OutTangent:
+        RawValue: 0
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+    - Time:
+        RawValue: 16384
+      Value:
+        RawValue: 65536
+      InTangent:
+        RawValue: 650299
+      OutTangent:
+        RawValue: 650299
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+    - Time:
+        RawValue: 16588
+      Value:
+        RawValue: 65434
+      InTangent:
+        RawValue: -709537
+      OutTangent:
+        RawValue: -709537
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+    - Time:
+        RawValue: 32768
+      Value:
+        RawValue: -32768
+      InTangent:
+        RawValue: -1879
+      OutTangent:
+        RawValue: -1879
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+    - Time:
+        RawValue: 49152
+      Value:
+        RawValue: 16384
+      InTangent:
+        RawValue: 634419
+      OutTangent:
+        RawValue: 634419
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+    - Time:
+        RawValue: 49690
+      Value:
+        RawValue: 16738
+      InTangent:
+        RawValue: -952207
+      OutTangent:
+        RawValue: -952207
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+    - Time:
+        RawValue: 65536
+      Value:
+        RawValue: -65536
+      InTangent:
+        RawValue: 0
+      OutTangent:
+        RawValue: 0
+      TangentMode: 0
+      TangentModeLeft: 0
+      TangentModeRight: 0
+      WeightedMode: 0
+  StatePriority: 2
+  ItemPriority: 2
