@@ -18,6 +18,17 @@ public static unsafe class QuantumUtils {
         SoundEffect.Enemy_Shell_Combo7,
     };
 
+    public static T SetFlag<T>(T value, T flag, bool set) where T : Enum {
+        long longValue = (long) (object) value;
+        long longFlag = (long) (object) flag;
+        if (set) {
+            longValue |= longFlag;
+        } else {
+            longValue &= ~longFlag;
+        }
+        return (T) (object) longValue;
+    }
+
     public static unsafe PlayerData* GetPlayerData(Frame f, PlayerRef player, QDictionary<PlayerRef, EntityRef>? dictionary = default) {
 
         QDictionary<PlayerRef, EntityRef> playerDataDictionary; 

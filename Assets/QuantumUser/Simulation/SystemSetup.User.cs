@@ -49,7 +49,7 @@ namespace Quantum {
                     new BreakableObjectSystem(),
                     new MarioBrosPlatformSystem(),
                     new EnterablePipeSystem()
-
+                    // new MiniscriptSystem()
                     // new BetterPhysicsObjectSystem()
                 )
             );

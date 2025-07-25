@@ -163,8 +163,12 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             base.OnDeselect(eventData);
             Editing = false;
             UpdateState();
-            leftArrow.enabled = false;
-            rightArrow.enabled = false;
+            if (leftArrow) {
+                leftArrow.enabled = false;
+            }
+            if (rightArrow) {
+                rightArrow.enabled = false;
+            }
         }
 
         public void UpdateState() {
