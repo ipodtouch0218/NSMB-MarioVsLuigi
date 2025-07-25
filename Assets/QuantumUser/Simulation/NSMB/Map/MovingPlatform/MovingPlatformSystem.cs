@@ -1,9 +1,9 @@
 using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Physics2D;
-using UnityEngine;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class MovingPlatformSystem : SystemMainThreadEntityFilter<MovingPlatform, MovingPlatformSystem.Filter> {
 
         public struct Filter {
@@ -97,6 +97,7 @@ namespace Quantum {
                 Frame = f.Number,
                 Tile = new(-1, -1)
             };
+
             bool keepContact = true;
             foreach (var callback in f.Context.PreContactCallbacks) {
                 callback?.Invoke(f, stage, hit.Entity, newContact, ref keepContact);
@@ -110,8 +111,8 @@ namespace Quantum {
             FPVector2 moveVector = -hit.Normal * (moveDistance * f.UpdateRate);
 
             var contacts = f.ResolveList(physicsObject->Contacts);
-            PhysicsObjectSystem.MoveVertically((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit1);
-            PhysicsObjectSystem.MoveHorizontally((FrameThreadSafe) f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
+            PhysicsObjectSystem.MoveVertically(f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit1);
+            PhysicsObjectSystem.MoveHorizontally(f, moveVector, ref physicsSystemFilter, stage, contacts, out bool tempHit2);
 
             bool addContact = !movingAway || FPVector3.Project(physicsObject->Velocity.XYO, platform->Velocity.Normalized.XYO).Magnitude < platform->Velocity.Magnitude;
             if (addContact) {

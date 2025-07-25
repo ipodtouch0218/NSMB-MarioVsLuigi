@@ -3,6 +3,7 @@ using Quantum.Physics2D;
 using UnityEngine;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class ObjectiveCoinSystem : SystemMainThread, ISignalOnMarioPlayerDropObjective, ISignalOnMarioPlayerCollectedCoin,
         ISignalOnMarioPlayerDied {
 

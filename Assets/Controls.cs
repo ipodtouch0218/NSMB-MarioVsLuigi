@@ -1198,7 +1198,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""ZoomIn"",
                     ""type"": ""Button"",
                     ""id"": ""7810083b-d8d7-4e63-ac60-48fcc1dc9661"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -1248,7 +1248,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""1c553b19-48a6-44cb-8ee5-62ab87ec22a8"",
-                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -1292,7 +1292,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""535dcf62-0d82-47f0-ad68-2c5de22b83ee"",
-                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -1336,7 +1336,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""72e6181e-040a-4d4a-9357-85537265e592"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -1365,7 +1365,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""FPS Monitor"",
                     ""type"": ""Button"",
                     ""id"": ""54336541-e28e-4a19-8fe5-5a45256cfe9e"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false

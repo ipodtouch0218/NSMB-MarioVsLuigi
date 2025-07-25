@@ -1,7 +1,7 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class CoinSystem : SystemMainThreadEntityFilter<Coin, CoinSystem.Filter>, ISignalOnStageReset, ISignalOnMarioPlayerCollectedCoin,
         ISignalOnEntityBumped, ISignalOnEntityCrushed {
 
@@ -28,7 +28,7 @@ namespace Quantum {
             if (!coin->CoinType.HasFlag(CoinType.BakedInStage)) {
                 if (coin->Lifetime == 480) {
                     // Eject
-                    PhysicsObjectSystem.TryEject((FrameThreadSafe) f, entity, stage);
+                    PhysicsObjectSystem.TryEject(f, entity, stage);
                 }
                 if (QuantumUtils.Decrement(ref coin->Lifetime)
                     || (coin->UncollectableFrames == 0 && filter.Transform->Position.Y < stage.StageWorldMin.Y)) {
@@ -41,10 +41,10 @@ namespace Quantum {
                 var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
                 bool invertX = false, invertY = false, applyFriction = false;
                 foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                    if (FPMath.Abs(FPVector2.Dot(contact.Normal, FPVector2.Up)) < PhysicsObjectSystem.GroundMaxAngle) {
+                    if (FPMath.Abs(FPVector2.Dot(contact.Normal, FPVector2.Up)) < Constants.PhysicsGroundMaxAngleCos) {
                         // Wall touch
                         invertX = true;
-                    } else if (FPVector2.Dot(contact.Normal, FPVector2.Up) >= PhysicsObjectSystem.GroundMaxAngle) {
+                    } else if (FPVector2.Dot(contact.Normal, FPVector2.Up) >= Constants.PhysicsGroundMaxAngleCos) {
                         // Ground touch
                         applyFriction = true;
                         if (physicsObject->PreviousFrameVelocity.Y < -BounceThreshold) {

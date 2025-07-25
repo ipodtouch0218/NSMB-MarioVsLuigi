@@ -22,13 +22,13 @@ public class StageTile : AssetObject {
         public struct TileShape : IEquatable<TileShape> {
             public FPVector2[] Vertices;
 
-            public bool Equals(TileShape other) {
+            public readonly bool Equals(TileShape other) {
                 // Uses linq... whatever.
                 return Vertices.SequenceEqual(other.Vertices);
             }
         }
 
-        public bool Equals(TileCollisionData other) {
+        public readonly bool Equals(TileCollisionData other) {
             return IsFullTile == other.IsFullTile
                 && Shapes.SequenceEqual(other.Shapes);
         }

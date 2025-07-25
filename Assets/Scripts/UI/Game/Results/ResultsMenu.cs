@@ -101,7 +101,6 @@ namespace NSMB.UI.Game.Results {
         }
 
         private void OnSubmit(InputAction.CallbackContext context) {
-
             if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !IsReplay)) {
                 return;
             }
@@ -181,7 +180,7 @@ namespace NSMB.UI.Game.Results {
                         }
                         noReplaysCoroutine = StartCoroutine(ResetTextAfterTime(0, 0.5f));
                     } else {
-                        ActiveReplayManager.Instance.StartReplay(newReplay);
+                        ActiveReplayManager.Instance.StartReplayPlayback(newReplay);
                     }
                 } else {
                     // Vote to continue

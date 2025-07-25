@@ -77,7 +77,7 @@ namespace NSMB.Quantum {
                         }, true);
                         } else {
                             Gizmos.color = Color.green;
-                            tile.GetWorldPolygons((FrameThreadSafe) null, stage, stageTile, VertexBuffer, ShapeVertexCountBuffer, worldPos);
+                            tile.GetWorldPolygons(null, stage, stageTile, VertexBuffer, ShapeVertexCountBuffer, worldPos);
 
                             int shapeIndex = 0;
                             int vertexIndex = 0;

@@ -51,10 +51,11 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
   <summary><h2>Credits</h2></summary>
   
 ### Contributors:
+* [amykaname](https://github.com/amykaname)
 * [Amy54Desu](https://github.com/Amy54Desu)
 * [AprilShade](https://github.com/AprilShade)
 * [ArianLust](https://github.com/ArianLust)
-* [AtwerJ](https://github.com/AtwerJ)
+* [Atwer](https://github.com/AtwerJ)
 * [Ave](https://github.com/AutumnLeafDev)
 * [BluCorDev](https://github.com/BluCorDev)
 * [Cubby Crazes](https://github.com/CubbyCrazes)
@@ -108,8 +109,10 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Iketarou *(ja-jp)*
 * IvythePoS *(es-la)*
 * Kate Karui *(sv-sv)*
-* Lyroy The Toad *(it-it)*
+* Laxan3000 *(it-it)*
+* LyroyTheToad *(it-it)*
 * Maestrike *(it-it)*
+* Maksymilian Król *(pl-pl)*
 * marbo *(pt-br)*
 * Mark19 *(es-es)*
 * MasterMindo *(it-it)*
@@ -121,8 +124,10 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * MUI_Noam *(he-il)*
 * notossdekasaihassei *(ja-jp)*
 * ossdekasaihassei *(ja-jp)*
+* Pedro Lunar *(es-la)*
 * pixelated *(he-il)*
-* SadenceZinzap *(tr-tr)*
+* SadeceZinzap *(tr-tr)*
+* SlavaWOW *(ru-ru)*
 * SLG64 *(es-la)*
 * Snayp *(fr-fr)*
 * Thebababois369 *(id-id)*
@@ -144,7 +149,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Vinnnnnnny
 
 ### Level Design:
-* AtwerJ
+* Atwer
 * Ave
 * mindnomad
 * Skarph

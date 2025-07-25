@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class GoldBlockSystem : SystemMainThreadEntityFilter<GoldBlock, GoldBlockSystem.Filter>,
         ISignalOnStageReset, ISignalOnMarioPlayerDied, ISignalOnMarioPlayerTakeDamage, ISignalOnMarioPlayerCollectedPowerup {
 
@@ -25,10 +26,12 @@ namespace Quantum {
                 // Attached to a player.
                 var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(goldBlock->AttachedTo);
                 
-                if (FPMath.Abs(marioPhysicsObject->Velocity.X) > 5) {
-                    goldBlock->Timer += 10;
-                } else if (marioPhysicsObject->Velocity.SqrMagnitude > FP._0_05) {
-                    goldBlock->Timer++;
+                if (!marioPhysicsObject->IsFrozen) {
+                    if (FPMath.Abs(marioPhysicsObject->Velocity.X) > 5) {
+                        goldBlock->Timer += 10;
+                    } else if (marioPhysicsObject->Velocity.SqrMagnitude > FP._0_05) {
+                        goldBlock->Timer++;
+                    }
                 }
 
                 if (goldBlock->Timer >= 40) {
@@ -57,12 +60,12 @@ namespace Quantum {
                 FP targetVel;
 
                 bool closeToGround;
-                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+                if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
                     closeToGround = false;
                 } else {
                     closeToGround = (transform->Position.Y - stage.StageWorldMin.Y) <= 4
-                        || PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position + (FPVector2.Left / 4), FPVector2.Down, 2, out _)
-                        || PhysicsObjectSystem.Raycast((FrameThreadSafe) f, stage, transform->Position + (FPVector2.Right / 4), FPVector2.Down, 2, out _);
+                        || PhysicsObjectSystem.Raycast(f, stage, transform->Position + (FPVector2.Left / 4), FPVector2.Down, 2, out _)
+                        || PhysicsObjectSystem.Raycast(f, stage, transform->Position + (FPVector2.Right / 4), FPVector2.Down, 2, out _);
                 }
 
                 if (closeToGround) {
@@ -85,7 +88,7 @@ namespace Quantum {
                     return;
                 }
 
-                if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+                if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
                     f.Events.CollectableDespawned(entity, transform->Position, false);
                     f.Destroy(entity);
                 }
@@ -112,8 +115,8 @@ namespace Quantum {
             }
 
             // If we hit from below, cancel contacts and equip to player.
-            if (FPVector2.Dot(contact.Normal, FPVector2.Down) >= PhysicsObjectSystem.GroundMaxAngle
-                || ((mario->IsGroundpoundActive || mario->IsDrilling) && FPVector2.Dot(contact.Normal, FPVector2.Up) >= PhysicsObjectSystem.GroundMaxAngle)) {
+            if (FPVector2.Dot(contact.Normal, FPVector2.Down) >= Constants.PhysicsGroundMaxAngleCos
+                || ((mario->IsGroundpoundActive || mario->IsDrilling) && FPVector2.Dot(contact.Normal, FPVector2.Up) >= Constants.PhysicsGroundMaxAngleCos)) {
                 // Hit from below.
 
                 bool handled = false;
@@ -183,7 +186,7 @@ namespace Quantum {
         private static int GetCoinsInGoldBlock(Frame f, MarioPlayer* mario) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             int firstPlaceCoins = gamemode.GetFirstPlaceObjectiveCount(f);
-            return 25 + (firstPlaceCoins - mario->GamemodeData.CoinRunners->ObjectiveCoins) / 3;
+            return FPMath.CeilToInt(25 + (firstPlaceCoins - mario->GamemodeData.CoinRunners->ObjectiveCoins) / Constants._2_50);
         }
     }
 }

@@ -131,7 +131,7 @@ MonoBehaviour:
       IsPersistent: 1
       CompoundShapes: []
     LayerSource: 1
-    Layer: 9
+    Layer: 14
     CallbackFlags:
       Value: 448
   PhysicsBody:

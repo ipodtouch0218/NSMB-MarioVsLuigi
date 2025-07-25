@@ -18,6 +18,17 @@ public static unsafe class QuantumUtils {
         SoundEffect.Enemy_Shell_Combo7,
     };
 
+    public static T SetFlag<T>(T value, T flag, bool set) where T : Enum {
+        long longValue = (long) (object) value;
+        long longFlag = (long) (object) flag;
+        if (set) {
+            longValue |= longFlag;
+        } else {
+            longValue &= ~longFlag;
+        }
+        return (T) (object) longValue;
+    }
+
     public static unsafe PlayerData* GetPlayerData(Frame f, PlayerRef player, QDictionary<PlayerRef, EntityRef>? dictionary = default) {
 
         QDictionary<PlayerRef, EntityRef> playerDataDictionary; 
@@ -122,6 +133,22 @@ public static unsafe class QuantumUtils {
 
     public static FPVector2 RelativeTileToWorldRounded(VersusStageData stage, IntVector2 relativeTile) {
         return RelativeTileToWorld(stage, relativeTile) + FPVector2.One * FP._0_25;
+    }
+
+    public static IntVector2 WrapRelativeTile(VersusStageData stage, IntVector2 relativeTile, out WrapDirection wrapDirection) {
+        if (relativeTile.X < 0) {
+            relativeTile.X += stage.TileDimensions.X;
+            wrapDirection = WrapDirection.Left;
+
+        } else if (relativeTile.X >= stage.TileDimensions.X) {
+            relativeTile.X -= stage.TileDimensions.X;
+            wrapDirection = WrapDirection.Right;
+
+        } else {
+            wrapDirection = WrapDirection.NoWrap;
+        }
+
+        return relativeTile;
     }
 
     public static FPVector2 WrapUnityTile(Frame f, FPVector2 unityTile, out WrapDirection wrapDirection) {

@@ -1,7 +1,7 @@
 using Photon.Deterministic;
-using UnityEngine;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class BulletBillSystem : SystemMainThread, ISignalOnBobombExplodeEntity, ISignalOnComponentRemoved<BulletBill>, ISignalOnIceBlockBroken {
 
         private static readonly FPVector2 SpawnOffset = new FPVector2(0, FP.FromString("-0.45"));
@@ -150,7 +150,7 @@ namespace Quantum {
 
             FP upDot = FPVector2.Dot(contact.Normal, FPVector2.Up);
             if (iceBlock->IsSliding
-                && upDot < PhysicsObjectSystem.GroundMaxAngle) {
+                && upDot < Constants.PhysicsGroundMaxAngleCos) {
 
                 bulletBill->Kill(f, bulletBillEntity, iceBlockEntity, KillReason.Special);
             }

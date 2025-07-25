@@ -1,6 +1,7 @@
 ﻿using NSMB.Networking;
 using NSMB.Quantum;
 using NSMB.UI.Loading;
+using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.UI.Options;
 using NSMB.UI.Translation;
@@ -40,13 +41,14 @@ namespace NSMB {
         [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
         [NonSerialized] public int windowWidth = 1280, windowHeight = 720;
 
-
         //---Serialized Variables
         [SerializeField] private AudioMixer mixer;
 
         //---Private Variables
         private Coroutine fadeMusicRoutine, fadeSfxRoutine, totalFadeRoutine;
+#if IDLE_LOCK_30FPS
         private int previousVsyncCount, previousFrameRate;
+#endif
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void CreateInstance() {
@@ -80,6 +82,7 @@ namespace NSMB {
             Settings.Controls.Debug.FPSMonitor.performed += ToggleFpsMonitor;
             QuantumEvent.Subscribe<EventStartGameEndFade>(this, OnStartGameEndFade);
             QuantumCallback.Subscribe<CallbackUnitySceneLoadDone>(this, OnUnitySceneLoadDone);
+            loadingCanvas.Startup();
         }
 
         public void OnDestroy() {
@@ -111,6 +114,15 @@ namespace NSMB {
                         PlaySound(SoundEffect.Player_Sound_PowerupCollect);
                     }
                 }
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha9)) {
+                    var canvas = FindFirstObjectByType<MainMenuCanvas>();
+                    if (canvas) {
+                        var blur = canvas.transform.Find("MainMenu").Find("Blur").gameObject;
+                        blur.SetActive(!blur.activeSelf);
+                    }
+                }
+
             }
 
             if (UnityEngine.Input.GetKeyDown(KeyCode.F6)) {
@@ -140,8 +152,10 @@ namespace NSMB {
                 this.StopCoroutineNullable(ref fadeMusicRoutine);
                 this.StopCoroutineNullable(ref fadeSfxRoutine);
 
+#if IDLE_LOCK_30FPS
                 QualitySettings.vSyncCount = previousVsyncCount;
                 Application.targetFrameRate = previousFrameRate;
+#endif
             } else {
                 if (Settings.Instance.audioMuteMusicOnUnfocus) {
                     fadeMusicRoutine ??= StartCoroutine(FadeVolume("MusicVolume"));
@@ -163,8 +177,10 @@ namespace NSMB {
         }
 
         public void OnUnitySceneLoadDone(CallbackUnitySceneLoadDone e) {
-            foreach (int localPlayer in e.Game.GetLocalPlayerSlots()) {
-                e.Game.SendCommand(localPlayer, new CommandPlayerLoaded());
+            if (e.SceneName != null) {
+                foreach (int localPlayer in e.Game.GetLocalPlayerSlots()) {
+                    e.Game.SendCommand(localPlayer, new CommandPlayerLoaded());
+                }
             }
 
             discordController.UpdateActivity();

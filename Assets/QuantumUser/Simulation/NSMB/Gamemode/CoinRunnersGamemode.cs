@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using System;
 
 namespace Quantum {
     public unsafe class CoinRunnersGamemode : GamemodeAsset {
@@ -13,30 +14,23 @@ namespace Quantum {
         public override void DisableGamemode(Frame f) {
             f.SystemDisable<ObjectiveCoinSystem>();
             f.SystemDisable<GoldBlockSystem>();
-        }
+       }
 
         public override void CheckForGameEnd(Frame f) {
             // End Condition: only one team alive
-            var marioFilter = f.Filter<MarioPlayer>();
-            marioFilter.UseCulling = false;
+            Span<int> objectiveCounts = stackalloc int[Constants.MaxPlayers];
+            GetAllTeamsObjectiveCounts(f, objectiveCounts);
 
-            bool livesGame = f.Global->Rules.IsLivesEnabled;
-            bool oneOrNoTeamAlive = true;
+            int aliveTeamCount = 0;
             int aliveTeam = -1;
-            while (marioFilter.NextUnsafe(out _, out MarioPlayer* mario)) {
-                if ((livesGame && mario->Lives <= 0) || mario->Disconnected) {
-                    continue;
-                }
-
-                if (aliveTeam == -1 && mario->GetTeam(f) is byte team) {
-                    aliveTeam = team;
-                } else {
-                    oneOrNoTeamAlive = false;
-                    break;
+            for (int i = 0; i < objectiveCounts.Length; i++) {
+                if (objectiveCounts[i] > -1) {
+                    aliveTeamCount++;
+                    aliveTeam = i;
                 }
             }
 
-            if (oneOrNoTeamAlive) {
+            if (aliveTeamCount <= 1) {
                 if (aliveTeam == -1) {
                     // It's a draw
                     GameLogicSystem.EndGame(f, false, null);

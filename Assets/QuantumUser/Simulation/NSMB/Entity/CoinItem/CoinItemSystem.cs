@@ -1,7 +1,8 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    public unsafe class CoinItemSystem : SystemMainThreadEntityFilter<CoinItem, CoinItemSystem.Filter> {
+    [UnityEngine.Scripting.Preserve]
+    public unsafe class CoinItemSystem : SystemMainThreadEntityFilter<CoinItem, CoinItemSystem.Filter>, ISignalOnStageReset {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
 
@@ -51,7 +52,7 @@ namespace Quantum {
                     }
 
                     if (QuantumUtils.Decrement(ref coinItem->SpawnAnimationFrames)) {
-                        if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, false, stage, entity)) {
+                        if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, false, stage, entity)) {
                             f.Events.CollectableDespawned(entity, f.Unsafe.GetPointer<Transform2D>(entity)->Position, false);
                             f.Destroy(entity);
                             return;
@@ -90,7 +91,7 @@ namespace Quantum {
 
             if (physicsObject != null && coinItem->SpawnAnimationFrames == 0 && physicsObject->DisableCollision) {
                 // Test that we're not in a wall anymore
-                if (!PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, stage: stage)) {
+                if (!PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, stage: stage)) {
                     physicsObject->DisableCollision = false;
                 }
             }
@@ -98,6 +99,22 @@ namespace Quantum {
             if (coinItem->Lifetime > 0 && QuantumUtils.Decrement(ref coinItem->Lifetime)) {
                 f.Events.CollectableDespawned(entity, transform->Position, false);
                 f.Destroy(entity);
+            }
+        }
+
+        public void OnStageReset(Frame f, QBoolean full) {
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            var filter = f.Filter<CoinItem, Transform2D, PhysicsCollider2D>();
+            while (filter.NextUnsafe(out EntityRef entity, out var coinItem, out var transform, out var collider)) {
+                if (coinItem->SpawnAnimationFrames > 0 || !collider->Enabled
+                    || (f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject) && physicsObject->DisableCollision)) {
+                    continue;
+                }
+
+                if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+                    // Insta-despawn. Crushed by blocks respawning.
+                    coinItem->Lifetime = 1;
+                }
             }
         }
     }

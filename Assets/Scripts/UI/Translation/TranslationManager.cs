@@ -119,7 +119,7 @@ namespace NSMB.UI.Translation {
             OnLanguageChanged?.Invoke(this);
         }
 
-        public LocaleData[] GetLocaleData() {
+        public LocaleData[] GetAvailableLocales() {
             List<LocaleData> results = new();
 
             // Add the default languages
@@ -169,12 +169,12 @@ namespace NSMB.UI.Translation {
 
             return results
                 .Distinct()
-                .OrderBy(ld => ld.Locale)
+                .OrderBy(ld => ld.Locale.ToLowerInvariant())
                 .ToArray();
         }
 
         public string[] GetLocaleCodes() {
-            return GetLocaleData().Select(ld => ld.Locale).ToArray();
+            return GetAvailableLocales().Select(ld => ld.Locale).ToArray();
         }
 
         public bool TryGetTranslation(string key, out string translated) {

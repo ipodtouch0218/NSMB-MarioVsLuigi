@@ -256,7 +256,7 @@ namespace NSMB {
             PlayerPrefs.SetInt("Graphics_VSync", GraphicsVsync ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_MaxFPS", GraphicsMaxFps);
             PlayerPrefs.SetInt("Graphics_PlayerOutlines", GraphicsPlayerOutlines ? 1 : 0);
-            PlayerPrefs.SetInt("Graphics_Nametags", GraphicsPlayerNametags ? 1 : 0);
+            PlayerPrefs.SetInt("Graphics_PlayerNametags", GraphicsPlayerNametags ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_Colorblind", GraphicsColorblind ? 1 : 0);
             PlayerPrefs.SetInt("Graphics_InputDisplay", GraphicsInputDisplay ? 1 : 0);
 

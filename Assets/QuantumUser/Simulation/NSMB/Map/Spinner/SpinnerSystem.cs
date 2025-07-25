@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class SpinnerSystem : SystemMainThreadEntityFilter<Spinner, SpinnerSystem.Filter> {
 
         public struct Filter {
@@ -72,7 +73,7 @@ namespace Quantum {
         }
 
         public static bool OnSpinnerMarioPlayerInteraction(Frame f, EntityRef marioEntity, EntityRef spinnerEntity, PhysicsContact contact) {
-            if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+            if (FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
                 return false;
             }
 

@@ -175,7 +175,8 @@ namespace Quantum {
             allPlayers.UseCulling = false;
             while (allPlayers.NextUnsafe(out _, out MarioPlayer* mario)) {
                 if (mario->GetTeam(f) != team
-                    || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
+                    || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)
+                    || mario->Disconnected) {
                     continue;
                 }
 

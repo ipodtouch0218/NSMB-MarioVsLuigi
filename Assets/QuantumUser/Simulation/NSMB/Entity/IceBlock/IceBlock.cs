@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe partial struct IceBlock {
-        public bool TimerEnabled(Frame f, EntityRef iceBlockEntity) {
+        public readonly bool TimerEnabled(Frame f, EntityRef iceBlockEntity) {
             var childFreezable = f.Unsafe.GetPointer<Freezable>(Entity);
             var holdable = f.Unsafe.GetPointer<Holdable>(iceBlockEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(iceBlockEntity);
@@ -44,7 +44,7 @@ namespace Quantum {
             AutoBreakFrames = child->AutoBreakFrames;
 
             // Try to not spawn inside blocks/walls
-            PhysicsObjectSystem.TryEject((FrameThreadSafe) f, iceBlockEntity);
+            PhysicsObjectSystem.TryEject(f, iceBlockEntity);
 
             f.Signals.OnEntityFreeze(childEntity, iceBlockEntity);
         }

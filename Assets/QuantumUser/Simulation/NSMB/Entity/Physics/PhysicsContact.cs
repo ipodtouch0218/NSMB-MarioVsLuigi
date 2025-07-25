@@ -12,7 +12,7 @@ namespace Quantum {
             return false;            
         }
 
-        public bool Equals(PhysicsContact other) {
+        public readonly bool Equals(PhysicsContact other) {
             return Tile == other.Tile
                 && Entity == other.Entity
                 && Frame == other.Frame;

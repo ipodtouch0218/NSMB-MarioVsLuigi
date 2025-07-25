@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe partial struct PhysicsObject {
-        public bool IsUnderwater => UnderwaterCounter > 0;
+        public readonly bool IsUnderwater => UnderwaterCounter > 0;
         public bool IsTouchingGround {
             get => HasFlag(CurrentData, PhysicsFlags.IsTouchingGround);
             set => SetFlag(ref CurrentData, PhysicsFlags.IsTouchingGround, value);
@@ -40,15 +40,15 @@ namespace Quantum {
             set => SetFlag(ref PreviousData, PhysicsFlags.IsBeingCrushed, value);
         }
         public FP FloorAngle {
-            get => CurrentData.FloorAngle;
+            readonly get => CurrentData.FloorAngle;
             set => CurrentData.FloorAngle = value;
         }
 
-        private bool HasFlag(in PhysicsObjectData data, PhysicsFlags flag) {
+        private readonly bool HasFlag(in PhysicsObjectData data, PhysicsFlags flag) {
             return ((int) data.Flags & (int) flag) != 0;
         }
 
-        private void SetFlag(ref PhysicsObjectData data, PhysicsFlags flag, bool value) {
+        private readonly void SetFlag(ref PhysicsObjectData data, PhysicsFlags flag, bool value) {
             if (value) {
                 data.Flags = (PhysicsFlags) (((int) data.Flags) | ((int) flag));
             } else {

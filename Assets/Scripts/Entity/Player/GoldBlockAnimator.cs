@@ -1,8 +1,11 @@
 using NSMB.Entities.Player;
+using NSMB.UI.Game;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.Entities.CoinItems {
@@ -25,6 +28,7 @@ namespace NSMB.Entities.CoinItems {
         //---Private Variables
         private MarioPlayerAnimator marioPlayerAnimator;
         private CharacterPoseData currentCharacterPoseData;
+        private List<Renderer> glowRenderers = new();
 
         private Vector2 lostViaDamageVelocity;
         private float lostViaDamageAngularVelocity;
@@ -44,12 +48,16 @@ namespace NSMB.Entities.CoinItems {
             QuantumEvent.Subscribe<EventGoldBlockLostViaDamage>(this, OnGoldBlockLostViaDamage, onlyIfEntityViewBound: true);
             QuantumEvent.Subscribe<EventGoldBlockRanOutOfCoins>(this, OnGoldBlockRanOutOfCoins, onlyIfEntityViewBound: true);
 
+            helmetMeshRenderer.GetComponentsInChildren(true, glowRenderers);
+
             EntityView.OnEntityDestroyed.AddListener(OnEntityDestroyed);
             MarioPlayerAnimator.OnStartBlink += OnMarioStartBlink;
+            RenderPipelineManager.beginCameraRendering += URPOnPreRender;
         }
 
         public void OnDestroy() {
             MarioPlayerAnimator.OnStartBlink -= OnMarioStartBlink;
+            RenderPipelineManager.beginCameraRendering -= URPOnPreRender;
             EntityView.OnEntityDestroyed.RemoveListener(OnEntityDestroyed);
         }
 
@@ -60,6 +68,9 @@ namespace NSMB.Entities.CoinItems {
             if (resyncedThisFrame || flyingModel.activeInHierarchy) {
                 Destroy(gameObject);
                 Destroy(helmetModel);
+            } else {
+                Destroy(gameObject, 3f);
+                Destroy(helmetModel, 3f);
             }
         }
 
@@ -134,12 +145,6 @@ namespace NSMB.Entities.CoinItems {
                 helmetModel.SetActive(false);
                 currentCharacterPoseData = null;
             }
-
-            foreach (var renderer in helmetMeshRenderer.GetComponentsInChildren<Renderer>(true)) {
-                MaterialPropertyBlock mpb = new();
-                mpb.SetColor("GlowColor", marioPlayerAnimator ? marioPlayerAnimator.GlowColor : Color.clear);
-                renderer.SetPropertyBlock(mpb);
-            }
         }
 
         private void OnMarioStartBlink(EntityRef marioEntity) {
@@ -149,6 +154,28 @@ namespace NSMB.Entities.CoinItems {
                     animation.Play();
                 }
             }
+        }
+
+        private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
+            Color glowColor = marioPlayerAnimator && (PredictedFrame.Global->Rules.TeamsEnabled || !IsCameraFocus(camera)) ? marioPlayerAnimator.GlowColor : Color.clear;
+            foreach (var renderer in glowRenderers) {
+                MaterialPropertyBlock mpb = new();
+                renderer.GetPropertyBlock(mpb);
+                mpb.SetColor("GlowColor", glowColor);
+                renderer.SetPropertyBlock(mpb);
+            }
+        }
+
+        private bool IsCameraFocus(Camera camera) {
+            if (!marioPlayerAnimator) {
+                return false;
+            }
+            foreach (var playerElement in PlayerElements.AllPlayerElements) {
+                if (marioPlayerAnimator.EntityRef == playerElement.Entity && (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void OnMarioPlayerPickedUpGoldBlock(EventMarioPlayerPickedUpGoldBlock e) {
@@ -181,7 +208,7 @@ namespace NSMB.Entities.CoinItems {
                 return;
             }
 
-
+            // TODO: play break particles?
         }
 
         private void OnGoldBlockLostViaDamage(EventGoldBlockLostViaDamage e) {
@@ -189,7 +216,9 @@ namespace NSMB.Entities.CoinItems {
                 return;
             }
 
-            marioPlayerAnimator.PlaySound(SoundEffect.World_Gold_Block_Damage);
+            if (!IsReplayFastForwarding) {
+                marioPlayerAnimator.PlaySound(SoundEffect.World_Gold_Block_Damage);
+            }
             helmetModel.transform.SetParent(null, true);
             lostViaDamage = true;
             lostViaDamageVelocity = Vector3.ProjectOnPlane(helmetModel.transform.rotation * lostViaDamageInitialVelocity, Vector3.forward);
@@ -205,6 +234,19 @@ namespace NSMB.Entities.CoinItems {
             StartCoroutine(DelayedParticlePlay());
         }
 
+        private void OnGoldBlockRanOutOfCoins(EventGoldBlockRanOutOfCoins e) {
+            if (e.GoldBlock != EntityRef) {
+                return;
+            }
+            if (!IsReplayFastForwarding) {
+                marioPlayerAnimator.PlaySound(SoundEffect.World_Gold_Block_Finished);
+            }
+            helmetMeshRenderer.enabled = false;
+            MiscParticles.Instance.Play(ParticleEffect.Puff, helmetModel.transform.position);
+            Destroy(gameObject);
+            Destroy(helmetModel);
+        }
+
         private void OnGameResynced(CallbackGameResynced e) {
             Frame f = PredictedFrame;
             if (EntityView) {
@@ -217,18 +259,6 @@ namespace NSMB.Entities.CoinItems {
                 Destroy(helmetModel);
             }
             resyncedThisFrame = true;
-        }
-
-        private void OnGoldBlockRanOutOfCoins(EventGoldBlockRanOutOfCoins e) {
-            if (e.GoldBlock != EntityRef) {
-                return;
-            }
-
-            marioPlayerAnimator.PlaySound(SoundEffect.World_Gold_Block_Finished);
-            helmetMeshRenderer.enabled = false;
-            MiscParticles.Instance.Play(ParticleEffect.Puff, helmetModel.transform.position);
-            Destroy(gameObject);
-            Destroy(helmetModel);
         }
 
         [System.Serializable]

@@ -1,5 +1,3 @@
-using JimmysUnityUtilities;
-using NaughtyAttributes.Test;
 using NSMB.Cameras;
 using NSMB.Particles;
 using NSMB.Quantum;
@@ -7,7 +5,6 @@ using NSMB.Sound;
 using NSMB.UI.Game;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
-using NSMB.Utilities.Components;
 using Photon.Deterministic;
 using Quantum;
 using Quantum.Profiling;
@@ -19,7 +16,6 @@ using UnityEngine.Rendering;
 using UnityEngine.Scripting;
 using static NSMB.Utilities.QuantumViewUtils;
 using Input = Quantum.Input;
-using NUnit.Framework.Constraints;
 
 namespace NSMB.Entities.Player {
     public unsafe class MarioPlayerAnimator : QuantumEntityViewComponent<StageContext> {
@@ -95,15 +91,6 @@ namespace NSMB.Entities.Player {
         //---Public Variables
         public bool wasTurnaround;
         public GameObject models;
-        public LegacyAnimateSpriteRenderer playerSpriteRenderer;
-        public LegacyAnimateSpriteRenderer capeSpriteRenderer;
-        public SpriteRenderer playerSpriteDisplay;
-        public SpriteRenderer capeSpriteDisplay;
-        public GameObject playerSpriteObject, capeSpriteObject;
-        private PowerupState previousPowerup;
-        private bool activeModels = false;
-        public float[] spriteScale;
-        public float[] megaSpriteScale;
 
         //---Serialized Variables
         [SerializeField] private CharacterAsset character;
@@ -147,13 +134,6 @@ namespace NSMB.Entities.Player {
         private Vector3 previousPosition;
         private bool forceUpdate;
         private GameObject activeRespawnParticle;
-        private CharacterState currentAnimationState;
-        private float FpsMultiplier = 1f;
-        private int JumpLandTimer = 0;
-        private int FireballTimer = 0;
-        private int ThrowTimer = 0;
-        private int PaddleTimer = 0;
-        private bool Walljumped = false;
 
         public void OnValidate() {
             this.SetIfNull(ref animator);
@@ -264,7 +244,7 @@ namespace NSMB.Entities.Player {
 
             if (VerifiedFrame.Global->GameState >= GameState.Ended && !forceUpdate) {
                 animator.speed = 0;
-                activeModels = (!mario->IsRespawning);
+                models.SetActive(!mario->IsRespawning);
                 SetParticleEmission(drillParticle, false);
                 SetParticleEmission(sparkles, false);
                 SetParticleEmission(iceSkiddingParticle, false);
@@ -294,7 +274,6 @@ namespace NSMB.Entities.Player {
             SetFacingDirection(f, mario, physicsObject);
             InterpolateFacingDirection(mario);
             UpdateAnimatorVariables(f, mario, physicsObject, freezable, ref inputs);
-            SetAnimation(f, mario, physicsObject, freezable, ref inputs);
 
             previousPosition = transform.position;
             forceUpdate = false;
@@ -386,17 +365,21 @@ namespace NSMB.Entities.Player {
             using var profilerScope = HostProfiler.Start("MarioPlayerAnimator.SetFacingDirection");
             float delta = Time.deltaTime;
 
-            float angleR = 125, angleL = 235; //Default angles, we can override them later. 
-            if (mario->CurrentPowerupState is PowerupState.BlueShell or PowerupState.MegaMushroom) {
-                //Hacky override that feels like something I'd put in one of my mods - HyperCat
-                angleR = 110;
-                angleL = 250;
-            }
+            float angle = mario->CurrentPowerupState switch {
+                PowerupState.BlueShell => 90f,
+                PowerupState.MegaMushroom => 78.75f,
+                _ => 67.5f,
+            };
+            float angleR = 180 - angle;
+            float angleL = 180 + angle;
 
             modelRotateInstantly = false;
             var freezable = f.Unsafe.GetPointer<Freezable>(EntityRef);
 
-            if (mario->IsInKnockback || freezable->IsFrozen(f)) {
+            if (f.Exists(mario->CurrentPipe)) {
+                modelRotationTarget = Quaternion.Euler(0, mario->FacingRight ? angleR : angleL, 0);
+                modelRotateInstantly = true;
+            } if (mario->IsInKnockback || freezable->IsFrozen(f)) {
                 bool right = mario->FacingRight;
                 if (mario->IsInKnockback && (physicsObject->IsUnderwater || mario->IsInWeakKnockback)) {
                     right = mario->KnockbackWasOriginallyFacingRight;
@@ -415,7 +398,7 @@ namespace NSMB.Entities.Player {
             } else if (animator.GetBool(ParamInShell) && (!f.Exists(mario->CurrentSpinner) || Mathf.Abs(physicsObject->Velocity.X.AsFloat) > 0.3f)) {
                 var physics = f.FindAsset(mario->PhysicsAsset);
                 float percentage = Mathf.Abs(physicsObject->Velocity.X.AsFloat) / physics.WalkMaxVelocity[physics.RunSpeedStage].AsFloat * delta;
-                modelRotationTarget *= Quaternion.Euler(0, percentage * 1400 * (mario->FacingRight ? -1 : 1), 0);
+                modelRotationTarget *= Quaternion.Euler(0, percentage * 2010.9f * (mario->FacingRight ? -1 : 1), 0);
                 modelRotateInstantly = true;
 
             } else if (wasTurnaround || mario->IsSkidding || mario->IsTurnaround || animator.GetCurrentAnimatorStateInfo(0).IsName("turnaround")) {
@@ -491,7 +474,7 @@ namespace NSMB.Entities.Player {
             animator.SetBool(ParamCrouching, mario->IsCrouching);
             animator.SetBool(ParamGroundpound, mario->IsGroundpounding);
             animator.SetBool(ParamSliding, mario->IsSliding);
-            animator.SetBool(ParamKnockback, mario->IsInKnockback);
+            animator.SetBool(ParamKnockback, mario->IsInKnockback && mario->KnockbackGetupFrames == 0);
             animator.SetBool(ParamFacingRight, (left ^ right) ? right : mario->FacingRight);
             animator.SetBool(ParamFlying, mario->IsSpinnerFlying);
             animator.SetBool(ParamDrill, mario->IsDrilling);
@@ -575,7 +558,7 @@ namespace NSMB.Entities.Player {
             };
             materialBlock.SetFloat(ParamPowerupState, ps);
             materialBlock.SetFloat(ParamEyeState, (int) (mario->IsDead || mario->IsInKnockback ? Enums.PlayerEyeState.Death : eyeState));
-            materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x * (smallModel.activeInHierarchy ? 0.5f : 1f));
+            materialBlock.SetFloat(ParamModelScale, transform.lossyScale.x * (mario->CurrentPowerupState >= PowerupState.Mushroom ? 1f : 0.5f));
 
             Vector3 giantMultiply = Vector3.one;
             float giantTimeRemaining = mario->MegaMushroomFrames / 60f;
@@ -589,13 +572,16 @@ namespace NSMB.Entities.Player {
             foreach (Renderer r in renderers) {
                 r.SetPropertyBlock(materialBlock);
                 foreach (var m in materials[r]) {
-                    m.shader = mario->IsStarmanInvincible ? rainbowShader : normalShader;
+                    var newShader = mario->IsStarmanInvincible ? rainbowShader : normalShader;
+                    if (m.shader != newShader) {
+                        m.shader = newShader;
+                    }
                 }
             }
 
             // Hit flash
             float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
-            activeModels = (f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
+            models.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
 
             // Model changing
             bool large = mario->CurrentPowerupState >= PowerupState.Mushroom;
@@ -603,9 +589,9 @@ namespace NSMB.Entities.Player {
             smallModel.SetActive(!large);
             blueShell.SetActive(mario->CurrentPowerupState == PowerupState.BlueShell);
             propellerHelmet.SetActive(!DisableHeadwear && mario->CurrentPowerupState == PowerupState.PropellerMushroom);
-            HammerHelm.SetActive(!DisableHeadwear && mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
-            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && !mario->IsCrouching);
-            HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching);
+            HammerHelm.SetActive(!DisableHeadwear && mario->CurrentPowerupState == PowerupState.HammerSuit && (!mario->IsCrouching || f.Exists(mario->CurrentPipe)));
+            HammerShell.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && (!mario->IsCrouching || f.Exists(mario->CurrentPipe)));
+            HammerTuck.SetActive(mario->CurrentPowerupState == PowerupState.HammerSuit && mario->IsCrouching && !f.Exists(mario->CurrentPipe));
 
             Avatar targetAvatar = large ? largeAvatar : smallAvatar;
             bool changedAvatar = animator.avatar != targetAvatar;
@@ -739,7 +725,7 @@ namespace NSMB.Entities.Player {
                 footstepSoundEffect = SoundEffect.Player_Walk_Water;
             } else {
                 foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < PhysicsObjectSystem.GroundMaxAngle) {
+                    if (FPVector2.Dot(contact.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
                         continue;
                     }
 
@@ -845,7 +831,6 @@ namespace NSMB.Entities.Player {
 
             PlaySound(SoundEffect.Player_Voice_WallJump, variant: 2);
             animator.SetTrigger(ParamThrow);
-            ThrowTimer = 30;
         }
 
         private void OnMarioPlayerPickedUpObject(EventMarioPlayerPickedUpObject e) {
@@ -860,8 +845,6 @@ namespace NSMB.Entities.Player {
                 animator.Play(ParamHeadPickup);
                 PlaySound(SoundEffect.Player_Voice_DoubleJump, variant: 2);
             }
-            FireballTimer = 0;
-            ThrowTimer = 0;
         }
 
         private void OnMarioPlayerStompedByTeammate(EventMarioPlayerStompedByTeammate e) {
@@ -879,11 +862,15 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
+            var mario = PredictedFrame.Unsafe.GetPointer<MarioPlayer>(e.Entity);
+            if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
+                PlayMegaFootstep();
+            }
+
             var physicsObject = PredictedFrame.Unsafe.GetPointer<PhysicsObject>(e.Entity);
             if (physicsObject->IsUnderwater && physicsObject->PreviousFrameVelocity.Y < -1) {
                 SpawnParticle(Enums.PrefabParticle.Player_WaterDust.GetGameObject(), transform.position + Vector3.back * 5);
             }
-            JumpLandTimer = 20;
         }
 
         private void OnPlayBumpSound(EventPlayBumpSound e) {
@@ -992,7 +979,6 @@ namespace NSMB.Entities.Player {
             animator.SetTrigger("fireball");
             ProjectileAsset projectile = e.Game.Frames.Predicted.FindAsset(e.Projectile.Asset);
             PlaySound(projectile.ShootSound);
-            FireballTimer = 30;
         }
 
         private void OnMarioPlayerWalljumped(EventMarioPlayerWalljumped e) {
@@ -1014,7 +1000,6 @@ namespace NSMB.Entities.Player {
                 PlaySound(SoundEffect.Player_Voice_WallJump, variant: (byte) UnityEngine.Random.Range(1, 3));
             }
             animator.SetTrigger("walljump");
-            Walljumped = true;
         }
 
         private void OnMarioPlayerCollectedCoin(EventMarioPlayerCollectedCoin e) {
@@ -1165,7 +1150,6 @@ namespace NSMB.Entities.Player {
                 } else { 
                     PlaySound(SoundEffect.Player_Sound_Swim);
                     animator.SetTrigger(ParamPaddle);
-                    PaddleTimer = 60;
                 }
                 return;
             }
@@ -1262,364 +1246,6 @@ namespace NSMB.Entities.Player {
             }
 
             sfx.PlayOneShot(SoundEffect.Powerup_HammerSuit_Bounce);
-        }
-
-        private void SetAnimation(Frame f, MarioPlayer* mario, PhysicsObject* physicsObject, Freezable* freezable, ref Input inputs) {
-            var gameStyle = ViewContext.Stage.stageStyle;
-            if (gameStyle == StageTheme.NSMB) {
-                playerSpriteRenderer.isDisplaying = false;
-                capeSpriteRenderer.isDisplaying = false;
-                playerSpriteObject.SetActive(false);
-                capeSpriteObject.SetActive(false);
-                activeModels = (!mario->IsRespawning);
-                models.SetActive(activeModels);
-            } else {
-                playerSpriteRenderer.isDisplaying = !mario->IsRespawning;
-                capeSpriteRenderer.isDisplaying = !mario->IsRespawning;
-                playerSpriteObject.SetActive(!mario->IsRespawning);
-                capeSpriteObject.SetActive(!mario->IsRespawning);
-                activeModels = (false);
-                models.SetActive(false);
-            }
-
-            PowerupState AnimPowerupState = mario->CurrentPowerupState;
-
-            CharacterState previousAnimationState = currentAnimationState;
-            var previousAnimData = character.GetAnimData(gameStyle, currentAnimationState, previousPowerup);
-
-            bool right = inputs.Right.IsDown;
-            bool left = inputs.Left.IsDown;
-
-            f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* heldObject);
-
-            bool AnimDead = mario->IsDead;
-            bool AnimOnLeft = mario->WallslideLeft;
-            bool AnimOnRight = mario->WallslideRight;
-            bool AnimWalljumped = Walljumped;
-            bool AnimOnGround = physicsObject->IsTouchingGround || mario->IsStuckInBlock || mario->CoyoteTimeFrames > 0;
-            bool AnimInvincible = mario->IsStarmanInvincible;
-            bool AnimSkidding = mario->IsSkidding;
-            bool AnimPropeller = mario->IsPropellerFlying;
-            bool AnimPropellerSpin = mario->IsPropellerFlying && mario->PropellerSpinFrames > 0;
-            bool AnimPropellerStart = mario->IsPropellerFlying && mario->PropellerLaunchFrames > 0;
-            bool AnimCrouching = mario->IsCrouching;
-            bool AnimGroundpoundStart = mario->GroundpoundStartFrames > 0;
-            bool AnimGroundpound = mario->IsGroundpounding;
-            bool AnimSliding = mario->IsSliding;
-            bool AnimFacingRight = (left ^ right) ? right : mario->FacingRight;
-            bool AnimSpin = f.Exists(mario->CurrentSpinner);
-            bool AnimFlying = mario->IsSpinnerFlying;
-            bool AnimDrill = mario->IsDrilling;
-            bool AnimSingleJump = mario->JumpState == JumpState.SingleJump;
-            bool AnimDoubleJump = mario->JumpState == JumpState.DoubleJump;
-            bool AnimTripleJump = mario->JumpState == JumpState.TripleJump;
-            bool AnimLand = JumpLandTimer > 0;
-            bool AnimShoot = FireballTimer > 0;
-            bool AnimHolding = f.Exists(mario->HeldEntity);
-            bool AnimHeadCarry = heldObject != null && heldObject->HoldAboveHead;
-            bool AnimCarryStart = heldObject != null && heldObject->HoldAboveHead && (f.Number - mario->HoldStartFrame) < 27;
-            bool AnimThrow = ThrowTimer > 0;
-            bool AnimPipe = f.Exists(mario->CurrentPipe);
-            bool AnimInShell = mario->IsInShell || (mario->CurrentPowerupState == PowerupState.BlueShell && (mario->IsCrouching || mario->IsGroundpounding || mario->IsSliding) && mario->GroundpoundStartFrames <= 9);
-            bool AnimTurnaround = mario->IsTurnaround;
-            bool AnimSwimming = physicsObject->IsUnderwater && !mario->IsGroundpounding && !mario->IsDrilling && !freezable->IsFrozen(f);
-            bool AnimAHeld = inputs.Jump.IsDown;
-            bool AnimSwimKick = AnimSwimming && AnimAHeld && physicsObject->Velocity.Y < 0;
-            bool AnimSwimPaddle = PaddleTimer > 0;
-            bool AnimFireballKnockback = mario->IsInWeakKnockback;
-            bool AnimFireDeath = mario->FireDeath;
-            bool AnimPushing = mario->LastPushingFrame + 5 >= f.Number;
-            bool AnimFrozen = freezable->IsFrozen(f);
-            bool AnimKnockback = mario->IsInKnockback;
-            bool AnimKnockforwards = mario->KnockForwards;
-            bool AnimKnockbackWeak = mario->IsInWeakKnockback;
-            bool AnimMegaGrow = mario->MegaMushroomStartFrames > 0;
-            bool AnimMegaShrink = mario->MegaMushroomStationaryEnd;
-            var physics = f.FindAsset(mario->PhysicsAsset);
-            int AnimRunState = mario->GetSpeedStage(physicsObject, physics);
-            
-            FpsMultiplier = 1f;
-            currentAnimationState = CharacterState.IDLE;
-
-            // Animation script
-            if (AnimOnGround) {
-                Walljumped = false;
-                AnimSingleJump = false;
-                AnimDoubleJump = false;
-                AnimTripleJump = false;
-                if (FPMath.Abs(physicsObject->Velocity.X) < FP._0_05) {
-                    //Idle
-                    currentAnimationState = CharacterState.IDLE;
-                    if (AnimHolding) {
-                        currentAnimationState = CharacterState.HOLDIDLE;
-                    }
-                    if (AnimHeadCarry) {
-                        currentAnimationState = CharacterState.HOLDUPIDLE;
-                    }
-                    if (AnimLand) {
-                        //Jump land
-                        currentAnimationState = CharacterState.JUMPLAND;
-                    }
-                    if (AnimSpin) {
-                        //Speen or something
-                        currentAnimationState = CharacterState.SPIN;
-                    }
-                } else if (AnimRunState <= physics.WalkSpeedStage) {
-                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
-                    //Walk
-                    currentAnimationState = CharacterState.WALK;
-                    if (AnimHolding) {
-                        currentAnimationState = CharacterState.HOLDWALK;
-                    }
-                    if (AnimHeadCarry) {
-                        currentAnimationState = CharacterState.HOLDUPWALK;
-                    }
-                } else if (AnimRunState <= physics.RunSpeedStage) {
-                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
-                    //Run
-                    currentAnimationState = CharacterState.RUN;
-                    if (AnimHolding) {
-                        currentAnimationState = CharacterState.HOLDRUN;
-                    }
-                    if (AnimHeadCarry) {
-                        currentAnimationState = CharacterState.HOLDUPRUN;
-                    }
-                } else if (AnimRunState <= physics.RunSpeedStage) {
-                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
-                    //Fast run
-                    currentAnimationState = CharacterState.FASTRUN;
-                    if (AnimHolding) {
-                        currentAnimationState = CharacterState.HOLDFASTRUN;
-                    }
-                    if (AnimHeadCarry) {
-                        currentAnimationState = CharacterState.HOLDUPFASTRUN;
-                    }
-                } else {
-                    FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
-                    currentAnimationState = CharacterState.MACH4;
-                    if (AnimHolding) {
-                        currentAnimationState = CharacterState.HOLDMACH4;
-                    }
-                    if (AnimHeadCarry) {
-                        currentAnimationState = CharacterState.HOLDUPMACH4;
-                    }
-                }
-                if (AnimSkidding) {
-                    currentAnimationState = CharacterState.SKID;
-                }
-                if (AnimPushing) {
-                    currentAnimationState = CharacterState.PUSH;
-                    FpsMultiplier = 1f;
-                }
-                if (AnimShoot) {
-                    //Shot at me
-                    currentAnimationState = CharacterState.SHOOT;
-                }
-            } else {
-                if (AnimWalljumped) {
-                    //Jumping wall
-                    currentAnimationState = CharacterState.WALLJUMPFALL;
-                    if (physicsObject->Velocity.Y >= 0) {
-                        currentAnimationState = CharacterState.WALLJUMPRISE;
-                    }
-                } else {
-                    //Fall
-                    currentAnimationState = CharacterState.FALL;
-                    if (AnimHolding) {
-                        currentAnimationState = CharacterState.HOLDFALL;
-                    }
-                    if (AnimHeadCarry) {
-                        currentAnimationState = CharacterState.HOLDUPFALL;
-                    }
-                    if (AnimSingleJump) {
-                        //Jumping single
-                        currentAnimationState = CharacterState.JUMPFALL;
-                        if (AnimHolding) {
-                            currentAnimationState = CharacterState.HOLDJUMPFALL;
-                        }
-                        if (AnimHeadCarry) {
-                            currentAnimationState = CharacterState.HOLDUPJUMPFALL;
-                        }
-                        if (physicsObject->Velocity.Y >= 0) {
-                            currentAnimationState = CharacterState.JUMPRISE;
-                            if (AnimHolding) {
-                                currentAnimationState = CharacterState.HOLDJUMPRISE;
-                            }
-                            if (AnimHeadCarry) {
-                                currentAnimationState = CharacterState.HOLDUPJUMPRISE;
-                            }
-                        }
-                    } else if (AnimDoubleJump) {
-                        //Jumping double
-                        currentAnimationState = CharacterState.DOUBLEJUMP;
-                    } else if (AnimTripleJump) {
-                        //Jumping triple
-                        currentAnimationState = CharacterState.TRIPLEJUMP;
-                    }
-                    if (AnimPropeller) {
-                        //Propelling
-                        currentAnimationState = CharacterState.PROPELLERFLY;
-                        AnimFacingRight = true;
-                    }
-                    if (AnimPropellerStart || AnimPropellerSpin) {
-                        //Propelling 2
-                        currentAnimationState = CharacterState.PROPELLERTWIRL;
-                        FpsMultiplier = 1.5f;
-                        AnimFacingRight = true;
-                    }
-                    if (AnimFlying) {
-                        //Launched
-                        currentAnimationState = CharacterState.SPINFLY;
-                        AnimFacingRight = true;
-                    }
-                    if (AnimDrill) {
-                        //Drill
-                        currentAnimationState = CharacterState.DRILL;
-                        FpsMultiplier = 2f;
-                        AnimFacingRight = true;
-                    }
-                }
-                if (AnimOnLeft || AnimOnRight) {
-                    //Wallslide
-                    currentAnimationState = CharacterState.WALLSLIDE;
-                }
-            }
-            //Not in OnGround or !OnGround
-            if (AnimSliding) {
-                //Sliding
-                currentAnimationState = CharacterState.SLIDE;
-            }
-            if (AnimPipe) {
-                //Pipe enter
-                currentAnimationState = CharacterState.PIPEENTER;
-            } else if (AnimCrouching) {
-                //Crouching
-                currentAnimationState = CharacterState.CROUCH;
-            } else if (AnimGroundpoundStart) {
-                //Groundpound start
-                currentAnimationState = CharacterState.GROUNDPOUNDSTART;
-            } else if (AnimGroundpound) {
-                //Groundpound
-                currentAnimationState = CharacterState.GROUNDPOUND;
-            }
-            if (AnimThrow) {
-                //Throwing held object
-                currentAnimationState = CharacterState.THROW;
-            }
-            if (AnimCarryStart) {
-                //Picking up an object
-                currentAnimationState = CharacterState.CARRYSTART;
-            }
-            if (AnimDead) {
-                //Die
-                if (AnimSwimming) {
-                    currentAnimationState = CharacterState.DIEWATER;
-                } else {
-                    currentAnimationState = CharacterState.DIE;
-                }
-            }
-            if (AnimInShell) {
-                FpsMultiplier = FPMath.Abs(physicsObject->Velocity.X).AsFloat;
-                //Blue shell
-                currentAnimationState = CharacterState.SHELLSPIN;
-            }
-            if (AnimSwimming) {
-                //Swimming
-                currentAnimationState = CharacterState.SWIM;
-                if (AnimHolding) {
-                    //Hold swim
-                    currentAnimationState = CharacterState.HOLDSWIM;
-                } else if (AnimSwimPaddle) {
-                    //Press A
-                    currentAnimationState = CharacterState.SWIMPADDLE;
-                } else if (AnimSwimKick) {
-                    //Swim with A held
-                    currentAnimationState = CharacterState.SWIMKICK;
-                }
-            }
-            if (AnimMegaGrow) {
-                //Mega grow
-                currentAnimationState = CharacterState.MEGAGROW;
-            }
-            if (AnimMegaShrink) {
-                //Mega shrink
-                currentAnimationState = CharacterState.MEGACANCEL;
-            }
-            if (AnimKnockback) {
-                if (AnimKnockbackWeak) {
-                    if (AnimKnockforwards) {
-                        //Weak knockfowards
-                        currentAnimationState = CharacterState.WEAKKNOCKFORWARD;
-                    } else {
-                        //Week knockback
-                        currentAnimationState = CharacterState.WEAKKNOCKBACK;
-                    }
-                } else {
-                    if (AnimKnockforwards) {
-                        //Strong knockforwards
-                        currentAnimationState = CharacterState.STRONGKNOCKFORWARD;
-                    } else {
-                        //Strong knockback
-                        currentAnimationState = CharacterState.STRONGKNOCKBACK;
-                    }
-                }
-                if (AnimSwimming) {
-                    //Water knockback
-                    currentAnimationState = CharacterState.WATERKNOCKBACK;
-                }
-            }
-
-            var animData = character.GetAnimData(gameStyle, currentAnimationState, AnimPowerupState);
-            float FpsStick = animData.Fps;
-
-            if ((previousAnimationState != currentAnimationState) || (previousPowerup != AnimPowerupState)) {
-                if(previousAnimData.Sprites != animData.Sprites) {
-                    playerSpriteRenderer.frame = 0;
-                    playerSpriteRenderer.frames = animData.Sprites;
-                }
-            }
-            playerSpriteRenderer.fps = FpsStick * FpsMultiplier;
-            if (AnimFacingRight) {
-                playerSpriteDisplay.flipX = false;
-                capeSpriteDisplay.flipX = false;
-            } else {
-                playerSpriteDisplay.flipX = true;
-                capeSpriteDisplay.flipX = true;
-            }
-
-            //Mega scale
-            Vector3 scale;
-            if (mario->MegaMushroomEndFrames > 0) {
-                float endTimer = mario->MegaMushroomEndFrames / 60f;
-                if (!mario->MegaMushroomStationaryEnd) {
-                    endTimer *= 2;
-                }
-
-                scale = Vector3.one + (Vector3.one * (Mathf.Min(1, endTimer / 1.5f) * 2.6f));
-            } else {
-                float startTimer = mario->MegaMushroomStartFrames / 60f;
-
-                scale = mario->CurrentPowerupState switch {
-                    PowerupState.MiniMushroom => Vector3.one * 0.5f,
-                    PowerupState.MegaMushroom => Vector3.one + (Vector3.one * (Mathf.Min(1, 1 - (startTimer / 1.5f)) * 2.6f)),
-                    _ => Vector3.one,
-                };
-            }
-
-            teammateStompTimer -= Time.deltaTime;
-            if (teammateStompTimer < 0) {
-                teammateStompTimer = 0;
-            }
-
-            scale.y -= Mathf.Sin(teammateStompTimer * Mathf.PI / 0.15f) * 0.2f;
-            playerSpriteDisplay.transform.localScale = scale * spriteScale[(int) gameStyle];
-            capeSpriteDisplay.transform.localScale = scale;
-
-            previousPowerup = AnimPowerupState;
-            JumpLandTimer -= Math.Sign(JumpLandTimer);
-            PaddleTimer -= Math.Sign(PaddleTimer);
-            FireballTimer -= Math.Sign(FireballTimer);
-            ThrowTimer -= Math.Sign(ThrowTimer);
         }
     }
 }

@@ -1,6 +1,5 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +8,7 @@ namespace NSMB.UI.Game.Track {
 
         //---Serialized Variables
         [SerializeField] private float trackMinX, trackMaxX;
-        [SerializeField] protected Image image;
+        [SerializeField] protected Image image, upArrow, downArrow;
 
         //---Private Variables
         protected EntityRef targetEntity;
@@ -48,6 +47,24 @@ namespace NSMB.UI.Game.Track {
 
             float percentage = (targetTransform.position.x - levelMinX) * levelWidthReciprocal;
             transform.localPosition = new(percentage * trackWidth - trackMaxX, transform.localPosition.y, transform.localPosition.z);
+
+            if (upArrow && downArrow) {
+                float minCameraMaxHeight = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + 7, stage.CameraMaxPosition.Y.AsFloat);
+                float stageHeight = minCameraMaxHeight - stage.CameraMinPosition.Y.AsFloat;
+                if (stageHeight > 18) {
+                    // Thirds
+                    upArrow.enabled = targetTransform.position.y > minCameraMaxHeight - (stageHeight / 3f);
+                    downArrow.enabled = targetTransform.position.y < (stage.CameraMinPosition.Y.AsFloat) + (stageHeight / 3f);
+                } else if (stageHeight > 12) {
+                    // Halves
+                    upArrow.enabled = targetTransform.position.y > (minCameraMaxHeight + stage.CameraMinPosition.Y.AsFloat / 2f);
+                    downArrow.enabled = !upArrow.enabled;
+                } else {
+                    // Screen bounds
+                    upArrow.enabled = targetTransform.position.y > minCameraMaxHeight;
+                    downArrow.enabled = targetTransform.position.y < stage.CameraMinPosition.Y.AsFloat;
+                }
+            }
         }
     }
 }

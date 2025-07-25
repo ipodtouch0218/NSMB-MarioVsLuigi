@@ -170,7 +170,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void OnWatchClick() {
-            ActiveReplayManager.Instance.StartReplay(ReplayFile);
+            ActiveReplayManager.Instance.StartReplayPlayback(ReplayFile);
         }
 
         public void OnRenameClick() {
@@ -229,7 +229,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
             string finalWarningText;
             if (!header.IsCompatible) {
-                finalWarningText = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToString());
+                finalWarningText = tm.GetTranslationWithReplacements("ui.extras.replays.incompatible", "version", header.Version.ToStringIgnoreHotfix() + ".X");
                 warningText.color = criticalColor;
                 foreach (var button in compatibleButtons) {
                     button.interactable = false;

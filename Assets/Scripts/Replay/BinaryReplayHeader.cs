@@ -11,7 +11,7 @@ namespace NSMB.Replay {
     public class BinaryReplayHeader {
 
         //---Helpers
-        private static GameVersion? CachedCurrentVersion;
+        private static GameVersion CachedCurrentVersion;
         private static int MagicHeaderLength => Encoding.ASCII.GetByteCount(MagicHeader);
         private static readonly byte[] MagicBuffer = new byte[MagicHeaderLength];
 
@@ -31,8 +31,14 @@ namespace NSMB.Replay {
         public ReplayPlayerInformation[] PlayerInformation = Array.Empty<ReplayPlayerInformation>();
         public sbyte WinningTeam = -1;
 
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void ResetCachedVersion() {
+            CachedCurrentVersion = GameVersion.Parse(Application.version);
+        }
+
         internal long WriteToStream(Stream output) {
-            using BinaryWriter writer = new(output, Encoding.ASCII, true);
+            using BinaryWriter writer = new(output, Encoding.UTF8, true);
             
             writer.Write(Encoding.ASCII.GetBytes(MagicHeader)); // Write the *bytes* to avoid wasteful \0 termination
 
@@ -56,7 +62,7 @@ namespace NSMB.Replay {
         }
 
         internal static ReplayParseResult TryLoadFromFile(Stream input, out BinaryReplayHeader result) {
-            using BinaryReader reader = new(input, Encoding.ASCII, true);
+            using BinaryReader reader = new(input, Encoding.UTF8, true);
             
             result = new();
 
@@ -124,11 +130,7 @@ namespace NSMB.Replay {
 
 
         public static GameVersion GetCurrentVersion() {
-            if (!CachedCurrentVersion.HasValue) {
-                CachedCurrentVersion = GameVersion.Parse(Application.version);
-            }
-
-            return CachedCurrentVersion.Value;
+            return CachedCurrentVersion;
         }
     }
 }

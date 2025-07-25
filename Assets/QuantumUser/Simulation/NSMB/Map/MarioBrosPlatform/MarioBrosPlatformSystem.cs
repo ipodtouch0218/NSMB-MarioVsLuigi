@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class MarioBrosPlatformSystem : SystemSignalsOnly {
         public override void OnInit(Frame f) {
             f.Context.Interactions.Register<MarioPlayer, MarioBrosPlatform>(f, OnMarioBrosPlatformMarioPlayerInteraction);
@@ -12,7 +13,7 @@ namespace Quantum {
             FPVector2 down = FPVector2.Rotate(FPVector2.Down, transform->Rotation);
             FP dot = FPVector2.Dot(down, contact.Normal);
 
-            if (dot > PhysicsObjectSystem.GroundMaxAngle) {
+            if (dot > Constants.PhysicsGroundMaxAngleCos) {
                 // Hit the ground
                 BlockBumpSystem.Bump(f, contact.Position, marioEntity, false, true);
                 f.Events.MarioBrosPlatformBumped(platformEntity, contact.Position + (FPVector2.Down * FP._0_25));

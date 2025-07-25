@@ -71,6 +71,7 @@ namespace NSMB.Entities.World {
                 pulseEffectCounter += Time.deltaTime;
                 float sin = Mathf.Sin(pulseEffectCounter * pulseSpeed) * pulseAmount;
                 graphicTransform.localScale = Vector3.one + new Vector3(sin, sin, 0);
+                sRenderer.color = Color.white;
                 sRenderer.enabled = true;
             } else {
                 graphicTransform.localScale = Vector3.one;

@@ -2146,6 +2146,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: hud_arrow
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 221
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7832e7107c1ee5841844bf652b779154
+      internalID: 1388684475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -2182,6 +2204,7 @@ TextureImporter:
       copy: -1032943485
       dpad_button: -1771438400
       dropdown_arrow: -2027879749
+      hud_arrow: 1388684475
       hud_luigi: -7975249404588759376
       hud_mario: 7263181891274304025
       hud_star: 1346584908

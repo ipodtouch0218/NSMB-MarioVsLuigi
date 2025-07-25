@@ -289,7 +289,7 @@ namespace NSMB.UI.Game {
             // TEAMS
             if (teamsEnabled) {
                 if (mario->GetTeam(f) is byte teamIndex) {
-                    int teamObjective = gamemode.GetTeamObjectiveCount(f, teamIndex);
+                    int teamObjective = Mathf.Max(0, gamemode.GetTeamObjectiveCount(f, teamIndex));
                     if (cachedTeamObjective != teamObjective) {
                         cachedTeamObjective = teamObjective;
                         TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[teamIndex]);
@@ -303,7 +303,7 @@ namespace NSMB.UI.Game {
             }
 
             // STARS
-            int objective = gamemode.GetObjectiveCount(f, mario);
+            int objective = Mathf.Max(0, gamemode.GetObjectiveCount(f, mario));
             if (objective != cachedObjective) {
                 cachedObjective = objective;
                 string objectiveString = gamemode.ObjectiveSymbolPrefix + "x" + cachedObjective;

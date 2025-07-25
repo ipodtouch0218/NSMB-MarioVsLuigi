@@ -59,7 +59,7 @@ namespace NSMB.Quantum {
 #endif
 
         public void OnPowerupAction(InputAction.CallbackContext context) {
-            if (!playerElements.IsSpectating) {
+            if (!playerElements.IsSpectating && !playerElements.PauseMenu.IsPaused) {
                 QuantumRunner.DefaultGame.SendCommand(new CommandSpawnReserveItem());
             }
         }

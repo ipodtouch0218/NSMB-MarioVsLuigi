@@ -1,6 +1,7 @@
 using Photon.Deterministic;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class BlockBumpSystem : SystemMainThreadEntityFilter<BlockBump, BlockBumpSystem.Filter> {
 
         private static readonly FPVector2 BumpOffset = new FPVector2(0, -FP._0_25);
@@ -32,10 +33,8 @@ namespace Quantum {
             newSize.Y += FP._0_25 * sizeAmount / 3;
 
             collider->Shape.Box.Extents = newSize;
-            transform->Position =
-                blockBump->Origin
-                + bumpOffset
-                + new FPVector2(0, blockBump->IsDownwards ? (bumpScale.Y * 2 - newSize.Y) : newSize.Y);
+            transform->Position = blockBump->Origin + bumpOffset;
+            transform->Position.Y += blockBump->IsDownwards ? (bumpScale.Y * 2 - newSize.Y) : newSize.Y;
 
             if (!blockBump->HasBumped) {
                 Bump(f, transform->Position, blockBump->Owner, blockBump->AllowSelfDamage, !blockBump->IsDownwards, bumpScale.X, -bumpOffset.Y / 2);

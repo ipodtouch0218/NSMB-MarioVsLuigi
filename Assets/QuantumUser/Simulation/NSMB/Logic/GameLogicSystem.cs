@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Quantum {
+    [UnityEngine.Scripting.Preserve]
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
         ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
@@ -111,6 +112,10 @@ namespace Quantum {
                     // Respawn all players and enable systems
                     f.Global->StartFrame = f.Number;
                     f.SystemEnable<StartDisabledSystemGroup>();
+
+                    foreach (var otherGamemodes in f.SimulationConfig.AllGamemodes) {
+                        f.FindAsset(otherGamemodes).DisableGamemode(f);
+                    }
 
                     var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
                     gamemode.EnableGamemode(f);

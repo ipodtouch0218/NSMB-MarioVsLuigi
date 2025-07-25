@@ -1,7 +1,10 @@
+using Photon.Deterministic;
+
 namespace Quantum {
 
+    [UnityEngine.Scripting.Preserve]
     public unsafe class EnemySystem : SystemMainThreadEntityFilter<Enemy, EnemySystem.Filter>, ISignalOnStageReset, ISignalOnTryLiquidSplash, ISignalOnBeforeInteraction,
-        ISignalOnEnemyDespawned, ISignalOnEnemyRespawned {
+        ISignalOnEnemyDespawned, ISignalOnEnemyRespawned, ISignalOnMarioPlayerMegaMushroomFootstep {
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -75,7 +78,7 @@ namespace Quantum {
                         continue;
                     }
 
-                    if (PhysicsObjectSystem.BoxInGround((FrameThreadSafe) f, transform->Position, collider->Shape, entity: entity)) {
+                    if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
                         f.Signals.OnEnemyKilledByStageReset(entity);
                     }
                 } else {
@@ -118,7 +121,23 @@ namespace Quantum {
         public void OnEnemyRespawned(Frame f, EntityRef entity) {
             if (f.Has<Enemy>(entity) && f.Unsafe.TryGetPointer(entity, out PhysicsCollider2D* collider)) {
                 collider->Enabled = true;
+            }
+        }
 
+        public void OnMarioPlayerMegaMushroomFootstep(Frame f) {
+            var it = f.Unsafe.FilterStruct<Filter>();
+            Filter filter = default;
+            while (it.Next(&filter)) {
+                var physicsObject = filter.PhysicsObject;
+                if (!filter.Enemy->IsAlive
+                    || physicsObject->IsFrozen
+                    || physicsObject->DisableCollision
+                    || !physicsObject->IsTouchingGround) {
+                    continue;
+                }
+                
+                physicsObject->Velocity.Y = Constants._3_50;
+                physicsObject->IsTouchingGround = false;
             }
         }
     }
