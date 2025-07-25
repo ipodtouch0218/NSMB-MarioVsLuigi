@@ -172,7 +172,7 @@ namespace Quantum {
                 effectiveVelocity = MoveHorizontally(f, effectiveVelocity, ref filter, stage, contacts, out _);
                 ResolveContacts(f, stage, physicsObject, contacts);
 
-                if (!physicsObject->DisableCollision /*&& !physicsObject->IsTouchingGround*/ && physicsObject->WasTouchingGround && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y) {
+                if (!physicsObject->DisableCollision /*&& !physicsObject->IsTouchingGround*/ && physicsObject->WasTouchingGround && (physicsObject->FloorAngle == 0 || FPMath.Sign(physicsObject->FloorAngle) == FPMath.Sign(physicsObject->Velocity.X)) && physicsObject->Velocity.Y <= physicsObject->PreviousFrameVelocity.Y) {
                     // Try snapping
                     FPVector2 previousVelocity = effectiveVelocity;
                     FPVector2 testVelocity = effectiveVelocity;
