@@ -1,12 +1,47 @@
-﻿using System;
+﻿using Miniscript;
+using System;
 
 namespace Quantum {
     public unsafe partial class Frame {
 
         public StageTileInstance[] StageTiles;
+        public Interpreter MiniscriptInterpreter;
 
         partial void InitUser() {
             StageTiles = Array.Empty<StageTileInstance>();
+
+            string script = @"
+update = function()
+    tile = frame.getStageTile(7, 7)
+    tile.rotation += 64
+end function
+";
+            script += @"
+_events = []
+while true
+  if _events.len > 0 then
+    _nextEvent = _events.pull
+    _nextEvent
+  end if
+  yield
+end while";
+            string debug = "", error = "";
+            MiniscriptInterpreter = new(script, 
+                (str, ln) => {
+                    debug += str;
+                    if (ln) {
+                        UnityEngine.Debug.Log(str);
+                        str = "";
+                    }
+                },
+                (str, ln) => {
+                    error += str;
+                    if (ln) {
+                        UnityEngine.Debug.LogError(str);
+                        str = "";
+                    }
+                });
+            MiniscriptInterpreter.Compile();
         }
 
         partial void SerializeUser(FrameSerializer serializer) {

@@ -4,6 +4,7 @@ namespace NSMB.Sound {
     public class LoopingMusicPlayer : MonoBehaviour {
 
         //---Properties
+        public AudioSource AudioSource => audioSource;
         public bool IsPlaying => audioSource.isPlaying;
         public float AudioStart => currentAudio.loopStartSeconds * CurrentSpeedupFactor;
         public float AudioEnd => currentAudio.loopEndSeconds * CurrentSpeedupFactor;

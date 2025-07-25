@@ -151,7 +151,7 @@ namespace Quantum {
             ReserveItem = newItem;
         }
 
-        public void Death(Frame f, EntityRef entity, bool fire, bool dropStars, EntityRef attacker) {
+        public void Death(Frame f, EntityRef entity, bool fire, bool dropObjectives, EntityRef attacker) {
             if (IsDead) {
                 return;
             }
@@ -167,8 +167,12 @@ namespace Quantum {
                 f.Signals.OnMarioPlayerDropObjective(entity, 1, attacker);
                 DeathAnimationFrames = (GamemodeData.StarChasers->Stars > 0) ? (byte) 30 : (byte) 36;
             } else {
-                if (dropStars) {
-                    f.Signals.OnMarioPlayerDropObjective(entity, 1, attacker);
+                if (dropObjectives) {
+                    int objectiveCount = 1;
+                    if (f.Unsafe.TryGetPointer(attacker, out MarioPlayer* attackerMario) && attackerMario->IsGroundpoundActive) {
+                        objectiveCount = 3;
+                    }
+                    f.Signals.OnMarioPlayerDropObjective(entity, objectiveCount, attacker);
                 }
                 DeathAnimationFrames = 36;
             }

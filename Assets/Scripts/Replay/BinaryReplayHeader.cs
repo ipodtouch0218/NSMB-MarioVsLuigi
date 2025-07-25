@@ -38,7 +38,7 @@ namespace NSMB.Replay {
         }
 
         internal long WriteToStream(Stream output) {
-            using BinaryWriter writer = new(output, Encoding.ASCII, true);
+            using BinaryWriter writer = new(output, Encoding.UTF8, true);
             
             writer.Write(Encoding.ASCII.GetBytes(MagicHeader)); // Write the *bytes* to avoid wasteful \0 termination
 
@@ -62,7 +62,7 @@ namespace NSMB.Replay {
         }
 
         internal static ReplayParseResult TryLoadFromFile(Stream input, out BinaryReplayHeader result) {
-            using BinaryReader reader = new(input, Encoding.ASCII, true);
+            using BinaryReader reader = new(input, Encoding.UTF8, true);
             
             result = new();
 

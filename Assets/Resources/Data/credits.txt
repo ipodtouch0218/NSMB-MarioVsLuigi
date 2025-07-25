@@ -2,6 +2,7 @@
 ipodtouch0218
 
 <color=yellow>{ui.about.credits.github}</color>
+amykaname
 Amy54Desu
 AprilShade
 ArianLust
@@ -62,6 +63,7 @@ Kate Karui <color=#AAAAAA>(sv-sv)</color>
 Laxan3000 <color=#AAAAAA>(it-it)</color>
 LyroyTheToad <color=#AAAAAA>(it-it)</color>
 Maestrike <color=#AAAAAA>(it-it)</color>
+Maksymilian Król <color=#AAAAAA>(pl-pl)</color>
 marbo <color=#AAAAAA>(pt-br)</color>
 Mark19 <color=#AAAAAA>(es-es)</color>
 MasterMindo <color=#AAAAAA>(it-it)</color>
@@ -81,7 +83,6 @@ SLG64 <color=#AAAAAA>(es-la)</color>
 Snayp <color=#AAAAAA>(fr-fr)</color>
 Thebababois369 <color=#AAAAAA>(id-id)</color>
 Tombuntu <color=#AAAAAA>(ja-jp)</color>
-Watercats <color=#AAAAAA>(pl-pl)</color>
 Windows10V <color=#AAAAAA>(pt-br)</color>
 vlco_o <color=#AAAAAA>(es-es, ro-ro)</color>
 

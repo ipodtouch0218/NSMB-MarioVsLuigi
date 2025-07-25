@@ -101,7 +101,6 @@ namespace NSMB.UI.Game.Results {
         }
 
         private void OnSubmit(InputAction.CallbackContext context) {
-
             if (GlobalController.Instance.optionsManager.isActiveAndEnabled || context.canceled || (previousCountdownTime == 0 && !IsReplay)) {
                 return;
             }

@@ -81,7 +81,7 @@
   "ui.extras.replays.temporary.nodelete": "一時リプレイ",
   "ui.extras.replays.rename.header": "リプレイ名を変更",
   "ui.extras.replays.delete.header": "リプレイを削除",
-  "ui.extras.replays.delete.text": "リプレイ削除\n本当に'{replayname}'を削除しますか？\n元に戻すことはできません。",
+  "ui.extras.replays.delete.text": "本当に'{replayname}'を消しますか？\nこの操作は元に戻せません。",
   "ui.extras.replays.incompatible": "互換性なし - {version}のバージョンで見ることができます!",
   "ui.extras.replays.favorited": "お気に入り",
   "ui.extras.replays.none": "リプレイが見つかりませんでした。\n\nリプレイ録画が有効です。ゲームをプレイしましょう!",
@@ -225,7 +225,7 @@
   "ui.inroom.settings.game.timer": "タイムリミット",
   "ui.inroom.settings.game.timer.description": "ゲームの時間制限の分数。時間切れになると、その時点で一位だったプレイヤーまたはチームが即座に勝利となる。1位が複数人いる場合は、ひとりになるまでゲームが続行される。",
   "ui.inroom.settings.game.teams": "チーム",
-  "ui.inroom.settings.game.teams.description": "5つまでのチーム選択を可能にする。同じチームのプレイヤーは目標を共有し、仲間からビッグスターを奪うことはできない。(フレンドリーファイアON時は可能)",
+  "ui.inroom.settings.game.teams.description": "5つまでのチーム選択を可能にする。同じチームのプレイヤーは目標を共有し、チームメイトからビッグスターを奪うことはできない。(フレンドリーファイアON時は可能)",
   "ui.inroom.settings.game.friendlyfire": "フレンドリーファイア",
   "ui.inroom.settings.game.friendlyfire.description": "同じチームでも、お互いに攻撃してスターを奪うことができるようにする。これには、プロペラスーツのドリル落下のような直接攻撃と、ファイアフラワーのような飛び道具での攻撃の双方が含まれる。",
   "ui.inroom.settings.game.powerups": "新しいパワーアップ",
@@ -297,6 +297,7 @@
   "ui.loading.musiccreator": "作曲者: {username}",
   "ui.loading.spectator": "観戦者として参加中...",
   "ui.loading.waiting": "対戦相手を待っています...",
+  "ui.loading.waitingon": "準備中:",
   "ui.loading.loading": "ロード中...",
   "ui.loading.starting": "開始中…",
   "ui.loading.ready": "READY!",
@@ -380,5 +381,5 @@
   "gamemode.starchasers": "ビッグスター(クラシック)",
   "gamemode.starchasers.description": "DS時代のオーソドックスなマリオVSルイージのゲームモード!ランダムに発生するビッグスターをゲットして勝利しよう。コインを集めてアイテムを手に入れ、ほかのプレイヤーを攻撃してスターを奪おう。",
   "gamemode.coinrunners": "コインバトル",
-  "gamemode.coinrunners.description": "他のプレイヤーを攻撃してパープルコインをドロップさせよう。時間切れで一番多くのコインを持っていたものが勝者となる!スターコインはパープルコイン25枚分の価値がある。ミスすると所持パープルコインの20%を失うぞ。負けが込んでいるなら、黄色のコインを集めることでパープルコインを大量にゲットできるゴールドブロックを得られるかも!"
+  "gamemode.coinrunners.description": "他のプレイヤーを攻撃してパープルコインをドロップさせよう。時間切れで一番多くのコインを持っていたものが勝者となる!スターコインはパープルコイン25枚分の価値がある。ミスすると所持パープルコインの20%を失うぞ。負けが込んでいるなら、黄色のコインを集めることでパープルコインを大量にゲットできるゴールドブロックを得られるチャンスがあるぞ!"
 }

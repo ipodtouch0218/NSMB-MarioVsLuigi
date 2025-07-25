@@ -32,7 +32,7 @@ namespace NSMB.Replay {
                 throw new InvalidOperationException("Cannot write replay that's not fully loaded!");
             }
 
-            using BinaryWriter writer = new(output, Encoding.ASCII, true);
+            using BinaryWriter writer = new(output, Encoding.UTF8, true);
             Header.WriteToStream(output);
 
             // Write variable-length data lengths
@@ -67,8 +67,7 @@ namespace NSMB.Replay {
         }
 
         private ReplayParseResult LoadFromStream(Stream input, bool includeReplayData) {
-            using BinaryReader reader = new(input, Encoding.ASCII);
-            BinaryFormatter formatter = new();
+            using BinaryReader reader = new(input, Encoding.UTF8);
 
             try {
                 ReplayParseResult headerParseResult = BinaryReplayHeader.TryLoadFromFile(input, out var tempHeader);
