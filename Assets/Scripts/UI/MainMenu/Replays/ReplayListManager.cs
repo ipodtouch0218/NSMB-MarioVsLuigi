@@ -69,6 +69,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #endif
 
         public void Initialize() {
+#if TODO && !UNITY_WEBGL
             watcher = new FileSystemWatcher(ReplayDirectory) {
                 NotifyFilter = NotifyFilters.CreationTime
                                      | NotifyFilters.DirectoryName
@@ -82,6 +83,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             watcher.Created += OnFileCreated;
             watcher.Deleted += OnFileDeleted;
             watcher.EnableRaisingEvents = true;
+#endif
 
             FindReplays();
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
