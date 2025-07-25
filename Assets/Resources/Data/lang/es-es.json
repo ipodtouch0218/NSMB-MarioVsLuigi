@@ -297,6 +297,7 @@
   "ui.loading.musiccreator": "Música hecha por {username}",
   "ui.loading.spectator": "Uniéndose como Espectador...",
   "ui.loading.waiting": "Esperando a Otros...",
+  "ui.loading.waitingon": "Esperando a:",
   "ui.loading.loading": "Cargando...",
   "ui.loading.starting": "Empezando...",
   "ui.loading.ready": "¿Listo?",

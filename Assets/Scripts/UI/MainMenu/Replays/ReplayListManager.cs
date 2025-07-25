@@ -411,13 +411,13 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         private IEnumerator ImportFile(string filepath, bool makeCopy) {
 #if UNITY_WEBGL
-            using UnityWebRequest downloadRequest = new(filepath, "GET");
-            downloadRequest.downloadHandler = new DownloadHandlerBuffer();
+            using UnityEngine.Networking.UnityWebRequest downloadRequest = new(filepath, "GET");
+            downloadRequest.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
             yield return downloadRequest.SendWebRequest();
             while (!downloadRequest.downloadHandler.isDone) {
                 yield return null;
             }
-            byte[] replay = ((DownloadHandlerBuffer) downloadRequest.downloadHandler).data;
+            byte[] replay = ((UnityEngine.Networking.DownloadHandlerBuffer) downloadRequest.downloadHandler).data;
             using MemoryStream memStream = new MemoryStream(replay);
 
             ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromStream(memStream, true, out BinaryReplayFile parsedReplay);

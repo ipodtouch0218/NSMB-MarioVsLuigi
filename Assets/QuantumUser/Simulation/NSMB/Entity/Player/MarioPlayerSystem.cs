@@ -131,7 +131,7 @@ namespace Quantum {
                 mario->IsSkidding = false;
             }
 
-            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable) && holdable->HoldAboveHead && f.Number - mario->HoldStartFrame < 60) {
+            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable) && holdable->HoldAboveHead && f.Number - mario->HoldStartFrame < physics.IceBlockPickupFreezeFrames) {
                 physicsObject->Velocity.X = 0;
                 return;
             }
@@ -394,7 +394,7 @@ namespace Quantum {
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
             QuantumUtils.Decrement(ref mario->CantJumpTimer);
 
-            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable) && holdable->HoldAboveHead && f.Number - mario->HoldStartFrame < 60) {
+            if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable) && holdable->HoldAboveHead && f.Number - mario->HoldStartFrame < physics.IceBlockPickupFreezeFrames) {
                 return;
             }
 

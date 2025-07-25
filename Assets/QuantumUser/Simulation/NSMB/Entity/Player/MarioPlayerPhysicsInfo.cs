@@ -132,9 +132,9 @@ public class MarioPlayerPhysicsInfo : AssetObject {
 
     public FPVector2 IceBlockSmallSize = new FPVector2(FP.FromString("0.65"), FP.FromString("0.65"));
     public FPVector2 IceBlockBigSize = new FPVector2(FP.FromString("0.65"), FP.FromString("1.3"));
-
     public FPVector2 IceBlockSmallOffset = FPVector2.Zero;
     public FPVector2 IceBlockBigOffset = FPVector2.Zero;
+    public byte IceBlockPickupFreezeFrames = 20;
 
     public byte MegaMushroomStepInterval = 20;
 
