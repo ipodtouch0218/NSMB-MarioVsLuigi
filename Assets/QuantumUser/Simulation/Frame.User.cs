@@ -12,8 +12,18 @@ namespace Quantum {
 
             string script = @"
 update = function()
-    tile = frame.getStageTile(7, 7)
-    tile.rotation += 64
+    print ""test""
+    for i in range(0,9)
+        playerData = frame.getPlayerData(i)
+        if playerData == null then
+            continue
+        end if
+        print playerdata.inputs
+        print playerdata.inputs.jump
+        if playerData.inputs().jump.wasPressed then
+            print ""jump was pressed by player "" + i + "" on frame "" + frame.number
+        end if
+    end for
 end function
 ";
             script += @"

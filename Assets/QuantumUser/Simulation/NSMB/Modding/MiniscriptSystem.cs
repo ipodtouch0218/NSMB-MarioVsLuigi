@@ -1,13 +1,14 @@
 using Miniscript;
 using Photon.Deterministic;
 using Quantum.Profiling;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class MiniscriptSystem : SystemMainThread {
 
         private static bool intrinsicsInitialized = false;
-        private ValMap Frame, PlayerData, StageTile;
-        private Intrinsic Frame_GetStageTile;
+        private ValMap Frame, PlayerData, StageTile, Input, Button, EmptyObject;
+        private Intrinsic Frame_GetStageTile, Frame_GetPlayerData, Frame_Create, Frame_Exists, Frame_Destroy, PlayerData_Inputs;
 
         public override void OnInit(Frame f) {
             InitializeIntrinsics();
@@ -28,26 +29,10 @@ namespace Quantum {
             Frame.userData = f;
             f.MiniscriptInterpreter.SetGlobalValue("frame", Frame);
 
-            /*
-            // Player info
-            ValList players = new();
-            foreach ((var _, var playerData) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
-                ValMap playerMap = new();
-                playerMap["Inputs"] = GetInputs(f, playerData->PlayerRef);
-                playerMap["PlayerRef"] = new ValNumber((int) playerData->PlayerRef);
-                playerMap["Team"] = new ValNumber((int) playerData->RealTeam);
-                playerMap["IsHost"] = (playerData->IsRoomHost ? ValNumber.one : ValNumber.zero);
-                players.values.Add(playerMap);
-            }
-            f.MiniscriptInterpreter.SetGlobalValue("Players", players);
-
-            // Mario info
-            */
-
             // Execute
-            f.MiniscriptInterpreter.RunUntilDone((10 * f.DeltaTime).AsDouble, true);
+            f.MiniscriptInterpreter.RunUntilDone(0.2, true);
             if (!f.MiniscriptInterpreter.vm.yielding) {
-                // Ran for 10 frames. Probably an infinite loop. Bail.
+                // Ran for 200ms. Probably an infinite loop. Crash.
                 
             }
         }
@@ -87,6 +72,72 @@ namespace Quantum {
                 return new Intrinsic.Result(result);
             };
 
+            Frame_GetPlayerData = Intrinsic.Create("");
+            Frame_GetPlayerData.AddParam("player");
+            Frame_GetPlayerData.code = (context, partial) => {
+                int playerRef = context.GetLocalInt("player");
+                Frame f = Frame.userData as Frame;
+                var dict = f.ResolveDictionary(f.Global->PlayerDatas);
+
+                if (!dict.ContainsKey(playerRef)) {
+                    return Intrinsic.Result.Null;
+                }
+                ValMap result = PlayerData.ShallowCopy();
+                result.userData = dict[playerRef];
+                return new Intrinsic.Result(result);
+            };
+
+            Frame_Create = Intrinsic.Create("");
+            Frame_Create.AddParam("entityPrototypeRef");
+            Frame_Create.code = (context, partial) => {
+                ValMap entityPrototypeRef = context.GetLocal("entityPrototypeRef") as ValMap;
+                Frame f = Frame.userData as Frame;
+                EntityRef newEntity;
+                if (entityPrototypeRef?.userData is AssetRef<EntityPrototype> ep) {
+                    try {
+                        newEntity = f.Create(ep);
+                    } catch {
+                        return Intrinsic.Result.Null;
+                    }
+                } else {
+                    newEntity = f.Create();
+                }
+                ValMap ret = EmptyObject.ShallowCopy();
+                ret.userData = newEntity;
+                return new Intrinsic.Result(ret);
+            };
+
+            Frame_Exists = Intrinsic.Create("");
+            Frame_Exists.AddParam("entityRef");
+            Frame_Exists.code = (context, partial) => {
+                ValMap entityRef = context.GetLocal("entityRef") as ValMap;
+                if (entityRef?.userData is EntityRef en) {
+                    Frame f = Frame.userData as Frame;
+                    return f.Exists(en) ? Intrinsic.Result.True : Intrinsic.Result.False;
+                }
+                return Intrinsic.Result.False;
+            };
+
+            Frame_Destroy = Intrinsic.Create("");
+            Frame_Destroy.AddParam("entityRef");
+            Frame_Destroy.code = (context, partial) => {
+                ValMap entityRef = context.GetLocal("entityRef") as ValMap;
+                if (entityRef?.userData is EntityRef en) {
+                    Frame f = Frame.userData as Frame;
+                    return f.Destroy(en) ? Intrinsic.Result.True : Intrinsic.Result.False;
+                }
+                return Intrinsic.Result.False;
+            };
+
+            PlayerData_Inputs = Intrinsic.Create("");
+            PlayerData_Inputs.code = (context, partial) => {
+                ValMap self = context.self as ValMap;
+                Frame f = Frame.userData as Frame;
+                var ret = Input.ShallowCopy();
+                ret.userData = f.Unsafe.GetPointer<PlayerData>((EntityRef) self.userData)->PlayerRef;
+                return new Intrinsic.Result(ret);
+            };
+
             intrinsicsInitialized = true;
         }
 
@@ -104,6 +155,10 @@ namespace Quantum {
                 case "playerCount": outValue = new ValNumber(f.ComponentCount<PlayerData>()); break;
                 case "rng": outValue = new ValNumber(f.RNG->Next()); break;
                 case "getStageTile": outValue = Frame_GetStageTile.GetFunc(); break;
+                case "getPlayerData": outValue = Frame_GetPlayerData.GetFunc(); break;
+                case "create": outValue = Frame_Create.GetFunc(); break;
+                case "exists": outValue = Frame_Exists.GetFunc(); break;
+                case "destroy": outValue = Frame_Destroy.GetFunc(); break;
                 }
                 return true;
             };
@@ -163,6 +218,7 @@ namespace Quantum {
                 case "isSpectator": outValue = playerData->IsSpectator ? ValNumber.one : ValNumber.zero; break;
                 case "character": outValue = new ValNumber(playerData->Character); break;
                 case "palette": outValue = new ValNumber(playerData->Palette); break;
+                case "inputs": outValue = PlayerData_Inputs.GetFunc(); break;
                 }
                 outValue = null;
                 return true;
@@ -186,9 +242,55 @@ namespace Quantum {
                 //case "character": playerData->Character = (byte) value.IntValue(); break;
                 //case "palette": playerData->Palette = (byte) value.IntValue(); break;
                 }
-                value = null;
                 return true;
             };
+
+            Input = new();
+            Input.evalOverride = (ValMap self, Value key, out Value outValue) => {
+                outValue = null;
+                Frame f = Frame.userData as Frame;
+                PlayerRef player = (PlayerRef) self.userData;
+                Input* inputs = f.GetPlayerInput(player);
+                if (inputs == null) {
+                    return true;
+                }
+
+                var ret = Button.ShallowCopy();
+                switch (key.ToString()) {
+                case "up": ret.userData = inputs->Up; break;
+                case "right": ret.userData = inputs->Right; break;
+                case "down": ret.userData = inputs->Down; break;
+                case "left": ret.userData = inputs->Left; break;
+                case "jump": ret.userData = inputs->Jump; break;
+                case "sprint": ret.userData = inputs->Sprint; break;
+                case "powerupAction": ret.userData = inputs->PowerupAction; break;
+                case "fireballPowerupAction": ret.userData = inputs->FireballPowerupAction; break;
+                case "propellerPowerupAction": ret.userData = inputs->PropellerPowerupAction; break;
+                default: return true;
+                }
+                outValue = ret;
+                return true;
+            };
+            Input.assignOverride = AssignNothing;
+
+            Button = new();
+            Button.evalOverride = (ValMap self, Value key, out Value outValue) => {
+                outValue = null;
+                Button b = (Button) self.userData;
+
+                switch (key.ToString()) {
+                case "isDown": outValue = (b.IsDown ? ValNumber.one : ValNumber.zero); break;
+                case "wasPressed": outValue = (b.WasPressed ? ValNumber.one : ValNumber.zero); break;
+                case "wasReleased": outValue = (b.WasReleased ? ValNumber.one : ValNumber.zero); break;
+                default: return true;
+                }
+                return true;
+            };
+            Button.assignOverride = AssignNothing;
+
+            EmptyObject = new();
+            EmptyObject.evalOverride = EvalNothing;
+            EmptyObject.assignOverride = AssignNothing;
         }
 
         private ValMap GetInputs(Frame f, PlayerRef player) {
@@ -207,7 +309,7 @@ namespace Quantum {
             AddButtonInput(inputMap, new ValString("PowerupAction"), inputs->PowerupAction);
             AddButtonInput(inputMap, new ValString("FireballAction"), inputs->FireballPowerupAction);
             AddButtonInput(inputMap, new ValString("PropellerAction"), inputs->PropellerPowerupAction);
-            inputMap.assignOverride = DoNothing;
+            inputMap.assignOverride = AssignNothing;
             return inputMap;
         }
 
@@ -216,12 +318,17 @@ namespace Quantum {
             thisInputMap["WasPressed"] =  button.WasPressed ? ValNumber.one : ValNumber.zero;
             thisInputMap["IsDown"] =      button.IsDown ? ValNumber.one : ValNumber.zero;
             thisInputMap["WasReleased"] = button.WasReleased ? ValNumber.one : ValNumber.zero;
-            thisInputMap.assignOverride = DoNothing;
+            thisInputMap.assignOverride = AssignNothing;
             inputMap.map[name] = thisInputMap;
         }
 
-        private static ValMap.AssignOverrideFunc DoNothing = (s,k,v) => {
-            return false;
+        private static ValMap.EvalOverrideFunc EvalNothing = (ValMap s, Value k, out Value v) => {
+            v = null;
+            return true;
+        };
+
+        private static ValMap.AssignOverrideFunc AssignNothing = (s,k,v) => {
+            return true;
         };
     }
 }
