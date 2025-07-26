@@ -111,7 +111,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnDestroyCustom() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+#if TODO && !UNITY_WEBGL
             watcher.Dispose();
+#endif
         }
 
         public void Show() {
