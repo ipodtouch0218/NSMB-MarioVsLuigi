@@ -1,6 +1,7 @@
 using Miniscript;
 using Photon.Deterministic;
 using Quantum.Profiling;
+using System;
 using UnityEngine;
 
 namespace Quantum {
@@ -8,7 +9,7 @@ namespace Quantum {
 
         private static bool intrinsicsInitialized = false;
         private ValMap Frame, PlayerData, StageTile, Input, Button, EmptyObject;
-        private Intrinsic Frame_GetStageTile, Frame_GetPlayerData, Frame_Create, Frame_Exists, Frame_Destroy, PlayerData_Inputs;
+        private Intrinsic Frame_GetStageTile, Frame_GetPlayerData, Frame_Create, Frame_Exists, Frame_Destroy, Frame_FindAsset, Frame_Add, Frame_Get, Frame_Has, Frame_Remove, PlayerData_Inputs;
 
         public override void OnInit(Frame f) {
             InitializeIntrinsics();
@@ -39,7 +40,7 @@ namespace Quantum {
 
         private void InitializeIntrinsics() {
             if (intrinsicsInitialized) {
-                return;
+                Intrinsic.Clear();
             }
 
             // Globals
@@ -88,53 +89,127 @@ namespace Quantum {
             };
 
             Frame_Create = Intrinsic.Create("");
-            Frame_Create.AddParam("entityPrototypeRef");
+            Frame_Create.AddParam("assetRef");
             Frame_Create.code = (context, partial) => {
-                ValMap entityPrototypeRef = context.GetLocal("entityPrototypeRef") as ValMap;
+                Value param = context.GetLocal("assetRef", null);
                 Frame f = Frame.userData as Frame;
                 EntityRef newEntity;
-                if (entityPrototypeRef?.userData is AssetRef<EntityPrototype> ep) {
-                    try {
+
+                if (param is ValAssetRef valAssetObject) {
+                    if (f.Context.ResourceManager.TryGetAsset(valAssetObject.Asset, out EntityPrototype ep)) {
+                        // Create from prototype
                         newEntity = f.Create(ep);
-                    } catch {
+                    } else {
+                        // Failure, do nothing
                         return Intrinsic.Result.Null;
                     }
-                } else {
+                } else if (param == null) {
+                    // Create empty
                     newEntity = f.Create();
+                } else {
+                    // Do nothing- invalid param
+                    return Intrinsic.Result.Null;
                 }
-                ValMap ret = EmptyObject.ShallowCopy();
-                ret.userData = newEntity;
-                return new Intrinsic.Result(ret);
+
+                return new Intrinsic.Result(new ValEntityRef(newEntity));
             };
 
             Frame_Exists = Intrinsic.Create("");
             Frame_Exists.AddParam("entityRef");
             Frame_Exists.code = (context, partial) => {
-                ValMap entityRef = context.GetLocal("entityRef") as ValMap;
-                if (entityRef?.userData is EntityRef en) {
-                    Frame f = Frame.userData as Frame;
-                    return f.Exists(en) ? Intrinsic.Result.True : Intrinsic.Result.False;
-                }
-                return Intrinsic.Result.False;
+                EntityRef entity = (context.GetLocal("entityRef") as ValEntityRef)?.EntityRef ?? EntityRef.None;
+                Frame f = Frame.userData as Frame;
+                return f.Exists(entity) ? Intrinsic.Result.True : Intrinsic.Result.False;
             };
 
             Frame_Destroy = Intrinsic.Create("");
             Frame_Destroy.AddParam("entityRef");
             Frame_Destroy.code = (context, partial) => {
-                ValMap entityRef = context.GetLocal("entityRef") as ValMap;
-                if (entityRef?.userData is EntityRef en) {
-                    Frame f = Frame.userData as Frame;
-                    return f.Destroy(en) ? Intrinsic.Result.True : Intrinsic.Result.False;
+                EntityRef entity = (context.GetLocal("entityRef") as ValEntityRef)?.EntityRef ?? EntityRef.None;
+                Frame f = Frame.userData as Frame;
+                return f.Destroy(entity) ? Intrinsic.Result.True : Intrinsic.Result.False;
+            };
+
+            Frame_FindAsset = Intrinsic.Create("");
+            Frame_FindAsset.AddParam("path");
+            Frame_FindAsset.code = (context, partial) => {
+                string path = context.GetLocalString("path");
+                Frame f = Frame.userData as Frame;
+                var asset = f.Context.ResourceManager.GetAsset(path);
+                return new Intrinsic.Result(new ValAssetRef(asset));
+            };
+
+            Frame_Add = Intrinsic.Create("");
+            Frame_Add.AddParam("entityRef");
+            Frame_Add.AddParam("type");
+            Frame_Add.code = (context, partial) => {
+                EntityRef entity = (context.GetLocal("entityRef") as ValEntityRef)?.EntityRef ?? EntityRef.None;
+                int id = ComponentTypeId.GetComponentIndex(context.GetLocalString("componentTypeName"));
+                Frame f = Frame.userData as Frame;
+                try {
+                    int index = ComponentTypeId.GetComponentIndex(context.GetLocalString("componentTypeName"));
+                    var result = f.Add(entity, index, out _);
+                    return (result is AddResult.ComponentAdded or AddResult.ComponentAlreadyExists) ? Intrinsic.Result.True : Intrinsic.Result.False;
+                } catch {
+                    return Intrinsic.Result.False;
                 }
-                return Intrinsic.Result.False;
+            };
+
+            Frame_Get = Intrinsic.Create("");
+            Frame_Get.AddParam("entityRef");
+            Frame_Get.AddParam("type");
+            Frame_Get.code = (context, partial) => {
+                EntityRef entity = (context.GetLocal("entityRef") as ValEntityRef)?.EntityRef ?? EntityRef.None;
+                Frame f = Frame.userData as Frame;
+                try {
+                    string typeStr = context.GetLocalString("type");
+                    int index = ComponentTypeId.GetComponentIndex(typeStr);
+                    Type type = ComponentTypeId.GetComponentType(index);
+
+                    if (!f.Unsafe.TryGetPointer(entity, index, out void* ptr)) {
+                        return Intrinsic.Result.Null;
+                    }
+                    return new Intrinsic.Result(new ValUnsafeStruct(type, (byte*) ptr));
+                } catch {
+                    return Intrinsic.Result.Null;
+                }
+            };
+
+            Frame_Has = Intrinsic.Create("");
+            Frame_Has.AddParam("entityRef");
+            Frame_Has.AddParam("type");
+            Frame_Has.code = (context, partial) => {
+                EntityRef entity = (context.GetLocal("entityRef") as ValEntityRef)?.EntityRef ?? EntityRef.None;
+                Frame f = Frame.userData as Frame;
+                try {
+                    int index = ComponentTypeId.GetComponentIndex(context.GetLocalString("type"));
+                    return f.Has(entity, index) ? Intrinsic.Result.True : Intrinsic.Result.False;
+                } catch {
+                    return Intrinsic.Result.False;
+                }
+            };
+
+            Frame_Remove = Intrinsic.Create("");
+            Frame_Remove.AddParam("entityRef");
+            Frame_Remove.AddParam("type");
+            Frame_Remove.code = (context, partial) => {
+                EntityRef entity = (context.GetLocal("entityRef") as ValEntityRef)?.EntityRef ?? EntityRef.None;
+                Frame f = Frame.userData as Frame;
+                try {
+                    int index = ComponentTypeId.GetComponentIndex(context.GetLocalString("type"));
+                    return f.Remove(entity, index) ? Intrinsic.Result.True : Intrinsic.Result.False;
+                } catch {
+                    return Intrinsic.Result.False;
+                }
             };
 
             PlayerData_Inputs = Intrinsic.Create("");
             PlayerData_Inputs.code = (context, partial) => {
                 ValMap self = context.self as ValMap;
                 Frame f = Frame.userData as Frame;
+                EntityRef en = (EntityRef) self.userData;
                 var ret = Input.ShallowCopy();
-                ret.userData = f.Unsafe.GetPointer<PlayerData>((EntityRef) self.userData)->PlayerRef;
+                ret.userData = f.Unsafe.GetPointer<PlayerData>(en)->PlayerRef;
                 return new Intrinsic.Result(ret);
             };
 
@@ -159,6 +234,11 @@ namespace Quantum {
                 case "create": outValue = Frame_Create.GetFunc(); break;
                 case "exists": outValue = Frame_Exists.GetFunc(); break;
                 case "destroy": outValue = Frame_Destroy.GetFunc(); break;
+                case "findAsset": outValue = Frame_FindAsset.GetFunc(); break;
+                case "add": outValue = Frame_Add.GetFunc(); break;
+                case "has": outValue = Frame_Has.GetFunc(); break;
+                case "get": outValue = Frame_Get.GetFunc(); break;
+                case "remove": outValue = Frame_Remove.GetFunc(); break;
                 }
                 return true;
             };
@@ -205,6 +285,7 @@ namespace Quantum {
             
             PlayerData = new();
             PlayerData.evalOverride = (ValMap self, Value key, out Value outValue) => {
+                outValue = null;
                 Frame f = Frame.userData as Frame;
                 EntityRef en = (EntityRef) self.userData;
                 var playerData = f.Unsafe.GetPointer<PlayerData>(en);
@@ -220,7 +301,6 @@ namespace Quantum {
                 case "palette": outValue = new ValNumber(playerData->Palette); break;
                 case "inputs": outValue = PlayerData_Inputs.GetFunc(); break;
                 }
-                outValue = null;
                 return true;
             };
             PlayerData.assignOverride = (ValMap self, Value key, Value value) => {

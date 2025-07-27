@@ -127,7 +127,7 @@ namespace Miniscript {
 		/// </summary>
 		/// <param name="index">index/key for the value to set</param>
 		/// <param name="value">value to set</param>
-		public virtual void SetElem(Value index, Value value) {}
+		public virtual void SetElem(Value index, Value value, TAC.Context context) {}
 
 		/// <summary>
 		/// Return whether this value is the given type (or some subclass thereof)
@@ -625,7 +625,7 @@ namespace Miniscript {
 
 		public override bool CanSetElem() { return true; }
 
-		public override void SetElem(Value index, Value value) {
+		public override void SetElem(Value index, Value value, TAC.Context context) {
 			var i = index.IntValue();
 			if (i < 0) i += values.Count;
 			if (i < 0 || i >= values.Count) {
@@ -937,7 +937,7 @@ namespace Miniscript {
 		/// we take the opportunity to look for an assignment override function,
 		/// and if found, give that a chance to handle it instead.
 		/// </summary>
-		public override void SetElem(Value index, Value value) {
+		public override void SetElem(Value index, Value value, TAC.Context context) {
 			if (index == null) index = ValNull.instance;
 			if (assignOverride == null || !assignOverride(this, index, value)) {
 				map[index] = value;
@@ -1149,42 +1149,42 @@ namespace Miniscript {
 			var includeMapType = true;
 			valueFoundIn = null;
 			int loopsLeft = ValMap.maxIsaDepth;
-			while (sequence != null) {
-				if (sequence is ValTemp || sequence is ValVar) sequence = sequence.Val(context);
-				if (sequence is ValMap) {
-					// If the map contains this identifier, return its value.
-					Value result = null;
-					var idVal = TempValString.Get(identifier);
-					bool found = ((ValMap)sequence).TryGetValue(idVal, out result);
-					TempValString.Release(idVal);
-					if (found) {
-						valueFoundIn = (ValMap)sequence;
-						return result;
-					}
-					
-					// Otherwise, if we have an __isa, try that next.
-					if (loopsLeft < 0) throw new LimitExceededException("__isa depth exceeded (perhaps a reference loop?)"); 
-					if (!((ValMap)sequence).TryGetValue(ValString.magicIsA, out sequence)) {
-						// ...and if we don't have an __isa, try the generic map type if allowed
-						if (!includeMapType) throw new KeyException(identifier);
-						sequence = context.vm.mapType ?? Intrinsics.MapType();
-						includeMapType = false;
-					}
-				} else if (sequence is ValList) {
-					sequence = context.vm.listType ?? Intrinsics.ListType();
-					includeMapType = false;
-				} else if (sequence is ValString) {
-					sequence = context.vm.stringType ?? Intrinsics.StringType();
-					includeMapType = false;
-				} else if (sequence is ValNumber) {
-					sequence = context.vm.numberType ?? Intrinsics.NumberType();
-					includeMapType = false;
-				} else if (sequence is ValFunction) {
-					sequence = context.vm.functionType ?? Intrinsics.FunctionType();
-					includeMapType = false;
-				} else {
-					throw new TypeException("Type Error (while attempting to look up " + identifier + ")");
-				}
+            while (sequence != null) {
+                if (sequence is ValTemp || sequence is ValVar) sequence = sequence.Val(context);
+                if (sequence is ValMap) {
+                    // If the map contains this identifier, return its value.
+                    Value result = null;
+                    var idVal = TempValString.Get(identifier);
+                    bool found = ((ValMap) sequence).TryGetValue(idVal, out result);
+                    TempValString.Release(idVal);
+                    if (found) {
+                        valueFoundIn = (ValMap) sequence;
+                        return result;
+                    }
+
+                    // Otherwise, if we have an __isa, try that next.
+                    if (loopsLeft < 0) throw new LimitExceededException("__isa depth exceeded (perhaps a reference loop?)");
+                    if (!((ValMap) sequence).TryGetValue(ValString.magicIsA, out sequence)) {
+                        // ...and if we don't have an __isa, try the generic map type if allowed
+                        if (!includeMapType) throw new KeyException(identifier);
+                        sequence = context.vm.mapType ?? Intrinsics.MapType();
+                        includeMapType = false;
+                    }
+                } else if (sequence is ValList) {
+                    sequence = context.vm.listType ?? Intrinsics.ListType();
+                    includeMapType = false;
+                } else if (sequence is ValString) {
+                    sequence = context.vm.stringType ?? Intrinsics.StringType();
+                    includeMapType = false;
+                } else if (sequence is ValNumber) {
+                    sequence = context.vm.numberType ?? Intrinsics.NumberType();
+                    includeMapType = false;
+                } else if (sequence is ValFunction) {
+                    sequence = context.vm.functionType ?? Intrinsics.FunctionType();
+                    includeMapType = false;
+                } else {
+                    throw new TypeException("Type Error (while attempting to look up " + identifier + ")");
+                }
 				loopsLeft--;
 			}
 			return null;

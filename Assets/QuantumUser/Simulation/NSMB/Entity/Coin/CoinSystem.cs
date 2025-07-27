@@ -38,35 +38,36 @@ namespace Quantum {
                     return;
                 }
 
-                var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(entity);
-                bool invertX = false, invertY = false, applyFriction = false;
-                foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
-                    if (FPMath.Abs(FPVector2.Dot(contact.Normal, FPVector2.Up)) < Constants.PhysicsGroundMaxAngleCos) {
-                        // Wall touch
-                        invertX = true;
-                    } else if (FPVector2.Dot(contact.Normal, FPVector2.Up) >= Constants.PhysicsGroundMaxAngleCos) {
-                        // Ground touch
-                        applyFriction = true;
-                        if (physicsObject->PreviousFrameVelocity.Y < -BounceThreshold) {
-                            physicsObject->IsTouchingGround = false;
-                            invertY = true;
-                        } else {
-                            physicsObject->Velocity.Y = 0;
+                if (f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
+                    bool invertX = false, invertY = false, applyFriction = false;
+                    foreach (var contact in f.ResolveList(physicsObject->Contacts)) {
+                        if (FPMath.Abs(FPVector2.Dot(contact.Normal, FPVector2.Up)) < Constants.PhysicsGroundMaxAngleCos) {
+                            // Wall touch
+                            invertX = true;
+                        } else if (FPVector2.Dot(contact.Normal, FPVector2.Up) >= Constants.PhysicsGroundMaxAngleCos) {
+                            // Ground touch
+                            applyFriction = true;
+                            if (physicsObject->PreviousFrameVelocity.Y < -BounceThreshold) {
+                                physicsObject->IsTouchingGround = false;
+                                invertY = true;
+                            } else {
+                                physicsObject->Velocity.Y = 0;
+                            }
                         }
                     }
-                }
 
-                if (invertX) {
-                    physicsObject->Velocity.X = physicsObject->PreviousFrameVelocity.X * -BounceStrength;
-                }
-                if (invertY) {
-                    physicsObject->Velocity.Y = physicsObject->PreviousFrameVelocity.Y * -BounceStrength;
-                }
-                if (/*!coin->CoinType.HasFlag(CoinType.Objective) &&*/ (invertX || invertY)) {
-                    f.Events.CoinBounced(entity, *coin);
-                }
-                if (applyFriction) {
-                    physicsObject->Velocity.X *= GroundFriction;
+                    if (invertX) {
+                        physicsObject->Velocity.X = physicsObject->PreviousFrameVelocity.X * -BounceStrength;
+                    }
+                    if (invertY) {
+                        physicsObject->Velocity.Y = physicsObject->PreviousFrameVelocity.Y * -BounceStrength;
+                    }
+                    if (/*!coin->CoinType.HasFlag(CoinType.Objective) &&*/ (invertX || invertY)) {
+                        f.Events.CoinBounced(entity, *coin);
+                    }
+                    if (applyFriction) {
+                        physicsObject->Velocity.X *= GroundFriction;
+                    }
                 }
             }
 
