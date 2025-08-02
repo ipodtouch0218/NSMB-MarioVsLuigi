@@ -36,6 +36,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             scroll.verticalNormalizedPosition = scroll.ScrollToCenter((RectTransform) transform, false);
         }
 
+        private bool IsRandomizeStageOn() 
+        {
+            QuantumGame game = QuantumRunner.DefaultGame;
+            return true;
+        }
+
         public unsafe void OnSubmit(BaseEventData eventData) {
             eventData.Use();
 

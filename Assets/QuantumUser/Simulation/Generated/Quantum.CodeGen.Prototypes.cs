@@ -398,6 +398,7 @@ namespace Quantum.Prototypes {
   public unsafe partial class GameRulesPrototype : StructPrototype {
     public AssetRef<Map> Stage;
     public AssetRef<GamemodeAsset> Gamemode;
+    public QBoolean RandomizeStage;
     public Int32 StarsToWin;
     public Int32 CoinsForPowerup;
     public Int32 Lives;
@@ -409,6 +410,7 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
         result.Gamemode = this.Gamemode;
+        result.RandomizeStage = this.RandomizeStage;
         result.StarsToWin = this.StarsToWin;
         result.CoinsForPowerup = this.CoinsForPowerup;
         result.Lives = this.Lives;

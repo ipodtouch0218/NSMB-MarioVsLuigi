@@ -23,6 +23,7 @@ namespace NSMB.Chat {
 
         //---Private Variables
         private AssetRef<Map> currentMap;
+        private bool currentMapRandomizedValue;
         private AssetRef<GamemodeAsset> currentGamemode;
         private ChatMessageData changeMapMessage, changeGamemodeMessage;
 
@@ -78,6 +79,12 @@ namespace NSMB.Chat {
                 changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
                 currentMap = rules.Stage;
             }
+
+            if (rules.RandomizeStage != currentMapRandomizedValue && rules.RandomizeStage) {
+                RemoveChatMessage(changeMapMessage);
+                changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", "ui.inroom.settings.game.map.random");
+                currentMapRandomizedValue = rules.RandomizeStage;
+            }
         }
 
         public ChatMessageData AddChatMessage(string message, PlayerRef player, Frame f, Color? color = null, bool filter = false) {
@@ -131,6 +138,7 @@ namespace NSMB.Chat {
             ref var rules = ref e.Game.Frames.Predicted.Global->Rules;
             currentGamemode = rules.Gamemode;
             currentMap = rules.Stage;
+            currentMapRandomizedValue = rules.RandomizeStage;
         }
 
         private void OnChatMessageCallback(ChatMessageData data) {

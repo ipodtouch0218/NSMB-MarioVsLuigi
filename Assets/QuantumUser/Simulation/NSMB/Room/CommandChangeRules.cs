@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using System;
+using System.Collections.Generic;
 
 namespace Quantum {
     public class CommandChangeRules : DeterministicCommand, ILobbyCommand {
@@ -8,6 +9,8 @@ namespace Quantum {
 
         public AssetRef<Map> Stage;
         public AssetRef<GamemodeAsset> Gamemode;
+        public List<AssetRef<Map>> StagesBannedFromRandomize;
+
         public int StarsToWin;
         public int CoinsForPowerup;
         public int Lives;
@@ -15,6 +18,7 @@ namespace Quantum {
         public bool TeamsEnabled;
         public bool CustomPowerupsEnabled;
         public bool DrawOnTimeUp;
+        public bool RandomizeStage;
 
         public override void Serialize(BitStream stream) {
             if (stream.Writing) {
@@ -100,6 +104,7 @@ namespace Quantum {
             TeamsEnabled = 1 << 6,
             CustomPowerupsEnabled = 1 << 7,
             DrawOnTimeUp = 1 << 8,
+            RandomizeStage = 1 << 9,
         }
     }
 }

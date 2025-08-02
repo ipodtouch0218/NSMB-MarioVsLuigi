@@ -791,6 +791,8 @@ namespace Quantum {
     public AssetRef<Map> Stage;
     [FieldOffset(32)]
     public AssetRef<GamemodeAsset> Gamemode;
+    [FieldOffset(24)]
+    public QBoolean RandomizeStage;
     [FieldOffset(8)]
     public Int32 StarsToWin;
     [FieldOffset(0)]
@@ -799,7 +801,7 @@ namespace Quantum {
     public Int32 Lives;
     [FieldOffset(12)]
     public Int32 TimerMinutes;
-    [FieldOffset(24)]
+    [FieldOffset(28)]
     public QBoolean TeamsEnabled;
     [FieldOffset(16)]
     public QBoolean CustomPowerupsEnabled;
@@ -810,6 +812,7 @@ namespace Quantum {
         var hash = 443;
         hash = hash * 31 + Stage.GetHashCode();
         hash = hash * 31 + Gamemode.GetHashCode();
+        hash = hash * 31 + RandomizeStage.GetHashCode();
         hash = hash * 31 + StarsToWin.GetHashCode();
         hash = hash * 31 + CoinsForPowerup.GetHashCode();
         hash = hash * 31 + Lives.GetHashCode();
@@ -828,6 +831,7 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->TimerMinutes);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
+        QBoolean.Serialize(&p->RandomizeStage, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
         AssetRef.Serialize(&p->Gamemode, serializer);
         AssetRef.Serialize(&p->Stage, serializer);

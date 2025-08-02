@@ -31,8 +31,10 @@ struct PlayerInformation {
 
 struct GameRules {
 	AssetRef<Map> Stage;
+	List<AssetRef<Map>> StagesBannedFromRandomize;
 	AssetRef<GamemodeAsset> Gamemode;
-
+	
+	bool RandomizeStage;
 	int StarsToWin;
 	int CoinsForPowerup;
 	int Lives;
