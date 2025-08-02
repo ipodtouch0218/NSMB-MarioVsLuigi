@@ -12217,10 +12217,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1695760184}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 299.51697, y: -16}
+  m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &322257449
 MonoBehaviour:
@@ -17228,6 +17228,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomMenu: {fileID: 252585805}
   panelToSelect: {fileID: 305467052}
+--- !u!114 &419031817 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4750951523557840859, guid: 2e92f1734286bca4b937457bd29d4bb2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1025221868}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc44cd722652acd40b4551892120fea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &420384054
 GameObject:
   m_ObjectHideFlags: 0
@@ -33140,6 +33152,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfc292274bbb3474493aa64b9e7b81e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &695165526 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3514946949506846817, guid: 2e92f1734286bca4b937457bd29d4bb2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1025221868}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &702961849
 GameObject:
   m_ObjectHideFlags: 0
@@ -44896,14 +44920,14 @@ MonoBehaviour:
   useHeaderColor: 0
   headerColor: {r: 0, g: 0, b: 0, a: 0}
   backButton: {fileID: 938455791}
-  headerTemplate: {fileID: 0}
-  horizontalTemplate: {fileID: 0}
-  stageSelectionButtonTemplate: {fileID: 0}
+  headerTemplate: {fileID: 695165526}
+  horizontalTemplate: {fileID: 1246044780}
+  stageSelectionButtonTemplate: {fileID: 419031817}
   headerOrder:
   - level.header.default
   - level.header.custom
   tabs:
-  - {fileID: 0}
+  - {fileID: 1313642334}
   - {fileID: 901415633}
   - {fileID: 562389159}
   descriptionText: {fileID: 1980070552}
@@ -57614,6 +57638,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1245064106}
   m_CullTransparentMesh: 1
+--- !u!1 &1246044780 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6959366842546276078, guid: 2e92f1734286bca4b937457bd29d4bb2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1025221868}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1247806887
 GameObject:
   m_ObjectHideFlags: 0
@@ -59969,6 +59999,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 47}
   m_Pivot: {x: 1, y: 1}
+--- !u!114 &1313642334 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8554329250785225388, guid: 2e92f1734286bca4b937457bd29d4bb2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1025221868}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 577810126a1698640b3b2362e6ecbbbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1315080091
 GameObject:
   m_ObjectHideFlags: 0
@@ -90941,10 +90983,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1695760184}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 148.75848, y: -16}
+  m_SizeDelta: {x: 265.51697, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1512472443
 MonoBehaviour:
