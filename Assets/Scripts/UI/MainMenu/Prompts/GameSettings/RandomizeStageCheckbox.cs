@@ -53,7 +53,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
-            GetComponent<Toggle>().isOn = e.Game.Frames.Predicted.Global->Rules.RandomizeStage;
+            int index = e.Game.GetLocalPlayers().IndexOf(e.Game.Frames.Predicted.Global->Host);
+            //Only change the value of the toggle if you're not the host ! (to avoid infinite loop)
+            if (index == -1) {
+                GetComponent<Toggle>().isOn = e.Game.Frames.Predicted.Global->Rules.RandomizeStage;
+            }
         }
 
         private unsafe void OnGameEnded(EventGameEnded e) {
