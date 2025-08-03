@@ -527,6 +527,8 @@ MonoBehaviour:
   stageName: {fileID: 8566804360657682441}
   stageAuthor: {fileID: 4251829752338806778}
   stageComposer: {fileID: 4826949944581122364}
+  stageImageDisabledMaterial: {fileID: -876546973899608171, guid: e541117e88ae02f42a7fd9e090da2457,
+    type: 3}
 --- !u!1 &5226892058080796210
 GameObject:
   m_ObjectHideFlags: 0

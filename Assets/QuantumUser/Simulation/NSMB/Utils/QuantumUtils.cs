@@ -4,6 +4,7 @@ using Quantum.Collections;
 using Quantum.Core;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public static unsafe class QuantumUtils {
 
@@ -473,6 +474,38 @@ public static unsafe class QuantumUtils {
         }
 
         return true;
+    }
+
+    public static void ChooseRandomLevel(QuantumGame game) 
+    {
+        int index = game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host);
+        if (index == -1) {
+            return;
+        }
+
+        var allStages = game.Configurations.Simulation.AllStages;
+        List<AssetRef<Map>> allowedStages = new List<AssetRef<Map>>();
+        for(int i=0; i<allStages.Length; i++) {
+            if (game.Frames.Predicted.Global->Rules.IsStageBannedFromRandom[i]==1) 
+            {
+                continue;
+            }
+            allowedStages.Add(allStages[i]);
+        }
+
+        if (allowedStages.Count<=0) 
+        {
+            allowedStages.AddRange(allStages);
+        }
+
+        CommandChangeRules cmd = new CommandChangeRules {
+            EnabledChanges = CommandChangeRules.Rules.Stage,
+            Stage = allowedStages[UnityEngine.Random.Range(0, allowedStages.Count)]
+        };
+
+        int slot = game.GetLocalPlayerSlots()[index];
+        game.SendCommand(slot, cmd);
+        Debug.Log("Chose a random level");
     }
 }
 

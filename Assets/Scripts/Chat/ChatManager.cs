@@ -3,6 +3,8 @@ using NSMB.Utilities;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
@@ -67,7 +69,7 @@ namespace NSMB.Chat {
                 changeGamemodeMessage = AddSystemMessage("ui.inroom.chat.server.gamemode", Red, "gamemode", gamemodeName);
                 currentGamemode = rules.Gamemode;
             }
-            if (rules.Stage != currentMap) {
+            if ((rules.Stage != currentMap && !rules.RandomizeStage) || (rules.RandomizeStage != currentMapRandomizedValue && !rules.RandomizeStage)) {
                 RemoveChatMessage(changeMapMessage);
                 string stageName;
                 if (f.TryFindAsset(rules.Stage, out Map map)
@@ -78,11 +80,14 @@ namespace NSMB.Chat {
                 }
                 changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
                 currentMap = rules.Stage;
+                currentMapRandomizedValue = rules.RandomizeStage;
             }
 
             if (rules.RandomizeStage != currentMapRandomizedValue && rules.RandomizeStage) {
                 RemoveChatMessage(changeMapMessage);
-                changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", "ui.inroom.settings.game.map.random");
+                string stageName = tm.GetTranslation("ui.inroom.settings.game.map.random");
+                changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
+                currentMap = rules.Stage;
                 currentMapRandomizedValue = rules.RandomizeStage;
             }
         }

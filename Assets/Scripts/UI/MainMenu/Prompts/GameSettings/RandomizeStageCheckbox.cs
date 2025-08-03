@@ -16,6 +16,13 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         private void Awake() {
             GetComponent<Toggle>().onValueChanged.AddListener(OnValueChanged);
         }
+
+        private void Start() {
+            QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
+            QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
+            QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+        }
+
         private unsafe void OnValueChanged(bool newValue) 
         {
             CommandChangeRules cmd = new CommandChangeRules {
@@ -29,6 +36,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 int slot = game.GetLocalPlayerSlots()[index];
                 game.SendCommand(slot, cmd);
                 canvas.PlayConfirmSound();
+                QuantumUtils.ChooseRandomLevel(game);
             } else {
                 canvas.PlaySound(SoundEffect.UI_Error);
             }
@@ -36,12 +44,19 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         private unsafe void OnPlayerAdded(EventPlayerAdded e) {
             if (e.Game.PlayerIsLocal(e.Player)) {
-                 GetComponent<Toggle>().Toggle(e.Game.Frames.Predicted.Global->Rules.RandomizeStage);
+                 GetComponent<Toggle>().isOn = e.Game.Frames.Predicted.Global->Rules.RandomizeStage;
             }
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
-            GetComponent<Toggle>().Toggle(e.Game.Frames.Predicted.Global->Rules.RandomizeStage);
+            GetComponent<Toggle>().isOn = e.Game.Frames.Predicted.Global->Rules.RandomizeStage;
+        }
+
+        private unsafe void OnGameEnded(EventGameEnded e) {
+            if (e.Game.Frames.Predicted.Global->Rules.RandomizeStage) 
+            {
+                QuantumUtils.ChooseRandomLevel(e.Game);
+            }
         }
     }
 }
