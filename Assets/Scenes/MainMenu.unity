@@ -48727,6 +48727,8 @@ MonoBehaviour:
   cursorSfx: {fileID: 252585806}
   stagePreview: {fileID: 400794474}
   unknownMapSprite: {fileID: 21300000, guid: e64cca18721d2d14e95065a64ba3f71c, type: 3}
+  randomStageTranslationKey: ui.inroom.settings.game.map.random
+  randomStageIcon: {fileID: 575101835, guid: f4b7221be8b79c94c9c8919163014cb0, type: 3}
 --- !u!114 &1014249987
 MonoBehaviour:
   m_ObjectHideFlags: 0

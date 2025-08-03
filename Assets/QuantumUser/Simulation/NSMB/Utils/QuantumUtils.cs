@@ -505,7 +505,6 @@ public static unsafe class QuantumUtils {
 
         int slot = game.GetLocalPlayerSlots()[index];
         game.SendCommand(slot, cmd);
-        Debug.Log("Chose a random level");
     }
 }
 

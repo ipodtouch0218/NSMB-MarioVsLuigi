@@ -46,6 +46,15 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
+        public unsafe void OnEnable() {
+            if (currentStageRandomized) {
+                var game = QuantumRunner.DefaultGame;
+                if (game != null) {
+                    QuantumUtils.ChooseRandomLevel(game);
+                }
+            }
+        }
+
         public override void OnDestroy() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
             chat.OnDestroy();
