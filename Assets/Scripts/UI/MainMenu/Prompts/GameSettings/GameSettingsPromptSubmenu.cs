@@ -28,6 +28,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
         //---Serialized Variables
         [Header("Map Selection")]
+        [SerializeField] private Toggle RandomizeMapOption;
         [SerializeField] private TMP_Text headerTemplate;
         [SerializeField] private GameObject horizontalTemplate;
         [SerializeField] private StageSelectionButton stageSelectionButtonTemplate;
@@ -111,6 +112,11 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
 
                     previousButton = newButton;
                     currentButtonRow.Add(newButton);
+
+                    //Once the first row is finished we do the nav links between it and the "Randomize" Option
+                    if (i==5 && previousButtonRow==null) {
+                        LinkRowWithRandomizeOption(currentButtonRow);
+                    }
                 }
             }
 
@@ -161,6 +167,17 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
                 nav.selectOnUp = top[targetIndex];
                 bottom[x].navigation = nav;
             }
+        }
+
+        public void LinkRowWithRandomizeOption(List<StageSelectionButton> row) {
+            for (int x = 0; x < row.Count; x++) {
+                var nav = row[x].navigation;
+                nav.selectOnUp = RandomizeMapOption;
+                row[x].navigation = nav;
+            }
+            var randomizeOptionNav = RandomizeMapOption.navigation;
+            randomizeOptionNav.selectOnDown = row[0];
+            RandomizeMapOption.navigation = randomizeOptionNav;
         }
 
         public override void Show(bool first) {

@@ -9,15 +9,15 @@ using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts {
     [RequireComponent(typeof(Toggle))]
-    public class RandomizeStageCheckbox : MonoBehaviour
+    public class RandomizeStageCheckbox : MonoBehaviour, ISelectHandler
        {
         [SerializeField] private MainMenuCanvas canvas;
+        [SerializeField] private ScrollRect scroll;
 
-        private void Awake() {
-            GetComponent<Toggle>().onValueChanged.AddListener(OnValueChanged);
-        }
 
         private void Start() {
+            GetComponent<Toggle>().onValueChanged.AddListener(OnValueChanged);
+
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
@@ -40,6 +40,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
             } else {
                 canvas.PlaySound(SoundEffect.UI_Error);
             }
+        }
+
+        public void OnSelect(BaseEventData eventData) {
+            scroll.verticalNormalizedPosition = scroll.ScrollToCenter((RectTransform) transform, false);
         }
 
         private unsafe void OnPlayerAdded(EventPlayerAdded e) {

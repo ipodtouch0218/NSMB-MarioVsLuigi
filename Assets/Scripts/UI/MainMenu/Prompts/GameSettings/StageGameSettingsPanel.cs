@@ -8,9 +8,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts {
         public unsafe override void OnEnable() {
             var stage = QuantumUnityDB.GetGlobalAsset(QuantumRunner.DefaultGame.Frames.Predicted.Global->Rules.Stage).UserAsset;
             var buttons = root.GetComponentsInChildren<StageSelectionButton>(true);
+            var randomizeToggle = root.GetComponentInChildren<Toggle>(true);
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) transform);
             Canvas.ForceUpdateCanvases();
-            submenu.Canvas.EventSystem.SetSelectedGameObject(buttons.FirstOrDefault(ssb => ssb.stage == stage).gameObject);
+            submenu.Canvas.EventSystem.SetSelectedGameObject(randomizeToggle.gameObject);
         }
     }
 }

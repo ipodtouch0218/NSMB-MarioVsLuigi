@@ -199,14 +199,14 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 1
+  m_ChildAlignment: 4
   m_Spacing: 0
-  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 1
-  m_ChildScaleHeight: 0
+  m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
 --- !u!1 &1693599192998545476
 GameObject:
@@ -1997,12 +1997,12 @@ PrefabInstance:
     - target: {fileID: 4665358816909722722, guid: 80da30e602b7d804c98f8b263684cc64,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 227.47
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4665358816909722722, guid: 80da30e602b7d804c98f8b263684cc64,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 48
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4665358816909722722, guid: 80da30e602b7d804c98f8b263684cc64,
         type: 3}
@@ -2077,7 +2077,7 @@ PrefabInstance:
     - target: {fileID: 4883193162172024638, guid: 80da30e602b7d804c98f8b263684cc64,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 4883193162172024638, guid: 80da30e602b7d804c98f8b263684cc64,
         type: 3}
@@ -2107,7 +2107,7 @@ PrefabInstance:
     - target: {fileID: 5735861377794176831, guid: 80da30e602b7d804c98f8b263684cc64,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 166.47
       objectReference: {fileID: 0}
     - target: {fileID: 5735861377794176831, guid: 80da30e602b7d804c98f8b263684cc64,
         type: 3}
@@ -2129,6 +2129,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: LabelledCheckbox
       objectReference: {fileID: 0}
+    - target: {fileID: 7782643969160787769, guid: 80da30e602b7d804c98f8b263684cc64,
+        type: 3}
+      propertyPath: m_ChildAlignment
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782643969160787769, guid: 80da30e602b7d804c98f8b263684cc64,
+        type: 3}
+      propertyPath: m_ChildControlWidth
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2144,6 +2154,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 6483491388792454736}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3034147924779556987 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8350386636827024939, guid: 80da30e602b7d804c98f8b263684cc64,
+    type: 3}
+  m_PrefabInstance: {fileID: 6483491388792454736}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3918553858597829604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3918553858597829604 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8041321068615599540, guid: 80da30e602b7d804c98f8b263684cc64,
@@ -2162,7 +2184,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d970509bfd44844bba41363c49ea84e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 3034147924779556987}
   canvas: {fileID: 0}
+  scroll: {fileID: 1492328093465984200}
 --- !u!1001 &6661484223167881422
 PrefabInstance:
   m_ObjectHideFlags: 0
