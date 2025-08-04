@@ -46778,8 +46778,7 @@ MonoBehaviour:
   stagePreviewManager: {fileID: 355157177}
   chat: {fileID: 492594545}
   randomStageTranslationKey: ui.inroom.settings.game.map.random
-  randomStageIcon: {fileID: 3681213532155896232, guid: 4d6f75c1a53c3d140bf6fe673ff7cdb9,
-    type: 3}
+  randomStageIcon: {fileID: 21300000, guid: 0d36bf5126bcbdf40974b95e82bb1968, type: 3}
 --- !u!1 &957537612
 GameObject:
   m_ObjectHideFlags: 0
