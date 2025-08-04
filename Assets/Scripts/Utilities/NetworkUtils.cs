@@ -83,7 +83,7 @@ namespace NSMB.Utilities {
                 CustomPowerups = true
             };
 
-            public bool CustomPowerups, Teams, DrawOnTimeUp, GameStarted;
+            public bool CustomPowerups, Teams, DrawOnTimeUp, GameStarted, RandomizeStage;
 
             public static implicit operator int(BooleanProperties props) {
                 int value = 0;
@@ -92,6 +92,7 @@ namespace NSMB.Utilities {
                 Utils.BitSet(ref value, 1, props.Teams);
                 Utils.BitSet(ref value, 2, props.DrawOnTimeUp);
                 Utils.BitSet(ref value, 3, props.GameStarted);
+                Utils.BitSet(ref value, 4, props.RandomizeStage);
 
                 return value;
             }
@@ -102,6 +103,7 @@ namespace NSMB.Utilities {
                     Teams = Utils.BitTest(bits, 1),
                     DrawOnTimeUp = Utils.BitTest(bits, 2),
                     GameStarted = Utils.BitTest(bits, 3),
+                    RandomizeStage = Utils.BitTest(bits, 4),
                 };
             }
         };
