@@ -9,21 +9,60 @@ namespace Quantum {
 
         partial void InitUser() {
             StageTiles = Array.Empty<StageTileInstance>();
-
+            
             string script = @"
+coinEntities = []
+
 update = function()
-    tile = frame.getStageTile(7, 7)
-    tile.rotation += 64
+    // Add a coin when a player hits space
+    for i in range(0,9)
+        playerData = frame.getPlayerData(i)
+        if playerData == null then
+            continue
+        end if
+            
+        if playerData.inputs.jump.wasPressed then
+            coin = frame.findAsset(""QuantumUser/Resources/EntityPrototypes/Coins/EnemyCoinEntityPrototype"")
+            globals.coinEntities.push(frame.create(coin))
+        end if
+    end for
+
+    // Remove coins that despawned
+    toRemove = []
+    for i in globals.coinEntities.indexes
+        if not frame.exists(globals.coinEntities[i]) then
+            toRemove.push(i)
+        end if
+    end for
+    removed = 0
+    for i in toRemove
+        globals.coinEntities.remove(i - removed)
+        removed += 1
+    end for
+
+    // Move coins in circles
+    count = 0
+    for coin in globals.coinEntities
+        coinPhysicsObject = frame.get(coin, ""PhysicsObject"")
+        coinPhysicsObject.disableCollision = true
+
+        coinTransform = frame.get(coin, ""Transform2D"")
+        rad = frame.number * 2 * pi / 120
+        rad += count * (pi / 8)
+        count += 1
+        coinTransform.position.x = -14 + sin(rad)
+        coinTransform.position.y = 1.5 + cos(rad)
+    end for
 end function
 ";
             script += @"
 _events = []
 while true
-  if _events.len > 0 then
-    _nextEvent = _events.pull
-    _nextEvent
-  end if
-  yield
+    if _events.len > 0 then
+        _nextEvent = _events.pull
+        _nextEvent
+    end if
+    yield
 end while";
             string debug = "", error = "";
             MiniscriptInterpreter = new(script, 

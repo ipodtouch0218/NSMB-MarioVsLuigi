@@ -111,7 +111,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnDestroyCustom() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+#if TODO && !UNITY_WEBGL
             watcher.Dispose();
+#endif
         }
 
         public void Show() {
@@ -123,6 +125,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             Canvas.ForceUpdateCanvases();
 
+#if !TODO || UNITY_WEBGL
+            FindReplays();
+#endif
             SortReplays();
             OnScrollRectScrolled(default);
             OnLanguageChanged(GlobalController.Instance.translationManager);

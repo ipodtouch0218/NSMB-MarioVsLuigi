@@ -100,6 +100,12 @@ namespace Miniscript {
 			if (nameMap.TryGetValue(name, out result)) return result;
 			return null;
 		}
+
+        public static void Clear() {
+            all.Clear();
+            nameMap.Clear();
+            shortNames.Clear();
+        }
 		
 		/// <summary>
 		/// Add a parameter to this Intrinsic, optionally with a default value

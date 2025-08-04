@@ -246,7 +246,7 @@ namespace Miniscript {
 						throw new RuntimeException("invalid use of 'new'; to create a function, use the 'function' keyword");
 					}
 					ValMap newMap = new ValMap();
-					newMap.SetElem(ValString.magicIsA, opA);
+					newMap.SetElem(ValString.magicIsA, opA, context);
 					return newMap;
 				}
 
@@ -784,23 +784,23 @@ namespace Miniscript {
 			}
 
 			public void StoreValue(Value lhs, Value value) {
-				if (lhs is ValTemp) {
-					SetTemp(((ValTemp)lhs).tempNum, value);
-				} else if (lhs is ValVar) {
-					SetVar(((ValVar)lhs).identifier, value);
-				} else if (lhs is ValSeqElem) {
-					ValSeqElem seqElem = (ValSeqElem)lhs;
-					Value seq = seqElem.sequence.Val(this);
-					if (seq == null) throw new RuntimeException("can't set indexed element of null");
-					if (!seq.CanSetElem()) {
-						throw new RuntimeException("can't set an indexed element in this type");
-					}
-					Value index = seqElem.index;
-					if (index is ValVar || index is ValSeqElem || 
-						index is ValTemp) index = index.Val(this);
-					seq.SetElem(index, value);
-				} else {
-					if (lhs != null) throw new RuntimeException("not an lvalue");
+                if (lhs is ValTemp) {
+                    SetTemp(((ValTemp) lhs).tempNum, value);
+                } else if (lhs is ValVar) {
+                    SetVar(((ValVar) lhs).identifier, value);
+                } else if (lhs is ValSeqElem) {
+                    ValSeqElem seqElem = (ValSeqElem) lhs;
+                    Value seq = seqElem.sequence.Val(this);
+                    if (seq == null) throw new RuntimeException("can't set indexed element of null");
+                    if (!seq.CanSetElem()) {
+                        throw new RuntimeException("can't set an indexed element in this type");
+                    }
+                    Value index = seqElem.index;
+                    if (index is ValVar || index is ValSeqElem ||
+                        index is ValTemp) index = index.Val(this);
+                    seq.SetElem(index, value, this);
+                } else {
+                    if (lhs != null) throw new RuntimeException("not an lvalue");
 				}
 			}
 			
