@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 using Photon.Deterministic;
+using Quantum;
 
 namespace Miniscript {
 	
@@ -35,7 +36,11 @@ namespace Miniscript {
 		}
 		
 		public abstract string ToString(TAC.Machine vm);
-		
+
+        public virtual void Serialize(FrameSerializer serializer) {
+            throw new RuntimeException("Undefined Serialize() function for " + GetType().Name);
+        }
+
 		/// <summary>
 		/// This version of Val is like the one above, but also returns
 		/// (via the output parameter) the ValMap the value was found in,
@@ -361,7 +366,11 @@ namespace Miniscript {
 			this.value = value;
 		}
 
-		public override string ToString(TAC.Machine vm) {
+        public override void Serialize(FrameSerializer serializer) {
+            serializer.Stream.Serialize(ref value);
+        }
+
+        public override string ToString(TAC.Machine vm) {
             return value.ToString();
 		}
 
@@ -442,7 +451,11 @@ namespace Miniscript {
 			this.value = value ?? _empty.value;
 		}
 
-		public override string ToString(TAC.Machine vm) {
+        public override void Serialize(FrameSerializer serializer) {
+            serializer.Stream.Serialize(ref value);
+        }
+
+        public override string ToString(TAC.Machine vm) {
 			return value;
 		}
 
@@ -713,7 +726,7 @@ namespace Miniscript {
 		/// </summary>
 		/// <param name="key">key to check for</param>
 		/// <returns>true if the map contains that key; false otherwise</returns>
-		public bool ContainsKey(Value key) {
+		public virtual bool ContainsKey(Value key) {
 			if (key == null) key = ValNull.instance;
 			return map.ContainsKey(key);
 		}
@@ -721,7 +734,7 @@ namespace Miniscript {
 		/// <summary>
 		/// Get the number of entries in this map.
 		/// </summary>
-		public int Count {
+		public virtual int Count {
 			get { return map.Count; }
 		}
 		

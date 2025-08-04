@@ -6,15 +6,18 @@ public class ValAssetRef : Value {
 
     public AssetRef Asset;
 
-    public ValAssetRef(AssetRef asset) {
-        Asset = asset;
-    }
-
     public override FP Equality(Value rhs) {
         if (rhs is not ValAssetRef rhsAssetObject) {
             return 0;
         }
-        return (Asset == rhsAssetObject.Asset) ? 1 : 0;
+
+        return Asset.Equals(rhsAssetObject.Asset) ? 1 : 0;
+    }
+
+    public override unsafe void Serialize(FrameSerializer serializer) {
+        fixed (void* ptr = &Asset) {
+            AssetRef.Serialize(ptr, serializer);
+        }
     }
 
     public override int Hash() {

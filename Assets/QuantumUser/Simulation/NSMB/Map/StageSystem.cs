@@ -1,4 +1,5 @@
 using System;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
@@ -14,11 +15,15 @@ namespace Quantum {
 
         public void OnMapChanged(Frame f, AssetRef<Map> previousMap) {
             if (f.Map != null && f.TryFindAsset(f.Map.UserAsset, out VersusStageData stage)) {
-                f.StageTiles = new StageTileInstance[stage.TileDimensions.X * stage.TileDimensions.Y];
-                Array.Copy(stage.TileData, f.StageTiles, stage.TileDimensions.X * stage.TileDimensions.Y);
+                int count = stage.TileDimensions.X * stage.TileDimensions.Y;
+                f.ReallocStageTiles(count);
+
+                fixed (StageTileInstance* originalData = &stage.TileData[0]) {
+                    UnsafeUtility.MemCpy(f.StageTiles, originalData, StageTileInstance.SIZE * count);
+                }
             } else {
                 // Not a valid VersusStage
-                f.StageTiles = Array.Empty<StageTileInstance>();
+                f.ReallocStageTiles(0);
             }
         }
     }

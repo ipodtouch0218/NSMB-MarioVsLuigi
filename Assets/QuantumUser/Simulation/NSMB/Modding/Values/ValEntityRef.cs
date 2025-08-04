@@ -6,8 +6,10 @@ public class ValEntityRef : Value {
 
     public EntityRef EntityRef;
 
-    public ValEntityRef(EntityRef entityRef) {
-        EntityRef = entityRef;
+    public override unsafe void Serialize(FrameSerializer serializer) {
+        fixed (void* ptr = &EntityRef) {
+            EntityRef.Serialize(ptr, serializer);
+        }
     }
 
     public override FP Equality(Value rhs) {
@@ -15,7 +17,7 @@ public class ValEntityRef : Value {
             return 0;
         }
 
-        return EntityRef == rhsEntityPrototype.EntityRef ? 1 : 0;
+        return EntityRef.Equals(rhsEntityPrototype.EntityRef) ? 1 : 0;
     }
 
     public override int Hash() {

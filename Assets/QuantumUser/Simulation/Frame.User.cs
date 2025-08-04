@@ -1,27 +1,28 @@
 ﻿using Miniscript;
-using System;
+using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Quantum {
     public unsafe partial class Frame {
 
-        public StageTileInstance[] StageTiles;
+        public StageTileInstance* StageTiles;
+        public int StageTilesLength;
+
         public Interpreter MiniscriptInterpreter;
 
         partial void InitUser() {
-            StageTiles = Array.Empty<StageTileInstance>();
-            
             string script = @"
 coinEntities = []
 
 update = function()
     // Add a coin when a player hits space
     for i in range(0,9)
-        playerData = frame.getPlayerData(i)
-        if playerData == null then
+        input = frame.getPlayerInput(i)
+        if input == null then
             continue
         end if
             
-        if playerData.inputs.jump.wasPressed then
+        if input.jump.wasPressed then
             coin = frame.findAsset(""QuantumUser/Resources/EntityPrototypes/Coins/EnemyCoinEntityPrototype"")
             globals.coinEntities.push(frame.create(coin))
         end if
@@ -50,8 +51,9 @@ update = function()
         rad = frame.number * 2 * pi / 120
         rad += count * (pi / 8)
         count += 1
-        coinTransform.position.x = -14 + sin(rad)
-        coinTransform.position.y = 1.5 + cos(rad)
+        
+        pos = {""x"": -14 + sin(rad), ""y"": 1.5 + cos(rad)}
+        coinTransform.position = pos
     end for
 end function
 ";
@@ -83,32 +85,76 @@ end while";
             MiniscriptInterpreter.Compile();
         }
 
+        partial void FreeUser() {
+            if (StageTiles != null) {
+                UnsafeUtility.Free(StageTiles, Unity.Collections.Allocator.Persistent);
+                StageTiles = null;
+            }
+        }
+
         partial void SerializeUser(FrameSerializer serializer) {
-            // Possible desync fix?
-            StageTiles ??= Array.Empty<StageTileInstance>();
+            var stream = serializer.Stream;
 
-            serializer.Stream.SerializeArrayLength(ref StageTiles);
-            for (int i = 0; i < StageTiles.Length; i++) {
-                ref StageTileInstance tile = ref StageTiles[i];
-                serializer.Stream.Serialize(ref tile.Tile);
+            // Tilemap
+            if (stream.Writing) {
+                stream.WriteInt(StageTilesLength);
+            } else {
+                int newLength = stream.ReadInt();
+                ReallocStageTiles(newLength);
+            }
+            for (int i = 0; i < StageTilesLength; i++) {
+                StageTileInstance.Serialize(StageTiles + i, serializer);
+            }
 
-                if (serializer.Stream.Writing) {
-                    serializer.Stream.WriteByte((byte) tile.Flags);
-                    serializer.Stream.WriteByte((byte) (tile.Rotation >> 8));
-                    serializer.Stream.WriteByte((byte) tile.Rotation);
-                } else {
-                    tile.Flags = (StageTileFlags) serializer.Stream.ReadByte();
-                    tile.Rotation = (ushort) (serializer.Stream.ReadByte() << 8);
-                    tile.Rotation |= serializer.Stream.ReadByte();
+            // Miniscript Globals
+            if (stream.Writing) {
+                ValMap globals = MiniscriptInterpreter.vm.globalContext.variables;
+                List<Value> values = new();
+                foreach (var (k,v) in globals.map) {
+                    int keyIndex = values.IndexOf(k);
+                    if (keyIndex == -1) {
+                        keyIndex = values.Count;
+                        values.Add(k);
+                    }
+                    int valueIndex = values.IndexOf(v);
+                    if (valueIndex == -1) {
+                        valueIndex = values.Count;
+                        values.Add(v);
+                    }
+                }
+
+                stream.WriteInt(values.Count);
+                foreach (Value value in values) {
+                    value.Serialize(serializer);
+                }
+            } else {
+                int globalCount = stream.ReadInt();
+                for (int i = 0; i < globalCount; i++) {
+                    
                 }
             }
         }
 
         partial void CopyFromUser(Frame frame) {
-            if (StageTiles.Length != frame.StageTiles.Length) {
-                StageTiles = new StageTileInstance[frame.StageTiles.Length];
+            ReallocStageTiles(frame.StageTilesLength);
+            UnsafeUtility.MemCpy(StageTiles, frame.StageTiles, StageTileInstance.SIZE * frame.StageTilesLength);
+        }
+
+        public void ReallocStageTiles(int newSize) {
+            if (StageTilesLength == newSize) {
+                return;
             }
-            Array.Copy(frame.StageTiles, StageTiles, frame.StageTiles.Length);
+
+            if (StageTiles != null) {
+                UnsafeUtility.Free(StageTiles, Unity.Collections.Allocator.Persistent);
+                StageTiles = null;
+            }
+            
+            if (newSize > 0) {
+                StageTiles = (StageTileInstance*) UnsafeUtility.Malloc(StageTileInstance.SIZE * newSize, StageTileInstance.ALIGNMENT, Unity.Collections.Allocator.Persistent);
+            }
+
+            StageTilesLength = newSize;
         }
     }
 }
