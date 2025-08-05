@@ -332,6 +332,14 @@ namespace Quantum {
                 }
                 break;
             case GameState.Starting:
+                // Fixes spectators being able to take over old players' objects.
+                foreach (var (k, v) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+                    if (v->PlayerRef == player) {
+                        v->Disconnected = true;
+                        v->PlayerRef = PlayerRef.None;
+                    }
+                }
+                goto case GameState.Playing;
             case GameState.Playing:
                 for (int i = 0; i < f.Global->RealPlayers; i++) {
                     ref PlayerInformation info = ref f.Global->PlayerInfo[i];

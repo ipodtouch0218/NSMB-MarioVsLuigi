@@ -9,7 +9,15 @@ namespace NSMB {
     public class Settings : Singleton<Settings> {
 
         //---Static Variables
-        public static Controls Controls { get; private set; }
+        private static Controls _controls;
+        public static Controls Controls {
+            get {
+                if (_controls == null) {
+                    _controls = new();
+                }
+                return _controls;
+            }
+        }
         private Action[] VersionUpdaters;
         public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
         public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
@@ -223,9 +231,15 @@ namespace NSMB {
         //---Private Variables
         [SerializeField] private AudioMixer mixer;
 
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void CreateInstance() {
+            // Fixes editor bug where inputs break if not using Reload Domain
+            _controls = null;
+        }
+
         public void Awake() {
             Set(this);
-            Controls = new();
             VersionUpdaters = new Action[] { LoadFromVersion0, LoadFromVersion1 };
             LoadSettings();
 

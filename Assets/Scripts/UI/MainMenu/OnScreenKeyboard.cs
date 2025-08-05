@@ -304,9 +304,11 @@ namespace NSMB.UI.MainMenu {
         }
 
         private void OnActionTriggered(InputAction.CallbackContext obj) {
-            if (!obj.control.noisy && obj.control.device.name != "Mouse") {;
-                usingGamepad = obj.control.device.name != "Keyboard";
-            }
+            try {
+                if (!obj.control.noisy && obj.control.device.name != "Mouse") {
+                    usingGamepad = obj.control.device.name != "Keyboard";
+                }
+            } catch { }
         }
 
         private static string GetDisplayString(char c) {

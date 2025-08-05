@@ -1792,7 +1792,9 @@ namespace Quantum {
             }
 
             mario->IsStuckInBlock = true;
-            mario->CurrentKnockback = KnockbackStrength.None;
+            if (mario->CurrentKnockback != KnockbackStrength.None) {
+                mario->ResetKnockback();
+            }
             mario->IsGroundpounding = false;
             mario->IsPropellerFlying = false;
             mario->IsDrilling = false;

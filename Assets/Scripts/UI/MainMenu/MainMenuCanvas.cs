@@ -137,6 +137,10 @@ namespace NSMB.UI.MainMenu {
             return submenuStack.Contains(menu);
         }
 
+        public T FindSubmenu<T>() where T : MainMenuSubmenu {
+            return (T) allSubmenus.FirstOrDefault(mms => mms.GetType() == typeof(T));
+        }
+
         public void OpenMenu(MainMenuSubmenu menu) {
             OpenMenu(menu, menu.IsOverlay ? SoundEffect.UI_WindowOpen : SoundEffect.UI_Decide);
         }

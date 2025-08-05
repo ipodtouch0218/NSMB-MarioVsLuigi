@@ -13,6 +13,9 @@ namespace NSMB.UI.Loading {
 
         public static event Action<bool> OnLoadingEnded;
 
+        //---Public Variables
+        public bool dontHideOnGameDestroy;
+
         //---Serialized Variables
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private MarioLoader mario;
@@ -39,7 +42,7 @@ namespace NSMB.UI.Loading {
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
-        private void Initialize(QuantumGame game) {
+        public void Initialize(QuantumGame game) {
             if (running) {
                 return;
             }
@@ -118,7 +121,11 @@ namespace NSMB.UI.Loading {
             }
         }
 
-        private void OnGameDestroyed(CallbackGameDestroyed callback) {
+        private void OnGameDestroyed(CallbackGameDestroyed e) {
+            if (dontHideOnGameDestroy) {
+                dontHideOnGameDestroy = false;
+                return;
+            }
             gameObject.SetActive(false);
         }
 

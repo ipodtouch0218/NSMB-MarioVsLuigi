@@ -119,13 +119,13 @@ namespace NSMB.UI.Game.Scoreboard {
                     }
                 }
 
-                if (f.Global->Rules.IsLivesEnabled && ((marioA->Lives == 0) ^ (marioB->Lives == 0))) {
-                    return marioB->Lives - marioA->Lives;
-                }
-
                 int starDiff = gamemode.GetObjectiveCount(f, marioB) - gamemode.GetObjectiveCount(f, marioA);
                 if (starDiff != 0) {
                     return starDiff;
+                }
+
+                if (f.Global->Rules.IsLivesEnabled && (marioA->Lives != marioB->Lives)) {
+                    return marioB->Lives - marioA->Lives;
                 }
 
             indexBasedSorting:

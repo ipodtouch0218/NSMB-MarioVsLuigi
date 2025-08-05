@@ -11,6 +11,7 @@ Ave
 BluCorDev
 Cubby Crazes
 davart154
+dotjp
 DonKaiStorm
 GithubSPerez
 GradedWarrior
@@ -26,8 +27,9 @@ skarph
 Skillz
 TheMoogle
 Tombuntu
-xFrostyCake123
 VLC
+xFrostyCake123
+Windows10V
 Zest
 _ZombleBobble
 
@@ -94,6 +96,7 @@ CreativeGhost
 Cubby Crazes
 Fawndue
 Grape
+Laxan3000
 MiiBumm
 mindnomad
 TheCyVap
