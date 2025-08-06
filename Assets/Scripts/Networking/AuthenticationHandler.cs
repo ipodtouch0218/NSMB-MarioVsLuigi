@@ -73,7 +73,9 @@ namespace NSMB.Networking {
                             "discord", DiscordServerURL);
                         NetworkHandler.ThrowError(msg, true);
                     }
-                } catch { }
+                } catch {
+                    NetworkHandler.ThrowError(result, true);
+                }
                 IsAuthenticating = false;
                 return null;
             }
