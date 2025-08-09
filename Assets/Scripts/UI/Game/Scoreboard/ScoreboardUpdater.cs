@@ -129,18 +129,7 @@ namespace NSMB.UI.Game.Scoreboard {
                 }
 
             indexBasedSorting:
-                int indexA = int.MaxValue;
-                int indexB = int.MaxValue;
-                for (int i = 0; i < f.Global->RealPlayers; i++) {
-                    PlayerRef player = f.Global->PlayerInfo[i].PlayerRef;
-                    if (player == marioA->PlayerRef) {
-                        indexA = i;
-                    } else if (player == marioB->PlayerRef) {
-                        indexB = i;
-                    }
-                }
-
-                return indexA - indexB;
+                return a.Index - b.Index;
             });
 
             foreach (var entry in entries) {
