@@ -785,31 +785,37 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct GameRules {
-    public const Int32 SIZE = 48;
+    public const Int32 SIZE = 248;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(40)]
+    [FieldOffset(240)]
     public AssetRef<Map> Stage;
-    [FieldOffset(32)]
+    [FieldOffset(4)]
+    public fixed Int32 IsStageBannedFromRandom[50];
+    [FieldOffset(232)]
     public AssetRef<GamemodeAsset> Gamemode;
-    [FieldOffset(8)]
+    [FieldOffset(224)]
+    public QBoolean RandomizeStage;
+    [FieldOffset(208)]
     public Int32 StarsToWin;
     [FieldOffset(0)]
     public Int32 CoinsForPowerup;
-    [FieldOffset(4)]
+    [FieldOffset(204)]
     public Int32 Lives;
-    [FieldOffset(12)]
+    [FieldOffset(212)]
     public Int32 TimerMinutes;
-    [FieldOffset(24)]
+    [FieldOffset(228)]
     public QBoolean TeamsEnabled;
-    [FieldOffset(16)]
+    [FieldOffset(216)]
     public QBoolean CustomPowerupsEnabled;
-    [FieldOffset(20)]
+    [FieldOffset(220)]
     public QBoolean DrawOnTimeUp;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 443;
         hash = hash * 31 + Stage.GetHashCode();
+        fixed (Int32* p = IsStageBannedFromRandom) hash = hash * 31 + HashCodeUtils.GetArrayHashCode(p, 50);
         hash = hash * 31 + Gamemode.GetHashCode();
+        hash = hash * 31 + RandomizeStage.GetHashCode();
         hash = hash * 31 + StarsToWin.GetHashCode();
         hash = hash * 31 + CoinsForPowerup.GetHashCode();
         hash = hash * 31 + Lives.GetHashCode();
@@ -823,11 +829,13 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (GameRules*)ptr;
         serializer.Stream.Serialize(&p->CoinsForPowerup);
+        serializer.Stream.SerializeBuffer(&p->IsStageBannedFromRandom[0], 50);
         serializer.Stream.Serialize(&p->Lives);
         serializer.Stream.Serialize(&p->StarsToWin);
         serializer.Stream.Serialize(&p->TimerMinutes);
         QBoolean.Serialize(&p->CustomPowerupsEnabled, serializer);
         QBoolean.Serialize(&p->DrawOnTimeUp, serializer);
+        QBoolean.Serialize(&p->RandomizeStage, serializer);
         QBoolean.Serialize(&p->TeamsEnabled, serializer);
         AssetRef.Serialize(&p->Gamemode, serializer);
         AssetRef.Serialize(&p->Stage, serializer);
@@ -1064,7 +1072,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 2888;
+    public const Int32 SIZE = 3088;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public AssetRef<Map> Map;
@@ -1099,7 +1107,7 @@ namespace Quantum {
     public BitSet64 UsedStarSpawns;
     [FieldOffset(1672)]
     public Int32 UsedStarSpawnCount;
-    [FieldOffset(1720)]
+    [FieldOffset(2840)]
     public GameRules Rules;
     [FieldOffset(1650)]
     public GameState GameState;
@@ -1115,7 +1123,7 @@ namespace Quantum {
     public UInt16 AutomaticStageRefreshInterval;
     [FieldOffset(1654)]
     public UInt16 AutomaticStageRefreshTimer;
-    [FieldOffset(1768)]
+    [FieldOffset(1720)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[1120];
     [FieldOffset(1648)]
@@ -1226,8 +1234,8 @@ namespace Quantum {
         Quantum.BitSet64.Serialize(&p->UsedStarSpawns, serializer);
         EntityRef.Serialize(&p->MainBigStar, serializer);
         FP.Serialize(&p->Timer, serializer);
-        Quantum.GameRules.Serialize(&p->Rules, serializer);
         FixedArray.Serialize(p->PlayerInfo, serializer, Statics.SerializePlayerInformation);
+        Quantum.GameRules.Serialize(&p->Rules, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -3312,6 +3320,7 @@ namespace Quantum {
   }
   public static unsafe partial class Constants {
     public const Int32 MaxPlayers = 10;
+    public const Int32 MaxStages = 50;
     /// <summary>8.5</summary>
     public static FP _8_50 {
       [MethodImpl(MethodImplOptions.AggressiveInlining)] get { 

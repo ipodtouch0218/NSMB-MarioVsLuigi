@@ -23,10 +23,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
         }
 
-        //---Serialized Variables
-        [SerializeField] private Image stagePreview;
-        [SerializeField] private Sprite unknownMapSprite;
-
         protected override void IncreaseValueInternal() {
             QuantumGame game = QuantumRunner.DefaultGame;
             var allStages = game.Configurations.Simulation.AllStages;
@@ -53,6 +49,10 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
         }
 
+        protected override void UpdateLabel() {
+            //All the actual visual stuff is handled in RoomPanel.cs
+        }
+
         private unsafe void SendCommand() {
             CommandChangeRules cmd = new CommandChangeRules {
                 EnabledChanges = ruleType,
@@ -67,22 +67,6 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
             int slot = game.GetLocalPlayerSlots()[game.GetLocalPlayers().IndexOf(game.Frames.Predicted.Global->Host)];
             game.SendCommand(slot, cmd);
-        }
-
-        protected override void UpdateLabel() {
-            string stageName;
-            Sprite sprite;
-            if (value is AssetRef<Map> mapAsset
-                && QuantumUnityDB.TryGetGlobalAsset(mapAsset, out Map map)
-                && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {
-                stageName = GlobalController.Instance.translationManager.GetTranslation(stage.TranslationKey);
-                sprite = stage.Icon;
-            } else {
-                stageName = "???";
-                sprite = unknownMapSprite;
-            }
-            label.text = labelPrefix + stageName;
-            stagePreview.sprite = sprite;
         }
     }
 }

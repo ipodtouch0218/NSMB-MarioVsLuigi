@@ -214,6 +214,8 @@
   "ui.inroom.settings.player.spectate": "Spectate match",
   "ui.inroom.settings.game.header": "Game Settings",
   "ui.inroom.settings.game.map": "Map",
+  "ui.inroom.settings.game.map.randomize": "Randomize",
+  "ui.inroom.settings.game.map.random": "Random",
   "ui.inroom.settings.game.map.description": "The level the game is played on. Be careful to consider the map when changing other rules, as a map's characteristics can influence what the ruleset should be (for example, the Timer is recommended to be enabled on Fortress).",
   "ui.inroom.settings.game.gamemode": "Gamemode",
   "ui.inroom.settings.game.stars": "Stars to win",
