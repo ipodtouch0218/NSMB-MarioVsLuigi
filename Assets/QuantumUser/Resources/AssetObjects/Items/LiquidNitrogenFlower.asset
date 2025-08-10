@@ -31,10 +31,11 @@ MonoBehaviour:
   CanSpawnFromBlock: 1
   OnlyOneCanExist: 0
   Type: 0
-  State: 12
+  State: 11
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   ReserveSprite:
+  - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   AvoidPlayers: 0
   Speed:

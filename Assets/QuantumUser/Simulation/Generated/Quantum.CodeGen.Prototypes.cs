@@ -274,6 +274,8 @@ namespace Quantum.Prototypes {
   public unsafe partial class CoinItemPrototype : ComponentPrototype<Quantum.CoinItem> {
     public AssetRef<CoinItemAsset> Scriptable;
     public Int32 Lifetime;
+    public QBoolean FeatherFall;
+    public Int32 Incr;
     partial void MaterializeUser(Frame frame, ref Quantum.CoinItem result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.CoinItem component = default;
@@ -283,6 +285,8 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.CoinItem result, in PrototypeMaterializationContext context = default) {
         result.Scriptable = this.Scriptable;
         result.Lifetime = this.Lifetime;
+        result.FeatherFall = this.FeatherFall;
+        result.Incr = this.Incr;
         MaterializeUser(frame, ref result, in context);
     }
   }

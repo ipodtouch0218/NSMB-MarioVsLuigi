@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3500937785695353841
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1554708682758543110}
+  m_Layer: 0
+  m_Name: Blank
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1554708682758543110
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3500937785695353841}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.171875, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6226578532214227705}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6307920351473437675
 GameObject:
   m_ObjectHideFlags: 0
@@ -18,6 +49,8 @@ GameObject:
   - component: {fileID: 5816618518376565689}
   - component: {fileID: -9113168347366101870}
   - component: {fileID: -8971064262029751978}
+  - component: {fileID: 973856499413669213}
+  - component: {fileID: 8568672403345788578}
   m_Layer: 19
   m_Name: Fireball
   m_TagString: Untagged
@@ -39,6 +72,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6102423714800591244}
+  - {fileID: 1554708682758543110}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2121123526138149625
@@ -61,12 +95,12 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
+    IsEnabled: 1
     IsTrigger: 0
     Material:
       Id:
         Value: 0
     SourceCollider: {fileID: 0}
-    IsEnabled: 1
     Shape2D:
       ShapeType: 4
       PolygonCollider:
@@ -338,7 +372,7 @@ MonoBehaviour:
   sRenderer: {fileID: 5329144335610595165}
   animator: {fileID: 0}
   legacySpriteAnimator: {fileID: 9162743564300288012}
-  sameTeamColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
+  sameTeamColor: {r: 0.5882353, g: 0.5882353, b: 0.5882353, a: 1}
   differentTeamColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &-8971064262029751978
 MonoBehaviour:
@@ -354,6 +388,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prototype:
     _empty_prototype_dummy_field_: 0
+--- !u!114 &973856499413669213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6307920351473437675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9bae64d07946894c9629349d5768bc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteAnimator: {fileID: 9162743564300288012}
+  SpriteList:
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
+    - {fileID: 750297706712597742, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
+    - {fileID: -8127487528002223245, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
+    - {fileID: -3915765450054648673, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
+    Fps: 12
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 457778918, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+    - {fileID: -2092205417, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+    - {fileID: -471219386, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+    - {fileID: 938875292, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+    Fps: 12
+--- !u!114 &8568672403345788578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6307920351473437675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2cbc4052da5fe04ab27058cc0db86a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ListOfObject:
+  - {fileID: 7524634318836740490}
+  - {fileID: 3500937785695353841}
 --- !u!1 &6817442949190414024
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,14 +568,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0.5826652
+  runInEditor: 0
   fps: 12
   frames:
   - {fileID: 5353841184698615464, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
   - {fileID: 750297706712597742, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
   - {fileID: -8127487528002223245, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
   - {fileID: -3915765450054648673, guid: 8b4c76bfff99dba4b90ef29e19c39f48, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 5329144335610595165}
   image: {fileID: 0}

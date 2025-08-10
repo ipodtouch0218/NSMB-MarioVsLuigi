@@ -120,6 +120,7 @@ namespace Quantum {
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
+            case ProjectileEffectType.KillEnemiesAndHardKnockbackPlayers:
             case ProjectileEffectType.Fire: {
                 f.Unsafe.GetPointer<Goomba>(goombaEntity)->Kill(f, goombaEntity, projectileEntity, KillReason.Special);
                 break;

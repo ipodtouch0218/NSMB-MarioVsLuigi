@@ -1,4 +1,5 @@
 using NSMB.Particles;
+using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
@@ -55,8 +56,18 @@ namespace NSMB.Entities.World {
 
             Vector2 a = particle.velocity;
             Vector2 b = transform.up;
-            float angularVelocity = (a.x * b.y) - (b.x * a.y);
-            particle.angularVelocity = angularVelocity * -(400f/5);
+
+            float angularVelocity = 0f;
+
+            switch ((int) Utils.GetStageTheme()) {
+            case 0:
+                angularVelocity = (a.x * b.y) - (b.x * a.y);
+                particle.angularVelocity = angularVelocity * -(400f/5);
+                break;
+            default:
+                particle.transform.localScale = new Vector3(particle.transform.localScale.x, -particle.transform.localScale.y, 1);
+                break;
+            }
 
             activeParticle = particle;
             currentEventKey = e;

@@ -1,4 +1,5 @@
 using NSMB.Utilities.Extensions;
+using NSMB.Utilities;
 using Quantum;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
@@ -128,7 +129,7 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            sfx.clip = SoundEffect.Enemy_Bobomb_Fuse.GetClip();
+            sfx.clip = SoundEffect.Enemy_Bobomb_Fuse.GetClip(Utils.GetStageTheme());
             sfx.Play();
 
             /*

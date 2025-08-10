@@ -29,7 +29,11 @@ namespace Quantum {
 
             // Physics
             transform->Position = spawnpoint;
-            physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), -Speed);
+            if (Speed > 19) {
+                physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), 0);
+            } else {
+                physicsObject->Velocity = new(Speed * (FacingRight ? 1 : -1), -Speed);
+            }
         }
 
         public void InitializeHammer(Frame f, EntityRef thisEntity, EntityRef owner, FPVector2 spawnpoint, bool right, bool playerHoldingUp) {
@@ -42,7 +46,7 @@ namespace Quantum {
             FacingRight = right;
 
             // Initial Velocity
-            FPVector2 velocity = playerHoldingUp ? new FPVector2(FP.FromString("3.8822"), FP.FromString("14.4888")) : new FPVector2(FP.FromString("6.25"), FP.FromString("7.5"));
+            FPVector2 velocity = playerHoldingUp ? new FPVector2(FP.FromString("3.8822"), FP.FromString("12.4888")) : new FPVector2(FP.FromString("6.25"), FP.FromString("7.5"));
             Speed = velocity.X;
             
             // Apply

@@ -1,4 +1,5 @@
 using NSMB.UI.Game;
+using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
@@ -57,7 +58,7 @@ namespace NSMB.Entities.World {
                 sfx.PlayOneShot(SoundEffect.World_Starcoin_Store);
             }
             mRenderer.enabled = false;
-            Destroy(gameObject, SoundEffect.World_Starcoin_Store.GetClip().length + 1);
+            Destroy(gameObject, SoundEffect.World_Starcoin_Store.GetClip(Utils.GetStageTheme()).length + 1);
             StarCoinDestroyed?.Invoke(VerifiedFrame, this);
         }
 

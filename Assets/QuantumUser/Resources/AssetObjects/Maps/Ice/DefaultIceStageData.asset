@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Ice/DefaultIceStageData
     Guid:
       Value: 464147531594164646
+  stageStyle: 0
   ShowAuthorAndComposer: 0
   StageAuthor: Nintendo
   MusicComposer: Nintendo
@@ -2636,8 +2637,8 @@ MonoBehaviour:
   - Tile:
       Id:
         Value: 404600007952925462
-    Rotation: 0
-    Flags: 0
+    Rotation: 65534
+    Flags: 1
   - Tile:
       Id:
         Value: 404600007952925462
@@ -3276,8 +3277,8 @@ MonoBehaviour:
   - Tile:
       Id:
         Value: 404600007952925462
-    Rotation: 0
-    Flags: 0
+    Rotation: 65534
+    Flags: 1
   - Tile:
       Id:
         Value: 404600007952925462
@@ -3916,8 +3917,8 @@ MonoBehaviour:
   - Tile:
       Id:
         Value: 404600007952925462
-    Rotation: 0
-    Flags: 0
+    Rotation: 65534
+    Flags: 1
   - Tile:
       Id:
         Value: 0

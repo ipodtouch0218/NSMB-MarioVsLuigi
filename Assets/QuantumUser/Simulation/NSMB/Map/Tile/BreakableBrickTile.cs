@@ -8,7 +8,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
 #if QUANTUM_UNITY
     public UnityEngine.Color ParticleColor;
 #endif
-    public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioDrill | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs;
+    public BreakableBy BreakingRules = BreakableBy.SmallMarioDrill | BreakableBy.LargeMario | BreakableBy.LargeMarioGroundpound | BreakableBy.LargeMarioDrill | BreakableBy.MegaMario | BreakableBy.Shells | BreakableBy.Bombs | BreakableBy.MegaMarioGroundpound;
     public bool BumpIfNotBroken;
     public FPVector2 BumpSize = new FPVector2(FP._0_50, FP._0_50);
     public FPVector2 BumpOffset = FPVector2.Zero;
@@ -35,7 +35,7 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
                 };
             } else if (mario->CurrentPowerupState == PowerupState.MegaMushroom) {
                 // Mega Mario
-                doBreak = BreakingRules.HasFlag(BreakableBy.MegaMario);
+                doBreak = BreakingRules.HasFlag(BreakableBy.MegaMario) || (BreakingRules.HasFlag(BreakableBy.MegaMarioGroundpound) && mario->IsGroundpounding);
                 brokenByMega = true;
             } else if (mario->IsInShell) {
                 // Blue Shell
@@ -118,5 +118,6 @@ public unsafe class BreakableBrickTile : StageTile, IInteractableTile {
         MegaMario = 1 << 6,
         Shells = 1 << 7,
         Bombs = 1 << 8,
+        MegaMarioGroundpound = 1 << 9,
     }
 }

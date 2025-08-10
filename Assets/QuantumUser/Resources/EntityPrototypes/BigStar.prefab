@@ -22,6 +22,8 @@ GameObject:
   - component: {fileID: 5279632371919351669}
   - component: {fileID: 5501024112843099950}
   - component: {fileID: 2599661224704062266}
+  - component: {fileID: 1446773055548893059}
+  - component: {fileID: 6497756990943918104}
   m_Layer: 19
   m_Name: BigStar
   m_TagString: Untagged
@@ -601,6 +603,36 @@ MonoBehaviour:
   Prototype:
     ColliderDisabled:
       Value: 0
+--- !u!114 &1446773055548893059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b8add6ebc4b634781775821d94cb5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ListOfObject:
+  - {fileID: 5237286551399780066}
+--- !u!114 &6497756990943918104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973747262660636106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 899bb7e5606179e40b39d069c66bf194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AnimationList:
+  - {fileID: 7400000, guid: 72b10467aa195f6409a95fcfb5502dfe, type: 2}
+  - {fileID: 7400000, guid: 9ece0cd1088be5f4999ed484908ad5d1, type: 2}
+  AnimatorOutput: {fileID: 130453169333135730}
 --- !u!1 &6306428316705399139
 GameObject:
   m_ObjectHideFlags: 0
@@ -644,6 +676,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7308630834410186342}
   - component: {fileID: 3409460790137144535}
+  - component: {fileID: 554147233607512307}
   m_Layer: 19
   m_Name: Sprite
   m_TagString: Untagged
@@ -722,6 +755,32 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &554147233607512307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9209823662088345179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9bae64d07946894c9629349d5768bc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteAnimator: {fileID: 0}
+  SpriteSingleAnimator: {fileID: 3409460790137144535}
+  SpriteList:
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 6326231466481203021, guid: 6afc8664f51abf545987f0a04b8a1125, type: 3}
+    Fps: 0
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 235765383, guid: 8154a84b219ce474299d18054172a2b4, type: 3}
+    Fps: 0
+  UseSingleRenderer: 1
 --- !u!1001 &7087770595906198018
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,10 +1,13 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
     public unsafe class CoinItemSystem : SystemMainThreadEntityFilter<CoinItem, CoinItemSystem.Filter>, ISignalOnStageReset {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");
+        public float SX = 0f;
+        public float SY = 0f;
 
         public struct Filter {
             public EntityRef Entity;
@@ -22,6 +25,9 @@ namespace Quantum {
             f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject);
 
             if (coinItem->SpawnAnimationFrames > 0) {
+                SX = transform->Position.X.AsFloat;
+                SY = transform->Position.Y.AsFloat;
+
                 if (f.Exists(coinItem->ParentMarioPlayer)) {
                     // Attached to a player. Don't interact, and follow the player.
                     var marioTransform = f.Unsafe.GetPointer<Transform2D>(coinItem->ParentMarioPlayer);
@@ -86,6 +92,13 @@ namespace Quantum {
                             interactable->ColliderDisabled = false;
                         }
                     }
+                }
+            } else {
+                if (coinItem->FeatherFall) {
+                    float BX = (SX + Mathf.Sin((coinItem->Incr * Mathf.PI) / 60000f));
+                    float BY = (SY + (Mathf.Abs(Mathf.Pow(Mathf.Sin((coinItem->Incr * Mathf.PI) / 60000f),2f) * 0.5f) - (coinItem->Incr / 60000f)));
+                    transform->Position = new FPVector2(FP.FromString(BX.ToString()), FP.FromString(BY.ToString()));
+                    coinItem->Incr += (int) (((coinItem->Incr + 1000) >= 10000) ? 1000 : ((coinItem->Incr + 1000) / 10f));
                 }
             }
 

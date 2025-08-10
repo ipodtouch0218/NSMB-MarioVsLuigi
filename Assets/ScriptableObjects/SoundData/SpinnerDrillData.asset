@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
   m_Name: SpinnerDrillData
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
-  loopStartSeconds: 1.368
-  loopEndSeconds: 1.668
+  clip:
+  - {fileID: 8300000, guid: 80e6fe6f66166f04e8beccc08fe56422, type: 3}
+  - {fileID: 8300000, guid: 1ca866c5280e85746a38fe74746c7f28, type: 3}
+  loopStartSeconds:
+  - 1.368
+  - 0
+  loopEndSeconds:
+  - 1.668
+  - 999

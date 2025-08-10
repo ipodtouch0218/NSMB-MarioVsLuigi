@@ -35,10 +35,11 @@ MonoBehaviour:
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   ReserveSprite:
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 8c3c80a47e6af9a4a8307f03a98a86ed, type: 3}
+  - {fileID: 21300000, guid: 8c3c80a47e6af9a4a8307f03a98a86ed, type: 3}
   AvoidPlayers: 0
   Speed:
-    RawValue: 131072
+    RawValue: 0
   BounceStrength:
     RawValue: 0
   TerminalVelocity:
@@ -68,5 +69,5 @@ MonoBehaviour:
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
-  StatePriority: 1
-  ItemPriority: 1
+  StatePriority: 2
+  ItemPriority: 2

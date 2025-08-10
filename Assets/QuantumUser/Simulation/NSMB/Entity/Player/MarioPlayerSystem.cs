@@ -1318,6 +1318,15 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
+            if (mario->LightningTimer > 0) {
+                QuantumUtils.Decrement(ref mario->LightningTimer);
+                if (mario->LightningTimer == 0) {
+                    mario->PlayLightningCharge = true;
+                }
+            } else {
+                mario->PlayLightningCharge = false;
+            }
+
             if (QuantumUtils.Decrement(ref mario->InvincibilityFrames)) {
                 f.Unsafe.GetPointer<ComboKeeper>(filter.Entity)->Combo = 0;
             }
@@ -1379,7 +1388,7 @@ namespace Quantum {
 
             if (!(inputs.PowerupAction.WasPressed
                 || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed && !physicsObject->IsTouchingGround && !mario->IsWallsliding)
-                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower || state == PowerupState.HammerSuit) && inputs.FireballPowerupAction.WasPressed))) {
+                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower || state == PowerupState.HammerSuit || state == PowerupState.LightningFlower) && inputs.FireballPowerupAction.WasPressed))) {
                 return;
             }
 
@@ -1391,17 +1400,15 @@ namespace Quantum {
             switch (mario->CurrentPowerupState) {
             case PowerupState.IceFlower:
             case PowerupState.FireFlower:
+            case PowerupState.LightningFlower:
             case PowerupState.HammerSuit: {
 
-                if (mario->ProjectileDelayFrames > 0 || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
+                if (mario->ProjectileDelayFrames > 0 || mario->LightningTimer > 0 || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
                     || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsSkidding || mario->IsTurnaround) {
                     return;
                 }
 
                 byte activeProjectiles = mario->CurrentProjectiles;
-                if (activeProjectiles >= physics.MaxProjecitles) {
-                    return;
-                }
 
                 if (activeProjectiles < 2) {
                     // Always allow if < 2
@@ -1413,7 +1420,9 @@ namespace Quantum {
                     // No more left in volley
                     return;
                 }
-
+                if(mario->CurrentPowerupState == PowerupState.LightningFlower) {
+                    mario->LightningTimer = 240;
+                }
                 mario->CurrentProjectiles++;
                 mario->ProjectileDelayFrames = physics.ProjectileDelayFrames;
                 mario->ProjectileVolleyFrames = physics.ProjectileVolleyFrames;
@@ -1474,7 +1483,7 @@ namespace Quantum {
             EntityRef newEntity = f.Create(f.SimulationConfig.HammerPrototype);
 
             var projectile = f.Unsafe.GetPointer<Projectile>(newEntity);
-            projectile->InitializeHammer(f, newEntity, filter.Entity, spawnPos, mario->FacingRight, false /* filter.Inputs.Up.IsDown */);
+            projectile->InitializeHammer(f, newEntity, filter.Entity, spawnPos, mario->FacingRight, filter.Inputs.Up.IsDown);
             return projectile;
         }
 
@@ -1483,14 +1492,16 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
-            FPVector2 spawnPos = filter.Transform->Position + new FPVector2(mario->FacingRight ? FP._0_25 : -FP._0_25, Constants._0_35);
+            FPVector2 spawnPos = filter.Transform->Position + new FPVector2(mario->CurrentPowerupState == PowerupState.LightningFlower ? (mario->FacingRight ? FP._0_75 : -FP._0_75) : (mario->FacingRight ? FP._0_25 : -FP._0_25), Constants._0_35);
 
             EntityRef newEntity = f.Create(mario->CurrentPowerupState == PowerupState.IceFlower
                 ? f.SimulationConfig.IceballPrototype
+                : mario->CurrentPowerupState == PowerupState.LightningFlower
+                ? f.SimulationConfig.LightningballPrototype
                 : f.SimulationConfig.FireballPrototype);
 
             var projectile = f.Unsafe.GetPointer<Projectile>(newEntity);
-            projectile->Initialize(f, newEntity, filter.Entity, spawnPos, mario->FacingRight);
+            projectile->Initialize(f, newEntity, mario->CurrentPowerupState == PowerupState.LightningFlower ? EntityRef.None : filter.Entity, spawnPos, mario->FacingRight);
             return projectile;
         }
 
@@ -2040,6 +2051,15 @@ namespace Quantum {
                     }
                     if (!damaged) {
                         didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectileEntity);
+                        damaged = true;
+                    }
+                    break;
+                case ProjectileEffectType.KillEnemiesAndHardKnockbackPlayers:
+                    if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
+                        damaged = mario->Powerdown(f, marioEntity, false, projectileEntity);
+                    }
+                    if (!damaged) {
+                        didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.Groundpound, projectileEntity);
                         damaged = true;
                     }
                     break;

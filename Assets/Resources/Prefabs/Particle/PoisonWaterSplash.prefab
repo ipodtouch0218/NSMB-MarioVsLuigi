@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5915462787734291376}
   - component: {fileID: 2954749760962805410}
   - component: {fileID: 6313531122763606821}
+  - component: {fileID: -5740024373672816302}
   m_Layer: 17
   m_Name: PoisonWaterSplash
   m_TagString: Untagged
@@ -4857,6 +4858,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4925,6 +4929,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 7fc9a814923a54d49af74669b64dd2f3, type: 3}
+  m_Resource: {fileID: 8300000, guid: 7fc9a814923a54d49af74669b64dd2f3, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -5027,3 +5032,19 @@ MonoBehaviour:
   soundOrigin: {fileID: 5915462787734291390}
   soundRange: 12
   maxPanning: 0.8
+--- !u!114 &-5740024373672816302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5915462787734291377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2e061a7372f8447885567935042c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundList:
+  - {fileID: 8300000, guid: 7fc9a814923a54d49af74669b64dd2f3, type: 3}
+  - {fileID: 8300000, guid: 5fc58a3c8c60e8e468122c70772e1de8, type: 3}
+  AudioOutput: {fileID: 2954749760962805410}

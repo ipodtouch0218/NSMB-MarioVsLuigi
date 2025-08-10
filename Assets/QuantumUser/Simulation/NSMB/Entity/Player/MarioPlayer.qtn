@@ -137,6 +137,8 @@ component MarioPlayer {
 	[ExcludeFromPrototype] bool PipeEntering;
 	[ExcludeFromPrototype] byte PipeFrames;
 	[ExcludeFromPrototype] byte PipeCooldownFrames;
+	[ExcludeFromPrototype] byte LightningTimer;
+	[ExcludeFromPrototype] bool PlayLightningCharge;
 
 	[ExcludeFromPrototype] EntityRef CurrentSpinner;
 }

@@ -4832,6 +4832,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4900,6 +4903,7 @@ GameObject:
   - component: {fileID: 7027243595425865096}
   - component: {fileID: 973512419996953564}
   - component: {fileID: 1573413261906505513}
+  - component: {fileID: 1121356547841877202}
   m_Layer: 17
   m_Name: LavaSplash
   m_TagString: Untagged
@@ -4949,6 +4953,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 7fc9a814923a54d49af74669b64dd2f3, type: 3}
+  m_Resource: {fileID: 8300000, guid: 7fc9a814923a54d49af74669b64dd2f3, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -5051,6 +5056,22 @@ MonoBehaviour:
   soundOrigin: {fileID: 5604144073064567413}
   soundRange: 12
   maxPanning: 0.8
+--- !u!114 &1121356547841877202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3187578607683521796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2e061a7372f8447885567935042c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundList:
+  - {fileID: 8300000, guid: 7fc9a814923a54d49af74669b64dd2f3, type: 3}
+  - {fileID: 8300000, guid: 79f414c83f1cd85498650430b61b2bb3, type: 3}
+  AudioOutput: {fileID: 973512419996953564}
 --- !u!1 &7629435363909363196
 GameObject:
   m_ObjectHideFlags: 0
@@ -9883,6 +9904,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

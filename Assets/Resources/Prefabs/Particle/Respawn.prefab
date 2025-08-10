@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6129504704901067234}
   - component: {fileID: -9213054407736008163}
   - component: {fileID: -2330482680041870623}
+  - component: {fileID: -4626287513151570682}
   m_Layer: 17
   m_Name: Respawn
   m_TagString: Untagged
@@ -164,6 +165,22 @@ MonoBehaviour:
   soundOrigin: {fileID: 9213689513685810617}
   soundRange: 12
   maxPanning: 0.8
+--- !u!114 &-4626287513151570682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5191653714546004373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2e061a7372f8447885567935042c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundList:
+  - {fileID: 8300000, guid: 952540ec58b4fac4497d126d96f92dd2, type: 3}
+  - {fileID: 8300000, guid: fd51bf497e14c264cacf742ff3044549, type: 3}
+  AudioOutput: {fileID: -9213054407736008163}
 --- !u!1 &5947153708774810409
 GameObject:
   m_ObjectHideFlags: 0

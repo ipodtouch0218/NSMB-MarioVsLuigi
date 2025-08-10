@@ -20,8 +20,11 @@ using UnityEngine.UI;
 namespace NSMB.UI.Game {
     public unsafe class UIUpdater : QuantumSceneViewComponent<StageContext> {
 
+        public int GameStyle => (int)Utils.GetStageTheme();
+
         //---Properties
         public EntityRef Target => playerElements.Entity;
+        public Image BGBar;
 
         //---Serialized Variables
         [SerializeField] private PlayerElements playerElements;
@@ -390,13 +393,26 @@ namespace NSMB.UI.Game {
         }
 
         private unsafe void ApplyUIColor(Frame f, MarioPlayer* mario) {
-            Color color = (f.Global->Rules.TeamsEnabled && mario != null && mario->GetTeam(f) is byte team) ? Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
-
-            foreach (Image bg in backgrounds) {
-                bg.color = color;
+            Color color = Color.clear;
+            switch (GameStyle) {
+            case 0:
+                //NSMB
+                color = (f.Global->Rules.TeamsEnabled && mario != null && mario->GetTeam(f) is byte team) ? Utils.GetTeamColor(f, team, 0.8f, 1f) : ViewContext.Stage.UIColor.AsColor;
+                foreach (Image bg in backgrounds) {
+                    bg.color = color;
+                }
+                itemColor.color = color;
+                break;
+            case 1:
+                //SMBDX
+                color = ViewContext.Stage.UIColor.AsColor;
+                BGBar.color = color;
+                foreach (Image bg in backgrounds) {
+                    bg.color = Color.white;
+                }
+                itemColor.color = Color.white;
+                break;
             }
-
-            itemColor.color = color;
         }
 
         private IEnumerator EndGameSequence(SoundEffect resultMusic, string resultAnimationTrigger, float delay) {

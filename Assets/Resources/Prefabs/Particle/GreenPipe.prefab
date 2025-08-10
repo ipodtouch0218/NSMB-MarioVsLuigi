@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4610713870707772705}
   - component: {fileID: 1154580734366823496}
+  - component: {fileID: 2767235844124235054}
   m_Layer: 17
   m_Name: Graphics
   m_TagString: Untagged
@@ -49,6 +50,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -77,13 +81,39 @@ SpriteRenderer:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 1
+  m_DrawMode: 2
   m_Size: {x: 2, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2767235844124235054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4602299652831625816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9bae64d07946894c9629349d5768bc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteAnimator: {fileID: 0}
+  SpriteSingleAnimator: {fileID: 1154580734366823496}
+  SpriteList:
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: -1133122105, guid: c55eba81d441d3f439e8289699cf72c8, type: 3}
+    Fps: 0
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 1746324248, guid: c87c07dd51d4978419be4caa7904e6ce, type: 3}
+    Fps: 0
+  UseSingleRenderer: 1
 --- !u!1 &4966771921777507886
 GameObject:
   m_ObjectHideFlags: 0
@@ -96,6 +126,8 @@ GameObject:
   - component: {fileID: 6090458509712813838}
   - component: {fileID: -1843595439736670929}
   - component: {fileID: 5957365481354593459}
+  - component: {fileID: 4271553255314905468}
+  - component: {fileID: 1115969547225001952}
   m_Layer: 17
   m_Name: GreenPipe
   m_TagString: Untagged
@@ -148,7 +180,8 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: cc76ebd60b562a44ca887fe96def4818, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 5c0b5ea84266d924cbcd29c71269d7b4, type: 3}
+  m_Resource: {fileID: 8300000, guid: 5c0b5ea84266d924cbcd29c71269d7b4, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -251,6 +284,36 @@ MonoBehaviour:
   soundOrigin: {fileID: 6460915104767337924}
   soundRange: 12
   maxPanning: 0.8
+--- !u!114 &4271553255314905468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4966771921777507886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2e061a7372f8447885567935042c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundList:
+  - {fileID: 8300000, guid: 5c0b5ea84266d924cbcd29c71269d7b4, type: 3}
+  - {fileID: 8300000, guid: 7daad71e46fe34a43b68ed3111b6cca1, type: 3}
+  AudioOutput: {fileID: -1843595439736670929}
+--- !u!114 &1115969547225001952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4966771921777507886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b8add6ebc4b634781775821d94cb5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ListOfObject:
+  - {fileID: 8802682422936085193}
 --- !u!1 &7504885489264103626
 GameObject:
   m_ObjectHideFlags: 0
@@ -5085,6 +5148,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

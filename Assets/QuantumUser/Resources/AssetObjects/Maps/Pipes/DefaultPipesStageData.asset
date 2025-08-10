@@ -16,6 +16,7 @@ MonoBehaviour:
     Path: QuantumUser/Resources/AssetObjects/Maps/Pipes/DefaultPipesStageData
     Guid:
       Value: 516894112774610642
+  stageStyle: 0
   ShowAuthorAndComposer: 0
   StageAuthor: Nintendo
   MusicComposer: Nintendo

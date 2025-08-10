@@ -25,7 +25,7 @@ MonoBehaviour:
     RawValue: 98304
   BlockSpawnSoundEffect: 69
   BigPowerup: 0
-  VerticalPowerup: 0
+  VerticalPowerup: 1
   CustomPowerup: 1
   LivesOnlyPowerup: 0
   CanSpawnFromBlock: 1
@@ -36,14 +36,15 @@ MonoBehaviour:
   SoundEffect: 16
   ReserveSprite:
   - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
+  - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   AvoidPlayers: 0
   Speed:
     RawValue: 0
   BounceStrength:
     RawValue: 0
   TerminalVelocity:
-    RawValue: -524288
-  FollowAnimationCurve: 1
+    RawValue: 0
+  FollowAnimationCurve: 0
   AnimationCurveX:
     Samples:
     - RawValue: 0

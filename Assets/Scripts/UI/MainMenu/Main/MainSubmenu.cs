@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using NSMB.Utilities;
 
 namespace NSMB.UI.MainMenu.Submenus {
     public class MainSubmenu : MainMenuSubmenu {
@@ -27,7 +28,7 @@ namespace NSMB.UI.MainMenu.Submenus {
         }
 
         private IEnumerator QuitCorotuine() {
-            AudioClip clip = SoundEffect.UI_Quit.GetClip();
+            AudioClip clip = SoundEffect.UI_Quit.GetClip(Utils.GetStageTheme());
             Canvas.PlaySound(SoundEffect.UI_Quit);
             yield return new WaitForSeconds(clip.length);
 

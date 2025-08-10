@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
   m_Name: WallslideSound
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: 95360a672a4824d4fb69690ee7c591ff, type: 3}
-  loopStartSeconds: 1.141
-  loopEndSeconds: 1.683
+  clip:
+  - {fileID: 8300000, guid: 95360a672a4824d4fb69690ee7c591ff, type: 3}
+  - {fileID: 8300000, guid: b4d59ad689c138943bfc53cfb764c520, type: 3}
+  loopStartSeconds:
+  - 1.141
+  - 0.08178711
+  loopEndSeconds:
+  - 1.683
+  - 0.33276367

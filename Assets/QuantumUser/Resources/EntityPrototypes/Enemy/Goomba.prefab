@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3591845850498963736}
   - component: {fileID: 7821411591339125535}
   - component: {fileID: 2072787540995169967}
+  - component: {fileID: 4058741552303636353}
   m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
@@ -26,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5669064217863857783}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.008726558, z: 0, w: 0.999962}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7523289063499453456}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
 --- !u!212 &7821411591339125535
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -50,6 +51,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -99,8 +103,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDisplaying: 1
-  runInEditor: 0
   frame: 0
+  runInEditor: 0
   fps: 12
   frames:
   - {fileID: -2665958366948368982, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
@@ -111,9 +115,44 @@ MonoBehaviour:
   - {fileID: 7518829234646223683, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   - {fileID: 2147156700845412417, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
   - {fileID: -1837141360104208851, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+  colorblindModeFrames: []
   useUnscaledDelta: 0
   sRenderer: {fileID: 7821411591339125535}
   image: {fileID: 0}
+--- !u!114 &4058741552303636353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5669064217863857783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9bae64d07946894c9629349d5768bc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteAnimator: {fileID: 2072787540995169967}
+  SpriteSingleAnimator: {fileID: 0}
+  SpriteList:
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: -2665958366948368982, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    - {fileID: 6268277884297706374, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    - {fileID: 1329094052204966939, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    - {fileID: -2646936077272662393, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    - {fileID: 8044139085597164931, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    - {fileID: 7518829234646223683, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    - {fileID: 2147156700845412417, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    - {fileID: -1837141360104208851, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+    Fps: 12
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 1607332890664886516, guid: 3535633c30e86c549b880191782ff9a4, type: 3}
+    - {fileID: 699991120, guid: 3535633c30e86c549b880191782ff9a4, type: 3}
+    Fps: 5
+  UseSingleRenderer: 0
 --- !u!1 &7523289063499453450
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,12 +218,12 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
+    IsEnabled: 1
     IsTrigger: 0
     Material:
       Id:
         Value: 0
     SourceCollider: {fileID: 0}
-    IsEnabled: 1
     Shape2D:
       ShapeType: 4
       PolygonCollider:
@@ -357,8 +396,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sRenderer: {fileID: 7821411591339125535}
-  deadSprite: {fileID: -728934508601558331, guid: b455056ca00f84e48a8040f94ae8170d,
-    type: 3}
+  deadSprite:
+  - {fileID: -728934508601558331, guid: b455056ca00f84e48a8040f94ae8170d, type: 3}
+  - {fileID: 1601886675, guid: 3535633c30e86c549b880191782ff9a4, type: 3}
   specialKillParticle: {fileID: 761201321277025702, guid: d0dec86b8ad08184d9da50d1f76fc7bd,
     type: 3}
   legacyAnimation: {fileID: 2072787540995169967}
@@ -375,6 +415,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 7382415506076328421}
   - component: {fileID: 5475970293224446295}
   - component: {fileID: 819605915704597882}
+  - component: {fileID: 6344934786397104263}
+  - component: {fileID: 8427713262258514243}
   m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
@@ -82,7 +84,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.5, y: 0.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -100,6 +102,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88eb6ee564c020f48a3b1cf851277386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6344934786397104263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3552150030264483580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9bae64d07946894c9629349d5768bc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteAnimator: {fileID: 8427713262258514243}
+  SpriteSingleAnimator: {fileID: 0}
+  SpriteList:
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 74701302, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
+    Fps: 0
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 1755229272, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
+    - {fileID: -286278248, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
+    Fps: 60
+  UseSingleRenderer: 0
+--- !u!114 &8427713262258514243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3552150030264483580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDisplaying: 1
+  frame: 0
+  runInEditor: 0
+  fps: 8
+  frames:
+  - {fileID: 74701302, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
+  colorblindModeFrames: []
+  useUnscaledDelta: 0
+  sRenderer: {fileID: 5475970293224446295}
+  image: {fileID: 0}
 --- !u!1 &5334425534174023786
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,13 +568,13 @@ MonoBehaviour:
       X:
         RawValue: 0
       Y:
-        RawValue: -1414398
+        RawValue: 0
     TerminalVelocity:
-      RawValue: -524288
+      RawValue: 0
     IsFrozen:
       Value: 0
     DisableCollision:
-      Value: 0
+      Value: 1
     SlowInLiquids:
       Value: 0
     IsWaterSolid:
@@ -582,3 +633,6 @@ MonoBehaviour:
       Id:
         Value: 396168740877459959
     Lifetime: 600
+    FeatherFall:
+      Value: 1
+    Incr: 0

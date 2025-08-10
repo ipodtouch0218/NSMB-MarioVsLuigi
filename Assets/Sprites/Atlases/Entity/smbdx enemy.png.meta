@@ -1,0 +1,527 @@
+fileFormatVersion: 2
+guid: 3535633c30e86c549b880191782ff9a4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1607332890664886516
+    second: smbdx enemy_0
+  - first:
+      213: -8476566284361426626
+    second: smbdx enemy_1
+  - first:
+      213: -1029448801990274731
+    second: smbdx enemy_2
+  - first:
+      213: -497621984281781322
+    second: smbdx enemy_3
+  - first:
+      213: -2594969710508178278
+    second: smbdx enemy_4
+  - first:
+      213: 4565602586359220626
+    second: smbdx enemy_5
+  - first:
+      213: -6161006363198604100
+    second: smbdx enemy_6
+  - first:
+      213: 820921368678904572
+    second: smbdx enemy_7
+  - first:
+      213: -569814532297030850
+    second: smbdx enemy_8
+  - first:
+      213: 3889586009996150993
+    second: smbdx enemy_9
+  - first:
+      213: 2454331316828155672
+    second: smbdx enemy_10
+  - first:
+      213: 7766923122892037616
+    second: smbdx enemy_11
+  - first:
+      213: 5586541864009602048
+    second: smbdx enemy_12
+  - first:
+      213: 8560920339373680163
+    second: smbdx enemy_13
+  - first:
+      213: -139993055685395231
+    second: smbdx enemy_14
+  - first:
+      213: -3957879371227107548
+    second: smbdx enemy_15
+  - first:
+      213: 1299627532606825415
+    second: smbdx enemy_16
+  - first:
+      213: 5741731801307573787
+    second: smbdx enemy_17
+  - first:
+      213: -3278903017921899429
+    second: smbdx enemy_18
+  - first:
+      213: -7904357728713627529
+    second: smbdx enemy_19
+  - first:
+      213: -3424041669081996234
+    second: smbdx enemy_20
+  - first:
+      213: 361168843163173104
+    second: smbdx enemy_21
+  - first:
+      213: -8066355961876304510
+    second: smbdx enemy_22
+  - first:
+      213: -2644438611050080158
+    second: smbdx enemy_23
+  - first:
+      213: -3585477272389728364
+    second: smbdx enemy_24
+  - first:
+      213: -3181739869385715836
+    second: smbdx enemy_25
+  - first:
+      213: 1247847212940965195
+    second: smbdx enemy_26
+  - first:
+      213: -2169477942640423539
+    second: smbdx enemy_27
+  - first:
+      213: -1153201141576053191
+    second: smbdx enemy_28
+  - first:
+      213: 1725011607430850912
+    second: smbdx enemy_29
+  - first:
+      213: 8942346796108658828
+    second: smbdx enemy_30
+  - first:
+      213: 8993193310905719201
+    second: smbdx enemy_31
+  - first:
+      213: 1428813620317404667
+    second: smbdx enemy_32
+  - first:
+      213: 7368355720603678980
+    second: smbdx enemy_33
+  - first:
+      213: -6518531266166417572
+    second: smbdx enemy_34
+  - first:
+      213: -8814937106025979076
+    second: smbdx enemy_35
+  - first:
+      213: 4936823698115446917
+    second: smbdx enemy_36
+  - first:
+      213: -6349040946412856422
+    second: smbdx enemy_37
+  - first:
+      213: -7259086071109696054
+    second: smbdx enemy_38
+  - first:
+      213: -4153000863537648409
+    second: smbdx enemy_39
+  - first:
+      213: -8943792140974480505
+    second: smbdx enemy_40
+  - first:
+      213: -2034542582329842902
+    second: smbdx enemy_41
+  - first:
+      213: 4742544469271948811
+    second: smbdx enemy_42
+  - first:
+      213: 4996592396832260965
+    second: smbdx enemy_43
+  - first:
+      213: 3114293471481753843
+    second: smbdx enemy_44
+  - first:
+      213: -4689155972066343976
+    second: smbdx enemy_45
+  - first:
+      213: -6480025115097963782
+    second: smbdx enemy_46
+  - first:
+      213: 2070980851013116228
+    second: smbdx enemy_47
+  - first:
+      213: 8606236735493154566
+    second: smbdx enemy_48
+  - first:
+      213: 2333450577163287090
+    second: smbdx enemy_49
+  - first:
+      213: 7086778935337767463
+    second: smbdx enemy_50
+  - first:
+      213: -7308256321223853014
+    second: smbdx enemy_51
+  - first:
+      213: -7350978572283491032
+    second: smbdx enemy_52
+  - first:
+      213: -4749606607011347953
+    second: smbdx enemy_53
+  - first:
+      213: -4767828431251671411
+    second: smbdx enemy_54
+  - first:
+      213: -5418229122944909094
+    second: smbdx enemy_55
+  - first:
+      213: 8757561523904477134
+    second: smbdx enemy_56
+  - first:
+      213: 858523467388188958
+    second: smbdx enemy_57
+  - first:
+      213: 7463868901196556145
+    second: smbdx enemy_58
+  - first:
+      213: 5328108193894143213
+    second: smbdx enemy_59
+  - first:
+      213: 8257054477547032058
+    second: smbdx enemy_60
+  - first:
+      213: 1031688919507362166
+    second: smbdx enemy_61
+  - first:
+      213: -3538598848198555168
+    second: smbdx enemy_62
+  - first:
+      213: -7459060631905250607
+    second: smbdx enemy_63
+  - first:
+      213: 4575454622156225112
+    second: smbdx enemy_64
+  - first:
+      213: 6059342164041761023
+    second: smbdx enemy_65
+  - first:
+      213: 8357300016868916366
+    second: smbdx enemy_66
+  - first:
+      213: 13173600180627155
+    second: smbdx enemy_67
+  - first:
+      213: 1254859902572944856
+    second: smbdx enemy_68
+  - first:
+      213: -9208559980043312169
+    second: smbdx enemy_69
+  - first:
+      213: 4147323086512668842
+    second: smbdx enemy_70
+  - first:
+      213: 8280388909016330849
+    second: smbdx enemy_71
+  - first:
+      213: -8277303906789533649
+    second: smbdx enemy_72
+  - first:
+      213: 1222251281444090731
+    second: smbdx enemy_73
+  - first:
+      213: 8008846387576008039
+    second: smbdx enemy_74
+  - first:
+      213: 315334169768230388
+    second: smbdx enemy_75
+  - first:
+      213: -6357142290184429472
+    second: smbdx enemy_76
+  - first:
+      213: 7148922969861846641
+    second: smbdx enemy_77
+  - first:
+      213: 5471413352623707672
+    second: smbdx enemy_78
+  - first:
+      213: 2009904185525668516
+    second: smbdx enemy_79
+  - first:
+      213: 5638540905524598999
+    second: smbdx enemy_80
+  - first:
+      213: 5697924189375578555
+    second: smbdx enemy_81
+  - first:
+      213: -1525015249414830816
+    second: smbdx enemy_82
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SMBDX_Goomba_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f0e1ef7fb46e4610800000000000000
+      internalID: 1607332890664886516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Goomba_1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 96
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83197252ee30e364e9403d600f8c6e0a
+      internalID: 699991120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_Goomba_2
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 96
+        width: 16
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c610495378106644e8d0fc57ea8c51ea
+      internalID: 1601886675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_GreenKoopa_0
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 96
+        width: 16
+        height: 24
+      alignment: 9
+      pivot: {x: 0.5, y: 0.33333334}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12d1108c4d09db54dbc1e4e58f134a5b
+      internalID: -491330496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_GreenKoopa_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 96
+        width: 16
+        height: 24
+      alignment: 9
+      pivot: {x: 0.5, y: 0.33333334}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42cae8460b294fb4f89f678f29516a00
+      internalID: 2096740557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_GreenShell_0
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 96
+        width: 16
+        height: 15
+      alignment: 9
+      pivot: {x: 0.5, y: 0.53333336}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15057ef6fbf303641b73e9930dd8f2ae
+      internalID: -1679520801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_GreenShell_1
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 96
+        width: 16
+        height: 15
+      alignment: 9
+      pivot: {x: 0.5, y: 0.53333336}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27fb933d13f4d6d43a8377a2e8d5d575
+      internalID: -1966683294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 1b80da781c14a34478d250c0b20e04ed
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SMBDX_Goomba_0: 1607332890664886516
+      SMBDX_Goomba_1: 699991120
+      SMBDX_Goomba_2: 1601886675
+      SMBDX_GreenKoopa_0: -491330496
+      SMBDX_GreenKoopa_1: 2096740557
+      SMBDX_GreenShell_0: -1679520801
+      SMBDX_GreenShell_1: -1966683294
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

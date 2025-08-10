@@ -2103,30 +2103,6 @@ MonoBehaviour:
       Item: 8
       Sprites:
       - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: -1433854009, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1332838342, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: -731332717, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 970844595, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 20
     - State: 18
       Item: 8
@@ -3701,9 +3677,9 @@ MonoBehaviour:
       Item: 9
       Sprites:
       - {fileID: 1610223218, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1610223218, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1610223218, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1610223218, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 875784273, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 119557088, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 1959560128, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1610223218, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1610223218, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 1610223218, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}

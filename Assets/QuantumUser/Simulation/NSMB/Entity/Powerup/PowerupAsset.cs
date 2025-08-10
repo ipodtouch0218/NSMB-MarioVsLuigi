@@ -28,6 +28,6 @@ public class PowerupAsset : CoinItemAsset {
 public enum PowerupType {
     Basic,
     Starman,
-    ExtraLife,
+    LetsGoGambling,
     ColdBrew,
 }

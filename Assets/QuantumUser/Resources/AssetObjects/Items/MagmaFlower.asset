@@ -18,7 +18,7 @@ MonoBehaviour:
       Value: 285548178290137776
   Prefab:
     Id:
-      Value: 1524544283524633813
+      Value: 1513059948828917572
   SpawnChance:
     RawValue: 32768
   LosingSpawnBonus:
@@ -35,6 +35,7 @@ MonoBehaviour:
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   ReserveSprite:
+  - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   AvoidPlayers: 0
   Speed:

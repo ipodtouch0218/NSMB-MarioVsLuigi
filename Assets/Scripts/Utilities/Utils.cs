@@ -10,6 +10,16 @@ using UnityEngine;
 namespace NSMB.Utilities {
     public class Utils {
 
+        public static StageTheme GetStageTheme() {
+            var f = QuantumRunner.DefaultGame.Frames.Predicted;
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            if(stage.stageStyle == null) {
+                Debug.Log("Style is null");
+                return StageTheme.NSMB;
+            }
+            return stage.stageStyle;
+        }
+
         public static bool BitTest(long v, int index) {
             return (v & (1L << index)) != 0;
         }
@@ -95,6 +105,25 @@ namespace NSMB.Utilities {
             ['8'] = "coinnumber_8",
             ['9'] = "coinnumber_9",
         };
+        public static readonly Dictionary<char, string> SMBDX_numberSymbols = new() {
+            ['0'] = "SMBDX_HUD_0",
+            ['1'] = "SMBDX_HUD_1",
+            ['2'] = "SMBDX_HUD_2",
+            ['3'] = "SMBDX_HUD_3",
+            ['4'] = "SMBDX_HUD_4",
+            ['5'] = "SMBDX_HUD_5",
+            ['6'] = "SMBDX_HUD_6",
+            ['7'] = "SMBDX_HUD_7",
+            ['8'] = "SMBDX_HUD_8",
+            ['9'] = "SMBDX_HUD_9",
+            [':'] = "SMBDX_HUD_Colon",
+            ['/'] = "SMBDX_HUD_Slash",
+            ['S'] = "SMBDX_HUD_Blank",
+            ['c'] = "SMBDX_HUD_Blank",
+            ['C'] = "SMBDX_HUD_Blank",
+            ['T'] = "SMBDX_HUD_Blank",
+            ['x'] = "SMBDX_HUD_x",
+        };
         public static readonly Dictionary<char, string> smallSymbols = new() {
             ['0'] = "room_smallnumber_0",
             ['1'] = "room_smallnumber_1",
@@ -125,7 +154,15 @@ namespace NSMB.Utilities {
 
         private static StringBuilder symbolStringBuilder = new();
         public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null) {
-            dict ??= uiSymbols;
+
+            switch ((int) GetStageTheme()) {
+            case 0:
+                dict ??= uiSymbols;
+                break;
+            case 1:
+                dict ??= SMBDX_numberSymbols;
+                break;
+            }
 
             symbolStringBuilder.Clear();
             foreach (char c in str) {

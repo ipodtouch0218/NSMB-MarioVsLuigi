@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2456925674553834749}
   - component: {fileID: -3568204047339294810}
   - component: {fileID: -5113133810989481609}
+  - component: {fileID: 4845206758332315727}
   m_Layer: 20
   m_Name: BlockBump
   m_TagString: Untagged
@@ -59,12 +60,12 @@ MonoBehaviour:
     PositionOffset:
       RawValue: 0
   PhysicsCollider:
+    IsEnabled: 1
     IsTrigger: 0
     Material:
       Id:
         Value: 0
     SourceCollider: {fileID: 0}
-    IsEnabled: 1
     Shape2D:
       ShapeType: 4
       PolygonCollider:
@@ -267,6 +268,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -315,7 +319,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 0700c8f2ea54bb9498d33bf839da0512, type: 3}
-  m_PlayOnAwake: 0
+  m_Resource: {fileID: 8300000, guid: 0700c8f2ea54bb9498d33bf839da0512, type: 3}
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -464,3 +469,19 @@ MonoBehaviour:
         RawValue: 0
     BroadRadius:
       RawValue: 49152
+--- !u!114 &4845206758332315727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6769544900703878166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2e061a7372f8447885567935042c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundList:
+  - {fileID: 8300000, guid: 0700c8f2ea54bb9498d33bf839da0512, type: 3}
+  - {fileID: 8300000, guid: 82c3eb8474705e34480437919c0747df, type: 3}
+  AudioOutput: {fileID: -7945987463487596907}

@@ -1,3 +1,4 @@
+using NSMB.Utilities;
 using NSMB.Utilities.Components;
 using NSMB.Utilities.Extensions;
 using Quantum;
@@ -9,7 +10,7 @@ namespace NSMB.Entities.Enemies {
 
         //---Serialized Variables
         [SerializeField] private SpriteRenderer sRenderer;
-        [SerializeField] private Sprite deadSprite;
+        [SerializeField] private Sprite[] deadSprite;
         [SerializeField] private GameObject specialKillParticle;
         [SerializeField] private LegacyAnimateSpriteRenderer legacyAnimation;
         [SerializeField] private AudioSource sfx;
@@ -48,13 +49,21 @@ namespace NSMB.Entities.Enemies {
             if (enemy->IsDead) {
                 if (goomba->DeathAnimationFrames > 0) {
                     // Stomped
-                    sRenderer.sprite = deadSprite;
+                    sRenderer.sprite = deadSprite[(int)Utils.GetStageTheme()];
                 } else {
                     // Special killed
-                    transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
+                    switch((int) Utils.GetStageTheme()) {
+                    case 0:
+                        transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
+                        break;
+                    default:
+                        transform.localScale = new Vector3(1, -1, 1);
+                        break;
+                    }
                 }
             } else {
                 transform.rotation = Quaternion.identity;
+                transform.localScale = Vector3.one;
             }
         }
 

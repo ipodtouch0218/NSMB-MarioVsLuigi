@@ -423,6 +423,10 @@ MonoBehaviour:
     prefab: {fileID: 3675436524114575726, guid: 739e2f42b51330f42a7332e15d5dd484,
       type: 3}
     offset: {x: 0, y: 0.25, z: 0}
+  - particle: 9
+    prefab: {fileID: 1674080856964950978, guid: 88c98ddee8b221c4aa6b25d34939759b,
+      type: 3}
+    offset: {x: 0, y: 0.1, z: 0}
 --- !u!1 &4420296297805007934
 GameObject:
   m_ObjectHideFlags: 0
@@ -759,7 +763,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapData: {fileID: 7682502346014357760}
-  Stage: {fileID: 0}
 --- !u!1 &9097954689152686375
 GameObject:
   m_ObjectHideFlags: 0

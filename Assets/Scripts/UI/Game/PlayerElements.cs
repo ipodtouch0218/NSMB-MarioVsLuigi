@@ -23,6 +23,7 @@ namespace NSMB.UI.Game {
         //---Static Variables
         public static HashSet<PlayerElements> AllPlayerElements = new();
         public event Action OnCameraFocusChanged;
+        //private int GameStyle = (int) Utils.GetStageTheme();
 
         //---Properties
         public PlayerRef Player { get; private set; }

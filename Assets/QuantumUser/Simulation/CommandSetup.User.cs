@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#define MVL_DEBUG
+using System.Collections.Generic;
 using Photon.Deterministic;
 
 namespace Quantum {

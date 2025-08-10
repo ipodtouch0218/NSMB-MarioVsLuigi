@@ -74,6 +74,7 @@ namespace Quantum {
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
+            case ProjectileEffectType.KillEnemiesAndHardKnockbackPlayers:
             case ProjectileEffectType.Fire: {
                 piranhaPlant->Kill(f, piranhaPlantEntity, projectileEntity, KillReason.Special);
                 break;

@@ -1,4 +1,5 @@
 using NSMB.UI.Game;
+using NSMB.Utilities;
 using NSMB.Utilities.Components;
 using NSMB.Utilities.Extensions;
 using Quantum;
@@ -19,7 +20,8 @@ namespace NSMB.Entities.World {
         [SerializeField] private LegacyAnimateSpriteRenderer defaultCoinAnimate, dottedCoinAnimate;
         [SerializeField] private AudioSource sfx;
         [SerializeField] private SpriteRenderer sRenderer;
-        [SerializeField] private ParticleSystem sparkles;
+        [SerializeField] private SpriteRenderer sRenderer2;
+        [SerializeField] private ParticleSystem[] sparkles;
         [SerializeField] private bool looseCoin, objectiveCoin;
 
         //---Private Variables
@@ -28,7 +30,7 @@ namespace NSMB.Entities.World {
         public void OnValidate() {
             this.SetIfNull(ref sfx);
             this.SetIfNull(ref sRenderer);
-            this.SetIfNull(ref sparkles, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref sparkles[(int) Utils.GetStageTheme()], UnityExtensions.GetComponentType.Children);
         }
 
         public void Start() {
@@ -43,13 +45,17 @@ namespace NSMB.Entities.World {
 
             bool dotted = coin->IsCurrentlyDotted;
             defaultCoinAnimate.isDisplaying = !dotted;
-            dottedCoinAnimate.isDisplaying = dotted;
+            if (dottedCoinAnimate) {
+                dottedCoinAnimate.isDisplaying = dotted;
+            }
             sRenderer.enabled = true;
             alreadyBounced = false;
 
             if (looseCoin) {
                 defaultCoinAnimate.frame = UnityEngine.Random.Range(0, defaultCoinAnimate.frames.Length);
-                dottedCoinAnimate.frame = UnityEngine.Random.Range(0, dottedCoinAnimate.frames.Length);
+                if (dottedCoinAnimate) {
+                    dottedCoinAnimate.frame = UnityEngine.Random.Range(0, dottedCoinAnimate.frames.Length);
+                }
             }
             if (objectiveCoin) {
                 ObjectiveCoinInitialized?.Invoke(f, this);
@@ -58,9 +64,12 @@ namespace NSMB.Entities.World {
 
         public override void OnDeactivate() {
             sRenderer.enabled = false;
+            if (sRenderer2) {
+                sRenderer2.enabled = false;
+            }
 
             if (looseCoin) {
-                ParticleSystem newSparkles = Instantiate(sparkles, sRenderer.transform.position, Quaternion.identity);
+                ParticleSystem newSparkles = Instantiate(sparkles[(int)Utils.GetStageTheme()], sRenderer.transform.position, Quaternion.identity);
                 newSparkles.gameObject.SetActive(true);
                 newSparkles.Play();
                 Destroy(newSparkles.gameObject, 0.5f);
@@ -85,9 +94,15 @@ namespace NSMB.Entities.World {
             if (coin->CoinType.HasFlag(CoinType.BakedInStage)) {
                 // Bodge: OnCoinChangedCollected doesnt work when collecting a coin at the exact same time as a level reset 
                 sRenderer.enabled = !coin->IsCollected;
+                if (sRenderer2) {
+                    sRenderer2.enabled = !coin->IsCollected;
+                }
             } else {
                 float despawnTimeRemaining = coin->Lifetime / 60f;
                 sRenderer.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
+                if (sRenderer2) {
+                    sRenderer2.enabled = !(despawnTimeRemaining < 3 && despawnTimeRemaining % 0.3f >= 0.15f);
+                }
             }
         }
 
@@ -146,12 +161,12 @@ namespace NSMB.Entities.World {
             sRenderer.enabled = !e.Collected;
             if (e.Collected && !IsReplayFastForwarding) {
                 if (looseCoin) {
-                    sparkles.transform.SetParent(transform.parent);
-                    sparkles.gameObject.SetActive(true);
-                    sparkles.transform.position = sRenderer.transform.position;
+                    sparkles[(int) Utils.GetStageTheme()].transform.SetParent(transform.parent);
+                    sparkles[(int) Utils.GetStageTheme()].gameObject.SetActive(true);
+                    sparkles[(int) Utils.GetStageTheme()].transform.position = sRenderer.transform.position;
                 }
 
-                sparkles.Play();
+                sparkles[(int) Utils.GetStageTheme()].Play();
             }
         }
 
@@ -162,7 +177,9 @@ namespace NSMB.Entities.World {
 
             bool dotted = e.Coin.IsCurrentlyDotted;
             defaultCoinAnimate.isDisplaying = !dotted;
-            dottedCoinAnimate.isDisplaying = dotted;
+            if (dottedCoinAnimate) {
+                dottedCoinAnimate.isDisplaying = dotted;
+            }
 
             if (!dotted && !IsReplayFastForwarding) {
                 sfx.PlayOneShot(SoundEffect.World_Coin_Dotted_Spawn);

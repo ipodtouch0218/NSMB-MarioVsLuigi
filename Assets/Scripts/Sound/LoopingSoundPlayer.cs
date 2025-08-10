@@ -1,14 +1,16 @@
 using UnityEngine;
 using UnityEngine.Serialization;
+using NSMB.Utilities;
 
 namespace NSMB.Sound {
     public class LoopingSoundPlayer : MonoBehaviour {
 
         //---Properties
+        public int gameStyle => (int) Utils.GetStageTheme();
         public bool IsPlaying => audioSource.isPlaying;
         public AudioSource Source => audioSource;
-        protected virtual float AudioStart => currentAudio.loopStartSeconds;
-        protected virtual float AudioEnd => currentAudio.loopEndSeconds;
+        protected virtual float AudioStart => currentAudio.loopStartSeconds[gameStyle];
+        protected virtual float AudioEnd => currentAudio.loopEndSeconds[gameStyle];
 
         //---Serialized Variables
         [SerializeField] protected AudioSource audioSource;
@@ -26,7 +28,7 @@ namespace NSMB.Sound {
                 return;
             }
 
-            if (currentAudio.loopEndSeconds != -1) {
+            if (currentAudio.loopEndSeconds[gameStyle] != -1) {
                 float time = audioSource.time;
 
                 if (time >= AudioEnd) {
@@ -37,7 +39,7 @@ namespace NSMB.Sound {
 
         public virtual void SetSoundData(LoopingSoundData data) {
             currentAudio = data;
-            audioSource.clip = data.clip;
+            audioSource.clip = data.clip[gameStyle];
         }
 
         public virtual void Play(bool restartIfAlreadyPlaying = true) {
@@ -55,7 +57,7 @@ namespace NSMB.Sound {
 
             currentAudio = song;
             audioSource.loop = true;
-            audioSource.clip = song.clip;
+            audioSource.clip = song.clip[(int) Utils.GetStageTheme()];
             audioSource.time = 0;
             audioSource.Play();
         }

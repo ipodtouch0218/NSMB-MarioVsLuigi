@@ -8,6 +8,47 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4015015153016662925, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: 'frames.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4928671260392873470, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
+        type: 3}
+    - target: {fileID: 4187851216033241612, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: 'SpriteList.Array.data[0].Sprites.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4928671260392873470, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
+        type: 3}
+    - target: {fileID: 4187851216033241612, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: 'SpriteList.Array.data[1].Sprites.Array.data[0]'
+      value: 
+      objectReference: {fileID: -1463124916, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
+        type: 3}
+    - target: {fileID: 4187851216033241612, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: 'SpriteList.Array.data[1].Sprites.Array.data[1]'
+      value: 
+      objectReference: {fileID: -1144583267, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
+        type: 3}
+    - target: {fileID: 4187851216033241612, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: 'SpriteList.Array.data[1].Sprites.Array.data[2]'
+      value: 
+      objectReference: {fileID: -1349642345, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
+        type: 3}
+    - target: {fileID: 4187851216033241612, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: 'SpriteList.Array.data[1].Sprites.Array.data[3]'
+      value: 
+      objectReference: {fileID: -144011697, guid: 794bc215dd02bf34ab2cfae7702bfdfd,
+        type: 3}
+    - target: {fileID: 4650848445799127066, guid: 9bcb5effadc837a45b61571768c543cf,
+        type: 3}
+      propertyPath: 'ListOfObject.Array.data[1]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5232922208935813434, guid: 9bcb5effadc837a45b61571768c543cf,
         type: 3}
       propertyPath: Flags
@@ -87,7 +128,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5900531122030324632, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1167208922550384180, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bcb5effadc837a45b61571768c543cf, type: 3}

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using NSMB.Utilities;
 
 namespace NSMB.Sound {
     public class AudioPreloader : MonoBehaviour {
@@ -66,24 +67,26 @@ namespace NSMB.Sound {
         }
 
         private void PreloadSoundEffect(SoundEffect sfx, CharacterAsset[] characters) {
-            var data = sfx.GetSoundData();
-            if (data.Sound.Contains("{char}")) {
-                foreach (var character in characters) {
-                    if (data.Variants > 1) {
-                        for (int i = 1; i <= data.Variants; i++) {
-                            sfx.GetClip(character, variant: i);
+            foreach (StageTheme stage in (StageTheme[]) Enum.GetValues(typeof(StageTheme))) {
+                var data = sfx.GetSoundData();
+                if (data.Sound.Contains("{char}")) {
+                    foreach (var character in characters) {
+                        if (data.Variants > 1) {
+                            for (int i = 1; i <= data.Variants; i++) {
+                                sfx.GetClip(stage, character, variant: i);
+                            }
+                        } else {
+                            sfx.GetClip(stage, character);
                         }
-                    } else {
-                        sfx.GetClip(character);
-                    }
-                }
-            } else {
-                if (data.Variants > 1) {
-                    for (int i = 1; i <= data.Variants; i++) {
-                        sfx.GetClip(variant: i);
                     }
                 } else {
-                    sfx.GetClip();
+                    if (data.Variants > 1) {
+                        for (int i = 1; i <= data.Variants; i++) {
+                            sfx.GetClip(stage, variant: i);
+                        }
+                    } else {
+                        sfx.GetClip(stage);
+                    }
                 }
             }
         }

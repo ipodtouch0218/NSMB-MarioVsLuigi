@@ -1,4 +1,5 @@
 using NSMB.Utilities.Extensions;
+using NSMB.Utilities;
 using NSMB.Tiles;
 using Quantum;
 using UnityEngine;
@@ -49,10 +50,20 @@ namespace NSMB.Entities.World {
             float bumpDuration = 0.25f;
 
             float remainingTime = (blockBump->Lifetime - Game.InterpolationFactor) / 60f;
-            float size = Mathf.Sin((remainingTime / bumpDuration) * Mathf.PI) * bumpScale * 0.5f;
+
+            float size = 0;
+            float position = Mathf.Sin((remainingTime / bumpDuration) * Mathf.PI) * bumpScale * 0.5f;
+            switch (Utils.GetStageTheme()) {
+            case 0:
+                size = Mathf.Sin((remainingTime / bumpDuration) * Mathf.PI) * bumpScale * 0.5f;
+                break;
+            default:
+                size = 0;
+                break;
+            }
 
             transform.localScale = new(0.5f + size, 0.5f + size, 1);
-            transform.position = blockBump->Origin.ToUnityVector2() + new Vector2(0, size * (blockBump->IsDownwards ? -1 : 1));
+            transform.position = blockBump->Origin.ToUnityVector2() + new Vector2(0, position * (blockBump->IsDownwards ? -1 : 1));
         }
     }
 }

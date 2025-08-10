@@ -1,4 +1,5 @@
 using NSMB.Utilities.Extensions;
+using NSMB.Utilities;
 using Quantum;
 using System;
 using UnityEngine;
@@ -66,6 +67,15 @@ namespace NSMB.Entities.World {
             }
 
             var star = f.Unsafe.GetPointer<BigStar>(EntityRef);
+
+            switch ((int) Utils.GetStageTheme()) {
+            case 0:
+                break;
+            default:
+                pulseAmount = 0;
+                rotationSpeed = 0;
+                break;
+            }
 
             if (star->IsStationary) {
                 pulseEffectCounter += Time.deltaTime;

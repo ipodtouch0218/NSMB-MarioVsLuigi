@@ -31,18 +31,19 @@ MonoBehaviour:
   CanSpawnFromBlock: 1
   OnlyOneCanExist: 0
   Type: 0
-  State: 13
+  State: 12
   SoundPlaysEverywhere: 0
   SoundEffect: 16
   ReserveSprite:
   - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
+  - {fileID: 697740482, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
   AvoidPlayers: 0
   Speed:
-    RawValue: 0
+    RawValue: 65536
   BounceStrength:
-    RawValue: 0
+    RawValue: 262144
   TerminalVelocity:
-    RawValue: -524288
+    RawValue: -196608
   FollowAnimationCurve: 0
   AnimationCurveX:
     Samples: []

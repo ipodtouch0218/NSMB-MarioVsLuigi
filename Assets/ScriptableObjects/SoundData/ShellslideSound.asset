@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
   m_Name: ShellslideSound
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: e9e8673a6dce3524c9ec16c0d228ac69, type: 3}
-  loopStartSeconds: 1.443
-  loopEndSeconds: 1.972
+  clip:
+  - {fileID: 8300000, guid: e9e8673a6dce3524c9ec16c0d228ac69, type: 3}
+  - {fileID: 8300000, guid: 82699eb03f6ae844b89cd69df1ef50c4, type: 3}
+  loopStartSeconds:
+  - 1.443
+  - 0
+  loopEndSeconds:
+  - 1.972
+  - 999

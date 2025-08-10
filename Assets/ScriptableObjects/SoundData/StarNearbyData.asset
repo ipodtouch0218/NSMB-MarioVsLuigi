@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
   m_Name: StarNearbyData
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: a6a625e3bb2c8ee41be41a59e4f81fe4, type: 3}
-  loopStartSeconds: 0
-  loopEndSeconds: 2.137
+  clip:
+  - {fileID: 8300000, guid: a6a625e3bb2c8ee41be41a59e4f81fe4, type: 3}
+  - {fileID: 8300000, guid: 82699eb03f6ae844b89cd69df1ef50c4, type: 3}
+  loopStartSeconds:
+  - 0
+  - 0
+  loopEndSeconds:
+  - 2.137
+  - 999

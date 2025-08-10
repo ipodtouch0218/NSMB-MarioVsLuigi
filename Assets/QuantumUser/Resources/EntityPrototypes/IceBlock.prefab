@@ -491,6 +491,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3560772426833456990}
   - component: {fileID: 5772244049117569476}
+  - component: {fileID: 4722397742187759293}
   m_Layer: 19
   m_Name: Graphics
   m_TagString: Untagged
@@ -558,7 +559,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
@@ -568,3 +569,29 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4722397742187759293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5906585881545024381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9bae64d07946894c9629349d5768bc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpriteAnimator: {fileID: 0}
+  SpriteSingleAnimator: {fileID: 5772244049117569476}
+  SpriteList:
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: 21300000, guid: 64d8b3652072ff942ad60637750783cc, type: 3}
+    Fps: 0
+  - State: 0
+    Item: 0
+    Sprites:
+    - {fileID: -139841572, guid: 9b39c43f1274b4846adc8cd2304dd2f9, type: 3}
+    Fps: 0
+  UseSingleRenderer: 1

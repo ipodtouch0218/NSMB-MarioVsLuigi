@@ -4,6 +4,7 @@ namespace Quantum {
     public unsafe partial struct CoinItem {
 
         public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength, PowerupSpawnReason spawnReason) {
+            Incr = 0;
             SpawnReason = spawnReason;
             SpawnAnimationFrames = spawnAnimationLength;
             Lifetime += spawnAnimationLength;
@@ -19,6 +20,7 @@ namespace Quantum {
         public void Initialize(Frame f, EntityRef thisEntity, byte spawnAnimationLength, PowerupSpawnReason spawnReason, FPVector2 spawnOrigin, FPVector2 spawnDestination, bool launch = false) {
             Initialize(f, thisEntity, spawnAnimationLength, spawnReason);
 
+            Incr = 0;
             LaunchSpawn = launch;
             BlockSpawn = !launch;
             BlockSpawnOrigin = spawnOrigin;

@@ -1,13 +1,15 @@
 component CoinItem {
 	AssetRef<CoinItemAsset> Scriptable;
 	int Lifetime;
+	bool FeatherFall;
+	int Incr;
 	[ExcludeFromPrototype] PowerupSpawnReason SpawnReason;
 	[ExcludeFromPrototype] bool BlockSpawn;
 	[ExcludeFromPrototype] bool LaunchSpawn;
 	[ExcludeFromPrototype] FPVector2 BlockSpawnOrigin;
 	[ExcludeFromPrototype] FPVector2 BlockSpawnDestination;
 	[ExcludeFromPrototype] byte BlockSpawnAnimationLength;
-
+	//
 	[ExcludeFromPrototype] byte SpawnAnimationFrames;
 	[ExcludeFromPrototype] EntityRef ParentMarioPlayer;
 }

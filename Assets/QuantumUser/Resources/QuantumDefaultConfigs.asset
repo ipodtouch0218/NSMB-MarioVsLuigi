@@ -316,6 +316,9 @@ MonoBehaviour:
   IceBlockPrototype:
     Id:
       Value: 1386525317044462577
+  LightningballPrototype:
+    Id:
+      Value: 1458772727067358690
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0

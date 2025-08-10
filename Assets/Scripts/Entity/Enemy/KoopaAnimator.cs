@@ -1,3 +1,4 @@
+using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using Quantum.Profiling;
@@ -69,7 +70,14 @@ namespace NSMB.Entities.Enemies {
             // "Flip" rotation
             float remainingWakeupTimer = koopa->IsKicked ? 0 : (koopa->WakeupFrames / 60f);
             if (enemy->IsDead) {
-                sRenderer.transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
+                switch ((int) Utils.GetStageTheme()) {
+                case 0:
+                    sRenderer.transform.rotation *= Quaternion.Euler(0, 0, 400f * (enemy->FacingRight ? -1 : 1) * Time.deltaTime);
+                    break;
+                default:
+                    sRenderer.transform.localScale = new Vector3(1, -1, 1);
+                    break;
+                }
 
             } else if (koopa->IsInShell) {
                 if (!freezable->IsFrozen(f)) {
@@ -90,6 +98,7 @@ namespace NSMB.Entities.Enemies {
                 }
             } else {
                 sRenderer.transform.rotation = Quaternion.identity;
+                sRenderer.transform.localScale = Vector3.one;
             }
 
             sRenderer.enabled = enemy->IsActive;

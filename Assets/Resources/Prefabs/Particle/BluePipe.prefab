@@ -4834,6 +4834,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4917,6 +4920,7 @@ GameObject:
   - component: {fileID: 2492885072743571861}
   - component: {fileID: 8803037422677927282}
   - component: {fileID: 6719394222846134981}
+  - component: {fileID: 3952406003617933270}
   m_Layer: 17
   m_Name: BluePipe
   m_TagString: Untagged
@@ -4969,7 +4973,8 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: -8359218312643153770, guid: b73add24eb026c844b85593f8bab1f8c,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: cc76ebd60b562a44ca887fe96def4818, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 5c0b5ea84266d924cbcd29c71269d7b4, type: 3}
+  m_Resource: {fileID: 8300000, guid: 5c0b5ea84266d924cbcd29c71269d7b4, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -5072,6 +5077,22 @@ MonoBehaviour:
   soundOrigin: {fileID: 2745735862268172808}
   soundRange: 12
   maxPanning: 0.8
+--- !u!114 &3952406003617933270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5534497648601427415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2e061a7372f8447885567935042c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundList:
+  - {fileID: 8300000, guid: 5c0b5ea84266d924cbcd29c71269d7b4, type: 3}
+  - {fileID: 8300000, guid: 7daad71e46fe34a43b68ed3111b6cca1, type: 3}
+  AudioOutput: {fileID: 8803037422677927282}
 --- !u!1 &8202364930682591119
 GameObject:
   m_ObjectHideFlags: 0
@@ -5121,6 +5142,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

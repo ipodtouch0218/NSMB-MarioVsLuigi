@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5478bfbe63c3c46b392d3ca752690c, type: 3}
   m_Name: WaterSkiddingSound
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: 7a2f311b131107240b42522a7f67d5c2, type: 3}
-  loopStartSeconds: 1.141
-  loopEndSeconds: 1.683
+  clip:
+  - {fileID: 8300000, guid: 7a2f311b131107240b42522a7f67d5c2, type: 3}
+  - {fileID: 8300000, guid: 3d3fe4ba003d8814db6238293a72c38b, type: 3}
+  loopStartSeconds:
+  - 1.141
+  - 0.087890625
+  loopEndSeconds:
+  - 1.683
+  - 0.171875

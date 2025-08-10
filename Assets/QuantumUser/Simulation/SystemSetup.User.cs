@@ -1,4 +1,6 @@
-﻿using Quantum.Core;
+﻿#define MVL_DEBUG
+
+using Quantum.Core;
 using System.Collections.Generic;
 
 namespace Quantum {
