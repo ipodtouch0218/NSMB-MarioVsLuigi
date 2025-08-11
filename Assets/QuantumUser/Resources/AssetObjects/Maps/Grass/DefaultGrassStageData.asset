@@ -70,14 +70,12 @@ MonoBehaviour:
   MainMusic:
   - Id:
       Value: 369157696319829885
-  - Id:
-      Value: 386427822095829515
   InvincibleMusic:
     Id:
-      Value: 289056355789154037
+      Value: 308334908874732861
   MegaMushroomMusic:
     Id:
-      Value: 451321131049702687
+      Value: 337229466863108273
   TileData:
   - Tile:
       Id:
@@ -1261,7 +1259,7 @@ MonoBehaviour:
     Flags: 0
   - Tile:
       Id:
-        Value: 392990342129010661
+        Value: 421624606179553367
     Rotation: 0
     Flags: 0
   - Tile:

@@ -843,6 +843,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: SMBDX_MiBom
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 32
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24d587b077294ea49941553a9e5d48ed
+      internalID: 1830452217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -861,6 +883,7 @@ TextureImporter:
       SMBDX_BrokenPipe_Green_1: 640730930
       SMBDX_BrokenPipe_Green_2: 1746324248
       SMBDX_BrokenPipe_Green_3: -26816537
+      SMBDX_MiBom: 1830452217
       SMBDX_Tile_Brick: -352315812
       SMBDX_Tile_Bush_0: 1443315358
       SMBDX_Tile_Bush_1: -1989909005

@@ -3,6 +3,7 @@ using NSMB.Replay;
 using NSMB.UI.Game;
 using NSMB.UI.Loading;
 using NSMB.Utilities.Extensions;
+using NSMB.Utilities;
 using Quantum;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
@@ -87,7 +88,7 @@ namespace NSMB.Sound {
                 }
 
                 speedup |= rules.IsLivesEnabled && mario->Lives == 1;
-                mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && mario->MegaMushroomFrames > 0;
+                mega |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.MegaMushroom) && ((mario->MegaMushroomFrames > 0) || (mario->MegaMushroomStartFrames > 0 && (int)Utils.GetStageTheme() == 1));
                 invincible |= Settings.Instance.audioSpecialPowerupMusic.HasFlag(Enums.SpecialPowerupMusic.Starman) && mario->IsStarmanInvincible;
             }
 

@@ -122,7 +122,7 @@ namespace Quantum {
         public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {
 
             if (newPowerup.Type == PowerupType.Starman) {
-                mario->InvincibilityFrames = 600;
+                mario->InvincibilityFrames = 1800;
                 f.Signals.OnMarioPlayerBecameInvincible(marioEntity);
                 return PowerupReserveResult.NoneButPlaySound;
             }

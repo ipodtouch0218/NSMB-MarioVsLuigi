@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 075af0e881e112348abe562216ddc298, type: 3}
+  m_Name: MusicLevelOverworld
+  m_EditorClassIdentifier: 
+  Identifier:
+    Path: QuantumUser/Resources/AssetObjects/Music/SMBDX/MusicLevelOverworld
+    Guid:
+      Value: 369157696319829885
+  clip: {fileID: 8300000, guid: 5e6b49e01ffb91045b01ed517e7d6980, type: 3}
+  fastClip: {fileID: 8300000, guid: aac236720a88556488b18bee5e9842a7, type: 3}
+  loopStartSeconds: 3.2
+  loopEndSeconds: 28.8
+  speedupFactor: 1.5

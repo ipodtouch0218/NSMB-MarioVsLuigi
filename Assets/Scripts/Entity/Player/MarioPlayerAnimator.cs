@@ -699,6 +699,9 @@ namespace NSMB.Entities.Player {
             if (!characterData) {
                 characterData = character;
             }
+            if(soundEffect == SoundEffect.World_Coin_Collect && sfx.clip == SoundEffect.World_Coin_Collect.GetClip(Utils.GetStageTheme())) {
+                sfx.Stop();
+            }
             sfx.PlayOneShot(soundEffect, characterData, variant, volume);
         }
 
@@ -1080,6 +1083,7 @@ namespace NSMB.Entities.Player {
             }
 
             coinSfx.pitch = UnityEngine.Random.Range(1.35f, 1.45f);
+            coinSfx.Stop();
             coinSfx.Play();
         }
 

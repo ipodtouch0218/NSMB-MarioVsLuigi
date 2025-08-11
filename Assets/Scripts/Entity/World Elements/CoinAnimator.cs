@@ -149,6 +149,7 @@ namespace NSMB.Entities.World {
 
             sfx.pitch = objectiveCoin ? UnityEngine.Random.Range(1.35f, 1.45f) : 1f;
             sfx.volume = objectiveCoin ? 0.1f : 1f;
+            sfx.Stop();
             sfx.PlayOneShot(SoundEffect.World_Coin_Drop);
             alreadyBounced = true;
         }
@@ -182,6 +183,7 @@ namespace NSMB.Entities.World {
             }
 
             if (!dotted && !IsReplayFastForwarding) {
+                sfx.Stop();
                 sfx.PlayOneShot(SoundEffect.World_Coin_Dotted_Spawn);
             }
         }

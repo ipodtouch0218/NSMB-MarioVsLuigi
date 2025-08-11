@@ -1174,7 +1174,7 @@ namespace Quantum {
 
                 if (QuantumUtils.Decrement(ref mario->MegaMushroomStartFrames)) {
                     // Started
-                    mario->MegaMushroomFrames = 15 * 60;
+                    mario->MegaMushroomFrames = (ushort)(24.616f * 60f);
                     physicsObject->IsFrozen = false;
 
                     Span<PhysicsObjectSystem.LocationTilePair> tiles = stackalloc PhysicsObjectSystem.LocationTilePair[64];
