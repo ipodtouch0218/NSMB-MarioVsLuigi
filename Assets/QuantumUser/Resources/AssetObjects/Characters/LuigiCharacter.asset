@@ -18,7 +18,7 @@ MonoBehaviour:
       Value: 485289843648077326
   Prototype:
     Id:
-      Value: 1526304449595821941
+      Value: 1479918679323180618
   SoundFolder: luigi
   UiString: <sprite name=hud_luigi>
   TranslationString: character.luigi
