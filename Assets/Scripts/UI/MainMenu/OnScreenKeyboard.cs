@@ -10,6 +10,7 @@ namespace NSMB.UI.MainMenu {
     public class OnScreenKeyboard : MonoBehaviour {
 
         //---Properties
+        public static OnScreenKeyboard Instance { get; private set; }
         public bool IsOpen => keyboardPanel.activeSelf;
 
         //---Serialized Variables
@@ -32,6 +33,7 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnEnable() {
+            Instance = this;
             actionAsset = Settings.Controls.asset;
             foreach (var actionMap in actionAsset.actionMaps) {
                 actionMap.actionTriggered += OnActionTriggered;

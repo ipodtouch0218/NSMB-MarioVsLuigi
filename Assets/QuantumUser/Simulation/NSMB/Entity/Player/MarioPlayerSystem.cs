@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using Quantum.Physics2D;
 using Quantum.Profiling;
 using System;
 using static IInteractableTile;

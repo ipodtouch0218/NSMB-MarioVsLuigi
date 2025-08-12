@@ -1,4 +1,6 @@
+using Quantum.Profiling;
 using TMPro;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -24,7 +26,8 @@ namespace NSMB.UI.MainMenu {
         }
 
         public void OnNavigate(InputAction.CallbackContext context) {
-            var osk = FindFirstObjectByType<OnScreenKeyboard>();
+            using var x = new ProfilerMarker("TMP_InputFieldFixer.OnNavigate").Auto();
+            var osk = OnScreenKeyboard.Instance;
             if (osk && osk.IsOpen) {
                 return;
             }
