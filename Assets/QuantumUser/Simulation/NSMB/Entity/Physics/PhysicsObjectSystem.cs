@@ -2,14 +2,11 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
-using UnityEngine;
 
 namespace Quantum {
 #if MULTITHREADED
-    [UnityEngine.Scripting.Preserve]
     public unsafe class PhysicsObjectSystem : SystemArrayFilter<PhysicsObjectSystem.Filter>, ISignalOnEntityEnterExitLiquid {
 #else
-    [UnityEngine.Scripting.Preserve]
     public unsafe class PhysicsObjectSystem : SystemMainThread, ISignalOnEntityEnterExitLiquid {
 #endif
 
@@ -795,27 +792,27 @@ namespace Quantum {
             );
             FPVector2 startLength = default;
             FPVector2 rayLength = default;
-            Vector2Int step = default;
+            IntVector2 step = default;
 
             if (direction.X < 0) {
-                step.x = -1;
+                step.X = -1;
                 startLength.X = rayLength.X = (worldPos.X - FPMath.Floor(worldPos.X * 2) / 2) * stepSize.X;
             } else if (direction.X > 0) {
-                step.x = 1;
+                step.X = 1;
                 startLength.X = rayLength.X = (FPMath.Floor(worldPos.X * 2 + 1) / 2 - worldPos.X) * stepSize.X;
             } else {
-                step.x = 0;
+                step.X = 0;
                 rayLength.X = maxDistance;
             }
 
             if (direction.Y < 0) {
-                step.y = -1;
+                step.Y = -1;
                 startLength.X = rayLength.Y = (worldPos.Y - FPMath.Floor(worldPos.Y * 2) / 2) * stepSize.Y;
             } else if (direction.Y > 0) {
-                step.y = 1;
+                step.Y = 1;
                 startLength.X = rayLength.Y = (FPMath.Floor(worldPos.Y * 2 + 1) / 2 - worldPos.Y) * stepSize.Y;
             } else {
-                step.y = 0;
+                step.Y = 0;
                 rayLength.Y = maxDistance;
             }
 
@@ -848,18 +845,18 @@ namespace Quantum {
             while (distance < maxDistance) {
                 bool steppedX;
                 if (rayLength.X < rayLength.Y) {
-                    tilePosition.X += step.x;
+                    tilePosition.X += step.X;
                     distance = rayLength.X;
                     rayLength.X += stepSize.X;
                     steppedX = true;
                 } else {
-                    tilePosition.Y += step.y;
+                    tilePosition.Y += step.Y;
                     distance = rayLength.Y;
                     rayLength.Y += stepSize.Y;
                     steppedX = false;
                 }
 
-                tile = stage.GetTileRelative((Frame) f, tilePosition);
+                tile = stage.GetTileRelative(f, tilePosition);
                 if (!tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out stageTile, QuantumUtils.RelativeTileToWorldRounded(stage, tilePosition))) {
                     continue;
                 }
@@ -873,7 +870,7 @@ namespace Quantum {
                     }
                     contact = new PhysicsContact {
                         Position = worldPos + (direction * trueDistance),
-                        Normal = (steppedX ? new(-step.x, 0) : new(0, -step.y)),
+                        Normal = (steppedX ? new(-step.X, 0) : new(0, -step.Y)),
                         Distance = trueDistance,
                         Tile = tilePosition,
                         Frame = f.Number,

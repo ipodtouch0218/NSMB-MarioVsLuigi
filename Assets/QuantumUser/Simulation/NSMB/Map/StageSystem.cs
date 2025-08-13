@@ -1,8 +1,6 @@
-using System;
 using Unity.Collections.LowLevel.Unsafe;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class StageSystem : SystemSignalsOnly, ISignalOnGameStarting, ISignalOnMapChanged {
         public override void OnInit(Frame f) {
             OnMapChanged(f, default);

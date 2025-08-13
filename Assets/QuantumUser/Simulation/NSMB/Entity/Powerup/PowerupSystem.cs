@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
 
         private static readonly FP BumpForce = Constants._5_50;

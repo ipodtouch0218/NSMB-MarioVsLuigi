@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class IceBlockSystem : SystemMainThreadEntityFilter<IceBlock, IceBlockSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEntityBumped,
         ISignalOnBeforeInteraction, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityChangeUnderwaterState {
 

@@ -1,12 +1,10 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using Quantum.Physics2D;
 using Quantum.Profiling;
 using System;
 using static IInteractableTile;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class MarioPlayerSystem : SystemMainThreadEntityFilter<MarioPlayer, MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>,
         ISignalOnGameStarting, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
         ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
@@ -2001,7 +1999,7 @@ namespace Quantum {
                 Tile = invisibleBlock->Tile,
             };
             f.Signals.OnMarioPlayerCollectedCoin(marioEntity, EntityRef.None, transform->Position, true, false);
-            BreakableBrickTile.Bump(f, stage, QuantumUtils.WorldToRelativeTile(stage, transform->Position), invisibleBlock->BumpTile, result, false, marioEntity, false);
+            BreakableBrickTile.Bump(f, stage, QuantumUtils.WorldToRelativeTile(stage, transform->Position), invisibleBlock->BumpTile, result, InteractionDirection.Up, marioEntity, false);
             return false;
         }
 

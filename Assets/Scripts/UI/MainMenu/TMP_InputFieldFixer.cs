@@ -73,7 +73,7 @@ namespace NSMB.UI.MainMenu {
                     if (next) {
                         system.SetSelectedGameObject(next.gameObject);
                         if (next.TryGetComponent(out TMP_InputField nextInputField)) {
-                            nextInputField.OnPointerClick(new PointerEventData(system));us
+                            nextInputField.OnPointerClick(new PointerEventData(system));
                         }
                         system.sendNavigationEvents = false;
                     }

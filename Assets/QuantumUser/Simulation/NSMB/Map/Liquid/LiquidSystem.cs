@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class LiquidSystem : SystemSignalsOnly, ISignalOnTriggerEnter2D, ISignalOnTrigger2D, ISignalOnTriggerExit2D,
         ISignalOnComponentRemoved<Transform2D> {
 
