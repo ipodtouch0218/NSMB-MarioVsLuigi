@@ -283,12 +283,14 @@ namespace NSMB.UI.Game.Replay {
         }
 
         private IEnumerator FrameAdvanceCoroutine() {
-            Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+            Frame f = PredictedFrame;
             Time.timeScale = 1;
             Time.captureDeltaTime = f.DeltaTime.AsFloat;
             yield return null;
-            Time.timeScale = 0;
-            Time.captureDeltaTime = 0;
+            if (!Game.Session.IsReplayFinished) {
+                Time.timeScale = 0;
+                Time.captureDeltaTime = 0;
+            }
         }
 
         public void ChangeReplaySpeed(int index) {

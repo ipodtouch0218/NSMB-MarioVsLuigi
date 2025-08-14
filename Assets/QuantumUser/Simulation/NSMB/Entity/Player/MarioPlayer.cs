@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 using System;
 
 namespace Quantum {
@@ -191,10 +192,11 @@ namespace Quantum {
             IsTurnaround = false;
             IsGroundpounding = false;
             CurrentKnockback = KnockbackStrength.None;
+            KnockbackGetupFrames = 0;
             WallslideRight = false;
             WallslideLeft = false;
             ForceJumpTimer = 0;
-            
+
             /*
             IsWaterWalking = false;
             IsFrozen = false;
