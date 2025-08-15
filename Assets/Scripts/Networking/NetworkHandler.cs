@@ -239,6 +239,7 @@ namespace NSMB.Networking {
                 CustomPowerups = rules.CustomPowerupsEnabled,
                 Teams = rules.TeamsEnabled,
                 DrawOnTimeUp = rules.DrawOnTimeUp,
+                RandomizeStage = rules.RandomizeStage,
             };
 
             RuntimePlayer hostData = f.GetPlayerData(host);

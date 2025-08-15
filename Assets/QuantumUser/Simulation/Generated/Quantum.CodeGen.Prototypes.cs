@@ -397,7 +397,10 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.GameRules))]
   public unsafe partial class GameRulesPrototype : StructPrototype {
     public AssetRef<Map> Stage;
+    [ArrayLengthAttribute(50)]
+    public Int32[] IsStageBannedFromRandom = new Int32[50];
     public AssetRef<GamemodeAsset> Gamemode;
+    public QBoolean RandomizeStage;
     public Int32 StarsToWin;
     public Int32 CoinsForPowerup;
     public Int32 Lives;
@@ -408,7 +411,11 @@ namespace Quantum.Prototypes {
     partial void MaterializeUser(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context);
     public void Materialize(Frame frame, ref Quantum.GameRules result, in PrototypeMaterializationContext context = default) {
         result.Stage = this.Stage;
+        for (int i = 0, count = PrototypeValidator.CheckLength(IsStageBannedFromRandom, 50, in context); i < count; ++i) {
+          result.IsStageBannedFromRandom[i] = this.IsStageBannedFromRandom[i];
+        }
         result.Gamemode = this.Gamemode;
+        result.RandomizeStage = this.RandomizeStage;
         result.StarsToWin = this.StarsToWin;
         result.CoinsForPowerup = this.CoinsForPowerup;
         result.Lives = this.Lives;

@@ -27,6 +27,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         //---Serialized Variables
         [SerializeField] private TMP_Text playersText, nameText, inProgressText, symbolsText, mapText;
         [SerializeField] private Image icon;
+        [SerializeField] private string randomStageTranslationKey="ui.inroom.settings.game.map.random";
 
         public void OnValidate() {
             this.SetIfNull(ref icon);
@@ -91,7 +92,10 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             gamemodeAndStage.Append(" - ");
 
-            if (stageAssetGuid != null
+            if (boolProperties.RandomizeStage) {
+                gamemodeAndStage.Append(tm.GetTranslation(randomStageTranslationKey));
+            }
+            else if (stageAssetGuid != null
                 && AssetGuid.TryParse(stageAssetGuid, out guid, true)
                 && QuantumUnityDB.TryGetGlobalAsset(new AssetRef<Map>(guid), out Map map)
                 && QuantumUnityDB.TryGetGlobalAsset(map.UserAsset, out VersusStageData stage)) {

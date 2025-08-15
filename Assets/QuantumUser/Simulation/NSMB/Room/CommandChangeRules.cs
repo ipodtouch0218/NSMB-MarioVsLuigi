@@ -1,5 +1,7 @@
 using Photon.Deterministic;
 using System;
+using Quantum;
+using System.Collections.Generic;
 
 namespace Quantum {
     public class CommandChangeRules : DeterministicCommand, ILobbyCommand {
@@ -8,6 +10,10 @@ namespace Quantum {
 
         public AssetRef<Map> Stage;
         public AssetRef<GamemodeAsset> Gamemode;
+
+        public int StageIndex;
+        public bool IsStageBannedFromRandom;
+
         public int StarsToWin;
         public int CoinsForPowerup;
         public int Lives;
@@ -15,6 +21,7 @@ namespace Quantum {
         public bool TeamsEnabled;
         public bool CustomPowerupsEnabled;
         public bool DrawOnTimeUp;
+        public bool RandomizeStage;
 
         public override void Serialize(BitStream stream) {
             if (stream.Writing) {
@@ -32,6 +39,9 @@ namespace Quantum {
             stream.Serialize(ref TeamsEnabled);
             stream.Serialize(ref CustomPowerupsEnabled);
             stream.Serialize(ref DrawOnTimeUp);
+            stream.Serialize(ref RandomizeStage);
+            stream.Serialize(ref IsStageBannedFromRandom);
+            stream.Serialize(ref StageIndex);
         }
 
         public unsafe void Execute(Frame f, PlayerRef sender, PlayerData* playerData) {
@@ -79,6 +89,14 @@ namespace Quantum {
             if (rulesChanges.HasFlag(Rules.DrawOnTimeUp)) {
                 rules.DrawOnTimeUp = DrawOnTimeUp;
             }
+            if (rulesChanges.HasFlag(Rules.RandomizeStage)) {
+             
+                rules.RandomizeStage = RandomizeStage;
+            }
+            if (rulesChanges.HasFlag(Rules.IsStageBannedFromRandom)) {
+                //If there's a huge error here, it's probably that there's now more than 50 maps, change the MaxMap value in GameLogic.qtn
+                rules.IsStageBannedFromRandom[StageIndex] = IsStageBannedFromRandom ? 1 : 0;
+            }
 
             f.Global->Rules = rules;
             f.Events.RulesChanged(gamemodeChanged, levelChanged);
@@ -100,6 +118,8 @@ namespace Quantum {
             TeamsEnabled = 1 << 6,
             CustomPowerupsEnabled = 1 << 7,
             DrawOnTimeUp = 1 << 8,
+            RandomizeStage = 1 << 9,
+            IsStageBannedFromRandom = 1 << 10,
         }
     }
 }

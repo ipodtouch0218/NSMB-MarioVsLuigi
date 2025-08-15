@@ -8,6 +8,7 @@ namespace NSMB.UI.MainMenu {
         //---Serialized Variables
         [SerializeField] private Camera targetCamera;
         [SerializeField] private StagePreviewData[] stages;
+        [SerializeField] private Transform randomizedStageCameraPosition;
 
         public void Start() {
             PreviewRandomStage();
@@ -28,6 +29,12 @@ namespace NSMB.UI.MainMenu {
             PreviewStage(GetPreviewDataFromMap(map));
         }
 
+        //Not the same as PreviewRandomStage. PreviewRandomStage choose a random stage to preview from the regular stages.
+        //This one is here to indicate the player that the stage is set to "randomized"
+        public void PreviewStageAsRandomized() {
+            targetCamera.transform.position = randomizedStageCameraPosition.position;
+        }
+
         private StagePreviewData GetPreviewDataFromMap(AssetRef<Map> map) {
             foreach (var stage in stages) {
                 if (stage.Map == map) {
@@ -39,11 +46,20 @@ namespace NSMB.UI.MainMenu {
 
         private unsafe void OnPlayerAdded(EventPlayerAdded e) {
             if (e.Game.PlayerIsLocal(e.Player)) {
+                if (e.Game.Frames.Predicted.Global->Rules.RandomizeStage) {
+                    PreviewStageAsRandomized();
+                    return;
+                }
                 PreviewStage(e.Game.Frames.Predicted.Global->Rules.Stage);
             }
         }
 
         private unsafe void OnRulesChanged(EventRulesChanged e) {
+            if (e.Game.Frames.Predicted.Global->Rules.RandomizeStage) 
+            {
+                PreviewStageAsRandomized();
+                return;
+            }
             PreviewStage(e.Game.Frames.Predicted.Global->Rules.Stage);
         }
 

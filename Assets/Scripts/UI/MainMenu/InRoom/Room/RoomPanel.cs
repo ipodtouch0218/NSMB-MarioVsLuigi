@@ -17,10 +17,13 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         [SerializeField] private TMP_Text stageNameText;
         [SerializeField] private StagePreviewManager stagePreviewManager;
         [SerializeField] private MainMenuChat chat;
+        [SerializeField] private string randomStageTranslationKey = "ui.inroom.settings.game.map.random";
+        [SerializeField] private Sprite randomStageIcon;
 
         //---Private Variables
         private readonly List<ChangeableRule> rules = new();
         private VersusStageData currentStage;
+        private bool currentStageRandomized;
 
         public override void Initialize() {
             base.Initialize();
@@ -41,6 +44,15 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+        }
+
+        public unsafe void OnEnable() {
+            if (currentStageRandomized) {
+                var game = QuantumRunner.DefaultGame;
+                if (game != null) {
+                    QuantumUtils.ChooseRandomLevel(game);
+                }
+            }
         }
 
         public override void OnDestroy() {
@@ -65,6 +77,12 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             currentStage = newStage;
         }
 
+        private void SetStageToRandom() 
+        {
+            stageNameText.text = GlobalController.Instance.translationManager.GetTranslation(randomStageTranslationKey);
+            stagePreviewImage.sprite = randomStageIcon;
+        }
+
         private unsafe void OnGameStarted(CallbackGameStarted e) {
             Frame f = e.Game.Frames.Predicted;
             ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(f.Global->Rules.Stage).UserAsset));
@@ -77,6 +95,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             if (e.MapChanged) {
                 ChangeStage(f.FindAsset<VersusStageData>(f.FindAsset(rules.Stage).UserAsset));
             }
+
+            currentStageRandomized = rules.RandomizeStage;
+            if (currentStageRandomized) {
+                SetStageToRandom();
+            }
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
@@ -85,6 +108,9 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 
             stageNameText.text = tm.GetTranslation(currentStage.TranslationKey);
+            if (currentStageRandomized) {
+                stageNameText.text = tm.GetTranslation(randomStageTranslationKey);
+            }
         }
     }
 }

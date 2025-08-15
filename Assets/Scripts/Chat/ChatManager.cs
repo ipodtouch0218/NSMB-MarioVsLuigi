@@ -3,6 +3,8 @@ using NSMB.Utilities;
 using Quantum;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
@@ -23,6 +25,7 @@ namespace NSMB.Chat {
 
         //---Private Variables
         private AssetRef<Map> currentMap;
+        private bool currentMapRandomizedValue;
         private AssetRef<GamemodeAsset> currentGamemode;
         private ChatMessageData changeMapMessage, changeGamemodeMessage;
 
@@ -66,7 +69,7 @@ namespace NSMB.Chat {
                 changeGamemodeMessage = AddSystemMessage("ui.inroom.chat.server.gamemode", Red, "gamemode", gamemodeName);
                 currentGamemode = rules.Gamemode;
             }
-            if (rules.Stage != currentMap) {
+            if ((rules.Stage != currentMap && !rules.RandomizeStage) || (rules.RandomizeStage != currentMapRandomizedValue && !rules.RandomizeStage)) {
                 RemoveChatMessage(changeMapMessage);
                 string stageName;
                 if (f.TryFindAsset(rules.Stage, out Map map)
@@ -77,6 +80,15 @@ namespace NSMB.Chat {
                 }
                 changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
                 currentMap = rules.Stage;
+                currentMapRandomizedValue = rules.RandomizeStage;
+            }
+
+            if (rules.RandomizeStage != currentMapRandomizedValue && rules.RandomizeStage) {
+                RemoveChatMessage(changeMapMessage);
+                string stageName = tm.GetTranslation("ui.inroom.settings.game.map.random");
+                changeMapMessage = AddSystemMessage("ui.inroom.chat.server.map", Red, "map", stageName);
+                currentMap = rules.Stage;
+                currentMapRandomizedValue = rules.RandomizeStage;
             }
         }
 
@@ -131,6 +143,7 @@ namespace NSMB.Chat {
             ref var rules = ref e.Game.Frames.Predicted.Global->Rules;
             currentGamemode = rules.Gamemode;
             currentMap = rules.Stage;
+            currentMapRandomizedValue = rules.RandomizeStage;
         }
 
         private void OnChatMessageCallback(ChatMessageData data) {
