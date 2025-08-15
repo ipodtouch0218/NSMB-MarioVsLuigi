@@ -16,7 +16,7 @@ namespace NSMB.UI {
             if (system.currentSelectedGameObject) {
                 // If there is no selected item, set the selected item to the event system's first selected item
                 lastSelection = system.currentSelectedGameObject;
-            } else {
+            } else if (lastSelection && lastSelection.activeInHierarchy) {
                 Debug.Log("current selected game object is null! switching to last object, " + lastSelection);
                 system.SetSelectedGameObject(lastSelection);
             }

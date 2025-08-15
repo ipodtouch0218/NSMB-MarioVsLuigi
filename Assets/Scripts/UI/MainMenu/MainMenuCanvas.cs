@@ -95,9 +95,12 @@ namespace NSMB.UI.MainMenu {
 
         public void Update() {
             // Fallback: select the default object if we somehow aren't selecting anything.
+
+            /*
             if (!eventSystem.currentSelectedGameObject && SubmenuStack.Count > 0) {
                 eventSystem.SetSelectedGameObject(SubmenuStack[^1].DefaultSelection);
             }
+            */
         }
 
         public void UpdateHeader() {

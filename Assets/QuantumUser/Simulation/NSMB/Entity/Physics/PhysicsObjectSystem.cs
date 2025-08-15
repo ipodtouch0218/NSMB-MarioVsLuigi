@@ -211,6 +211,10 @@ namespace Quantum {
         public void SendEventsTask(FrameThreadSafe f) {
             var filter = f.Filter<PhysicsObject>();
             while (filter.NextUnsafe(out EntityRef entity, out PhysicsObject* physicsObject)) {
+                if (physicsObject->IsFrozen) {
+                    return;
+                }
+
                 if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
                     ((Frame) f).Events.PhysicsObjectLanded(entity);
                 }
