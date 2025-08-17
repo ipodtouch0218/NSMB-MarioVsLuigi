@@ -71,6 +71,8 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [Kraken](https://github.com/McKrak)
 * [MiiBumm](https://github.com/MiiBumm)
 * [mindnomad](https://github.com/mindnomad)
+* Mixin
+* Mizzierella
 * [Pordrack](https://github.com/Pordrack)
 * [skarph](https://github.com/skarph)
 * [Skillz](https://github.com/Skillz808)
@@ -148,6 +150,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Laxan3000
 * MiiBumm
 * mindnomad
+* notossdekasaihassei
 * TheCyVap
 * Vinnnnnnny
 

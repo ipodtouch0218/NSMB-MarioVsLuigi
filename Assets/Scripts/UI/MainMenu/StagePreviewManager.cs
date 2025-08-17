@@ -48,6 +48,13 @@ namespace NSMB.UI.MainMenu {
         }
 
 
+        public void OnDrawGizmos() {
+            Gizmos.color = Color.gray;
+            foreach (var preview in stages) {
+                Gizmos.DrawWireCube(preview.CameraPosition.position, new Vector3(7f * (16f/9f), 7f));
+            }
+        }
+
         [Serializable]
         public class StagePreviewData {
             public AssetRef<Map> Map;

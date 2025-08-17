@@ -136,10 +136,25 @@ namespace NSMB.UI.Loading {
 
             Frame f = game.Frames.Predicted;
 
-            bool longIntro = !IsReplay && (state <= GameState.Starting || game.GetLocalPlayers().Any(p => !(QuantumUtils.GetPlayerDataSafe(f, p)?.IsSpectator ?? true)));
-            
+            FinalLoadingAnimation anim;
+            if (IsReplay) {
+                anim = FinalLoadingAnimation.Replay;
+            } else {
+                if (game.GetLocalPlayers().Any(p => !(QuantumUtils.GetPlayerDataSafe(f, p)?.IsSpectator ?? true))) {
+                    anim = FinalLoadingAnimation.JoinAsPlayer;
+                } else {
+                    anim = FinalLoadingAnimation.JoinAsSpectator;
+                }
+            }
+
+            bool longAnim = (anim != FinalLoadingAnimation.Replay) && state <= GameState.Starting;
+
+            if (anim == FinalLoadingAnimation.JoinAsSpectator && state <= GameState.Starting) {
+                yield return new WaitForSeconds(2.5f);
+            }
+
             readyGroup.gameObject.SetActive(true);
-            animator.SetTrigger(longIntro  ? "loaded" : "spectating");
+            animator.SetTrigger(longAnim ? "loaded" : "spectating");
 
             if (fadeVolumeCoroutine != null) {
                 StopCoroutine(fadeVolumeCoroutine);
@@ -148,9 +163,15 @@ namespace NSMB.UI.Loading {
             fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             //audioListener.enabled = false;
 
-            OnLoadingEnded?.Invoke(longIntro);
+            OnLoadingEnded?.Invoke(longAnim);
             running = false;
             endCoroutine = null;
+        }
+
+        public enum FinalLoadingAnimation {
+            Replay,
+            JoinAsSpectator,
+            JoinAsPlayer,
         }
 
         public void EndAnimation() {

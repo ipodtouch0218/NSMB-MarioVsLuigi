@@ -130,10 +130,12 @@ namespace Quantum {
                 mario->IsSkidding = false;
             }
 
+            /*
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable) && holdable->HoldAboveHead && f.Number - mario->HoldStartFrame < physics.IceBlockPickupFreezeFrames) {
                 physicsObject->Velocity.X = 0;
                 return;
             }
+            */
 
             ref var inputs = ref filter.Inputs;
             bool mega = mario->CurrentPowerupState == PowerupState.MegaMushroom;
@@ -818,7 +820,7 @@ namespace Quantum {
             bool wasCrouching = mario->IsCrouching;
             mario->IsCrouching =
                 (
-                    (mario->IsCrouching && f.IsPlayerVerifiedOrLocal(mario->PlayerRef)) // Fixes mispredicted uncrouching
+                    (mario->IsCrouching && !f.IsPlayerVerifiedOrLocal(mario->PlayerRef)) // Fixes mispredicted uncrouching
                     || (inputs.Down.IsDown && mario->IsStuckInBlock)
                     || (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding)
                     || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
@@ -2161,10 +2163,11 @@ namespace Quantum {
                 return;
             }
 
+            bool marioAStarman = marioA->IsStarmanInvincible;
+            bool marioBStarman = marioB->IsStarmanInvincible;
+
             if (!eitherDamageInvincible) {
                 // Starman cases
-                bool marioAStarman = marioA->IsStarmanInvincible;
-                bool marioBStarman = marioB->IsStarmanInvincible;
                 if (marioAStarman && marioBStarman) {
                     bool damaged = false;
                     damaged |= marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, marioBEntity);
@@ -2286,7 +2289,7 @@ namespace Quantum {
                 }
             }
 
-            if (!eitherDamageInvincible && !marioA->IsInKnockback && !marioB->IsInKnockback) {
+            if (!eitherDamageInvincible && !marioA->IsInKnockback && !marioB->IsInKnockback && !marioAStarman && !marioBStarman) {
                 // Collide
                 int directionToOtherPlayer = fromRight ? -1 : 1;
                 var marioACollider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioAEntity);

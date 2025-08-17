@@ -163,6 +163,8 @@ namespace Quantum {
             if (newState == PowerupState.MegaMushroom) {
                 mario->MegaMushroomStartFrames = 90;
                 mario->IsSliding = false;
+                mario->CurrentKnockback = KnockbackStrength.None;
+                mario->KnockbackGetupFrames = 0;
                 if (marioPhysicsObject->IsTouchingGround) {
                     mario->JumpState = JumpState.None;
                 }
