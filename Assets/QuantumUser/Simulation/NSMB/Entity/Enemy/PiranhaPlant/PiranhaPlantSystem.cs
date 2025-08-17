@@ -85,6 +85,12 @@ namespace Quantum {
                 newIceBlockTransform->Position.Y += (1 - piranhaPlant->PopupAnimationTime) * FP._0_75;
                 break;
             }
+            case ProjectileEffectType.FreezeLong: {
+                EntityRef newIceBlock = IceBlockSystem.FreezeLong(f, piranhaPlantEntity);
+                var newIceBlockTransform = f.Unsafe.GetPointer<Transform2D>(newIceBlock);
+                newIceBlockTransform->Position.Y += (1 - piranhaPlant->PopupAnimationTime) * FP._0_75;
+                break;
+            }
             }
 
             f.Signals.OnProjectileHitEntity(f, projectileEntity, piranhaPlantEntity);

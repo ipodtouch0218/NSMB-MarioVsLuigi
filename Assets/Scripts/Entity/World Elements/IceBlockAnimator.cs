@@ -2,6 +2,7 @@ using NSMB.Utilities.Extensions;
 using Quantum;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
+using NSMB.Utilities;
 
 namespace NSMB.Entities.World {
     public unsafe class IceBlockAnimator : QuantumEntityViewComponent {
@@ -9,13 +10,16 @@ namespace NSMB.Entities.World {
         //---Serialized Variables
         [SerializeField] private AudioSource sfx;
         [SerializeField] private SpriteRenderer sRenderer;
-        [SerializeField] private GameObject breakPrefab;
+        [SerializeField] private SpriteRenderer nitroRenderer;
+        [SerializeField] private GameObject[] breakPrefab;
+        [SerializeField] private GameObject nitroSmoke, isNitro, isNotNitro;
 
         [SerializeField] private float shakeSpeed = 120, shakeAmount = 0.03f;
 
         public void OnValidate() {
             this.SetIfNull(ref sfx);
             this.SetIfNull(ref sRenderer, UnityExtensions.GetComponentType.Children);
+            this.SetIfNull(ref nitroRenderer, UnityExtensions.GetComponentType.Children);
         }
 
         public void Start() {
@@ -30,6 +34,7 @@ namespace NSMB.Entities.World {
             }
 
             sRenderer.size = cube->Size.ToUnityVector2() * 2;
+            nitroRenderer.size = cube->Size.ToUnityVector2() * 2;
 
             Vector3 position = transform.position;
             position.z = -4.25f;
@@ -43,6 +48,16 @@ namespace NSMB.Entities.World {
             }
 
             var cube = f.Unsafe.GetPointer<IceBlock>(EntityRef);
+            if (cube->IsNitro) {
+                isNitro.SetActive(true);
+                isNotNitro.SetActive(false);
+            } else {
+                isNitro.SetActive(false);
+                isNotNitro.SetActive(true);
+            }
+            if (Utils.GetStageTheme() != StageTheme.NSMB) {
+                nitroSmoke.SetActive(false);
+            }
 
             if (cube->AutoBreakFrames > 0 && cube->AutoBreakFrames < 60
                 && cube->TimerEnabled(f, EntityRef)) {
@@ -56,7 +71,7 @@ namespace NSMB.Entities.World {
 
         public override void OnDeactivate() {
             if (!IsReplayFastForwarding) {
-                Instantiate(breakPrefab, transform.position, Quaternion.identity);
+                Instantiate(breakPrefab[(int)Utils.GetStageTheme()], transform.position, Quaternion.identity);
             }
         }
 

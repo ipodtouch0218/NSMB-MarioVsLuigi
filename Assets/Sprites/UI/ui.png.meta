@@ -3255,7 +3255,7 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -3264,6 +3264,28 @@ TextureImporter:
       bones: []
       spriteID: a2b6baae34d9c1249af4240620f53697
       internalID: -328982282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_HUD_Reserve
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 160
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb5bf55895a7dd8448d4a9f1c4a7cc14
+      internalID: 1554326702
       vertices: []
       indices: 
       edges: []
@@ -3293,6 +3315,7 @@ TextureImporter:
       SMBDX_HUD_Blank: 1378813770
       SMBDX_HUD_Luigi: 190424385
       SMBDX_HUD_Mario: 1127684574
+      SMBDX_HUD_Reserve: 1554326702
       SMBDX_HUD_Team: -328982282
       SMBDX_Letter_A: 938401392
       SMBDX_Letter_B: -1060326172

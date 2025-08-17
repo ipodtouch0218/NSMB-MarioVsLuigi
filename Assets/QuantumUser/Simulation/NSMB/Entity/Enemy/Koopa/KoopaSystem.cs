@@ -360,6 +360,10 @@ namespace Quantum {
                 IceBlockSystem.Freeze(f, koopaEntity);
                 break;
             }
+            case ProjectileEffectType.FreezeLong: {
+                IceBlockSystem.FreezeLong(f, koopaEntity);
+                break;
+            }
             }
 
             f.Signals.OnProjectileHitEntity(f, projectileEntity, koopaEntity);

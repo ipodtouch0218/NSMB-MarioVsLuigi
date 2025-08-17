@@ -49,6 +49,11 @@ namespace NSMB.Quantum {
                     CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
                 });
             }
+            if (UnityEngine.Input.GetKeyDown(KeyCode.I)) {
+                QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd {
+                    CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelfLong,
+                });
+            }
         }
 
         [Serializable]

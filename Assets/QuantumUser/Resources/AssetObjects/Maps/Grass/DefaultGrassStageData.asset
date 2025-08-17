@@ -53,7 +53,7 @@ MonoBehaviour:
     X:
       RawValue: -6553600
     Y:
-      RawValue: 0
+      RawValue: -32768
   CameraMaxPosition:
     X:
       RawValue: 6553600

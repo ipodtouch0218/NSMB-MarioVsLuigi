@@ -157,6 +157,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: nitrocube
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 0
+        width: 22
+        height: 22
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 3, y: 3, z: 3, w: 3}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adff6c35058a547439d8e61381fd250a
+      internalID: 941321901
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_NitroCube
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 0
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 5, y: 5, z: 5, w: 5}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce7eb0d58a3b1bb44995e50c3aecb9d6
+      internalID: 959239219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -172,9 +216,11 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       SMBDX_FrozenCube: -139841572
+      SMBDX_NitroCube: 959239219
       frozencube_0: 732412983
       frozencube_1: 733263250
       frozencube_2: 1303551094
+      nitrocube: 941321901
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

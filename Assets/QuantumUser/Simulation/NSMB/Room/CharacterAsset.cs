@@ -110,3 +110,9 @@ public class CharacterStateAnimation {
     public Sprite[] Sprites;
     public float Fps;
 }
+[System.Serializable]
+public class InvincibilityColors {
+    public Gradient HatGradient;
+    public Gradient OverallsGradient;
+    public Gradient SkinGradient;
+}

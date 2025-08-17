@@ -410,7 +410,7 @@ namespace NSMB.UI.Game {
                 foreach (Image bg in backgrounds) {
                     bg.color = Color.white;
                 }
-                itemColor.color = Color.white;
+                itemColor.color = color;
                 break;
             }
         }

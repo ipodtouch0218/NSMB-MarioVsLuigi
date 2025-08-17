@@ -146,7 +146,7 @@ namespace Quantum {
                 } else {
                     maxStage = physics.SwimMaxVelocity.Length - 1;
                 }
-            } else if (mario->IsStarmanInvincible && run && physicsObject->IsTouchingGround) {
+            } else if (mario->IsStarmanInvincible && run) {
                 maxStage = physics.StarSpeedStage;
             } else if (run) {
                 maxStage = physics.RunSpeedStage;
@@ -177,6 +177,10 @@ namespace Quantum {
                 acc = physics.WalkMegaAcceleration[stage];
             } else {
                 acc = physics.WalkAcceleration[stage];
+            }
+
+            if(mario->CurrentPowerupState == PowerupState.CubbyLandHat) {
+                acc *= FP._8;
             }
 
             FP xVel = physicsObject->Velocity.X;
@@ -259,6 +263,9 @@ namespace Quantum {
                                     : physics.SlowTurnaroundAcceleration[mario->SlowTurnaroundFrames];
                             }
                         }
+                        if(mario->CurrentPowerupState == PowerupState.CubbyLandHat) {
+                            acc *= FP._8;
+                        }
                     } else {
                         // TODO: change 0.85 to a constant?
                         acc = physics.WalkAcceleration[0] * Constants._0_85;
@@ -282,7 +289,7 @@ namespace Quantum {
 
                 physicsObject->Velocity.X = newX;
 
-            } else if (physicsObject->IsTouchingGround || swimming) {
+            } else if (physicsObject->IsTouchingGround || swimming || mario->CurrentPowerupState == PowerupState.CubbyLandHat) {
                 // Not holding anything, sliding, or holding both directions. decelerate
                 mario->IsSkidding = false;
                 mario->IsTurnaround = false;
@@ -312,6 +319,9 @@ namespace Quantum {
                     acc = -physics.WalkButtonReleaseIceDeceleration[stage];
                 } else {
                     acc = -physics.WalkButtonReleaseDeceleration;
+                }
+                if (mario->CurrentPowerupState == PowerupState.CubbyLandHat) {
+                    acc *= FP._8;
                 }
 
                 FP newX = xVel + acc * f.DeltaTime * sign;
@@ -390,7 +400,9 @@ namespace Quantum {
                 && mario->CantJumpTimer == 0;
 
             QuantumUtils.Decrement(ref mario->ForceJumpTimer);
-            QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
+            if(mario->CurrentPowerupState != PowerupState.CubbyLandHat) {
+                QuantumUtils.Decrement(ref mario->CoyoteTimeFrames);
+            }
             QuantumUtils.Decrement(ref mario->JumpBufferFrames);
             QuantumUtils.Decrement(ref mario->CantJumpTimer);
 
@@ -659,7 +671,6 @@ namespace Quantum {
             if (mario->IsWallsliding) {
                 HandleWallslideStopChecks(ref filter, currentWallDirection);
             }
-
             if (mario->WallslideEndFrames > 0 && QuantumUtils.Decrement(ref mario->WallslideEndFrames)) {
                 mario->WallslideRight = false;
                 mario->WallslideLeft = false;
@@ -668,6 +679,7 @@ namespace Quantum {
 
             if (mario->IsWallsliding) {
                 // Walljump check
+                mario->CoyoteTimeFrames = 0;
                 physicsObject->Velocity.X = FPMath.Clamp(physicsObject->Velocity.X, -FP._0_25, FP._0_25);
                 mario->FacingRight = mario->WallslideLeft;
                 if (mario->JumpBufferFrames > 0 && mario->WalljumpFrames == 0 /* && !BounceJump */) {
@@ -746,7 +758,7 @@ namespace Quantum {
 
             if ((wallDirection == FPVector2.Left && (!inputs.Left.IsDown || !physicsObject->IsTouchingLeftWall)) || (wallDirection == FPVector2.Right && (!inputs.Right.IsDown || !physicsObject->IsTouchingRightWall))) {
                 if (mario->WallslideEndFrames == 0) {
-                    mario->WallslideEndFrames = 16;
+                    mario->WallslideEndFrames = mario->CurrentPowerupState == PowerupState.CubbyLandHat ? 99999 : 16;
                     filter.Transform->Position -= wallDirection * FP._0_01;
                 }
             } else {
@@ -1386,9 +1398,13 @@ namespace Quantum {
                 return;
             }
 
+            if(mario->CurrentPowerupState == PowerupState.Cape && inputs.Jump.IsDown && !physicsObject->IsTouchingGround) {
+                physicsObject->Velocity = new FPVector2(physicsObject->Velocity.X,FPMath.Max(physicsObject->Velocity.Y, -FP._1_25));
+            }
+
             if (!(inputs.PowerupAction.WasPressed
                 || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed && !physicsObject->IsTouchingGround && !mario->IsWallsliding)
-                || ((state == PowerupState.FireFlower || state == PowerupState.IceFlower || state == PowerupState.HammerSuit || state == PowerupState.LightningFlower) && inputs.FireballPowerupAction.WasPressed))) {
+                || ((state == PowerupState.FireFlower || state == PowerupState.MagmaFlower || state == PowerupState.IceFlower || state == PowerupState.LiquidNitrogenFlower || state == PowerupState.HammerSuit || state == PowerupState.LightningFlower) && inputs.FireballPowerupAction.WasPressed))) {
                 return;
             }
 
@@ -1400,6 +1416,8 @@ namespace Quantum {
             switch (mario->CurrentPowerupState) {
             case PowerupState.IceFlower:
             case PowerupState.FireFlower:
+            case PowerupState.LiquidNitrogenFlower:
+            case PowerupState.MagmaFlower:
             case PowerupState.LightningFlower:
             case PowerupState.HammerSuit: {
 
@@ -1498,6 +1516,10 @@ namespace Quantum {
                 ? f.SimulationConfig.IceballPrototype
                 : mario->CurrentPowerupState == PowerupState.LightningFlower
                 ? f.SimulationConfig.LightningballPrototype
+                : mario->CurrentPowerupState == PowerupState.MagmaFlower
+                ? f.SimulationConfig.MagmaballPrototype
+                : mario->CurrentPowerupState == PowerupState.LiquidNitrogenFlower
+                ? f.SimulationConfig.NitroballPrototype
                 : f.SimulationConfig.FireballPrototype);
 
             var projectile = f.Unsafe.GetPointer<Projectile>(newEntity);
@@ -2071,6 +2093,19 @@ namespace Quantum {
                         damaged = true;
                     }
                     
+                    if (!damaged) {
+                        didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectileEntity);
+                        damaged = true;
+                    }
+                    break;
+                case ProjectileEffectType.FreezeLong:
+                    if (dropStars && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
+                        damaged = mario->Powerdown(f, marioEntity, false, projectileEntity);
+                    } else if (dropStars) {
+                        IceBlockSystem.FreezeLong(f, marioEntity);
+                        damaged = true;
+                    }
+
                     if (!damaged) {
                         didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectileEntity);
                         damaged = true;

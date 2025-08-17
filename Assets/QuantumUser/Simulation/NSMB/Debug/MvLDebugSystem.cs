@@ -52,6 +52,9 @@ namespace Quantum {
             case DebugCommand.FreezeSelf:
                 IceBlockSystem.Freeze(f, marioEntity);
                 break;
+            case DebugCommand.FreezeSelfLong:
+                IceBlockSystem.FreezeLong(f, marioEntity);
+                break;
             }
         }
     }

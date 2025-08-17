@@ -319,6 +319,12 @@ MonoBehaviour:
   LightningballPrototype:
     Id:
       Value: 1458772727067358690
+  MagmaballPrototype:
+    Id:
+      Value: 1513088566681638755
+  NitroballPrototype:
+    Id:
+      Value: 1357533379437497778
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -508,6 +508,7 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.IceBlock))]
   public unsafe partial class IceBlockPrototype : ComponentPrototype<Quantum.IceBlock> {
     public FP SlidingSpeed;
+    public QBoolean IsNitro;
     partial void MaterializeUser(Frame frame, ref Quantum.IceBlock result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.IceBlock component = default;
@@ -516,6 +517,7 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.IceBlock result, in PrototypeMaterializationContext context = default) {
         result.SlidingSpeed = this.SlidingSpeed;
+        result.IsNitro = this.IsNitro;
         MaterializeUser(frame, ref result, in context);
     }
   }

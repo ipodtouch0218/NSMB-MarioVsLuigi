@@ -87,6 +87,13 @@ namespace NSMB.Entities.Player {
         private static readonly int ParamThrow = Animator.StringToHash("throw");
         private static readonly int ParamHeadPickup = Animator.StringToHash("head-pickup");
         private static readonly int ParamFireball = Animator.StringToHash("fireball");
+
+        private static readonly int Param2DHatHue = Shader.PropertyToID("HatHue");
+        private static readonly int Param2DOverallsHue = Shader.PropertyToID("OverallsHue");
+        private static readonly int Param2DOverrideColor = Shader.PropertyToID("OverrideColor");
+        private static readonly int Param2DHatGradient = Shader.PropertyToID("HatGradient");
+        private static readonly int Param2DOverallsGradient = Shader.PropertyToID("OverallsGradient");
+        private static readonly int Param2DSkinGradient = Shader.PropertyToID("SkinGradient");
         #endregion
 
         //---Public Variables
@@ -99,7 +106,7 @@ namespace NSMB.Entities.Player {
         [SerializeField] private GameObject coinNumberParticle, coinFromBlockParticle, respawnParticle, starCollectParticle;
         [SerializeField] private Animator animator;
         [SerializeField] private Avatar smallAvatar, largeAvatar;
-        [SerializeField] private Shader normalShader, rainbowShader;
+        [SerializeField] private Shader normalShader, rainbowShader, spriteShader;
         [SerializeField] private ParticleSystem dust, sparkles, drillParticle, giantParticle, fireParticle, bubblesParticle, iceSkiddingParticle, waterRunningParticle, waterSkiddingParticle, lightningParticle;
         [SerializeField] private GameObject smallModel, largeModel, largeShellExclude, blueShell, propellerHelmet, propeller, HammerHelm, HammerShell, HammerTuck;
         [SerializeField] private GameObject smallHeadBone, largeHeadBone;
@@ -112,6 +119,8 @@ namespace NSMB.Entities.Player {
         //---Components
         private readonly List<Renderer> renderers = new();
         private readonly Dictionary<Renderer, List<Material>> materials = new();
+        private readonly List<SpriteRenderer> renderers2D = new();
+        private readonly Dictionary<SpriteRenderer, List<Material>> materials2D = new();
 
         //---Properties
         public Color GlowColor { get; private set; }
@@ -128,7 +137,7 @@ namespace NSMB.Entities.Player {
         private bool modelRotateInstantly, footstepVariant;
         private CharacterSpecificPalette skin;
         private float lastBumpSound;
-        private MaterialPropertyBlock materialBlock;
+        private MaterialPropertyBlock materialBlock, materialBlock2D;
         private float teammateStompTimer;
         private float lastStompSoundTime = -1;
         private float waterSurfaceMovementDistance;
@@ -152,6 +161,7 @@ namespace NSMB.Entities.Player {
         private int PaddleTimer = 0;
         private bool Walljumped = false;
         private int LightningChargeCooldown = 60;
+        public InvincibilityColors[] StarmanGradients;
 
 
         public void OnValidate() {
@@ -161,6 +171,7 @@ namespace NSMB.Entities.Player {
         public void Start() {
             renderers.AddRange(GetComponentsInChildren<MeshRenderer>(true));
             renderers.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>(true));
+            renderers2D.AddRange(GetComponentsInChildren<SpriteRenderer>(true));
             foreach (Renderer r in renderers) {
                 // Get a copy of all materials.
                 // This looks jank as hell, but it works, because
@@ -171,6 +182,14 @@ namespace NSMB.Entities.Player {
                 matList.Clear();
                 r.GetMaterials(matList);
                 materials[r] = matList;
+            }
+            foreach (SpriteRenderer r2d in renderers2D) {
+                List<Material> matList = new();
+                r2d.GetSharedMaterials(matList);
+                r2d.SetMaterials(matList);
+                matList.Clear();
+                r2d.GetMaterials(matList);
+                materials2D[r2d] = matList;
             }
 
             modelRotationTarget = models.transform.rotation;
@@ -672,6 +691,14 @@ namespace NSMB.Entities.Player {
             materialBlock.SetVector(ParamOverallsColor, skin?.OverallsColor.AsColor.linear ?? Color.clear);
             materialBlock.SetVector(ParamShirtColor, skin?.ShirtColor != null ? skin.ShirtColor.AsColor.linear : Color.clear);
             materialBlock.SetFloat(ParamHatUsesOverallsColor, (skin?.HatUsesOverallsColor ?? false) ? 1 : 0);
+        }
+
+        private void TryCreateMaterialBlock2D() {
+            if (materialBlock2D != null) {
+                return;
+            }
+
+            materialBlock2D = new();
         }
 
         private unsafe void URPOnPreRender(ScriptableRenderContext context, Camera camera) {
@@ -1649,6 +1676,28 @@ namespace NSMB.Entities.Player {
             scale.y -= Mathf.Sin(teammateStompTimer * Mathf.PI / 0.15f) * 0.2f;
             playerSpriteDisplay.transform.localScale = scale * spriteScale[(int) gameStyle];
             capeSpriteDisplay.transform.localScale = scale;
+
+            //Custom colors
+            float StarTime = (mario->InvincibilityFrames <= 120 ? (1f - (((mario->InvincibilityFrames / 240f) * 7.5f) % 1f)) : (1f - (((mario->InvincibilityFrames / 240f) * 30f) % 1f)));
+            TryCreateMaterialBlock2D();
+            materialBlock2D.SetFloat(Param2DHatHue, 0f);
+            materialBlock2D.SetFloat(Param2DOverallsHue, 0.155555555555555555555555555555555555555555f);
+            materialBlock2D.SetFloat(Param2DOverrideColor, mario->IsStarmanInvincible ? 1f : 0f);
+            materialBlock2D.SetColor(Param2DHatGradient, StarmanGradients[(int) Utils.GetStageTheme()].HatGradient.Evaluate(StarTime));
+            materialBlock2D.SetColor(Param2DOverallsGradient, StarmanGradients[(int) Utils.GetStageTheme()].OverallsGradient.Evaluate(StarTime));
+            materialBlock2D.SetColor(Param2DSkinGradient, StarmanGradients[(int) Utils.GetStageTheme()].SkinGradient.Evaluate(StarTime));
+
+            foreach (SpriteRenderer r in renderers2D) {
+                r.SetPropertyBlock(materialBlock2D);
+                foreach (var m in materials2D[r]) {
+                    if (m.shader != spriteShader) {
+                        m.shader = spriteShader;
+                    }
+                }
+            }
+
+            playerSpriteDisplay.SetPropertyBlock(materialBlock2D);
+            capeSpriteDisplay.SetPropertyBlock(materialBlock2D);
 
             previousPowerup = AnimPowerupState;
             JumpLandTimer -= Math.Sign(JumpLandTimer);

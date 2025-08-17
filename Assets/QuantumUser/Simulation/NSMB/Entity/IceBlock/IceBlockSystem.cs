@@ -102,6 +102,19 @@ namespace Quantum {
             return iceBlockEntity;
         }
 
+        public static EntityRef FreezeLong(Frame f, EntityRef entityToFreeze, bool flying = false) {
+            if (!f.Has<Freezable>(entityToFreeze)) {
+                return default;
+            }
+
+            EntityRef iceBlockEntity = f.Create(f.SimulationConfig.IceBlockPrototype);
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+            iceBlock->IsNitro = true;
+            iceBlock->InitializeLong(f, iceBlockEntity, entityToFreeze);
+            iceBlock->IsFlying = flying;
+            return iceBlockEntity;
+        }
+
         public static void Destroy(Frame f, EntityRef iceBlockEntity, IceBlockBreakReason breakReason) {
             f.Signals.OnIceBlockBroken(iceBlockEntity, breakReason);
             f.Destroy(iceBlockEntity);

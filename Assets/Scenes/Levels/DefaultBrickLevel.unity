@@ -3860,7 +3860,7 @@ MonoBehaviour:
   Updater: {fileID: 892967449}
   UseFindUpdater: 0
   tilemap: {fileID: 190325740}
-  tileBreakParticleSystem: {fileID: 4829880438140776504, guid: e1e481681ce723d41ba61becae047562,
+  tileBreakParticleSystem: {fileID: 8812354282658346917, guid: e1e481681ce723d41ba61becae047562,
     type: 3}
 --- !u!1 &253646779
 GameObject:

@@ -126,7 +126,6 @@ MonoBehaviour:
     Item: 0
     Sprites:
     - {fileID: 1755229272, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
-    - {fileID: -286278248, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
     Fps: 60
   UseSingleRenderer: 0
 --- !u!114 &8427713262258514243

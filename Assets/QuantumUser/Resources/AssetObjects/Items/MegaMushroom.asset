@@ -36,7 +36,7 @@ MonoBehaviour:
   SoundEffect: 40
   ReserveSprite:
   - {fileID: -1604689058, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
-  - {fileID: -1604689058, guid: a87d3b028baa82640b06b88398a8c4f0, type: 3}
+  - {fileID: -1549435186, guid: 794bc215dd02bf34ab2cfae7702bfdfd, type: 3}
   AvoidPlayers: 1
   Speed:
     RawValue: 98304

@@ -9,8 +9,9 @@ component IceBlock {
 	[ExcludeFromPrototype] bool IsFlying;
 	[ExcludeFromPrototype] bool IsSliding;
 	[ExcludeFromPrototype] bool FacingRight;
-	[ExcludeFromPrototype] byte AutoBreakFrames;
+	[ExcludeFromPrototype] int AutoBreakFrames;
 	[ExcludeFromPrototype] LiquidType InLiquidType;
+	bool IsNitro;
 }
 
 signal OnIceBlockBroken(EntityRef brokenIceBlock, IceBlockBreakReason breakReason);

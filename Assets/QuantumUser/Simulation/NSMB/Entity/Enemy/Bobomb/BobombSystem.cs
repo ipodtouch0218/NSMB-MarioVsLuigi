@@ -248,6 +248,10 @@ namespace Quantum {
                 IceBlockSystem.Freeze(f, bobombEntity);
                 break;
             }
+            case ProjectileEffectType.FreezeLong: {
+                IceBlockSystem.FreezeLong(f, bobombEntity);
+                break;
+            }
             }
 
             f.Signals.OnProjectileHitEntity(f, projectileEntity, bobombEntity);

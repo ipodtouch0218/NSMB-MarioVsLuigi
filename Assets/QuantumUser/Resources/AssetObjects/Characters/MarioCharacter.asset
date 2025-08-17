@@ -1447,35 +1447,35 @@ MonoBehaviour:
     - State: 34
       Item: 6
       Sprites:
-      - {fileID: 1183432885, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 178137171, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 10
     - State: 35
       Item: 6
       Sprites:
-      - {fileID: 2137871973, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 439759684, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1395676558, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -579648352, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 1427001289, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 2051701304, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 4
     - State: 36
       Item: 6
       Sprites:
-      - {fileID: 2137871973, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 439759684, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1395676558, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -579648352, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 1427001289, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 2051701304, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 4
     - State: 37
       Item: 6
       Sprites:
-      - {fileID: 2137871973, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 439759684, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1395676558, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -579648352, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 1427001289, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 2051701304, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 4
     - State: 38
       Item: 6
       Sprites:
-      - {fileID: 2137871973, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 439759684, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      - {fileID: 1395676558, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -579648352, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 1427001289, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 2051701304, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 4
     - State: 39
       Item: 6

@@ -162,6 +162,8 @@ namespace Quantum {
 
             if (projectileAsset.Effect == ProjectileEffectType.Freeze) {
                 IceBlockSystem.Freeze(f, bulletBillEntity, true);
+            } else if (projectileAsset.Effect == ProjectileEffectType.FreezeLong) {
+                IceBlockSystem.FreezeLong(f, bulletBillEntity, true);
             } else if (projectileAsset.Effect == ProjectileEffectType.Fire) {
                 f.Events.BulletBillHitByProjectile(bulletBillEntity);
             } else {

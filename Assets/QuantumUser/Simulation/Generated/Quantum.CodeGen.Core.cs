@@ -109,7 +109,7 @@ namespace Quantum {
     CubbyLandHat,
     Cape,
     Bombermario,
-    }
+  }
   public enum StageTileFlags : byte {
     MirrorX = 1,
     MirrorY = 2,
@@ -2065,18 +2065,20 @@ namespace Quantum {
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsFlying;
-    [FieldOffset(16)]
+    [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public QBoolean IsSliding;
     [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
-    [FieldOffset(0)]
-    [ExcludeFromPrototype()]
-    public Byte AutoBreakFrames;
     [FieldOffset(4)]
     [ExcludeFromPrototype()]
+    public Int32 AutoBreakFrames;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public LiquidType InLiquidType;
+    [FieldOffset(16)]
+    public QBoolean IsNitro;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 15017;
@@ -2089,15 +2091,17 @@ namespace Quantum {
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + AutoBreakFrames.GetHashCode();
         hash = hash * 31 + (byte)InLiquidType;
+        hash = hash * 31 + IsNitro.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (IceBlock*)ptr;
-        serializer.Stream.Serialize(&p->AutoBreakFrames);
         serializer.Stream.Serialize((byte*)&p->InLiquidType);
+        serializer.Stream.Serialize(&p->AutoBreakFrames);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IsFlying, serializer);
+        QBoolean.Serialize(&p->IsNitro, serializer);
         QBoolean.Serialize(&p->IsSliding, serializer);
         EntityRef.Serialize(&p->Entity, serializer);
         FP.Serialize(&p->SlidingSpeed, serializer);
@@ -2315,7 +2319,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct MarioPlayer : Quantum.IComponent {
-    public const Int32 SIZE = 264;
+    public const Int32 SIZE = 272;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(184)]
     public AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
@@ -2426,9 +2430,9 @@ namespace Quantum {
     [FieldOffset(168)]
     [ExcludeFromPrototype()]
     public QBoolean WallslideRight;
-    [FieldOffset(37)]
+    [FieldOffset(264)]
     [ExcludeFromPrototype()]
-    public Byte WallslideEndFrames;
+    public Int32 WallslideEndFrames;
     [FieldOffset(36)]
     [ExcludeFromPrototype()]
     public Byte WalljumpFrames;
@@ -3077,27 +3081,30 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Projectile : Quantum.IComponent {
-    public const Int32 SIZE = 40;
+    public const Int32 SIZE = 48;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(16)]
-    public AssetRef<ProjectileAsset> Asset;
-    [FieldOffset(32)]
-    public FP Speed;
     [FieldOffset(24)]
+    public AssetRef<ProjectileAsset> Asset;
+    [FieldOffset(40)]
+    public FP Speed;
+    [FieldOffset(32)]
     [ExcludeFromPrototype()]
     public EntityRef Owner;
-    [FieldOffset(8)]
-    [ExcludeFromPrototype()]
-    public QBoolean FacingRight;
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
+    public QBoolean FacingRight;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public QBoolean HasBounced;
-    [FieldOffset(4)]
+    [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public QBoolean CheckedCollision;
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte Combo;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    public Int32 GroundTimer;
     public override Int32 GetHashCode() {
       unchecked { 
         var hash = 16141;
@@ -3108,12 +3115,14 @@ namespace Quantum {
         hash = hash * 31 + HasBounced.GetHashCode();
         hash = hash * 31 + CheckedCollision.GetHashCode();
         hash = hash * 31 + Combo.GetHashCode();
+        hash = hash * 31 + GroundTimer.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Projectile*)ptr;
         serializer.Stream.Serialize(&p->Combo);
+        serializer.Stream.Serialize(&p->GroundTimer);
         QBoolean.Serialize(&p->CheckedCollision, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->HasBounced, serializer);

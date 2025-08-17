@@ -249,7 +249,7 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -271,7 +271,7 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -280,6 +280,50 @@ TextureImporter:
       bones: []
       spriteID: 8557208007fab0941ac74f09e858dcaa
       internalID: -1509830597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_IceBreak_0
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 16
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b7f5296499b63847a67df56cbcf4bb5
+      internalID: -689430485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SMBDX_IceBreak_1
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 16
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef28660a0c52b5e4ab5d3edf6bb34f79
+      internalID: 1095008498
       vertices: []
       indices: 
       edges: []
@@ -305,6 +349,8 @@ TextureImporter:
       SMBDX_Coin_1: -1377096151969877323
       SMBDX_Coin_2: -3875195902990900467
       SMBDX_Coin_3: -4377249139353801030
+      SMBDX_IceBreak_0: -689430485
+      SMBDX_IceBreak_1: 1095008498
       SMBDX_Sharticle: -408620322
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

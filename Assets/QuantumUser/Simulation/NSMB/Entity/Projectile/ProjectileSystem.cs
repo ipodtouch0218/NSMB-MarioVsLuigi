@@ -33,6 +33,15 @@ namespace Quantum {
                 projectile->CheckedCollision = true;
             }
 
+            if(projectile->GroundTimer > 0) {
+                projectile->GroundTimer -= 1;
+                physicsObject->Velocity = new FPVector2(0, 0);
+                if (projectile->GroundTimer == 0) {
+                    Destroy(f, filter.Entity, ParticleEffect.None);
+                    return;
+                }
+            }
+
             HandleTileCollision(f, ref filter, asset);
 
             physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
@@ -50,7 +59,7 @@ namespace Quantum {
             if ((physicsObject->IsTouchingLeftWall
                 || physicsObject->IsTouchingRightWall
                 || physicsObject->IsTouchingCeiling
-                || (physicsObject->IsTouchingGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
+                || (physicsObject->IsTouchingGround && !asset.StaysOnGround && (!asset.Bounce || (projectile->HasBounced && asset.DestroyOnSecondBounce)))
                 || PhysicsObjectSystem.BoxInGround(f, filter.Transform->Position, filter.PhysicsCollider->Shape)) && !physicsObject->DisableCollision) {
 
                 Destroy(f, filter.Entity, asset.DestroyParticleEffect);
@@ -67,6 +76,12 @@ namespace Quantum {
                 physicsObject->Velocity.Y = asset.BounceStrength + boost;
                 physicsObject->IsTouchingGround = false;
                 projectile->HasBounced = true;
+            }
+            //Stay there
+            if (physicsObject->IsTouchingGround && asset.StaysOnGround) {
+                physicsObject->Velocity = new FPVector2(0, 0);
+                projectile->GroundTimer = asset.StayFrames;
+
             }
         }
 

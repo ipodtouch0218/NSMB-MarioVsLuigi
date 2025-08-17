@@ -21,6 +21,7 @@ namespace Quantum {
             SpawnEntity,
             KillSelf,
             FreezeSelf,
+            FreezeSelfLong,
         }
     }
 }
