@@ -143,7 +143,7 @@ namespace NSMB.UI.Game.Replay {
             }
 
             float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;
-            trackBufferMask.rectTransform.SetAnchorMaxX(bufferPercentage);
+            trackBufferMask.rectTransform.SetAnchorMaxX(Mathf.Clamp01(bufferPercentage));
             
             if (draggingArrow && !replayCanvasGroup.interactable) {
                 StopArrowDrag();

@@ -1243,7 +1243,7 @@ GameObject:
   - component: {fileID: 2064833281695251147}
   - component: {fileID: 8224161238141519067}
   - component: {fileID: 8439958257386823327}
-  m_Layer: 18
+  m_Layer: 17
   m_Name: dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
