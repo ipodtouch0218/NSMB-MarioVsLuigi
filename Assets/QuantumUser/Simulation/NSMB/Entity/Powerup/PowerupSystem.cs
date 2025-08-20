@@ -165,6 +165,9 @@ namespace Quantum {
                 mario->IsSliding = false;
                 mario->CurrentKnockback = KnockbackStrength.None;
                 mario->KnockbackGetupFrames = 0;
+                if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
+                    holdable->DropWithoutThrowing(f, mario->HeldEntity);
+                }
                 if (marioPhysicsObject->IsTouchingGround) {
                     mario->JumpState = JumpState.None;
                 }

@@ -1,4 +1,5 @@
-﻿using NSMB.Replay;
+﻿using JimmysUnityUtilities;
+using NSMB.Replay;
 using NSMB.Sound;
 using NSMB.UI.Pause;
 using NSMB.Utilities;
@@ -141,12 +142,9 @@ namespace NSMB.UI.Game.Replay {
                 previousTimestampSeconds = currentSeconds;
             }
 
-            float width = maxTrackX - minTrackX;
             float bufferPercentage = (float) ActiveReplayManager.Instance.ReplayFrameCache.Count * f.UpdateRate * 5 / ActiveReplayManager.Instance.ReplayLength;
-            Vector4 newPadding = trackBufferMask.padding;
-            newPadding.z = Mathf.Max((1f - bufferPercentage) * width + 8, 16);
-            trackBufferMask.padding = newPadding;
-
+            trackBufferMask.rectTransform.SetAnchorMaxX(bufferPercentage);
+            
             if (draggingArrow && !replayCanvasGroup.interactable) {
                 StopArrowDrag();
             }

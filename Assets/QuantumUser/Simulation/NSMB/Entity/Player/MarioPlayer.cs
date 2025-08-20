@@ -170,9 +170,11 @@ namespace Quantum {
             } else {
                 if (dropObjectives) {
                     int objectiveCount = 1;
+                    /*
                     if (f.Unsafe.TryGetPointer(attacker, out MarioPlayer* attackerMario) && attackerMario->IsGroundpoundActive) {
                         objectiveCount = 3;
                     }
+                    */
                     f.Signals.OnMarioPlayerDropObjective(entity, objectiveCount, attacker);
                 }
                 DeathAnimationFrames = 36;
@@ -206,7 +208,7 @@ namespace Quantum {
             }
             */
 
-            if (f.Exists(HeldEntity) && f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
+            if (f.Unsafe.TryGetPointer(HeldEntity, out Holdable* holdable)) {
                 holdable->DropWithoutThrowing(f, HeldEntity);
             }
 

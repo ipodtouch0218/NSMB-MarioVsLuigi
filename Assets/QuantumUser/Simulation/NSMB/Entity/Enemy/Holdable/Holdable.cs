@@ -12,9 +12,11 @@ namespace Quantum {
 
         public void DropWithoutThrowing(Frame f, EntityRef entity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(Holder);
-            mario->HeldEntity = default;
+            mario->HeldEntity = EntityRef.None;
             PreviousHolder = Holder;
-            Holder = default;
+            Holder = EntityRef.None;
+
+            PhysicsObjectSystem.TryEject(f, entity);
 
             f.Signals.OnThrowHoldable(entity, PreviousHolder, true, true);
         }
@@ -22,7 +24,7 @@ namespace Quantum {
         public void Throw(Frame f, EntityRef entity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(Holder);
             var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(Holder);
-            mario->HeldEntity = default;
+            mario->HeldEntity = EntityRef.None;
             mario->ProjectileDelayFrames = 15;
 
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
@@ -36,7 +38,7 @@ namespace Quantum {
             }
 
             PreviousHolder = Holder;
-            Holder = default;
+            Holder = EntityRef.None;
 
             bool softDrop = false;
             var rawInput = f.GetPlayerInput(mario->PlayerRef);
