@@ -44,12 +44,12 @@ namespace NSMB.Tiles {
             startTime = Time.timeAsDouble;
         }
 
-        public void RefreshMap(Frame f) {
+        public unsafe void RefreshMap(Frame f) {
             VersusStageData stage = ViewContext.Stage;
             int width = stage.TileDimensions.X;
             if (f == null
                 || f.StageTiles == null
-                || f.StageTiles.Length != width * stage.TileDimensions.Y) {
+                || f.StageTilesLength != width * stage.TileDimensions.Y) {
                 return;
             }
 

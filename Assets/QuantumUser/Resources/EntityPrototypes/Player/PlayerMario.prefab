@@ -360,8 +360,8 @@ Transform:
   m_GameObject: {fileID: 3629787967981286811}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5129171, y: -0.4867402, z: -0.5129171, w: 0.4867402}
-  m_LocalPosition: {x: 0.0001, y: 0.005, z: -0.0013}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalPosition: {x: 0, y: 0.0025, z: -0.0013}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7192167547613311844}
@@ -447,7 +447,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.92918384, y: 0.002103237, z: -0.009821523, w: -0.36948153}
   m_LocalPosition: {x: 0, y: 0.00339999, z: -0.042000055}
-  m_LocalScale: {x: -0.9000002, y: 0.89999974, z: 0.8999998}
+  m_LocalScale: {x: 0.9, y: 0.9175, z: 0.9}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4179535912005182115}
@@ -1243,7 +1243,7 @@ GameObject:
   - component: {fileID: 2064833281695251147}
   - component: {fileID: 8224161238141519067}
   - component: {fileID: 8439958257386823327}
-  m_Layer: 18
+  m_Layer: 17
   m_Name: dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}

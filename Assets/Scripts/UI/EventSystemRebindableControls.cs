@@ -10,33 +10,27 @@ namespace NSMB.UI {
         //---Serialized Variables
         [SerializeField] private InputSystemUIInputModule inputSystem;
 
-        private InputActionReference point, click, middleClick, rightClick, scrollWheel, navigate, submit, cancel;
-
         public void OnValidate() {
             this.SetIfNull(ref inputSystem);
         }
 
         public void OnEnable() {
-            if (point == null) {
-                point = inputSystem.point;
-                click = inputSystem.leftClick;
-                middleClick = inputSystem.middleClick;
-                rightClick = inputSystem.rightClick;
-                scrollWheel = inputSystem.scrollWheel;
-                navigate = inputSystem.move;
-                submit = inputSystem.submit;
-                cancel = inputSystem.cancel;
-            }
-
             inputSystem.actionsAsset = Settings.Controls.asset;
-            inputSystem.point = point;
-            inputSystem.leftClick = click;
-            inputSystem.middleClick = middleClick;
-            inputSystem.rightClick = rightClick;
-            inputSystem.scrollWheel = scrollWheel;
-            inputSystem.move = navigate;
-            inputSystem.submit = submit;
-            inputSystem.cancel = cancel;
+            inputSystem.point = InputActionReference.Create(Settings.Controls.UI.Point);
+            inputSystem.leftClick = InputActionReference.Create(Settings.Controls.UI.Click);
+            inputSystem.middleClick = InputActionReference.Create(Settings.Controls.UI.MiddleClick);
+            inputSystem.rightClick = InputActionReference.Create(Settings.Controls.UI.RightClick);
+            inputSystem.scrollWheel = InputActionReference.Create(Settings.Controls.UI.ScrollWheel);
+            inputSystem.move = InputActionReference.Create(Settings.Controls.UI.Navigate);
+            inputSystem.submit = InputActionReference.Create(Settings.Controls.UI.Submit);
+            inputSystem.cancel = InputActionReference.Create(Settings.Controls.UI.Cancel);
+            Settings.Controls.asset.Enable();
+        }
+
+        public void OnDisable() {
+            // For some reason, InputSystemUIInputModule breaks everything OnDisable. Thanks for that.
+            inputSystem.actionsAsset = null;
+            Settings.Controls.asset.Enable();
         }
     }
 }

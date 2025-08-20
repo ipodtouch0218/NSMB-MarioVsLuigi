@@ -185,14 +185,18 @@ namespace NSMB.Replay {
         }
 
         public async void StartReplayPlayback(BinaryReplayFile replay) {
+            if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
+                return;
+            }
+
+            GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
+            GlobalController.Instance.loadingCanvas.Initialize(null);
+
             if (NetworkHandler.Client.IsConnected) {
                 await NetworkHandler.Client.DisconnectAsync();
             }
             if (NetworkHandler.Runner && NetworkHandler.Runner.IsRunning) {
                 await NetworkHandler.Runner.ShutdownAsync();
-            }
-            if (replay.LoadAllIfNeeded() != ReplayParseResult.Success) {
-                return;
             }
 
             CurrentReplay = replay;
@@ -227,7 +231,7 @@ namespace NSMB.Replay {
 
             ReplayFrameCache.Clear();
             ReplayFrameCache.Add(arguments.FrameData);
-            
+
             NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);
         }
 

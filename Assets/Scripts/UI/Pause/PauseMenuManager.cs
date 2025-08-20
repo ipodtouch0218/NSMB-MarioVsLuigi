@@ -1,5 +1,6 @@
 using NSMB.Quantum;
 using NSMB.UI.Game;
+using NSMB.UI.Options;
 using NSMB.UI.Translation;
 using NSMB.Utilities.Extensions;
 using Quantum;
@@ -8,6 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Scripting;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Pause {
@@ -55,6 +57,15 @@ namespace NSMB.UI.Pause {
             }
             UpdateLabels();
             QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+        }
+
+        public void OnEnable() {
+            if (GlobalController.Instance.optionsManager.gameObject.activeInHierarchy) {
+                // In options, we should be paused rn.
+                Pause(false);
+                skipSound = true;
+                SelectOption(2);
+            }
         }
 
         public void OnDestroy() {
@@ -302,6 +313,7 @@ namespace NSMB.UI.Pause {
             skipSound = false;
         }
 
+        [Preserve]
         public void SelectOption(TMP_Text option) {
             skipSound = true;
             int index = -1;

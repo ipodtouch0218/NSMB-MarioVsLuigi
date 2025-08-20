@@ -29,7 +29,7 @@ public unsafe abstract class PowerupTileBase : BreakableBrickTile {
             return false;
         }
 
-        Bump(f, null, tilePosition, resultTile, direction == InteractionDirection.Down, entity, allowSelfDamage, GetItemAsset(f, entity, mario).Prefab);
+        Bump(f, null, tilePosition, resultTile, direction, entity, allowSelfDamage, GetItemAsset(f, entity, mario).Prefab);
         playBumpSound = false;
         return false;
     }

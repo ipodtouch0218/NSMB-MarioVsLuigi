@@ -213,15 +213,6 @@ namespace NSMB.Cameras {
             newPosition = QuantumUtils.WrapWorld(stage, newPosition.ToFPVector2(), out _).ToUnityVector3();
             newPosition.z = -10;
 
-            truePosition = newPosition;
-
-            // Screenshake
-            if ((screenshakeTimer -= Time.unscaledDeltaTime) > 0) {
-                newPosition += new Vector3((UnityEngine.Random.value - 0.5f) * screenshakeTimer, (UnityEngine.Random.value - 0.5f) * screenshakeTimer);
-            }
-
-            ourCamera.transform.position = newPosition;
-
             // Zoom
             float zoomAmount = Settings.Controls.UI.ScrollWheel.ReadValue<Vector2>().y * -12;
             Vector3? worldPosBefore = (zoomAmount != 0) ? ourCamera.ViewportToWorldPoint(pointer) : null;
@@ -271,6 +262,13 @@ namespace NSMB.Cameras {
             float cameraMinY = stage.CameraMinPosition.Y.AsFloat - orthoSize;
             float cameraMaxY = cameraMinY + Mathf.Max(7, stage.CameraMaxPosition.Y.AsFloat - stage.CameraMinPosition.Y.AsFloat) + (orthoSize * 2);
             newPosition.y = Mathf.Clamp(newPosition.y, cameraMinY, cameraMaxY);
+
+            truePosition = newPosition;
+
+            // Screenshake
+            if ((screenshakeTimer -= Time.unscaledDeltaTime) > 0) {
+                newPosition += new Vector3((UnityEngine.Random.value - 0.5f) * screenshakeTimer, (UnityEngine.Random.value - 0.5f) * screenshakeTimer);
+            }
 
             ourCamera.transform.position = newPosition;
         }

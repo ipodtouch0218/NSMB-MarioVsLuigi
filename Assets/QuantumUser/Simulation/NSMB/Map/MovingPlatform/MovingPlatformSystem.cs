@@ -3,7 +3,6 @@ using Quantum.Collections;
 using Quantum.Physics2D;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class MovingPlatformSystem : SystemMainThreadEntityFilter<MovingPlatform, MovingPlatformSystem.Filter> {
 
         public struct Filter {

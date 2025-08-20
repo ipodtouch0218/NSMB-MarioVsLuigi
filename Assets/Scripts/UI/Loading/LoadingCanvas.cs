@@ -13,6 +13,9 @@ namespace NSMB.UI.Loading {
 
         public static event Action<bool> OnLoadingEnded;
 
+        //---Public Variables
+        public bool dontHideOnGameDestroy;
+
         //---Serialized Variables
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private MarioLoader mario;
@@ -39,7 +42,7 @@ namespace NSMB.UI.Loading {
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
         }
 
-        private void Initialize(QuantumGame game) {
+        public void Initialize(QuantumGame game) {
             if (running) {
                 return;
             }
@@ -118,7 +121,11 @@ namespace NSMB.UI.Loading {
             }
         }
 
-        private void OnGameDestroyed(CallbackGameDestroyed callback) {
+        private void OnGameDestroyed(CallbackGameDestroyed e) {
+            if (dontHideOnGameDestroy) {
+                dontHideOnGameDestroy = false;
+                return;
+            }
             gameObject.SetActive(false);
         }
 
@@ -129,10 +136,25 @@ namespace NSMB.UI.Loading {
 
             Frame f = game.Frames.Predicted;
 
-            bool longIntro = !IsReplay && (state <= GameState.Starting || game.GetLocalPlayers().Any(p => !(QuantumUtils.GetPlayerDataSafe(f, p)?.IsSpectator ?? true)));
-            
+            FinalLoadingAnimation anim;
+            if (IsReplay) {
+                anim = FinalLoadingAnimation.Replay;
+            } else {
+                if (game.GetLocalPlayers().Any(p => !(QuantumUtils.GetPlayerDataSafe(f, p)?.IsSpectator ?? true))) {
+                    anim = FinalLoadingAnimation.JoinAsPlayer;
+                } else {
+                    anim = FinalLoadingAnimation.JoinAsSpectator;
+                }
+            }
+
+            bool longAnim = (anim != FinalLoadingAnimation.Replay) && state <= GameState.Starting;
+
+            if (anim == FinalLoadingAnimation.JoinAsSpectator && state <= GameState.Starting) {
+                yield return new WaitForSeconds(2.5f);
+            }
+
             readyGroup.gameObject.SetActive(true);
-            animator.SetTrigger(longIntro  ? "loaded" : "spectating");
+            animator.SetTrigger(longAnim ? "loaded" : "spectating");
 
             if (fadeVolumeCoroutine != null) {
                 StopCoroutine(fadeVolumeCoroutine);
@@ -141,9 +163,15 @@ namespace NSMB.UI.Loading {
             fadeVolumeCoroutine = StartCoroutine(FadeVolume(0.1f, false));
             //audioListener.enabled = false;
 
-            OnLoadingEnded?.Invoke(longIntro);
+            OnLoadingEnded?.Invoke(longAnim);
             running = false;
             endCoroutine = null;
+        }
+
+        public enum FinalLoadingAnimation {
+            Replay,
+            JoinAsSpectator,
+            JoinAsPlayer,
         }
 
         public void EndAnimation() {

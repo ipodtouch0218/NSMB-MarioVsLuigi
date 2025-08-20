@@ -88,23 +88,22 @@ public unsafe class VersusStageData : AssetObject {
 
     public void SetTileRelative(Frame f, IntVector2 tilePosition, StageTileInstance tile) {
         int index = tilePosition.X + tilePosition.Y * TileDimensions.X;
-        StageTileInstance[] stageLayout = f.StageTiles;
-        if (index < 0 || index >= stageLayout.Length) {
+        if (index < 0 || index >= f.StageTilesLength) {
             return;
         }
 
-        stageLayout[index] = tile;
+        f.StageTiles[index] = tile;
         f.Signals.OnTileChanged(tilePosition, tile);
         f.Events.TileChanged(tilePosition + TileOrigin, tile);
     }
 
     public void ResetStage(Frame f, bool full) {
         using var scope = HostProfiler.Start("VersusStageData.ResetStage");
-        StageTileInstance[] stageData = f.StageTiles;
+        StageTileInstance* stageTiles = f.StageTiles;
 
         for (int i = 0; i < TileData.Length; i++) {
             ref StageTileInstance newTile = ref TileData[i];
-            if (!stageData[i].Equals(newTile)) {
+            if (!stageTiles[i].Equals(newTile)) {
                 using var callbackScope = HostProfiler.Start("VersusStageData.ExecuteCallbacks");
                 int x = i % TileDimensions.X;
                 int y = i / TileDimensions.X;
@@ -112,7 +111,7 @@ public unsafe class VersusStageData : AssetObject {
                 f.Signals.OnTileChanged(tile, newTile);
                 f.Events.TileChanged(tile + TileOrigin, newTile);
             }
-            stageData[i] = newTile;
+            stageTiles[i] = newTile;
         }
         f.Signals.OnStageReset(full);
     }

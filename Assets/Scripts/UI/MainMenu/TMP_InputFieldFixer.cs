@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -11,6 +12,8 @@ namespace NSMB.UI.MainMenu {
         [SerializeField] private float deadzone = 0.35f;
 
         //---Private Variables
+        private GameObject selectedGameObject;
+        private TMP_InputField selectedInputField;
         private bool activated;
 
         public void OnEnable() {
@@ -23,8 +26,27 @@ namespace NSMB.UI.MainMenu {
             Settings.Controls.UI.Navigate.canceled -= OnNavigate;
         }
 
+        public void Update() {
+            var eventSystem = EventSystem.current;
+            if (eventSystem && selectedGameObject != eventSystem.currentSelectedGameObject) {
+                selectedGameObject = eventSystem.currentSelectedGameObject;
+                if (selectedGameObject) {
+                    selectedGameObject.TryGetComponent(out selectedInputField);
+                } else {
+                    selectedInputField = null;
+                }
+            }
+        }
+
+        private readonly ProfilerMarker marker1 = new("TMP_InputFieldFixer.OnNavigate");
+        private readonly ProfilerMarker marker2 = new("TMP_InputFieldFixer.OnNavigate.PerformNavigation");
         public void OnNavigate(InputAction.CallbackContext context) {
-            var osk = FindFirstObjectByType<OnScreenKeyboard>();
+            using var x = marker1.Auto();
+            if (!selectedInputField) {
+                return;
+            }
+
+            var osk = OnScreenKeyboard.Instance;
             if (osk && osk.IsOpen) {
                 return;
             }
@@ -37,23 +59,23 @@ namespace NSMB.UI.MainMenu {
             if (Mathf.Abs(y) > deadzone && context.control.name.Length != 1) {
                 if (!activated) {
                     // https://discussions.unity.com/t/tab-between-input-fields/547817/10
-                    if (system.currentSelectedGameObject && system.currentSelectedGameObject.TryGetComponent(out TMP_InputField selected)) {
-                        Selectable next;
-                        if (y > 0) {
-                            // up
-                            next = selected.FindSelectableOnUp();
-                        } else {
-                            // down
-                            next = selected.FindSelectableOnDown();
-                        }
+                    using var z = marker2.Auto();
 
-                        if (next) {
-                            system.SetSelectedGameObject(next.gameObject);
-                            if (next.TryGetComponent(out TMP_InputField nextInputField)) {
-                                nextInputField.OnPointerClick(new PointerEventData(system));
-                            }
-                            system.sendNavigationEvents = false;
+                    Selectable next;
+                    if (y > 0) {
+                        // up
+                        next = selectedInputField.FindSelectableOnUp();
+                    } else {
+                        // down
+                        next = selectedInputField.FindSelectableOnDown();
+                    }
+
+                    if (next) {
+                        system.SetSelectedGameObject(next.gameObject);
+                        if (next.TryGetComponent(out TMP_InputField nextInputField)) {
+                            nextInputField.OnPointerClick(new PointerEventData(system));
                         }
+                        system.sendNavigationEvents = false;
                     }
                     activated = true;
                 }

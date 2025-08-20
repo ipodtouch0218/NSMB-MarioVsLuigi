@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: cf2f07e1e0d369c4fbd2d42caf15f52f
+guid: 28c9088564a42864ca526a06dc8d76cf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -9087496668241558959
-    second: mario_small_head_starman_0
+      213: -4634907917440771093
+    second: a-prompt_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -40,15 +40,15 @@ TextureImporter:
     filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mario_small_head_starman_0
+      name: a-prompt_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 64
+        width: 18
+        height: 18
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1528ae78de9b2e180800000000000000
-      internalID: -9087496668241558959
+      spriteID: beb1c4e4ecf7dafb0800000000000000
+      internalID: -4634907917440771093
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      mario_small_head_starman_0: -9087496668241558959
+      a-prompt_0: -4634907917440771093
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

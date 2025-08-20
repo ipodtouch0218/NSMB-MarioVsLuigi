@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
 
         private static readonly FP BumpForce = Constants._5_50;
@@ -164,6 +163,11 @@ namespace Quantum {
             if (newState == PowerupState.MegaMushroom) {
                 mario->MegaMushroomStartFrames = 90;
                 mario->IsSliding = false;
+                mario->CurrentKnockback = KnockbackStrength.None;
+                mario->KnockbackGetupFrames = 0;
+                if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {
+                    holdable->DropWithoutThrowing(f, mario->HeldEntity);
+                }
                 if (marioPhysicsObject->IsTouchingGround) {
                     mario->JumpState = JumpState.None;
                 }

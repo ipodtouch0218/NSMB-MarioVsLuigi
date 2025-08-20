@@ -5,7 +5,6 @@ using System;
 using static IInteractableTile;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class MarioPlayerSystem : SystemMainThreadEntityFilter<MarioPlayer, MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>,
         ISignalOnGameStarting, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
         ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
@@ -131,10 +130,12 @@ namespace Quantum {
                 mario->IsSkidding = false;
             }
 
+            /*
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable) && holdable->HoldAboveHead && f.Number - mario->HoldStartFrame < physics.IceBlockPickupFreezeFrames) {
                 physicsObject->Velocity.X = 0;
                 return;
             }
+            */
 
             ref var inputs = ref filter.Inputs;
             bool mega = mario->CurrentPowerupState == PowerupState.MegaMushroom;
@@ -819,7 +820,8 @@ namespace Quantum {
             bool wasCrouching = mario->IsCrouching;
             mario->IsCrouching =
                 (
-                    (inputs.Down.IsDown && mario->IsStuckInBlock)
+                    (mario->IsCrouching && !f.IsPlayerVerifiedOrLocal(mario->PlayerRef)) // Fixes mispredicted uncrouching
+                    || (inputs.Down.IsDown && mario->IsStuckInBlock)
                     || (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && !mario->IsSliding)
                     || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
                 /* || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics)) */
@@ -1792,7 +1794,9 @@ namespace Quantum {
             }
 
             mario->IsStuckInBlock = true;
-            mario->CurrentKnockback = KnockbackStrength.None;
+            if (mario->CurrentKnockback != KnockbackStrength.None) {
+                mario->ResetKnockback();
+            }
             mario->IsGroundpounding = false;
             mario->IsPropellerFlying = false;
             mario->IsDrilling = false;
@@ -1998,7 +2002,7 @@ namespace Quantum {
                 Tile = invisibleBlock->Tile,
             };
             f.Signals.OnMarioPlayerCollectedCoin(marioEntity, EntityRef.None, transform->Position, true, false);
-            BreakableBrickTile.Bump(f, stage, QuantumUtils.WorldToRelativeTile(stage, transform->Position), invisibleBlock->BumpTile, result, false, marioEntity, false);
+            BreakableBrickTile.Bump(f, stage, QuantumUtils.WorldToRelativeTile(stage, transform->Position), invisibleBlock->BumpTile, result, InteractionDirection.Up, marioEntity, false);
             return false;
         }
 
@@ -2159,10 +2163,11 @@ namespace Quantum {
                 return;
             }
 
+            bool marioAStarman = marioA->IsStarmanInvincible;
+            bool marioBStarman = marioB->IsStarmanInvincible;
+
             if (!eitherDamageInvincible) {
                 // Starman cases
-                bool marioAStarman = marioA->IsStarmanInvincible;
-                bool marioBStarman = marioB->IsStarmanInvincible;
                 if (marioAStarman && marioBStarman) {
                     bool damaged = false;
                     damaged |= marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, KnockbackStrength.CollisionBump, marioBEntity);
@@ -2284,7 +2289,7 @@ namespace Quantum {
                 }
             }
 
-            if (!eitherDamageInvincible && !marioA->IsInKnockback && !marioB->IsInKnockback) {
+            if (!eitherDamageInvincible && !marioA->IsInKnockback && !marioB->IsInKnockback && !marioAStarman && !marioBStarman) {
                 // Collide
                 int directionToOtherPlayer = fromRight ? -1 : 1;
                 var marioACollider = f.Unsafe.GetPointer<PhysicsCollider2D>(marioAEntity);

@@ -1,4 +1,5 @@
 using NSMB.Chat;
+using NSMB.Networking;
 using NSMB.UI.Translation;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
@@ -95,11 +96,15 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
             selectedPanel = defaultSelectedPanel;
             selectedPanel.Select(true);
+
+            TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
         public void OnDisable() {
             Settings.Controls.UI.Next.performed -= OnNextPerformed;
             Settings.Controls.UI.Previous.performed -= OnPreviousPerformed;
+            TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         public override void OnDestroy() {
@@ -243,6 +248,13 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         //---Callbacks
+        private void OnLanguageChanged(TranslationManager tm) {
+            if (NetworkHandler.Game != null) {
+                var game = NetworkHandler.Game;
+                UpdateStartButton(game, game.Frames.Predicted);
+            }
+        }
+
         private void OnPreviousPerformed(InputAction.CallbackContext context) {
             if (!context.performed || allPanels.Any(p => p.IsInSubmenu)
                 || GlobalController.Instance.optionsManager.isActiveAndEnabled || Canvas.SubmenuStack[^1] != this) {

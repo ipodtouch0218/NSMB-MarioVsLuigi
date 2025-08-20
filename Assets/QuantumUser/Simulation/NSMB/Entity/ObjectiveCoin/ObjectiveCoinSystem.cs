@@ -3,7 +3,6 @@ using Quantum.Physics2D;
 using UnityEngine;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class ObjectiveCoinSystem : SystemMainThread, ISignalOnMarioPlayerDropObjective, ISignalOnMarioPlayerCollectedCoin,
         ISignalOnMarioPlayerDied {
 
@@ -152,7 +151,7 @@ namespace Quantum {
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
             int coinsToSpawn = (10 + 5 * (amount - 1)) / coinDivideFactor;
             SpawnObjectiveCoins(f, transform->Position + collider->Shape.Centroid + (FPVector2.Up * collider->Shape.Box.Extents.Y), coinsToSpawn, excludeTeamNumber, selfDamage);
-            mario->GamemodeData.CoinRunners->ObjectiveCoins -= Mathf.Min(mario->GamemodeData.CoinRunners->ObjectiveCoins, coinsToSpawn) / 2;
+            mario->GamemodeData.CoinRunners->ObjectiveCoins -= (int) FPMath.Min(mario->GamemodeData.CoinRunners->ObjectiveCoins, coinsToSpawn) / 2;
             f.Events.MarioPlayerObjectiveCoinsChanged(entity);
         }
 

@@ -68,6 +68,18 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 #endif
 
+        protected override void OnEnable() {
+            base.OnEnable();
+#if UNITY_EDITOR
+            // #if fixes an error in the editor.
+            if (GlobalController.Instance && GlobalController.Instance.translationManager) {
+                OnLanguageChanged(GlobalController.Instance.translationManager);
+            }
+#else
+            OnLanguageChanged(GlobalController.Instance.translationManager);
+#endif
+        }
+
         public void Initialize() {
 #if TODO && !UNITY_WEBGL
             watcher = new FileSystemWatcher(ReplayDirectory) {
@@ -111,7 +123,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnDestroyCustom() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+#if TODO && !UNITY_WEBGL
             watcher.Dispose();
+#endif
         }
 
         public void Show() {
@@ -123,6 +137,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             Canvas.ForceUpdateCanvases();
 
+#if !TODO || UNITY_WEBGL
+            FindReplays();
+#endif
             SortReplays();
             OnScrollRectScrolled(default);
             OnLanguageChanged(GlobalController.Instance.translationManager);

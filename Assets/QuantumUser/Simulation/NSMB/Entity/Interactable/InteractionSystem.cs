@@ -8,10 +8,8 @@ using System.Collections.Generic;
 namespace Quantum {
 
 #if MULTITHREADED
-    [UnityEngine.Scripting.Preserve]
     public unsafe class InteractionSystem : SystemArrayFilter<InteractionSystem.Filter> {
 #else
-    [UnityEngine.Scripting.Preserve]
     public unsafe class InteractionSystem : SystemMainThread, ISignalOnMarioPlayerGroundpoundedSolid {
 #endif
         private List<PendingInteraction> pendingInteractions = new(16);

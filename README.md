@@ -61,6 +61,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [Cubby Crazes](https://github.com/CubbyCrazes)
 * [davart154](https://github.com/davart154)
 * [DonKaiStorm](https://github.com/DonKaiStorm)
+* [dotjp](https://github.com/windows10isnotavailable)
 * [GithubSPerez](https://github.com/GithubSPerez)
 * GradedWarrior
 * [HyperC@T](https://github.com/SuperSonic392)
@@ -70,13 +71,16 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [Kraken](https://github.com/McKrak)
 * [MiiBumm](https://github.com/MiiBumm)
 * [mindnomad](https://github.com/mindnomad)
+* Mixin
+* Mizzierella
 * [Pordrack](https://github.com/Pordrack)
 * [skarph](https://github.com/skarph)
 * [Skillz](https://github.com/Skillz808)
 * [TheMoogle](https://github.com/TheMoogle)
 * [Tombuntu](https://github.com/ReXiSp)
-* [xFrostyCake123](https://github.com/xFrostyCake123)
 * [VLC](https://github.com/vlcoo)
+* [Windows10V](https://github.com/Windows10V1)
+* [xFrostyCake123](https://github.com/xFrostyCake123)
 * [Zest](https://github.com/zestydevy)
 * _ZombleBobble
 
@@ -143,8 +147,10 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Cubby Crazes
 * Fawndue
 * Grape
+* Laxan3000
 * MiiBumm
 * mindnomad
+* notossdekasaihassei
 * TheCyVap
 * Vinnnnnnny
 

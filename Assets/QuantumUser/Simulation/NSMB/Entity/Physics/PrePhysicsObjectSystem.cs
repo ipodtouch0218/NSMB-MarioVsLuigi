@@ -1,5 +1,4 @@
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class PrePhysicsObjectSystem : SystemMainThreadEntityFilter<PhysicsObject, PrePhysicsObjectSystem.Filter> {
         public struct Filter {
             public EntityRef Entity;

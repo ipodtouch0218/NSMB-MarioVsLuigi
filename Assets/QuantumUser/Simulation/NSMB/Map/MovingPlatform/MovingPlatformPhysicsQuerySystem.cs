@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Collections;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class MovingPlatformPhysicsQuerySystem : SystemMainThreadEntityFilter<MovingPlatform, MovingPlatformSystem.Filter> {
         public override void Update(Frame f, ref MovingPlatformSystem.Filter filter, VersusStageData stage) {
             var platform = filter.Platform;

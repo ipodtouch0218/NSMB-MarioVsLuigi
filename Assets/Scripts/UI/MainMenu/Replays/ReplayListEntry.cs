@@ -52,6 +52,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            OnLanguageChanged(GlobalController.Instance.translationManager);
         }
 
         public void OnDisable() {
@@ -100,10 +101,14 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 return;
             }
             if (IsOpen) {
+                /*
                 if (showHideButtonsCoroutine != null) {
                     StopCoroutine(showHideButtonsCoroutine);
                 }
-                showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, /*0.1f*/ 0));
+                showHideButtonsCoroutine = StartCoroutine(SmoothResize(48, 0));
+                */
+                dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 48);
+                Canvas.ForceUpdateCanvases();
             }
             canvasGroup.interactable = false;
             button.interactable = true;
@@ -116,10 +121,15 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnSelect(bool open) {
             if (open) {
+                /*
                 if (showHideButtonsCoroutine != null) {
                     StopCoroutine(showHideButtonsCoroutine);
                 }
-                showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, /*0.1f*/ 0));
+                showHideButtonsCoroutine = StartCoroutine(SmoothResize(86, 0));
+                */
+                dropDownRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 86);
+                Canvas.ForceUpdateCanvases();
+                
                 canvasGroup.interactable = true;
                 button.interactable = false;
                 canvas.PlayCursorSound();

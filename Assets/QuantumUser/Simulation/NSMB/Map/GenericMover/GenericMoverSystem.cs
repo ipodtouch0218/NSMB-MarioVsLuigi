@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class GenericMoverSystem : SystemMainThreadEntityFilter<GenericMover, GenericMoverSystem.Filter> {
         public struct Filter {
             public EntityRef Entity;

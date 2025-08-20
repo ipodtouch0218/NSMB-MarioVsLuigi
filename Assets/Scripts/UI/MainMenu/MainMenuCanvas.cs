@@ -95,9 +95,12 @@ namespace NSMB.UI.MainMenu {
 
         public void Update() {
             // Fallback: select the default object if we somehow aren't selecting anything.
+
+            /*
             if (!eventSystem.currentSelectedGameObject && SubmenuStack.Count > 0) {
                 eventSystem.SetSelectedGameObject(SubmenuStack[^1].DefaultSelection);
             }
+            */
         }
 
         public void UpdateHeader() {
@@ -135,6 +138,10 @@ namespace NSMB.UI.MainMenu {
 
         public bool IsSubmenuOpen(MainMenuSubmenu menu) {
             return submenuStack.Contains(menu);
+        }
+
+        public T FindSubmenu<T>() where T : MainMenuSubmenu {
+            return (T) allSubmenus.FirstOrDefault(mms => mms.GetType() == typeof(T));
         }
 
         public void OpenMenu(MainMenuSubmenu menu) {
