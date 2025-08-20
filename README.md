@@ -52,7 +52,6 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
   
 ### Contributors:
 * [amykaname](https://github.com/amykaname)
-* [Amy54Desu](https://github.com/Amy54Desu)
 * [AprilShade](https://github.com/AprilShade)
 * [ArianLust](https://github.com/ArianLust)
 * [Atwer](https://github.com/AtwerJ)
@@ -73,6 +72,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * [mindnomad](https://github.com/mindnomad)
 * Mixin
 * Mizzierella
+* [notossdekasaihassei](https://github.com/Amy54Desu)
 * [Pordrack](https://github.com/Pordrack)
 * [skarph](https://github.com/skarph)
 * [Skillz](https://github.com/Skillz808)
@@ -143,6 +143,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * AprilShade
 * ArianLust
 * Ave
+* Cleeaf
 * CreativeGhost
 * Cubby Crazes
 * Fawndue
