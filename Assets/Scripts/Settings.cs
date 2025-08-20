@@ -10,14 +10,7 @@ namespace NSMB {
 
         //---Static Variables
         private static Controls _controls;
-        public static Controls Controls {
-            get {
-                if (_controls == null) {
-                    _controls = new();
-                }
-                return _controls;
-            }
-        }
+        public static Controls Controls => _controls;
         private Action[] VersionUpdaters;
         public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
         public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
@@ -232,10 +225,9 @@ namespace NSMB {
         [SerializeField] private AudioMixer mixer;
 
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         public static void CreateInstance() {
-            // Fixes editor bug where inputs break if not using Reload Domain
-            _controls = null;
+            _controls = new();
         }
 
         public void Awake() {
