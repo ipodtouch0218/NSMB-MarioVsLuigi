@@ -158,7 +158,10 @@ namespace NSMB.UI.Game {
             }
 
             OnCameraFocusChanged?.Invoke();
-            FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
+
+            if (f.Global->GameState == GameState.Playing) {
+                FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
+            }
         }
 
         public void StartSpectating() {
@@ -173,8 +176,8 @@ namespace NSMB.UI.Game {
             SpectateNextPlayer(0);
         }
 
-        public void SpectateNextPlayer(InputAction.CallbackContext context) {
-            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused) {
+        public unsafe void SpectateNextPlayer(InputAction.CallbackContext context) {
+            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
                 return;
             }
 
@@ -220,16 +223,16 @@ namespace NSMB.UI.Game {
             UpdateSpectateUI();
         }
 
-        public void SpectatePreviousPlayer(InputAction.CallbackContext context) {
-            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused) {
+        public unsafe void SpectatePreviousPlayer(InputAction.CallbackContext context) {
+            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
                 return;
             }
 
             SpectateNextPlayer(-1);
         }
 
-        private void OnNavigate(InputAction.CallbackContext context) {
-            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused) {
+        private unsafe void OnNavigate(InputAction.CallbackContext context) {
+            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
                 previousNavigate = Vector2.zero;
                 return;
             }
@@ -246,8 +249,8 @@ namespace NSMB.UI.Game {
             previousNavigate = newPosition;
         }
 
-        private void OnSubmit(InputAction.CallbackContext context) {
-            if (!spectating || pauseMenu.IsPaused || Game.Session.IsReplay) {
+        private unsafe void OnSubmit(InputAction.CallbackContext context) {
+            if (!spectating || pauseMenu.IsPaused || Game.Session.IsReplay || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
                 return;
             }
 
