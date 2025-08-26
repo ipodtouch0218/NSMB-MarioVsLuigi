@@ -38,6 +38,12 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         public void Initialize() {
             initialized = true;
+            slider.value = Settings.Instance.primaryHue;
+            slider2.value = Settings.Instance.secondaryHue;
+            isPrimaryHueEnabled = Settings.Instance.primaryHueEnabled;
+            isSecondaryHueEnabled = Settings.Instance.secondaryHueEnabled;
+            isPrimarySliderGray = Settings.Instance.primaryHueGrayscale;
+            isSecondarySliderGray = Settings.Instance.secondaryHueGrayscale;
         }
         public void ChangePaletteButton(int index) {
         }
