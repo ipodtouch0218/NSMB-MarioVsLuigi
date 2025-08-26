@@ -208,7 +208,7 @@ namespace NSMB {
         //---Public Variables
         public string generalNickname;
         public int generalCharacter, generalPalette, generalMaxTempReplays;
-        public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
+        public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor, primaryHueEnabled, primaryHueGrayscale, secondaryHueEnabled, secondaryHueGrayscale;
 
         public float primaryHue, secondaryHue;
 

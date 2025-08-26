@@ -787,6 +787,7 @@ namespace Quantum.Prototypes {
     public Byte Character;
     public FP PrimaryHue;
     public FP SecondaryHue;
+    public Byte HueSettings;
     public Byte RequestedTeam;
     public QBoolean IsSpectator;
     public QBoolean ManualSpectator;
@@ -812,6 +813,7 @@ namespace Quantum.Prototypes {
         result.Character = this.Character;
         result.PrimaryHue = this.PrimaryHue;
         result.SecondaryHue = this.SecondaryHue;
+        result.HueSettings = this.HueSettings;
         result.RequestedTeam = this.RequestedTeam;
         result.IsSpectator = this.IsSpectator;
         result.ManualSpectator = this.ManualSpectator;

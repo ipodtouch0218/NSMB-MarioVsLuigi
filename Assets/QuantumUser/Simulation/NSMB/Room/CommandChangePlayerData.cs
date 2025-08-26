@@ -8,6 +8,7 @@ namespace Quantum {
         public byte Character;
         public float PrimaryHue;
         public float SecondaryHue;
+        public byte HueSettings;
         public byte Team;
         public bool Spectating;
 
@@ -19,6 +20,7 @@ namespace Quantum {
             stream.Serialize(ref Character);
             stream.Serialize(ref PrimaryHue);
             stream.Serialize(ref SecondaryHue);
+            stream.Serialize(ref HueSettings);
             stream.Serialize(ref Team);
             stream.Serialize(ref Spectating);
         }
@@ -40,6 +42,9 @@ namespace Quantum {
             if (playerChanges.HasFlag(Changes.SecondaryHue)) {
                 playerData->SecondaryHue = FP.FromString(SecondaryHue.ToString());
             }
+            if (playerChanges.HasFlag(Changes.HueSettings)) {
+                playerData->HueSettings = HueSettings;
+            }
             if (playerChanges.HasFlag(Changes.Team)) {
                 playerData->RequestedTeam = Team;
             }
@@ -59,8 +64,9 @@ namespace Quantum {
             Character = 1 << 0,
             PrimaryHue = 1 << 1,
             SecondaryHue = 1 << 2,
-            Team = 1 << 3,
-            Spectating = 1 << 4,
+            HueSettings = 1 << 3,
+            Team = 1 << 4,
+            Spectating = 1 << 5,
             All = byte.MaxValue,
         }
     }

@@ -2998,11 +2998,11 @@ namespace Quantum {
   public unsafe partial struct PlayerData : Quantum.IComponent {
     public const Int32 SIZE = 72;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(20)]
+    [FieldOffset(24)]
     public PlayerRef PlayerRef;
-    [FieldOffset(36)]
+    [FieldOffset(40)]
     public QBoolean IsRoomHost;
-    [FieldOffset(28)]
+    [FieldOffset(32)]
     public QBoolean IsLoaded;
     [FieldOffset(0)]
     public Byte Character;
@@ -3010,29 +3010,31 @@ namespace Quantum {
     public FP PrimaryHue;
     [FieldOffset(64)]
     public FP SecondaryHue;
-    [FieldOffset(3)]
-    public Byte RequestedTeam;
-    [FieldOffset(40)]
-    public QBoolean IsSpectator;
-    [FieldOffset(44)]
-    public QBoolean ManualSpectator;
-    [FieldOffset(48)]
-    public QBoolean VotedToContinue;
     [FieldOffset(1)]
-    public Byte Palette;
-    [FieldOffset(16)]
-    public Int32 Wins;
-    [FieldOffset(2)]
-    public Byte RealTeam;
-    [FieldOffset(8)]
-    public Int32 LastChatMessage;
-    [FieldOffset(32)]
-    public QBoolean IsReady;
-    [FieldOffset(24)]
-    public QBoolean IsInSettings;
+    public Byte HueSettings;
     [FieldOffset(4)]
-    public Int32 JoinTick;
+    public Byte RequestedTeam;
+    [FieldOffset(44)]
+    public QBoolean IsSpectator;
+    [FieldOffset(48)]
+    public QBoolean ManualSpectator;
+    [FieldOffset(52)]
+    public QBoolean VotedToContinue;
+    [FieldOffset(2)]
+    public Byte Palette;
+    [FieldOffset(20)]
+    public Int32 Wins;
+    [FieldOffset(3)]
+    public Byte RealTeam;
     [FieldOffset(12)]
+    public Int32 LastChatMessage;
+    [FieldOffset(36)]
+    public QBoolean IsReady;
+    [FieldOffset(28)]
+    public QBoolean IsInSettings;
+    [FieldOffset(8)]
+    public Int32 JoinTick;
+    [FieldOffset(16)]
     public Int32 Ping;
     public override Int32 GetHashCode() {
       unchecked { 
@@ -3043,6 +3045,7 @@ namespace Quantum {
         hash = hash * 31 + Character.GetHashCode();
         hash = hash * 31 + PrimaryHue.GetHashCode();
         hash = hash * 31 + SecondaryHue.GetHashCode();
+        hash = hash * 31 + HueSettings.GetHashCode();
         hash = hash * 31 + RequestedTeam.GetHashCode();
         hash = hash * 31 + IsSpectator.GetHashCode();
         hash = hash * 31 + ManualSpectator.GetHashCode();
@@ -3061,6 +3064,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (PlayerData*)ptr;
         serializer.Stream.Serialize(&p->Character);
+        serializer.Stream.Serialize(&p->HueSettings);
         serializer.Stream.Serialize(&p->Palette);
         serializer.Stream.Serialize(&p->RealTeam);
         serializer.Stream.Serialize(&p->RequestedTeam);

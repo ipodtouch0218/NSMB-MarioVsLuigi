@@ -6,6 +6,7 @@ component PlayerData {
 	byte Character;
 	FP PrimaryHue;
 	FP SecondaryHue;
+	byte HueSettings;
 	byte RequestedTeam;
 	bool IsSpectator;
 	bool ManualSpectator;

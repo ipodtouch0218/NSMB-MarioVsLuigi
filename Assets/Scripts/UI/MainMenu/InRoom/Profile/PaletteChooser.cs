@@ -19,9 +19,11 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         //[SerializeField] private Sprite clearSprite, baseSprite;
         [SerializeField] private CharacterAsset defaultCharacter;
         [SerializeField] private GameObject selectOnClose;
-        [SerializeField] private Gradient hueMap;
-        [SerializeField] private Image sliderButton, sliderButton2, marioPrimary, marioSecondary, luigiPrimary, luigiSecondary;
+        [SerializeField] private Gradient hueMap, grayscaleMap;
+        [SerializeField] private Image sliderButton, sliderButton2, marioPrimary, marioSecondary, luigiPrimary, luigiSecondary, sliderImage1, sliderImage2;
         [SerializeField] private Slider slider, slider2;
+        [SerializeField] private bool isPrimarySliderGray, isSecondarySliderGray, isPrimaryHueEnabled, isSecondaryHueEnabled;
+        [SerializeField] private Sprite hueMapSprite, grayscaleMapSprite;
 
         [SerializeField] private Image overallsImage, shirtImage, baseImage;
 
@@ -52,16 +54,65 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             character = data;
         }
 
-        public void ChangeColorOfSliderButton(bool isSecondary) {
-            if (isSecondary) {
-                sliderButton2.color = hueMap.Evaluate(slider2.value);
-                marioSecondary.color = hueMap.Evaluate(slider2.value);
-                luigiPrimary.color = hueMap.Evaluate(slider2.value);
+        public void MakeSliderGray(bool firstSlider) {
+            if (firstSlider) {
+                isPrimarySliderGray = !isPrimarySliderGray;
+                sliderImage1.sprite = (isPrimarySliderGray ? grayscaleMapSprite : hueMapSprite);
+                ChangeColorOfPrimarySliderButton();
             } else {
-                sliderButton.color = hueMap.Evaluate(slider.value);
-                marioPrimary.color = hueMap.Evaluate(slider.value);
-                luigiSecondary.color = hueMap.Evaluate(slider.value);
+                isSecondarySliderGray = !isSecondarySliderGray;
+                sliderImage2.sprite = (isPrimarySliderGray ? grayscaleMapSprite : hueMapSprite);
+                ChangeColorOfSecondarySliderButton();
             }
+            QuantumGame game = QuantumRunner.DefaultGame;
+                foreach (var slot in game.GetLocalPlayerSlots()) {
+                    game.SendCommand(slot, new CommandChangePlayerData {
+                        EnabledChanges = CommandChangePlayerData.Changes.HueSettings,
+                        HueSettings = (byte)((isPrimaryHueEnabled ? 1 : 0) + (isPrimarySliderGray ? 2 : 0) + (isSecondaryHueEnabled ? 4 : 0) + (isSecondarySliderGray ? 8 : 0)),
+                    });
+                }
+
+            Settings.Instance.primaryHueGrayscale = isPrimarySliderGray;
+            Settings.Instance.secondaryHueGrayscale = isSecondarySliderGray;
+            Settings.Instance.SaveSettings();
+        }
+
+        public void ToggleSliderState(bool firstSlider) {
+            if (firstSlider) {
+                isPrimaryHueEnabled = !isPrimaryHueEnabled;
+                ChangeColorOfPrimarySliderButton();
+            } else {
+                isSecondaryHueEnabled = !isSecondaryHueEnabled;
+                ChangeColorOfSecondarySliderButton();
+            }
+            QuantumGame game = QuantumRunner.DefaultGame;
+            foreach (var slot in game.GetLocalPlayerSlots()) {
+                game.SendCommand(slot, new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.HueSettings,
+                    HueSettings = (byte)((isPrimaryHueEnabled ? 1 : 0) + (isPrimarySliderGray ? 2 : 0) + (isSecondaryHueEnabled ? 4 : 0) + (isSecondarySliderGray ? 8 : 0)),
+                });
+            }
+
+            Settings.Instance.primaryHueEnabled = isPrimaryHueEnabled;
+            Settings.Instance.secondaryHueEnabled = isSecondaryHueEnabled;
+            Settings.Instance.SaveSettings();
+        }
+
+
+        public void ChangeColorOfPrimarySliderButton() {
+            var currentGradient = isPrimarySliderGray ? grayscaleMap : hueMap;
+            sliderButton.color = currentGradient.Evaluate(slider.value) * (isPrimaryHueEnabled ? Color.white : new Color(0.35f,0.35f,0.35f,1f));
+            marioPrimary.color = currentGradient.Evaluate(slider.value) * (isPrimaryHueEnabled ? Color.white : Color.clear);
+            luigiSecondary.color = currentGradient.Evaluate(slider.value) * (isPrimaryHueEnabled ? Color.white : Color.clear);
+            sliderImage1.color = (isPrimaryHueEnabled ? Color.white : new Color(0.35f, 0.35f, 0.35f, 1f));
+        }
+
+        public void ChangeColorOfSecondarySliderButton() {
+            var currentGradient = isSecondarySliderGray ? grayscaleMap : hueMap;
+            sliderButton2.color = currentGradient.Evaluate(slider2.value) * (isSecondaryHueEnabled ? Color.white : new Color(0.35f, 0.35f, 0.35f, 1f));
+            marioSecondary.color = currentGradient.Evaluate(slider2.value) * (isSecondaryHueEnabled ? Color.white : Color.clear);
+            luigiPrimary.color = currentGradient.Evaluate(slider2.value) * (isSecondaryHueEnabled ? Color.white : Color.clear);
+            sliderImage2.color = (isSecondaryHueEnabled ? Color.white : new Color(0.35f, 0.35f, 0.35f, 1f));
         }
 
         public void SelectPrimaryHue() {
