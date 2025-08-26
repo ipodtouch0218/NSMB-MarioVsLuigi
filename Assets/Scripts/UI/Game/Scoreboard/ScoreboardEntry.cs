@@ -93,9 +93,9 @@ namespace NSMB.UI.Game.Scoreboard {
 
             StringBuilder scoreBuilder = new();
             if (f.Global->Rules.IsLivesEnabled) {
-                scoreBuilder.Append(character.UiString).Append(Utils.GetSymbolString(lives.ToString()));
+                scoreBuilder.Append(character.UiString).Append(Utils.GetSymbolString(lives.ToString(), null, true));
             }
-            scoreBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString()));
+            scoreBuilder.Append(Utils.GetSymbolString(gamemode.ObjectiveSymbolPrefix + objective.ToString(), null, true));
 
             scoreText.text = scoreBuilder.ToString();
             updater.RequestSorting = true;

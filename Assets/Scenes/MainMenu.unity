@@ -32009,8 +32009,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 408801538}
-  - {fileID: 1617767158}
   - {fileID: 583636824}
+  - {fileID: 1617767158}
   - {fileID: 690485965}
   m_Father: {fileID: 1989863063}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -97049,8 +97049,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Note: Colors will have uniform brightnesses in-game and will likely not
-    be fully saturated.'
+  m_text: 'Note: All hues will have uniform brightnesses relative to each other in-game.
+    Colors will likely not be fully saturated.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d42c556520644b148ada62f0b573e1a5, type: 2}
   m_sharedMaterial: {fileID: 6015020410494396785, guid: d42c556520644b148ada62f0b573e1a5,

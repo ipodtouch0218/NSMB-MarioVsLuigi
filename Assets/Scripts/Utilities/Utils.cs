@@ -158,8 +158,10 @@ namespace NSMB.Utilities {
         };
 
         private static StringBuilder symbolStringBuilder = new();
-        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null) {
-
+        public static string GetSymbolString(ReadOnlySpan<char> str, Dictionary<char, string> dict = null, bool forceNSMB = false) {
+            if (forceNSMB) {
+                dict ??= uiSymbols;
+            }
             switch ((int) GetStageTheme()) {
             case 0:
                 dict ??= uiSymbols;
