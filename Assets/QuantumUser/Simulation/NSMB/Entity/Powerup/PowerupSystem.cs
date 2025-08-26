@@ -126,6 +126,11 @@ namespace Quantum {
                 f.Signals.OnMarioPlayerBecameInvincible(marioEntity);
                 return PowerupReserveResult.NoneButPlaySound;
             }
+            if (newPowerup.Type == PowerupType.ColdBrew) {
+                mario->ColdBrewFrames = 2400;
+                f.Signals.OnMarioPlayerColdBrewHit(marioEntity);
+                return PowerupReserveResult.NoneButPlaySound;
+            }
             if (newPowerup.Type == PowerupType.LetsGoGambling) {
                 if(mario->Lives > 0) {
                     mario->Lives += 1;

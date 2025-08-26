@@ -153,7 +153,7 @@ namespace NSMB.Entities.Player {
         private bool activeModels = false;
         public float[] spriteScale;
         public float[] megaSpriteScale;
-        private CharacterState currentAnimationState;
+        public CharacterState currentAnimationState, capeAnimationState;
         private float FpsMultiplier = 1f;
         private int JumpLandTimer = 0;
         private int FireballTimer = 0;
@@ -161,6 +161,7 @@ namespace NSMB.Entities.Player {
         private int PaddleTimer = 0;
         private bool Walljumped = false;
         private int LightningChargeCooldown = 60;
+        public float TestFloat = 0;
         public InvincibilityColors[] StarmanGradients;
 
 
@@ -209,6 +210,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventMarioPlayerCollectedObjectiveCoin>(this, OnMarioPlayerCollectedObjectiveCoin, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerWalljumped>(this, OnMarioPlayerWalljumped, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerShotProjectile>(this, OnMarioPlayerShotProjectile, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerShotBombProjectile>(this, OnMarioPlayerShotBombProjectile, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerUsedPropeller>(this, OnMarioPlayerUsedPropeller, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerPropellerSpin>(this, OnMarioPlayerPropellerSpin, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerCollectedStar>(this, OnMarioPlayerCollectedStar, FilterOutReplayFastForward);
@@ -230,6 +232,7 @@ namespace NSMB.Entities.Player {
             QuantumEvent.Subscribe<EventPhysicsObjectLanded>(this, OnPhysicsObjectLanded, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventMarioPlayerLandedWithAnimation>(this, OnMarioPlayerLandedWithAnimation, FilterOutReplayFastForward);
             QuantumEvent.Subscribe<EventEnemyKicked>(this, OnEnemyKicked, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventMarioPlayerCapeSpin>(this, OnMarioPlayerCapeSpin, FilterOutReplayFastForward);
         }
 
         public override void OnActivate(Frame f) {
@@ -959,6 +962,14 @@ namespace NSMB.Entities.Player {
             PlaySound(SoundEffect.Player_Sound_Powerdown);
         }
 
+        private void OnMarioPlayerCapeSpin(EventMarioPlayerCapeSpin e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            PlaySound(SoundEffect.Powerup_Cape_Spin);
+        }
+
         private void OnMarioPlayerRespawned(EventMarioPlayerRespawned e) {
             if (e.Entity != EntityRef) {
                 return;
@@ -1043,6 +1054,16 @@ namespace NSMB.Entities.Player {
             animator.SetTrigger("fireball");
             ProjectileAsset projectile = e.Game.Frames.Predicted.FindAsset(e.Projectile.Asset);
             PlaySound(projectile.ShootSound);
+            FireballTimer = 30;
+        }
+
+        private void OnMarioPlayerShotBombProjectile(EventMarioPlayerShotBombProjectile e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+
+            animator.SetTrigger("fireball");
+            PlaySound(SoundEffect.Powerup_Bomberman_Throw);
             FireballTimer = 30;
         }
 
@@ -1348,7 +1369,9 @@ namespace NSMB.Entities.Player {
             PowerupState AnimPowerupState = mario->CurrentPowerupState;
 
             CharacterState previousAnimationState = currentAnimationState;
+            CharacterState previousCapeAnimationState = capeAnimationState;
             var previousAnimData = character.GetAnimData(gameStyle, currentAnimationState, previousPowerup);
+            var previousCapeAnimData = character.GetAnimData(gameStyle, currentAnimationState, PowerupState.ForCapeOnlyDoNotUse);
 
             bool right = inputs.Right.IsDown;
             bool left = inputs.Left.IsDown;
@@ -1400,6 +1423,7 @@ namespace NSMB.Entities.Player {
             bool AnimMegaShrink = mario->MegaMushroomStationaryEnd;
             var physics = f.FindAsset(mario->PhysicsAsset);
             int AnimRunState = mario->GetSpeedStage(physicsObject, physics);
+            bool AnimCapeSpin = mario->CapeSpinFrames > 0;
 
             FpsMultiplier = 1f;
             currentAnimationState = CharacterState.IDLE;
@@ -1631,8 +1655,33 @@ namespace NSMB.Entities.Player {
                     currentAnimationState = CharacterState.WATERKNOCKBACK;
                 }
             }
+            if (AnimCapeSpin) {
+                //Cape spin
+                currentAnimationState = CharacterState.SPIN;
+                AnimFacingRight = true;
+                FpsMultiplier = 2f;
+            }
+
+            capeAnimationState = CharacterState.IDLE;
+            if (FPMath.Abs(physicsObject->Velocity.X) >= FP._3) {
+                capeAnimationState = CharacterState.RUN;
+            } else if (FPMath.Abs(physicsObject->Velocity.X) >= FP._0_05) {
+                capeAnimationState = CharacterState.WALK;
+            } else {
+                capeAnimationState = CharacterState.IDLE;
+            }
+            if (physicsObject->Velocity.Y >= FP._0_50) {
+                capeAnimationState = CharacterState.JUMPRISE;
+            }
+            if (physicsObject->Velocity.Y <= -FP._0_50) {
+                capeAnimationState = CharacterState.JUMPFALL;
+            }
+            if (currentAnimationState == CharacterState.SPIN || currentAnimationState == CharacterState.SPINFLY) {
+                capeAnimationState = CharacterState.THROW;
+            }
 
             var animData = character.GetAnimData(gameStyle, currentAnimationState, AnimPowerupState);
+            var capeAnimData = character.GetAnimData(gameStyle, capeAnimationState, PowerupState.ForCapeOnlyDoNotUse);
             float FpsStick = animData.Fps;
 
             if ((previousAnimationState != currentAnimationState) || (previousPowerup != AnimPowerupState)) {
@@ -1641,17 +1690,21 @@ namespace NSMB.Entities.Player {
                     playerSpriteRenderer.frames = animData.Sprites;
                 }
             }
-            playerSpriteRenderer.fps = FpsStick * FpsMultiplier;
-            if (AnimFacingRight) {
-                playerSpriteDisplay.flipX = false;
-                capeSpriteDisplay.flipX = false;
-            } else {
-                playerSpriteDisplay.flipX = true;
-                capeSpriteDisplay.flipX = true;
+            if (previousCapeAnimationState != capeAnimationState) {
+                capeSpriteRenderer.frame = 0;
+                capeSpriteRenderer.frames = capeAnimData.Sprites;
+                capeSpriteRenderer.fps = capeAnimData.Fps;
             }
 
-            //Mega scale
-            Vector3 scale;
+            playerSpriteRenderer.fps = FpsStick * FpsMultiplier;
+            playerSpriteDisplay.flipX = !AnimFacingRight;
+            if (FPMath.Abs(physicsObject->Velocity.X) >= FP._0_05) {
+                capeSpriteDisplay.flipX = FPMath.Sign(physicsObject->Velocity.X) == FP._1 ? false : true;
+            } else {
+                capeSpriteDisplay.flipX = !AnimFacingRight;
+            }
+                //Mega scale
+                Vector3 scale;
             if (mario->MegaMushroomEndFrames > 0) {
                 float endTimer = mario->MegaMushroomEndFrames / 60f;
                 if (!mario->MegaMushroomStationaryEnd) {
@@ -1675,14 +1728,16 @@ namespace NSMB.Entities.Player {
 
             scale.y -= Mathf.Sin(teammateStompTimer * Mathf.PI / 0.15f) * 0.2f;
             playerSpriteDisplay.transform.localScale = scale * spriteScale[(int) gameStyle];
-            capeSpriteDisplay.transform.localScale = scale;
+            capeSpriteDisplay.transform.localScale = scale * spriteScale[(int) gameStyle];
+            capeSpriteObject.SetActive(mario->CurrentPowerupState == PowerupState.Cape);
 
             //Custom colors
             float StarTime = (mario->InvincibilityFrames <= 120 ? (1f - (((mario->InvincibilityFrames / 240f) * 7.5f) % 1f)) : (1f - (((mario->InvincibilityFrames / 240f) * 30f) % 1f)));
+            StarTime = (mario->MegaMushroomFrames < 240 && mario->CurrentPowerupState == PowerupState.MegaMushroom) ? (1f - (((mario->MegaMushroomFrames / 240f) * 7.5f) % 1f)) : StarTime;
             TryCreateMaterialBlock2D();
             materialBlock2D.SetFloat(Param2DHatHue, 0f);
             materialBlock2D.SetFloat(Param2DOverallsHue, 0.155555555555555555555555555555555555555555f);
-            materialBlock2D.SetFloat(Param2DOverrideColor, mario->IsStarmanInvincible ? 1f : 0f);
+            materialBlock2D.SetFloat(Param2DOverrideColor, mario->IsStarmanInvincible ? 1f : (mario->MegaMushroomFrames < 240 && mario->MegaMushroomStartFrames == 0 && mario->CurrentPowerupState == PowerupState.MegaMushroom) ? 1f : 0f);
             materialBlock2D.SetColor(Param2DHatGradient, StarmanGradients[(int) Utils.GetStageTheme()].HatGradient.Evaluate(StarTime));
             materialBlock2D.SetColor(Param2DOverallsGradient, StarmanGradients[(int) Utils.GetStageTheme()].OverallsGradient.Evaluate(StarTime));
             materialBlock2D.SetColor(Param2DSkinGradient, StarmanGradients[(int) Utils.GetStageTheme()].SkinGradient.Evaluate(StarTime));

@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
 
@@ -24,11 +25,19 @@ namespace Quantum {
             f.Context.Interactions.Register<Bobomb, MarioPlayer>(f, OnBobombMarioInteraction);
             f.Context.Interactions.Register<Bobomb, Projectile>(f, OnBobombProjectileInteraction);
             f.Context.Interactions.Register<Bobomb, IceBlock>(f, OnBobombIceBlockInteraction);
+
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var bobomb = filter.Bobomb;
             var enemy = filter.Enemy;
+            var entity = filter.Entity;
+
+            if (bobomb->StartLit && !bobomb->IsLitFromStart) {
+                bobomb->CurrentDetonationFrames = bobomb->DetonationFrames;
+                bobomb->IsLitFromStart = true;
+                f.Events.BobombLit(entity, false);
+            }
 
             if (!enemy->IsAlive
                 || filter.Freezable->IsFrozen(f)) {
@@ -56,7 +65,7 @@ namespace Quantum {
             }
 
             // Friction
-            if (physicsObject->IsTouchingGround && lit) {
+            if (physicsObject->IsTouchingGround && (lit || bobomb->StartLit)) {
                 physicsObject->Velocity.X *= Constants._0_95;
             }
 
@@ -83,6 +92,7 @@ namespace Quantum {
             var transform = filter.Transform;
             var holdable = filter.Holdable;
             var physicsObject = filter.PhysicsObject;
+            var entity = filter.Entity;
 
             // Hit players
             Shape2D shape = Shape2D.CreateCircle(bobomb->ExplosionRadius);
@@ -297,7 +307,9 @@ namespace Quantum {
 
         public void OnEnemyRespawned(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
-                bobomb->Respawn(f, entity);
+                if (!bobomb->StartLit) {
+                    bobomb->Respawn(f, entity);
+                }
             }
         }
 

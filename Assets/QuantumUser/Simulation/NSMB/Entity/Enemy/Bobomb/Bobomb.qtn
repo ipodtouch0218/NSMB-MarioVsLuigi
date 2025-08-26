@@ -7,6 +7,8 @@ component Bobomb {
 	FP ExplosionRadius;
 	FP Speed;
 	ushort DetonationFrames;
+	bool StartLit;
+	bool IsLitFromStart;
 
 	[ExcludeFromPrototype] ushort CurrentDetonationFrames;
 }

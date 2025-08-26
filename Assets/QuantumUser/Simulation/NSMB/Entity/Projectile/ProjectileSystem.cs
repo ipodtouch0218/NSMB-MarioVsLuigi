@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using UnityEngine;
 
 namespace Quantum {
     [UnityEngine.Scripting.Preserve]
@@ -35,7 +36,9 @@ namespace Quantum {
 
             if(projectile->GroundTimer > 0) {
                 projectile->GroundTimer -= 1;
-                physicsObject->Velocity = new FPVector2(0, 0);
+                projectile->JustHitGround = false;
+                physicsObject->Velocity.X = 0;
+                physicsObject->Velocity.Y = 0;
                 if (projectile->GroundTimer == 0) {
                     Destroy(f, filter.Entity, ParticleEffect.None);
                     return;
@@ -44,8 +47,9 @@ namespace Quantum {
 
             HandleTileCollision(f, ref filter, asset);
 
-            physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
-
+            if (projectile->GroundTimer == 0) {
+                physicsObject->Velocity.X = projectile->Speed * (projectile->FacingRight ? 1 : -1);
+            }
             if (asset.LockTo45Degrees) {
                 physicsObject->TerminalVelocity = -projectile->Speed;
             }
@@ -78,10 +82,11 @@ namespace Quantum {
                 projectile->HasBounced = true;
             }
             //Stay there
-            if (physicsObject->IsTouchingGround && asset.StaysOnGround) {
+            if (physicsObject->IsTouchingGround && asset.StaysOnGround && projectile->GroundTimer == 0) {
                 physicsObject->Velocity = new FPVector2(0, 0);
                 projectile->GroundTimer = asset.StayFrames;
-
+                projectile->JustHitGround = true;
+                projectile->Owner = EntityRef.None;
             }
         }
 

@@ -29,7 +29,7 @@ namespace NSMB.Quantum {
         }
 
 
-#if UNITY_EDITOR || MVL_DEBUG
+//#if UNITY_EDITOR || MVL_DEBUG
         public void Update() {
             foreach (var debug in debugSpawnCommands) {
                 if (UnityEngine.Input.GetKeyDown(debug.KeyCode)) {
@@ -61,7 +61,7 @@ namespace NSMB.Quantum {
             public KeyCode KeyCode;
             public AssetRef<EntityPrototype> Entity;
         }
-#endif
+//#endif
 
         public void OnPowerupAction(InputAction.CallbackContext context) {
             if (!playerElements.IsSpectating && !playerElements.PauseMenu.IsPaused) {

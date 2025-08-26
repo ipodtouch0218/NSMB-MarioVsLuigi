@@ -146,9 +146,9 @@ namespace Quantum {
                 } else {
                     maxStage = physics.SwimMaxVelocity.Length - 1;
                 }
-            } else if (mario->IsStarmanInvincible && run) {
+            } else if ((mario->IsStarmanInvincible || mario->ColdBrewFrames > 400) && run) {
                 maxStage = physics.StarSpeedStage;
-            } else if (run) {
+            } else if (run && mario->ColdBrewFrames == 0) {
                 maxStage = physics.RunSpeedStage;
             } else {
                 maxStage = physics.WalkSpeedStage;
@@ -766,7 +766,6 @@ namespace Quantum {
             }
         }
 
-
         public void HandleFacingDirection(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
             using var profilerScope = HostProfiler.Start("MarioPlayerSystem.HandleFacingDirection");
             var mario = filter.MarioPlayer;
@@ -838,6 +837,10 @@ namespace Quantum {
                 )
                 && !mario->HeldEntity.IsValid
                 && !mario->IsInShell;
+
+            if(mario->IsCrouching && !wasCrouching && physicsObject->IsOnSlipperyGround && physicsObject->Velocity.X != 0) {
+                physicsObject->Velocity.X *= FP._1_10;
+            }
 
             if (mario->IsCrouching && mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                 var contacts = f.ResolveList(physicsObject->Contacts);
@@ -1183,6 +1186,7 @@ namespace Quantum {
                 mario->CurrentKnockback = KnockbackStrength.None;
                 mario->DamageInvincibilityFrames = 0;
                 mario->InvincibilityFrames = 0;
+                mario->ColdBrewFrames = 0;
 
                 if (QuantumUtils.Decrement(ref mario->MegaMushroomStartFrames)) {
                     // Started
@@ -1219,6 +1223,7 @@ namespace Quantum {
             }
             if (mario->MegaMushroomFrames > 0) {
                 mario->InvincibilityFrames = 0;
+                mario->ColdBrewFrames = 0;
 
                 if (physicsObject->IsTouchingGround) {
                     if (mario->JumpState != JumpState.None) {
@@ -1342,6 +1347,7 @@ namespace Quantum {
             if (QuantumUtils.Decrement(ref mario->InvincibilityFrames)) {
                 f.Unsafe.GetPointer<ComboKeeper>(filter.Entity)->Combo = 0;
             }
+            QuantumUtils.Decrement(ref mario->ColdBrewFrames);
             QuantumUtils.Decrement(ref mario->PropellerSpinFrames);
             QuantumUtils.Decrement(ref mario->ProjectileDelayFrames);
             if (QuantumUtils.Decrement(ref mario->ProjectileVolleyFrames)) {
@@ -1400,11 +1406,39 @@ namespace Quantum {
 
             if(mario->CurrentPowerupState == PowerupState.Cape && inputs.Jump.IsDown && !physicsObject->IsTouchingGround) {
                 physicsObject->Velocity = new FPVector2(physicsObject->Velocity.X,FPMath.Max(physicsObject->Velocity.Y, -FP._1_25));
+                if(physicsObject->Velocity.Y <= -FP._1_25) {
+                    mario->JumpState = JumpState.None;
+                }
+            }
+
+            mario->CapeJustSpun = false;
+            if (!QuantumUtils.Decrement(ref mario->CapeSpinFrames) && mario->CapeSpinFrames == 21 && mario->CurrentPowerupState == PowerupState.Cape) {
+                Shape2D box = Shape2D.CreateBox(new FPVector2(FP.FromString("0.66666666666666667"), FP._0_10), new FPVector2(FP._0, FP._0_20));
+                var hits = f.Physics2D.OverlapShape(filter.Transform->Position, 0, box);
+                for (int i = 0; i < hits.Count; i++) {
+                    var hit = hits[i];
+                    // Filter out hitting yourself
+                    if (hit.Entity != filter.Entity) {
+                        f.Signals.OnEntityBumped(hit.Entity, hit.Point, filter.Entity, true);
+                    }
+                    
+                }
+
+                Span<PhysicsObjectSystem.LocationTilePair> tiles = stackalloc PhysicsObjectSystem.LocationTilePair[64];
+                int overlappingTiles = PhysicsObjectSystem.GetTilesOverlappingHitbox(f, filter.Transform->Position, box, tiles, stage);
+
+                for (int i = 0; i < overlappingTiles; i++) {
+                    StageTile stageTile = f.FindAsset(tiles[i].Tile.Tile);
+                    if (stageTile is IInteractableTile it) {
+                        it.Interact(f, filter.Entity, InteractionDirection.Up, tiles[i].Position, tiles[i].Tile, out _);
+                    }
+                }
+
             }
 
             if (!(inputs.PowerupAction.WasPressed
                 || (state == PowerupState.PropellerMushroom && inputs.PropellerPowerupAction.WasPressed && !physicsObject->IsTouchingGround && !mario->IsWallsliding)
-                || ((state == PowerupState.FireFlower || state == PowerupState.MagmaFlower || state == PowerupState.IceFlower || state == PowerupState.LiquidNitrogenFlower || state == PowerupState.HammerSuit || state == PowerupState.LightningFlower) && inputs.FireballPowerupAction.WasPressed))) {
+                || ((state == PowerupState.Cape || state == PowerupState.FireFlower || state == PowerupState.MagmaFlower || state == PowerupState.IceFlower || state == PowerupState.LiquidNitrogenFlower || state == PowerupState.HammerSuit || state == PowerupState.LightningFlower || state == PowerupState.Bombermario) && inputs.FireballPowerupAction.WasPressed))) {
                 return;
             }
 
@@ -1419,7 +1453,8 @@ namespace Quantum {
             case PowerupState.LiquidNitrogenFlower:
             case PowerupState.MagmaFlower:
             case PowerupState.LightningFlower:
-            case PowerupState.HammerSuit: {
+            case PowerupState.HammerSuit:
+            case PowerupState.Bombermario: {
 
                 if (mario->ProjectileDelayFrames > 0 || mario->LightningTimer > 0 || mario->IsWallsliding || (mario->JumpState == JumpState.TripleJump && !physicsObject->IsTouchingGround)
                     || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsSkidding || mario->IsTurnaround) {
@@ -1445,13 +1480,21 @@ namespace Quantum {
                 mario->ProjectileDelayFrames = physics.ProjectileDelayFrames;
                 mario->ProjectileVolleyFrames = physics.ProjectileVolleyFrames;
 
-                Projectile* projectile;
                 if (mario->CurrentPowerupState == PowerupState.HammerSuit) {
+                    Projectile* projectile;
                     projectile = ShootHammerProjectile(f, ref filter, physics);
+                    f.Events.MarioPlayerShotProjectile(filter.Entity, *projectile);
+                } else if (mario->CurrentPowerupState == PowerupState.Bombermario) {
+                    Bobomb* projectile;
+                    projectile = ShootBombProjectile(f, ref filter, physics);
+                    f.Events.MarioPlayerShotBombProjectile(filter.Entity, *projectile);
+                    mario->LightningTimer = 180;
+
                 } else {
+                    Projectile* projectile;
                     projectile = ShootNormalProjectile(f, ref filter, physics);
+                    f.Events.MarioPlayerShotProjectile(filter.Entity, *projectile);
                 }
-                f.Events.MarioPlayerShotProjectile(filter.Entity, *projectile);
 
                 // Weird interaction in the main game...
                 mario->WalljumpFrames = 0;
@@ -1490,7 +1533,16 @@ namespace Quantum {
                 f.Events.MarioPlayerUsedPropeller(filter.Entity);
                 break;
             }
+            case PowerupState.Cape: {
+                if (mario->IsGroundpounding || mario->GroundpoundStartFrames > 0 || physicsObject->IsUnderwater || mario->IsSpinnerFlying || mario->IsDrilling || mario->IsPropellerFlying || mario->WalljumpFrames > 0) {
+                    return;
+                }
+                mario->CapeSpinFrames = 22;
+                f.Events.MarioPlayerCapeSpin(filter.Entity);
+                break;
             }
+            }
+
         }
 
         private Projectile* ShootHammerProjectile(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
@@ -1524,6 +1576,19 @@ namespace Quantum {
 
             var projectile = f.Unsafe.GetPointer<Projectile>(newEntity);
             projectile->Initialize(f, newEntity, mario->CurrentPowerupState == PowerupState.LightningFlower ? EntityRef.None : filter.Entity, spawnPos, mario->FacingRight);
+            return projectile;
+        }
+
+        private Bobomb* ShootBombProjectile(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics) {
+            var mario = filter.MarioPlayer;
+            var physicsObject = filter.PhysicsObject;
+
+            FPVector2 spawnPos = filter.Transform->Position + new FPVector2(mario->FacingRight ? FP._0_50 : -FP._0_50, Constants._0_35);
+
+            EntityRef newEntity = f.Create(f.SimulationConfig.BombermanBombPrototype);
+
+            var projectile = f.Unsafe.GetPointer<Bobomb>(newEntity);
+            projectile->Initialize(f, newEntity, spawnPos, new FPVector2(physicsObject->Velocity.X + (mario->FacingRight ? FP._5 : -FP._5), FP._0));
             return projectile;
         }
 

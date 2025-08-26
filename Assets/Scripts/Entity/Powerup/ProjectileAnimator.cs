@@ -14,6 +14,8 @@ namespace NSMB.Entities.Player {
         [SerializeField] private Animator animator;
         [SerializeField] private LegacyAnimateSpriteRenderer legacySpriteAnimator;
         [SerializeField] private Color sameTeamColor, differentTeamColor;
+        [SerializeField] private AudioSource sfx;
+        [SerializeField] private GameObject BurnObject, NormalObject;
 
         //---Private Variables
         private EntityRef owner;
@@ -46,6 +48,15 @@ namespace NSMB.Entities.Player {
             }
             if (legacySpriteAnimator) {
                 legacySpriteAnimator.enabled = PredictedFrame.Global->GameState == GameState.Playing;
+            }
+            var f = QuantumRunner.DefaultGame.Frames.Predicted;
+            var projectile = f.Unsafe.GetPointer<Projectile>(EntityRef);
+            if (projectile->JustHitGround) {
+                sfx.clip = SoundEffect.Powerup_Magmaball_Burn.GetClip(Utils.GetStageTheme());
+                sfx.Play();
+                sRenderer.color = sameTeamColor;
+                BurnObject.SetActive(true);
+                NormalObject.SetActive(false);
             }
         }
 

@@ -144,6 +144,8 @@ namespace Quantum.Prototypes {
     public FP ExplosionRadius;
     public FP Speed;
     public UInt16 DetonationFrames;
+    public QBoolean StartLit;
+    public QBoolean IsLitFromStart;
     partial void MaterializeUser(Frame frame, ref Quantum.Bobomb result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Bobomb component = default;
@@ -154,6 +156,8 @@ namespace Quantum.Prototypes {
         result.ExplosionRadius = this.ExplosionRadius;
         result.Speed = this.Speed;
         result.DetonationFrames = this.DetonationFrames;
+        result.StartLit = this.StartLit;
+        result.IsLitFromStart = this.IsLitFromStart;
         MaterializeUser(frame, ref result, in context);
     }
   }

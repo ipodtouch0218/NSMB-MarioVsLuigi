@@ -3,6 +3,16 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe partial struct Bobomb {
 
+        public void Initialize(Frame f, EntityRef thisEntity, FPVector2 spawnpoint, FPVector2 speed) {
+            var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
+            var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(thisEntity);
+            var enemy = f.Unsafe.GetPointer<Enemy>(thisEntity);
+
+            transform->Position = spawnpoint;
+            physicsObject->Velocity = speed;
+            enemy->IsActive = true;
+        }
+
         public void Respawn(Frame f, EntityRef entity) {
             CurrentDetonationFrames = 0;
 
@@ -41,7 +51,7 @@ namespace Quantum {
 
             FPVector2 position = bobombTransform->Position;
 
-            if (reason.ShouldSpawnCoin()) {
+            if (reason.ShouldSpawnCoin() && !StartLit) {
                 // Spawn coin
                 var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
                 gamemode.SpawnLooseCoin(f, position);

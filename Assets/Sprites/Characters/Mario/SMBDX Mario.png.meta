@@ -7645,8 +7645,8 @@ TextureImporter:
         y: 312
         width: 8
         height: 8
-      alignment: 6
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -7755,8 +7755,8 @@ TextureImporter:
         y: 304
         width: 16
         height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -9735,8 +9735,8 @@ TextureImporter:
         y: 160
         width: 16
         height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -9909,7 +9909,7 @@ TextureImporter:
         serializedVersion: 2
         x: 320
         y: 160
-        width: 16
+        width: 32
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -9929,7 +9929,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_SpinFly_2
       rect:
         serializedVersion: 2
-        x: 336
+        x: 352
         y: 160
         width: 32
         height: 32
@@ -9951,9 +9951,9 @@ TextureImporter:
       name: SMBDX_Mario_Cape_SpinFly_3
       rect:
         serializedVersion: 2
-        x: 368
+        x: 384
         y: 160
-        width: 16
+        width: 32
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -9973,9 +9973,9 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Spin_0
       rect:
         serializedVersion: 2
-        x: 384
+        x: 416
         y: 160
-        width: 16
+        width: 32
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -9995,9 +9995,9 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Spin_1
       rect:
         serializedVersion: 2
-        x: 400
+        x: 448
         y: 160
-        width: 16
+        width: 32
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -10017,9 +10017,9 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Spin_2
       rect:
         serializedVersion: 2
-        x: 416
+        x: 480
         y: 160
-        width: 16
+        width: 32
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -10039,9 +10039,9 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Spin_3
       rect:
         serializedVersion: 2
-        x: 432
+        x: 512
         y: 160
-        width: 16
+        width: 32
         height: 32
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -10061,7 +10061,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Swim_0
       rect:
         serializedVersion: 2
-        x: 448
+        x: 544
         y: 160
         width: 16
         height: 32
@@ -10083,7 +10083,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Swim_1
       rect:
         serializedVersion: 2
-        x: 464
+        x: 560
         y: 160
         width: 16
         height: 32
@@ -10105,7 +10105,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Swim_2
       rect:
         serializedVersion: 2
-        x: 480
+        x: 576
         y: 160
         width: 16
         height: 32
@@ -10127,7 +10127,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Swim_3
       rect:
         serializedVersion: 2
-        x: 496
+        x: 592
         y: 160
         width: 16
         height: 32
@@ -10149,7 +10149,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Run_0
       rect:
         serializedVersion: 2
-        x: 512
+        x: 608
         y: 160
         width: 32
         height: 32
@@ -10171,7 +10171,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Run_1
       rect:
         serializedVersion: 2
-        x: 544
+        x: 640
         y: 160
         width: 32
         height: 32
@@ -10193,7 +10193,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Run_2
       rect:
         serializedVersion: 2
-        x: 576
+        x: 672
         y: 160
         width: 32
         height: 32
@@ -10215,7 +10215,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_Float_0
       rect:
         serializedVersion: 2
-        x: 608
+        x: 704
         y: 160
         width: 16
         height: 32
@@ -10237,7 +10237,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldIdle_0
       rect:
         serializedVersion: 2
-        x: 624
+        x: 720
         y: 160
         width: 32
         height: 32
@@ -10259,7 +10259,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldWalk_0
       rect:
         serializedVersion: 2
-        x: 656
+        x: 752
         y: 160
         width: 32
         height: 32
@@ -10281,7 +10281,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldWalk_1
       rect:
         serializedVersion: 2
-        x: 688
+        x: 784
         y: 160
         width: 32
         height: 32
@@ -10303,7 +10303,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldWalk_2
       rect:
         serializedVersion: 2
-        x: 720
+        x: 816
         y: 160
         width: 32
         height: 32
@@ -10325,7 +10325,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldUpIdle_0
       rect:
         serializedVersion: 2
-        x: 752
+        x: 848
         y: 160
         width: 16
         height: 32
@@ -10347,7 +10347,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldUpWalk_0
       rect:
         serializedVersion: 2
-        x: 768
+        x: 864
         y: 160
         width: 16
         height: 32
@@ -10369,7 +10369,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldUpWalk_1
       rect:
         serializedVersion: 2
-        x: 784
+        x: 880
         y: 160
         width: 16
         height: 32
@@ -10391,7 +10391,7 @@ TextureImporter:
       name: SMBDX_Mario_Cape_HoldUpWalk_2
       rect:
         serializedVersion: 2
-        x: 800
+        x: 896
         y: 160
         width: 16
         height: 32
@@ -10413,7 +10413,7 @@ TextureImporter:
       name: SMBDX_Cape_0
       rect:
         serializedVersion: 2
-        x: 816
+        x: 912
         y: 160
         width: 16
         height: 32
@@ -10435,7 +10435,7 @@ TextureImporter:
       name: SMBDX_Cape_1
       rect:
         serializedVersion: 2
-        x: 832
+        x: 928
         y: 160
         width: 16
         height: 32
@@ -10457,7 +10457,7 @@ TextureImporter:
       name: SMBDX_Cape_2
       rect:
         serializedVersion: 2
-        x: 848
+        x: 944
         y: 160
         width: 16
         height: 32
@@ -10479,7 +10479,7 @@ TextureImporter:
       name: SMBDX_Cape_3
       rect:
         serializedVersion: 2
-        x: 864
+        x: 960
         y: 160
         width: 16
         height: 32
@@ -10501,7 +10501,7 @@ TextureImporter:
       name: SMBDX_Cape_4
       rect:
         serializedVersion: 2
-        x: 880
+        x: 976
         y: 160
         width: 16
         height: 32
@@ -10523,7 +10523,7 @@ TextureImporter:
       name: SMBDX_Cape_5
       rect:
         serializedVersion: 2
-        x: 896
+        x: 992
         y: 160
         width: 16
         height: 32
@@ -10545,7 +10545,7 @@ TextureImporter:
       name: SMBDX_Cape_6
       rect:
         serializedVersion: 2
-        x: 912
+        x: 1008
         y: 160
         width: 16
         height: 32
@@ -10567,12 +10567,12 @@ TextureImporter:
       name: SMBDX_Cape_7
       rect:
         serializedVersion: 2
-        x: 928
+        x: 1024
         y: 160
         width: 16
         height: 32
-      alignment: 8
-      pivot: {x: 1, y: 0}
+      alignment: 9
+      pivot: {x: 0.8125, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -10589,12 +10589,12 @@ TextureImporter:
       name: SMBDX_Cape_8
       rect:
         serializedVersion: 2
-        x: 944
+        x: 1040
         y: 160
         width: 16
         height: 32
-      alignment: 8
-      pivot: {x: 1, y: 0}
+      alignment: 9
+      pivot: {x: 0.8125, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -10611,12 +10611,12 @@ TextureImporter:
       name: SMBDX_Cape_9
       rect:
         serializedVersion: 2
-        x: 960
+        x: 1056
         y: 160
-        width: 15
+        width: 16
         height: 32
-      alignment: 8
-      pivot: {x: 1, y: 0}
+      alignment: 9
+      pivot: {x: 0.8125, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -12969,8 +12969,8 @@ TextureImporter:
         y: 16
         width: 16
         height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -12991,8 +12991,8 @@ TextureImporter:
         y: 16
         width: 16
         height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -13013,8 +13013,8 @@ TextureImporter:
         y: 16
         width: 16
         height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -13035,8 +13035,8 @@ TextureImporter:
         y: 16
         width: 16
         height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -13058,7 +13058,7 @@ TextureImporter:
         width: 7
         height: 9
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

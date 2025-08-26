@@ -325,6 +325,9 @@ MonoBehaviour:
   NitroballPrototype:
     Id:
       Value: 1357533379437497778
+  BombermanBombPrototype:
+    Id:
+      Value: 1414208946312067297
 --- !u!114 &-100545808229499591
 MonoBehaviour:
   m_ObjectHideFlags: 0

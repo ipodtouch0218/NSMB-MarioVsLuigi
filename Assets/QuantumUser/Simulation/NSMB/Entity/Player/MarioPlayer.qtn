@@ -76,7 +76,7 @@ component MarioPlayer {
 	// Wallslide
 	[ExcludeFromPrototype] bool WallslideLeft;
 	[ExcludeFromPrototype] bool WallslideRight;
-	[ExcludeFromPrototype] byte WallslideEndFrames;
+	[ExcludeFromPrototype] int WallslideEndFrames;
     [ExcludeFromPrototype] byte WalljumpFrames;
 
 	// Groundpound
@@ -107,6 +107,7 @@ component MarioPlayer {
 
 	// Powerups
     [ExcludeFromPrototype] ushort InvincibilityFrames;
+	[ExcludeFromPrototype] ushort ColdBrewFrames;
 	
 	[ExcludeFromPrototype] byte MegaMushroomStartFrames;
 	[ExcludeFromPrototype] ushort MegaMushroomFrames;
@@ -128,6 +129,9 @@ component MarioPlayer {
 	[ExcludeFromPrototype] bool UsedPropellerThisJump;
 	[ExcludeFromPrototype] byte PropellerDrillCooldown;
 	[ExcludeFromPrototype] byte PropellerDrillHoldFrames;
+
+	[ExcludeFromPrototype] byte CapeSpinFrames;
+	[ExcludeFromPrototype] bool CapeJustSpun;
 
     [ExcludeFromPrototype] EntityRef HeldEntity;
 	[ExcludeFromPrototype] int HoldStartFrame;
@@ -166,6 +170,7 @@ enum KnockbackStrength : Byte {
 
 signal OnMarioPlayerDied(EntityRef entity);
 signal OnMarioPlayerBecameInvincible(EntityRef entity);
+signal OnMarioPlayerColdBrewHit(EntityRef entity);
 signal OnMarioPlayerDropObjective(EntityRef entity, int amount, EntityRef attacker);
 signal OnMarioPlayerTakeDamage(EntityRef entity, ref bool keepDamage);
 signal OnMarioPlayerGroundpoundedSolid(EntityRef mario, PhysicsContact contact, ref bool continueGroundpound);
@@ -215,6 +220,11 @@ event MarioPlayerWalljumped {
 event MarioPlayerShotProjectile {
 	EntityRef Entity;
 	nothashed Projectile Projectile;
+}
+
+event MarioPlayerShotBombProjectile {
+	EntityRef Entity;
+	nothashed Bobomb Projectile;
 }
 
 event MarioPlayerUsedPropeller {
@@ -301,4 +311,8 @@ event PlayKnockbackEffect {
 	EntityRef Attacker;
 	KnockbackStrength Strength;
 	nothashed FPVector2 AttackerPosition;
+}
+
+event MarioPlayerCapeSpin {
+	EntityRef Entity;
 }

@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 
 public enum SoundEffect : int {
-    //CURRENT HIGHEST NUMBER: 119 (use 120 next)
+    //CURRENT HIGHEST NUMBER: 124 (use 125 next)
     //Enemy
     [SoundEffectData("{style}/enemy/freeze")] Enemy_Generic_Freeze = 0,
     [SoundEffectData("{style}/enemy/freeze_shatter")] Enemy_Generic_FreezeShatter = 1,
@@ -66,6 +66,7 @@ public enum SoundEffect : int {
     [SoundEffectData("{style}/powerup/1-up")] Powerup_1UP_Collect = 78, //HARDCODED: DO NOT CHANGE WITHOUT CHANGING POWERUPS SCRIPTABLES
     [SoundEffectData("{style}/powerup/blueshell_enter")] Powerup_BlueShell_Enter = 41,
     [SoundEffectData("{style}/powerup/blueshell_slide")] Powerup_BlueShell_Slide = 42,
+    [SoundEffectData("{style}/powerup/bomb_throw")] Powerup_Bomberman_Throw = 124,
     [SoundEffectData("{style}/powerup/fireball_break")] Powerup_Fireball_Break = 43,
     [SoundEffectData("{style}/powerup/fireball_shoot")] Powerup_Fireball_Shoot = 44,
     [SoundEffectData("{style}/powerup/iceball_break")] Powerup_Iceball_Break = 46,
@@ -73,6 +74,10 @@ public enum SoundEffect : int {
     [SoundEffectData("{style}/powerup/lightningball_shoot")] Powerup_Lightning_Shoot = 115,
     [SoundEffectData("{style}/powerup/lightningball_break")] Powerup_Lightning_Break = 116,
     [SoundEffectData("{style}/powerup/lightningball_charge")] Powerup_Lightning_Charge = 117,
+    [SoundEffectData("{style}/powerup/magmaball_shoot")] Powerup_Magmaball_Shoot = 120,
+    [SoundEffectData("{style}/powerup/magmaball_break")] Powerup_Magmaball_Break = 121,
+    [SoundEffectData("{style}/powerup/magmaball_burn")] Powerup_Magmaball_Burn = 122,
+    [SoundEffectData("{style}/powerup/cape_spin")] Powerup_Cape_Spin = 123,
     [SoundEffectData("{style}/powerup/megamushroom_break_block")] Powerup_MegaMushroom_Break_Block = 48,
     [SoundEffectData("{style}/powerup/megamushroom_break_pipe")] Powerup_MegaMushroom_Break_Pipe = 49,
     [SoundEffectData("{style}/powerup/megamushroom_end")] Powerup_MegaMushroom_End = 50,

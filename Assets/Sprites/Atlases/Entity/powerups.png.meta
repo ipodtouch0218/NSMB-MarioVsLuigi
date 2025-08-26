@@ -451,7 +451,7 @@ TextureImporter:
         serializedVersion: 2
         x: 64
         y: 0
-        width: 16
+        width: 15
         height: 16
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -1128,12 +1128,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SMBDX_CapeFeather_1
+      name: SMBDX_ColdBrew
       rect:
         serializedVersion: 2
         x: 176
         y: 32
-        width: 16
+        width: 15
         height: 16
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -1294,7 +1294,7 @@ TextureImporter:
       SMBDX_1Up: -908563853
       SMBDX_BlueShell: 501699288
       SMBDX_CapeFeather_0: 1755229272
-      SMBDX_CapeFeather_1: -286278248
+      SMBDX_ColdBrew: -286278248
       SMBDX_CubbyLandHat: 835503472
       SMBDX_FireFlower_0: 1565704883
       SMBDX_FireFlower_1: 571845618

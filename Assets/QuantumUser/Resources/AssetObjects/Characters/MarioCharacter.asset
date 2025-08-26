@@ -5176,7 +5176,7 @@ MonoBehaviour:
     - State: 9
       Item: 13
       Sprites:
-      - {fileID: 261721876, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: 1648423079, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 4
     - State: 10
       Item: 13
@@ -5756,57 +5756,57 @@ MonoBehaviour:
       Item: 14
       Sprites:
       - {fileID: 1686354430, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 35
       Item: 14
       Sprites:
       - {fileID: 453124580, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 229099077, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1970235245, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 36
       Item: 14
       Sprites:
       - {fileID: 453124580, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 229099077, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1970235245, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 37
       Item: 14
       Sprites:
       - {fileID: 453124580, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 229099077, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1970235245, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 38
       Item: 14
       Sprites:
       - {fileID: 453124580, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 229099077, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1970235245, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 39
       Item: 14
       Sprites:
       - {fileID: 453124580, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: 229099077, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       - {fileID: -1970235245, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 39
       Item: 14
       Sprites:
       - {fileID: 453124580, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 40
       Item: 14
       Sprites:
       - {fileID: 453124580, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 41
       Item: 14
       Sprites:
       - {fileID: 229099077, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
-      Fps: 10
+      Fps: 4
     - State: 42
       Item: 14
       Sprites:
@@ -5903,6 +5903,44 @@ MonoBehaviour:
       Item: 14
       Sprites:
       - {fileID: -1167532646, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 0
+      Item: 15
+      Sprites:
+      - {fileID: 1031427995, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 1
+      Item: 15
+      Sprites:
+      - {fileID: -1908174121, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -1492078421, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -445101282, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 6
+    - State: 2
+      Item: 15
+      Sprites:
+      - {fileID: 589472249, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -1492078421, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -1520976521, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 16
+    - State: 7
+      Item: 15
+      Sprites:
+      - {fileID: -1908174121, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -1492078421, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -445101282, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 8
+    - State: 8
+      Item: 15
+      Sprites:
+      - {fileID: -1741993800, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -2077141215, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      - {fileID: -2036219145, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
+      Fps: 10
+    - State: 51
+      Item: 15
+      Sprites:
+      - {fileID: -333496553, guid: 66283b3b4576e0a4f9764772ef3b841d, type: 3}
       Fps: 10
   DefaultSprite:
     State: 0

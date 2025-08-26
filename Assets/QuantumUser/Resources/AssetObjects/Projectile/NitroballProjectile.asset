@@ -33,5 +33,7 @@ MonoBehaviour:
   InheritShooterVelocity: 1
   HasCollision: 1
   DoesntEffectBlueShell: 1
-  DestroyParticleEffect: 6
+  StaysOnGround: 0
+  StayFrames: 0
+  DestroyParticleEffect: 11
   ShootSound: 47

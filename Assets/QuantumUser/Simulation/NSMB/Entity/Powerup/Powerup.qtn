@@ -17,7 +17,14 @@ enum PowerupState : Byte {
     PropellerMushroom,
     BlueShell,
 	HammerSuit,
-    MegaMushroom
+    MegaMushroom,
+    LightningFlower,
+    MagmaFlower,
+    LiquidNitrogenFlower,
+    CubbyLandHat,
+    Cape,
+    Bombermario,
+    ForCapeOnlyDoNotUse
 }
 
 enum PowerupSpawnReason : Byte {

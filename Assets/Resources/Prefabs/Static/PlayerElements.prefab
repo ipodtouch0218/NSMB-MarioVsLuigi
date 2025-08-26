@@ -25341,10 +25341,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugSpawnCommands:
-  - KeyCode: 256
-    Entity:
-      Id:
-        Value: 1302927369648075827
   - KeyCode: 257
     Entity:
       Id:
@@ -25437,6 +25433,10 @@ MonoBehaviour:
     Entity:
       Id:
         Value: 1333996724301495071
+  - KeyCode: 256
+    Entity:
+      Id:
+        Value: 1393821057306775479
   - KeyCode: 278
     Entity:
       Id:

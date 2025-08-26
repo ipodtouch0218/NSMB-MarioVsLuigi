@@ -79,7 +79,7 @@ namespace Quantum {
             Size = extents;
 
             // Set timer
-            AutoBreakFrames = 30;
+            AutoBreakFrames = 1800;
 
             // Try to not spawn inside blocks/walls
             PhysicsObjectSystem.TryEject(f, iceBlockEntity);

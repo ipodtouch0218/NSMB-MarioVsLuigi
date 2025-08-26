@@ -677,6 +677,7 @@ GameObject:
   - component: {fileID: 7308630834410186342}
   - component: {fileID: 3409460790137144535}
   - component: {fileID: 554147233607512307}
+  - component: {fileID: 2544033198901404384}
   m_Layer: 19
   m_Name: Sprite
   m_TagString: Untagged
@@ -767,7 +768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9bae64d07946894c9629349d5768bc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpriteAnimator: {fileID: 0}
+  SpriteAnimator: {fileID: 2544033198901404384}
   SpriteSingleAnimator: {fileID: 3409460790137144535}
   SpriteList:
   - State: 0
@@ -779,8 +780,32 @@ MonoBehaviour:
     Item: 0
     Sprites:
     - {fileID: 235765383, guid: 8154a84b219ce474299d18054172a2b4, type: 3}
-    Fps: 0
-  UseSingleRenderer: 1
+    - {fileID: 1788186429, guid: 8154a84b219ce474299d18054172a2b4, type: 3}
+    - {fileID: 892958909, guid: 8154a84b219ce474299d18054172a2b4, type: 3}
+    - {fileID: 243619171, guid: 8154a84b219ce474299d18054172a2b4, type: 3}
+    Fps: 4
+  UseSingleRenderer: 0
+--- !u!114 &2544033198901404384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9209823662088345179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41c5d135866d4444088fd55baaa2ae03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDisplaying: 1
+  frame: 0
+  runInEditor: 0
+  fps: 8
+  frames: []
+  colorblindModeFrames: []
+  useUnscaledDelta: 0
+  sRenderer: {fileID: 3409460790137144535}
+  image: {fileID: 0}
 --- !u!1001 &7087770595906198018
 PrefabInstance:
   m_ObjectHideFlags: 0

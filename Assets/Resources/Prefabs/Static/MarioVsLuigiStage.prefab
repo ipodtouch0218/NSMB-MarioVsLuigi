@@ -427,6 +427,14 @@ MonoBehaviour:
     prefab: {fileID: 1674080856964950978, guid: 88c98ddee8b221c4aa6b25d34939759b,
       type: 3}
     offset: {x: 0, y: 0.1, z: 0}
+  - particle: 10
+    prefab: {fileID: 5903185039186744869, guid: 4e4e85eb2418b714bb14f60870054c17,
+      type: 3}
+    offset: {x: 0, y: 0.1, z: 0}
+  - particle: 11
+    prefab: {fileID: 5903185039186744869, guid: 33fd544df2650b449b1a2eb03ef4d0d1,
+      type: 3}
+    offset: {x: 0, y: 0.1, z: 0}
 --- !u!1 &4420296297805007934
 GameObject:
   m_ObjectHideFlags: 0
