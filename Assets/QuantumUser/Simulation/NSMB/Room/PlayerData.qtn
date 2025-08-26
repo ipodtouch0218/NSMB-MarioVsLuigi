@@ -4,11 +4,13 @@ component PlayerData {
 	bool IsLoaded;
 
 	byte Character;
-	byte Palette;
+	FP PrimaryHue;
+	FP SecondaryHue;
 	byte RequestedTeam;
 	bool IsSpectator;
 	bool ManualSpectator;
 	bool VotedToContinue;
+	byte Palette;
 
 	int Wins;
 	byte RealTeam;

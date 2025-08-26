@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Navigation = UnityEngine.UI.Navigation;
+using Photon.Deterministic;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
     public class PaletteChooser : MonoBehaviour, KeepChildInFocus.IFocusIgnore {
@@ -13,11 +14,14 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         //---Serialized Variables
         // [SerializeField] private SimulationConfig config;
         [SerializeField] private MainMenuCanvas canvas;
-        [SerializeField] private GameObject template, blockerTemplate;
+        //[SerializeField] private GameObject template, blockerTemplate;
         [SerializeField] public GameObject content;
-        [SerializeField] private Sprite clearSprite, baseSprite;
+        //[SerializeField] private Sprite clearSprite, baseSprite;
         [SerializeField] private CharacterAsset defaultCharacter;
         [SerializeField] private GameObject selectOnClose;
+        [SerializeField] private Gradient hueMap;
+        [SerializeField] private Image sliderButton, sliderButton2, marioPrimary, marioSecondary, luigiPrimary, luigiSecondary;
+        [SerializeField] private Slider slider, slider2;
 
         [SerializeField] private Image overallsImage, shirtImage, baseImage;
 
@@ -30,60 +34,15 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         private int selected;
         private bool initialized;
 
-        public void OnDisable() {
-            Close(false);
+        public void Initialize() {
+            initialized = true;
+        }
+        public void ChangePaletteButton(int index) {
         }
 
-        public unsafe void Initialize() {
-            if (initialized) {
-                return;
-            }
 
-            AssetRef<PaletteSet>[] palettes = GlobalController.Instance.config.Palettes;
-
-            for (int i = 0; i < palettes.Length; i++) {
-                PaletteSet palette = QuantumUnityDB.GetGlobalAsset(palettes[i]);
-
-                GameObject newButton = Instantiate(template, template.transform.parent);
-                PaletteButton cb = newButton.GetComponent<PaletteButton>();
-                paletteButtons.Add(cb);
-                cb.palette = palette;
-
-                Button b = newButton.GetComponent<Button>();
-                newButton.name = palette ? palette.name : "Reset";
-                if (!palette) {
-                    b.image.sprite = clearSprite;
-                }
-
-                newButton.SetActive(true);
-                buttons.Add(b);
-
-                Navigation navigation = new() { mode = Navigation.Mode.Explicit };
-
-                if (i > 0 && i % 4 != 0) {
-                    Navigation n = navigations[i - 1];
-                    n.selectOnRight = b;
-                    navigations[i - 1] = n;
-                    navigation.selectOnLeft = buttons[i - 1];
-                }
-                if (i >= 4) {
-                    Navigation n = navigations[i - 4];
-                    n.selectOnDown = b;
-                    navigations[i - 4] = n;
-                    navigation.selectOnUp = buttons[i - 4];
-                }
-
-                navigations.Add(navigation);
-            }
-
-            for (int i = 0; i < buttons.Count; i++) {
-                buttons[i].navigation = navigations[i];
-            }
-            initialized = true;
-
-            foreach (PaletteButton b in paletteButtons) {
-                b.Instantiate(defaultCharacter);
-            }
+        public void OnDisable() {
+            Close(false);
         }
 
         public void ChangeCharacter(CharacterAsset data) {
@@ -91,58 +50,53 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 b.Instantiate(data);
             }
             character = data;
-            ChangePaletteButton(selected);
         }
 
-        public void ChangePaletteButton(int index) {
-            selected = index;
-            AssetRef<PaletteSet>[] palettes = GlobalController.Instance.config.Palettes;
-            PaletteSet palette = null;
-
-            if (index >= 0 && index < palettes.Length) {
-                palette = QuantumUnityDB.GetGlobalAsset(palettes[index]);
-            }
-
-            if (palette) {
-                overallsImage.enabled = true;
-                overallsImage.color = palette.GetPaletteForCharacter(character).OverallsColor.AsColor;
-                shirtImage.enabled = true;
-                shirtImage.color = palette.GetPaletteForCharacter(character).ShirtColor.AsColor;
-                baseImage.sprite = baseSprite;
+        public void ChangeColorOfSliderButton(bool isSecondary) {
+            if (isSecondary) {
+                sliderButton2.color = hueMap.Evaluate(slider2.value);
+                marioSecondary.color = hueMap.Evaluate(slider2.value);
+                luigiPrimary.color = hueMap.Evaluate(slider2.value);
             } else {
-                overallsImage.enabled = false;
-                shirtImage.enabled = false;
-                baseImage.sprite = clearSprite;
+                sliderButton.color = hueMap.Evaluate(slider.value);
+                marioPrimary.color = hueMap.Evaluate(slider.value);
+                luigiSecondary.color = hueMap.Evaluate(slider.value);
             }
         }
 
-        public void SelectPalette(Button button) {
-            int newIndex = buttons.IndexOf(button);
+        public void SelectPrimaryHue() {
+            FP newIndex = FP.FromString(slider.value.ToString());
             QuantumGame game = QuantumRunner.DefaultGame;
             foreach (var slot in game.GetLocalPlayerSlots()) {
-                game.SendCommand(slot, new CommandChangePlayerData { 
-                    EnabledChanges = CommandChangePlayerData.Changes.Palette,
-                    Palette = (byte) newIndex,
+                game.SendCommand(slot, new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.PrimaryHue,
+                    PrimaryHue = newIndex.AsFloat,
                 });
             }
-            
-            Close(false);
-            selected = newIndex;
-            ChangePaletteButton(selected);
-            Settings.Instance.generalPalette = selected;
+
+            Settings.Instance.primaryHue = slider.value;
             Settings.Instance.SaveSettings();
-            canvas.PlayConfirmSound();
+        }
+
+        public void SelectSecondaryHue() {
+            FP newIndex = FP.FromString(slider2.value.ToString());
+            QuantumGame game = QuantumRunner.DefaultGame;
+            foreach (var slot in game.GetLocalPlayerSlots()) {
+                game.SendCommand(slot, new CommandChangePlayerData {
+                    EnabledChanges = CommandChangePlayerData.Changes.SecondaryHue,
+                    SecondaryHue = newIndex.AsFloat,
+                });
+            }
+
+            Settings.Instance.secondaryHue = slider2.value;
+            Settings.Instance.SaveSettings();
         }
 
         public void Open() {
-            Initialize();
+            content.SetActive(!content.activeInHierarchy);
+            canvas.PlaySound(content.activeInHierarchy ? SoundEffect.UI_WindowOpen : SoundEffect.UI_WindowClose);
 
-            blocker = Instantiate(blockerTemplate, canvas.transform);
-            blocker.SetActive(true);
-            content.SetActive(true);
-            canvas.PlayCursorSound();
-
-            EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
+            //EventSystem.current.SetSelectedGameObject(buttons[selected].gameObject);
         }
 
         public void Close(bool playSound) {

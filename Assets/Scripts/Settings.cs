@@ -210,6 +210,8 @@ namespace NSMB {
         public int generalCharacter, generalPalette, generalMaxTempReplays;
         public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
 
+        public float primaryHue, secondaryHue;
+
         public bool graphicsNametags;
 
         public Enums.SpecialPowerupMusic audioSpecialPowerupMusic;

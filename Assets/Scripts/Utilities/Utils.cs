@@ -11,13 +11,18 @@ namespace NSMB.Utilities {
     public class Utils {
 
         public static StageTheme GetStageTheme() {
-            var f = QuantumRunner.DefaultGame.Frames.Predicted;
-            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-            if(stage.stageStyle == null) {
-                Debug.Log("Style is null");
-                return StageTheme.NSMB;
+            if (QuantumRunner.DefaultGame != null) {
+                var f = QuantumRunner.DefaultGame.Frames.Predicted;
+                if (f != null) {
+                    if (f.Map != null) {
+                        var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                        if (stage.stageStyle != null) {
+                            return stage.stageStyle;
+                        }
+                    }
+                }
             }
-            return stage.stageStyle;
+            return StageTheme.NSMB;
         }
 
         public static bool BitTest(long v, int index) {

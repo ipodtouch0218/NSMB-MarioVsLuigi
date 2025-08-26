@@ -2996,8 +2996,8 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct PlayerData : Quantum.IComponent {
-    public const Int32 SIZE = 52;
-    public const Int32 ALIGNMENT = 4;
+    public const Int32 SIZE = 72;
+    public const Int32 ALIGNMENT = 8;
     [FieldOffset(20)]
     public PlayerRef PlayerRef;
     [FieldOffset(36)]
@@ -3006,8 +3006,10 @@ namespace Quantum {
     public QBoolean IsLoaded;
     [FieldOffset(0)]
     public Byte Character;
-    [FieldOffset(1)]
-    public Byte Palette;
+    [FieldOffset(56)]
+    public FP PrimaryHue;
+    [FieldOffset(64)]
+    public FP SecondaryHue;
     [FieldOffset(3)]
     public Byte RequestedTeam;
     [FieldOffset(40)]
@@ -3016,6 +3018,8 @@ namespace Quantum {
     public QBoolean ManualSpectator;
     [FieldOffset(48)]
     public QBoolean VotedToContinue;
+    [FieldOffset(1)]
+    public Byte Palette;
     [FieldOffset(16)]
     public Int32 Wins;
     [FieldOffset(2)]
@@ -3037,11 +3041,13 @@ namespace Quantum {
         hash = hash * 31 + IsRoomHost.GetHashCode();
         hash = hash * 31 + IsLoaded.GetHashCode();
         hash = hash * 31 + Character.GetHashCode();
-        hash = hash * 31 + Palette.GetHashCode();
+        hash = hash * 31 + PrimaryHue.GetHashCode();
+        hash = hash * 31 + SecondaryHue.GetHashCode();
         hash = hash * 31 + RequestedTeam.GetHashCode();
         hash = hash * 31 + IsSpectator.GetHashCode();
         hash = hash * 31 + ManualSpectator.GetHashCode();
         hash = hash * 31 + VotedToContinue.GetHashCode();
+        hash = hash * 31 + Palette.GetHashCode();
         hash = hash * 31 + Wins.GetHashCode();
         hash = hash * 31 + RealTeam.GetHashCode();
         hash = hash * 31 + LastChatMessage.GetHashCode();
@@ -3070,6 +3076,8 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsSpectator, serializer);
         QBoolean.Serialize(&p->ManualSpectator, serializer);
         QBoolean.Serialize(&p->VotedToContinue, serializer);
+        FP.Serialize(&p->PrimaryHue, serializer);
+        FP.Serialize(&p->SecondaryHue, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
