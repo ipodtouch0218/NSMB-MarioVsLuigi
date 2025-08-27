@@ -11,7 +11,6 @@ using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -47,8 +46,8 @@ namespace NSMB.UI.Game {
         [SerializeField] private ReplayUI replayUi;
         [SerializeField] private PauseMenuManager pauseMenu;
 
-        [SerializeField] public GameObject spectationUI;
-        [SerializeField] private TMP_Text spectatingText;
+        [SerializeField] public GameObject spectationUI, spectatingArrows;
+        [SerializeField] private TMP_Text spectatingText, spectateModeSwitchPrompt;
         [SerializeField] private PlayerNametag nametagPrefab;
         [SerializeField] public GameObject nametagCanvas;
 
@@ -73,6 +72,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.SpectatePlayerByIndex.performed += SpectatePlayerIndex;
             Settings.Controls.UI.Next.performed += SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed += SpectatePreviousPlayer;
+            Settings.Controls.UI.Submit.performed += OnSubmit;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
@@ -83,6 +83,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.SpectatePlayerByIndex.performed -= SpectatePlayerIndex;
             Settings.Controls.UI.Next.performed -= SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed -= SpectatePreviousPlayer;
+            Settings.Controls.UI.Submit.performed -= OnSubmit;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
@@ -124,7 +125,7 @@ namespace NSMB.UI.Game {
             if (!f.Exists(Entity) && f.Global->GameState >= GameState.Starting && CameraAnimator.Mode == CameraAnimator.CameraMode.FollowPlayer) {
                 if (spectating) {
                     // Find a new player to spectate
-                    SpectateNextPlayer(0, allowFreecam: false);
+                    SpectateNextPlayer(0);
                 } else {
                     // Spectating
                     StartSpectating();
@@ -149,12 +150,19 @@ namespace NSMB.UI.Game {
                 }
 
                 spectatingText.text = tm.GetTranslationWithReplacements("ui.game.spectating", "playername", nickname);
+                spectateModeSwitchPrompt.text = tm.GetTranslation("ui.replay.camera.freecam");
+                spectatingArrows.SetActive(true);
             } else {
                 spectatingText.text = tm.GetTranslation("ui.replay.camera.freecam");
+                spectateModeSwitchPrompt.text = tm.GetTranslation("ui.game.players");
+                spectatingArrows.SetActive(false);
             }
 
             OnCameraFocusChanged?.Invoke();
-            FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
+
+            if (f.Global->GameState == GameState.Playing) {
+                FindFirstObjectByType<MusicManager>().HandleMusic(Game, true);
+            }
         }
 
         public void StartSpectating() {
@@ -166,22 +174,18 @@ namespace NSMB.UI.Game {
                 }
             }
 
-            SpectateNextPlayer(0, allowFreecam: false);
+            SpectateNextPlayer(0);
         }
 
-        public void SpectateNextPlayer(InputAction.CallbackContext context) {
-            if (!spectating) {
+        public unsafe void SpectateNextPlayer(InputAction.CallbackContext context) {
+            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
                 return;
             }
 
             SpectateNextPlayer(1);
         }
         
-        public void SpectateNextPlayer(int increment) {
-            SpectateNextPlayer(increment, true);
-        }
-
-        public unsafe void SpectateNextPlayer(int increment, bool allowFreecam) {
+        public unsafe void SpectateNextPlayer(int increment) {
             Frame f = PredictedFrame;
 
             int marioCount = f.ComponentCount<MarioPlayer>();
@@ -213,50 +217,58 @@ namespace NSMB.UI.Game {
             });
             
             int currentIndex = marios.IndexOf(Entity);
-            if (currentIndex < 0) currentIndex = 0;
-            int nextIndex = (int) Mathf.Repeat(currentIndex + increment, marioCount + (allowFreecam ? 1 : 0)) + (allowFreecam ? 0 : 1);
-            if (nextIndex == marioCount) {
-                // Freecam
-                CameraAnimator.Mode = CameraAnimator.CameraMode.Freecam;
-                Entity = EntityRef.None;
-            } else {
-                // Follow Player
-                CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
-                Entity = marios[nextIndex];
-            }
+            int nextIndex = (int) Mathf.Repeat(currentIndex + increment, marioCount);
+            CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
+            Entity = marios[nextIndex];
 
             UpdateSpectateUI();
         }
 
-        public void SpectatePreviousPlayer(InputAction.CallbackContext context) {
-            if (!spectating) {
+        public unsafe void SpectatePreviousPlayer(InputAction.CallbackContext context) {
+            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
                 return;
             }
 
             SpectateNextPlayer(-1);
         }
 
-        private void OnNavigate(InputAction.CallbackContext context) {
-            /*
-            if (!spectating) {
+        private unsafe void OnNavigate(InputAction.CallbackContext context) {
+            if (!spectating || cameraAnimator.Mode != CameraAnimator.CameraMode.FollowPlayer || pauseMenu.IsPaused || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
+                previousNavigate = Vector2.zero;
                 return;
             }
 
             Vector2 newPosition = context.ReadValue<Vector2>();
             if (previousNavigate.x > -0.3f && newPosition.x <= -0.3f) {
                 // Left
-                SpectatePreviousPlayer();
+                SpectateNextPlayer(-1);
             }
             if (previousNavigate.x < 0.3f && newPosition.x >= 0.3f) {
                 // Right
-                SpectateNextPlayer();
+                SpectateNextPlayer(1);
             }
             previousNavigate = newPosition;
-            */
+        }
+
+        private unsafe void OnSubmit(InputAction.CallbackContext context) {
+            if (!spectating || pauseMenu.IsPaused || Game.Session.IsReplay || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
+                return;
+            }
+
+            // Change mode
+            if (cameraAnimator.Mode == CameraAnimator.CameraMode.FollowPlayer) {
+                cameraAnimator.Mode = CameraAnimator.CameraMode.Freecam;
+                Entity = EntityRef.None;
+
+            } else if (cameraAnimator.Mode == CameraAnimator.CameraMode.Freecam) {
+                CameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
+                Entity = scoreboardUpdater.EntityAtPosition(0);
+            }
+            UpdateSpectateUI();
         }
 
         private unsafe void SpectatePlayerIndex(InputAction.CallbackContext context) {
-            if (!spectating || Game.Frames.Predicted.Global->GameState >= GameState.Ended) {
+            if (!spectating || Game.Frames.Predicted.Global->GameState >= GameState.Ended || pauseMenu.IsPaused) {
                 return;
             }
 

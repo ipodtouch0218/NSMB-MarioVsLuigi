@@ -1,5 +1,4 @@
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class EnterablePipeSystem : SystemSignalsOnly {
 
         public override void OnInit(Frame f) {

@@ -38,8 +38,10 @@ namespace NSMB.UI.Game.Results {
             }
             template.gameObject.SetActive(false);
 
-            QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
             QuantumCallback.Subscribe<CallbackGameResynced>(this, OnGameResynced);
+            QuantumCallback.Subscribe<CallbackSimulateFinished>(this, OnSimulateFinished);
+            QuantumEvent.Subscribe<EventGameEnded>(this, OnGameEnded);
+
             parent.SetActive(false);
 
             var game = QuantumRunner.DefaultGame;
@@ -51,14 +53,29 @@ namespace NSMB.UI.Game.Results {
             }
         }
 
+        private unsafe void OnSimulateFinished(CallbackSimulateFinished e) {
+            if (!IsReplay) {
+                return;
+            }
+
+            Frame f = e.Game.Frames.Verified;
+            if (e.Game.Session.IsReplayFinished && f.Global->GameState == GameState.Playing) {
+                // Ended replay without EventGameEnded...
+
+                // Is this a dirty hack?
+                f.Global->GameState = GameState.Ended;
+                f.Events.GameEnded(true, -1, false);
+            }
+        }
+
         private void OnGameEnded(EventGameEnded e) {
             if (!e.EndedByHost || IsReplay) {
-                endingCoroutine = StartCoroutine(RunEndingSequence(e.Game.Frames.Predicted, IsReplay ? replayDelayUntilStart : delayUntilStart));
+                endingCoroutine = StartCoroutine(RunEndingSequence(e.Game.Frames.Verified, IsReplay ? replayDelayUntilStart : delayUntilStart));
             }
         }
 
         private IEnumerator RunEndingSequence(Frame f, float delay) {
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSecondsRealtime(delay);
 
             parent.SetActive(true);
             FindFirstObjectByType<LoopingMusicPlayer>().Play(musicData);

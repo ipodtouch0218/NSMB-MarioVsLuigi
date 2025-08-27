@@ -3,7 +3,9 @@ using Quantum.Collections;
 using Quantum.Physics2D;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
+    /// <summary>
+    /// UNUSED. NOT FINISHED!
+    /// </summary>
     public unsafe class BetterPhysicsObjectSystem : SystemMainThreadFilterStage<BetterPhysicsObjectSystem.Filter> {
 
         public static readonly FP GroundMaxAngle = FP.FromString("0.07612"); // 1 - cos(22.5 degrees)

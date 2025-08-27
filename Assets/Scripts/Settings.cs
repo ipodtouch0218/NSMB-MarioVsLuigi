@@ -9,7 +9,8 @@ namespace NSMB {
     public class Settings : Singleton<Settings> {
 
         //---Static Variables
-        public static Controls Controls { get; private set; }
+        private static Controls _controls;
+        public static Controls Controls => _controls;
         private Action[] VersionUpdaters;
         public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
         public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
@@ -225,9 +226,14 @@ namespace NSMB {
         //---Private Variables
         [SerializeField] private AudioMixer mixer;
 
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        public static void CreateInstance() {
+            _controls = new();
+        }
+
         public void Awake() {
             Set(this);
-            Controls = new();
             VersionUpdaters = new Action[] { LoadFromVersion0, LoadFromVersion1 };
             LoadSettings();
 

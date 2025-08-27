@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class GameLogicSystem : SystemMainThread, ISignalOnPlayerAdded, ISignalOnPlayerRemoved, ISignalOnMarioPlayerDied,
         ISignalOnLoadingComplete, ISignalOnReturnToRoom, ISignalOnComponentRemoved<MarioPlayer> {
 
@@ -61,9 +60,7 @@ namespace Quantum {
                 int validPlayers = 0;
                 int loadedPlayers = 0;
 
-                var playerDataFilter = f.Filter<PlayerData>();
-                playerDataFilter.UseCulling = false;
-                while (playerDataFilter.NextUnsafe(out _, out PlayerData* data)) {
+                foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                     if (!f.RuntimeConfig.IsRealGame) {
                         data->IsLoaded = true;
                         data->IsSpectator = false;
@@ -332,6 +329,14 @@ namespace Quantum {
                 }
                 break;
             case GameState.Starting:
+                // Fixes spectators being able to take over old players' objects.
+                foreach (var (k, v) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+                    if (v->PlayerRef == player) {
+                        v->Disconnected = true;
+                        v->PlayerRef = PlayerRef.None;
+                    }
+                }
+                goto case GameState.Playing;
             case GameState.Playing:
                 for (int i = 0; i < f.Global->RealPlayers; i++) {
                     ref PlayerInformation info = ref f.Global->PlayerInfo[i];
@@ -353,9 +358,8 @@ namespace Quantum {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             int teamCount = 0;
 
-            var playerDatas = f.Filter<PlayerData>();
             int playerCount = 0;
-            while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+            foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 if (!data->IsLoaded) {
                     // Force spectator, didn't load in time
                     data->IsSpectator = true;
@@ -424,8 +428,7 @@ namespace Quantum {
             f.Global->UsedStarSpawns.ClearAll();
             f.Global->UsedStarSpawnCount = 0;
 
-            var playerDatas = f.Filter<PlayerData>();
-            while (playerDatas.NextUnsafe(out _, out PlayerData* data)) {
+            foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 data->IsLoaded = false;
                 data->IsReady = false;
                 data->IsSpectator = data->ManualSpectator;

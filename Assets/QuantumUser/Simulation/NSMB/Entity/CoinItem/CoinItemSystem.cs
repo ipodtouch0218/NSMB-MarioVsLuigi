@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using UnityEngine;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class CoinItemSystem : SystemMainThreadEntityFilter<CoinItem, CoinItemSystem.Filter>, ISignalOnStageReset {
 
         public static readonly FP CameraYOffset = FP.FromString("1.68");

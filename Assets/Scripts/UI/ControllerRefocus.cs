@@ -8,11 +8,16 @@ namespace NSMB.UI {
         private GameObject lastSelection;
 
         public void Update() {
-            if (EventSystem.current.currentSelectedGameObject) {
+            var system = EventSystem.current;
+            if (!system) {
+                return;
+            }
+
+            if (system.currentSelectedGameObject) {
                 // If there is no selected item, set the selected item to the event system's first selected item
-                lastSelection = EventSystem.current.currentSelectedGameObject;
-            } else {
-                EventSystem.current.SetSelectedGameObject(lastSelection);
+                lastSelection = system.currentSelectedGameObject;
+            } else if (lastSelection && lastSelection.activeInHierarchy) {
+                system.SetSelectedGameObject(lastSelection);
             }
         }
     }

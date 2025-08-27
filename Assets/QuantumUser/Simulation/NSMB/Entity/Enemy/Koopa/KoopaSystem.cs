@@ -3,7 +3,6 @@ using Quantum.Collections;
 using static IInteractableTile;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class KoopaSystem : SystemMainThreadEntityFilter<Koopa, KoopaSystem.Filter>, ISignalOnThrowHoldable, ISignalOnEnemyRespawned, ISignalOnEntityBumped,
         ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEnemyTurnaround, ISignalOnEntityCrushed,
         ISignalOnMarioPlayerBecameInvincible {

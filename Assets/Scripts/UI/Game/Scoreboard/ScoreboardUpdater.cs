@@ -119,28 +119,17 @@ namespace NSMB.UI.Game.Scoreboard {
                     }
                 }
 
-                if (f.Global->Rules.IsLivesEnabled && ((marioA->Lives == 0) ^ (marioB->Lives == 0))) {
-                    return marioB->Lives - marioA->Lives;
-                }
-
                 int starDiff = gamemode.GetObjectiveCount(f, marioB) - gamemode.GetObjectiveCount(f, marioA);
                 if (starDiff != 0) {
                     return starDiff;
                 }
 
-            indexBasedSorting:
-                int indexA = int.MaxValue;
-                int indexB = int.MaxValue;
-                for (int i = 0; i < f.Global->RealPlayers; i++) {
-                    PlayerRef player = f.Global->PlayerInfo[i].PlayerRef;
-                    if (player == marioA->PlayerRef) {
-                        indexA = i;
-                    } else if (player == marioB->PlayerRef) {
-                        indexB = i;
-                    }
+                if (f.Global->Rules.IsLivesEnabled && (marioA->Lives != marioB->Lives)) {
+                    return marioB->Lives - marioA->Lives;
                 }
 
-                return indexA - indexB;
+            indexBasedSorting:
+                return a.Index - b.Index;
             });
 
             foreach (var entry in entries) {

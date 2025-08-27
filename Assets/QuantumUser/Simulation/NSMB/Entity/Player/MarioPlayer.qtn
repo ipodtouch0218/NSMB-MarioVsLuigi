@@ -8,6 +8,8 @@
 #define _0_09 0.09
 #define _0_66 0.66666
 #define _0_075 0.075
+#define _8_25 8.25
+#define _3_75 3.75
 
 input {
 	button Up;

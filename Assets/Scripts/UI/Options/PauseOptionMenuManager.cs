@@ -147,9 +147,11 @@ namespace NSMB.UI.Options {
                 }
             }
 
+            /*
             if (EventSystem.current) {
                 EventSystem.current.SetSelectedGameObject(gameObject);
             }
+            */
         }
 
         public void ChangeTab(int diff) {

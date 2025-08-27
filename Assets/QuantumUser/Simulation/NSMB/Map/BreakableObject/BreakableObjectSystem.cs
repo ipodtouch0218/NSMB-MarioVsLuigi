@@ -1,7 +1,6 @@
 using Photon.Deterministic;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class BreakableObjectSystem : SystemSignalsOnly, ISignalOnStageReset {
 
         public override void OnInit(Frame f) {

@@ -67,7 +67,19 @@ namespace NSMB.Utilities {
 
         public static string SecondsToMinuteSeconds(int number) {
             StringBuilder builder = new StringBuilder();
-            builder.Append(number / 60).Append(':').AppendFormat((number % 60).ToString("00"));
+            int seconds = number % 60;
+            int minutes = number / 60;
+            int hours = minutes / 60;
+
+            if (hours > 0) {
+                builder.Append(hours).Append(':')
+                    .Append((minutes).ToString("00")).Append(':')
+                    .Append((seconds).ToString("00"));
+            } else {
+                builder.Append(minutes).Append(':')
+                    .Append(seconds.ToString("00"));
+            }
+
             return builder.ToString();
         }
 

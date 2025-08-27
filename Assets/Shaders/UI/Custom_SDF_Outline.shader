@@ -124,8 +124,8 @@ SubShader {
 
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
-		#include "../Extensions/TextMesh Pro/Shaders/TMPro_Properties.cginc"
-		#include "../Extensions/TextMesh Pro/Shaders/TMPro.cginc"
+		#include "Assets/Extensions/TextMesh Pro/Shaders/TMPro_Properties.cginc"
+		#include "Assets/Extensions/TextMesh Pro/Shaders/TMPro.cginc"
 
 		struct vertex_t
 		{

@@ -68,7 +68,20 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 #endif
 
+        protected override void OnEnable() {
+            base.OnEnable();
+#if UNITY_EDITOR
+            // #if fixes an error in the editor.
+            if (GlobalController.Instance && GlobalController.Instance.translationManager) {
+                OnLanguageChanged(GlobalController.Instance.translationManager);
+            }
+#else
+            OnLanguageChanged(GlobalController.Instance.translationManager);
+#endif
+        }
+
         public void Initialize() {
+#if TODO && !UNITY_WEBGL
             watcher = new FileSystemWatcher(ReplayDirectory) {
                 NotifyFilter = NotifyFilters.CreationTime
                                      | NotifyFilters.DirectoryName
@@ -82,6 +95,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             watcher.Created += OnFileCreated;
             watcher.Deleted += OnFileDeleted;
             watcher.EnableRaisingEvents = true;
+#endif
 
             FindReplays();
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
@@ -109,7 +123,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         public void OnDestroyCustom() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+#if TODO && !UNITY_WEBGL
             watcher.Dispose();
+#endif
         }
 
         public void Show() {
@@ -121,6 +137,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             Canvas.ForceUpdateCanvases();
 
+#if !TODO || UNITY_WEBGL
+            FindReplays();
+#endif
             SortReplays();
             OnScrollRectScrolled(default);
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -411,13 +430,13 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         private IEnumerator ImportFile(string filepath, bool makeCopy) {
 #if UNITY_WEBGL
-            using UnityWebRequest downloadRequest = new(filepath, "GET");
-            downloadRequest.downloadHandler = new DownloadHandlerBuffer();
+            using UnityEngine.Networking.UnityWebRequest downloadRequest = new(filepath, "GET");
+            downloadRequest.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
             yield return downloadRequest.SendWebRequest();
             while (!downloadRequest.downloadHandler.isDone) {
                 yield return null;
             }
-            byte[] replay = ((DownloadHandlerBuffer) downloadRequest.downloadHandler).data;
+            byte[] replay = ((UnityEngine.Networking.DownloadHandlerBuffer) downloadRequest.downloadHandler).data;
             using MemoryStream memStream = new MemoryStream(replay);
 
             ReplayParseResult parseResult = BinaryReplayFile.TryLoadNewFromStream(memStream, true, out BinaryReplayFile parsedReplay);

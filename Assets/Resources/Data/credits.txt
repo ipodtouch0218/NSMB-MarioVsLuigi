@@ -3,7 +3,6 @@ ipodtouch0218
 
 <color=yellow>{ui.about.credits.github}</color>
 amykaname
-Amy54Desu
 AprilShade
 ArianLust
 Atwer
@@ -11,6 +10,7 @@ Ave
 BluCorDev
 Cubby Crazes
 davart154
+dotjp
 DonKaiStorm
 GithubSPerez
 GradedWarrior
@@ -21,13 +21,17 @@ kittenchilly
 Kraken
 MiiBumm
 mindnomad
+Mixin
+Mizzierella
+notossdekasaihassei
 Pordrack
 skarph
 Skillz
 TheMoogle
 Tombuntu
-xFrostyCake123
 VLC
+xFrostyCake123
+Windows10V
 Zest
 _ZombleBobble
 
@@ -90,12 +94,15 @@ vlco_o <color=#AAAAAA>(es-es, ro-ro)</color>
 AprilShade
 ArianLust
 Ave
+Cleeaf
 CreativeGhost
 Cubby Crazes
 Fawndue
 Grape
+Laxan3000
 MiiBumm
 mindnomad
+notossdekasaihassei
 TheCyVap
 Vinnnnnnny
 

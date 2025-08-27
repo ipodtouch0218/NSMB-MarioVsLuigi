@@ -2,7 +2,6 @@ using Photon.Deterministic;
 using Quantum.Task;
 
 namespace Quantum {
-    [UnityEngine.Scripting.Preserve]
     public unsafe class MvLCullingSystem : SystemBase {
 
         private TaskDelegateHandle updateTaskHandle;
